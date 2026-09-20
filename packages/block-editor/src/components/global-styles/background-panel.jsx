@@ -1,11 +1,16 @@
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Icon, caution as cautionIcon } from '@wordpress/icons';
+import BackgroundClipControl, {
+	ALL_BACKGROUND_CLIP_VALUES,
+} from '../background-clip-control';
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -21,6 +26,7 @@ const DEFAULT_CONTROLS = {
 	backgroundImage: true,
 	backgroundColor: true,
 	gradient: true,
+	backgroundClip: false,
 };
 
 /**
@@ -48,8 +54,9 @@ export function useHasBackgroundControl( settings, feature ) {
  */
 export function useHasBackgroundPanel( settings ) {
 	const hasBackgroundColor = useHasBackgroundColorPanel( settings );
-	const { backgroundImage, gradient } = settings?.background || {};
-	return backgroundImage || gradient || hasBackgroundColor;
+	const { backgroundImage, gradient, backgroundClip } =
+		settings?.background || {};
+	return backgroundImage || gradient || backgroundClip || hasBackgroundColor;
 }
 
 /**
@@ -157,6 +164,12 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	// The block's own style for the Default state, passed only while another
+	// state is selected. That state layers over it, so a clip set there still
+	// governs what this one can paint.
+	baseValue,
+	// The selected style state, so a viewport can be told from a pseudo state.
+	styleState,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -202,17 +215,83 @@ export default function BackgroundImagePanel( {
 		'backgroundImage'
 	);
 
+	// The clip control is only exposed when a theme opts in, either with
+	// `true` for every value or an array naming the ones it wants.
+	const clipSetting = settings?.background?.backgroundClip;
+	let allowedClipValues = [];
+	if ( true === clipSetting ) {
+		allowedClipValues = ALL_BACKGROUND_CLIP_VALUES;
+	} else if ( Array.isArray( clipSetting ) ) {
+		// A value the control has no option for would leave a labelled but
+		// empty row, so only the ones it knows count.
+		allowedClipValues = clipSetting.filter( ( clipValue ) =>
+			ALL_BACKGROUND_CLIP_VALUES.includes( clipValue )
+		);
+	}
+	// The Typography panel's gradient control already expresses the text
+	// value, so this control needs a box to choose between to be worth
+	// showing at all.
+	const hasBoxClipValue = allowedClipValues.some(
+		( clipValue ) => clipValue !== 'text'
+	);
+	/*
+	 * Clipping is treated as a property of the block rather than of a width.
+	 * The Default state's clip carries into every breakpoint, and splitting it
+	 * by width produced controls that could not do what they offered, so a
+	 * viewport state does not get to change it. A pseudo state does: its
+	 * styles are scoped to the selector, so a clip set there applies on hover
+	 * alone rather than fighting the Default state everywhere else.
+	 */
+	const isViewportState = hasViewportBlockStyleState( styleState );
+	const showBackgroundClipControl = hasBoxClipValue && ! isViewportState;
+
+	const localClip = value?.background?.backgroundClip;
+	const baseClip = baseValue?.background?.backgroundClip;
+	const inheritedClip = inheritedValue?.background?.backgroundClip;
+	// A gradient clipped to text is a text gradient, which the Typography
+	// panel owns. This panel only treats it as its own when the clip control
+	// has been opted into.
+	const isTextGradient = localClip === 'text';
+	// `background-clip` clips every background layer at once, including the
+	// color, so a block paints its own background or a text gradient, never
+	// both. While it clips to the text the Typography panel owns that value
+	// and holds it in an editable control, so this panel shows neither.
+	// The block's own clip outranks an inherited one, whichever state it was
+	// set in, so the Default state's value sits between the two.
+	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
+	// The Typography panel holds the gradient, but only in the Default state,
+	// so say so when this one cannot reach it.
+	const clipIsFromBase =
+		clipsToText && localClip === undefined && !! baseClip;
+	const backgroundImageDisabledHint = clipIsFromBase
+		? __(
+				"A background image can't be set while the block has a text gradient, which is set in the Default state."
+			)
+		: __(
+				"A background image can't be set while the block has a text gradient."
+			);
+
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
 			const clearsColorBackground = showBackgroundColorControl;
 			const clearsColorGradient =
 				hasBackgroundGradientControl || showLegacyColorGradientControl;
+			// Without the clip control, a text gradient belongs to the
+			// Typography panel and must survive a reset here.
+			const prevClip = previousValue?.background?.backgroundClip;
+			const background =
+				! showBackgroundClipControl && 'text' === prevClip
+					? {
+							gradient: previousValue?.background?.gradient,
+							backgroundClip: prevClip,
+						}
+					: {};
 			if ( ! clearsColorBackground && ! clearsColorGradient ) {
-				return { ...previousValue, background: {} };
+				return { ...previousValue, background };
 			}
 			return {
 				...previousValue,
-				background: {},
+				background,
 				color: {
 					...previousValue?.color,
 					...( clearsColorBackground && { background: undefined } ),
@@ -224,6 +303,7 @@ export default function BackgroundImagePanel( {
 			hasBackgroundGradientControl,
 			showBackgroundColorControl,
 			showLegacyColorGradientControl,
+			showBackgroundClipControl,
 		]
 	);
 
@@ -231,7 +311,8 @@ export default function BackgroundImagePanel( {
 		! showBackgroundImageControl &&
 		! showBackgroundColorControl &&
 		! showBackgroundGradientControl &&
-		! showLegacyColorGradientControl
+		! showLegacyColorGradientControl &&
+		! showBackgroundClipControl
 	) {
 		return null;
 	}
@@ -252,8 +333,22 @@ export default function BackgroundImagePanel( {
 			undefined
 		);
 		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		// Clearing the gradient behind a text clip would leave the text
+		// invisible, so drop the clip with it.
+		if ( isTextGradient ) {
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'backgroundClip' ],
+				undefined
+			);
+		}
 		onChange( newValue );
 	};
+
+	const resetBackgroundClip = () =>
+		onChange(
+			setImmutably( value, [ 'background', 'backgroundClip' ], undefined )
+		);
 
 	// Non-cascading root values are already dropped from `inheritedValue` by
 	// the builder, so inherited reads below are direct.
@@ -306,12 +401,18 @@ export default function BackgroundImagePanel( {
 	// Fall back to color.gradient for legacy blocks that haven't migrated
 	// to background.gradient yet (mirrors block inspector fallback in
 	// packages/block-editor/src/hooks/background.jsx).
-	const currentGradient = decodeValue(
-		value?.background?.gradient ?? value?.color?.gradient
-	);
-	const inheritedGradient = decodeValue(
-		inheritedValue?.background?.gradient ?? inheritedValue?.color?.gradient
-	);
+	// A text gradient is left out so it does not appear to be this panel's
+	// gradient.
+	const currentGradient = isTextGradient
+		? undefined
+		: decodeValue( value?.background?.gradient ?? value?.color?.gradient );
+	const inheritedGradient =
+		inheritedClip === 'text'
+			? undefined
+			: decodeValue(
+					inheritedValue?.background?.gradient ??
+						inheritedValue?.color?.gradient
+				);
 
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
@@ -340,6 +441,10 @@ export default function BackgroundImagePanel( {
 		},
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
+
+	const inheritedBackgroundClip = inheritedValue?.background?.backgroundClip;
+	const hasLocalBackgroundClip =
+		value?.background?.backgroundClip !== undefined;
 
 	return (
 		<Wrapper
@@ -370,10 +475,21 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
+						disabled={ clipsToText }
+						disabledHint={ backgroundImageDisabledHint }
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
 					/>
+					{ clipsToText && (
+						// Matches the colour rows: the dimmed toggle alone
+						// reads as too subtle. Hover falls through to the
+						// toggle, which owns the tooltip.
+						<Icon
+							icon={ cautionIcon }
+							className="block-editor-panel-color-gradient-settings__disabled-hint"
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
@@ -381,6 +497,16 @@ export default function BackgroundImagePanel( {
 					label={ __( 'Color' ) }
 					hasValue={ () => hasBackgroundColorValue( value ) }
 					resetValue={ resetBackgroundColor }
+					disabled={ clipsToText }
+					disabledHint={
+						clipIsFromBase
+							? __(
+									"A background color can't be set while the block has a text gradient, which is set in the Default state."
+								)
+							: __(
+									"A background color can't be set while the block has a text gradient."
+								)
+					}
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
@@ -426,8 +552,20 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
-					hasValue={ () => hasBackgroundGradientValue( value ) }
+					hasValue={ () =>
+						hasBackgroundGradientValue( value ) && ! isTextGradient
+					}
 					resetValue={ resetGradient }
+					disabled={ clipsToText }
+					disabledHint={
+						clipIsFromBase
+							? __(
+									"A background gradient can't be set while the block has a text gradient, which is set in the Default state."
+								)
+							: __(
+									"A background gradient can't be set while the block has a text gradient."
+								)
+					}
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
 					showInheritanceLabelIndicators={
@@ -512,6 +650,45 @@ export default function BackgroundImagePanel( {
 					} }
 					panelId={ panelId }
 				/>
+			) }
+			{ showBackgroundClipControl && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						inheritedBackgroundClip && ! hasLocalBackgroundClip,
+						hasLocalBackgroundClip &&
+							inheritedBackgroundClip !== undefined,
+						'block-editor-background-panel__clip-item'
+					) }
+					label={ __( 'Clip' ) }
+					// A text clip belongs to the Typography panel's gradient
+					// control, so it does not count as a value here. Without
+					// this the control would appear in this panel as a side
+					// effect of setting a text gradient elsewhere.
+					hasValue={ () =>
+						hasLocalBackgroundClip && ! isTextGradient
+					}
+					onDeselect={ resetBackgroundClip }
+					isShownByDefault={ defaultControls.backgroundClip }
+					panelId={ panelId }
+				>
+					<BackgroundClipControl
+						value={
+							value?.background?.backgroundClip ??
+							baseClip ??
+							inheritedBackgroundClip
+						}
+						onChange={ ( newClip ) =>
+							onChange(
+								setImmutably(
+									value,
+									[ 'background', 'backgroundClip' ],
+									newClip
+								)
+							)
+						}
+						allowedValues={ allowedClipValues }
+					/>
+				</InheritanceToolsPanelItem>
 			) }
 		</Wrapper>
 	);

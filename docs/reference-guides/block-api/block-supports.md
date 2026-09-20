@@ -178,20 +178,29 @@ _**Note:** Since WordPress 6.5._
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
     -   `backgroundSize`: type `boolean`, default value `false`
+    -   `backgroundClip`: type `boolean`, default value `false` _(since WordPress 7.2)_
 
 This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 `backgroundImage` adds UI controls which allow the user to select a background image.
 `backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
+`backgroundClip` sets which box the background is painted into, and can clip it to the block's text.
 
 ```js
 supports: {
 	background: {
 		backgroundImage: true // Enable background image control.
-		backgroundSize: true // Enable background image + size control.
+		backgroundSize: true, // Enable background image + size control.
+		backgroundClip: true // Enable background clip.
 	}
 }
 ```
+
+Declaring `backgroundClip` alongside `gradient` gives the block a text gradient. The Typography panel then offers a Gradient control that fills the text, storing the gradient in `style.background.gradient` and `text` in `style.background.backgroundClip`. A block with a text gradient is not given the `has-background` class, because the gradient paints the text rather than the block's background.
+
+Which clip values may be used is a theme's decision, through `settings.background.backgroundClip`. It takes `true` for every value, `false` for none, or an array naming the ones to allow, for example `[ "border-box", "text" ]`. A block declaring the support only stands in where a theme has not set it, so a theme can turn a text gradient off on a block that opts in.
+
+The clip control itself is shown only when a value other than `text` is allowed, since the Typography panel's Gradient control already expresses the text value. A theme allowing `[ "text" ]` therefore gets a text gradient and no clip control.
 
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
@@ -208,6 +217,7 @@ When a background images is selected and its position or size are changed, the b
             - `title`: type `string`, title of the media attachment
         - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        - `backgroundClip`: an attribute of `string` type, defining the CSS [`background-clip`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip) value. One of `border-box`, `padding-box`, `content-box` or `text`.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
 

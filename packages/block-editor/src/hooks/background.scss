@@ -6,5 +6,12 @@
 		.background-block-support-panel__inner-wrapper {
 			row-gap: 0;
 		}
+
+		/* The clip control is a separate control rather than part of the
+		   colour item group above it, so it needs back the row gap the
+		   wrapper removes. Not when it is the only visible item. */
+		.block-editor-background-panel__clip-item:not(.first) {
+			margin-top: $grid-unit-20;
+		}
 	}
 }

@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import { getBlockSupport } from '@wordpress/blocks';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -22,6 +23,7 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -200,6 +202,7 @@ export function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			className="block-editor-typography-panel--flush-color-items"
 			__experimentalFirstVisibleItemClass="first"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
@@ -222,6 +225,7 @@ const DEFAULT_CONTROLS = {
 	writingMode: true,
 	textColumns: true,
 	textShadow: true,
+	textGradient: false,
 };
 
 const EMPTY_VALUES = [ undefined, null, '' ];
@@ -252,15 +256,30 @@ export default function TypographyPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	// The block's own style for the Default state, passed only while another
+	// state is selected. That state layers over it, so a text gradient set
+	// there still paints here.
+	baseValue,
+	// The selected style state, so a viewport can be told from a pseudo state.
+	styleState,
 	settings,
+	blockName,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
 } ) {
-	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
-		useColorGradientSettings( settings );
+	const {
+		colors,
+		gradients,
+		allColors,
+		areCustomSolidsEnabled,
+		areCustomGradientsEnabled,
+		hasGradientColors,
+		decodeValue,
+		encodeGradientValue,
+	} = useColorGradientSettings( settings );
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
@@ -294,6 +313,101 @@ export default function TypographyPanel( {
 		onChange( changedObject );
 	};
 	const resetTextColor = () => setTextColor( undefined );
+
+	/*
+	 * Text gradient. Stored as `background.gradient` clipped to the text with
+	 * `background.backgroundClip`, because CSS has no gradient text colour.
+	 *
+	 * The setting decides, as it does for every other support.
+	 * `useSettingsForBlockElement` has already folded block support into it, so
+	 * `false` means either the theme or the block said no. It is only undefined
+	 * when the block supports clipping and the theme has not spoken, and there
+	 * `backgroundClip` has no default to fall back on, so block support stands
+	 * in. A theme naming box values without `text` has spoken, and gets no text
+	 * gradient control.
+	 */
+	const clipSetting = settings?.background?.backgroundClip;
+	const blockSupportsBackgroundClip = blockName
+		? !! getBlockSupport( blockName, [ 'background', 'backgroundClip' ] )
+		: false;
+	const settingAllowsTextClip =
+		undefined === clipSetting
+			? blockSupportsBackgroundClip
+			: true === clipSetting ||
+				( Array.isArray( clipSetting ) &&
+					clipSetting.includes( 'text' ) );
+	/*
+	 * A text gradient is a clip, and clipping is treated as a property of the
+	 * block rather than of a width: the Default state's clip carries into
+	 * every breakpoint, so only that state sets or clears it. A pseudo state
+	 * does get its own, since its styles are scoped to the selector and apply
+	 * on hover alone.
+	 */
+	const isViewportState = hasViewportBlockStyleState( styleState );
+	const hasTextGradientEnabled =
+		settingAllowsTextClip &&
+		!! settings?.background?.gradient &&
+		hasGradientColors &&
+		! isViewportState;
+
+	const isTextGradient = value?.background?.backgroundClip === 'text';
+	const baseClip = baseValue?.background?.backgroundClip;
+	// The Default state's clip still applies unless the selected state sets
+	// its own, so a text gradient set there paints the text here too.
+	const clipsToTextHere =
+		( value?.background?.backgroundClip ?? baseClip ) === 'text';
+	// Only the Default state holds the gradient, so this one cannot change it.
+	const textGradientIsFromBase = clipsToTextHere && ! isTextGradient;
+	const textColorDisabledHint = textGradientIsFromBase
+		? __(
+				'The text gradient set in the Default state replaces the text color.'
+			)
+		: __( 'The text gradient replaces the text color.' );
+	const inheritedIsTextGradient =
+		inheritedValue?.background?.backgroundClip === 'text';
+	// `background-clip` clips every background layer at once, including the
+	// color, so applying a text gradient would wipe out a background set on
+	// this block. Only its own values are considered: clipping away one the
+	// block merely inherits is a normal override, not a loss.
+	const backgroundGradient = value?.background?.gradient;
+	const backgroundColor = value?.color?.background;
+	const clipsToText =
+		( value?.background?.backgroundClip ??
+			baseClip ??
+			inheritedValue?.background?.backgroundClip ) === 'text';
+	const hasBlockBackground =
+		! clipsToText && !! ( backgroundGradient || backgroundColor );
+	const textGradient = inheritedIsTextGradient
+		? decodeValue( inheritedValue?.background?.gradient )
+		: undefined;
+	const userTextGradient = isTextGradient
+		? decodeValue( value?.background?.gradient )
+		: undefined;
+	const hasTextGradientValue = () => userTextGradient !== undefined;
+	const setTextGradient = ( newGradient, newSlug ) => {
+		let changedObject = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			newGradient
+				? encodeGradientValue( newGradient, newSlug )
+				: undefined
+		);
+		changedObject = setImmutably(
+			changedObject,
+			[ 'background', 'backgroundClip' ],
+			newGradient ? 'text' : undefined
+		);
+		// Mirrors `setGradient` in the Background panel. The legacy
+		// `color.gradient` location writes the `background` shorthand, which
+		// would collide with the `background-image` longhand written here.
+		changedObject = setImmutably(
+			changedObject,
+			[ 'color', 'gradient' ],
+			undefined
+		);
+		onChange( changedObject );
+	};
+	const resetTextGradient = () => setTextGradient( undefined );
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
@@ -801,22 +915,37 @@ export default function TypographyPanel( {
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
+			// This panel owns the text gradient, so a reset here clears both
+			// halves of it and leaves the rest of `background` alone.
+			const clearsTextGradient =
+				hasTextGradientEnabled &&
+				previousValue?.background?.backgroundClip === 'text';
+			const background = clearsTextGradient
+				? {
+						...previousValue?.background,
+						gradient: undefined,
+						backgroundClip: undefined,
+					}
+				: previousValue?.background;
+
 			if ( ! hasTextColorEnabled ) {
 				return {
 					...previousValue,
 					typography: {},
+					background,
 				};
 			}
 			return {
 				...previousValue,
 				typography: {},
+				background,
 				color: {
 					...previousValue?.color,
 					text: undefined,
 				},
 			};
 		},
-		[ hasTextColorEnabled ]
+		[ hasTextColorEnabled, hasTextGradientEnabled ]
 	);
 
 	return (
@@ -831,6 +960,10 @@ export default function TypographyPanel( {
 					label={ __( 'Color' ) }
 					hasValue={ hasTextColorValue }
 					resetValue={ resetTextColor }
+					// A text gradient paints the text itself, so a text
+					// colour set here would never show.
+					disabled={ clipsToTextHere }
+					disabledHint={ textColorDisabledHint }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
 					contrastWarning={ contrastWarning }
@@ -864,6 +997,63 @@ export default function TypographyPanel( {
 					colorGradientControlSettings={ {
 						colors,
 						disableCustomColors: ! areCustomSolidsEnabled,
+					} }
+					panelId={ panelId }
+				/>
+			) }
+			{ hasTextGradientEnabled && (
+				<ColorGradientDropdownItem
+					label={ __( 'Gradient' ) }
+					hasValue={ hasTextGradientValue }
+					resetValue={ resetTextGradient }
+					disabled={ hasBlockBackground }
+					disabledHint={
+						backgroundGradient
+							? __(
+									"A text gradient can't be set while the block has a background gradient."
+								)
+							: __(
+									"A text gradient can't be set while the block has a background color."
+								)
+					}
+					isShownByDefault={ defaultControls.textGradient }
+					indicators={ [ userTextGradient ?? textGradient ] }
+					showInheritanceLabelIndicators={
+						showInheritanceLabelIndicators
+					}
+					isPlaceholder={
+						userTextGradient === undefined &&
+						textGradient !== undefined
+					}
+					hasInheritedValue={ textGradient !== undefined }
+					tabs={ [
+						{
+							key: 'text-gradient',
+							label: __( 'Gradient' ),
+							inheritedValue: textGradient,
+							inheritedSlug: extractPresetSlug(
+								inheritedIsTextGradient
+									? inheritedValue?.background?.gradient
+									: undefined,
+								'gradient'
+							),
+							userSlug: extractPresetSlug(
+								isTextGradient
+									? value?.background?.gradient
+									: undefined,
+								'gradient'
+							),
+							setValue: setTextGradient,
+							userValue: userTextGradient,
+							isGradient: true,
+							isPlaceholder:
+								userTextGradient === undefined &&
+								textGradient !== undefined,
+						},
+					] }
+					colorGradientControlSettings={ {
+						gradients,
+						disableCustomGradients: ! areCustomGradientsEnabled,
 					} }
 					panelId={ panelId }
 				/>
