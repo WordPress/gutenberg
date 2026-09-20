@@ -63,7 +63,7 @@ const EditWithGeneratedProps = ( props ) => {
 				attributes?.metadata?.bindings
 					? Object.values( attributes.metadata.bindings ).map(
 							( binding ) => registeredSources[ binding?.source ]
-					  )
+						)
 					: undefined
 			),
 			hasPatternOverrides: hasPatternOverridesDefaultBinding(

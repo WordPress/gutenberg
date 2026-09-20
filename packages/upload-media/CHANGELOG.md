@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
 -   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
 
 ### Internal

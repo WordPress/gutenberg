@@ -13,6 +13,9 @@ import { CRDT_RECORD_MAP_KEY, getSyncManager } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
+
+vi.mock( '@wordpress/api-fetch' );
+
 /**
  * Mock sync manager accessor.
  */

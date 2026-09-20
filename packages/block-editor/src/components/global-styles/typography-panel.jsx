@@ -35,7 +35,7 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -178,7 +178,7 @@ function getMergedFontSizes( settings ) {
 	return [
 		...( fontSizes?.custom ?? [] ),
 		...( fontSizes?.theme ?? [] ),
-		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+		...( defaultFontSizesEnabled ? ( fontSizes?.default ?? [] ) : [] ),
 	];
 }
 
@@ -256,7 +256,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
@@ -284,13 +284,7 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// With the experiment off, keep the pre-inheritance comparison on
-		// `inheritedValue`.
-		const syncLinkColor = isGlobalStylesInheritanceEnabled()
-			? shouldSyncLinkColor( value, inheritedValue )
-			: inheritedValue?.color?.text ===
-			  inheritedValue?.elements?.link?.color?.text;
-		if ( syncLinkColor ) {
+		if ( shouldSyncLinkColor( value, inheritedValue ) ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
@@ -970,7 +964,7 @@ export default function TypographyPanel( {
 										getNumericPlaceholder(
 											inheritedLineHeight
 										),
-							  }
+								}
 							: {} ) }
 					/>
 				</InheritanceToolsPanelItem>
@@ -1004,7 +998,7 @@ export default function TypographyPanel( {
 							isLetterSpacingPlaceholder
 								? getNumericPlaceholder(
 										inheritedLetterSpacing
-								  )
+									)
 								: undefined
 						}
 					/>

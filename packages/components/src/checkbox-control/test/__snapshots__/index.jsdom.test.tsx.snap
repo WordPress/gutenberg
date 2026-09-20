@@ -20,13 +20,13 @@ Snapshot Diff:
 +             aria-hidden="true"
 +             class="components-checkbox-control__indeterminate"
 +             focusable="false"
-+             height="24"
++             height="16"
 +             role="presentation"
 +             stroke="currentColor"
 +             stroke-width="1.5"
 +             style="fill: none;"
-+             viewBox="0 0 24 24"
-+             width="24"
++             viewBox="4 4 16 16"
++             width="16"
 +             xmlns="http://www.w3.org/2000/svg"
 +           >
 +             <path
