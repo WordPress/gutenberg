@@ -6721,6 +6721,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_update_column_width_declarations() {
 		return array(
+			'fill preset width'              => array(
+				array(
+					'styles' => array(
+						'blocks' => array(
+							'core/column' => array(
+								'dimensions' => array(
+									'width' => 'var:preset|dimension|fill',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-column){flex-basis: 0;flex-grow: 1;}',
+			),
 			'percentage width'               => array(
 				array(
 					'styles' => array(

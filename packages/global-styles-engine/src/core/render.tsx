@@ -8,6 +8,7 @@ import {
 import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
+import { getColumnFlexDeclarations } from '../utils/column-width';
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
@@ -736,19 +737,19 @@ export function getStylesDeclarations(
 }
 
 /**
- * Converts `width` declarations to `flex-basis` for column blocks.
+ * Converts `width` declarations to the flex sizing a column block needs.
  *
  * The column block sizes itself with `flex-basis` rather than `width` because
  * it lives in a flex container. This post-processes the computed declarations
- * so the correct CSS property is output.
- *
- * Keep in sync with `WP_Theme_JSON_Gutenberg::update_column_width_declarations`.
+ * so the correct properties are output.
  *
  * @param declarations CSS declarations.
  * @return The updated declarations.
  */
-function updateColumnWidthDeclarations( declarations: string[] ): string[] {
-	let hasWidth = false;
+export function updateColumnWidthDeclarations(
+	declarations: string[]
+): string[] {
+	let flexGrow: string | undefined;
 
 	const updated = declarations.map( ( declaration ) => {
 		const separatorIndex = declaration.indexOf( ':' );
@@ -759,17 +760,15 @@ function updateColumnWidthDeclarations( declarations: string[] ): string[] {
 			return declaration;
 		}
 
-		hasWidth = true;
-		return `flex-basis:${ declaration.slice( separatorIndex + 1 ) }`;
+		const width = declaration.slice( separatorIndex + 1 ).trim();
+		const flex = getColumnFlexDeclarations( width );
+		flexGrow = flex.flexGrow;
+
+		return `flex-basis: ${ flex.flexBasis }`;
 	} );
 
-	/*
-	 * Columns without a width divide the remaining space between them via
-	 * `flex-grow`. A column given a width should keep it instead, matching
-	 * the behaviour of a width set on the block itself.
-	 */
-	if ( hasWidth ) {
-		updated.push( 'flex-grow: 0' );
+	if ( flexGrow !== undefined ) {
+		updated.push( `flex-grow: ${ flexGrow }` );
 	}
 
 	return updated;

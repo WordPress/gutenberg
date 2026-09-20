@@ -3535,44 +3535,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Converts `width` declarations to `flex-basis` for column blocks.
-	 *
-	 * The column block sizes itself with `flex-basis` rather than `width`
-	 * because it lives in a flex container. This post-processes the computed
-	 * style declarations so the correct CSS property is output.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array $declarations An array of CSS declarations.
-	 * @return array The updated declarations.
-	 */
-	private static function update_column_width_declarations( $declarations ) {
-		$has_width = false;
-
-		foreach ( $declarations as &$declaration ) {
-			if ( 'width' === $declaration['name'] ) {
-				$declaration['name'] = 'flex-basis';
-				$has_width           = true;
-			}
-		}
-		unset( $declaration );
-
-		/*
-		 * Columns without a width divide the remaining space between them via
-		 * `flex-grow`. A column given a width should keep it instead, matching
-		 * the behaviour of a width set on the block itself.
-		 */
-		if ( $has_width ) {
-			$declarations[] = array(
-				'name'  => 'flex-grow',
-				'value' => '0',
-			);
-		}
-
-		return $declarations;
-	}
-
-	/**
 	 * Updates the text indent selector for paragraph blocks based on the textIndent setting.
 	 *
 	 * The textIndent setting can be 'subsequent' (default), 'all', or false.
@@ -3975,7 +3937,7 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
 				if ( 'core/column' === ( $block_metadata['name'] ?? null ) ) {
-					$style_variation_declarations[ $style_variation['selector'] ] = static::update_column_width_declarations( $style_variation_declarations[ $style_variation['selector'] ] );
+					$style_variation_declarations[ $style_variation['selector'] ] = gutenberg_update_column_width_declarations( $style_variation_declarations[ $style_variation['selector'] ] );
 				}
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
@@ -4037,7 +3999,7 @@ class WP_Theme_JSON_Gutenberg {
 					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
 
 					if ( 'core/column' === $block_name ) {
-						$breakpoint_declarations = static::update_column_width_declarations( $breakpoint_declarations );
+						$breakpoint_declarations = gutenberg_update_column_width_declarations( $breakpoint_declarations );
 					}
 
 					if ( ! empty( $breakpoint_declarations ) ) {
@@ -4214,7 +4176,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( 'core/column' === $block_name ) {
-			$declarations = static::update_column_width_declarations( $declarations );
+			$declarations = gutenberg_update_column_width_declarations( $declarations );
 		}
 
 		/*

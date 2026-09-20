@@ -2198,6 +2198,24 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should let a column set to the fill preset take the remaining space', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/column': {
+							dimensions: {
+								width: 'var:preset|dimension|fill',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( renderColumnStyles( tree ) ).toBe(
+				':root :where(.wp-block-column){flex-basis: 0;flex-grow: 1;}'
+			);
+		} );
+
 		it( 'should leave other column styles untouched', () => {
 			const tree = {
 				styles: {
