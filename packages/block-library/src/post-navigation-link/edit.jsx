@@ -10,6 +10,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -18,9 +19,10 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
-	attributes: { type, label, showTitle, linkLabel, arrow, taxonomy },
+	attributes,
 	setAttributes,
 } ) {
+	const { type, label, showTitle, linkLabel, arrow, taxonomy } = attributes;
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -41,7 +43,8 @@ export default function PostNavigationLinkEdit( {
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
-	const blockProps = useBlockProps();
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const blockProps = useBlockProps( { style: shadowProps.style } );
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );

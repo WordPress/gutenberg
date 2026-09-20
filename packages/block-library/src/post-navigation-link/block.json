@@ -55,9 +55,15 @@
 				"fontSize": true
 			}
 		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"shadow": ".wp-block-post-navigation-link:not(:empty)"
 	},
 	"style": "wp-block-post-navigation-link"
 }
