@@ -1,9 +1,17 @@
-import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import {
+	Flex,
+	FlexItem,
+	Modal,
+	CheckboxControl as WCCheckboxControl,
+	SearchControl,
+} from '@wordpress/components';
+import { Stack, Tabs, Text } from '@wordpress/ui';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,6 +24,16 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { getPopulatedCategories, searchItems } = unlock(
+	blockEditorPrivateApis
+);
+
+const ALL_PATTERNS_CATEGORY = {
+	name: 'allPatterns',
+	label: _x( 'All', 'patterns' ),
+};
 
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -61,6 +79,45 @@ export function useStartPatterns() {
 	}, [ postType, blockPatternsWithPostContentBlockType ] );
 }
 
+function useStartPatternCategories( startPatterns ) {
+	const { registeredCategories, userCategories } = useSelect( ( select ) => {
+		return {
+			// The block editor settings already merge the categories from the
+			// REST API with the ones added through `block_editor_settings_all`.
+			registeredCategories:
+				select( blockEditorStore ).getSettings()
+					.__experimentalBlockPatternCategories,
+			userCategories: select( coreStore ).getUserPatternCategories(),
+		};
+	}, [] );
+
+	return useMemo( () => {
+		const allCategories = [ ...( registeredCategories ?? [] ) ];
+		userCategories?.forEach( ( userCategory ) => {
+			if (
+				! allCategories.some(
+					( { name } ) => name === userCategory.name
+				)
+			) {
+				allCategories.push( userCategory );
+			}
+		} );
+
+		const categories = getPopulatedCategories(
+			startPatterns,
+			allCategories
+		);
+
+		// Filtering is not useful when no start pattern belongs to a
+		// registered category.
+		if ( categories.every( ( { name } ) => name === 'uncategorized' ) ) {
+			return [];
+		}
+
+		return [ ALL_PATTERNS_CATEGORY, ...categories ];
+	}, [ startPatterns, registeredCategories, userCategories ] );
+}
+
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postType, postId } = useSelect( ( select ) => {
@@ -88,9 +145,44 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 
 function StartPageOptionsModal( { onClose } ) {
 	const [ showStartPatterns, setShowStartPatterns ] = useState( true );
+	const [ selectedCategory, setSelectedCategory ] = useState(
+		ALL_PATTERNS_CATEGORY.name
+	);
+	const [ searchValue, setSearchValue ] = useState( '' );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const startPatterns = useStartPatterns();
+	const patternCategories = useStartPatternCategories( startPatterns );
+	const hasCategories = patternCategories.length > 0;
 	const hasStartPattern = startPatterns.length > 0;
+
+	// The selected category can stop existing while the modal stays mounted,
+	// for instance when the edited post changes. A controlled `Tabs` value
+	// that matches no tab renders no panel at all, so fall back to all
+	// patterns.
+	const activeCategory = patternCategories.some(
+		( { name } ) => name === selectedCategory
+	)
+		? selectedCategory
+		: ALL_PATTERNS_CATEGORY.name;
+
+	const filteredStartPatterns = useMemo( () => {
+		let patterns = startPatterns;
+		if ( activeCategory !== ALL_PATTERNS_CATEGORY.name ) {
+			patterns = patterns.filter( ( pattern ) =>
+				activeCategory === 'uncategorized'
+					? ! pattern.categories?.some( ( patternCategory ) =>
+							patternCategories.some(
+								( { name } ) => name === patternCategory
+							)
+						)
+					: pattern.categories?.includes( activeCategory )
+			);
+		}
+		if ( searchValue ) {
+			patterns = searchItems( patterns, searchValue );
+		}
+		return patterns;
+	}, [ startPatterns, activeCategory, patternCategories, searchValue ] );
 
 	if ( ! hasStartPattern ) {
 		return null;
@@ -108,19 +200,69 @@ function StartPageOptionsModal( { onClose } ) {
 			isFullScreen
 			onRequestClose={ handleClose }
 		>
-			<div className="editor-start-page-options__modal-content">
-				<PatternSelection
-					blockPatterns={ startPatterns }
-					onChoosePattern={ handleClose }
-				/>
-			</div>
+			{ hasCategories ? (
+				<Tabs.Root
+					orientation="vertical"
+					value={ activeCategory }
+					onValueChange={ setSelectedCategory }
+				>
+					<Stack
+						direction="column"
+						gap="lg"
+						className="editor-start-page-options__sidebar"
+					>
+						<SearchControl
+							onChange={ setSearchValue }
+							value={ searchValue }
+							label={ __( 'Search' ) }
+							placeholder={ __( 'Search' ) }
+						/>
+						<Tabs.List>
+							{ patternCategories.map( ( { name, label } ) => (
+								<Tabs.Tab key={ name } value={ name }>
+									{ label }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.List>
+					</Stack>
+					{ patternCategories.map( ( { name } ) => (
+						<Tabs.Panel
+							key={ name }
+							value={ name }
+							tabIndex={ -1 }
+							className="editor-start-page-options__modal-content has-pattern-categories"
+						>
+							{ filteredStartPatterns.length > 0 ? (
+								<PatternSelection
+									blockPatterns={ filteredStartPatterns }
+									onChoosePattern={ handleClose }
+								/>
+							) : (
+								<Text
+									render={ <p /> }
+									className="editor-start-page-options__no-results"
+								>
+									{ __( 'No results found.' ) }
+								</Text>
+							) }
+						</Tabs.Panel>
+					) ) }
+				</Tabs.Root>
+			) : (
+				<div className="editor-start-page-options__modal-content">
+					<PatternSelection
+						blockPatterns={ filteredStartPatterns }
+						onChoosePattern={ handleClose }
+					/>
+				</div>
+			) }
 			<Flex
 				className="editor-start-page-options__modal__actions"
 				justify="flex-start"
 				expanded={ false }
 			>
 				<FlexItem>
-					<CheckboxControl
+					<WCCheckboxControl
 						checked={ showStartPatterns }
 						label={ __(
 							'Always show starter patterns for new pages'
