@@ -1022,7 +1022,11 @@ test.describe( 'Image - lightbox', () => {
 			await expect( lightboxImage ).toBeVisible();
 			await lightboxImage.click();
 
-			const container = page.locator( '.lightbox-image-container' );
+			// The overlay renders two containers, a placeholder and the
+			// enlarged image, both sized from the same custom properties.
+			const container = page
+				.locator( '.lightbox-image-container' )
+				.first();
 			await expect( container ).toBeVisible();
 
 			await page.setViewportSize( {
