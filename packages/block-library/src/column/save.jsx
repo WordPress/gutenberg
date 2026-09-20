@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
-import { getColumnFlexBasis } from './utils';
+import { getColumnStyle } from './utils';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment, style } = attributes;
@@ -9,11 +9,11 @@ export default function save( { attributes } ) {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const flexBasis = getColumnFlexBasis( style?.dimensions?.width );
+	const columnStyle = getColumnStyle( style?.dimensions?.width );
 
 	const blockProps = useBlockProps.save( {
 		className: wrapperClasses,
-		style: flexBasis ? { flexBasis } : undefined,
+		style: columnStyle,
 	} );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 

@@ -10,7 +10,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { sprintf, __ } from '@wordpress/i18n';
-import { getColumnFlexBasis } from './utils';
+import { getColumnStyle } from './utils';
 
 /**
  * Renders the `core/column` block in the editor.
@@ -61,13 +61,13 @@ function ColumnEdit( {
 		} );
 	};
 
-	const flexBasis = getColumnFlexBasis( style?.dimensions?.width );
+	const columnStyle = getColumnStyle( style?.dimensions?.width );
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
 		ref: setDropZoneElement,
 		className: classes,
-		style: flexBasis ? { flexBasis } : undefined,
+		style: columnStyle,
 	} );
 
 	const columnsCount = columnsIds.length;

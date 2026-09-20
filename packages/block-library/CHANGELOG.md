@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Column: Move the column width to the `dimensions.width` block support, so it is set from the Dimensions panel and can be styled from theme.json and Global Styles. The top-level `width` attribute is removed and existing content migrates on parse, following the same approach as the Button block ([#76684](https://github.com/WordPress/gutenberg/pull/76684)).
+-   Column: Add width presets, including a `Fill` preset that lets a column take the remaining space in its row. Fill is how a column opts out of a width set for every column in theme.json or Global Styles ([#76684](https://github.com/WordPress/gutenberg/pull/76684)).
 
 ### Bug Fixes
 
