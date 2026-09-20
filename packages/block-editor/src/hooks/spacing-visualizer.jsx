@@ -62,7 +62,7 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 	return (
 		<BlockPopoverCover
 			clientId={ clientId }
-			__unstablePopoverSlot="block-toolbar"
+			__unstablePopoverSlot="__unstable-block-tools-after"
 		>
 			<div className="block-editor__spacing-visualizer" style={ style } />
 		</BlockPopoverCover>

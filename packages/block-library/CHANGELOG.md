@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Caption: Show caption format controls in the block toolbar instead of a separate floating toolbar, for Image, Gallery, Audio, Video, Playlist, Embed, Table and Quote ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).

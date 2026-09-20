@@ -163,8 +163,7 @@
 	padding: $grid-unit-20;
 }
 
-.block-editor-block-toolbar,
-.block-editor-rich-text__inline-format-toolbar-group {
+.block-editor-block-toolbar {
 	// Override Toolbar buttons size.
 	.components-toolbar-group,
 	.components-toolbar {
@@ -280,12 +279,6 @@
 	.components-toolbar,
 	.components-toolbar-group {
 		flex-shrink: 1;
-	}
-
-	.block-editor-rich-text__inline-format-toolbar-group {
-		.components-button + .components-button {
-			margin-left: 6px;
-		}
 	}
 }
 

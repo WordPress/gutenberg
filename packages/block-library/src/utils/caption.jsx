@@ -96,7 +96,6 @@ export function Caption( {
 						onChange={ ( value ) =>
 							setAttributes( { [ attributeKey ]: value } )
 						}
-						inlineToolbar
 						__unstableOnSplitAtEnd={
 							insertBlocksAfter
 								? () =>
