@@ -51,13 +51,17 @@
 		}
 	}
 
-	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
+	// Responsiveness: show at most one column on mobile. `!important` is needed
+	// because the column assigns its own width as an inline style. The selector
+	// is wrapped so that it carries a single class, letting an equally important
+	// width set for a viewport state override it on source order.
+	@at-root :root :where(#{&}:not(.is-not-stacked-on-mobile) > .wp-block-column) {
 		@media (max-width: #{ ($break-medium - 1) }) {
-			// Responsiveness: Show at most one columns on mobile. This must be
-			// important since the Column assigns its own width as an inline style.
 			flex-basis: 100% !important;
 		}
+	}
 
+	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
 		@include break-medium() {
 			// Columns with an explicitly-assigned width should maintain their
 			// `flex-basis` width and not grow.
