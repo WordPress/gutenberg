@@ -1,28 +1,43 @@
+import {
+	getDimensionPresetCssVar,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
+import { unlock } from '../lock-unlock';
+
+const { isColumnFillWidth } = unlock( globalStylesEnginePrivateApis );
+
 const PRESET_PREFIX = 'var:preset|dimension|';
+const FILL_STYLE = { flexBasis: '0', flexGrow: '1' };
 
 /**
- * Converts a column width into the `flex-basis` value that sizes the column
- * within its flex container.
+ * Converts a column width into the inline style that sizes the column within
+ * its flex container.
+ *
+ * Only a filling column needs `flex-grow` inline. Every other width is already
+ * stopped from growing by the `[style*="flex-basis"]` rule in the Columns
+ * block's stylesheet, and leaving it out keeps existing markup unchanged.
  *
  * @param {string|number|undefined} width Column width.
  *
- * @return {string|undefined} Flex basis value, or undefined when there is none.
+ * @return {Object|undefined} Style object, or undefined when there is no width.
  */
-export function getColumnFlexBasis( width ) {
+export function getColumnStyle( width ) {
 	// Numbers are handled for backward compatibility as they can still be
-	// provided by templates and patterns.
+	// provided by templates and patterns. Zero has always meant no width.
 	if ( Number.isFinite( width ) ) {
-		return width ? `${ width }%` : undefined;
+		return width ? { flexBasis: `${ width }%` } : undefined;
 	}
 
 	if ( typeof width !== 'string' || ! width ) {
 		return undefined;
 	}
 
+	if ( isColumnFillWidth( width ) ) {
+		return FILL_STYLE;
+	}
+
 	if ( width.startsWith( PRESET_PREFIX ) ) {
-		return `var(--wp--preset--dimension--${ width.slice(
-			PRESET_PREFIX.length
-		) })`;
+		return { flexBasis: getDimensionPresetCssVar( width ) };
 	}
 
 	if ( ! /\d/.test( width ) ) {
@@ -32,10 +47,13 @@ export function getColumnFlexBasis( width ) {
 	if ( width.endsWith( '%' ) ) {
 		// In some cases we need to round the width to a shorter float.
 		const multiplier = 1000000000000;
-		return `${
-			Math.round( Number.parseFloat( width ) * multiplier ) / multiplier
-		}%`;
+		return {
+			flexBasis: `${
+				Math.round( Number.parseFloat( width ) * multiplier ) /
+				multiplier
+			}%`,
+		};
 	}
 
-	return width;
+	return { flexBasis: width };
 }

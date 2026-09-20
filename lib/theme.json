@@ -360,7 +360,44 @@
 			},
 			"core/column": {
 				"dimensions": {
-					"width": true
+					"width": true,
+					"dimensionSizes": [
+						{
+							"name": "Fill",
+							"slug": "fill",
+							"size": "auto"
+						},
+						{
+							"name": "25%",
+							"slug": "25",
+							"size": "25%"
+						},
+						{
+							"name": "33%",
+							"slug": "33",
+							"size": "33.33%"
+						},
+						{
+							"name": "50%",
+							"slug": "50",
+							"size": "50%"
+						},
+						{
+							"name": "66%",
+							"slug": "66",
+							"size": "66.66%"
+						},
+						{
+							"name": "75%",
+							"slug": "75",
+							"size": "75%"
+						},
+						{
+							"name": "100%",
+							"slug": "100",
+							"size": "100%"
+						}
+					]
 				}
 			},
 			"core/image": {

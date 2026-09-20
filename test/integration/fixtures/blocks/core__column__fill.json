@@ -1,0 +1,24 @@
+[
+	{
+		"name": "core/column",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"dimensions": {
+					"width": "var:preset|dimension|fill"
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "This column takes the remaining space.",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
