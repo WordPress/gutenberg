@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image: Warn in the "Alternative text" field when the alt text looks like a file name, is only a generic word like "image", duplicates the caption, is unusually long, or is empty on a linked image ([#83130](https://github.com/WordPress/gutenberg/pull/83130)).
+
 ### Bug Fixes
 
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
