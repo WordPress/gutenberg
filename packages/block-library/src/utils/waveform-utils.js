@@ -516,6 +516,7 @@ export function logPlayError( error ) {
  * @param {Function} options.onEnded               - Callback when track ends.
  * @param {Object}   options.labels                - Translated button labels.
  * @param {string}   options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {number[]} [options.waveform]            - Pre-analysed peaks. When supplied the library draws these instead of fetching and decoding the audio.
  * @param {boolean}  options.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Object} Object with instance, container, and destroy function.
  */
@@ -536,6 +537,7 @@ export function initWaveformPlayer(
 		onEnded,
 		labels,
 		waveformStyle,
+		waveform,
 		showPlayButtonArtwork = false,
 	}
 ) {
@@ -576,7 +578,15 @@ export function initWaveformPlayer(
 	// Initialize the WaveformPlayer library. The library reads the translated
 	// seek label and value-text templates from the container's data attributes
 	// and owns the seek slider's accessible label and value text.
-	const instance = new WaveformPlayerLib( container );
+	//
+	// Supplying `waveform` skips analysis entirely: the library draws the peaks
+	// it is given instead of fetching and decoding the audio, which is the only
+	// way to get a real waveform for media on an origin that does not allow
+	// cross-origin reads.
+	const instance = new WaveformPlayerLib(
+		container,
+		waveform ? { waveform } : {}
+	);
 	if ( instance.artworkEl ) {
 		instance.artworkEl.alt = imageAlt || '';
 	}

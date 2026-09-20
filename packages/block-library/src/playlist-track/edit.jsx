@@ -28,6 +28,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { queueTrackPeaks } from '../utils/waveform-peaks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -39,7 +40,7 @@ const PlaylistTrackEdit = ( {
 	clientId,
 	isSelected,
 } ) => {
-	const { id, src, album, artist, image, imageAlt, length, title } =
+	const { id, src, album, artist, image, imageAlt, length, title, waveform } =
 		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
@@ -86,6 +87,47 @@ const PlaylistTrackEdit = ( {
 		setCurrentTrackClientId,
 	] );
 
+	/**
+	 * Peaks analysed from a blob URL, held until its upload finishes.
+	 *
+	 * Completing an upload rewrites the track's attributes wholesale, so
+	 * writing the peaks straight away would only see them cleared.
+	 */
+	const pendingPeaksRef = useRef( null );
+
+	// Prefer the blob: a file that is still uploading is local and always
+	// readable, whereas the uploaded copy may live on another origin that
+	// forbids cross-origin reads — in which case this is the only chance to
+	// analyse it.
+	const analysisSource = temporaryURL || src;
+
+	useEffect( () => {
+		if ( waveform || ! analysisSource ) {
+			return;
+		}
+
+		let cancelled = false;
+
+		queueTrackPeaks( analysisSource ).then( ( peaks ) => {
+			// A null result means the audio could not be read or decoded. The
+			// track still plays; the player falls back when it draws.
+			if ( cancelled || ! peaks ) {
+				return;
+			}
+
+			if ( isBlobURL( analysisSource ) ) {
+				pendingPeaksRef.current = { url: analysisSource, peaks };
+				return;
+			}
+
+			setAttributes( { waveform: peaks } );
+		} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [ analysisSource, waveform, setAttributes ] );
+
 	// Handles drag/drop uploads
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -112,7 +154,9 @@ const PlaylistTrackEdit = ( {
 				length: undefined,
 				title: undefined,
 				url: undefined,
+				waveform: undefined,
 			} );
+			pendingPeaksRef.current = null;
 			setTemporaryURL();
 			return;
 		}
@@ -122,9 +166,22 @@ const PlaylistTrackEdit = ( {
 			return;
 		}
 
+		// Carry over peaks analysed from the blob, but only when they belong to
+		// the upload that is completing. Selecting different media instead
+		// leaves them behind, so the new audio gets analysed on its own.
+		// `temporaryURL` is checked first so that the two undefined values of a
+		// direct media selection cannot compare equal to each other.
+		const analysedPeaks =
+			temporaryURL && pendingPeaksRef.current?.url === temporaryURL
+				? pendingPeaksRef.current.peaks
+				: undefined;
+
+		pendingPeaksRef.current = null;
+
 		setAttributes( {
 			blob: undefined,
 			...getTrackAttributes( media ),
+			...( analysedPeaks ? { waveform: analysedPeaks } : {} ),
 		} );
 		setTemporaryURL();
 	}
