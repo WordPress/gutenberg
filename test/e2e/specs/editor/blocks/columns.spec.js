@@ -256,6 +256,39 @@ test.describe( 'Columns', () => {
 		] );
 	} );
 
+	test( 'applies a column width set for a viewport state below the stacking breakpoint', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { title: 'Column viewport state width' } );
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					attributes: {
+						style: {
+							dimensions: { width: '25%' },
+							'@mobile': { dimensions: { width: '75%' } },
+						},
+					},
+				},
+				{ name: 'core/column' },
+			],
+		} );
+
+		const postId = await editor.publishPost();
+		await page.setViewportSize( { width: 400, height: 800 } );
+		await page.goto( `/?p=${ postId }` );
+
+		const column = page.locator( '.wp-block-column' ).first();
+
+		// Without the width to flex-basis conversion this is `auto`, and
+		// without the lowered stacking rule it is `100%`.
+		await expect( column ).toHaveCSS( 'flex-basis', '75%' );
+	} );
+
 	test.describe( 'should update the column widths correctly', () => {
 		const initialColumnWidths = [ '10%', '20%', '30%', '40%' ];
 
