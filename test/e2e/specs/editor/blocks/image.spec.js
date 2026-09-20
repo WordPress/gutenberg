@@ -996,6 +996,57 @@ test.describe( 'Image - lightbox', () => {
 			} );
 			expect( margin ).toBe( '0px' );
 		} );
+
+		test( 'Overlay image should still fill the viewport after rotating to landscape', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			// The 10x10 image the rest of this suite uses is smaller than any
+			// viewport, so it would never exercise the sizing calculation.
+			const largeMedia = await requestUtils.uploadMedia(
+				'./assets/3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+			);
+
+			await editor.setContent( `<!-- wp:image {"id":${ largeMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ largeMedia.source_url }" alt="" class="wp-image-${ largeMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+
+			const landscapeHeight = 390;
+			await page.setViewportSize( { width: 390, height: 844 } );
+			await page.goto( `/?p=${ postId }` );
+
+			const lightboxImage = page.locator( '.wp-lightbox-container img' );
+			await expect( lightboxImage ).toBeVisible();
+			await lightboxImage.click();
+
+			// The overlay renders two containers, a placeholder and the
+			// enlarged image, both sized from the same custom properties.
+			const container = page
+				.locator( '.lightbox-image-container' )
+				.first();
+			await expect( container ).toBeVisible();
+
+			await page.setViewportSize( {
+				width: 844,
+				height: landscapeHeight,
+			} );
+
+			// The lightbox reserves vertical room for the close and navigation
+			// buttons. That reservation was a flat 160px whenever the viewport was
+			// 960px wide or narrower, which a phone in landscape satisfies while
+			// having less than half the height the figure was chosen for, so the
+			// image came out smaller than it had been before the rotation. This
+			// measures 59% without the short-viewport reservation and 88% with it.
+			await expect
+				.poll( async () => {
+					const box = await container.boundingBox();
+					return ( box?.height ?? 0 ) / landscapeHeight;
+				} )
+				.toBeGreaterThan( 0.8 );
+		} );
 	} );
 } );
 

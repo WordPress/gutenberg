@@ -10,6 +10,7 @@
 -   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
+-   Image: Reserve less vertical space for the lightbox close and navigation buttons on viewports 500px tall or shorter. The reservation was picked by viewport width alone, so a phone rotated to landscape kept the amount meant for a tall portrait screen and rendered the enlarged image smaller than it had been before the rotation ([#82825](https://github.com/WordPress/gutenberg/pull/82825)).
 
 ### Internal
 
