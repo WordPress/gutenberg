@@ -494,6 +494,75 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		);
 	} );
 
+	test( 'a __proto__ region matches and its attachTo variant renders under its declared parent', async () => {
+		const { actions } = await import( '../index' );
+		const namespace = 'test/r19-match-proto';
+		const region = setupNavigableRegion(
+			namespace,
+			'__proto__',
+			'proto-before'
+		);
+		expect( routerRegions.has( '__proto__' ) ).toBe( true );
+
+		await actions.navigate( 'http://localhost/r19-proto-match', {
+			html: plainHtml(
+				regionMarkup( namespace, '__proto__', 'proto-after' )
+			),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		expect( region ).toHaveTextContent( 'proto-after' );
+
+		const parent = document.createElement( 'div' );
+		parent.id = 'r19-parent-proto';
+		document.body.appendChild( parent );
+
+		await actions.navigate( 'http://localhost/r19-proto-attach', {
+			html: plainHtml(
+				regionMarkup(
+					namespace,
+					'{"id":"__proto__","attachTo":"#r19-parent-proto"}',
+					'proto-attached'
+				)
+			),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		expect( parent ).toHaveTextContent( 'proto-attached' );
+	} );
+
+	test( 'a malformed nonempty region value matches, updates, and reports its raw id', async () => {
+		const { state, actions } = await import( '../index' );
+		const malformedValue = '{"id":';
+		const trigger = setupRegionTrigger(
+			'test/r19-malformed-trigger',
+			malformedValue
+		);
+		const region = setupNavigableRegion(
+			'test/r19-malformed-region',
+			malformedValue,
+			'malformed-before'
+		);
+		expect( routerRegions.has( malformedValue ) ).toBe( true );
+
+		await trigger.runInScope( () =>
+			actions.navigate( 'http://localhost/r19-malformed', {
+				html: plainHtml(
+					regionMarkup(
+						'test/r19-malformed-region',
+						malformedValue,
+						'malformed-after'
+					)
+				),
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			} )
+		);
+
+		expect( region ).toHaveTextContent( 'malformed-after' );
+		expect( state.initiator ).toBe( malformedValue );
+	} );
+
 	test( 'namespace-prefixed and plain JSON object regions attach destination content under their declared parents', async () => {
 		const { actions } = await import( '../index' );
 		const cases = [

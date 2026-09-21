@@ -226,8 +226,12 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	// This prevents browsers from extracting styles from noscript tags.
 	dom.querySelectorAll( 'noscript' ).forEach( ( el ) => el.remove() );
 
-	const regions = {};
-	const regionsToAttach = {};
+	// Preserve every extracted region id as an own enumerable key, including
+	// ids that collide with Object.prototype properties.
+	const regions: Record< string, any > = Object.create( null );
+	// Preserve every extracted attachment selector under its region id for the
+	// render pass, including ids that collide with Object.prototype properties.
+	const regionsToAttach: Record< string, string > = Object.create( null );
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
