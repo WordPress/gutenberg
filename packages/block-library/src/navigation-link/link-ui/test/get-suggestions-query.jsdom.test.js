@@ -49,6 +49,31 @@ describe( 'getSuggestionsQuery', () => {
 		}
 	);
 
+	it.each( LINK_TYPES )(
+		'leaves attachments out of the %s link’s search',
+		( type, kind ) => {
+			expect( getSuggestionsQuery( type, kind ).exclude ).toContain(
+				'attachment'
+			);
+		}
+	);
+
+	it.each( LINK_TYPES.filter( ( [ type ] ) => type !== 'post_format' ) )(
+		'leaves post formats out of the %s link’s search',
+		( type, kind ) => {
+			expect( getSuggestionsQuery( type, kind ).exclude ).toContain(
+				'post-format'
+			);
+		}
+	);
+
+	it( 'keeps post formats in a post format link’s search', () => {
+		// Excluding them would leave the link with nothing of its own to find.
+		expect(
+			getSuggestionsQuery( 'post_format', 'taxonomy' ).exclude
+		).toEqual( [ 'attachment' ] );
+	} );
+
 	it.each( [
 		[ 'a custom link', 'custom', 'custom' ],
 		[ 'a link with no type', undefined, undefined ],

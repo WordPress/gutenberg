@@ -3,6 +3,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
+
 export type SearchOptions = {
 	/**
 	 * Displays initial search suggestions, when true.
@@ -18,11 +20,18 @@ export type SearchOptions = {
 	/**
 	 * Filters by search type.
 	 */
-	type?: 'attachment' | 'post' | 'term' | 'post-format';
+	type?: SearchType;
 	/**
 	 * Slug of the post-type or taxonomy.
 	 */
 	subtype?: string;
+	/**
+	 * Types to leave out. Only meaningful for a search that is not already
+	 * narrowed by `type`, to drop results the caller cannot use:
+	 *
+	 *     exclude: [ 'attachment' ]
+	 */
+	exclude?: SearchType[];
 	/**
 	 * Result types to rank above every other type, most wanted first. Each is
 	 * named as the results spell it: a post type or taxonomy slug, such as
@@ -130,6 +139,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		exclude,
 		priorityTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
@@ -137,9 +147,15 @@ export default async function fetchLinkSuggestions(
 
 	const { disablePostFormats = false } = editorSettings;
 
+	// An unscoped search covers every type. `exclude` drops the ones the caller
+	// cannot use, so that they neither reach the caller nor take up room in the
+	// results, which are merged and cut to `perPage` before being returned.
+	const isSearched = ( searchType: SearchType ) =>
+		( ! type || type === searchType ) && ! exclude?.includes( searchType );
+
 	const queries: Promise< SearchResult[] >[] = [];
 
-	if ( ! type || type === 'post' ) {
+	if ( isSearched( 'post' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -167,7 +183,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! type || type === 'term' ) {
+	if ( isSearched( 'term' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -195,7 +211,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+	if ( ! disablePostFormats && isSearched( 'post-format' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -223,7 +239,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! type || type === 'attachment' ) {
+	if ( isSearched( 'attachment' ) ) {
 		queries.push(
 			apiFetch< MediaAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/media', {

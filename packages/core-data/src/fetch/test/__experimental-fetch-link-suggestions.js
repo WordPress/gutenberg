@@ -233,6 +233,63 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
+	it( 'excludes a type from an unscoped search', () => {
+		return fetchLinkSuggestions( '', {
+			exclude: [ 'attachment' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
+				'media'
+			);
+			// Everything else is still searched.
+			expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
+				'Contact Page',
+				'Cats',
+				'Uncategorized',
+				'Gallery',
+				'Quote',
+			] );
+		} );
+	} );
+
+	it( 'excludes several types at once', () => {
+		return fetchLinkSuggestions( '', {
+			exclude: [ 'attachment', 'post-format' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
+				'media'
+			);
+			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
+				'post-format'
+			);
+		} );
+	} );
+
+	it( 'leaves a narrowed search alone when the exclusion does not apply', () => {
+		return Promise.all( [
+			fetchLinkSuggestions( '', { type: 'term', perPage: 20 } ),
+			fetchLinkSuggestions( '', {
+				type: 'term',
+				exclude: [ 'attachment' ],
+				perPage: 20,
+			} ),
+		] ).then( ( [ without, excluded ] ) => {
+			expect( excluded ).toEqual( without );
+		} );
+	} );
+
+	it( 'excludes a type that was explicitly asked for', () => {
+		// Contradictory, but the exclusion is the more specific instruction.
+		return fetchLinkSuggestions( '', {
+			type: 'attachment',
+			exclude: [ 'attachment' ],
+			perPage: 20,
+		} ).then( ( suggestions ) => {
+			expect( suggestions ).toEqual( [] );
+		} );
+	} );
+
 	describe( 'Initial search suggestions', () => {
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {
