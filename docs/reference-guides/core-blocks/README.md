@@ -859,7 +859,7 @@ Displays the link of a post, page, or any other content-type.
 
 -	**Name:** [core/read-more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-read-more/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** content, linkTarget
 
 ## RSS
