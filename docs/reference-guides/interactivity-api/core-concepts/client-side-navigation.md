@@ -796,7 +796,7 @@ For the exact types and edge cases, see the [`core/router` state reference](http
 
 **When a navigation ends**, the router sets `state.navigating` back to `false`. By then the new content is normally already in the DOM and `state.url` already holds the destination URL; the two exceptions are described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) below. The update happens on a later frame than the DOM commit (the moment the new content is applied to the real DOM), so that even a very fast navigation produces two separate updates rather than a single one that only shows the finished state. How much later is not specified, so treat it as "some time after the content is committed". In particular, the promise returned by `actions.navigate()` resolves before this update, so code like `yield actions.navigate( url ); if ( state.navigating ) { … }` still sees `state.navigating` as truthy. To react to the end of a navigation, use a watcher instead.
 
-`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts (or until a back/forward traversal that reloads the document clears it, as described below), so a watcher reacting to the end can still read who started it. This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
+`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts, so a watcher reacting to the end can still read who started it. (The one exception, a back/forward traversal that reloads the document, is described in [Which navigations update the keys](#which-navigations-update-the-keys).) This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
 
 ### When a navigation ends without new content
 
@@ -828,7 +828,7 @@ No navigation starts for:
 
 The router is latest-wins (see [Race condition protection](#race-condition-protection)), and so are these properties. If a second navigation starts before the first one ends, `state.navigating` stays truthy from the first start until the winning navigation ends, with no idle gap in between and no second "end" when the abandoned navigation finishes. When the winner ends, `state.navigating` becomes `false` once. The 10-second limit described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) applies here too: if the winning navigation is a back/forward traversal whose cached page fetch has still not settled after 10 seconds, the router sets `state.navigating` to `false` rather than leaving it truthy indefinitely. If that fetch settles later, the traversal then updates both properties like an ordinary navigation.
 
-`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal served from the in-memory cache that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator. A traversal that reloads the document instead sets both properties back to idle, as described in [Which navigations update the keys](#which-navigations-update-the-keys).
+`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator.
 
 For a per-region loading indicator this is the behavior you want, with no bookkeeping of your own: a region whose navigation is superseded by another region's stops showing as the initiator at that moment, and two overlapping navigations from the same region keep that region showing as the initiator until the last of them ends.
 
@@ -955,7 +955,7 @@ store( 'myPlugin', {
 
 You could instead find the ID inside the getter from the DOM, with `getElement().ref.closest( '[data-wp-router-region]' )`, but reading it from the context hands the getter a value the block already knew when it rendered, with no DOM walk on every evaluation and no need to reimplement the ID normalization described above.
 
-On the initial page load both properties read `undefined`, so the getter returns `false` and the indicator stays hidden. On a back/forward traversal served from the in-memory cache, `state.navigating` becomes truthy but `state.initiator` is `null`, so the indicator stays hidden too, and a traversal that reloads the document never makes `state.navigating` truthy at all: a traversal is not something your block started.
+On the initial page load both properties read `undefined`, so the getter returns `false` and the indicator stays hidden. On a back/forward traversal `state.initiator` is never your region's ID, so the indicator stays hidden too: a traversal is not something your block started.
 
 #### Region-scoped focus after navigation
 
@@ -1065,7 +1065,7 @@ The callback reads `state.navigating` and nothing else, so it re-runs only when 
 
 -   **Overlapping navigations start the timer once.** `state.navigating` stays truthy from the first start until the winning navigation ends (see [Overlapping navigations](#overlapping-navigations)), so a double click does not restart the delay or flicker the bar.
 -   **A navigation that falls back to a full page load keeps the bar up while the browser replaces the document.** `state.navigating` becomes `false` only if the document is still there 10 seconds later (see [When a navigation ends without new content](#when-a-navigation-ends-without-new-content)), so the bar stays up for as long as the full page load is really in progress, and comes down if the load never happens, for example because the visitor declined an unload prompt.
--   **Traversals behave like any other navigation.** Those served from the in-memory cache almost always finish well inside the 400ms window, so no bar appears. A traversal that reloads the document never makes `state.navigating` truthy, so the timer is never started; if it arrives while a navigation is in progress, it sets `state.navigating` to `false` and the watcher clears that navigation's timer.
+-   **Traversals behave like any other navigation.** Those served from the in-memory cache almost always finish well inside the 400ms window, so no bar appears.
 
 On the initial page load `state.navigating` is `undefined`, so the first run takes the `else` branch and does nothing.
 
@@ -1518,7 +1518,7 @@ When `navigate()` is called (for example, on link click):
 8. Screen reader announcement is made for accessibility.
 9. If the URL has a hash, the page scrolls to that element.
 10. Navigation is complete.
-11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared; it keeps its value until the next navigation replaces it, or until a back/forward traversal that reloads the document clears it.
+11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared; it keeps its value until the next navigation replaces it.
 
 Steps 2 and 11 are the two moments the lifecycle properties change. [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) covers what your code can rely on about them, including why the end is set on a later frame instead of inside step 6.
 
