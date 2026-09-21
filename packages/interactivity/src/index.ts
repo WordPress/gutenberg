@@ -92,9 +92,6 @@ export const privateApis = (
 			sessionId,
 			warn,
 			afterNextFrame,
-			// The router's scope probe. Unlike `getContext`/`getElement`/
-			// `getServerContext`, this returns `undefined` off-scope by
-			// design — it never throws.
 			getScope,
 		};
 	}

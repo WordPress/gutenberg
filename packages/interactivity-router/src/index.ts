@@ -425,11 +425,10 @@ window.addEventListener( 'popstate', async () => {
 		}
 	}, LIFECYCLE_RELEASE_BOUND );
 
-	// The uncached decision, before any effect-running write. This splits
-	// today's short-circuited `pages.has( … ) && ( await pages.get( … ) )`
-	// expression: a page absent from the cache reloads with no consumer
-	// code having run beforehand, so a throwing watcher can never suppress
-	// the reload -- structurally restoring that property of today's code.
+	// The uncached decision, before any effect-running write. A page absent
+	// from the cache reloads with no consumer code having run beforehand, so
+	// a throwing watcher can never suppress the reload. Keep this check
+	// ahead of the lifecycle writes below for that reason.
 	if ( ! pages.has( pagePath ) ) {
 		try {
 			window.location.reload();
@@ -509,7 +508,8 @@ window.addEventListener( 'popstate', async () => {
 			} );
 		}
 
-		// The existing render batch, untouched -- see Task 5 row 10.
+		// The render batch. It carries no lifecycle write of its own: the
+		// start pair is written above and the end is scheduled below.
 		batch( () => {
 			state.url = window.location.href;
 			renderPage( page );
@@ -533,8 +533,7 @@ window.addEventListener( 'popstate', async () => {
 		// reload exits with the cached render path and publish an end where no
 		// lifecycle cycle began. Exceptional exits discharge through this
 		// `catch` instead, which schedules the guarded idle restoration and
-		// rethrows immediately, with nothing suspending between the two, so the
-		// rethrow's timing is unchanged from today's.
+		// rethrows immediately, with nothing suspending between the two.
 		if ( currentNavigationId === token && state.navigating ) {
 			afterNextFrame( () => {
 				if ( currentNavigationId === token ) {
@@ -594,8 +593,8 @@ let currentNavigationId = 0;
 // region id, without breaking attribution for a `withScope`-wrapped
 // callback that carries a scope of its own.
 //
-// Marked at exactly **two** sites — the start `batch()` and the existing
-// commit batch below — with save-and-restore
+// Marked at exactly **two** sites — the start `batch()` and the commit
+// batch below — with save-and-restore
 // (`const prev = writeFrameScope; writeFrameScope = entryScope; try {
 // …write…; } finally { writeFrameScope = prev; }`), never set-and-clear.
 // Write spans nest (a reactive navigation started from inside another
@@ -604,8 +603,8 @@ let currentNavigationId = 0;
 // flush, so a third-level navigation started from that effect would
 // wrongly inherit the outer navigation's region. Save-and-restore keeps
 // the outer span's scope installed once the inner span closes, and for a
-// top-level navigation the restored value is `undefined`, so off-frame
-// behaviour is unchanged.
+// top-level navigation the restored value is `undefined`, so no marker is
+// installed outside a write span.
 //
 // No marker anywhere else, and the two consumer kinds resolve differently
 // there — which is the point. The scheduled end write and the popstate
@@ -614,7 +613,8 @@ let currentNavigationId = 0;
 // consumer navigating from either derives `null` by scope absence, while a
 // **`data-wp-watch`** consumer — which does run in scope — derives *its
 // own* region, because the restored marker refuses nothing. That second
-// reading is what the AC25(b) region-scoped focus pattern is built on. The
+// reading is what the documented region-scoped focus pattern — a
+// `data-wp-watch` reacting to the end of a navigation — is built on. The
 // popstate handler's frame carries no scope at all. A future `navigate()`-
 // side scope-carrying write added without this marker would re-open
 // initiator inheritance for it.
@@ -692,13 +692,13 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 		// `navigate()` installed around one of its own write frames — see
 		// the `writeFrameScope` comment above. The `scope &&` conjunct
 		// states intent ("we are refusing an *inherited* scope") rather
-		// than a guarantee: today `getScope()` and `writeFrameScope` are
+		// than adding a guarantee: `getScope()` and `writeFrameScope` are
 		// each either an object or `undefined`, so a genuinely scope-less
-		// call (`scope` and the marker both `undefined`) already falls
-		// through this clause and returns `null` two lines below, via the
-		// `element` check — the short-circuit changes nothing observable
-		// for that case now, and is kept for a future derivation clause
-		// that might return non-null off-scope.
+		// call (`scope` and the marker both `undefined`) falls through
+		// this clause and returns `null` below, via the `element` check,
+		// with or without the conjunct. It is kept so that a derivation
+		// clause added later that returns non-null off-scope cannot be
+		// reached through the marker comparison.
 		const scope = getScope();
 		if ( scope && scope === writeFrameScope ) {
 			return null;
