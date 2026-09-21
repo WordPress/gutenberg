@@ -380,17 +380,14 @@ describe( 'sortResults', () => {
 		const order = sortResults( results, 'travel tips' ).map(
 			( result ) => result.id
 		);
-		// Results group by type before they order by match, so every page
-		// comes before the categories.
 		expect( order ).toEqual( [
-			4, // page, contains: travel, tips
-			3, // page, contains: travel
-			// pages that do not match, in the same order as input:
+			7, // exact match
+			4, // contains: travel, tips
+			3, // contains: travel
+			// same order as input:
 			1,
 			2,
 			5,
-			// categories, best match first:
-			7, // exact match
 			6,
 		] );
 	} );
@@ -582,7 +579,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'The Gallery Show Of The Year', 'Gallery' ] );
 	} );
 
-	it( 'orders an attachment below a page even when its title is what was typed', () => {
+	it( 'keeps an attachment first when its title is what was typed', () => {
 		const results = [
 			{
 				id: 1,
@@ -600,11 +597,11 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// The type is the first thing compared, so no title can lift an
-		// attachment above a page.
+		// The page does not answer the search at all, so being a page does not
+		// lift it above an attachment that does.
 		expect(
 			sortResults( results, 'beach day' ).map( ( { title } ) => title )
-		).toEqual( [ 'Day', 'Beach Day' ] );
+		).toEqual( [ 'Beach Day', 'Day' ] );
 	} );
 
 	it( 'leads with the type the caller names', () => {

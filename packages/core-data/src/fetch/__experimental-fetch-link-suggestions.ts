@@ -332,10 +332,14 @@ function getTypeRank(
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * Results are grouped by type first, because the type a link points at matters more than how
- * closely a title matches: a page is what a link usually wants, and an attachment almost never is.
- * A caller that knows better names its own types as `priorityTypes`, and those lead instead, in
- * the order it named them.
+ * A title that answers the search — one that is what was typed, or that begins with it — ranks
+ * above every title that does not, whatever its type. Nothing that fails to match should displace
+ * something that matches.
+ *
+ * Among titles that answer the search equally, the type decides, because the type a link points at
+ * matters more than the difference between a whole-title and a start-of-title match: a page is
+ * what a link usually wants, and an attachment almost never is. A caller that knows better names
+ * its own types as `priorityTypes`, and those lead instead, in the order it named them.
  *
  * Within a type, a title that is what was typed, or that begins with it, ranks above the rest.
  * Where the match sits in the title is a stronger signal than how much of the title it covers, and
@@ -397,8 +401,13 @@ export function sortResults(
 		}
 	}
 
+	// A title that answers the search outranks one that does not, before any type is considered.
+	const isMatch = ( result: SearchResult ) =>
+		tiers[ scoreKey( result ) ] > 0 ? 1 : 0;
+
 	return results.sort(
 		( a, b ) =>
+			isMatch( b ) - isMatch( a ) ||
 			getTypeRank( a, priorityTypes ) - getTypeRank( b, priorityTypes ) ||
 			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
