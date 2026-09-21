@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `__experimentalFetchLinkSuggestions`: rank a result whose title is what was typed, or begins with it, above the rest. The score divides by the title's length, so a long title was marked down for being long even when the search term was its first word ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `__experimentalFetchLinkSuggestions`: rank a result whose title is what was typed, or begins with it, above the rest. The score divides by the title's length, so a long title was marked down for being long even when the search term was its first word ([#83287](https://github.com/WordPress/gutenberg/pull/83287)).
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
 -   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
