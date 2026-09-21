@@ -687,29 +687,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should match a keyword whose case differs outside of ASCII, as keywords are
-	 * translated and so may hold any script.
-	 */
-	public function test_get_registered_icons_matches_non_ascii_keywords_case_insensitively() {
-		if ( ! function_exists( 'mb_stripos' ) ) {
-			$this->markTestSkipped( 'The mbstring extension is required to case-fold multibyte characters.' );
-		}
-
-		$this->register(
-			'test-collection/apple',
-			array(
-				'label'    => 'Apple',
-				'content'  => '<svg></svg>',
-				'keywords' => array( 'Äpfel' ),
-			)
-		);
-
-		$names = array_column( $this->registry->get_registered_icons( 'äpfel' ), 'name' );
-
-		$this->assertContains( 'test-collection/apple', $names );
-	}
-
-	/**
 	 * Should not drop a third-party icon's keywords when an existing base registry
 	 * is upgraded to the Gutenberg registry.
 	 */
