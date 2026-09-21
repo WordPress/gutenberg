@@ -85,6 +85,14 @@ const settle = ( page: Page ) =>
  * file uses instead wherever a flow needs to inspect the *outgoing*
  * document's state around a forced full page load.
  *
+ * **`release()` alone is not a reliable "the browser has resumed" signal.**
+ * It only tells you Playwright's own route handler returned; the browser's
+ * fetch-then-parse pipeline can still be in flight well after that. Flows
+ * 14 and 15 need the *browser* to have the full response before sampling a
+ * mid-window reading, so they pair `release()` with a `page.waitForResponse`
+ * promise created beforehand, per the held-request idiom the operational
+ * notes already prescribe.
+ *
  * @param page The Playwright page.
  * @param url  The URL to intercept.
  * @return An object with a `hit` promise and a `release` function.
@@ -208,6 +216,75 @@ test.describe( 'Router navigation lifecycle', () => {
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - observer only',
 			attributes: { page: 'observer', observerOnly: true },
+		} );
+
+		/*
+		 * Task 7's inventory, rows 8-12, appended in the same strict
+		 * topological order: a post's `next`/`other` must already exist.
+		 */
+
+		// Row 8: region A's destination in Flows 13, 14, 15, 28, 29.
+		const twoRegionDestA = await utils.addPostWithBlock(
+			'test/router-navigation-lifecycle',
+			{
+				alias: 'lifecycle two-region - dest A',
+				attributes: {
+					page: 'two-a',
+					regionId: 'lifecycle-a',
+					secondRegionId: 'lifecycle-b',
+				},
+			}
+		);
+
+		// Row 9: region B's destination, and region A's *second*
+		// destination in Flow 15. A different href from row 8.
+		const twoRegionDestB = await utils.addPostWithBlock(
+			'test/router-navigation-lifecycle',
+			{
+				alias: 'lifecycle two-region - dest B',
+				attributes: {
+					page: 'two-b',
+					regionId: 'lifecycle-a',
+					secondRegionId: 'lifecycle-b',
+				},
+			}
+		);
+
+		// Row 10: the origin for Flows 13, 14, 15, 28, 29. Region A's
+		// `navigate` link -> `next` (row 8); region A's `navigate (other)`
+		// link -> `other` (row 9); region B's `navigate` link -> `other`
+		// (row 9), per Task 6's second-region rule.
+		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
+			alias: 'lifecycle two-region - page 1',
+			attributes: {
+				page: 'two-1',
+				regionId: 'lifecycle-a',
+				secondRegionId: 'lifecycle-b',
+				next: twoRegionDestA,
+				other: twoRegionDestB,
+			},
+		} );
+
+		// Row 11: the nested page's destination, so the inner and outer
+		// regions exist on both pages.
+		const nestedPage2 = await utils.addPostWithBlock(
+			'test/router-navigation-lifecycle',
+			{
+				alias: 'lifecycle nested - page 2',
+				attributes: { page: 'nested-2', nested: true },
+			}
+		);
+
+		// Row 12: Flow 19's origin -- `render.php`'s `nested` branch emits
+		// an `inner-region` inside an `outer-region`, with the `navigate`
+		// link inside the inner one.
+		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
+			alias: 'lifecycle nested - page 1',
+			attributes: {
+				page: 'nested-1',
+				nested: true,
+				next: nestedPage2,
+			},
 		} );
 	} );
 
@@ -665,6 +742,283 @@ test.describe( 'Router navigation lifecycle', () => {
 				{ navigating: 'not navigating', initiator: 'absent' },
 				{ navigating: 'navigating', initiator: 'lifecycle-a' },
 			] );
+		} );
+	} );
+
+	test.describe( 'Initiator identity in region-based navigation mode', () => {
+		test( 'Flow 13: two regions -- only the initiating region reads as the origin', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle two-region - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const destAUrl = utils.getLink( 'lifecycle two-region - dest A' );
+			const heldDestA = await holdRoute( page, destAUrl );
+
+			const regionA = page.getByTestId( 'region-lifecycle-a' );
+			const regionB = page.getByTestId( 'region-lifecycle-b' );
+
+			await regionA.getByTestId( 'navigate' ).click();
+			await heldDestA.hit;
+
+			// Positive checkpoint first, then the negative it protects.
+			await expect( regionA ).toHaveClass( /is-origin/ );
+			await expect( regionB ).not.toHaveClass( /is-origin/ );
+
+			heldDestA.release();
+
+			// Positive checkpoint (the lifecycle really ended), then the
+			// settle, then the negative: neither region reads as origin.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await settle( page );
+			await expect( regionA ).not.toHaveClass( /is-origin/ );
+			await expect( regionB ).not.toHaveClass( /is-origin/ );
+		} );
+
+		test( 'Flow 14: cross-region supersession hands the origin over at the moment of supersession', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle two-region - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const destAUrl = utils.getLink( 'lifecycle two-region - dest A' );
+			const destBUrl = utils.getLink( 'lifecycle two-region - dest B' );
+			const heldDestA = await holdRoute( page, destAUrl );
+			const heldDestB = await holdRoute( page, destBUrl );
+
+			const regionA = page.getByTestId( 'region-lifecycle-a' );
+			const regionB = page.getByTestId( 'region-lifecycle-b' );
+
+			await regionA.getByTestId( 'navigate' ).click();
+			await heldDestA.hit;
+			await expect( regionA ).toHaveClass( /is-origin/ );
+
+			await regionB.getByTestId( 'navigate' ).click();
+			await heldDestB.hit;
+
+			// Positive checkpoint before the negative it protects.
+			await expect( regionB ).toHaveClass( /is-origin/ );
+			await expect( regionA ).not.toHaveClass( /is-origin/ );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'lifecycle-b' );
+
+			// Release A's destination -- A's, not B's -- and wait for its
+			// generator to actually resume and take the `navigatingTo`
+			// bail. `page.waitForResponse` is the accurate signal here --
+			// it resolves once the browser has the full response, unlike a
+			// Node-side "the route handler returned" signal, which can
+			// resolve well before the page's own fetch-then-parse pipeline
+			// has actually let the generator past its `yield`.
+			const destAResponse = page.waitForResponse( destAUrl );
+			heldDestA.release();
+			await destAResponse;
+			await settle( page );
+
+			// Mid-window reading, taken while B is still held: the
+			// lifecycle must still read in flight and B must still read
+			// as origin. Red on: an unguarded end write in A's `finally`.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'navigating' );
+			await expect( regionB ).toHaveClass( /is-origin/ );
+
+			heldDestB.release();
+
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await settle( page );
+			await expect( regionA ).not.toHaveClass( /is-origin/ );
+			await expect( regionB ).not.toHaveClass( /is-origin/ );
+		} );
+
+		test( 'Flow 15: two overlapping navigations from one region keep the region reading as origin', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle two-region - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const destAUrl = utils.getLink( 'lifecycle two-region - dest A' );
+			const destBUrl = utils.getLink( 'lifecycle two-region - dest B' );
+			const heldDestA = await holdRoute( page, destAUrl );
+			const heldDestB = await holdRoute( page, destBUrl );
+
+			const regionA = page.getByTestId( 'region-lifecycle-a' );
+
+			// Both destinations, both from region A: `navigate` (-> next,
+			// dest A) and then `navigate (other)` (-> other, dest B).
+			await regionA.getByTestId( 'navigate' ).click();
+			await heldDestA.hit;
+			await expect( regionA ).toHaveClass( /is-origin/ );
+
+			await regionA.getByTestId( 'navigate (other)' ).click();
+			await heldDestB.hit;
+
+			// Release the *first* destination and wait for its generator
+			// to actually resume and take the bail. `page.waitForResponse`
+			// is the accurate signal here -- it resolves once the browser
+			// has the full response, unlike a Node-side "the route handler
+			// returned" signal, which can resolve well before the page's
+			// own fetch-then-parse pipeline has actually let the generator
+			// past its `yield`.
+			const destAResponse = page.waitForResponse( destAUrl );
+			heldDestA.release();
+			await destAResponse;
+			await settle( page );
+
+			// A must still read as origin: the region's own per-region
+			// indication must not clear on a superseded call's own end.
+			// Red on: an implementation that clears it at *every* end
+			// rather than only the last.
+			await expect( regionA ).toHaveClass( /is-origin/ );
+
+			heldDestB.release();
+
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await settle( page );
+			await expect( regionA ).not.toHaveClass( /is-origin/ );
+		} );
+
+		test( 'Flow 16: a declared identity is readable by a consumer in a different store', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const heldPage2 = await holdRoute( page, page2Url );
+
+			// The `navigate (declared)` link sits inside region
+			// `lifecycle-a` -- an implementation that ignored the
+			// `initiator` option would read `lifecycle-a` here, not the
+			// declared value.
+			await page.getByTestId( 'navigate (declared)' ).click();
+			await heldPage2.hit;
+
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'my-plugin/declared' );
+
+			heldPage2.release();
+
+			// The declared identity is also still readable at the end.
+			await expect( page ).toHaveURL( page2Url );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'my-plugin/declared' );
+		} );
+
+		test( 'Flow 17: `initiator: null` suppresses attribution', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const heldPage2 = await holdRoute( page, page2Url );
+
+			await page.getByTestId( 'navigate (suppressed)' ).click();
+			await heldPage2.hit;
+
+			// Positive checkpoint, then the settle, then the negatives.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'navigating' );
+			await settle( page );
+
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+			await expect(
+				page.getByTestId( 'region-lifecycle-a' )
+			).not.toHaveClass( /is-origin/ );
+
+			heldPage2.release();
+		} );
+
+		test( 'Flow 18: a scope-less programmatic navigation reads as having no initiator', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			const pageErrors: Error[] = [];
+			const consoleErrors: string[] = [];
+			page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
+			page.on( 'console', ( message ) => {
+				if ( message.type() === 'error' ) {
+					consoleErrors.push( message.text() );
+				}
+			} );
+
+			// This page *does* carry region `lifecycle-a` -- a derivation
+			// implemented as a document query rather than from the
+			// (absent) scope would read it here instead of absent.
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const heldPage2 = await holdRoute( page, page2Url );
+
+			await page.evaluate( () =>
+				window.dispatchEvent( new Event( '_test_navigate_scopeless_' ) )
+			);
+			await heldPage2.hit;
+
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'navigating' );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+
+			heldPage2.release();
+
+			await expect( page ).toHaveURL( page2Url );
+			await waitForLogLength( page, 'lifecycle log', 3 );
+			expect( await readLog( page, 'lifecycle log' ) ).toEqual( [
+				{ navigating: 'not navigating', initiator: 'absent' },
+				{ navigating: 'navigating', initiator: 'absent' },
+				{ navigating: 'not navigating', initiator: 'absent' },
+			] );
+
+			expect( pageErrors ).toEqual( [] );
+			expect( consoleErrors ).toEqual( [] );
+		} );
+
+		test( 'Flow 19: nested regions attribute to the nearest enclosing region', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle nested - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const nestedPage2Url = utils.getLink( 'lifecycle nested - page 2' );
+			const heldNestedPage2 = await holdRoute( page, nestedPage2Url );
+
+			await page
+				.getByTestId( 'region-inner-region' )
+				.getByTestId( 'navigate' )
+				.click();
+			await heldNestedPage2.hit;
+
+			// Would read `outer-region` under an outermost-region walk.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'navigating' );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'inner-region' );
+
+			heldNestedPage2.release();
 		} );
 	} );
 } );

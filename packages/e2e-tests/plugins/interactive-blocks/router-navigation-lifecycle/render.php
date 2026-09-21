@@ -168,6 +168,46 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
+
+		<?php if ( ! empty( $attributes['nested'] ) ) : ?>
+			<?php
+			/*
+			 * Flow 19's fixture: an `inner-region` nested inside an
+			 * `outer-region`, with the `navigate` link inside the inner
+			 * one, so a derivation that walks to the *outermost* region
+			 * (the reading a writer might reach for "because the router
+			 * treats the outer region as the update unit") reads
+			 * `outer-region` instead of the correct nearest-enclosing
+			 * `inner-region`. Both posts using `nested` render the same
+			 * two ids -- see the build plan's Task 7 table, row 11 -- so
+			 * the router updates both regions on navigation.
+			 *
+			 * FIXTURE TRAP (see above): both the outer and the inner
+			 * region element carry `data-wp-interactive` on *themselves*,
+			 * not only on an ancestor -- `regionsSelector` requires it on
+			 * the region-bearing element itself.
+			 */
+			?>
+			<div
+				data-testid="region-outer-region"
+				data-wp-interactive="router-navigation-lifecycle"
+				data-wp-router-region="outer-region"
+			>
+				<div
+					data-testid="region-inner-region"
+					data-wp-interactive="router-navigation-lifecycle"
+					data-wp-router-region="inner-region"
+				>
+					<?php if ( isset( $next_href ) ) : ?>
+						<a
+							data-testid="navigate"
+							data-wp-on--click="actions.navigate"
+							href="<?php echo esc_url( $next_href ); ?>"
+						>navigate</a>
+					<?php endif; ?>
+				</div>
+			</div>
+		<?php endif; ?>
 	<?php endif; ?>
 
 	<!--
