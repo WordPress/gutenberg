@@ -665,7 +665,10 @@ describe( 'the popstate handler', () => {
 		void inFlight;
 	} );
 
-	test( 'plain idle traversal to a cached entry: the clear notifies nobody (raw effect(), the opposite instrument of the hydrated-watcher test)', async () => {
+	test( 'a materialized idle traversal to a cached entry: its same-value clear notifies nobody (raw effect(), the opposite instrument of the hydrated-watcher test)', async () => {
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBeNull();
+
 		await actions.prefetch( 'http://localhost/popstate-row4-dest', {
 			html: plainHtml( 'row4-dest' ),
 		} );
