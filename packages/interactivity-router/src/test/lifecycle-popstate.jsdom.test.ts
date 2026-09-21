@@ -343,9 +343,9 @@ describe( 'the popstate handler', () => {
 		// superseded it) restores idle at its bound. Advancing past it
 		// here, before this test's fake timers are torn down, keeps a
 		// stale reading from leaking into a later test sharing this
-		// file's one module instance -- navigate()'s own fallback has
-		// deliberately no release of its own (see the design), and a
-		// timer armed under fake timers never fires once they're torn
+		// file's one module instance. The in-flight navigate() has not
+		// reached its fallback, so that navigation's release is not armed;
+		// a timer armed under fake timers never fires once they're torn
 		// down.
 		await vi.advanceTimersByTimeAsync( 10600 );
 		expect( state.navigating ).toBe( false );
@@ -612,9 +612,9 @@ describe( 'the popstate handler', () => {
 			// Clean up: settle the second navigation normally (its own
 			// claim is still current, so its finally's guarded end fires
 			// as usual) so a later test sharing this file's one module
-			// instance does not inherit a stale in-flight reading --
-			// unlike a popstate claim, navigate()'s own fallback has
-			// deliberately no release timer to fall back on.
+			// instance does not inherit a stale in-flight reading. Its
+			// fallback release is not involved because this navigation
+			// reaches the normal commit path.
 			respond( pending[ 0 ], plainHtml( 'row7b-second' ) );
 			await advanceOneFrame();
 			await secondNav;

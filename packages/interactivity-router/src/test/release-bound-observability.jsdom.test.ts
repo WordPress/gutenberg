@@ -7,15 +7,16 @@
  * This composite uses the real router, and the constants below keep the
  * measured scheduler relationship explicit rather than re-deriving it.
  *
- * This file installs fake-timer control before importing the router module
- * and never toggles it per test (unlike every other file in this
- * directory's `beforeEach`/`afterEach` pattern) -- the router's own
- * module-scope timers must be under deterministic control from the moment
- * the module evaluates, which a per-test `beforeEach` cannot guarantee.
- * That is why this row lives in its own file rather than alongside the
- * others in `lifecycle-popstate.ts`.
+ * The first behavioral composite installs fake-timer control before importing
+ * the router module, so its module-scope timers are deterministic from the
+ * moment the module evaluates. The fallback composite reuses that module
+ * under a fresh fake clock. This is why these rows live in their own file
+ * rather than alongside the other lifecycle tests.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
 import { store, privateApis } from '@wordpress/interactivity';
@@ -27,6 +28,53 @@ vi.mock(
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 const { getRegionRootFragment, toVdom } = privateApis( CONSENT );
+
+/**
+ * Hydrates a watcher that records lifecycle readings from a router state.
+ *
+ * @param state            The router lifecycle state to observe.
+ * @param state.navigating The lifecycle flag read by the watcher.
+ * @param namespace        Store namespace for the hydrated watcher.
+ * @return                  The readings captured by the watcher.
+ */
+function hydrateNavigatingWatcher(
+	state: { navigating?: boolean },
+	namespace: string
+) {
+	const runs: Array< boolean | undefined > = [];
+	store( namespace, {
+		callbacks: {
+			logNavigating() {
+				runs.push( state.navigating );
+			},
+		},
+	} );
+	const container = document.createElement( 'div' );
+	container.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-watch="callbacks.logNavigating"></div>`;
+	document.body.appendChild( container );
+	const el = container.firstElementChild as Element;
+	hydrate( toVdom( el ), getRegionRootFragment( el ) );
+	return runs;
+}
+
+// Vitest's jsdom virtual console is created before the console matcher spies;
+// mirror navigation diagnostics onto the current console spy.
+const jsdomVirtualConsole = (
+	globalThis as typeof globalThis & {
+		jsdom: {
+			virtualConsole: {
+				on: (
+					event: string,
+					listener: ( error: unknown ) => void
+				) => void;
+			};
+		};
+	}
+ ).jsdom.virtualConsole;
+jsdomVirtualConsole.on( 'jsdomError', ( error ) => {
+	// eslint-disable-next-line no-console
+	console.error( error );
+} );
 
 // The watch directive calls performance.measure()
 // on every run, unimplemented by jsdom, and an unstubbed throw there aborts
@@ -99,20 +147,7 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 		// hydrated only now -- after navigating is already true -- so its
 		// own (frame-deferred) hydration run is "the in-flight reading"
 		// this row asserts, observed before the idle one.
-		const namespace = 'test/release-bound';
-		const runs: Array< boolean | undefined > = [];
-		store( namespace, {
-			callbacks: {
-				logNavigating() {
-					runs.push( state.navigating );
-				},
-			},
-		} );
-		const container = document.createElement( 'div' );
-		container.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-watch="callbacks.logNavigating"></div>`;
-		document.body.appendChild( container );
-		const el = container.firstElementChild as Element;
-		hydrate( toVdom( el ), getRegionRootFragment( el ) );
+		const runs = hydrateNavigatingWatcher( state, 'test/release-bound' );
 
 		// Phase-align the fake clock to a 16 ms boundary (any multiple of
 		// 16 works; 208 is the value that was measured and executed).
@@ -146,4 +181,71 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 	} finally {
 		vi.useRealTimers();
 	}
+} );
+
+test( 'the fallback release preserves the in-flight reading until its bound and then records idle', async () => {
+	vi.useFakeTimers( { shouldAdvanceTime: true } );
+
+	try {
+		window.performance.measure = vi.fn();
+		window.performance.getEntriesByType = vi.fn( () => [] );
+		window.fetch = vi.fn( async () => ( {
+			status: 404,
+			text: async () => '',
+		} ) ) as unknown as typeof window.fetch;
+
+		const { state, actions } = await import( '../index' );
+		const fallbackNav = actions.navigate(
+			'http://localhost/release-bound-fallback',
+			{
+				timeout: 60000,
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			}
+		);
+		expect( state.navigating ).toBe( true );
+
+		const runs = hydrateNavigatingWatcher(
+			state,
+			'test/release-bound-fallback'
+		);
+
+		// Phase-align the fake clock to a 16 ms boundary before allowing the
+		// hydrated watcher to perform its first frame-deferred run.
+		await vi.advanceTimersByTimeAsync( 208 );
+		await vi.advanceTimersByTimeAsync( 17 );
+
+		// The fallback is parked at forcePageReload(), so the lifecycle must
+		// remain in flight before the release's scheduling target.
+		expect( state.navigating ).toBe( true );
+		expect( runs ).toEqual( [ true ] );
+
+		// Advance past the release bound. The detached release writes idle,
+		// and the watcher's next frame records the second reading.
+		await vi.advanceTimersByTimeAsync( 10200 );
+
+		expect( runs ).toEqual( [ true, false ] );
+		expect( console ).toHaveErrored();
+
+		void fallbackNav;
+	} finally {
+		vi.useRealTimers();
+	}
+} );
+
+test( 'the lifecycle release uses one bound for both arming sites without changing navigate timeout default', () => {
+	const routerIndexSource = readFileSync(
+		join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
+		'utf-8'
+	);
+
+	expect( routerIndexSource ).not.toContain( 'POPSTATE_RELEASE_BOUND' );
+	expect(
+		routerIndexSource.match( /^const LIFECYCLE_RELEASE_BOUND = 10000;$/gm )
+	).toHaveLength( 1 );
+	expect(
+		routerIndexSource.match( /^\s*\}, LIFECYCLE_RELEASE_BOUND \);$/gm )
+	).toHaveLength( 2 );
+	expect( routerIndexSource ).toContain( 'timeout = 10000,' );
+	expect( routerIndexSource ).not.toMatch( /^\s*\}, 10000 \);$/m );
 } );

@@ -360,32 +360,41 @@ const forcePageReload = ( href: string ) => {
 	return new Promise( () => {} );
 };
 
-// Bound (in ms) for the popstate handler's lifecycle release below --
-// discharges a claim whose terminating structures (the `try`/`catch`) never
-// see its exit: a `pages.get()` await that never settles, or a `reload()`
-// whose document replacement the visitor declines. Same horizon as
-// `navigate()`'s own page race (`timeout = 10000` above); the two are
+// Bound (in ms) for the lifecycle release. The same guarded mechanism is
+// armed at two sites: in the popstate claim frame below and immediately
+// before `navigate()`'s mid-flight fallback yield. It discharges a claim whose
+// terminating structure never sees its exit, such as a parked await or a
+// full-page reload whose document replacement never lands. The horizon is the
+// same as `navigate()`'s page race (`timeout = 10000` above); the two are
 // independent and changing one must not change the other.
 //
+// The predicate is a scheduling bound, not an abandonment test: a release
+// only writes when its token is still current and the lifecycle is in flight.
+// This bound is the release's scheduling target, not a wall-clock execution
+// instant. Its callback runs when the page's timer schedule runs it -- on the
+// normal timer schedule while the page runs, or on the platform's throttled
+// schedule in a backgrounded tab. The release writes only `navigating` and
+// retains `initiator`, exactly like every other end write.
+//
 // INVARIANT, invisible from the call graph: this bound must remain greater
-// than one frame. The release and the scheduled end write below are both
-// guarded and so compose safely at any bound, but a release firing *before*
-// the pending directive flush would pre-empt it and reintroduce the exact
-// coalescing defect the frame scheduler exists to fix (see the
-// `afterNextFrame` comment on `navigate()`'s end write above). At 10 s
-// versus a ~16 ms frame this is unreachable by three orders of magnitude --
-// a contributor tuning this constant down would not see it coming. This
-// comment is a signpost, not the protection: the protection is
-// `test/release-bound-observability.ts`, which goes red on a tuned-down
-// bound.
-const POPSTATE_RELEASE_BOUND = 10000;
+// than one frame. The release and every scheduled end write are guarded and
+// so compose safely at any bound, but a release firing *before* the pending
+// directive flush would pre-empt it and reintroduce the exact coalescing
+// defect the frame scheduler exists to fix (see the `afterNextFrame` comment
+// on `navigate()`'s end write above). At 10 s versus a ~16 ms frame this is
+// unreachable by three orders of magnitude -- a contributor tuning this
+// constant down would not see it coming. This comment is a signpost, not the
+// protection: the protection is `test/release-bound-observability.jsdom.test.ts`,
+// which goes red on a tuned-down bound.
+const LIFECYCLE_RELEASE_BOUND = 10000;
 
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 //
-// Four end-write sites exist in this file: `navigate()`'s `finally` above,
-// this handler's cached-branch scheduled end, this handler's `catch`, and
-// the lifecycle release armed below. Every one of them is guarded by
+// Five end-write sites exist in this file: `navigate()`'s `finally`, this
+// handler's cached-branch scheduled end, this handler's `catch`, and the
+// lifecycle release armed at the popstate claim frame and immediately before
+// `navigate()`'s fallback yield. Every one of them is guarded by
 // `currentNavigationId === token`; a future lifecycle write added without
 // that guard would reintroduce spurious end transitions. The popstate frame
 // carries no directive scope, so -- unlike `navigate()`'s start and commit
@@ -399,20 +408,21 @@ window.addEventListener( 'popstate', async () => {
 	const token = ++navigationId;
 	currentNavigationId = token;
 
-	// Arm the release *before* the uncached decision below, so a claim that
-	// never resumes -- a parked `await`, or a `reload()` whose document
-	// replacement never lands -- still discharges its debt. Guarded, and
-	// re-checked at fire time: no suspension sits between this timer's
-	// guard and its write, so it is the one end-write site legitimately
-	// exempt from the "re-check after every suspension" rule the other
-	// three follow, and the one write site outside a terminal-write
-	// structure (the `try`/`catch` below). Never cleared on a designed
-	// exit -- the guard already no-ops there.
+	// Arm the lifecycle release *before* the uncached decision below, so a
+	// claim that never resumes -- a parked `await`, or a `reload()` whose
+	// document replacement never lands -- still discharges its debt. The same
+	// mechanism is armed immediately before `navigate()`'s mid-flight fallback
+	// yield below. Guarded, and re-checked at fire time: no suspension sits
+	// between this timer's guard and its write, so it is the one end-write site
+	// legitimately exempt from the "re-check after every suspension" rule the
+	// other three follow, and the one write site outside a terminal-write
+	// structure (the `try`/`catch` below). Never cleared on a designed exit --
+	// the guard already no-ops there.
 	setTimeout( () => {
 		if ( currentNavigationId === token && state.navigating ) {
 			state.navigating = false;
 		}
-	}, POPSTATE_RELEASE_BOUND );
+	}, LIFECYCLE_RELEASE_BOUND );
 
 	// The uncached decision, before any effect-running write. This splits
 	// today's short-circuited `pages.has( … ) && ( await pages.get( … ) )`
@@ -857,6 +867,20 @@ export const { state, actions } = store< Store >( 'core/router', {
 						document.querySelector( hash )?.scrollIntoView();
 					}
 				} else {
+					// This fallback parks the generator at a never-resolving
+					// `forcePageReload()` yield, so it never enters the `finally`
+					// when the document is not replaced. Arm the same detached
+					// lifecycle release immediately before that yield. Its bound is
+					// a scheduling target, not an abandonment test; the guarded
+					// write restores only `navigating` and retains `initiator`.
+					setTimeout( () => {
+						if (
+							currentNavigationId === token &&
+							state.navigating
+						) {
+							state.navigating = false;
+						}
+					}, LIFECYCLE_RELEASE_BOUND );
 					yield forcePageReload( href );
 				}
 			} finally {

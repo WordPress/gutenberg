@@ -534,10 +534,68 @@ describe( 'navigate() lifecycle write protocol', () => {
 		await advanceOneFrame();
 	} );
 
-	// This row deliberately leaves the lifecycle stuck at `navigating: true`
-	// forever — that is the property under test — so it must run last: no
-	// later test can rely on the lifecycle having settled back to idle.
-	test( 'row 11 — a navigation that falls back mid-flight never produces an end', async () => {
+	test( 'a newer navigation keeps the lifecycle in flight when an earlier fallback release reaches its bound', async () => {
+		let fetchCount = 0;
+		const pending: Array< { resolve: ( response: unknown ) => void } > = [];
+		window.fetch = vi.fn( () => {
+			if ( fetchCount++ === 0 ) {
+				return Promise.resolve( {
+					status: 404,
+					text: async () => '',
+				} );
+			}
+			let resolve!: ( response: unknown ) => void;
+			const promise = new Promise( ( res ) => {
+				resolve = res;
+			} );
+			pending.push( { resolve } );
+			return promise;
+		} ) as unknown as typeof window.fetch;
+
+		const fallback = actions.navigate(
+			'http://localhost/row11-guard-fallback',
+			{
+				initiator: 'fallback',
+				timeout: 60000,
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			}
+		);
+		await vi.advanceTimersByTimeAsync( 0 );
+
+		const { raw, dispose } = rawLifecycleLog();
+		const newer = actions.navigate( 'http://localhost/row11-guard-newer', {
+			initiator: 'newer',
+			timeout: 60000,
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		const logAtNewerClaim = raw.slice( 1 );
+
+		expect( pending ).toHaveLength( 1 );
+		await vi.advanceTimersByTimeAsync( 10000 );
+		dispose();
+
+		expect( {
+			navigating: state.navigating,
+			initiator: state.initiator,
+		} ).toEqual( { navigating: true, initiator: 'newer' } );
+		expect( raw.slice( 1 ) ).toEqual( logAtNewerClaim );
+
+		respond( pending[ 0 ], plainHtml( 'row11-guard-newer' ) );
+		await advanceOneFrame();
+		await newer;
+		expect( console ).toHaveErrored();
+
+		void fallback;
+	} );
+
+	// This row deliberately leaves its navigation promise parked at
+	// `forcePageReload()`, but the lifecycle release has already restored idle
+	// and retained the declared initiator. The unresolved generator is stale
+	// as soon as a later navigation claims the token, so no ordering requirement
+	// remains for the lifecycle reading.
+	test( 'row 11 — a navigation that falls back mid-flight is released after the bound while its reload remains pending', async () => {
 		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',
@@ -546,6 +604,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		const promise = actions.navigate( 'http://localhost/row11-dest', {
+			initiator: 'row11-fallback',
 			timeout: 60000,
 			loadingAnimation: false,
 			screenReaderAnnouncement: false,
@@ -560,19 +619,24 @@ describe( 'navigate() lifecycle write protocol', () => {
 			}
 		);
 
-		// Advance past every timer the call arms (the 400 ms loadingTimeout
-		// and the 60 s timeout promise), plus two afterNextFrame windows.
+		// Advance past the fallback's release bound, the 400 ms loadingTimeout,
+		// and the 60 s timeout promise. The forcePageReload() yield remains
+		// parked, so the navigation promise never settles.
 		await vi.advanceTimersByTimeAsync( 60000 + 400 + 200 );
 		dispose();
 
 		expect( settled ).toBe( false );
-		expect( state.navigating ).toBe( true );
-		expect( raw.slice( 1 ).some( ( entry ) => entry.n === true ) ).toBe(
-			true
-		);
-		expect( raw.slice( 1 ).some( ( entry ) => entry.n === false ) ).toBe(
-			false
-		);
+		expect( raw.slice( 1 ) ).toEqual( [
+			{ n: true, i: 'row11-fallback' },
+			{ n: false, i: 'row11-fallback' },
+		] );
+		expect( {
+			navigating: state.navigating,
+			initiator: state.initiator,
+		} ).toEqual( {
+			navigating: false,
+			initiator: 'row11-fallback',
+		} );
 		expect( console ).toHaveErrored();
 	} );
 } );
