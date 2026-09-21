@@ -1311,11 +1311,7 @@ Subscribes to changes in any signal accessed inside the callback, re-running the
 
 Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
 
-When you call `watch()` directly, its callback runs without an ambient directive scope. The runtime installs an empty scope while it runs the callback as written, then restores the previous scope when the callback returns or throws. This keeps surrounding and nested executions unaffected.
-
-Scope reads inside an unwrapped callback are therefore absent: there is no element or context to read, and `getScope()` is `undefined`. Calls such as `getContext()` and `getElement()` behave as they do in any other scope-less callback, such as a `setTimeout()` callback, and raise the existing not-in-scope error. `watch()` doesn't introduce a new error mode. Use [`withScope()`](#withscope) to give a programmatic callback a captured directive scope. A callback wrapped with `withScope()` re-installs the scope it captured, so it isn't the scope-less case.
-
-This behavior applies only to a bare `watch()` call. `data-wp-watch` callbacks and actions invoked from a directive keep their scopes. The `watch()` signature, synchronous timing, returned cleanup function, and `unwatch()` disposer are unchanged.
+The callback runs without a directive scope, even when you call `watch()` from inside an action or a callback that has one. `getContext()` and `getElement()` are therefore not available inside it, and calling them throws, exactly as it does in a `setTimeout()` callback. Use `watch()` for work that only reads the store, and `data-wp-watch` when the callback needs the element or its context.
 
 ```js
 import { store, watch } from '@wordpress/interactivity';

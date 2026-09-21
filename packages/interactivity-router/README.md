@@ -124,7 +124,7 @@ This function normalizes the passed `href`, fetches the page HTML if needed, and
 navigate( href: string, options: NavigateOptions = {} )
 ```
 
-<- `href`: The page `href`.
+- `href`: The page `href`.
 - `options`: Options object.
     - `force`: If `true`, it forces re-fetching the URL. `navigate()` always caches the page, so if the page has been navigated to before, it will be used. Default is `false`.
     - `html`: HTML string to be used instead of fetching the requested URL.
@@ -132,7 +132,7 @@ navigate( href: string, options: NavigateOptions = {} )
     - `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
     - `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
     - `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
-    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none. An empty string or any other invalid value is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
+    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none. Any other value (an empty string, a number, an object, `false`) is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
 
 #### `prefetch`
 
@@ -158,7 +158,7 @@ All three properties are reactive, so reading them inside a directive or a `watc
 
 -   `state.url` (`string`): Synchronized with the current URL.
 -   `state.navigating` (`boolean | undefined`): Truthy while a client-side navigation is in flight. The start is published as soon as the navigation enters the client-side pipeline, without waiting for the destination page; the end is published after the new content has been committed to the DOM, on a later frame, and the delay between the commit and the end is unbounded. A navigation that falls back to a full page load mid-flight keeps it truthy while the browser replaces the document, and resets it to `false` if the document is still there 10 seconds later; a navigation that throws while rendering ends normally, with the page possibly only partially updated. In both cases the end promises no new content. Neither the `loadingAnimation` nor the `screenReaderAnnouncement` option affects it: they change the built-in feedback, not this key.
--   `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for a cache-served back/forward traversal whose entry resolves truthy, calls made with no directive scope, and calls made from inside an unwrapped `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). A callback wrapped with `withScope()` deliberately reinstalls its captured scope and can derive that scope's region instead. An uncached traversal, or a cached entry that resolves falsy, publishes no lifecycle cycle of its own: when there is nothing to clear, it writes nothing, so on a page that has never navigated the key remains `undefined`; when it displaces an in-flight claim or a completed navigation's retained identity, it discharges the state to idle and clears the identity to `null`. The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal clears it — at the claim for any cached traversal, or at the reload exit for an uncached traversal.
+-   `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for back/forward traversals, for calls made with no directive scope, and for calls made from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal that reloads the document clears it to `null`.
 
 Neither `navigating` nor `initiator` is declared when the store is registered, so both read `undefined` until the first client-side navigation writes them, and on pages where the router module never loads. Consume them by truthiness — `if ( state.navigating )` and `state.initiator === myRegionId` — rather than comparing against `false` or `null`. Note that a binding such as `data-wp-bind--aria-busy="state.navigating"` renders no attribute at all while the value is `undefined`, rather than `aria-busy="false"`.
 
@@ -177,20 +177,6 @@ npm install @wordpress/interactivity-router --save
 This step is only required if you use the Interactivity API outside WordPress.
 
 Within WordPress, the package is already bundled in Core. To ensure it's enqueued, add `@wordpress/interactivity-router` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
-
-### Runtime compatibility
-
-`@wordpress/interactivity-router` and `@wordpress/interactivity` are supported as a matched pair when you use the router's ESM entry: npm `import` resolution (`module`/`exports.import`) or WordPress script modules (`wpScriptModuleExports`). Use the `@wordpress/interactivity` release that carries all of the runtime pieces this router consumes: the shared `parseDirectiveValue` directive-value interpretation, the shared `afterNextFrame` scheduler, and the `getScope` scope probe—all three accessed by the router through `privateApis()`—plus the `watch()` scope-isolation contract, which runs callbacks without an ambient directive scope and restores the previous scope afterwards.
-
-Keep the pair together in each deployment:
-
--   **npm (ESM):** Importing `@wordpress/interactivity-router` resolves `@wordpress/interactivity` as a package dependency.
--   **Gutenberg plugin:** The plugin re-registers both module IDs from one build.
--   **WordPress:** A WordPress release that ships this feature ships both modules at that release's version.
-
-This ESM matched pair is the supported pairing. The router has no capability gate or fallback for an older or mismatched runtime.
-
-The package also advertises a CommonJS entry through `main` and `exports.require` (`build/index.cjs`), but that entry isn't supported. It calls `require( '@wordpress/interactivity' )`, while `@wordpress/interactivity` exposes only an `import` condition. As a result, `require( '@wordpress/interactivity-router' )` fails at module resolution.
 
 Furthermore, this package assumes your code will run in an **ES2015+** environment. If you're using an environment with limited or no support for such language features and APIs, you should include the polyfill shipped in [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.
 

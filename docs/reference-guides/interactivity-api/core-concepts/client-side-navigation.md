@@ -383,7 +383,7 @@ store( 'myPlugin', {
 
 For accessibility, consider moving focus to a meaningful element after navigation, such as the main content area or a heading, so keyboard and screen reader users know where they are on the new page.
 
-The pattern above only runs for navigations this action started. To cover every other navigation that publishes a lifecycle cycle — such as another link inside the same region or a cache-served back/forward traversal whose entry resolves truthy — react to the end of the navigation instead, with a watcher on the router's `state.navigating` property. On the normal path, an uncovered traversal (an uncached destination or a cached entry that resolves falsy) reloads the document without a lifecycle cycle of its own. If a synchronous consumer throws while a cached-falsy traversal clears a retained identity, that traversal is aborted before its reload; the document stays, the reading is left idle, and it still publishes no lifecycle cycle of its own. From idle, the watcher does not run for either outcome, and when an uncovered traversal reaches its normal discharge of a displaced reading, the watcher sees that discharge rather than a traversal cycle. See [Which navigations update the keys](#which-navigations-update-the-keys) for the cached-falsy boundary, [Region-scoped focus after navigation](#region-scoped-focus-after-navigation) for the watcher, and [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) for the properties it reads. Such a watcher runs slightly later than the code after the `yield` above, because `state.navigating` is updated on a later frame than the one in which `actions.navigate()` resolves.
+The pattern above only runs for navigations this action started. To also cover navigations it did not start — another link inside the same region, or a back/forward traversal — react to the end of the navigation instead, with a watcher on the router's `state.navigating` property. Such a watcher runs slightly later than the code after the `yield` above, because `state.navigating` is updated on a later frame than the one in which `actions.navigate()` resolves. See [Region-scoped focus after navigation](#region-scoped-focus-after-navigation) for the watcher, and [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) for the properties it reads.
 
 ### Adding new regions on navigation
 
@@ -407,7 +407,7 @@ Sometimes you need UI elements — like modals, sidebars, or notification panels
 
 The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the region will be created and appended to the element matching the selector.
 
-**Example: Modal that appears on navigation:**
+**Example: Modal that appears on navigation**
 
 _Page without modal (page-1.php):_
 
@@ -746,7 +746,7 @@ Use cases for disabling feedback:
 
 ### Subscribing to page changes
 
-The `core/router` store exposes a reactive `state.url` property that holds the current page's URL. By reading this value inside a `data-wp-watch` or `watch` callback, you create a reactive subscription that re-runs when the URL changes. The router assigns the value in the commit batch that renders a client-side destination and when it renders a cache-served back/forward traversal. A same-URL assignment—such as the `navigate( window.location.href, { force: true } )` refresh pattern—doesn't change the value, so it doesn't notify subscribers. A navigation that falls back to a full page load commits no destination and leaves `state.url` at the source page's URL. Use the lifecycle keys below for work that must react to every covered navigation.
+The `core/router` store exposes a reactive `state.url` property that updates every time a client-side navigation occurs. By reading this value inside a `data-wp-watch` or `watch` callbacks, you create a reactive subscription that re-runs whenever the URL changes.
 
 ```js
 // view.js
@@ -770,7 +770,7 @@ store( 'myPlugin', {
 ```
 
 <div class="callout callout-info">
-Blocks can read the `core/router` store without importing the `@wordpress/interactivity-router` package. When the router module evaluates, it initializes `state.url` from the current location unless the server has already seeded it. If the module never loads, `state.url` is `undefined` only when the server has not seeded `core/router.url`; `@wordpress/interactivity` merges a server-seeded value into the `core/router` store, so that value remains readable without the router module. See [The navigation lifecycle keys](#the-navigation-lifecycle-keys) for the router-absent behavior.
+The `core/router` store and `state.url` are available and populated on page load, so there's no need to import the `@wordpress/interactivity-router` package to access them.
 </div>
 
 ## Reacting to the navigation lifecycle
@@ -792,17 +792,17 @@ For the exact types and edge cases, see the [`core/router` state reference](http
 
 ### When the keys change
 
-**When a navigation starts**, the router resolves the initiator for the call, then calls `actions.prefetch()` for the destination. That prefetch starts the destination fetch, and the router sets `state.navigating` and `state.initiator` together, in a single batch, before the navigation yields to wait for the page. The start is synchronous with the call: it doesn't wait for the fetch or the page, and the fetch may already be in flight when the start pair is published. This happens for every client-side navigation, however fast: the 400ms delay described in [Disabling navigation feedback](#disabling-navigation-feedback) only applies to the built-in loading animation and screen reader announcement, and the `loadingAnimation` and `screenReaderAnnouncement` options do not affect these properties either. A navigation to the URL you are already on, like the `navigate( window.location.href, { force: true } )` refresh pattern, counts too.
+**When a navigation starts**, the router sets `state.navigating` and `state.initiator` together, in a single batch, before it waits for the destination. This happens for every client-side navigation, however fast: the 400ms delay described in [Disabling navigation feedback](#disabling-navigation-feedback) only applies to the built-in loading animation and screen reader announcement, and the `loadingAnimation` and `screenReaderAnnouncement` options do not affect these properties either. A navigation to the URL you are already on, like the `navigate( window.location.href, { force: true } )` refresh pattern, counts too.
 
 **When a navigation ends**, the router sets `state.navigating` back to `false`. By then the new content is normally already in the DOM and `state.url` already holds the destination URL; the two exceptions are described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) below. The update happens on a later frame than the DOM commit (the moment the new content is applied to the real DOM), so that even a very fast navigation produces two separate updates rather than a single one that only shows the finished state. How much later is not specified, so treat it as "some time after the content is committed". In particular, the promise returned by `actions.navigate()` resolves before this update, so code like `yield actions.navigate( url ); if ( state.navigating ) { … }` still sees `state.navigating` as truthy. To react to the end of a navigation, use a watcher instead.
 
-`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts, so a watcher reacting to the end can still read who started it. A back/forward traversal clears it instead — at the claim for any cached traversal, or at the reload exit for an uncached traversal — as described in [Which navigations update the keys](#which-navigations-update-the-keys). This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
+`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts, so a watcher reacting to the end can still read who started it. (The one exception, a back/forward traversal that reloads the document, is described in [Which navigations update the keys](#which-navigations-update-the-keys).) This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
 
 ### When a navigation ends without new content
 
 Normally, when `state.navigating` becomes `false` the new content is already in the DOM. Two cases break that rule:
 
--   **The router threw while rendering the new page.** `state.navigating` is still set to `false` on a later frame, so it does not stay truthy forever. `state.url` already holds the destination URL, but the regions may still contain their old content, be partially updated, or be absent.
+-   **The router threw while rendering the new page.** `state.navigating` is still set to `false` on a later frame, so it does not stay truthy forever. `state.url` already holds the destination URL, but the regions may be only partially updated.
 -   **The navigation fell back to a full page load.** A failed fetch, a non-200 response, an unparseable response, the navigation timeout, or a destination page whose configuration disables client-side navigation all make the router hand the navigation to the browser, which then replaces the document. Nothing was rendered, and `state.url` still holds the URL of the page you were on. `state.navigating` stays truthy while the browser replaces the document. If the document is still there 10 seconds after the fallback began — the visitor declined an unload prompt, say, or the reload is very slow — the router stops waiting and sets `state.navigating` to `false`. That is not an error report: it only means that nothing is in progress any more. The 10 seconds are measured on the page's own timers, so a backgrounded tab may run the reset later, and they are unrelated to `navigate()`'s `timeout` option, which happens to default to 10 seconds too.
 
 In both cases `state.initiator` keeps the navigation's value, as it does after any other navigation.
@@ -819,22 +819,22 @@ Both properties are updated for:
 No navigation starts for:
 
 -   A `navigate()` call on a page where [client-side navigation is disabled](#disabling-client-side-navigation-on-certain-pages). The router hands the navigation to the browser before doing any client-side work.
--   A back/forward traversal to a page that is not in the in-memory cache, or whose cached fetch had failed. On the normal path, the uncached exit invokes `window.location.reload()` before writing any state, and a cached-falsy entry takes the reload exit; neither publishes a lifecycle cycle of its own. The cached-falsy path first clears a retained `state.initiator` at its claim, before awaiting the entry. If a synchronous consumer, such as a `watch()` callback, throws while observing that clear, the outer handler rethrows before the reload branch: the traversal is aborted before the reload, the document stays, and the clear stands. A displaced in-flight reading is then ended by the guarded end write, leaving the reading idle; this observer-side exception isn't a lifecycle cycle or a supported cancellation mechanism. From pristine idle, neither path writes anything, so both keys stay `undefined`. On the normal reload path, if either an in-flight navigation or a retained initiator is present, the traversal discharges the readable values: an uncached traversal does so at the reload exit, while a cached-falsy traversal clears a retained initiator at the claim and any in-flight navigation at the reload exit, so no stale value survives the traversal.
+-   A back/forward traversal to a page that is not in the in-memory cache, or whose cached fetch had failed, which causes a full page reload. From an idle state it writes nothing. If a navigation was still in progress when the visitor pressed Back, or an earlier navigation's initiator was still set, the traversal sets `state.navigating` to `false` and `state.initiator` to `null` as it triggers the reload, so no stale value survives into the reload.
 -   `actions.prefetch()`. Prefetching is not navigating.
 
 **A failed navigation is never reported as a successful one.** When a navigation starts client-side and then falls back to a full page load, `state.navigating` becomes truthy, nothing is rendered, and `state.url` keeps the URL of the page you were on. `state.navigating` stays truthy while the browser replaces the document, and is set to `false` only if the document is still there 10 seconds later, as described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content). The promise returned by `navigate()` never resolves in that case either.
 
 ### Overlapping navigations
 
-The router is latest-wins (see [Race condition protection](#race-condition-protection)), and so are these properties. If a second navigation starts before the first one ends, `state.navigating` stays truthy from the first start until the winning navigation ends, with no idle gap in between and no second "end" when the abandoned navigation finishes. When the winner ends, `state.navigating` becomes `false` once. The 10-second limit described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) applies here too: if the winning navigation is a back/forward traversal whose cached page fetch has still not settled after 10 seconds, the router sets `state.navigating` to `false` rather than leaving it truthy indefinitely. If that cached entry settles after the release, a truthy page starts a fresh cycle: `state.navigating` rises again, `state.initiator` reads `null` in the start pair, and the ordinary end follows. On the normal path, a falsy result takes the reload exit instead and publishes no cycle of its own. If a synchronous consumer throws while observing the cached-falsy claim's identity clear, the traversal is aborted before that reload; the document stays, the reading is left idle, and it still publishes no lifecycle cycle of its own. See [Which navigations update the keys](#which-navigations-update-the-keys) for this boundary.
+The router is latest-wins (see [Race condition protection](#race-condition-protection)), and so are these properties. If a second navigation starts before the first one ends, `state.navigating` stays truthy from the first start until the winning navigation ends, with no idle gap in between and no second "end" when the abandoned navigation finishes. When the winner ends, `state.navigating` becomes `false` once. The 10-second limit described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) applies here too: if the winning navigation is a back/forward traversal whose cached page fetch has still not settled after 10 seconds, the router sets `state.navigating` to `false` rather than leaving it truthy indefinitely. If that fetch settles later, the traversal then updates both properties like an ordinary navigation.
 
-`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator. A cached traversal also clears an identity retained from a completed navigation at its claim, before waiting for its entry.
+`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator.
 
 For a per-region loading indicator this is the behavior you want, with no bookkeeping of your own: a region whose navigation is superseded by another region's stops showing as the initiator at that moment, and two overlapping navigations from the same region keep that region showing as the initiator until the last of them ends.
 
 ### Who initiated the navigation
 
-`actions.navigate()` accepts an `initiator` option with four cases:
+`actions.navigate()` accepts an `initiator` option that can take three kinds of value:
 
 ```js
 // Derive it from where the call was made (the default).
@@ -843,25 +843,24 @@ yield actions.navigate( url );
 // Set it explicitly.
 yield actions.navigate( url, { initiator: 'myPlugin/cart' } );
 
-// Suppress attribution.
+// Leave it empty.
 yield actions.navigate( url, { initiator: null } );
 ```
 
 -   **A nonempty string** is stored in `state.initiator` as is, and no region lookup happens. Use this to give a block an identity of its own that other code can read, including code in a different store that does not own the action that navigated.
 -   **`null`** leaves `state.initiator` as `null` for the whole navigation, even when the call was made from inside a router region.
 -   **Omitted** derives the initiator from where the action was called: the nearest element with `data-wp-router-region` that encloses the element whose directive called the action, including that element itself. When regions are nested, the nearest one wins: the outer region is still what the router updates, but the inner region is what started the navigation.
--   **An empty string or any other invalid value** resolves to `null`, logs a warning when `SCRIPT_DEBUG` is enabled, and never falls back to deriving the initiator.
 
-A derived initiator is the region's ID as you wrote it, not the raw attribute text: for the JSON object form used in [Adding new regions on navigation](#adding-new-regions-on-navigation) it is the value of `id`, and a `namespace::` prefix is stripped. An empty or non-string `id` in that object form derives `null`; a malformed but nonempty attribute value remains its raw post-prefix string. See the [`initiator` option reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#navigate) for the exact rules.
+A derived initiator is the region's ID as you wrote it, not the raw attribute text: for the JSON object form used in [Adding new regions on navigation](#adding-new-regions-on-navigation) it is the value of `id`, and a `namespace::` prefix is stripped. Any other kind of `initiator` value is treated as `null`. See the [`initiator` option reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#navigate) for the exact rules.
 
 ### Navigations with no initiator
 
 `state.initiator` is `null` when:
 
--   **The visitor used the browser's back or forward button.** A cache-served traversal whose entry resolves truthy writes `state.initiator` as `null` in its start pair. An uncached traversal, or a cached entry that resolves falsy, normally reloads the document without publishing a lifecycle cycle of its own. If a synchronous consumer throws while a cached-falsy traversal clears a retained identity, it can abort before the reload; the document stays, the reading is left idle, and it still publishes no lifecycle cycle of its own. See [Which navigations update the keys](#which-navigations-update-the-keys) for this boundary. On the normal reload path, from pristine idle either uncovered path writes nothing, so both keys stay `undefined`; if either displaces an in-flight navigation or a retained identity, it discharges the reading as reload starts, ending any in-flight reading with `state.navigating = false` and clearing a retained identity to `null` (a cached-falsy entry clears that identity at its claim). No block started the navigation, which is what lets a block tell a traversal apart from a navigation it started itself.
+-   **The visitor used the browser's back or forward button.** No block started the navigation, which is what lets a block tell a traversal apart from a navigation it started itself.
 -   **A link was handled by the document-level listener of full-page mode**, wherever the link sits. A plain link inside a block's region was not started by that block.
 -   **`navigate()` was called with no directive scope**, for example from a module that imports the router and calls it from its own code rather than from an action bound to an element.
--   **`navigate()` was called from inside an unwrapped `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url`.** That callback runs without a directive scope, so the call does not inherit the initiator of the navigation it is reacting to. A callback wrapped with `withScope()` deliberately reinstalls its captured scope and can derive that region instead. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
+-   **`navigate()` was called from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url`.** That callback runs without a directive scope, so the call does not inherit the initiator of the navigation it is reacting to. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
 
 In full-page mode, the `<body>` element itself carries `data-wp-router-region="core/body"`, so an element with a directive that calls `navigate()` from outside every block's router region derives `core/body`, where the same markup in region-based mode derives `null`. See [Full-page client-side navigation](#full-page-client-side-navigation-experimental).
 
@@ -879,11 +878,11 @@ A derived initiator identifies the region, not the element: two blocks inside th
 
 Where you read the two properties decides when your code runs and what it can see:
 
--   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame. For a navigation that reaches its content commit, a callback reacting to its end sees the newly committed destination DOM. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — publishes no destination content, so the callback may observe old, partially updated, or absent content and can't assume a committed destination. Derived state getters evaluated through a directive run in that element's scope too.
--   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes. An unwrapped callback has **no directive scope** — `getContext()` and `getElement()` are not available inside it — while a callback wrapped with `withScope()` deliberately reinstalls its captured scope. Use an unwrapped watcher for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM. When it is keyed on the end of a navigation that reaches its content commit, it runs after the commit and observes the new destination DOM. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — publishes no destination content, so the callback may observe old, partially updated, or absent content and can't assume a committed destination. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
+-   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
+-   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes and has **no directive scope** — `getContext()` and `getElement()` are not available inside it. Use it for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
 -   **`data-wp-init`** runs in scope once per element, which makes it the place for setup that belongs to hydration rather than to a navigation.
 
-"The new DOM" above applies only to a navigation that reaches its content commit. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — promises no destination content, so a callback reacting to it may find old, partially updated, or absent content. Look elements up inside the callback and check that they exist.
+"The new DOM" above assumes the navigation rendered its content. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content), a callback reacting to the end with either primitive may find the previous page or a partially updated one, so look elements up inside the callback and check that they exist.
 
 ### Recipes
 
@@ -967,7 +966,7 @@ const { state: routerState } = store( 'core/router' );
 
 // The previous `navigating` value, per region. See the two notes below for
 // why this lives neither in `context` nor on the region element.
-const wasNavigating = Object.create( null );
+const wasNavigating = {};
 
 store( 'myPlugin', {
 	callbacks: {
@@ -981,11 +980,8 @@ store( 'myPlugin', {
 				routerState.initiator === regionId
 			) {
 				// Looked up after the navigation ends, never captured
-				// before it: a navigation that reaches its content commit
-				// has its destination content in the DOM by this point.
-				// An end without that commit promises no destination content
-				// and may leave old, partially updated, or absent content.
-				// The `?.` covers a target that isn't there.
+				// before it: the region's content has been replaced by now.
+				// The `?.` chain covers a navigation that ends without new content.
 				getElement()
 					.ref.closest( '[data-wp-router-region]' )
 					?.querySelector( 'a' )
@@ -1012,15 +1008,15 @@ The watcher lives on its own element inside the region, and the region's ID reac
 
 If the region ID is a literal you wrote by hand, drop the `getContext()` line and compare against that literal.
 
-**React to the change, not to the condition.** `state.initiator` keeps its value after a navigation ends (see [When the keys change](#when-the-keys-change)); a traversal clears it separately, so a callback that checks `! state.navigating && state.initiator === regionId` would move focus again on every later re-run. Comparing against the previous value makes it act exactly once, when the navigation ends.
+**React to the change, not to the condition.** `state.initiator` keeps its value after a navigation ends (see [When the keys change](#when-the-keys-change)), so a callback that checks `! state.navigating && state.initiator === regionId` would move focus again on every later re-run. Comparing against the previous value makes it act exactly once, when the navigation ends.
 
-**Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` value is bookkeeping, not something the page renders, so a key-preserving module-scope object is the right home for it.
+**Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` value is bookkeeping, not something the page renders, so a plain module-scope object is the right home for it.
 
-**Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A key-preserving module-scope object keyed by region ID does, and one object serves every region on the page.
+**Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A module-scope object keyed by region ID does, and one object serves every region on the page.
 
-**Capture no DOM reference across the navigation.** Look up the focus target after the falling edge, not before it. For a navigation that reaches its content commit, the end is published after the destination content is in the DOM, so the lookup finds the new page's element. An end reached without that commit promises no destination content and may leave the lookup against old, partially updated, or absent content. The `?.focus()` guard handles a target that isn't there.
+**Capture no DOM reference across the navigation.** The focus target is looked up after the navigation ends, when the destination's content is already committed, so the lookup finds the new page's element. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) the element may be missing, which is why the lookup ends in `?.focus()` rather than assuming success.
 
-On the initial page load the callback runs once at hydration, reads `state.navigating` as `undefined`, records `false` and does nothing. On a cache-served back/forward traversal whose entry resolves truthy, the start pair sets `state.initiator` to `null`, so the comparison fails and focus stays where the browser put it. An uncached traversal, or a cached entry that resolves falsy, publishes no lifecycle cycle for the callback to see: from idle, the callback does not re-run, and when the traversal discharges a displaced in-flight reading or a retained identity, the callback observes the discharge and the comparison still fails. Focus therefore stays where the browser put it, which is usually what a visitor who pressed Back expects.
+On the initial page load the callback runs once at hydration, reads `state.navigating` as `undefined`, records `false` and does nothing. On a back/forward traversal `state.initiator` is `null`, so the comparison fails and focus stays where the browser put it, which is usually what a visitor who pressed Back expects.
 
 #### Debounced page-level loading bar
 
@@ -1064,8 +1060,8 @@ watch( () => {
 The callback reads `state.navigating` and nothing else, so it re-runs only when that property changes, which is what keeps the timer from being started twice. Three things follow from that, and none of them needs bookkeeping of your own:
 
 -   **Overlapping navigations start the timer once.** `state.navigating` stays truthy from the first start until the winning navigation ends (see [Overlapping navigations](#overlapping-navigations)), so a double click does not restart the delay or flicker the bar.
--   **A navigation that falls back to a full page load can release the bar before the document is replaced.** `state.navigating` stays truthy while the browser replaces the document, but the lifecycle release returns the reading to idle at its 10-second bound even if the document has not been replaced — a slow replacement is indistinguishable from a declined unload (see [When a navigation ends without new content](#when-a-navigation-ends-without-new-content)). The watcher then clears the timer and hides the bar. The release is a bound on how long this page reports in progress, not a failure signal or proof that the replacement will not happen.
--   **A cache-served traversal whose entry resolves truthy publishes a lifecycle cycle.** It usually finishes inside the 400ms window, so no bar appears. An uncached traversal or a cached entry that resolves falsy publishes no cycle of its own: from idle, `state.navigating` never rises, so the watcher never arms the timer; if the traversal discharges a displaced in-flight claim, the reading falls to idle and the watcher takes its `else` branch. The traversal produces no bar.
+-   **A navigation that falls back to a full page load keeps the bar up while the browser replaces the document.** `state.navigating` becomes `false` only if the document is still there 10 seconds later (see [When a navigation ends without new content](#when-a-navigation-ends-without-new-content)), so the bar stays up for as long as the full page load is really in progress, and comes down if the load never happens, for example because the visitor declined an unload prompt.
+-   **Traversals behave like any other navigation.** Those served from the in-memory cache almost always finish well inside the 400ms window, so no bar appears.
 
 On the initial page load `state.navigating` is `undefined`, so the first run takes the `else` branch and does nothing.
 
@@ -1121,7 +1117,7 @@ const { actions } = store( 'myPlugin', {
 
 Router regions are the sections of your page that the router knows how to update during client-side navigation. They act as boundaries that tell the router "this is the content that should change when navigating between pages."
 
-**Defining router regions:**
+**Defining router regions**
 
 You define a router region by adding the `data-wp-router-region` attribute to an element alongside `data-wp-interactive` (as described in [Setting up router regions](#setting-up-router-regions) above).
 
@@ -1139,7 +1135,6 @@ The attribute value serves as a unique identifier for that region. You can speci
     ```
 
 2. As a JSON object (when you need to pass other options):
-
     ```html
     <div
     	data-wp-interactive="myPlugin"
@@ -1151,7 +1146,7 @@ The attribute value serves as a unique identifier for that region. You can speci
 
 The region ID must be unique within a single page and consistent across pages that share the same region. For example, if both your "Products" page and "Product Detail" page have a sidebar, and you want that sidebar to update during navigation, both pages should define a region with the same ID (e.g., `"myPlugin/sidebar"`).
 
-**How regions are processed during page fetch:**
+**How regions are processed during page fetch**
 
 When the router fetches a new page (either through `prefetch()` or as part of `navigate()`), it processes the HTML to extract and prepare all router regions. This happens in several steps:
 
@@ -1165,13 +1160,13 @@ Finally, each region's virtual DOM is stored in the page cache entry, indexed by
 
 Beyond processing regions, the router also extracts the page's CSS stylesheets and JavaScript script modules during this step. New stylesheets that haven't been loaded yet are added to the document in a disabled state so the browser can begin downloading them without applying them. Similarly, new script modules are identified and their dependency trees are resolved and fetched. These assets are prepared in advance so that when navigation actually renders the new content, all necessary styles and scripts are ready. The details of how styles and script modules are handled are covered in the [CSS handling](#css-handling) and [Script module handling](#script-module-handling) sections below.
 
-**How regions are rendered during navigation:**
+**How regions are rendered during navigation**
 
 When `navigate()` is called and the target page has been successfully fetched (or was already cached), the router needs to update the current page to show the new content. This rendering process is carefully orchestrated to be efficient and avoid visual glitches.
 
 The router begins by examining which regions exist in the current page and which exist in the target page. Based on this comparison, three different scenarios can occur:
 
-**Scenario 1: Region exists on both pages (update):**
+**Scenario 1: Region exists on both pages (update)**
 
 This is the most common case. When a region with a given ID exists on both the current page and the target page, the router updates the existing region with the new content.
 
@@ -1194,7 +1189,7 @@ The `attachTo` property contains a CSS selector that identifies where in the cur
 
 This allows content that exists on one page but not another to appear smoothly during navigation, without requiring the target element to exist in advance.
 
-**Scenario 3: Region exists only on the current page (remove):**
+**Scenario 3: Region exists only on the current page (remove)**
 
 When a region exists on the current page but not on the target page, it means that content is no longer needed. The router handles this by setting the region's content to empty, effectively clearing it from the display.
 
@@ -1247,13 +1242,13 @@ This pattern is useful for global UI elements that need to stay synchronized wit
 
 One of the trickier aspects of client-side navigation is managing CSS style sheets. Different pages may require different styles, and the router must ensure that the correct styles are active for each page — without causing flashes of unstyled content or breaking the CSS cascade order.
 
-**The challenge of CSS cascade order:**
+**The challenge of CSS cascade order**
 
 CSS rules are applied in a specific order, and when two rules have the same specificity, the one that appears later in the document "wins." This means that the order of `<link>` and `<style>` elements in your HTML matters. If the router simply appended new style sheets to the end of the document, it could inadvertently change which rules take precedence, causing visual bugs.
 
 Consider this example: Page A has style sheets `base.css` and `theme.css`, and Page B has `base.css`, `components.css` and `theme.css`. If the user navigates from A to B, the router needs to insert `components.css` between `base.css` and `theme.css` — not at the end. Otherwise, any rules in `theme.css` that are meant to override `components.css` would stop working.
 
-**How styles are extracted and prepared:**
+**How styles are extracted and prepared**
 
 When the router fetches a page, it extracts all style-related elements: both `<link rel="stylesheet">` tags and inline `<style>` blocks. Each style element is identified by a combination of its attributes (for `<link>` tags, primarily the `href`) or its content hash (for inline `<style>` blocks).
 
@@ -1263,7 +1258,7 @@ The router then compares the extracted styles with those already present in the 
 2. **New**: The style sheet doesn't exist in the current page. It needs to be added.
 3. **No longer needed**: The style sheet is in the current page but not in the target page. It will be disabled during navigation.
 
-**Preloading new styles without applying them:**
+**Preloading new styles without applying them**
 
 For new style sheets, the router faces a dilemma: it needs to ensure the styles are fully loaded before showing the new page content (to prevent flash of unstyled content), but it doesn't want to apply them yet (because the user is still viewing the current page).
 
@@ -1271,7 +1266,7 @@ The solution is to add new `<link>` elements with their `media` attribute set to
 
 When a `<link>` element is added this way, the browser begins downloading the CSS file immediately. The router tracks when each style sheet finishes loading by listening for the `load` event. This allows it to wait until all new styles are ready before proceeding with navigation.
 
-**Maintaining cascade order with the Shortest Common Supersequence algorithm:**
+**Maintaining cascade order with the Shortest Common Supersequence algorithm**
 
 When inserting new style sheets, the router must preserve the correct cascade order. It accomplishes this using an algorithm based on finding the Shortest Common Supersequence (SCS) of two sequences.
 
@@ -1291,7 +1286,7 @@ This approach ensures that:
 -   New style sheets are inserted at the proper position to maintain cascade correctness
 -   The minimum number of DOM operations is performed
 
-**Activating and deactivating styles during navigation:**
+**Activating and deactivating styles during navigation**
 
 When `navigate()` actually renders the new page, the router toggles style sheets on and off:
 
@@ -1305,7 +1300,7 @@ By keeping deactivated style elements in the DOM (rather than removing them), th
 
 The Interactivity API uses [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for interactive behavior. The router must ensure that when navigating to a new page, the required script modules are loaded and executed.
 
-**Identifying script modules for client-side navigation:**
+**Identifying script modules for client-side navigation**
 
 Not all script modules should be loaded during client-side navigation. Some modules might be for admin functionality, or for features that only apply on initial page load. As described in the [Getting started](#getting-started-with-the-interactivity-router) section, WordPress uses the `data-wp-router-options` attribute to mark which script modules should be loaded during navigation:
 
@@ -1319,7 +1314,7 @@ Not all script modules should be loaded during client-side navigation. Some modu
 
 When the router fetches a page, it scans for all `<script type="module">` elements that have this attribute with `loadOnClientNavigation` set to `true`. These are the modules it will preload and execute.
 
-**Processing the import map:**
+**Processing the import map**
 
 Modern JavaScript uses import maps to resolve bare module specifiers (like `@wordpress/interactivity`) to actual URLs. WordPress generates an import map that tells the browser where to find each module:
 
@@ -1336,7 +1331,7 @@ Modern JavaScript uses import maps to resolve bare module specifiers (like `@wor
 
 When the router fetches a new page, it extracts the import map from that page and merges any new mappings with the current page's import map. This ensures that script modules can resolve their dependencies correctly even when navigating between pages that have different sets of scripts.
 
-**Preloading script modules and their dependencies:**
+**Preloading script modules and their dependencies**
 
 Preloading script modules requires resolving their full dependency tree, since a single entry-point module might depend on dozens of other script modules, which might depend on dozens more.
 
@@ -1350,7 +1345,7 @@ To handle this, the router performs a recursive dependency resolution:
 
 The router is smart about avoiding redundant work. If a script module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again — the browser already has it cached.
 
-**Handling the import timing:**
+**Handling the import timing**
 
 An important subtlety is that script module code shouldn't execute until navigation actually happens. The router needs to have the script module code ready (to avoid delays during navigation), but it shouldn't run that code while the user is still viewing the current page.
 
@@ -1358,7 +1353,7 @@ The router accomplishes this by transforming the fetched script modules. It rewr
 
 Because the browser's module system caches script modules by URL, importing the same blob URL multiple times returns the same module instance. This ensures that each script module is only executed once, even if multiple code paths try to import it.
 
-**Script module execution during navigation:**
+**Script module execution during navigation**
 
 When `navigate()` renders the new page, it imports all the script modules that were preloaded for that page:
 
@@ -1377,7 +1372,7 @@ Interactive elements often need data from the server — configuration values, c
 
 During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
 
-**How server data is embedded in pages:**
+**How server data is embedded in pages**
 
 When WordPress renders a page with interactive elements, it embeds server-provided data in special `<script>` tags:
 
@@ -1413,7 +1408,7 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 </div>
 ```
 
-**Extracting state, context and config during fetch:**
+**Extracting state, context and config during fetch**
 
 When the router fetches a new page, it extracts these types of server data:
 
@@ -1423,13 +1418,13 @@ When the router fetches a new page, it extracts these types of server data:
 
 3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extract its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
 
-**Merging server data during navigation:**
+**Merging server data during navigation**
 
 When navigation renders the new page, the server-provided data may need to merge with the existing client-side state, depending on the use case. The key principle here is that **client-side state is never automatically overwritten by the server**. This design ensures that any changes your JavaScript code has made to the state (such as user preferences, UI toggles, or form input) are preserved across navigations.
 
 For **global state**, the merge works as follows: properties that already exist on the client are left untouched, and only new properties (those that don't exist on the client yet) are added from the server data. If you need the client state to reflect server changes during navigation, use `getServerState()` to subscribe to the server-provided values and update the client state yourself.
 
-```text
+```
 Server state from the initial page:
   { "totalResults": 120, "isFiltersOpen": false }
 
@@ -1449,7 +1444,7 @@ After navigation:
 
 For **local context**, the behavior follows the same principle. The Interactivity API tracks server context and client context separately. During navigation, the server context is updated with the values from the new page, but the client context remains unchanged. Use `getServerContext()` to read the server-provided values and `getContext()` to read the client-side values, choosing whichever is appropriate for your use case.
 
-```text
+```
 Server context from the initial page:
   { "isAvailable": true, "isLiked": false }
 
@@ -1467,7 +1462,7 @@ After navigation:
 
 `isAvailable` stays `true` in `getContext()` because it already existed on the client. `isLiked` is also preserved. `discount` is added because it didn't exist on the client yet. Meanwhile, `getServerContext()` always reflects exactly what the server sent for the new page.
 
-**Subscribing to server data changes:**
+**Subscribing to server data changes**
 
 The Interactivity API provides two functions for accessing server-provided data that updates during navigation:
 
@@ -1503,8 +1498,8 @@ When `prefetch()` is called (for example, on link hover):
 When `navigate()` is called (for example, on link click):
 
 1. The router checks if client navigation is disabled; if so, falls back to full page load without touching `state.navigating` or `state.initiator`.
-2. The router records the target URL and calls `actions.prefetch()` for it. The prefetch reuses the Phase 1 cache check and begins fetching the page if it isn't already cached.
-3. `state.navigating` and `state.initiator` are set together in a single batch, synchronously, before the navigation yields to wait for the page. The fetch may already be in flight when this start pair is published.
+2. If not already prefetched, the fetch process from Phase 1 starts now.
+3. `state.navigating` and `state.initiator` are set together in a single batch, before the router waits for the page.
 4. The router waits for the page to be ready (fetch complete, styles loaded).
 5. A loading indicator may appear if the wait exceeds a threshold (400ms), together with a "loading" announcement for screen readers. That threshold only applies to this built-in feedback, not to `state.navigating`.
 6. The rendering phase begins:
@@ -1519,7 +1514,7 @@ When `navigate()` is called (for example, on link click):
 8. Screen reader announcement is made for accessibility.
 9. If the URL has a hash, the page scrolls to that element.
 10. Navigation is complete.
-11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared by this end write; it keeps its value until the next navigation replaces it or a traversal clears it.
+11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared; it keeps its value until the next navigation replaces it.
 
 Steps 3 and 11 are the two moments the lifecycle properties change. [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) covers what your code can rely on about them, including why the end is set on a later frame instead of inside step 6.
 
