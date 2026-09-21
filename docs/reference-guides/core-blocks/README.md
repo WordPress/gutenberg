@@ -339,7 +339,7 @@ Display footnotes added to the page.
 
 -	**Name:** [core/footnotes](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-footnotes/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** anchor, color (background, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
 
 ## Classic
 
