@@ -961,7 +961,7 @@ On the initial page load both properties read `undefined`, so the getter returns
 
 ```js
 // view.js
-import { getContext, store } from '@wordpress/interactivity';
+import { getContext, getElement, store } from '@wordpress/interactivity';
 
 const { state: routerState } = store( 'core/router' );
 
@@ -986,12 +986,9 @@ store( 'myPlugin', {
 				// An end without that commit promises no destination content
 				// and may leave old, partially updated, or absent content.
 				// The `?.` covers a target that isn't there.
-				document
-					.querySelector(
-						`[data-wp-router-region="${ CSS.escape(
-							regionId
-						) }"] a`
-					)
+				getElement()
+					.ref.closest( '[data-wp-router-region]' )
+					?.querySelector( 'a' )
 					?.focus();
 			}
 
