@@ -383,6 +383,10 @@ store( 'myPlugin', {
 
 For accessibility, consider moving focus to a meaningful element after navigation, such as the main content area or a heading, so keyboard and screen reader users know where they are on the new page.
 
+The pattern above only runs for navigations this action started. If your focus code should also cover navigations it did not start — another link inside the same region, or a back/forward traversal it should deliberately decline — react to the end of the navigation instead, with a watcher built from the router's lifecycle state. [Recipe: region-scoped focus after navigation](#recipe-region-scoped-focus-after-navigation) below shows that watcher, and [Subscribing to page changes](#subscribing-to-page-changes) describes the state it reads.
+
+One timing difference is worth knowing before you swap one for the other: `actions.navigate()`'s promise resolves once the new content is committed, while the end transition is published on a later frame, so an end watcher acts roughly a frame after the `await` above returns. The exact delay is not guaranteed — see [When each transition happens](#when-each-transition-happens). The `await` pattern remains the right tool for focus work that only ever follows a navigation you started yourself.
+
 ### Adding new regions on navigation
 
 Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page.
@@ -914,6 +918,212 @@ Both keys are public, supported API, and both are meant to keep working as the r
 -   **The delay between the commit and the end transition is unbounded.** Do not depend on a frame count, on a microtask, or on your callback running before or after anyone else's deferred work.
 
 The new keys also do not change the deprecated `state.navigation.hasStarted` / `hasFinished` flags in place. Reading `state.navigating` or `state.initiator` never emits the `state.navigation` deprecation warning, and the deprecated flags still warn, still work, and are unchanged until their scheduled removal in WordPress 7.1. They were never a lifecycle: they are presentation state for Core's loading bar, gated by the 400 ms delay and written only when `loadingAnimation` is on.
+
+#### Recipe: a per-block loading indication
+
+Blocks have shown "this block is loading" with a hand-rolled flag for as long as the router has existed. The `create-block` scaffold's client-side navigation variant is the canonical shape: the block's own action writes `state.isNavigating = true` before it calls `actions.navigate()` and `false` after the call resolves, and a `data-wp-bind--hidden="!state.isNavigating"` reveals a "Loading…" element in between.
+
+It works, and it has three limits the two lifecycle keys remove:
+
+-   It only knows about navigations that action started. A back/forward traversal, or a navigation another block on the page starts, leaves it reading idle.
+-   The flag lives in that store's global state, so every instance of the block on the page lights up at once.
+-   It is private by convention. Another block that wants to dim itself while the gallery navigates would have to know that plugin's namespace and the name it happened to give its flag, where `core/router`'s two keys are one well-known place every consumer already reads.
+
+The replacement is a derived state getter composing the two keys, bound through a directive:
+
+```js
+// view.js
+import { store } from '@wordpress/interactivity';
+
+// Read `core/router`; do not import it. Reading a namespace creates it, and
+// it merges into the router's own store if and when that module loads — so
+// this is safe on a page where the router never loads at all.
+const { state: routerState } = store( 'core/router' );
+
+store( 'myPlugin', {
+	state: {
+		get isLoading() {
+			return (
+				!! routerState.navigating &&
+				routerState.initiator === 'myPlugin/quote'
+			);
+		},
+	},
+} );
+```
+
+```html
+<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/quote">
+	<span data-wp-class--is-loading="state.isLoading"></span>
+</div>
+```
+
+The `!!` is there so the getter returns a boolean rather than `undefined`: `state.navigating` reads `undefined` before the first navigation, and `undefined && …` evaluates to `undefined`. Directive bindings treat both as falsy, so the indication renders correctly either way, but a getter that other code may read is better off with a boolean.
+
+That is the whole composition. It has two identity tiers, differing only in what the comparison's right-hand side is.
+
+**The static tier: one region id, written at authoring time.** This is the scaffold's own shape and it needs no extra markup at all — the region id in the getter is the same literal as the one in `data-wp-router-region`.
+
+What the comparison must match is the region's **id**, not the raw attribute text. If the region is declared in the JSON object form the directive also accepts — `data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'`, the form used in [Adding new regions on navigation](#adding-new-regions-on-navigation) — then the value to compare against is `'myPlugin/modal'`, and comparing against the attribute string never matches. The same applies to a `namespace::` prefix, which is not part of the id. See [What `state.initiator` compares against](#what-stateinitiator-compares-against) for the full rule; the failure is silent, so it is worth checking once rather than debugging later.
+
+**The per-instance tier: one region per instance, its id co-rendered into context.** When the same block appears more than once on a page and each copy needs its own indication, give each copy its own router region and write that id into the block's own context at render time:
+
+```php
+<?php
+$region_id = "myPlugin/gallery-{$instance_id}";
+?>
+<div
+	data-wp-interactive="myPlugin"
+	data-wp-router-region="<?php echo esc_attr( $region_id ); ?>"
+	<?php echo wp_interactivity_data_wp_context( array( 'regionId' => $region_id ) ); ?>
+>
+	<span data-wp-class--is-loading="state.isLoading"></span>
+</div>
+```
+
+The getter reads it back with `getContext()`, so one getter serves every instance:
+
+```js
+// view.js
+import { getContext, store } from '@wordpress/interactivity';
+
+const { state: routerState } = store( 'core/router' );
+
+store( 'myPlugin', {
+	state: {
+		get isLoading() {
+			const { regionId } = getContext();
+			return (
+				!! routerState.navigating && routerState.initiator === regionId
+			);
+		},
+	},
+} );
+```
+
+The extra context line is worth being honest about, because a reader who knows `getElement()` will spot the alternative immediately. There is a DOM route: a getter evaluated through a directive runs in that element's scope, so `getElement().ref.closest( '[data-wp-router-region]' )` can find the enclosing region element and read its attribute back. That is precisely the walk `core/query` still performs today — `ref.closest( '.wp-block-query[data-wp-router-region]' )` in `packages/block-library/src/query/view.js` — and precisely the walk this feature exists to retire. The claim for the context line is not that no other route exists; it is that the context line hands the getter a value the block already knew when it rendered, instead of re-deriving it from the DOM on every evaluation and having to reimplement the id normalization above to do it.
+
+**On the initial page load and on a traversal:** both keys read `undefined` on the initial page load, so the getter returns `false` and the indication renders idle — on every page, including one where the router module never loads. On a back/forward traversal `state.navigating` goes truthy but `state.initiator` reads `null` throughout, so the comparison fails and the indication stays idle. That is the intended answer: a traversal is not something your block started.
+
+Finally, the case that needs no recipe at all, and is the one many readers arrive with: **a block that is already its own router region needs neither tier.** Core's Query block with enhanced pagination is that case — its render callback writes `data-wp-router-region="query-{queryId}"` on every instance — so two Query blocks on one page are already distinguishable through `state.initiator`, with no setup on either. See [Telling which region started a navigation](#telling-which-region-started-a-navigation).
+
+#### Recipe: region-scoped focus after navigation
+
+Moving focus after a navigation is the accessibility work [Handling scroll and focus](#handling-scroll-and-focus) asks for, and the usual way to do it is inside the navigating action, after the `await`. Core's Query block does exactly that: it walks the DOM for its own region with `closest()`, then focuses the first anchor inside it once `actions.navigate()` resolves.
+
+Reacting to the end of the navigation instead moves that code out of the call site. It runs for any navigation started from inside the region — every link, every action, without repeating the focus code at each one — and it puts the region's identity in the condition rather than in a DOM walk. It also makes the traversal case an explicit decision instead of an accident of where the code sits.
+
+Put a `data-wp-watch` inside each region, edge-trigger it on the falling edge of `state.navigating`, and act only when `state.initiator` still reads as that region's own id:
+
+```js
+// view.js
+import { getContext, store } from '@wordpress/interactivity';
+
+const { state: routerState } = store( 'core/router' );
+
+// The previous `navigating` reading, per region. See the two notes below for
+// why this lives neither in `context` nor on the region element.
+const wasNavigating = {};
+
+store( 'myPlugin', {
+	callbacks: {
+		focusAfterNavigation() {
+			const { regionId } = getContext();
+			const navigating = !! routerState.navigating;
+
+			if (
+				wasNavigating[ regionId ] &&
+				! navigating &&
+				routerState.initiator === regionId
+			) {
+				// Looked up after the edge fires, never captured before
+				// the navigation: the region's content has been replaced
+				// by now.
+				document
+					.querySelector(
+						`[data-wp-router-region="${ regionId }"] a`
+					)
+					?.focus();
+			}
+
+			wasNavigating[ regionId ] = navigating;
+		},
+	},
+} );
+```
+
+The watcher lives on its own element inside the region, and the region's id reaches it through the same context line the per-instance tier above uses:
+
+```html
+<div
+	data-wp-interactive="myPlugin"
+	data-wp-router-region="myPlugin/gallery-1"
+	data-wp-context='{ "regionId": "myPlugin/gallery-1" }'
+>
+	<span data-wp-watch="callbacks.focusAfterNavigation"></span>
+</div>
+```
+
+If the region id is a literal you wrote by hand, drop the `getContext()` line and compare against that literal, exactly as the static tier does above.
+
+**React to the edge, not to the condition.** `state.initiator` is retained after the end transition — it keeps the finished navigation's value until the next navigation starts, as described in [When each transition happens](#when-each-transition-happens). So the level-triggered form `! state.navigating && state.initiator === regionId` is true not only at the moment the navigation ends but for the whole idle window afterwards, and a callback written that way would move focus again on every later re-run. Comparing against the previous reading is what makes it fire exactly once, at the transition.
+
+**Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` reading is bookkeeping, not something the page renders, so a plain module-scope object is the right home for it.
+
+**Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A module-scope object keyed by region id does, and one object serves every region on the page.
+
+**Capture no DOM reference across the navigation.** The focus target is looked up after the falling edge fires, never before it. By the time the end transition is published the destination's content is already committed, so the lookup finds the new page's element — see [When each transition happens](#when-each-transition-happens).
+
+**On the initial page load and on a traversal:** the callback runs once at hydration, reads `state.navigating` as `undefined`, records `false` and does nothing. On a back/forward traversal it runs on both edges — traversals publish the lifecycle like any other navigation — but `state.initiator` reads `null` throughout, so the comparison fails and the callback refrains. That is deliberate: a visitor who pressed Back asked the browser to restore a page, and moving focus on their behalf is usually the wrong call. The `await` pattern never gets to make that choice, because it never runs on a traversal at all.
+
+#### Recipe: a debounced page-level loading bar
+
+The router's built-in loading animation appears only if the navigation is still in flight after 400 ms, so a prefetched or cached navigation never flashes a bar at the visitor. If you turn that animation off and draw your own — see [Disabling navigation feedback](#disabling-navigation-feedback) — reproduce the debounce rather than binding a bar straight to `state.navigating`: arm a timer on the rising edge, clear it on the falling edge.
+
+This is page-level work that only touches store state, so it needs no directive scope. Use `watch()`, the module-scope utility from `@wordpress/interactivity`, rather than a `data-wp-watch`. The timer callback writes this store's own `state`, not `context`, which is exactly why it can run outside any scope:
+
+```js
+// view.js
+import { store, watch } from '@wordpress/interactivity';
+
+const { state: routerState } = store( 'core/router' );
+
+const { state } = store( 'myPlugin', {
+	state: {
+		// This store's own state, declared with an idle default. Unlike the
+		// router's two keys, it is not a passthrough of anything.
+		showBar: false,
+	},
+} );
+
+let timer;
+
+watch( () => {
+	if ( routerState.navigating ) {
+		timer = setTimeout( () => {
+			state.showBar = true;
+		}, 400 );
+	} else {
+		clearTimeout( timer );
+		state.showBar = false;
+	}
+} );
+```
+
+```html
+<div
+	data-wp-interactive="myPlugin"
+	data-wp-class--show-bar="state.showBar"
+></div>
+```
+
+The callback reads `state.navigating` and nothing else, so it re-runs only when that key changes — which is what keeps the timer from being armed twice. Three consequences follow from that, and none of them needs bookkeeping of your own:
+
+-   **Overlapping navigations arm the timer once.** From the first start through the winning navigation's end, `state.navigating` reads in flight continuously, with no idle gap and no second end transition, so the callback runs once on the way in and once on the way out. A double click does not restart the debounce or flicker the bar. See [Overlapping navigations](#overlapping-navigations).
+-   **A navigation that falls back to a full page load keeps the bar up.** Such a navigation publishes its start and never publishes an end, so the timer is never cleared — which is the right outcome, because a full page load really is still in progress until the browser replaces the document. See [Which navigations are covered](#which-navigations-are-covered).
+-   **On a traversal the bar behaves as it does for any other navigation.** Back/forward traversals publish the lifecycle too, and because the router serves them from its in-memory page cache they almost always finish well inside the 400 ms window, so no bar appears.
+
+On the initial page load `state.navigating` reads `undefined`, so the first run takes the `else` branch: `clearTimeout()` on an unset timer does nothing and `showBar` is already `false`. The first run is a no-op on every page, including one where the router module never loads.
 
 ## The Interactivity Router in depth
 
