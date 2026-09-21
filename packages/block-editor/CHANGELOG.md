@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
 -   Remove the `react-autosize-textarea` dependency. `PlainText` and the block "Edit as HTML" field now auto-grow with CSS `field-sizing: content`. Browsers without support use scrollable fields. `PlainText` consumers should use CSS height constraints instead of `rows` ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
@@ -86,7 +87,6 @@
 
 -   Allow blocks to provide inspector controls for viewport style states.
 -   `BlockStyles`: Use `Button` from `@wordpress/ui`, truncate long labels after three lines, and navigate the variations as a radio group ([#40331](https://github.com/WordPress/gutenberg/issues/40331)).
--   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
 -   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   `PublishDateTimePicker`: Add a `showPopoverHeader` prop so the picker can be rendered inline, without the popover title and close button. Rename the header's reset action from "Now" to "Reset", which reads as an action rather than a status ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
