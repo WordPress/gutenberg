@@ -868,7 +868,7 @@ Display entries from any RSS or Atom feed.
 
 -	**Name:** [core/rss](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-rss/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~html~~
 -	**Attributes:** blockLayout, columns, displayAuthor, displayDate, displayExcerpt, excerptLength, feedURL, itemsToShow, openInNewTab, rel
 
 ## Search
