@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Bug fixes
 
--   Run `watch()` callbacks without an ambient directive scope. Inside an unwrapped callback, scope reads are absent and scope-derived calls behave as they do from other scope-less callers such as `setTimeout`; the previous scope is restored after the callback returns or throws. `data-wp-watch` callbacks, `withScope()`-wrapped callbacks, and actions invoked from directives keep their scopes. Only bare `watch()` callbacks change; the export, signature, cleanup behavior, and synchronous timing are unchanged.
+-   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope.
 
 ### Internal
 
