@@ -57,7 +57,7 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 *                              stay available to server-side code via {@see wp_get_icon()}.
 	 *                              Default true.
 	 *     @type string[] $keywords Optional. Additional search terms for the icon, matched by
-   *                              `get_registered_icons()` alongside the name and label.
+	 *                              `get_registered_icons()` alongside the name and label.
 	 * }
 	 * @return bool True if the icon was registered successfully, else false.
 	 */
