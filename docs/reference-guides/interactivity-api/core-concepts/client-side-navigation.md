@@ -878,7 +878,6 @@ A derived initiator identifies the region, not the element: two blocks inside th
 
 Where you read the two properties decides when your code runs and what it can see:
 
--   **`data-wp-bind`, `data-wp-class`, `data-wp-text` and other bindings** update as part of the Interactivity API's own re-render, scheduled asynchronously after the change rather than during it. That is all a purely visual indicator needs.
 -   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
 -   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes and has **no directive scope** — `getContext()` and `getElement()` are not available inside it. Use it for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
 -   **`data-wp-init`** runs in scope once per element, which makes it the place for setup that belongs to hydration rather than to a navigation.
