@@ -1,6 +1,6 @@
 <?php
 /**
- * Icons API: registration of the core icon collection and its icons from the
+ * Icons API: registration of the core icon collections and their icons from the
  * plugin's own `packages/icons` manifest, replacing the core registration.
  *
  * @package gutenberg
@@ -17,6 +17,13 @@ function gutenberg_register_default_icon_collections() {
 			'description' => __( 'Core icon collection.', 'gutenberg' ),
 		)
 	);
+	wp_register_icon_collection(
+		'core-admin',
+		array(
+			'label'       => __( 'WordPress Admin', 'gutenberg' ),
+			'description' => __( 'Icon collection used by the WordPress admin interface.', 'gutenberg' ),
+		)
+	);
 }
 
 $default_icon_collections_priority = has_action( 'init', '_wp_register_default_icon_collections' );
@@ -26,7 +33,7 @@ if ( false !== $default_icon_collections_priority ) {
 add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
 
 /**
- * Registers the default core icons from the Gutenberg manifest.
+ * Registers the default core and core-admin icons from the Gutenberg manifest.
  */
 function gutenberg_register_default_icons() {
 	$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
@@ -41,9 +48,9 @@ function gutenberg_register_default_icons() {
 		return;
 	}
 
-	$collection = include $manifest_path;
+	$manifest = include $manifest_path;
 
-	if ( empty( $collection ) ) {
+	if ( empty( $manifest ) ) {
 		wp_trigger_error(
 			__FUNCTION__,
 			__( 'Core icon collection manifest is empty or invalid.', 'gutenberg' )
@@ -51,7 +58,7 @@ function gutenberg_register_default_icons() {
 		return;
 	}
 
-	foreach ( $collection as $icon_name => $icon_data ) {
+	foreach ( $manifest as $icon_name => $icon_data ) {
 		if (
 			empty( $icon_data['filePath'] )
 			|| ! is_string( $icon_data['filePath'] )
@@ -74,6 +81,11 @@ function gutenberg_register_default_icons() {
 		}
 
 		wp_register_icon( 'core/' . $icon_name, $icon_args );
+
+		if ( ! empty( $icon_data['admin'] ) ) {
+			$icon_args['public'] = false;
+			wp_register_icon( 'core-admin/' . $icon_name, $icon_args );
+		}
 	}
 }
 

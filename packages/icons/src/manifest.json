@@ -182,7 +182,8 @@
 		"slug": "brush",
 		"label": "Brush",
 		"filePath": "library/brush.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "bug",
@@ -278,7 +279,8 @@
 		"slug": "chevron-left",
 		"label": "Chevron Left",
 		"filePath": "library/chevron-left.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "chevron-left-small",
@@ -375,7 +377,8 @@
 		"slug": "comment",
 		"label": "Comment",
 		"filePath": "library/comment.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "comment-author-avatar",
@@ -493,7 +496,8 @@
 		"slug": "dashboard",
 		"label": "Dashboard",
 		"filePath": "library/dashboard.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "desktop",
@@ -766,7 +770,8 @@
 		"slug": "home",
 		"label": "Home",
 		"filePath": "library/home.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "home-button",
@@ -926,7 +931,8 @@
 		"slug": "link",
 		"label": "Link",
 		"filePath": "library/link.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "link-off",
@@ -988,7 +994,8 @@
 		"slug": "media",
 		"label": "Media",
 		"filePath": "library/media.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "media-and-text",
@@ -1004,7 +1011,8 @@
 		"slug": "menu",
 		"label": "Menu",
 		"filePath": "library/menu.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "mobile",
@@ -1074,7 +1082,8 @@
 		"slug": "page",
 		"label": "Page",
 		"filePath": "library/page.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "page-break",
@@ -1107,7 +1116,8 @@
 		"slug": "pencil",
 		"label": "Pencil",
 		"filePath": "library/pencil.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "pending",
@@ -1118,7 +1128,8 @@
 		"slug": "people",
 		"label": "People",
 		"filePath": "library/people.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "percent",
@@ -1129,7 +1140,8 @@
 		"slug": "pin",
 		"label": "Pin",
 		"filePath": "library/pin.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "pin-small",
@@ -1140,7 +1152,8 @@
 		"slug": "plugins",
 		"label": "Plugins",
 		"filePath": "library/plugins.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "play",
@@ -1161,7 +1174,8 @@
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "plus-circle",
@@ -1394,7 +1408,8 @@
 		"slug": "search",
 		"label": "Search",
 		"filePath": "library/search.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "seen",
@@ -1415,7 +1430,8 @@
 		"slug": "settings",
 		"label": "Settings",
 		"filePath": "library/settings.svg",
-		"public": true
+		"public": true,
+		"admin": true
 	},
 	{
 		"slug": "shadow",
@@ -1515,7 +1531,8 @@
 		"slug": "sites",
 		"label": "Sites",
 		"filePath": "library/sites.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "square",
@@ -1722,7 +1739,8 @@
 		"slug": "tool",
 		"label": "Tool",
 		"filePath": "library/tool.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "trash",
@@ -1768,7 +1786,8 @@
 		"slug": "update",
 		"label": "Update",
 		"filePath": "library/update.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	},
 	{
 		"slug": "upload",
@@ -1801,6 +1820,7 @@
 		"slug": "wordpress",
 		"label": "WordPress",
 		"filePath": "library/wordpress.svg",
-		"public": false
+		"public": false,
+		"admin": true
 	}
 ]
