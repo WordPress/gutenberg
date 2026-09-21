@@ -77,9 +77,9 @@ export function getSuggestionsQuery( type, kind ) {
 
 	return {
 		perPage,
-		// Results are named by their post type or taxonomy slug, which is the
-		// `subtype` here for everything but a post format.
-		priorityType: ownType.subtype ?? ownType.type,
+		// The link's own type leads. Results are named by their post type or
+		// taxonomy slug, which is the `subtype` here for all but a post format.
+		priorityTypes: [ ownType.subtype ?? ownType.type ],
 		initialSuggestionsSearchOptions: { ...ownType, perPage },
 	};
 }

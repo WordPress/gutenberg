@@ -632,7 +632,7 @@ describe( 'sortResults', () => {
 
 		// A caller editing a category link asks for categories instead.
 		expect(
-			sortResults( results, 'coffee', 'category' ).map(
+			sortResults( results, 'coffee', [ 'category' ] ).map(
 				( { title } ) => title
 			)
 		).toEqual( [ 'Coffee', 'Coffee Guide' ] );
@@ -671,7 +671,7 @@ describe( 'sortResults', () => {
 		];
 
 		expect(
-			sortResults( results, 'coffee', 'post_tag' ).map(
+			sortResults( results, 'coffee', [ 'post_tag' ] ).map(
 				( { title } ) => title
 			)
 		).toEqual( [
@@ -680,6 +680,91 @@ describe( 'sortResults', () => {
 			'Coffee Talk', // then posts
 			'Coffee Beans', // attachments last
 		] );
+	} );
+
+	it( 'leads with several types in the order they are named', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Shop',
+				url: 'http://wordpress.local/coffee-shop/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Gear',
+				url: 'http://wordpress.local/tag/coffee-gear/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+			{
+				id: 3,
+				title: 'Coffee',
+				url: 'http://wordpress.local/category/coffee/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 4,
+				title: 'Coffee Talk',
+				url: 'http://wordpress.local/coffee-talk/',
+				type: 'post',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee', [ 'post_tag', 'category' ] ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Coffee Gear', // named first
+			'Coffee', // named second
+			'Coffee Shop', // then the default order: pages,
+			'Coffee Talk', // then posts
+		] );
+	} );
+
+	it( 'orders types that are not named by the default preference', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Coffee Talk',
+				url: 'http://wordpress.local/coffee-talk/',
+				type: 'post',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee Shop',
+				url: 'http://wordpress.local/coffee-shop/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'Coffee',
+				url: 'http://wordpress.local/category/coffee/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// Naming only the post type leaves pages, categories and attachments
+		// in the order they are given by default.
+		expect(
+			sortResults( results, 'coffee', [ 'post' ] ).map(
+				( { title } ) => title
+			)
+		).toEqual( [ 'Coffee Talk', 'Coffee Shop', 'Coffee', 'Coffee Beans' ] );
 	} );
 } );
 

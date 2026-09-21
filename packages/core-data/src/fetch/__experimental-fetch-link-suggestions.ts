@@ -24,16 +24,16 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
-	 * A result type to rank above every other type, named as the results spell
-	 * it: a post type or taxonomy slug, such as `page`, `category` or
-	 * `post_tag`. Everything else keeps the default order, which leads with
-	 * pages.
+	 * Result types to rank above every other type, most wanted first. Each is
+	 * named as the results spell it: a post type or taxonomy slug, such as
+	 * `page`, `category` or `post_tag`.
 	 *
-	 * A caller that edits one kind of link leads with that kind:
+	 * Types left out keep the default order below them, which leads with pages
+	 * and ends with attachments and post formats:
 	 *
-	 *     priorityType: 'category'
+	 *     priorityTypes: [ 'category', 'post_tag' ]
 	 */
-	priorityType?: string;
+	priorityTypes?: string[];
 	/**
 	 * Which page of results to return.
 	 */
@@ -130,7 +130,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
-		priorityType,
+		priorityTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -253,7 +253,7 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	results = sortResults( results, search, priorityType );
+	results = sortResults( results, search, priorityTypes );
 	results = results.slice( 0, perPage );
 	return results;
 }
@@ -293,15 +293,22 @@ function getMatchTier( title: string, search: string ): number {
  * and tags, because nothing general can be said about them.
  *
  * @param result
- * @param priorityType
+ * @param priorityTypes
  *
- * @return -1 for the caller's own type, then 0 for the most likely type and 3 for the least.
+ * @return A negative rank for a type the caller named, otherwise 0 for the most likely type
+ *         through to 3 for the least.
  */
-function getTypeRank( result: SearchResult, priorityType?: string ): number {
-	// The caller's own type leads, whatever it is. A Category Link searches
-	// from a category, so categories are the likeliest thing it wants.
-	if ( priorityType && result.type === priorityType ) {
-		return -1;
+function getTypeRank(
+	result: SearchResult,
+	priorityTypes: string[] = []
+): number {
+	// The caller's own types lead, in the order it named them. A Category Link
+	// searches from a category, so categories are what it most likely wants.
+	// Ranking them below zero keeps them above every unnamed type.
+	const priority = priorityTypes.indexOf( result.type );
+
+	if ( priority !== -1 ) {
+		return priority - priorityTypes.length;
 	}
 
 	if ( result.kind === 'media' || result.type === 'post-format' ) {
@@ -327,7 +334,8 @@ function getTypeRank( result: SearchResult, priorityType?: string ): number {
  *
  * Results are grouped by type first, because the type a link points at matters more than how
  * closely a title matches: a page is what a link usually wants, and an attachment almost never is.
- * A caller that knows better names its own type as `priorityType`, and that type leads instead.
+ * A caller that knows better names its own types as `priorityTypes`, and those lead instead, in
+ * the order it named them.
  *
  * Within a type, a title that is what was typed, or that begins with it, ranks above the rest.
  * Where the match sits in the title is a stronger signal than how much of the title it covers, and
@@ -340,12 +348,12 @@ function getTypeRank( result: SearchResult, priorityType?: string ): number {
  *
  * @param results
  * @param search
- * @param priorityType
+ * @param priorityTypes
  */
 export function sortResults(
 	results: SearchResult[],
 	search: string,
-	priorityType?: string
+	priorityTypes?: string[]
 ) {
 	const searchTokens = tokenize( search );
 
@@ -391,7 +399,7 @@ export function sortResults(
 
 	return results.sort(
 		( a, b ) =>
-			getTypeRank( a, priorityType ) - getTypeRank( b, priorityType ) ||
+			getTypeRank( a, priorityTypes ) - getTypeRank( b, priorityTypes ) ||
 			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);

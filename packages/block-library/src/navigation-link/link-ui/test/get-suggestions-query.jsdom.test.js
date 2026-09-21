@@ -43,9 +43,9 @@ describe( 'getSuggestionsQuery', () => {
 	it.each( LINK_TYPES )(
 		'ranks the %s link’s own type above the others',
 		( type, kind, _initial, expectedPriority ) => {
-			expect( getSuggestionsQuery( type, kind ).priorityType ).toBe(
-				expectedPriority
-			);
+			expect( getSuggestionsQuery( type, kind ).priorityTypes ).toEqual( [
+				expectedPriority,
+			] );
 		}
 	);
 
@@ -62,7 +62,7 @@ describe( 'getSuggestionsQuery', () => {
 				subtype: 'page',
 				perPage: PER_PAGE,
 			} );
-			expect( query.priorityType ).toBe( 'page' );
+			expect( query.priorityTypes ).toEqual( [ 'page' ] );
 		}
 	);
 } );
