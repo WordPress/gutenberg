@@ -66,6 +66,10 @@
 		"anchor": true,
 		"align": true,
 		"spacing": {
+			"blockGap": {
+				"sides": [ "horizontal", "vertical" ],
+				"__experimentalDefault": { "top": "1.25em", "left": "0.75em" }
+			},
 			"margin": true,
 			"padding": true
 		},
@@ -90,7 +94,17 @@
 				"style": true
 			}
 		},
-		"interactivity": true
+		"interactivity": true,
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowOrientation": false,
+			"allowVerticalAlignment": false,
+			"allowWrap": false,
+			"default": {
+				"type": "flex"
+			}
+		}
 	},
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
