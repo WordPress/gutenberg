@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the root-level `original_attachment` field to the `Attachment` entity type — the original attachment's id, or `0` when the attachment was not created by editing another one; embeddable via the `wp:original-attachment` link, exposed in the `edit` context ([#81803](https://github.com/WordPress/gutenberg/pull/81803)).
+
 ### Bug Fixes
 
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
