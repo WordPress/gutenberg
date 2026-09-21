@@ -11,7 +11,7 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
-import { Badge, Stack } from '@wordpress/ui';
+import { Badge } from '@wordpress/ui';
 import type { Revision } from './types';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
@@ -300,20 +300,14 @@ function RevisionsList( {
 				actions={ actions }
 			>
 				<DataViewsPicker.Layout />
-				<Stack
-					direction="row"
-					justify="space-between"
-					align="center"
-					gap="sm"
-					className="global-styles-ui-screen-revisions__footer"
-				>
-					{ /* Kept even on a single page, when the select renders
-					     nothing, so the action stays at the end of the row. */ }
-					<div className="global-styles-ui-screen-revisions__pagination">
+				{ /* The sidebar has no room for both pagination controls next
+				     to the action, so the footer holds the page select alone. */ }
+				<DataViewsPicker.Footer>
+					<DataViewsPicker.Pagination>
 						<DataViewsPicker.PageSelect />
-					</div>
+					</DataViewsPicker.Pagination>
 					<DataViewsPicker.Actions />
-				</Stack>
+				</DataViewsPicker.Footer>
 			</DataViewsPicker>
 		</div>
 	);

@@ -10,21 +10,6 @@
 	min-height: 0;
 }
 
-// The screen composes its own footer: the page select and the Apply / Reset
-// action on one row, since the sidebar has no room for both pagination
-// controls next to the action.
-.global-styles-ui-screen-revisions__footer {
-	flex-shrink: 0;
-	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
-	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
-}
-
-// The select's wrapper may shrink, so a long page label never pushes the
-// action out of the row.
-.global-styles-ui-screen-revisions__pagination {
-	min-width: 0;
-}
-
 .global-styles-ui-screen-revisions__date {
 	text-transform: uppercase;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
