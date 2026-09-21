@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
