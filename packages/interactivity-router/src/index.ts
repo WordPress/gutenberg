@@ -457,6 +457,39 @@ let navigatingTo = '';
 let navigationId = 0;
 let currentNavigationId = 0;
 
+// Frame-scope guard: identity marker for the ambient directive scope active
+// during one of the router's own lifecycle writes. `resolveInitiator()`'s
+// derive branch refuses to attribute a navigation to a scope that *is* this
+// marker, which stops a scope-less `watch()`/`effect()` reacting to one of
+// `navigate()`'s own writes from inheriting the previous navigation's
+// region id, without breaking attribution for a `withScope`-wrapped
+// callback that carries a scope of its own.
+//
+// Marked at exactly **two** sites — the start `batch()` and the existing
+// commit batch below — with save-and-restore
+// (`const prev = writeFrameScope; writeFrameScope = entryScope; …write…;
+// writeFrameScope = prev;`), never set-and-clear. Write spans nest (a
+// reactive navigation started from inside another navigation's write
+// span), and a set-and-clear form leaks: the inner span's clear re-opens
+// inheritance for an effect deferred to the outer flush, so a third-level
+// navigation started from that effect would wrongly inherit the outer
+// navigation's region. Save-and-restore keeps the outer span's scope
+// installed once the inner span closes, and for a top-level navigation the
+// restored value is `undefined`, so off-frame behaviour is unchanged.
+//
+// No marker anywhere else, and the two consumer kinds resolve differently
+// there — which is the point. The scheduled end write and the popstate
+// lifecycle release both execute in detached macrotasks whose scope stack
+// is empty and whose marker has already been restored, so a **scope-less**
+// consumer navigating from either derives `null` by scope absence, while a
+// **`data-wp-watch`** consumer — which does run in scope — derives *its
+// own* region, because the restored marker refuses nothing. That second
+// reading is what the AC25(b) region-scoped focus pattern is built on. The
+// popstate handler's frame carries no scope at all. A future `navigate()`-
+// side scope-carrying write added without this marker would re-open
+// initiator inheritance for it.
+let writeFrameScope: ReturnType< typeof getScope >;
+
 let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
 	loading: 'Loading page, please wait.',
@@ -524,7 +557,22 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 		return null;
 	}
 	if ( declared === undefined ) {
+		// Frame-scope guard, ahead of the ref/region walk: refuse a scope
+		// that reached here only because it is the marker
+		// `navigate()` installed around one of its own write frames — see
+		// the `writeFrameScope` comment above. The `scope &&` conjunct
+		// states intent ("we are refusing an *inherited* scope") rather
+		// than a guarantee: today `getScope()` and `writeFrameScope` are
+		// each either an object or `undefined`, so a genuinely scope-less
+		// call (`scope` and the marker both `undefined`) already falls
+		// through this clause and returns `null` two lines below, via the
+		// `element` check — the short-circuit changes nothing observable
+		// for that case now, and is kept for a future derivation clause
+		// that might return non-null off-scope.
 		const scope = getScope();
+		if ( scope && scope === writeFrameScope ) {
+			return null;
+		}
 		const element = scope?.ref?.current;
 		if ( typeof element?.closest !== 'function' ) {
 			return null;
@@ -598,6 +646,12 @@ export const { state, actions } = store< Store >( 'core/router', {
 				yield forcePageReload( href );
 			}
 
+			// Captured once, at this generator step's synchronous prefix —
+			// the same place `resolveInitiator()` reads the ambient scope
+			// (see its own comment) — so the frame-scope guard marks its
+			// two write sites below with the *initiating* element's scope,
+			// not whatever happens to be ambient when each write runs.
+			const entryScope = getScope();
 			const initiator = resolveInitiator( options.initiator );
 
 			const pagePath = getPagePath( href );
@@ -645,10 +699,16 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// truthy with `initiator` still absent. It needs no token
 				// guard because it runs synchronously in the claim's own
 				// frame, before any other navigation can supersede it.
+				// Frame-scope guard, save-and-restore: mark this write's
+				// span with the initiating scope, then restore whatever was
+				// there before (see the `writeFrameScope` comment above).
+				const prevWriteFrameScopeAtStart = writeFrameScope;
+				writeFrameScope = entryScope;
 				batch( () => {
 					state.navigating = true;
 					state.initiator = initiator;
 				} );
+				writeFrameScope = prevWriteFrameScopeAtStart;
 
 				const page = yield Promise.race( [
 					pages.get( pagePath ),
@@ -672,6 +732,14 @@ export const { state, actions } = store< Store >( 'core/router', {
 				) {
 					yield importScriptModules( page.scriptModules );
 
+					// Frame-scope guard, save-and-restore — see the
+					// `writeFrameScope` comment above. The batch below is
+					// otherwise untouched: its statements' order is what
+					// keeps `state.url` atomic with `renderPage()`, so a
+					// rendering consumer sees the URL and the DOM change
+					// together.
+					const prevWriteFrameScopeAtCommit = writeFrameScope;
+					writeFrameScope = entryScope;
 					batch( () => {
 						// Updates the URL in the state.
 						state.url = href;
@@ -686,6 +754,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 						// Renders the new page.
 						renderPage( page );
 					} );
+					writeFrameScope = prevWriteFrameScopeAtCommit;
 
 					window.history[
 						options.replace ? 'replaceState' : 'pushState'
@@ -715,6 +784,20 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// microtask or a bare `setTimeout`: moving it off the
 				// directive runtime's shared frame scheduler would silently
 				// un-observe transitions for every directive consumer.
+				//
+				// Deliberately no `writeFrameScope` marker here. This write
+				// runs in a detached macrotask whose scope stack is already
+				// empty, so marking it correctly — with the same
+				// save-and-restore shape used above — is behaviourally
+				// inert: every consumer of this write reads exactly what it
+				// reads without a marker, because the guard compares scope
+				// identity and no consumer runs inside this callback's span
+				// in the first place. What is not inert is marking it and
+				// forgetting to restore, which is the shape a fire-and-
+				// forget `afterNextFrame` callback invites: it would pin
+				// `writeFrameScope` to this navigation's entry scope
+				// permanently, silently nulling the *next* navigation from
+				// the same element.
 				if ( currentNavigationId === token ) {
 					afterNextFrame( () => {
 						if ( currentNavigationId === token ) {
