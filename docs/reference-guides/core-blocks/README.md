@@ -792,7 +792,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable.
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
 -	**Allowed Blocks:** core/query-pagination-previous, core/query-pagination-numbers, core/query-pagination-next
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, anchor, background (gradient), color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
 ## Next Page
