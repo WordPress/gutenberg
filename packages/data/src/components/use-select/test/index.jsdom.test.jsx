@@ -1278,19 +1278,19 @@ describe( 'useSelect', () => {
 
 			expect( await screen.findByText( '2' ) ).toBeInTheDocument();
 
-			// Initial render, sync update, async update. The mode switch itself
-			// re-subscribes but must not recompute the value.
+			// Initial render, sync update, async update. The mode switch moves
+			// the subscription over but must not recompute the value.
 			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
 		} );
 
-		it( 'catches an update dispatched between render and re-subscription', () => {
+		it( 'catches an update dispatched from a layout effect on a mode switch', () => {
 			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
 			const TestComponent = ( { async } ) => {
 				const count = useSelect( selectSpy, [] );
-				// Layout effects run before the passive effect in which
-				// `useSyncExternalStore` swaps the subscription, so this update
-				// lands while the old (async) subscription is still active.
+				// Layout effects run between the render that switches the mode
+				// and the passive effects, the narrowest window in which a
+				// dispatch could find the hook listening on neither tier.
 				useLayoutEffect( () => {
 					if ( ! async ) {
 						registry.dispatch( 'counter' ).inc();
@@ -1314,12 +1314,12 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 		} );
 
-		it( 'catches an update dispatched between unsubscribe and re-subscription', () => {
+		it( 'catches an update dispatched from a sibling effect on a mode switch', () => {
 			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
 
-			// Rendered before the hook, so its passive effect runs after the
-			// hook's old subscription is torn down and before the new one
-			// is created.
+			// Rendered before the hook, so its passive effect runs before the
+			// hook's own, while `useSyncExternalStore` has not yet re-read the
+			// value for the new mode.
 			const Sibling = ( { async } ) => {
 				useEffect( () => {
 					if ( ! async ) {
