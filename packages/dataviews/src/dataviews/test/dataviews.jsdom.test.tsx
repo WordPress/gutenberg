@@ -174,6 +174,50 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
 	} );
 
+	it( 'orders and indents loaded items from their parent ids', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 2, title: 'Child' },
+					{ id: 1, title: 'Parent' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		const rows = screen.getAllByRole( 'row' ).slice( 1 );
+		expect( rows[ 0 ] ).toHaveTextContent( 'Parent' );
+		expect( rows[ 1 ] ).toHaveTextContent( '— Child' );
+	} );
+
+	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+				] }
+				getItemLevel={ ( item ) => item.id - 1 }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect( screen.getByText( '—' ) ).toBeInTheDocument();
+	} );
+
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
 		const fieldsWithSearch = [
 			{
