@@ -796,7 +796,7 @@ For the exact types and edge cases, see the [`core/router` state reference](http
 
 **When a navigation ends**, the router sets `state.navigating` back to `false`. By then the new content is normally already in the DOM and `state.url` already holds the destination URL; the two exceptions are described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) below. The update happens on a later frame than the DOM commit (the moment the new content is applied to the real DOM), so that even a very fast navigation produces two separate updates rather than a single one that only shows the finished state. How much later is not specified, so treat it as "some time after the content is committed". In particular, the promise returned by `actions.navigate()` resolves before this update, so code like `yield actions.navigate( url ); if ( state.navigating ) { … }` still sees `state.navigating` as truthy. To react to the end of a navigation, use a watcher instead.
 
-`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts, so a watcher reacting to the end can still read who started it. (The one exception, a back/forward traversal that reloads the document, is described in [Which navigations update the keys](#which-navigations-update-the-keys).) This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
+`state.initiator` is **not cleared** when a navigation ends. It keeps the value of the last navigation until the next one starts, so a watcher reacting to the end can still read who started it. A back/forward traversal clears it instead — at the claim for any cached traversal, or at the reload exit for an uncached traversal — as described in [Which navigations update the keys](#which-navigations-update-the-keys). This also means that a condition like `! state.navigating && state.initiator === myRegionId` stays true for as long as the page is idle afterwards, not only at the moment the navigation ends. React to the change itself rather than to the condition being true; the [focus recipe](#region-scoped-focus-after-navigation) below shows how.
 
 ### When a navigation ends without new content
 
@@ -819,7 +819,7 @@ Both properties are updated for:
 No navigation starts for:
 
 -   A `navigate()` call on a page where [client-side navigation is disabled](#disabling-client-side-navigation-on-certain-pages). The router hands the navigation to the browser before doing any client-side work.
--   A back/forward traversal to a page that is not in the in-memory cache, or whose cached fetch had failed, which causes a full page reload. From an idle state it writes nothing. If a navigation was still in progress when the visitor pressed Back, or an earlier navigation's initiator was still set, the traversal sets `state.navigating` to `false` and `state.initiator` to `null` as it triggers the reload, so no stale value survives into the reload.
+-   A back/forward traversal to a page that is not in the in-memory cache, or whose cached fetch had failed, which causes a full page reload. When neither a navigation nor a retained initiator exists, it writes nothing. If either is present, the traversal clears the readable values: an uncached traversal does so at the reload exit, while a cached-falsy traversal clears a retained initiator at the claim and any in-flight navigation at the reload exit, so no stale value survives the traversal.
 -   `actions.prefetch()`. Prefetching is not navigating.
 
 **A failed navigation is never reported as a successful one.** When a navigation starts client-side and then falls back to a full page load, `state.navigating` becomes truthy, nothing is rendered, and `state.url` keeps the URL of the page you were on. `state.navigating` stays truthy while the browser replaces the document, and is set to `false` only if the document is still there 10 seconds later, as described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content). The promise returned by `navigate()` never resolves in that case either.
@@ -828,13 +828,13 @@ No navigation starts for:
 
 The router is latest-wins (see [Race condition protection](#race-condition-protection)), and so are these properties. If a second navigation starts before the first one ends, `state.navigating` stays truthy from the first start until the winning navigation ends, with no idle gap in between and no second "end" when the abandoned navigation finishes. When the winner ends, `state.navigating` becomes `false` once. The 10-second limit described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) applies here too: if the winning navigation is a back/forward traversal whose cached page fetch has still not settled after 10 seconds, the router sets `state.navigating` to `false` rather than leaving it truthy indefinitely. If that fetch settles later, the traversal then updates both properties like an ordinary navigation.
 
-`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator.
+`state.initiator` always identifies the most recent navigation. The moment a second navigation starts it replaces the first one's value, including with `null` when the second navigation has no identifiable initiator. A back/forward traversal that arrives while a navigation is in progress does exactly that: it takes over and clears the initiator. A cached traversal also clears an identity retained from a completed navigation at its claim, before waiting for its entry.
 
 For a per-region loading indicator this is the behavior you want, with no bookkeeping of your own: a region whose navigation is superseded by another region's stops showing as the initiator at that moment, and two overlapping navigations from the same region keep that region showing as the initiator until the last of them ends.
 
 ### Who initiated the navigation
 
-`actions.navigate()` accepts an `initiator` option that can take three kinds of value:
+`actions.navigate()` accepts an `initiator` option with four cases:
 
 ```js
 // Derive it from where the call was made (the default).
@@ -843,15 +843,16 @@ yield actions.navigate( url );
 // Set it explicitly.
 yield actions.navigate( url, { initiator: 'myPlugin/cart' } );
 
-// Leave it empty.
+// Suppress attribution.
 yield actions.navigate( url, { initiator: null } );
 ```
 
--   **A string** is stored in `state.initiator` as is, and no region lookup happens. Use this to give a block an identity of its own that other code can read, including code in a different store that does not own the action that navigated.
+-   **A nonempty string** is stored in `state.initiator` as is, and no region lookup happens. Use this to give a block an identity of its own that other code can read, including code in a different store that does not own the action that navigated.
 -   **`null`** leaves `state.initiator` as `null` for the whole navigation, even when the call was made from inside a router region.
 -   **Omitted** derives the initiator from where the action was called: the nearest element with `data-wp-router-region` that encloses the element whose directive called the action, including that element itself. When regions are nested, the nearest one wins: the outer region is still what the router updates, but the inner region is what started the navigation.
+-   **An empty string or any other invalid value** resolves to `null`, logs a warning when `SCRIPT_DEBUG` is enabled, and never falls back to deriving the initiator.
 
-A derived initiator is the region's ID as you wrote it, not the raw attribute text: for the JSON object form used in [Adding new regions on navigation](#adding-new-regions-on-navigation) it is the value of `id`, and a `namespace::` prefix is stripped. Any other kind of `initiator` value is treated as `null`. See the [`initiator` option reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#navigate) for the exact rules.
+A derived initiator is the region's ID as you wrote it, not the raw attribute text: for the JSON object form used in [Adding new regions on navigation](#adding-new-regions-on-navigation) it is the value of `id`, and a `namespace::` prefix is stripped. An empty or non-string `id` in that object form derives `null`; a malformed but nonempty attribute value remains its raw post-prefix string. See the [`initiator` option reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#navigate) for the exact rules.
 
 ### Navigations with no initiator
 
@@ -860,7 +861,7 @@ A derived initiator is the region's ID as you wrote it, not the raw attribute te
 -   **The visitor used the browser's back or forward button.** No block started the navigation, which is what lets a block tell a traversal apart from a navigation it started itself.
 -   **A link was handled by the document-level listener of full-page mode**, wherever the link sits. A plain link inside a block's region was not started by that block.
 -   **`navigate()` was called with no directive scope**, for example from a module that imports the router and calls it from its own code rather than from an action bound to an element.
--   **`navigate()` was called from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url`.** That call does not inherit the initiator of the navigation it is reacting to. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
+-   **`navigate()` was called from inside an unwrapped `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url`.** That callback runs without a directive scope, so the call does not inherit the initiator of the navigation it is reacting to. A callback wrapped with `withScope()` deliberately reinstalls its captured scope and can derive that region instead. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
 
 In full-page mode, the `<body>` element itself carries `data-wp-router-region="core/body"`, so an element with a directive that calls `navigate()` from outside every block's router region derives `core/body`, where the same markup in region-based mode derives `null`. See [Full-page client-side navigation](#full-page-client-side-navigation-experimental).
 
@@ -879,7 +880,7 @@ A derived initiator identifies the region, not the element: two blocks inside th
 Where you read the two properties decides when your code runs and what it can see:
 
 -   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
--   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes and has **no directive scope** — `getContext()` and `getElement()` are not available inside it. Use it for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
+-   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes. An unwrapped callback has **no directive scope** — `getContext()` and `getElement()` are not available inside it — while a callback wrapped with `withScope()` deliberately reinstalls its captured scope. Use an unwrapped watcher for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
 -   **`data-wp-init`** runs in scope once per element, which makes it the place for setup that belongs to hydration rather than to a navigation.
 
 "The new DOM" above assumes the navigation rendered its content. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content), a callback reacting to the end with either primitive may find the previous page or a partially updated one, so look elements up inside the callback and check that they exist.
@@ -1009,7 +1010,7 @@ The watcher lives on its own element inside the region, and the region's ID reac
 
 If the region ID is a literal you wrote by hand, drop the `getContext()` line and compare against that literal.
 
-**React to the change, not to the condition.** `state.initiator` keeps its value after a navigation ends (see [When the keys change](#when-the-keys-change)), so a callback that checks `! state.navigating && state.initiator === regionId` would move focus again on every later re-run. Comparing against the previous value makes it act exactly once, when the navigation ends.
+**React to the change, not to the condition.** `state.initiator` keeps its value after a navigation ends (see [When the keys change](#when-the-keys-change)); a traversal clears it separately, so a callback that checks `! state.navigating && state.initiator === regionId` would move focus again on every later re-run. Comparing against the previous value makes it act exactly once, when the navigation ends.
 
 **Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` value is bookkeeping, not something the page renders, so a plain module-scope object is the right home for it.
 
@@ -1515,7 +1516,7 @@ When `navigate()` is called (for example, on link click):
 8. Screen reader announcement is made for accessibility.
 9. If the URL has a hash, the page scrolls to that element.
 10. Navigation is complete.
-11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared; it keeps its value until the next navigation replaces it.
+11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared by this end write; it keeps its value until the next navigation replaces it or a traversal clears it.
 
 Steps 2 and 11 are the two moments the lifecycle properties change. [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) covers what your code can rely on about them, including why the end is set on a later frame instead of inside step 6.
 
