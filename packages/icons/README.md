@@ -50,7 +50,7 @@ To add a new icon to the library, follow these steps:
    - `slug`: The icon identifier (should match the SVG filename without the `.svg` extension)
    - `label`: The human-readable label for the icon. Use Title Case (for example, `My New Icon`).
    - `filePath`: The relative path to the SVG file (e.g., `library/my-new-icon.svg`)
-   - `public` (optional): Set to `true` to ship the icon to WordPress Core and register it in the `core` collection. Omit it or set it to `false` to keep the icon in the JS library only. **Important**: Once an icon ships to WordPress Core, removing it is difficult, so carefully consider this field before setting it.
+   - `public` (optional): Set to `true` to ship the icon to WordPress Core and register it in the `core` collection. Omit it to keep the icon in the JS library only. **Important**: Once an icon ships to WordPress Core, removing it is difficult, so carefully consider this field before setting it.
 
    This manifest property controls which icons ship to WordPress Core. REST API visibility is configured for the whole collection through the `public` argument of `wp_register_icon_collection()`, which defaults to `true`. Icons in non-public collections remain available to server-side code through `wp_get_icon()` but are not exposed through the REST API or selectable in the Icon block.
 
