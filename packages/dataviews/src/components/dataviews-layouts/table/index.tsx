@@ -302,26 +302,8 @@ function ViewTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
-	// Parent-based hierarchy is not supported with grouping. Preserve the
-	// existing group order and `getItemLevel` indentation.
-	const rowsByGroup = dataByGroup
-		? new Map(
-				Array.from( dataByGroup.entries() ).map(
-					( [ groupName, groupItems ] ) => [
-						groupName,
-						getRows(
-							groupItems,
-							getItemId,
-							getItemLevel,
-							undefined,
-							view.showLevels
-						),
-					]
-				)
-		  )
-		: null;
-	const rows = rowsByGroup
-		? Array.from( rowsByGroup.values() ).flat()
+	const rows = dataByGroup
+		? []
 		: getRows(
 				data,
 				getItemId,
@@ -330,7 +312,9 @@ function ViewTable< Item >( {
 				view.showLevels
 		  );
 	// Selection ranges follow the rendered hierarchy and group order.
-	const orderedData = rows.map( ( row ) => row.item );
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: rows.map( ( row ) => row.item );
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
@@ -632,9 +616,9 @@ function ViewTable< Item >( {
 					</tr>
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
-				{ hasData && groupField && rowsByGroup ? (
-					Array.from( rowsByGroup.entries() ).map(
-						( [ groupName, groupRows ] ) => (
+				{ hasData && groupField && dataByGroup ? (
+					Array.from( dataByGroup.entries() ).map(
+						( [ groupName, groupItems ] ) => (
 							<tbody key={ `group-${ groupName }` }>
 								<tr className="dataviews-view-table__group-header-row">
 									<td
@@ -656,13 +640,20 @@ function ViewTable< Item >( {
 											  ) }
 									</td>
 								</tr>
-								{ groupRows.map( ( row ) => {
-									const { id, item, level } = row;
+								{ groupItems.map( ( item, index ) => {
+									const id =
+										getItemId( item ) || index.toString();
 									return (
 										<TableRow
-											key={ id }
+											key={ getItemId( item ) }
 											item={ item }
-											level={ level }
+											level={
+												view.showLevels &&
+												typeof getItemLevel ===
+													'function'
+													? getItemLevel( item )
+													: undefined
+											}
 											hasBulkActions={ hasBulkActions }
 											actions={ actions }
 											fields={ fields }

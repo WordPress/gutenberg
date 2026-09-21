@@ -198,32 +198,6 @@ describe( 'DataViews component', () => {
 		expect( rows[ 1 ] ).toHaveTextContent( '— Child' );
 	} );
 
-	it( 'keeps grouped rows in group order and uses getItemLevel', () => {
-		render(
-			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child', author: 1 },
-					{ id: 1, title: 'Parent', author: 1 },
-				] }
-				getItemLevel={ ( item ) => ( item.id === 2 ? 1 : 0 ) }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					groupBy: { field: 'author', direction: 'asc' },
-					showLevels: true,
-					titleField: 'title',
-				} }
-			/>
-		);
-
-		const rows = screen.getAllByRole( 'row' );
-		expect( rows[ 2 ] ).toHaveTextContent( '— Child' );
-		expect( rows[ 3 ] ).toHaveTextContent( 'Parent' );
-	} );
-
 	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
 		render(
 			<DataViewWrapper

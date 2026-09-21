@@ -53,15 +53,15 @@ export default function getHierarchicalRows< Item >(
 	}
 
 	const result: HierarchicalRow< Item >[] = [];
-	const visited = new Set< Row< Item > >();
+	const visited = new Set< string >();
 	const appendTree = ( root: Row< Item > ) => {
 		const stack = [ { row: root, level: 0 } ];
 		while ( stack.length ) {
 			const current = stack.pop()!;
-			if ( visited.has( current.row ) ) {
+			if ( visited.has( current.row.id ) ) {
 				continue;
 			}
-			visited.add( current.row );
+			visited.add( current.row.id );
 			result.push( {
 				item: current.row.item,
 				id: current.row.id,
@@ -80,7 +80,7 @@ export default function getHierarchicalRows< Item >(
 
 	roots.forEach( appendTree );
 	rows.forEach( ( row ) => {
-		if ( ! visited.has( row ) ) {
+		if ( ! visited.has( row.id ) ) {
 			appendTree( row );
 		}
 	} );
