@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Run `watch()` callbacks without an ambient directive scope. Inside an unwrapped callback, scope reads are absent and scope-derived calls behave as they do from other scope-less callers such as `setTimeout`; the previous scope is restored after the callback returns or throws. `data-wp-watch` callbacks, `withScope()`-wrapped callbacks, and actions invoked from directives keep their scopes. Only bare `watch()` callbacks change; the export, signature, cleanup behavior, and synchronous timing are unchanged.
+
 ### Internal
 
--   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. No public API is added or changed.
+-   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent.
 
 ## 6.55.0 (2026-09-10)
 
