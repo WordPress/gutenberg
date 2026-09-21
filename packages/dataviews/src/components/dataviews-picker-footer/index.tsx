@@ -7,9 +7,7 @@ import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-import DataViewsPagination, {
-	hasPaginationControls,
-} from '../dataviews-pagination';
+import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
@@ -269,7 +267,12 @@ export function DataViewsPickerFooter( {
 		view,
 	} = useContext( DataViewsContext );
 
-	if ( ! actions.length && ! hasPaginationControls( view, paginationInfo ) ) {
+	const hasPagination =
+		! view.infiniteScrollEnabled &&
+		!! paginationInfo.totalItems &&
+		paginationInfo.totalPages > 1;
+
+	if ( ! actions.length && ! hasPagination ) {
 		return null;
 	}
 
