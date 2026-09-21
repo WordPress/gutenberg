@@ -23,6 +23,7 @@
 
 ### Bug Fixes
 
+-   `BlockAlignmentControl`: Hide the control again when none of a block's alignments are available. Paragraph, Heading, List and other blocks that support only wide and full were showing a menu of unavailable options that could not change anything ([#83265](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 -   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
