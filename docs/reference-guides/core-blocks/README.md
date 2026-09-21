@@ -621,7 +621,7 @@ The author biography.
 
 -	**Name:** [core/post-author-biography](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-biography/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Supports:** anchor, background (gradient), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
 
 ## Author Name
 
