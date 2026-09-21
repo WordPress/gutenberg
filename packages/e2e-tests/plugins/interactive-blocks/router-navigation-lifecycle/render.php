@@ -4,10 +4,10 @@
  * and `state.initiator`, published by `@wordpress/interactivity-router`) in
  * region-based client-side navigation.
  *
- * This single fixture block is shared by every task of the
+ * This single fixture block is shared by every flow of the
  * `router-navigation-lifecycle` e2e spec, so it supports more attributes
- * than any one task's flows exercise. See the build plan for the inventory
- * of published pages and which flow uses which attribute combination.
+ * than any one flow exercises. The spec's `beforeAll` lists the published
+ * pages and which attribute combination each one uses.
  *
  * @package gutenberg-test-interactive-blocks
  *
@@ -38,10 +38,7 @@ $other_href = $attributes['other'] ?? null;
 // Each entry describes one router region this block instance renders: its
 // id, the href its own (unlabelled) "navigate" link targets, and whether it
 // is the primary region -- the one that also carries the destination marker
-// and the server-context readout. A second region is added here (rather
-// than in a later task) because later tasks only ever extend `view.js` and
-// the spec file, never this file's markup for `secondRegionId` -- see the
-// build plan's Task 7 notes.
+// and the server-context readout.
 $regions = array();
 if ( isset( $attributes['regionId'] ) ) {
 	$regions[] = array(
@@ -89,9 +86,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 			 * `page.regions` for *any* page, including the very first one,
 			 * so every navigation resets this region's signal to `null` and
 			 * never repopulates it -- the region's entire content silently
-			 * disappears after the first client-side navigation. This one
-			 * cost a full debugging pass in this task; see the build's
-			 * commit message for the trace that found it.
+			 * disappears after the first client-side navigation.
 			 */
 			?>
 			<div
@@ -208,8 +203,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 			 * treats the outer region as the update unit") reads
 			 * `outer-region` instead of the correct nearest-enclosing
 			 * `inner-region`. Both posts using `nested` render the same
-			 * two ids -- see the build plan's Task 7 table, row 11 -- so
-			 * the router updates both regions on navigation.
+			 * two ids, so the router updates both regions on navigation.
 			 *
 			 * FIXTURE TRAP (see above): both the outer and the inner
 			 * region element carry `data-wp-interactive` on *themselves*,
@@ -263,19 +257,18 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 	<?php
 	/*
-	 * Flows 24-26 (Task 10): the two `hidden` bindings, deliberately
-	 * opposite polarities on the same page. `bind-hidden-negated` is
+	 * Flows 24-26: the two `hidden` bindings, deliberately opposite
+	 * polarities on the same page. `bind-hidden-negated` is
 	 * `!state.navigating` -- the spinner shape, visible only while
 	 * navigating -- and `bind-hidden-plain` is the un-negated inverse. Do
-	 * not "fix" either expression to make a failing assertion pass: an
-	 * earlier plan revision had these two inverted and a reviewer caught
-	 * it, precisely because a writer following an inverted expectation
-	 * would go red against *correct* code here and "fix" it by dropping
-	 * the negation, planting the bug in the fixture instead of the test.
-	 * Check polarity against the spec/plan text, not intuition, and see
+	 * not "fix" either expression to make a failing assertion pass: a
+	 * test written against an inverted expectation goes red against
+	 * *correct* code here, and dropping the negation would plant the bug
+	 * in the fixture instead of the test. Check polarity against
 	 * `getEvaluate`/`bind.ts`'s handling of the `!` prefix and of `hidden`
 	 * specifically (`packages/interactivity/src/hooks.tsx:249,283-284` and
-	 * `packages/interactivity/src/directives/bind.ts:67-72`).
+	 * `packages/interactivity/src/directives/bind.ts:67-72`), not
+	 * intuition.
 	 */
 	?>
 	<span data-testid="bind-hidden-negated" data-wp-bind--hidden="!state.navigating"></span>

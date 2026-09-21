@@ -8,9 +8,10 @@
  * Because `vi.resetModules()` is unusable here (`assets/dynamic-importmap`
  * defines a non-configurable global that throws on redefinition), the
  * router module is imported exactly once per file and every test in this
- * file shares that one instance and its `core/router` store. Row 1, row 14
- * and row 15 depend on the lifecycle keys never having been written to, so
- * they run first, in that order, before any test performs a real
+ * file shares that one instance and its `core/router` store. The three tests
+ * that depend on the lifecycle keys never having been written to (the
+ * pristine `undefined` reading, `prefetch()` alone, and the entry-check
+ * rejection) run first, in that order, before any test performs a real
  * navigation.
  */
 
@@ -76,7 +77,7 @@ async function advanceOneFrame() {
 
 /**
  * Binds a raw `effect()` to the two lifecycle keys, tagging each entry with
- * only the keys that are not `undefined` — the shape the lifecycle rows'
+ * only the keys that are not `undefined` — the shape the lifecycle tests'
  * fingerprints are stated against (e.g. `{ n: true }` with no `i`).
  */
 function rawLifecycleLog() {
@@ -165,7 +166,7 @@ const plainHtml = ( marker: string ) =>
 	`<!doctype html><title>t</title><body>${ marker }</body>`;
 
 describe( 'navigate() lifecycle write protocol', () => {
-	test( 'row 1 — before any navigation the lifecycle keys read undefined, and loading the router module alone does not re-run a watcher already bound to the namespace', async () => {
+	test( 'before any navigation the lifecycle keys read undefined, and loading the router module alone does not re-run a watcher already bound to the namespace', async () => {
 		const { state: preState } = store( 'core/router', {} ) as {
 			state: typeof state;
 		};
@@ -192,7 +193,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		dispose();
 	} );
 
-	test( 'row 14 — actions.prefetch() alone produces no lifecycle transition at all', async () => {
+	test( 'actions.prefetch() alone produces no lifecycle transition at all', async () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		await actions.prefetch( 'http://localhost/row14-dest', {
@@ -206,7 +207,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		expect( state.initiator ).toBeUndefined();
 	} );
 
-	test( 'row 15 — an entry-check rejection produces no lifecycle transition, and the lifecycle reads idle throughout', async () => {
+	test( 'an entry-check rejection produces no lifecycle transition, and the lifecycle reads idle throughout', async () => {
 		populateServerData( {
 			config: { 'core/router': { clientNavigationDisabled: true } },
 		} );
@@ -245,7 +246,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		populateServerData();
 	} );
 
-	test( 'row 2 — the start pair is atomic: no notification is published in which navigating is truthy and initiator is still absent', async () => {
+	test( 'the start pair is atomic: no notification is published in which navigating is truthy and initiator is still absent', async () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		await actions.navigate( 'http://localhost/row2-dest', {
@@ -268,7 +269,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		expect( raw.some( ( entry ) => entry.n === false ) ).toBe( true );
 	} );
 
-	test( 'row 3 — initiator is not cleared by the end write and stays readable at and after the end', async () => {
+	test( 'initiator is not cleared by the end write and stays readable at and after the end', async () => {
 		await actions.navigate( 'http://localhost/row3-dest', {
 			initiator: 'region-x',
 			html: plainHtml( 'row3-dest' ),
@@ -283,7 +284,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		} ).toEqual( { navigating: false, initiator: 'region-x' } );
 	} );
 
-	test( 'row 4 — the transitions are produced regardless of options, of a forced same-URL navigation, and for consecutive navigations without any latch', async () => {
+	test( 'the transitions are produced regardless of options, of a forced same-URL navigation, and for consecutive navigations without any latch', async () => {
 		// Clause 1: loadingAnimation/screenReaderAnnouncement both false.
 		{
 			const { raw, dispose } = rawLifecycleLog();
@@ -333,7 +334,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		}
 	} );
 
-	test( 'row 6 — the end transition observes the committed DOM and the destination URL (raw effect(), the deliberate split-the-effects exception)', async () => {
+	test( 'the end transition observes the committed DOM and the destination URL (raw effect(), the deliberate split-the-effects exception)', async () => {
 		const region = setupRegion( 'row6', 'origin-marker' );
 		const href = 'http://localhost/row6-dest';
 
@@ -372,7 +373,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		} );
 	} );
 
-	test( 'row 8 — a throw in the post-commit hash-scroll tail still lands the end write, leaves the lifecycle idle, and the original error still propagates', async () => {
+	test( 'a throw in the post-commit hash-scroll tail still lands the end write, leaves the lifecycle idle, and the original error still propagates', async () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		let caught: unknown;
@@ -397,7 +398,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		] );
 	} );
 
-	test( 'row 9 — a navigation superseded at the existing-URL bail runs its finally, finds the token no longer current, and writes nothing', async () => {
+	test( 'a navigation superseded at the existing-URL bail runs its finally, finds the token no longer current, and writes nothing', async () => {
 		const { fetchMock, pending } = makeDeferredFetch();
 		window.fetch = fetchMock as unknown as typeof window.fetch;
 
@@ -429,7 +430,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		await callB;
 	} );
 
-	test( 'row 10 — staggered same-href overlap under { force: true }, the natural delivery order', async () => {
+	test( 'staggered same-href overlap under { force: true }, the natural delivery order', async () => {
 		const region = setupRegion( 'row10', 'origin' );
 		const href = 'http://localhost/row10-dest';
 
@@ -470,7 +471,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		dispose();
 	} );
 
-	test( 'row 12 — a second navigation claiming the token inside the frame-wide window makes the stale scheduled end write nothing', async () => {
+	test( 'a second navigation claiming the token inside the frame-wide window makes the stale scheduled end write nothing', async () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		// First navigation: cache-served, reaches its finally and schedules
@@ -511,7 +512,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		dispose();
 	} );
 
-	test( "row 13 — actions.navigate()'s promise resolution timing is unchanged: a cache-served call resolves on microtasks alone", async () => {
+	test( "actions.navigate()'s promise for a cache-served call resolves on microtasks alone", async () => {
 		const promise = actions.navigate( 'http://localhost/row13-dest', {
 			html: plainHtml( 'row13-dest' ),
 			loadingAnimation: false,
@@ -595,7 +596,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 	// and retained the declared initiator. The unresolved generator is stale
 	// as soon as a later navigation claims the token, so no ordering requirement
 	// remains for the lifecycle reading.
-	test( 'row 11 — a navigation that falls back mid-flight is released after the bound while its reload remains pending', async () => {
+	test( 'a navigation that falls back mid-flight is released after the bound while its reload remains pending', async () => {
 		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',

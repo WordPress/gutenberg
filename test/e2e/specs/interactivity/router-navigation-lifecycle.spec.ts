@@ -50,7 +50,7 @@ const waitForLogLength = async (
 
 /**
  * Waits, by polling, for the counted lifecycle log to contain at least one
- * truthy-navigating entry. This is the positive evidence Task 9's full-page
+ * truthy-navigating entry. This is the positive evidence the full-page
  * flows lead with: in full-page mode the whole BODY is the router region, so
  * the counted observer's own `data-wp-watch` element is torn down and
  * re-created on every navigation and its run **count** is not a transition
@@ -90,8 +90,8 @@ const settle = ( page: Page ) =>
 	);
 
 /**
- * A real-time wait, used only where the plan explicitly calls for one:
- * comfortably past the 400 ms window Flows 27 and 30's consumer-side
+ * A real-time wait, used only for the debounce negatives: comfortably
+ * past the 400 ms window Flows 27 and 30's consumer-side
  * debounces key off of. Without it the corresponding negative assertion is
  * a coin flip at 400 ms and a guaranteed pass taken immediately -- true on
  * every implementation, including one whose cache-served navigation
@@ -137,26 +137,24 @@ const collectConsoleActivity = ( page: Page ) => {
 /**
  * Registers a route on `url` *before* any request against it is expected,
  * holding it open until `release()` is called. This is the held-request
- * idiom from `router-navigate.spec.ts:89-102`, extended with a hit signal
- * (per the operational notes): `hit` resolves the moment the request
- * arrives -- the positive checkpoint that it was really made.
+ * idiom from `router-navigate.spec.ts:89-102`, extended with a hit signal:
+ * `hit` resolves the moment the request arrives -- the positive checkpoint
+ * that it was really made.
  *
  * **Only ever safe on a resource `fetch()`, never on a main-frame document
- * request.** Holding (or aborting) a main-frame request was probed here and
- * found not to leave the outgoing document's execution context alive and
- * assertable in this environment -- residual R1 fails either way, which is
- * stronger than the plan's own named fallback (`route.abort()`)
- * anticipated. See `readBeforeUnloadLog()` below for the replacement this
- * file uses instead wherever a flow needs to inspect the *outgoing*
- * document's state around a forced full page load.
+ * request.** Holding or aborting a main-frame request does not keep the
+ * outgoing document's execution context alive and assertable in this
+ * environment, so neither is any safer than letting the request through.
+ * See `readBeforeUnloadLog()` below for what this file uses instead
+ * wherever a flow needs to inspect the *outgoing* document's state around a
+ * forced full page load.
  *
  * **`release()` alone is not a reliable "the browser has resumed" signal.**
  * It only tells you Playwright's own route handler returned; the browser's
  * fetch-then-parse pipeline can still be in flight well after that. Flows
  * 14 and 15 need the *browser* to have the full response before sampling a
  * mid-window reading, so they pair `release()` with a `page.waitForResponse`
- * promise created beforehand, per the held-request idiom the operational
- * notes already prescribe.
+ * promise created beforehand.
  *
  * @param page The Playwright page.
  * @param url  The URL to intercept.
@@ -179,8 +177,8 @@ const holdRoute = async ( page: Page, url: string ) => {
  * document (on the same origin) was last torn down -- persisted by
  * `view.js`'s `pagehide`/`beforeunload` listener into `localStorage`, which
  * survives a same-origin navigation even when the outgoing document's own
- * execution context does not (residual R1; see the `holdRoute` doc
- * comment). Call this only *after* the forced full page load this flow
+ * execution context does not (see the `holdRoute` doc comment). Call this
+ * only *after* the forced full page load this flow
  * expects has landed: reading it any earlier would return a stale value
  * from whatever document last unloaded on this origin, or `null` on a
  * browser context that has never unloaded one.
@@ -225,7 +223,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		await utils.activatePlugins();
 
 		/*
-		 * Task 6's inventory, rows 1-7, in the stated topological order.
+		 * The region-mode fixture pages, rows 1-7, in topological order.
 		 * `addPostWithBlock` creates and returns a post's link in one call
 		 * with no update path, so a post's `next`/`other` must already
 		 * exist -- every row below is built strictly top to bottom.
@@ -306,8 +304,9 @@ test.describe( 'Router navigation lifecycle', () => {
 		} );
 
 		/*
-		 * Task 7's inventory, rows 8-12, appended in the same strict
-		 * topological order: a post's `next`/`other` must already exist.
+		 * The two-region and nested fixture pages, rows 8-12, appended in
+		 * the same strict topological order: a post's `next`/`other` must
+		 * already exist.
 		 */
 
 		// Row 8: region A's destination in Flows 13, 14, 15, 28, 29.
@@ -340,7 +339,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		// Row 10: the origin for Flows 13, 14, 15, 28, 29. Region A's
 		// `navigate` link -> `next` (row 8); region A's `navigate (other)`
 		// link -> `other` (row 9); region B's `navigate` link -> `other`
-		// (row 9), per Task 6's second-region rule.
+		// (row 9), so that a cross-region flow has two distinct hrefs.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle two-region - page 1',
 			attributes: {
@@ -375,8 +374,8 @@ test.describe( 'Router navigation lifecycle', () => {
 		} );
 
 		/*
-		 * Task 9's inventory, rows 13-14: the full-page mode fixture
-		 * (`test/router-navigation-full-page`), a distinct block from the
+		 * The full-page mode fixture pages, rows 13-14: the fixture block
+		 * (`test/router-navigation-full-page`) is a distinct block from the
 		 * region-mode fixture above. Every plain link and every navigate
 		 * control on page 1 targets page 2, so Flows 21-23 differ only in
 		 * *what* was clicked, never in *where* it went.
@@ -654,9 +653,9 @@ test.describe( 'Router navigation lifecycle', () => {
 			} ) => {
 				const { page3Url } = await setup( page, utils );
 
-				// No interception of `page3Url`: residual R1 means
-				// holding or aborting it would be no safer than
-				// letting it through, so the reload is let through
+				// No interception of `page3Url`: it is a main-frame
+				// request, and holding or aborting one is no safer than
+				// letting it through (see `holdRoute`), so the reload is let through
 				// normally and the outgoing document's last known
 				// state is recovered from `localStorage` afterwards
 				// (see `readBeforeUnloadLog`).
@@ -690,7 +689,7 @@ test.describe( 'Router navigation lifecycle', () => {
 				// shared setup's own navigation to `page2Url` would
 				// deadlock that fetch. This is a resource `fetch()`,
 				// not a main-frame document request, so holding it
-				// open is unaffected by residual R1.
+				// open is safe (see `holdRoute`).
 				const heldPage2 = await holdRoute( page, page2Url );
 
 				// `refresh` re-fetches `window.location.href`,
@@ -740,9 +739,9 @@ test.describe( 'Router navigation lifecycle', () => {
 			await waitForLogLength( page, 'lifecycle log', 1 );
 
 			const page2Url = utils.getLink( 'lifecycle - page 2' );
-			// No interception: residual R1 means holding or aborting the
-			// forced reload's main-frame request is no safer than letting
-			// it through, so it is let through normally and the origin
+			// No interception: holding or aborting the forced reload's
+			// main-frame request is no safer than letting it through (see
+			// `holdRoute`), so it is let through normally and the origin
 			// document's last known state is recovered afterwards.
 			await page.getByTestId( 'navigate' ).click();
 
@@ -773,8 +772,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			// triggers) hangs forever, forcing the router's own
 			// short-timeout fallback. The *second* request -- the
 			// forced reload that follows -- is a main-frame request,
-			// so -- residual R1 -- it is deliberately left
-			// unintercepted (a counter tells them apart, since both
+			// so it is deliberately left unintercepted (see
+			// `holdRoute`; a counter tells them apart, since both
 			// hit this same URL): its landing and the origin
 			// document's last known state are both checked afterwards.
 			let requestCount = 0;
@@ -822,8 +821,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			// Delay the router's own successful fetch of the destination
 			// just enough to widen the in-flight window for the positive
 			// checkpoint below; the forced reload that follows is a
-			// main-frame request, so -- residual R1 -- it is left
-			// unintercepted.
+			// main-frame request, so it is left unintercepted (see
+			// `holdRoute`).
 			await page.route( disabledDestUrl, async ( route ) => {
 				await new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
 				await route.continue();
@@ -1134,8 +1133,8 @@ test.describe( 'Router navigation lifecycle', () => {
 		 * `core/query` is not part of the `interactive-blocks` test plugin,
 		 * and `InteractivityUtils.addPostWithBlock` only ever generates a
 		 * single root block, so this page is built directly with
-		 * `requestUtils.createPost` and raw block markup, per the build
-		 * plan's Task 8 notes -- rather than through `interactivityUtils`.
+		 * `requestUtils.createPost` and raw block markup rather than
+		 * through `interactivityUtils`.
 		 */
 		const QUERY_PAGE_SIZE = 2;
 
@@ -1272,9 +1271,8 @@ test.describe( 'Router navigation lifecycle', () => {
 		 * navigation` in this repository -- there is no per-post switch, it
 		 * is global while enabled, and Playwright runs this project with a
 		 * single worker. So the reset in `afterAll` below is unconditional:
-		 * a leaked experiment would not fail this task, it would corrupt
-		 * every spec that runs after it, including the four existing router
-		 * suites in this task's own gate.
+		 * a leaked experiment would not fail this suite, it would corrupt
+		 * every spec that runs after it, including the other router suites.
 		 */
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.setGutenbergExperiments( [
@@ -1404,18 +1402,12 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'absent' );
 
 			// `aria-busy` absent entirely -- not `"false"` -- is a declared
-			// `navigating: false` seen through the binding. **Correction to
-			// the build plan, verified by red-driving it**: this does *not*
-			// discriminate Task 2's "neither key is declared in the router's
-			// own store literal" decision -- at this point in the flow the
-			// router module has not been imported at all (confirmed: zero
-			// `interactivity-router` network requests before the first
-			// click), so a mutation to that literal has no effect here.
-			// That decision's only browser-reachable consequence is the
-			// spurious hydration-time re-run the design doc names, which is
-			// pinned at unit level (Task 2's first acceptance row) as the
-			// plan itself says. This assertion still stands as a real
-			// regression check: it pins that this binding renders no
+			// `navigating: false` seen through the binding. At this point
+			// in the flow the router module has not been imported at all
+			// (zero `interactivity-router` network requests before the
+			// first click), so this assertion says nothing about how the
+			// router's own store declares its keys; that is pinned at
+			// unit level. What it does pin is that this binding renders no
 			// attribute at all for an `undefined` value, before hydration
 			// has ever touched it.
 			await expect(
@@ -1534,7 +1526,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await page.goto( page1Url );
 			await waitForLogLength( page, 'lifecycle log', 1 );
 
-			// Default options: the bar animates exactly as today.
+			// Default options: the built-in bar animates.
 			const heldPage2 = await holdRoute( page, page2Url );
 			await page.getByTestId( 'navigate' ).click();
 			await heldPage2.hit;
@@ -1555,8 +1547,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			/*
 			 * A fresh page load before the `loadingAnimation: false` half.
 			 * `hasFinished` above is left `true` indefinitely once set --
-			 * matching today's bar, which only fades the class away via
-			 * CSS rather than ever removing it -- so continuing on the same
+			 * Core's bar only fades the class away via CSS rather than
+			 * ever removing it -- so continuing on the same
 			 * document would make "gains neither" trivially true for the
 			 * wrong reason: the class would already be there from before
 			 * this half even started.

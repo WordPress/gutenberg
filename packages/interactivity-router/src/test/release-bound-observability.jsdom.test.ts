@@ -1,7 +1,7 @@
 /**
  * The release never pre-empts the pending directive flush:
  * the observable form of the "the lifecycle-release bound must remain
- * greater than one frame" invariant, and the row that must go red if the
+ * greater than one frame" invariant, and the test that must go red if the
  * bound is ever tuned down.
  *
  * This composite uses the real router, and the constants below keep the
@@ -10,7 +10,7 @@
  * The first behavioral composite installs fake-timer control before importing
  * the router module, so its module-scope timers are deterministic from the
  * moment the module evaluates. The fallback composite reuses that module
- * under a fresh fake clock. This is why these rows live in their own file
+ * under a fresh fake clock. This is why these tests live in their own file
  * rather than alongside the other lifecycle tests.
  */
 
@@ -82,7 +82,7 @@ jsdomVirtualConsole.on( 'jsdomError', ( error ) => {
 // rather than error, the exact false-pass this rule exists to prevent.
 // performance.getEntriesByType is stubbed too, since the router's module
 // scope reaches onDOMReady.
-test( 'row 9 — the release never pre-empts the pending directive flush (the bound-greater-than-one-frame invariant)', async () => {
+test( 'the release never pre-empts the pending directive flush (the bound-greater-than-one-frame invariant)', async () => {
 	vi.useFakeTimers( { shouldAdvanceTime: true } );
 
 	try {

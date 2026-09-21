@@ -1,5 +1,5 @@
 /**
- * Row 5 — the `initiator` option's three declared arms, exercised from
+ * The `initiator` option's three declared arms, exercised from
  * inside a router region, covering the declared values that this suite can
  * distinguish. The omitted-value derivation has its own dedicated suite.
  *

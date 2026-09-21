@@ -1,6 +1,6 @@
 /**
- * Row 16 — the deprecated `state.navigation` surface is unaffected by the
- * new `navigating`/`initiator` keys.
+ * The deprecated `state.navigation` surface is unaffected by the
+ * `navigating`/`initiator` keys.
  *
  * This is a separate file, like `initiator-invalid-warning.ts`, because
  * `warn()`'s dedupe set (`packages/interactivity/src/utils.ts`) is
@@ -80,9 +80,9 @@ describe( 'the deprecated state.navigation surface is unaffected by the new keys
 		// Clause 1: the deprecated getter was never invoked over the cycle.
 		expect( __warnCallCounter.count ).toBe( 0 );
 
-		// Clause 2: reading the deprecated surface still warns exactly once
-		// with today's verbatim message, and still reflects the
-		// loading-animation behaviour that ran during the cycle above.
+		// Clause 2: reading the deprecated surface warns exactly once
+		// with its verbatim message, and reflects the loading-animation
+		// behaviour that ran during the cycle above.
 		const hasStarted = state.navigation.hasStarted;
 		const hasFinished = state.navigation.hasFinished;
 		// A second read must not add a second console.warn call — warn()'s

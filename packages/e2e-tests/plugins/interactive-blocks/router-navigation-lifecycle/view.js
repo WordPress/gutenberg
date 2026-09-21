@@ -229,9 +229,9 @@ const { state } = store( 'router-navigation-lifecycle', {
 	callbacks: {
 		/*
 		 * The counted lifecycle observer. Reads *only*
-		 * `routerState.navigating` and `routerState.initiator` -- see this
-		 * file's acceptance row -- so it never re-runs at the commit batch,
-		 * which writes `state.url` while `navigating` is still truthy.
+		 * `routerState.navigating` and `routerState.initiator`, so it never
+		 * re-runs at the commit batch, which writes `state.url` while
+		 * `navigating` is still truthy.
 		 */
 		watchLifecycle() {
 			state._log.push( {
@@ -255,9 +255,8 @@ const { state } = store( 'router-navigation-lifecycle', {
 		 * are. Binding `data-wp-text="state.readout"` and expecting it to
 		 * track each destination's own server-seeded value, with no further
 		 * code, looked correct through hydration and the first page but
-		 * silently kept showing the *first* page's value forever after
-		 * (this cost a debugging pass in this task; see the build's commit
-		 * message). A consumer that wants a key to track the destination's
+		 * silently kept showing the *first* page's value forever after.
+		 * A consumer that wants a key to track the destination's
 		 * own server-seeded value must re-sync it itself from
 		 * `getServerState()`, the documented pattern
 		 * (`router-regions/view.js`'s `updateCounterFromServer` does the
@@ -322,7 +321,8 @@ const { state } = store( 'router-navigation-lifecycle', {
 /*
  * Flow 30's sufficiency demonstration: a Core-loading-bar equivalent,
  * rebuilt purely from the two public keys plus a consumer-side 400 ms
- * debounce -- design doc pattern (c), verbatim. A bare `watch()`, not a
+ * debounce -- the debounced loading bar recipe from the Client-Side
+ * Navigation guide. A bare `watch()`, not a
  * `data-wp-watch`: the timer callback writes this store's own `state`
  * (`showBar`), not `context`, so it needs no scope at all.
  */
@@ -352,12 +352,9 @@ watch( () => {
  * was intercepted (held or aborted) via Playwright's `page.route()`.
  *
  * This exists because holding a main-frame document request open, or
- * aborting it, both turned out to be equally unable to keep the outgoing
- * document's execution context alive and assertable in this environment --
- * residual R1 (see the build plan's "Open verifications") fails either way,
- * which is a stronger and more surprising finding than the plan's own
- * named fallback (`route.abort()`) anticipated. `pagehide` and
- * `beforeunload`, by contrast, were confirmed (by a standalone probe
+ * aborting it, are both equally unable to keep the outgoing document's
+ * execution context alive and assertable in this environment. `pagehide`
+ * and `beforeunload`, by contrast, were confirmed (by a standalone probe
  * against this same environment) to fire reliably even when the
  * *outgoing* navigation's own request is aborted, and `localStorage`
  * persists across the reload because the destination is same-origin. Both

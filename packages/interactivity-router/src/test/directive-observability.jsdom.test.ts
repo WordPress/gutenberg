@@ -1,5 +1,5 @@
 /**
- * Row 7 — a real hydrated `data-wp-watch` observes the navigation lifecycle
+ * A real hydrated `data-wp-watch` observes the navigation lifecycle
  * as three distinct runs (hydration, in flight, ended), on both of
  * `afterNextFrame`'s scheduler arms.
  *
@@ -103,7 +103,7 @@ function hydrateWatcher(
 	return runs;
 }
 
-describe( 'directive observability — row 7', () => {
+describe( 'directive observability', () => {
 	// Both tests below import the same router module instance
 	// (`vi.resetModules()` is unusable here — see the harness comment in
 	// `lifecycle-navigate.ts`), so the second test's hydration may observe

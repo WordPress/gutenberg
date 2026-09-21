@@ -13,13 +13,13 @@
  * imported exactly once, in `beforeAll()` below, and every test in this
  * file shares that one instance and its `core/router` store.
  *
- * Row 6 needs to *capture* the router's own `popstate` listener rather than
- * dispatch to it, so that a rejection from inside it becomes handled rather
- * than an unassertable unhandled rejection.
+ * The exceptional-exit tests need to *capture* the router's own `popstate`
+ * listener rather than dispatch to it, so that a rejection from inside it
+ * becomes handled rather than an unassertable unhandled rejection.
  * That capture only works at the listener's registration, which happens
  * once, at module evaluation -- so `window.addEventListener` is wrapped
  * *before* the one-and-only `import( '../index' )` in `beforeAll()`, and
- * every other row in this file still drives the handler the ordinary way,
+ * every other test in this file still drives the handler the ordinary way,
  * via a real dispatched `popstate` event, since the wrapper delegates to
  * the real `addEventListener` and so registers the listener normally too.
  */
@@ -81,7 +81,7 @@ beforeAll( async () => {
 	// `popstate` callback at the moment it registers it -- see the module
 	// comment above. Delegating to the real addEventListener keeps normal
 	// registration (and therefore normal dispatchEvent-driven tests)
-	// working unchanged.
+	// working normally.
 	const originalAddEventListener = window.addEventListener.bind( window );
 	window.addEventListener = ( (
 		type: string,
@@ -234,7 +234,7 @@ function hydrateWatcher( namespace: string ) {
 }
 
 describe( 'the popstate handler', () => {
-	test( 'row 2a — uncached traversal from a clean idle state runs no consumer code before the reload and writes nothing', async () => {
+	test( 'uncached traversal from a clean idle state runs no consumer code before the reload and writes nothing', async () => {
 		expect( state.navigating ).toBeUndefined();
 		expect( state.initiator ).toBeUndefined();
 
@@ -265,7 +265,7 @@ describe( 'the popstate handler', () => {
 		expect( console ).toHaveErrored();
 	} );
 
-	test( 'row 1 — cached, truthy entry, from idle: a full lifecycle cycle observed through a real hydrated data-wp-watch', async () => {
+	test( 'cached, truthy entry, from idle: a full lifecycle cycle observed through a real hydrated data-wp-watch', async () => {
 		const runs = hydrateWatcher( 'test/popstate-row1' );
 		await advanceOneFrame();
 		expect( runs ).toHaveLength( 1 );
@@ -281,9 +281,11 @@ describe( 'the popstate handler', () => {
 
 		expect( runs ).toEqual( [ baseline, true, false ] );
 		expect( state.initiator ).toBeNull();
+		// The render batch updates `state.url` on a traversal.
+		expect( state.url ).toBe( 'http://localhost/popstate-row1-dest' );
 	} );
 
-	test( 'row 1b — a cached traversal after a completed navigation reports no stale identity, only null, not the previous navigation’s', async () => {
+	test( 'a cached traversal after a completed navigation reports no stale identity, only null, not the previous navigation’s', async () => {
 		await actions.navigate( 'http://localhost/popstate-row1b-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'prior' ),
@@ -311,7 +313,7 @@ describe( 'the popstate handler', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'row 2b — uncached traversal superseding a navigation in flight discharges the displaced claim without starting a cycle', async () => {
+	test( 'uncached traversal superseding a navigation in flight discharges the displaced claim without starting a cycle', async () => {
 		const { fetchMock } = makeDeferredFetch();
 		window.fetch = fetchMock as unknown as typeof window.fetch;
 
@@ -354,7 +356,7 @@ describe( 'the popstate handler', () => {
 		void inFlight;
 	} );
 
-	test( 'row 2c — an uncached traversal clears an identity retained after a completed navigation with one notification', async () => {
+	test( 'an uncached traversal clears an identity retained after a completed navigation with one notification', async () => {
 		await actions.navigate( 'http://localhost/popstate-row2c-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'row2c-prior' ),
@@ -384,7 +386,7 @@ describe( 'the popstate handler', () => {
 		expect( console ).toHaveErrored();
 	} );
 
-	test( 'row 2d — an uncached traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
+	test( 'an uncached traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
 		await actions.navigate( 'http://localhost/popstate-row2d-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'row2d-prior' ),
@@ -433,7 +435,7 @@ describe( 'the popstate handler', () => {
 		);
 	} );
 
-	test( 'row 3a — a cached entry that resolves falsy from idle stays silent and reloads on a normal return', async () => {
+	test( 'a cached entry that resolves falsy from idle stays silent and reloads on a normal return', async () => {
 		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',
@@ -457,7 +459,7 @@ describe( 'the popstate handler', () => {
 		expect( console ).toHaveErrored();
 	} );
 
-	test( 'row 3b — a cached falsy entry clears an identity retained after a completed navigation', async () => {
+	test( 'a cached falsy entry clears an identity retained after a completed navigation', async () => {
 		await actions.navigate( 'http://localhost/popstate-row3b-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'row3b-prior' ),
@@ -493,7 +495,7 @@ describe( 'the popstate handler', () => {
 		expect( console ).toHaveErrored();
 	} );
 
-	test( 'row 3c — a cached falsy traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
+	test( 'a cached falsy traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
 		await actions.navigate( 'http://localhost/popstate-row3c-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'row3c-prior' ),
@@ -546,7 +548,7 @@ describe( 'the popstate handler', () => {
 		);
 	} );
 
-	test( 'row 4 — plain idle traversal to a cached entry: the clear notifies nobody (raw effect(), the opposite instrument of row 1)', async () => {
+	test( 'plain idle traversal to a cached entry: the clear notifies nobody (raw effect(), the opposite instrument of the hydrated-watcher test)', async () => {
 		await actions.prefetch( 'http://localhost/popstate-row4-dest', {
 			html: plainHtml( 'row4-dest' ),
 		} );
@@ -565,7 +567,7 @@ describe( 'the popstate handler', () => {
 		] );
 	} );
 
-	test( 'row 5 — a cached traversal superseding a navigation in flight, whose entry has not yet settled: reads in flight throughout, then closes its own cycle', async () => {
+	test( 'a cached traversal superseding a navigation in flight, whose entry has not yet settled: reads in flight throughout, then closes its own cycle', async () => {
 		const { fetchMock, pending } = makeDeferredFetch();
 		window.fetch = fetchMock as unknown as typeof window.fetch;
 
@@ -615,7 +617,7 @@ describe( 'the popstate handler', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	describe( 'row 6 — exceptional exit (captured-listener instrument)', () => {
+	describe( 'exceptional exit (captured-listener instrument)', () => {
 		test( 'half 1 — the lifecycle is restored idle a frame later; half 2 — the original error still propagates', async () => {
 			await actions.prefetch( 'http://localhost/popstate-row6-dest', {
 				html: plainHtml( 'row6-dest' ),
@@ -690,7 +692,7 @@ describe( 'the popstate handler', () => {
 		} );
 	} );
 
-	describe( 'row 7 — the claim never discharges, and the guard is not decoration', () => {
+	describe( 'the claim never discharges, and the guard is not decoration', () => {
 		test( 'half 1 — the release restores idle at the bound when the awaited entry never settles', async () => {
 			const { fetchMock, pending } = makeDeferredFetch();
 			window.fetch = fetchMock as unknown as typeof window.fetch;
@@ -788,7 +790,7 @@ describe( 'the popstate handler', () => {
 		} );
 	} );
 
-	test( 'row 8 — a cache entry that settles after the release bound produces a second, well-ordered cycle', async () => {
+	test( 'a cache entry that settles after the release bound produces a second, well-ordered cycle', async () => {
 		const { fetchMock, pending } = makeDeferredFetch();
 		window.fetch = fetchMock as unknown as typeof window.fetch;
 
@@ -838,25 +840,5 @@ describe( 'the popstate handler', () => {
 		] );
 
 		void outerNav;
-	} );
-
-	test( 'row 10 — the existing render batch is unchanged (drift guard), asserted at source level against a literal', () => {
-		const routerIndexSource = readFileSync(
-			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
-			'utf-8'
-		);
-
-		// This must stay byte-identical to packages/interactivity-router/
-		// src/index.ts's popstate handler's render batch. What it
-		// protects: the handler is structured *around* an
-		// existing batch without disturbing it, and state.url still
-		// updates on traversals exactly as today.
-		const popstateRenderBatchSource =
-			'\t\tbatch( () => {\n' +
-			'\t\t\tstate.url = window.location.href;\n' +
-			'\t\t\trenderPage( page );\n' +
-			'\t\t} );';
-
-		expect( routerIndexSource ).toContain( popstateRenderBatchSource );
 	} );
 } );

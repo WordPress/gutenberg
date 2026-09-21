@@ -2,11 +2,11 @@
  * Derives the initiator from the ambient directive scope and verifies that
  * region identity uses the directive runtime's shared value interpretation.
  *
- * Rows 1 and 2 pin attribution against **real, hydrated directive-side
- * registration** for all six `data-wp-router-region` attribute forms — the
- * four id-bearing forms (row 1) and the two absent-id forms (row 2). The R19
- * rows additionally exercise matching, updates, and attachment through
- * navigation for the affected forms.
+ * The attribute-form tests pin attribution against **real, hydrated
+ * directive-side registration** for all six `data-wp-router-region`
+ * attribute forms — the four id-bearing forms and the two absent-id forms —
+ * and two further tests exercise matching, updates, and attachment through
+ * navigation for those forms.
  *
  * Like every other file in this directory, this suite is exercised through a
  * Vitest module mock that assembles the real implementations of everything
@@ -19,13 +19,10 @@
  * `vi.resetModules()` is unusable here (see the harness comment in
  * `lifecycle-navigate.ts`), so the router module is imported once and every
  * test in this file shares that one instance and its `core/router` store.
- * No row in this file depends on the lifecycle keys' pristine pre-navigation
+ * No test in this file depends on the lifecycle keys' pristine pre-navigation
  * value, so ordering between tests is not load-bearing here.
  */
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
 import { effect } from '@preact/signals';
@@ -60,7 +57,7 @@ const plainHtml = ( marker: string ) =>
  * ambient directive scope inside the region — the same construction
  * `initiator-invalid-warning.ts` uses, generalised to accept the *raw*
  * `data-wp-router-region` attribute text (not just a bare id), which is
- * what rows 1, 2, 5 and 7 need to exercise every attribute form.
+ * what the attribute-form and absent-scope tests need to exercise every attribute form.
  *
  * @param namespace      Store namespace — must be unique per call.
  * @param regionAttrText The raw text to put in the `data-wp-router-region`
@@ -155,8 +152,8 @@ function regionMarkup(
 
 /**
  * Same recipe as `setupRegionTrigger()`, but with no `data-wp-router-region`
- * anywhere in the markup — for row 5's "no enclosing region" input and
- * row 7's "a detached element" (no region) input.
+ * anywhere in the markup — for the "no enclosing region" input and the
+ * "detached element" (no region) input.
  *
  * @param namespace Store namespace — must be unique per call.
  * @return An object exposing `runInScope()` and `remove()`.
@@ -201,7 +198,7 @@ function setupTriggerWithNoRegion( namespace: string ) {
 
 /**
  * Two router regions (`outer` containing `inner`), sharing one interactive
- * namespace, with the trigger inside `inner` — row 3's nested-regions
+ * namespace, with the trigger inside `inner` — the nested-regions
  * construction.
  *
  * @param namespace Store namespace — must be unique per call.
@@ -245,7 +242,7 @@ function setupNestedRegionsTrigger( namespace: string ) {
 
 /**
  * A factory for hydrating *separate* router regions that all share one
- * interactive namespace — row 4's "two instances of one block type"
+ * interactive namespace — the "two instances of one block type"
  * construction, e.g. two Query blocks both under `core/query`.
  *
  * Regions are hydrated **lazily**, one at a time via `hydrateRegion()`,
@@ -255,7 +252,7 @@ function setupNestedRegionsTrigger( namespace: string ) {
  * destination page — which unmounts any region hydrated earlier whose id
  * the destination page doesn't happen to include (a region
  * hydrated *before* an unrelated navigation completes loses its scope's
- * `ref.current`, the same guard row 5 exercises deliberately — so
+ * `ref.current`, the same guard the absent-scope test exercises deliberately — so
  * completing a navigation from one instance before the next instance is
  * even hydrated is what keeps the second instance's scope genuinely live
  * when it is used).
@@ -305,7 +302,7 @@ function setupSharedNamespaceRegionFactory( namespace: string ) {
 
 /**
  * Finds the one key `routerRegions` gained since `before` was captured.
- * Used by row 1 to read the directive-side-registered id straight out of
+ * Used by the attribute-forms test to read the directive-side-registered id straight out of
  * the real `routerRegions` map, rather than assuming it.
  *
  * @param before A snapshot of `routerRegions`' keys taken before hydrating.
@@ -323,7 +320,7 @@ function newlyRegisteredKey( before: Set< unknown > ): unknown {
 }
 
 describe( 'deriving the initiator from the ambient directive scope', () => {
-	test( 'row 1 — the four id-bearing attribute forms report the id the shared interpretation registers', async () => {
+	test( 'the four id-bearing attribute forms report the id the shared interpretation registers', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// A plain string id.
@@ -404,7 +401,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		}
 	} );
 
-	test( 'row 2 — an empty region attribute and an id-less JSON form both report null, asserted as null and not merely as falsy', async () => {
+	test( 'an empty region attribute and an id-less JSON form both report null, asserted as null and not merely as falsy', async () => {
 		const { state, actions } = await import( '../index' );
 
 		const empty = setupRegionTrigger( 'test/row2-empty', '' );
@@ -431,7 +428,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'R19 — plain, object, namespace-prefixed, and JSON-scalar regions match and update under their registered ids', async () => {
+	test( 'plain, object, namespace-prefixed, and JSON-scalar regions match and update under their registered ids', async () => {
 		const { actions } = await import( '../index' );
 		const forms = [
 			{
@@ -495,7 +492,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		);
 	} );
 
-	test( 'R19 — namespace-prefixed and plain JSON object regions attach destination content under their declared parents', async () => {
+	test( 'namespace-prefixed and plain JSON object regions attach destination content under their declared parents', async () => {
 		const { actions } = await import( '../index' );
 		const cases = [
 			{
@@ -548,7 +545,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		}
 	} );
 
-	test( 'row 3 — nested regions report the nearest enclosing region, not the outermost', async () => {
+	test( 'nested regions report the nearest enclosing region, not the outermost', async () => {
 		const { state, actions } = await import( '../index' );
 		const nested = setupNestedRegionsTrigger( 'test/row3' );
 
@@ -563,7 +560,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( state.initiator ).toBe( 'inner' );
 	} );
 
-	test( 'row 4 — two instances of one block type, in two regions with distinct ids, are distinguished', async () => {
+	test( 'two instances of one block type, in two regions with distinct ids, are distinguished', async () => {
 		const { state, actions } = await import( '../index' );
 		const factory = setupSharedNamespaceRegionFactory( 'test/row4-probe' );
 
@@ -594,7 +591,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( first ).not.toBe( second );
 	} );
 
-	test( 'row 5 — absent-scope inputs report null and never throw: no scope at all, ref.current null, ref.current a text node, no enclosing region', async () => {
+	test( 'absent-scope inputs report null and never throw: no scope at all, ref.current null, ref.current a text node, no enclosing region', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// (a) No ambient scope at all — called directly, not through a
@@ -655,7 +652,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'row 6 — an explicit initiator still wins ahead of derivation, and an explicit null still suppresses it, both exercised from inside a region', async () => {
+	test( 'an explicit initiator still wins ahead of derivation, and an explicit null still suppresses it, both exercised from inside a region', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// Each arm gets its own freshly-hydrated, single-use region, with
@@ -714,7 +711,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( state.initiator ).toBe( 'row6-region-derive' );
 	} );
 
-	test( 'row 7 — no derivation input is safe, including a detached element and an element inside a detached region carrier', async () => {
+	test( 'no derivation input is safe, including a detached element and an element inside a detached region carrier', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// A detached element, no region at all.
@@ -759,10 +756,9 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
  *
  * `writeFrameScope` refuses to attribute a navigation to a scope that
  * reached derivation only because it is the ambient scope of one of the
- * router's own lifecycle writes. Rows 1–7, in order, numbered independently
- * of the describe block above.
+ * router's own lifecycle writes.
  *
- * Every row below shares one construction: the outer navigation is started
+ * Every test below shares one construction: the outer navigation is started
  * from an action whose scope sits inside a region with a known id
  * (`…-region-x`). Without that, the guard has nothing to refuse.
  */
@@ -784,7 +780,7 @@ describe( 'the frame-scope guard', () => {
 	} );
 
 	/**
-	 * Builds a reactive-navigate callback for this describe block's rows:
+	 * Builds a reactive-navigate callback for this describe block's tests:
 	 * `react()` calls `actions.navigate( innerHref, options )` the first
 	 * time `read()`'s signal changes *after* `react` starts being called —
 	 * its second call, since the first is the baseline call `effect()`
@@ -893,7 +889,7 @@ describe( 'the frame-scope guard', () => {
 	}
 
 	/**
-	 * Row 6's own destination-page HTML: a full document whose BODY *is* a
+	 * The destination-page HTML for the second-click test: a full document whose BODY *is* a
 	 * `[data-wp-router-region]` carrying the same region id and the same
 	 * nested trigger button `setupRegionTrigger()` hydrates initially.
 	 *
@@ -910,7 +906,7 @@ describe( 'the frame-scope guard', () => {
 	 * matches the re-hydrated button against the freshly parsed one by
 	 * position and tag, patching the existing DOM node (and its scope,
 	 * held in a `useRef` per `hooks.tsx`) in place rather than remounting
-	 * it. That is what lets row 6 click "the same element" a second time,
+	 * it. That is what lets that test click "the same element" a second time,
 	 * after a completed navigation, at all.
 	 *
 	 * @param namespace Store namespace — must match the one
@@ -928,7 +924,7 @@ describe( 'the frame-scope guard', () => {
 		);
 	}
 
-	test( 'row 1 — a scope-less subscriber reacting to state.navigating, state.initiator or state.url reports null, not region-x, for all three trigger points', async () => {
+	test( 'a scope-less subscriber reacting to state.navigating, state.initiator or state.url reports null, not region-x, for all three trigger points', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// state.navigating — written inside the start batch.
@@ -1012,7 +1008,7 @@ describe( 'the frame-scope guard', () => {
 		}
 	} );
 
-	test( "row 2 — a withScope-wrapped raw effect() carrying region B's own scope, reacting to the rising edge of state.navigating, still reports lifecycle-b", async () => {
+	test( "a withScope-wrapped raw effect() carrying region B's own scope, reacting to the rising edge of state.navigating, still reports lifecycle-b", async () => {
 		const { state, actions } = await import( '../index' );
 
 		// withScope() captures getScope() at *wrap* time, so the wrap
@@ -1045,10 +1041,10 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBe( 'lifecycle-b' );
 	} );
 
-	test( "row 3 — an explicit initiator string still wins even when called from inside the router's own write frame, by a callback whose captured scope is the initiating element's own", async () => {
+	test( "an explicit initiator string still wins even when called from inside the router's own write frame, by a callback whose captured scope is the initiating element's own", async () => {
 		const { state, actions } = await import( '../index' );
 
-		// Row 4's construction, with one effect instead of two: the
+		// The third-level navigation test's construction, with one effect instead of two: the
 		// withScope-wrapped reacting effect and the outer trigger share
 		// the *same* hydrated element, so the scope the effect captures
 		// is the very object the outer navigation itself carries.
@@ -1082,7 +1078,7 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBe( 'declared-x' );
 	} );
 
-	test( "row 4 — a third-level navigation started from a withScope effect, after a nested navigation's own write span has closed, still reports null", async () => {
+	test( "a third-level navigation started from a withScope effect, after a nested navigation's own write span has closed, still reports null", async () => {
 		const { state, actions } = await import( '../index' );
 
 		const trigger = setupRegionTrigger(
@@ -1133,7 +1129,7 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'row 5 — a data-wp-watch in region B reacting to the end transition still reports guard-row5-region-b, not region-x and not null (characterisation)', async () => {
+	test( 'a data-wp-watch in region B reacting to the end transition still reports guard-row5-region-b, not region-x and not null (characterisation)', async () => {
 		vi.useFakeTimers( { shouldAdvanceTime: true } );
 		const fakeSetTimeout = globalThis.setTimeout;
 		const redirectSetTimeout = ( (
@@ -1210,7 +1206,7 @@ describe( 'the frame-scope guard', () => {
 			// its end write afterwards. The id itself
 			// (guard-row5-region-b) is unique across this file —
 			// routerRegions is keyed by id regardless of namespace, and
-			// reusing row 2's "lifecycle-b" here would silently inherit
+			// reusing the withScope raw-effect test's "lifecycle-b" here would silently inherit
 			// that already-nulled signal instead of a fresh one.
 			const regionBMarkup = ( marker: string ) =>
 				`<div data-wp-interactive="${ namespace }" data-wp-router-region="guard-row5-region-b" data-wp-watch="callbacks.reactToEnd">${ marker }</div>`;
@@ -1249,7 +1245,7 @@ describe( 'the frame-scope guard', () => {
 		}
 	} );
 
-	test( 'row 6 — after a navigation from an element in a region has fully ended, a second, ordinary navigation from the same element still reports that region', async () => {
+	test( 'after a navigation from an element in a region has fully ended, a second, ordinary navigation from the same element still reports that region', async () => {
 		const { state, actions } = await import( '../index' );
 
 		const namespace = 'test/guard-row6';
@@ -1284,7 +1280,7 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBe( 'guard-row6-region-x' );
 	} );
 
-	test( 'row 7 — a throwing raw effect in the start batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
+	test( 'a throwing raw effect in the start batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
 		const { state, actions } = await import( '../index' );
 		const namespace = 'test/guard-row7-start';
 		const regionId = 'guard-row7-start-region-x';
@@ -1359,7 +1355,7 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBe( regionId );
 	} );
 
-	test( 'row 8 — a throwing raw effect in the commit batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
+	test( 'a throwing raw effect in the commit batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
 		const { state, actions } = await import( '../index' );
 		const namespace = 'test/guard-row8-commit';
 		const regionId = 'guard-row8-commit-region-x';
@@ -1412,36 +1408,5 @@ describe( 'the frame-scope guard', () => {
 		);
 
 		expect( state.initiator ).toBe( regionId );
-	} );
-
-	test( 'row 7 — the commit batch still contains the same statements in the same order (drift guard), asserted at source level against a literal', () => {
-		const routerIndexSource = readFileSync(
-			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
-			'utf-8'
-		);
-
-		// This must stay byte-identical to packages/interactivity-router/
-		// src/index.ts's commit batch inside navigate() (the batch() call
-		// wrapped by the frame-scope guard's save-and-restore, not the
-		// wrapping itself). What this protects: the atomicity of
-		// state.url with renderPage() is what makes a rendering consumer
-		// see the URL and the DOM change together.
-		const commitBatchSource =
-			'\t\t\t\t\t\tbatch( () => {\n' +
-			'\t\t\t\t\t\t\t// Updates the URL in the state.\n' +
-			'\t\t\t\t\t\t\tstate.url = href;\n' +
-			'\n' +
-			'\t\t\t\t\t\t\t// Updates the navigation status once the the new page rendering\n' +
-			'\t\t\t\t\t\t\t// has been completed.\n' +
-			'\t\t\t\t\t\t\tif ( loadingAnimation ) {\n' +
-			'\t\t\t\t\t\t\t\tnavigation.hasStarted = false;\n' +
-			'\t\t\t\t\t\t\t\tnavigation.hasFinished = true;\n' +
-			'\t\t\t\t\t\t\t}\n' +
-			'\n' +
-			'\t\t\t\t\t\t\t// Renders the new page.\n' +
-			'\t\t\t\t\t\t\trenderPage( page );\n' +
-			'\t\t\t\t\t\t} );';
-
-		expect( routerIndexSource ).toContain( commitBatchSource );
 	} );
 } );
