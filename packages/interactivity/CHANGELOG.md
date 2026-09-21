@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add `afterNextFrame` and `getScope` to the `privateApis` bundle, which `@wordpress/interactivity-router` uses to publish its navigation lifecycle state. No public API is added or changed.
+
 ## 6.55.0 (2026-09-10)
 
 ## 6.54.0 (2026-08-26)
