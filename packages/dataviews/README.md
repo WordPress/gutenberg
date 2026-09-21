@@ -628,7 +628,7 @@ There are also a few differences in the implementation:
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
 -   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
 -   Only the `callback` style of action is supported. `RenderModal` is unsupported.
--   An action's `isEligible` callback disables its footer button when no selected item is eligible, and the callback receives only the eligible items. A `label` function still receives the whole selection.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible, and the callback receives only the eligible items.
 -   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
 
 Example:
@@ -702,7 +702,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 **Important differences from `DataViews`:**
 
 -   Only `callback` style actions are supported. `RenderModal` is unsupported.
--   An action's `isEligible` callback disables its footer button when no selected item is eligible; the callback receives only the eligible items, while a `label` function receives the whole selection.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible; the callback receives only the eligible items.
 -   The `isPrimary` option is used to render a `primary` variant of `Button`.
 -   To implement multi-selection, ensure all actions have `supportsBulk: true`. For single selection use `supportsBulk: false`.
 
