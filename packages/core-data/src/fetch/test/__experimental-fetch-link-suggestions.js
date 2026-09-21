@@ -461,6 +461,75 @@ describe( 'sortResults', () => {
 		);
 		expect( order ).toEqual( [ 1, 4, 3, 2 ] );
 	} );
+
+	it( 'orders a title that begins with the search term above a shorter title that only contains it', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/our-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Roasting Guide For Beginners',
+				url: 'http://wordpress.local/coffee-roasting-guide/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Coffee Roasting Guide For Beginners', 'Our Coffee' ] );
+	} );
+
+	it( 'orders a whole title match above a title that only begins with the search term', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee',
+				url: 'http://wordpress.local/coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Guide',
+				url: 'http://wordpress.local/category/coffee-guide/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
+		).toEqual( [ 'Coffee Guide', 'Coffee' ] );
+	} );
+
+	it( 'orders by the start of a title from the first character typed', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Tips for travel with a young baby',
+				url: 'http://wordpress.local/young-baby-tips/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'A day trip from Stockholm to Swedish countryside towns',
+				url: 'http://wordpress.local/day-trip-stockholm/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect( sortResults( results, 'a' ).map( ( { id } ) => id ) ).toEqual( [
+			2, 1,
+		] );
+	} );
 } );
 
 describe( 'tokenize', () => {

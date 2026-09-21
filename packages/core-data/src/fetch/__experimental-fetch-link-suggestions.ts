@@ -247,15 +247,46 @@ export default async function fetchLinkSuggestions(
 }
 
 /**
+ * How directly a title answers what was typed.
+ *
+ * Only a whole-title or a start-of-title match counts. Anything less is left to the token score,
+ * which cannot tell where in the title a match sits.
+ *
+ * @param title
+ * @param search
+ *
+ * @return 2 for the whole title, 1 for the start of it, otherwise 0.
+ */
+function getMatchTier( title: string, search: string ): number {
+	const haystack = ( title ?? '' ).toLowerCase().trim();
+	const needle = ( search ?? '' ).toLowerCase().trim();
+
+	if ( ! haystack || ! needle ) {
+		return 0;
+	}
+
+	if ( haystack === needle ) {
+		return 2;
+	}
+
+	return haystack.startsWith( needle ) ? 1 : 0;
+}
+
+/**
  * Sort search results by relevance to the given query.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * We sort by scoring each result, where the score is the number of tokens in the title that are
- * also in the search query, divided by the total number of tokens in the title. This gives us a
- * score between 0 and 1, where 1 is a perfect match.
+ * A title that is what was typed, or that begins with it, is ranked above everything else. Where
+ * the match sits in the title is a stronger signal than how much of the title it covers, and the
+ * score below cannot see it: it divides by the title's length, so a long title is marked down for
+ * being long even when the search term is its first word.
+ *
+ * The rest is sorted by scoring each result, where the score is the number of tokens in the title
+ * that are also in the search query, divided by the total number of tokens in the title. This gives
+ * us a score between 0 and 1, where 1 is a perfect match.
  *
  * @param results
  * @param search
@@ -269,7 +300,10 @@ export function sortResults( results: SearchResult[], search: string ) {
 		`${ result.kind }:${ result.type }:${ result.id }`;
 
 	const scores = {};
+	const tiers = {};
 	for ( const result of results ) {
+		tiers[ scoreKey( result ) ] = getMatchTier( result.title, search );
+
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
 			const exactMatchingTokens = titleTokens.filter( ( titleToken ) =>
@@ -301,7 +335,9 @@ export function sortResults( results: SearchResult[], search: string ) {
 	}
 
 	return results.sort(
-		( a, b ) => scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+		( a, b ) =>
+			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
+			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
 }
 
