@@ -33,6 +33,9 @@ import { describe, expect, it } from 'vitest';
 
 const INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT =
 	'packages/interactivity/src/index.ts';
+/** Repository-relative path to the directive runtime's vDOM implementation. */
+const INTERACTIVITY_VDOM_PATH_FROM_REPO_ROOT =
+	'packages/interactivity/src/vdom.ts';
 const ROUTER_INDEX_PATH_FROM_REPO_ROOT =
 	'packages/interactivity-router/src/index.ts';
 
@@ -40,6 +43,14 @@ const interactivityIndexSource = readFileSync(
 	join(
 		dirname( fileURLToPath( import.meta.url ) ),
 		'../../../interactivity/src/index.ts'
+	),
+	'utf-8'
+);
+/** Source text used to verify the shared directive-value implementation. */
+const interactivityVdomSource = readFileSync(
+	join(
+		dirname( fileURLToPath( import.meta.url ) ),
+		'../../../interactivity/src/vdom.ts'
 	),
 	'utf-8'
 );
@@ -172,13 +183,17 @@ function getPublicExportNames( source: string ): string[] {
 }
 
 describe( 'privateApis seam (packages/interactivity ↔ packages/interactivity-router)', () => {
-	it( `lists afterNextFrame and getScope in the object literal returned by privateApis in ${ INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT }`, () => {
+	it( `lists afterNextFrame, getScope, and parseDirectiveValue in the object literal returned by privateApis in ${ INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT }`, () => {
 		const producerNames = getPrivateApisProducerNames(
 			interactivityIndexSource
 		);
 
 		expect( producerNames ).toEqual(
-			expect.arrayContaining( [ 'afterNextFrame', 'getScope' ] )
+			expect.arrayContaining( [
+				'afterNextFrame',
+				'getScope',
+				'parseDirectiveValue',
+			] )
 		);
 	} );
 
@@ -195,6 +210,7 @@ describe( 'privateApis seam (packages/interactivity ↔ packages/interactivity-r
 		// broken, and the assertion below would pass for the wrong reason.
 		expect( consumerSourceNames ).toContain( 'h' );
 		expect( consumerSourceNames ).not.toContain( 'createElement' );
+		expect( consumerSourceNames ).toContain( 'parseDirectiveValue' );
 
 		const missing = consumerSourceNames.filter(
 			( name ) => ! producerNames.includes( name )
@@ -211,13 +227,65 @@ describe( 'privateApis seam (packages/interactivity ↔ packages/interactivity-r
 		} );
 	} );
 
-	it( `does not add afterNextFrame or getScope to the public export surface of ${ INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT }`, () => {
+	it( `does not add afterNextFrame, getScope, or parseDirectiveValue to the public export surface of ${ INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT }`, () => {
 		const publicExportNames = getPublicExportNames(
 			interactivityIndexSource
 		);
 
 		expect( publicExportNames ).not.toContain( 'afterNextFrame' );
 		expect( publicExportNames ).not.toContain( 'getScope' );
+		expect( publicExportNames ).not.toContain( 'parseDirectiveValue' );
+	} );
+
+	it( `uses one directive-value interpretation in ${ INTERACTIVITY_VDOM_PATH_FROM_REPO_ROOT } and the router's region wrappers`, () => {
+		const attributeLoopStart = interactivityVdomSource.indexOf(
+			'\t\tfor ( let i = 0; i < attributes.length; i++ ) {'
+		);
+		const attributeLoopEnd = interactivityVdomSource.indexOf(
+			'\n\t\t}\n\n\t\tif ( ignore && ! island )',
+			attributeLoopStart
+		);
+		expect( attributeLoopStart ).toBeGreaterThanOrEqual( 0 );
+		expect( attributeLoopEnd ).toBeGreaterThan( attributeLoopStart );
+
+		const attributeLoop = interactivityVdomSource.slice(
+			attributeLoopStart,
+			attributeLoopEnd
+		);
+		expect( attributeLoop ).toContain(
+			'parseDirectiveValue( attributeValue )'
+		);
+		expect( attributeLoop ).not.toContain( 'nsPathRegExp' );
+		expect( attributeLoop ).not.toContain( 'JSON.parse' );
+		expect( attributeLoop ).not.toContain( 'isObject' );
+
+		for ( const functionName of [
+			'parseRegionAttribute',
+			'parseRegionId',
+		] ) {
+			const functionStart = routerIndexSource.indexOf(
+				`const ${ functionName } =`
+			);
+			const functionEnd = routerIndexSource.indexOf(
+				'\n};',
+				functionStart
+			);
+			expect( functionStart ).toBeGreaterThanOrEqual( 0 );
+			expect( functionEnd ).toBeGreaterThan( functionStart );
+
+			const functionSource = routerIndexSource.slice(
+				functionStart,
+				functionEnd
+			);
+			expect( functionSource ).toContain( 'parseDirectiveValue' );
+			expect( functionSource ).not.toContain( 'nsPathRegExp' );
+			expect( functionSource ).not.toContain( 'namespacedValueRegExp' );
+			expect( functionSource ).not.toContain( 'JSON.parse' );
+			expect( functionSource ).not.toContain( 'constructor === Object' );
+			expect( functionSource ).not.toContain( 'isObject' );
+		}
+
+		expect( routerIndexSource ).not.toContain( 'namespacedValueRegExp' );
 	} );
 
 	it( `still gates privateApis' returned literal behind the consent check, and throws "Forbidden access." outside it, in ${ INTERACTIVITY_INDEX_PATH_FROM_REPO_ROOT }`, () => {

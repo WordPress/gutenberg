@@ -9,12 +9,10 @@
  *
  * The mock swaps in this module wholesale wherever the router imports
  * `@wordpress/interactivity`. This file assembles the *real* implementations
- * of everything the shipped router destructures from `privateApis`
- * (nine from the deep source modules under
- * `packages/interactivity/src`, and `render`, `h` and `batch` straight from
- * `preact` / `@preact/signals` — not from a source module, which does not
- * export them — exactly as `packages/interactivity/src/index.ts` itself
- * sources them.
+ * of everything the shipped router destructures from `privateApis`. The
+ * `render`, `h`, and `batch` entries come straight from `preact` /
+ * `@preact/signals` — not from a source module, which does not export them —
+ * exactly as `packages/interactivity/src/index.ts` itself sources them.
  *
  * It also re-exports `withScope` and `populateServerData` as top-level named
  * exports (not only bundled inside `privateApis`), because `vi.mock`'s
@@ -56,7 +54,7 @@ const requiredConsent =
  * of every entry the router destructures.
  *
  * @param lock The consent string.
- * @return The private APIs bundle.
+ * @return The private APIs bundle, including the shared directive-value parser.
  */
 function privateApis( lock: string ) {
 	if ( lock === requiredConsent ) {
@@ -64,6 +62,8 @@ function privateApis( lock: string ) {
 			getRegionRootFragment: hydrationApis.getRegionRootFragment,
 			initialVdomPromise: hydrationApis.initialVdomPromise,
 			toVdom: vdomApis.toVdom,
+			// Shares the directive runtime's interpretation with router consumers.
+			parseDirectiveValue: vdomApis.parseDirectiveValue,
 			render,
 			parseServerData: storeApis.parseServerData,
 			populateServerData: storeApis.populateServerData,

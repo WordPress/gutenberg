@@ -1,14 +1,12 @@
 /**
- * Deriving the initiator from the ambient directive scope, and the
- * three-clause `parseRegionId` mirror it is built on.
+ * Derives the initiator from the ambient directive scope and verifies that
+ * region identity uses the directive runtime's shared value interpretation.
  *
- * Rows 1–8, in order. Rows 1 and 2 together pin the parse mirror against
- * **real, hydrated directive-side registration** for all six
- * `data-wp-router-region` attribute forms — the four id-bearing forms
- * (row 1) and the two absent-id forms (row 2), which the mirror
- * deliberately normalises to `null` rather than mirroring. Row 8 is the
- * drift guard that keeps this deliberate duplication from being "fixed"
- * into a reuse of `parseRegionAttribute`.
+ * Rows 1 and 2 pin attribution against **real, hydrated directive-side
+ * registration** for all six `data-wp-router-region` attribute forms — the
+ * four id-bearing forms (row 1) and the two absent-id forms (row 2). The R19
+ * rows additionally exercise matching, updates, and attachment through
+ * navigation for the affected forms.
  *
  * Like every other file in this directory, this suite is exercised through a
  * Vitest module mock that assembles the real implementations of everything
@@ -107,6 +105,52 @@ function setupRegionTrigger( namespace: string, regionAttrText: string ) {
 			container.remove();
 		},
 	};
+}
+
+/**
+ * Builds a router-region element, hydrates its real directive, and returns
+ * the element so navigation can be observed through its rendered content.
+ *
+ * @param namespace      Store namespace — must be unique per call.
+ * @param regionAttrText Raw `data-wp-router-region` value.
+ * @param marker         Text rendered inside the region.
+ * @return The hydrated region element.
+ */
+function setupNavigableRegion(
+	namespace: string,
+	regionAttrText: string,
+	marker: string
+) {
+	store( namespace, {} );
+
+	const container = document.createElement( 'div' );
+	container.innerHTML = regionMarkup( namespace, regionAttrText, marker );
+	document.body.appendChild( container );
+	const regionEl = container.firstElementChild as Element;
+
+	hydrate( toVdom( regionEl ), getRegionRootFragment( regionEl ) );
+
+	return regionEl;
+}
+
+/**
+ * Creates markup for a hydrated or destination router region.
+ *
+ * @param namespace      Store namespace used by the interactive island.
+ * @param regionAttrText Raw `data-wp-router-region` value.
+ * @param marker         Text rendered inside the region.
+ * @return Serialized router-region markup.
+ */
+function regionMarkup(
+	namespace: string,
+	regionAttrText: string,
+	marker: string
+) {
+	return (
+		`<div data-wp-interactive="${ namespace }" data-wp-router-region='${ regionAttrText }'>` +
+		`<span>${ marker }</span>` +
+		'</div>'
+	);
 }
 
 /**
@@ -279,7 +323,7 @@ function newlyRegisteredKey( before: Set< unknown > ): unknown {
 }
 
 describe( 'deriving the initiator from the ambient directive scope', () => {
-	test( 'row 1 — the four id-bearing attribute forms report the id the directive side actually registered', async () => {
+	test( 'row 1 — the four id-bearing attribute forms report the id the shared interpretation registers', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// A plain string id.
@@ -385,6 +429,123 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 			} )
 		);
 		expect( state.initiator ).toBeNull();
+	} );
+
+	test( 'R19 — plain, object, namespace-prefixed, and JSON-scalar regions match and update under their registered ids', async () => {
+		const { actions } = await import( '../index' );
+		const forms = [
+			{
+				namespace: 'test/r19-match-plain',
+				attribute: 'r19-match-plain',
+				id: 'r19-match-plain',
+				before: 'plain-before',
+				after: 'plain-after',
+			},
+			{
+				namespace: 'test/r19-match-object',
+				attribute: '{"id":"r19-match-object"}',
+				id: 'r19-match-object',
+				before: 'object-before',
+				after: 'object-after',
+			},
+			{
+				namespace: 'test/r19-match-namespace',
+				attribute: 'myplugin::r19-match-namespace',
+				id: 'r19-match-namespace',
+				before: 'namespace-before',
+				after: 'namespace-after',
+			},
+			{
+				namespace: 'test/r19-match-scalar',
+				attribute: '901',
+				id: '901',
+				before: 'scalar-before',
+				after: 'scalar-after',
+			},
+		];
+
+		const regions = forms.map( ( form ) => {
+			const element = setupNavigableRegion(
+				form.namespace,
+				form.attribute,
+				form.before
+			);
+			expect( routerRegions.has( form.id ) ).toBe( true );
+			return element;
+		} );
+
+		await actions.navigate( 'http://localhost/r19-matching', {
+			html: plainHtml(
+				forms
+					.map( ( form ) =>
+						regionMarkup(
+							form.namespace,
+							form.attribute,
+							form.after
+						)
+					)
+					.join( '' )
+			),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+
+		expect( regions.map( ( region ) => region.textContent ) ).toEqual(
+			forms.map( ( form ) => form.after )
+		);
+	} );
+
+	test( 'R19 — namespace-prefixed and plain JSON object regions attach destination content under their declared parents', async () => {
+		const { actions } = await import( '../index' );
+		const cases = [
+			{
+				namespace: 'test/r19-attach-namespace',
+				id: 'r19-attach-namespace',
+				parentId: 'r19-parent-namespace',
+				attribute:
+					'myplugin::{"id":"r19-attach-namespace","attachTo":"#r19-parent-namespace"}',
+				marker: 'namespace-attached',
+			},
+			{
+				namespace: 'test/r19-attach-object',
+				id: 'r19-attach-object',
+				parentId: 'r19-parent-object',
+				attribute:
+					'{"id":"r19-attach-object","attachTo":"#r19-parent-object"}',
+				marker: 'object-attached',
+			},
+		];
+
+		for ( const item of cases ) {
+			const parent = document.createElement( 'div' );
+			parent.id = item.parentId;
+			document.body.appendChild( parent );
+			// Register each id from an existing region; the destination's
+			// attachTo value then exercises the router's new-region path.
+			setupNavigableRegion( item.namespace, item.id, 'before-attach' );
+		}
+
+		await actions.navigate( 'http://localhost/r19-attachment', {
+			html: plainHtml(
+				cases
+					.map( ( item ) =>
+						regionMarkup(
+							item.namespace,
+							item.attribute,
+							item.marker
+						)
+					)
+					.join( '' )
+			),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+
+		for ( const item of cases ) {
+			expect(
+				document.getElementById( item.parentId )
+			).toHaveTextContent( item.marker );
+		}
 	} );
 
 	test( 'row 3 — nested regions report the nearest enclosing region, not the outermost', async () => {
@@ -590,31 +751,6 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 			)
 		).resolves.toBeUndefined();
 		expect( state.initiator ).toBe( 'region-detached' );
-	} );
-
-	test( 'row 8 — parseRegionAttribute is unchanged (drift guard), asserted at source level against a literal', () => {
-		const routerIndexSource = readFileSync(
-			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
-			'utf-8'
-		);
-
-		// This must stay byte-identical to packages/interactivity-router/
-		// src/index.ts's parseRegionAttribute(). Do not "fix" it to agree
-		// with parseRegionId() above — see that function's own comment for
-		// why the disagreement is deliberate and why changing this one
-		// would change which regions client navigation updates.
-		const parseRegionAttributeSource =
-			'const parseRegionAttribute = ( region: Element ) => {\n' +
-			'\tconst value = region.getAttribute( regionAttr );\n' +
-			'\ttry {\n' +
-			'\t\tconst { id, attachTo } = JSON.parse( value );\n' +
-			'\t\treturn { id, attachTo };\n' +
-			'\t} catch {\n' +
-			'\t\treturn { id: value };\n' +
-			'\t}\n' +
-			'};';
-
-		expect( routerIndexSource ).toContain( parseRegionAttributeSource );
 	} );
 } );
 

@@ -11,6 +11,7 @@ const {
 	getRegionRootFragment,
 	initialVdomPromise,
 	toVdom,
+	parseDirectiveValue,
 	render,
 	parseServerData,
 	populateServerData,
@@ -84,84 +85,41 @@ const getPagePath = ( url: string ) => {
 };
 
 /**
- * Parses the given region's directive.
+ * Parses the given region's directive with the shared directive-value
+ * interpretation used by the runtime.
  *
  * @param region Region element.
- * @return Data contained in the region directive value.
+ * @return The region `id` and optional `attachTo` selector.
  */
 const parseRegionAttribute = ( region: Element ) => {
-	const value = region.getAttribute( regionAttr );
-	try {
-		const { id, attachTo } = JSON.parse( value );
-		return { id, attachTo };
-	} catch {
+	const { value } = parseDirectiveValue(
+		region.getAttribute( regionAttr ) ?? ''
+	);
+	if ( typeof value === 'string' ) {
 		return { id: value };
 	}
+	return {
+		id: value.id as string,
+		attachTo: value.attachTo as string | undefined,
+	};
 };
 
 /**
- * The same shape as the directive runtime's own namespace regular
- * expression (`nsPathRegExp`, `packages/interactivity/src/vdom.ts:77`),
- * matching an optional `namespace::` prefix on a directive attribute value.
- */
-const namespacedValueRegExp = /^([\w_\/-]+)::(.+)$/;
-
-/**
- * Parses a `data-wp-router-region` attribute value into the region id the
- * **directive side** registers it under — the key
- * `packages/interactivity/src/directives/router-region.ts` uses for
- * `routerRegions`.
+ * Parses a region attribute into the initiator id used by the router.
  *
- * This is a **deliberate duplication** of the directive runtime's generic
- * directive-value parse (`packages/interactivity/src/vdom.ts`'s
- * per-attribute loop), mirrored here in its three clauses and in order:
- *
- * 1. Apply `namespacedValueRegExp` above and keep the post-`::` remainder
- *    when it matches.
- * 2. `try JSON.parse` the remainder, swallowing failures.
- * 3. If the parsed value is a plain object, take its `id` (defaulting to
- *    `null`); otherwise take the remainder string.
- *
- * The final `typeof id === 'string' && id ? id : null` keeps the public
- * `string | null` contract and maps an empty region attribute — and any
- * other non-string or falsy id — to `null`.
- *
- * **Do not reuse `parseRegionAttribute` above for this, and do not modify
- * it.** Its bare `JSON.parse` plus unconditional destructure disagrees with
- * directive-side registration on two of six attribute forms: for
- * `myplugin::sidebar` its `catch` returns the *whole* string as `id`, where
- * the directive side registers `sidebar` (the namespace is stripped before
- * parsing there); and for a JSON-scalar id such as `123` its destructure
- * yields `id: undefined`, where the directive side registers the string
- * `'123'` (a parsed value that is not a plain object is discarded in favor
- * of the raw string). Reusing `parseRegionAttribute` here would make a
- * consumer's `state.initiator === myRegionId` comparison silently fail for
- * those blocks; modifying it would change *which regions client navigation
- * updates* — region semantics are frozen, and `parseRegionAttribute` stays
- * untouched for its existing caller in `preparePage()`. This duplication is
- * drift-guarded by a source-level test asserting `parseRegionAttribute`'s
- * source is unchanged — see
- * `packages/interactivity-router/src/test/initiator-resolution.ts`.
+ * The shared directive-value interpretation supplies either a string or an
+ * object. Region attribution keeps a nonempty string id and treats every
+ * other value as absent.
  *
  * @param value The raw `data-wp-router-region` attribute value, or `null`.
- * @return      The region id the directive side would register, or `null`.
+ * @return The region id, or `null` when no usable id is present.
  */
 const parseRegionId = ( value: string | null ): string | null => {
 	if ( value === null ) {
 		return null;
 	}
-	const remainder = namespacedValueRegExp.exec( value )?.[ 2 ] ?? value;
-	let parsed: unknown = remainder;
-	try {
-		parsed = JSON.parse( remainder );
-	} catch {}
-	const isPlainObject =
-		parsed !== null &&
-		typeof parsed === 'object' &&
-		( parsed as object ).constructor === Object;
-	const id = isPlainObject
-		? ( parsed as { id?: unknown } ).id ?? null
-		: remainder;
+	const { value: parsedValue } = parseDirectiveValue( value );
+	const id = typeof parsedValue === 'string' ? parsedValue : parsedValue.id;
 	return typeof id === 'string' && id ? id : null;
 };
 
