@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Internal
+### Breaking Changes
 
--   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
+-   `InspectorControls`: Remove the `__experimentalGroup` prop from the fill and the slot. It was deprecated in WordPress 6.2 in favour of `group`, with removal scheduled for 6.4 ([#83171](https://github.com/WordPress/gutenberg/pull/83171)).
 
 ### New Features
 
@@ -16,9 +16,12 @@
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
+-   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
+-   `BlockQuickNavigation`: Highlight a block on the canvas while its item is hovered or focused, matching the List View. This affects the inspector Content tab, the pattern overrides panel, and the template and template part content panels ([#83049](https://github.com/WordPress/gutenberg/pull/83049)).
 
 ### Bug Fixes
 
+-   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
@@ -26,8 +29,10 @@
 
 ### Internal
 
+-   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
 -   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
+-   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 
 ## 17.1.0 (2026-09-10)
 
