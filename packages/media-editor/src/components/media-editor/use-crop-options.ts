@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_ASPECT_RATIOS } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { useMediaEditor, resolveAspectRatio } from '../../state';

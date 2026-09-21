@@ -1,12 +1,11 @@
-/**
- * Internal dependencies
- */
 import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?inline';
 import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?inline';
 import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inline';
 import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?inline';
 import componentsLtr from '../package-styles/components-ltr.lazy.scss?inline';
 import componentsRtl from '../package-styles/components-rtl.lazy.scss?inline';
+import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
+import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import editorLtr from '../package-styles/editor-ltr.lazy.scss?inline';
 import editorRtl from '../package-styles/editor-rtl.lazy.scss?inline';
 import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?inline';
@@ -91,6 +90,17 @@ const CONFIG = [
 		rtl: [ designTokens ],
 	},
 	{
+		// Dashboard stories include form controls and the command palette.
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr, commandsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
+	},
+	{
+		componentIdMatcher: /^tokens-/,
+		ltr: [ designTokens ],
+		rtl: [ designTokens ],
+	},
+	{
 		componentIdMatcher: /^mediaeditor-/,
 		ltr: [ componentsLtr ],
 		rtl: [ componentsRtl ],
@@ -102,6 +112,11 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^design-system-patterns-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
+	{
+		componentIdMatcher: /^widget-primitives-/,
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
 	},

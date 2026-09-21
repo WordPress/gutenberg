@@ -16,12 +16,12 @@
 	margin-top: $grid-unit-20;
 
 	p {
-		color: var(--wpds-color-fg-content-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	h2 {
 		font-size: 11px;
-		font-weight: $font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		text-transform: uppercase;
 	}
 }

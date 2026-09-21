@@ -1,30 +1,21 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
+import { ThemeProvider } from '@wordpress/theme';
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import PluginArea from '../plugin-area';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
-import './style.scss';
+import useSyncBodyBackground from './use-sync-body-background';
+import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).
@@ -34,9 +25,7 @@ export default function RootSinglePage() {
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
@@ -45,29 +34,45 @@ export default function RootSinglePage() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
-			<ThemeProvider isRoot color={ { ...themeColors, bg: '#f8f8f8' } }>
+			<PluginArea />
+			<ThemeProvider
+				isRoot
+				color={ { ...themeColors, background: '#f8f8f8' } }
+			>
 				<ThemeProvider color={ themeColors }>
 					<div
+						ref={ layoutRef }
 						className={ clsx(
-							'boot-layout boot-layout--single-page',
+							styles.layout,
+							styles[ 'layout-single-page' ],
 							{
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
+								[ styles[ 'has-canvas' ] ]:
+									!! canvas || canvas === null,
+								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
 							}
 						) }
 					>
+						<UnsavedChangesWarning />
 						<SavePanel />
-						<SnackbarNotices className="boot-notices__snackbar" />
-						<div className="boot-layout__surfaces">
+						<SnackbarNotices
+							className={ styles[ 'notices-snackbar' ] }
+						/>
+						<div className={ styles.surfaces }>
 							<ThemeProvider
-								color={ { ...themeColors, bg: '#ffffff' } }
+								color={ {
+									...themeColors,
+									// Reset to the default background color.
+									background: '#fcfcfc',
+								} }
 							>
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }
 								{ ( canvas || canvas === null ) && (
-									<div className="boot-layout__canvas">
+									<div className={ styles.canvas }>
 										<CanvasRenderer
 											canvas={ canvas }
 											routeContentModule={

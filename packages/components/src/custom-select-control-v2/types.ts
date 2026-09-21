@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type * as Ariakit from '@ariakit/react';
 
 export type CustomSelectStore = {
@@ -24,8 +21,7 @@ export type CustomSelectButtonSize = CustomSelectSize<
 >;
 
 export type CustomSelectContext =
-	| ( CustomSelectStore & CustomSelectButtonSize )
-	| undefined;
+	( CustomSelectStore & CustomSelectButtonSize ) | undefined;
 
 export type CustomSelectButtonProps = {
 	/**

@@ -9,9 +9,6 @@
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 0
@@ -37,12 +34,14 @@
 				"link": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

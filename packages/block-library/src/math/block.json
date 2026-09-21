@@ -23,6 +23,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -36,11 +37,16 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"attributes": {
 		"latex": {
 			"type": "string",
+			"source": "text",
+			"selector": "math annotation[encoding=\"application/x-tex\"]",
 			"role": "content"
 		},
 		"mathML": {

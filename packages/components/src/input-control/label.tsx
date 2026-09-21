@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import {
 	Label as BaseLabel,

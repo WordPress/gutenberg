@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../../constants';
 import type { DataFormControlProps } from '../../../types';
 
@@ -96,7 +85,6 @@ export default function RelativeDateControl< Item >( {
 		>
 			<Stack direction="row" gap="sm">
 				<NumberControl
-					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"
 					spinControls="none"
 					min={ 1 }
@@ -105,9 +93,8 @@ export default function RelativeDateControl< Item >( {
 					onChange={ onChangeValue }
 					disabled={ disabled }
 				/>
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-controls__relative-date-unit"
-					__next40pxDefaultSize
 					label={ __( 'Unit' ) }
 					value={ unit }
 					options={ options }
