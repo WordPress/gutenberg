@@ -967,7 +967,7 @@ const { state: routerState } = store( 'core/router' );
 
 // The previous `navigating` value, per region. See the two notes below for
 // why this lives neither in `context` nor on the region element.
-const wasNavigating = {};
+const wasNavigating = Object.create( null );
 
 store( 'myPlugin', {
 	callbacks: {
@@ -988,7 +988,9 @@ store( 'myPlugin', {
 				// The `?.` covers a target that isn't there.
 				document
 					.querySelector(
-						`[data-wp-router-region="${ regionId }"] a`
+						`[data-wp-router-region="${ CSS.escape(
+							regionId
+						) }"] a`
 					)
 					?.focus();
 			}
@@ -1015,9 +1017,9 @@ If the region ID is a literal you wrote by hand, drop the `getContext()` line an
 
 **React to the change, not to the condition.** `state.initiator` keeps its value after a navigation ends (see [When the keys change](#when-the-keys-change)); a traversal clears it separately, so a callback that checks `! state.navigating && state.initiator === regionId` would move focus again on every later re-run. Comparing against the previous value makes it act exactly once, when the navigation ends.
 
-**Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` value is bookkeeping, not something the page renders, so a plain module-scope object is the right home for it.
+**Keep the bookkeeping out of `context`.** A callback that both reads and writes the same value through the reactive `context` proxy subscribes itself to its own write and re-triggers. The previous `navigating` value is bookkeeping, not something the page renders, so a key-preserving module-scope object is the right home for it.
 
-**Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A module-scope object keyed by region ID does, and one object serves every region on the page.
+**Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A key-preserving module-scope object keyed by region ID does, and one object serves every region on the page.
 
 **Capture no DOM reference across the navigation.** Look up the focus target after the falling edge, not before it. For a navigation that reaches its content commit, the end is published after the destination content is in the DOM, so the lookup finds the new page's element. An end reached without that commit promises no destination content and may leave the lookup against old, partially updated, or absent content. The `?.focus()` guard handles a target that isn't there.
 
