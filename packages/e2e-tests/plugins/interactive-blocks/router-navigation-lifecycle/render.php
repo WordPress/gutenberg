@@ -1,0 +1,196 @@
+<?php
+/**
+ * HTML for testing the router navigation lifecycle state (`state.navigating`
+ * and `state.initiator`, published by `@wordpress/interactivity-router`) in
+ * region-based client-side navigation.
+ *
+ * This single fixture block is shared by every task of the
+ * `router-navigation-lifecycle` e2e spec, so it supports more attributes
+ * than any one task's flows exercise. See the build plan for the inventory
+ * of published pages and which flow uses which attribute combination.
+ *
+ * @package gutenberg-test-interactive-blocks
+ *
+ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+ */
+
+if ( isset( $attributes['disableNavigation'] ) && $attributes['disableNavigation'] ) {
+	wp_interactivity_config(
+		'core/router',
+		array( 'clientNavigationDisabled' => true )
+	);
+}
+
+$page = $attributes['page'] ?? '';
+
+// Seeded into this block's own server context so `server-context-readout`
+// below is driven by the real `parseServerData` -> `populateServerData`
+// path rather than by static markup -- see Flow 7 and the "cascaded-commit
+// absorption on the real server-context path" verifier it discharges.
+wp_interactivity_state(
+	'router-navigation-lifecycle',
+	array( 'readout' => "server context for page {$page}" )
+);
+
+$next_href  = $attributes['next'] ?? null;
+$other_href = $attributes['other'] ?? null;
+
+// Each entry describes one router region this block instance renders: its
+// id, the href its own (unlabelled) "navigate" link targets, and whether it
+// is the primary region -- the one that also carries the destination marker
+// and the server-context readout. A second region is added here (rather
+// than in a later task) because later tasks only ever extend `view.js` and
+// the spec file, never this file's markup for `secondRegionId` -- see the
+// build plan's Task 7 notes.
+$regions = array();
+if ( isset( $attributes['regionId'] ) ) {
+	$regions[] = array(
+		'id'            => $attributes['regionId'],
+		'navigate_href' => $next_href,
+		'is_primary'    => true,
+	);
+}
+if ( isset( $attributes['secondRegionId'] ) ) {
+	$regions[] = array(
+		'id'            => $attributes['secondRegionId'],
+		// The second region's own "navigate" link targets `other`, not
+		// `next` -- deliberately, so a cross-region flow has two distinct
+		// hrefs for the router's `navigatingTo` bail to separate. "Same
+		// structure as the first" stops here: every other link below keeps
+		// its usual meaning for both regions.
+		'navigate_href' => $other_href,
+		'is_primary'    => false,
+	);
+}
+?>
+<div data-wp-interactive="router-navigation-lifecycle">
+	<?php if ( empty( $attributes['observerOnly'] ) ) : ?>
+		<?php
+		foreach ( $regions as $region ) :
+			$region_id     = $region['id'];
+			$navigate_href = $region['navigate_href'];
+			$context       = wp_interactivity_data_wp_context( array( 'regionId' => $region_id ) );
+			?>
+			<?php
+			/*
+			 * FIXTURE TRAP: `data-wp-interactive` is repeated here even
+			 * though the outer wrapper above already carries it. Do not
+			 * "simplify" this away. The directive runtime's own hydration
+			 * resolves the namespace from any ancestor, so omitting it here
+			 * looks like it still works on first load -- links click,
+			 * `data-wp-text` renders, everything hydrates fine. What breaks
+			 * is silent: `interactivity-router`'s own region-detection
+			 * selector (`regionsSelector` in
+			 * `packages/interactivity-router/src/index.ts`) is
+			 * `[data-wp-interactive][data-wp-router-region], [data-wp-interactive] [data-wp-interactive][data-wp-router-region]`
+			 * -- it requires the *region-bearing element itself* to carry
+			 * `data-wp-interactive`, not merely an ancestor. Without it,
+			 * `preparePage()` never registers this element under
+			 * `page.regions` for *any* page, including the very first one,
+			 * so every navigation resets this region's signal to `null` and
+			 * never repopulates it -- the region's entire content silently
+			 * disappears after the first client-side navigation. This one
+			 * cost a full debugging pass in this task; see the build's
+			 * commit message for the trace that found it.
+			 */
+			?>
+			<div
+				data-testid="region-<?php echo esc_attr( $region_id ); ?>"
+				data-wp-interactive="router-navigation-lifecycle"
+				data-wp-router-region="<?php echo esc_attr( $region_id ); ?>"
+				data-wp-class--is-origin="state.isOrigin"
+				<?php echo $context; ?>
+			>
+				<?php if ( isset( $navigate_href ) ) : ?>
+					<a
+						data-testid="navigate"
+						data-wp-on--click="actions.navigate"
+						href="<?php echo esc_url( $navigate_href ); ?>"
+					>navigate</a>
+				<?php endif; ?>
+
+				<?php
+				/*
+				 * `refresh` takes its href from `window.location.href` at
+				 * click time, not from an attribute, so it renders on every
+				 * page regardless of `next`/`other` -- which is what lets
+				 * Flow 9 Part B start a navigation from page 2.
+				 */
+				?>
+				<a
+					data-testid="refresh"
+					data-wp-on--click="actions.refresh"
+					href="#"
+				>refresh</a>
+
+				<?php if ( isset( $next_href ) ) : ?>
+					<a
+						data-testid="navigate (silent)"
+						data-wp-on--click="actions.navigateSilent"
+						href="<?php echo esc_url( $next_href ); ?>"
+					>navigate (silent)</a>
+					<a
+						data-testid="navigate (declared)"
+						data-wp-on--click="actions.navigateDeclared"
+						href="<?php echo esc_url( $next_href ); ?>"
+					>navigate (declared)</a>
+					<a
+						data-testid="navigate (suppressed)"
+						data-wp-on--click="actions.navigateSuppressed"
+						href="<?php echo esc_url( $next_href ); ?>"
+					>navigate (suppressed)</a>
+					<a
+						data-testid="navigate (timeout)"
+						data-wp-on--click="actions.navigateTimeout"
+						href="<?php echo esc_url( $next_href ); ?>"
+					>navigate (timeout)</a>
+					<a
+						data-testid="prefetch"
+						data-wp-on--click="actions.prefetch"
+						href="<?php echo esc_url( $next_href ); ?>"
+					>prefetch</a>
+				<?php endif; ?>
+
+				<?php if ( isset( $other_href ) ) : ?>
+					<a
+						data-testid="navigate (other)"
+						data-wp-on--click="actions.navigate"
+						href="<?php echo esc_url( $other_href ); ?>"
+					>navigate (other)</a>
+				<?php endif; ?>
+
+				<?php if ( $region['is_primary'] ) : ?>
+					<p data-testid="page-marker">page marker: <?php echo esc_html( $page ); ?></p>
+					<p
+						data-testid="server-context-readout"
+						data-wp-text="state.readout"
+					>not hydrated</p>
+				<?php endif; ?>
+			</div>
+		<?php endforeach; ?>
+	<?php endif; ?>
+
+	<!--
+		The observer readout: rendered on every page, including
+		`observerOnly`. The two watchers live on their own elements, each --
+		not sharing one, since directives at one priority level on one
+		element share a scope object.
+	-->
+	<p
+		data-testid="lifecycle log"
+		data-wp-watch="callbacks.watchLifecycle"
+		data-wp-text="state.log"
+	>not hydrated</p>
+	<p
+		data-testid="settlement log"
+		data-wp-watch="callbacks.watchSettlement"
+		data-wp-text="state.settlementLog"
+	>not hydrated</p>
+	<p data-testid="lifecycle navigating" data-wp-text="state.navigatingReading">not hydrated</p>
+	<p data-testid="lifecycle initiator" data-wp-text="state.initiatorReading">not hydrated</p>
+
+	<span data-testid="bind-aria-busy" data-wp-bind--aria-busy="state.navigating"></span>
+	<span data-testid="bind-class-busy" data-wp-class--busy="state.navigating"></span>
+	<span data-testid="bind-hidden-negated" data-wp-bind--hidden="!state.navigating"></span>
+	<span data-testid="bind-hidden-plain" data-wp-bind--hidden="state.navigating"></span>
+</div>
