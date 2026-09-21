@@ -94,6 +94,13 @@ class WP_Navigation_Block_Renderer {
 	private static $has_submenus = false;
 
 	/**
+	 * Number of overlay template part renders currently in progress.
+	 *
+	 * @since 7.2.0
+	 */
+	private static $overlay_render_depth = 0;
+
+	/**
 	 * Used to determine which blocks need an <li> wrapper.
 	 *
 	 * @since 6.5.0
@@ -373,45 +380,6 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Recursively disables overlay menu for navigation blocks within overlay blocks.
-	 * Prevents nested overlays (inception).
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $blocks Array of parsed block arrays.
-	 * @return array Modified blocks with overlayMenu set to 'never' for navigation blocks.
-	 */
-	private static function disable_overlay_menu_for_nested_navigation_blocks( $blocks ) {
-		if ( empty( $blocks ) || ! is_array( $blocks ) ) {
-			return $blocks;
-		}
-
-		foreach ( $blocks as &$block ) {
-			if ( ! isset( $block['blockName'] ) ) {
-				continue;
-			}
-
-			// If this is a navigation block, disable its overlay menu.
-			if ( 'core/navigation' === $block['blockName'] ) {
-				if ( ! isset( $block['attrs'] ) ) {
-					$block['attrs'] = array();
-				}
-				$block['attrs']['overlayMenu'] = 'never';
-				// Mark this as a nested navigation within an overlay template part
-				// so we can handle its rendering differently.
-				$block['attrs']['_isWithinOverlayTemplatePart'] = true;
-			}
-
-			// Recursively process inner blocks.
-			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-				$block['innerBlocks'] = static::disable_overlay_menu_for_nested_navigation_blocks( $block['innerBlocks'] );
-			}
-		}
-
-		return $blocks;
-	}
-
-	/**
 	 * Gets the inner blocks for the navigation block from an overlay template part.
 	 *
 	 * @since 6.5.0
@@ -476,8 +444,6 @@ class WP_Navigation_Block_Renderer {
 				$content       = do_shortcode( $content );
 				$parsed_blocks = parse_blocks( $content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
 				return new WP_Block_List( $blocks, $attributes );
 			}
 			return new WP_Block_List( array(), $attributes );
@@ -505,9 +471,6 @@ class WP_Navigation_Block_Renderer {
 		$markup = do_shortcode( $markup );
 
 		$blocks = parse_blocks( $markup );
-
-		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-		$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
 
 		return new WP_Block_List( $blocks, $attributes );
 	}
@@ -765,7 +728,12 @@ class WP_Navigation_Block_Renderer {
 			// Get blocks from the overlay template part.
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 			// Render template part blocks directly without navigation container wrapper.
-			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			++static::$overlay_render_depth;
+			try {
+				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			} finally {
+				--static::$overlay_render_depth;
+			}
 			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
 			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
 			// Add Interactivity API directives to the overlay close block if present.
@@ -1055,6 +1023,14 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
+
+		// Prevent nested overlays (inception). The overlay's blocks cannot be rewritten
+		// before it renders: core/pattern, core/block and a nested core/template-part
+		// expand their content in a render pass of their own.
+		if ( static::$overlay_render_depth > 0 ) {
+			$attributes['overlayMenu']                  = 'never';
+			$attributes['_isWithinOverlayTemplatePart'] = true;
+		}
 
 		// Submenu detection is memoized while a navigation block renders. Reset it so
 		// the result of a previously rendered navigation block is not reused for this one.
