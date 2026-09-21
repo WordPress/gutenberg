@@ -23,6 +23,13 @@ const Icon = styled.span( {
 	lineHeight: 1,
 } );
 
+// Storybook treats slashes as hierarchy separators, so story titles use
+// internal keys and the sidebar restores the exact npm package names.
+const PACKAGE_LABELS = {
+	'@wordpress-ui': '@wordpress/ui',
+	'@wordpress-components': '@wordpress/components',
+};
+
 /**
  * Fetches tags from the Storybook API, and returns Icon
  * elements for any that have matching badge data
@@ -60,7 +67,11 @@ function useIcons( item ) {
  */
 function Label( { item } ) {
 	const iconSet = useIcons( item );
-	const title = createElement( Title, {}, item.name );
+	const title = createElement(
+		Title,
+		{},
+		PACKAGE_LABELS[ item.name ] ?? item.name
+	);
 	const icons = createElement( Icons, { 'aria-hidden': true }, ...iconSet );
 
 	return createElement( Wrapper, {}, title, icons );

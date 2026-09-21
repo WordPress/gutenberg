@@ -3,7 +3,7 @@ import Elevation from '../deprecated';
 
 const meta: Meta< typeof Elevation > = {
 	component: Elevation,
-	title: 'Components/Deprecated/Elevation',
+	title: 'Components/@wordpress-components/Deprecated/Elevation',
 	id: 'components-elevation',
 	argTypes: {
 		as: { control: { type: 'text' } },
