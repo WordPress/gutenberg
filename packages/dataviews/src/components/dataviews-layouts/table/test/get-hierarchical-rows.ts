@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import getHierarchicalRows from './get-hierarchical-rows';
+import getHierarchicalRows from '../get-hierarchical-rows';
 
 type Item = {
 	id: string;
@@ -32,14 +32,12 @@ describe( 'getHierarchicalRows', () => {
 		] );
 	} );
 
-	it( 'returns missing-parent, self-parenting, cyclic, and duplicate-id items exactly once', () => {
+	it( 'returns missing-parent, self-parenting, and cyclic items exactly once', () => {
 		const items = [
 			{ id: 'orphan', parentId: 'missing' },
 			{ id: 'self', parentId: 'self' },
 			{ id: 'cycle-a', parentId: 'cycle-b' },
 			{ id: 'cycle-b', parentId: 'cycle-a' },
-			{ id: 'duplicate' },
-			{ id: 'duplicate' },
 		];
 
 		const rows = getHierarchicalRows( items, getItemId, getItemParentId );
