@@ -93,8 +93,8 @@ function git( ...args: string[] ): string {
 function assertPristineTree(): void {
 	let changed;
 	try {
-		git( 'diff', '--exit-code' );
-		git( 'diff', '--cached', '--exit-code' );
+		git( 'diff', '--quiet' );
+		git( 'diff', '--cached', '--quiet' );
 	} catch {
 		changed = true;
 	}
