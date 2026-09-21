@@ -73,13 +73,14 @@ function getOwnTypeSearchOptions( type, kind ) {
 export function getSuggestionsQuery( type, kind ) {
 	// How many results to show initially and per search.
 	const perPage = 20;
+	const ownType = getOwnTypeSearchOptions( type, kind );
 
 	return {
 		perPage,
-		initialSuggestionsSearchOptions: {
-			...getOwnTypeSearchOptions( type, kind ),
-			perPage,
-		},
+		// Results are named by their post type or taxonomy slug, which is the
+		// `subtype` here for everything but a post format.
+		priorityType: ownType.subtype ?? ownType.type,
+		initialSuggestionsSearchOptions: { ...ownType, perPage },
 	};
 }
 

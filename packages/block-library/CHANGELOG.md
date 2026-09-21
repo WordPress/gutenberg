@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Navigation Link: Search every entity type from the link UI instead of only the link's own type, so a category, tag or post can be added without leaving the search box. The suggestions shown before anything is typed still lead with the link's own type ([#ZZZZZ](https://github.com/WordPress/gutenberg/pull/ZZZZZ)).
+-   Navigation Link: Search every entity type from the link UI instead of only the link's own type, so a category, tag or post can be added without leaving the search box. Results lead with the link's own type, as do the suggestions shown before anything is typed ([#ZZZZZ](https://github.com/WordPress/gutenberg/pull/ZZZZZ)).
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
 -   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
 -   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).

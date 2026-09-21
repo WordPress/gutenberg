@@ -24,6 +24,17 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
+	 * A result type to rank above every other type, named as the results spell
+	 * it: a post type or taxonomy slug, such as `page`, `category` or
+	 * `post_tag`. Everything else keeps the default order, which leads with
+	 * pages.
+	 *
+	 * A caller that edits one kind of link leads with that kind:
+	 *
+	 *     priorityType: 'category'
+	 */
+	priorityType?: string;
+	/**
 	 * Which page of results to return.
 	 */
 	page?: number;
@@ -119,6 +130,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		priorityType,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -241,7 +253,7 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	results = sortResults( results, search );
+	results = sortResults( results, search, priorityType );
 	results = results.slice( 0, perPage );
 	return results;
 }
@@ -273,19 +285,37 @@ function getMatchTier( title: string, search: string ): number {
 }
 
 /**
- * Whether a result is of a type a link search is rarely looking for.
+ * How likely a result's type is to be what a link search wants.
  *
- * An attachment or a post format is almost never the target of a link, and on a site with a large
- * media library they crowd out the pages and posts that are. Neither is dropped, because either can
- * still be the answer when its title is what was typed; the match tier is consulted first, so an
- * exact match is never demoted.
+ * A link is usually to a page, then to a category, then to a post or a tag. Attachments and post
+ * formats come last: a link search is rarely looking for one, and on a site with a large media
+ * library they crowd out everything else. Custom post types and custom taxonomies sit with posts
+ * and tags, because nothing general can be said about them.
  *
  * @param result
+ * @param priorityType
  *
- * @return True when the result should rank below the other types.
+ * @return -1 for the caller's own type, then 0 for the most likely type and 3 for the least.
  */
-function isDemotedType( result: SearchResult ): boolean {
-	return result.kind === 'media' || result.type === 'post-format';
+function getTypeRank( result: SearchResult, priorityType?: string ): number {
+	// The caller's own type leads, whatever it is. A Category Link searches
+	// from a category, so categories are the likeliest thing it wants.
+	if ( priorityType && result.type === priorityType ) {
+		return -1;
+	}
+
+	if ( result.kind === 'media' || result.type === 'post-format' ) {
+		return 3;
+	}
+
+	switch ( result.type ) {
+		case 'page':
+			return 0;
+		case 'category':
+			return 1;
+		default:
+			return 2;
+	}
 }
 
 /**
@@ -295,14 +325,14 @@ function isDemotedType( result: SearchResult ): boolean {
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * A title that is what was typed, or that begins with it, is ranked above everything else. Where
- * the match sits in the title is a stronger signal than how much of the title it covers, and the
- * score below cannot see it: it divides by the title's length, so a long title is marked down for
- * being long even when the search term is its first word.
+ * Results are grouped by type first, because the type a link points at matters more than how
+ * closely a title matches: a page is what a link usually wants, and an attachment almost never is.
+ * A caller that knows better names its own type as `priorityType`, and that type leads instead.
  *
- * Below that, attachments and post formats rank under the other types, because a link search is
- * rarely looking for one. This is only consulted when two results answer the search equally well,
- * so an attachment whose title is what was typed still comes first.
+ * Within a type, a title that is what was typed, or that begins with it, ranks above the rest.
+ * Where the match sits in the title is a stronger signal than how much of the title it covers, and
+ * the score below cannot see it: it divides by the title's length, so a long title is marked down
+ * for being long even when the search term is its first word.
  *
  * The rest is sorted by scoring each result, where the score is the number of tokens in the title
  * that are also in the search query, divided by the total number of tokens in the title. This gives
@@ -310,8 +340,13 @@ function isDemotedType( result: SearchResult ): boolean {
  *
  * @param results
  * @param search
+ * @param priorityType
  */
-export function sortResults( results: SearchResult[], search: string ) {
+export function sortResults(
+	results: SearchResult[],
+	search: string,
+	priorityType?: string
+) {
 	const searchTokens = tokenize( search );
 
 	// Give each result a unique key to avoid duplicate ids from different tables
@@ -356,8 +391,8 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 	return results.sort(
 		( a, b ) =>
+			getTypeRank( a, priorityType ) - getTypeRank( b, priorityType ) ||
 			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
-			Number( isDemotedType( a ) ) - Number( isDemotedType( b ) ) ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
 }

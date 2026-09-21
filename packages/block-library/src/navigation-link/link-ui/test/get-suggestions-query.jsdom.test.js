@@ -4,13 +4,18 @@ import { getSuggestionsQuery } from '..';
 const PER_PAGE = 20;
 
 const LINK_TYPES = [
-	[ 'page', 'post-type', { type: 'post', subtype: 'page' } ],
-	[ 'post', 'post-type', { type: 'post', subtype: 'post' } ],
-	[ 'category', 'taxonomy', { type: 'term', subtype: 'category' } ],
-	[ 'tag', 'taxonomy', { type: 'term', subtype: 'post_tag' } ],
-	[ 'post_format', 'taxonomy', { type: 'post-format' } ],
-	[ 'event', 'post-type', { type: 'post', subtype: 'event' } ],
-	[ 'genre', 'taxonomy', { type: 'term', subtype: 'genre' } ],
+	[ 'page', 'post-type', { type: 'post', subtype: 'page' }, 'page' ],
+	[ 'post', 'post-type', { type: 'post', subtype: 'post' }, 'post' ],
+	[
+		'category',
+		'taxonomy',
+		{ type: 'term', subtype: 'category' },
+		'category',
+	],
+	[ 'tag', 'taxonomy', { type: 'term', subtype: 'post_tag' }, 'post_tag' ],
+	[ 'post_format', 'taxonomy', { type: 'post-format' }, 'post-format' ],
+	[ 'event', 'post-type', { type: 'post', subtype: 'event' }, 'event' ],
+	[ 'genre', 'taxonomy', { type: 'term', subtype: 'genre' }, 'genre' ],
 ];
 
 describe( 'getSuggestionsQuery', () => {
@@ -35,16 +40,29 @@ describe( 'getSuggestionsQuery', () => {
 		}
 	);
 
+	it.each( LINK_TYPES )(
+		'ranks the %s link’s own type above the others',
+		( type, kind, _initial, expectedPriority ) => {
+			expect( getSuggestionsQuery( type, kind ).priorityType ).toBe(
+				expectedPriority
+			);
+		}
+	);
+
 	it.each( [
 		[ 'a custom link', 'custom', 'custom' ],
 		[ 'a link with no type', undefined, undefined ],
 	] )(
 		'suggests pages before anything is typed for %s',
 		( _label, type, kind ) => {
-			expect(
-				getSuggestionsQuery( type, kind )
-					.initialSuggestionsSearchOptions
-			).toEqual( { type: 'post', subtype: 'page', perPage: PER_PAGE } );
+			const query = getSuggestionsQuery( type, kind );
+
+			expect( query.initialSuggestionsSearchOptions ).toEqual( {
+				type: 'post',
+				subtype: 'page',
+				perPage: PER_PAGE,
+			} );
+			expect( query.priorityType ).toBe( 'page' );
 		}
 	);
 } );

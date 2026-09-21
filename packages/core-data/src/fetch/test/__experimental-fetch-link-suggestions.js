@@ -380,14 +380,17 @@ describe( 'sortResults', () => {
 		const order = sortResults( results, 'travel tips' ).map(
 			( result ) => result.id
 		);
+		// Results group by type before they order by match, so every page
+		// comes before the categories.
 		expect( order ).toEqual( [
-			7, // exact match
-			4, // contains: travel, tips
-			3, // contains: travel
-			// same order as input:
+			4, // page, contains: travel, tips
+			3, // page, contains: travel
+			// pages that do not match, in the same order as input:
 			1,
 			2,
 			5,
+			// categories, best match first:
+			7, // exact match
 			6,
 		] );
 	} );
@@ -420,9 +423,11 @@ describe( 'sortResults', () => {
 			},
 		];
 
+		// The page ranks above the category, and the category above the post,
+		// before any of their titles are compared.
 		expect(
 			sortResults( results, 'contact' ).map( ( { title } ) => title )
-		).toEqual( [ 'Contact', 'Contact us today', 'Hello world!' ] );
+		).toEqual( [ 'Contact us today', 'Contact', 'Hello world!' ] );
 	} );
 
 	it( 'orders results to prefer direct matches over sub matches', () => {
@@ -497,9 +502,9 @@ describe( 'sortResults', () => {
 			{
 				id: 2,
 				title: 'Coffee Guide',
-				url: 'http://wordpress.local/category/coffee-guide/',
-				type: 'category',
-				kind: 'taxonomy',
+				url: 'http://wordpress.local/coffee-guide/',
+				type: 'page',
+				kind: 'post-type',
 			},
 		];
 
@@ -577,7 +582,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'The Gallery Show Of The Year', 'Gallery' ] );
 	} );
 
-	it( 'keeps an attachment first when its title is what was typed', () => {
+	it( 'orders an attachment below a page even when its title is what was typed', () => {
 		const results = [
 			{
 				id: 1,
@@ -595,9 +600,86 @@ describe( 'sortResults', () => {
 			},
 		];
 
+		// The type is the first thing compared, so no title can lift an
+		// attachment above a page.
 		expect(
 			sortResults( results, 'beach day' ).map( ( { title } ) => title )
-		).toEqual( [ 'Beach Day', 'Day' ] );
+		).toEqual( [ 'Day', 'Beach Day' ] );
+	} );
+
+	it( 'leads with the type the caller names', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Guide',
+				url: 'http://wordpress.local/coffee-guide/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee',
+				url: 'http://wordpress.local/category/coffee/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// Pages lead by default.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Coffee Guide', 'Coffee' ] );
+
+		// A caller editing a category link asks for categories instead.
+		expect(
+			sortResults( results, 'coffee', 'category' ).map(
+				( { title } ) => title
+			)
+		).toEqual( [ 'Coffee', 'Coffee Guide' ] );
+	} );
+
+	it( 'keeps the default order below the type the caller names', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Coffee Talk',
+				url: 'http://wordpress.local/coffee-talk/',
+				type: 'post',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee Shop',
+				url: 'http://wordpress.local/coffee-shop/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'Coffee Gear',
+				url: 'http://wordpress.local/tag/coffee-gear/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee', 'post_tag' ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Coffee Gear', // the named type
+			'Coffee Shop', // then pages
+			'Coffee Talk', // then posts
+			'Coffee Beans', // attachments last
+		] );
 	} );
 } );
 
