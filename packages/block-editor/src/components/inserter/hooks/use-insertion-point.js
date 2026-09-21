@@ -1,6 +1,7 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { _n, sprintf } from '@wordpress/i18n';
+import { getBlockType, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
@@ -136,6 +137,7 @@ function useInsertionPoint( {
 		hideInsertionPoint,
 		setLastFocus,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false, _rootClientId ) => {
@@ -158,6 +160,29 @@ function useInsertionPoint( {
 				{ rootClientId, insertionIndex, clientId, isAppender }
 			);
 
+			// No root given: use the closest container that accepts the blocks,
+			// as the hover cue does.
+			if ( _rootClientId === undefined ) {
+				const names = (
+					Array.isArray( blocks ) ? blocks : [ blocks ]
+				).map( ( block ) => block.name );
+				_rootClientId = getClosestAllowedInsertionPoint(
+					names,
+					destination.destinationRootClientId
+				);
+				if ( _rootClientId === null ) {
+					createErrorNotice(
+						sprintf(
+							/* translators: %s: block title. */
+							__( 'Block "%s" can\'t be inserted.' ),
+							getBlockType( names[ 0 ] )?.title ?? names[ 0 ]
+						),
+						{ type: 'snackbar', id: 'inserter-notice' }
+					);
+					return;
+				}
+			}
+
 			const selectedBlock = getSelectedBlock();
 
 			if (
@@ -175,14 +200,14 @@ function useInsertionPoint( {
 			} else {
 				insertBlocks(
 					blocks,
-					isAppender || _rootClientId === undefined
+					isAppender
 						? destination.destinationIndex
 						: getIndex( {
 								...destination,
 								rootClientId: _rootClientId,
 								registry,
 							} ),
-					isAppender || _rootClientId === undefined
+					isAppender
 						? destination.destinationRootClientId
 						: _rootClientId,
 					selectBlockOnInsert,
@@ -208,6 +233,8 @@ function useInsertionPoint( {
 			clientId,
 			isAppender,
 			getSelectedBlock,
+			getClosestAllowedInsertionPoint,
+			createErrorNotice,
 			replaceBlocks,
 			insertBlocks,
 			onSelect,
