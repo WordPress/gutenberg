@@ -26,13 +26,13 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 		() => ( { [ isFiltered ]: !! isQuick } ),
 		[ isQuick ]
 	);
-	const [ items ] = useSelect(
-		( select ) => [
+	// Not wrapped in a tuple, so `useSelect` can return the previous array when the items match.
+	const items = useSelect(
+		( select ) =>
 			select( blockEditorStore ).getInserterItems(
 				rootClientId,
 				options
 			),
-		],
 		[ rootClientId, options ]
 	);
 	const { getClosestAllowedInsertionPoint } = unlock(
