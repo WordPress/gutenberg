@@ -85,15 +85,13 @@ export default function FeaturedImageEdit(
 	props: DataFormControlProps< Item >
 ) {
 	const { data } = props;
-	// Back-compat for the post summary only. The classic panel rendered inside
-	// the post editor, so filter callbacks may resolve the post implicitly,
-	// through `core/editor` selectors, `editPost` or `useEntityProp` without an
-	// id. That only holds where the item is the entity in context: the editor
-	// sets its current post and this EntityProvider from the same post. In
-	// Quick Edit there is no provider and no current post, so such callbacks
-	// would read nothing and save nothing; the plain control renders instead.
-	// A callback that only used the passed `currentPostId` and `postType` would
-	// work there too, but it can't be told apart from the others, so none apply.
+	// The post and site editor load different APIs. Callbacks written for the
+	// classic panel may rely on `core/editor` selectors, actions (e.g.
+	// `editPost`), `useEntityProp` without an id, or on plugins only loaded in
+	// the post editor, so the filter can't be offered safely in Quick Edit. It
+	// only applies where the item is the entity in context, as in the post
+	// editor. A callback that only reads the passed props would work in Quick
+	// Edit too, but it can't be told apart from the others, so none apply.
 	const contextId = useEntityId( 'postType', data.type );
 	if (
 		contextId === undefined ||
