@@ -21,6 +21,7 @@
 
 ### Deprecations
 
+-   `Scrollable`: Deprecate the component, planned for removal in WordPress 7.4.
 -   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
 
 ### Bug Fixes
