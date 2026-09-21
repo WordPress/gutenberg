@@ -214,7 +214,7 @@ function PickerBulkSelectionInfo() {
 	);
 }
 
-export function DataViewsPickerActions() {
+export function PickerActions() {
 	const {
 		data,
 		selection,
@@ -249,7 +249,7 @@ export function DataViewsPickerBulkActionToolbar() {
 	return (
 		<Stack direction="row" gap="md" align="center">
 			<PickerBulkSelectionInfo />
-			<DataViewsPickerActions />
+			<PickerActions />
 		</Stack>
 	);
 }
@@ -257,7 +257,7 @@ export function DataViewsPickerBulkActionToolbar() {
 // The full picker footer: bulk-selection info, pagination, and actions — the
 // picker counterpart to `DataViews.Footer`. Given children, it renders those
 // in their place instead, so a picker can compose its footer from
-// `DataViewsPagination` and `DataViewsPickerActions` alone, for instance.
+// `DataViewsPagination` and `PickerActions` alone, for instance.
 export function DataViewsPickerFooter( {
 	children,
 }: {
@@ -285,7 +285,7 @@ export function DataViewsPickerFooter( {
 				<>
 					<PickerBulkSelectionInfo />
 					<DataViewsPagination />
-					<DataViewsPickerActions />
+					<PickerActions />
 				</>
 			) }
 		</Stack>
