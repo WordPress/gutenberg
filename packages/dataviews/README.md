@@ -218,7 +218,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, `pickerActivity`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -436,7 +436,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, and `pickerActivity`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -623,7 +623,7 @@ The component behaves differently to a regular `DataViews` component in the foll
 
 There are also a few differences in the implementation:
 
--   Only the `pickerGrid` and `pickerTable` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid` and `table` layouts respectively.
+-   Only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid`, `table`, and `activity` layouts respectively.
 -   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
 -   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
@@ -690,7 +690,7 @@ Same as `DataViews`. The fields describe the visible items for each record in th
 
 #### `view`: `Object`
 
-Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` and `pickerTable` layout types are supported.
+Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported.
 
 #### `onChangeView`: `function`
 
@@ -725,7 +725,7 @@ Same as `DataViews`. Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-Limits the available layouts. Only `pickerGrid` and `pickerTable` are supported for `DataViewsPicker`.
+Limits the available layouts. Only `pickerGrid`, `pickerTable`, and `pickerActivity` are supported for `DataViewsPicker`.
 
 Example:
 
