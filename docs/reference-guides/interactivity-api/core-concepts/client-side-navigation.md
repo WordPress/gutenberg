@@ -792,7 +792,7 @@ For the exact types and edge cases, see the [`core/router` state reference](http
 
 ### When the keys change
 
-**When a navigation starts**, the router sets `state.navigating` and `state.initiator` together, in a single batch, before it fetches the destination. This happens for every client-side navigation, however fast: the 400ms delay described in [Disabling navigation feedback](#disabling-navigation-feedback) only applies to the built-in loading animation and screen reader announcement, and the `loadingAnimation` and `screenReaderAnnouncement` options do not affect these properties either. A navigation to the URL you are already on, like the `navigate( window.location.href, { force: true } )` refresh pattern, counts too.
+**When a navigation starts**, the router resolves the initiator for the call, then calls `actions.prefetch()` for the destination. That prefetch starts the destination fetch, and the router sets `state.navigating` and `state.initiator` together, in a single batch, before the navigation yields to wait for the page. The start is synchronous with the call: it doesn't wait for the fetch or the page, and the fetch may already be in flight when the start pair is published. This happens for every client-side navigation, however fast: the 400ms delay described in [Disabling navigation feedback](#disabling-navigation-feedback) only applies to the built-in loading animation and screen reader announcement, and the `loadingAnimation` and `screenReaderAnnouncement` options do not affect these properties either. A navigation to the URL you are already on, like the `navigate( window.location.href, { force: true } )` refresh pattern, counts too.
 
 **When a navigation ends**, the router sets `state.navigating` back to `false`. By then the new content is normally already in the DOM and `state.url` already holds the destination URL; the two exceptions are described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) below. The update happens on a later frame than the DOM commit (the moment the new content is applied to the real DOM), so that even a very fast navigation produces two separate updates rather than a single one that only shows the finished state. How much later is not specified, so treat it as "some time after the content is committed". In particular, the promise returned by `actions.navigate()` resolves before this update, so code like `yield actions.navigate( url ); if ( state.navigating ) { … }` still sees `state.navigating` as truthy. To react to the end of a navigation, use a watcher instead.
 
@@ -1503,8 +1503,8 @@ When `prefetch()` is called (for example, on link hover):
 When `navigate()` is called (for example, on link click):
 
 1. The router checks if client navigation is disabled; if so, falls back to full page load without touching `state.navigating` or `state.initiator`.
-2. `state.navigating` and `state.initiator` are set together in a single batch, before any fetching or waiting.
-3. If not already prefetched, the fetch process from Phase 1 runs now.
+2. The router records the target URL and calls `actions.prefetch()` for it. The prefetch reuses the Phase 1 cache check and begins fetching the page if it isn't already cached.
+3. `state.navigating` and `state.initiator` are set together in a single batch, synchronously, before the navigation yields to wait for the page. The fetch may already be in flight when this start pair is published.
 4. The router waits for the page to be ready (fetch complete, styles loaded).
 5. A loading indicator may appear if the wait exceeds a threshold (400ms), together with a "loading" announcement for screen readers. That threshold only applies to this built-in feedback, not to `state.navigating`.
 6. The rendering phase begins:
@@ -1521,7 +1521,7 @@ When `navigate()` is called (for example, on link click):
 10. Navigation is complete.
 11. On a later frame, after the commit in step 6 has landed in the DOM, `state.navigating` is set back to `false`. `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared by this end write; it keeps its value until the next navigation replaces it or a traversal clears it.
 
-Steps 2 and 11 are the two moments the lifecycle properties change. [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) covers what your code can rely on about them, including why the end is set on a later frame instead of inside step 6.
+Steps 3 and 11 are the two moments the lifecycle properties change. [Reacting to the navigation lifecycle](#reacting-to-the-navigation-lifecycle) covers what your code can rely on about them, including why the end is set on a later frame instead of inside step 6.
 
 #### Race condition protection
 
