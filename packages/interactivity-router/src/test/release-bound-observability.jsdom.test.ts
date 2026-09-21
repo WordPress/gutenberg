@@ -1,13 +1,11 @@
 /**
- * Task 5 row 9 — the release never pre-empts the pending directive flush:
+ * The release never pre-empts the pending directive flush:
  * the observable form of the "the lifecycle-release bound must remain
  * greater than one frame" invariant, and the row that must go red if the
  * bound is ever tuned down.
  *
- * This whole composite has been executed against the real router
- * (investigation fact 8; build-plan Appendix E, S6′-adjacent apparatus), so
- * what follows is a recipe that ran, not a construction to be discovered --
- * every constant below is copied from it rather than re-derived.
+ * This composite uses the real router, and the constants below keep the
+ * measured scheduler relationship explicit rather than re-deriving it.
  *
  * This file installs fake-timer control before importing the router module
  * and never toggles it per test (unlike every other file in this
@@ -18,41 +16,36 @@
  * others in `lifecycle-popstate.ts`.
  */
 
-/**
- * External dependencies
- */
+import { expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
-);
-
 import { store, privateApis } from '@wordpress/interactivity';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
+);
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 const { getRegionRootFragment, toVdom } = privateApis( CONSENT );
 
-// See investigation fact 4: the watch directive calls performance.measure()
+// The watch directive calls performance.measure()
 // on every run, unimplemented by jsdom, and an unstubbed throw there aborts
 // the flusher's dependency tracking silently -- the watcher would go quiet
 // rather than error, the exact false-pass this rule exists to prevent.
 // performance.getEntriesByType is stubbed too, since the router's module
-// scope reaches onDOMReady (investigation fact 8).
-window.performance.measure = jest.fn();
-window.performance.getEntriesByType = jest.fn( () => [] );
-
+// scope reaches onDOMReady.
 test( 'row 9 — the release never pre-empts the pending directive flush (the bound-greater-than-one-frame invariant)', async () => {
-	jest.useFakeTimers();
+	vi.useFakeTimers( { shouldAdvanceTime: true } );
 
 	try {
+		// Install these after fake timers so Vitest's faked performance object
+		// cannot replace the jsdom stubs.
+		window.performance.measure = vi.fn();
+		window.performance.getEntriesByType = vi.fn( () => [] );
 		// A window.fetch mock that never resolves on its own -- both the
 		// outer navigate() call and the popstate traversal's cache entry
 		// are held against it, so neither await ever settles by itself.
-		window.fetch = jest.fn(
+		window.fetch = vi.fn(
 			() => new Promise( () => {} )
 		) as unknown as typeof window.fetch;
 
@@ -62,10 +55,9 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 		// in its claim frame, then parks at its Promise.race yield -- it
 		// never enters its finally, so it has no end write of its own to
 		// be stale-guarded, and the release below is the only structure
-		// that can discharge the claim (the plan's own parked-generator
-		// mechanism -- see Task 2's fallback row).
+		// that can discharge the claim while the generator remains parked.
 		//
-		// All three options are load-bearing (investigation fact 8), for
+		// All three options are load-bearing for
 		// reasons that have nothing to do with the assertion below:
 		// screenReaderAnnouncement: false is the one that matters most --
 		// left at its default the 400 ms loadingTimeout calls
@@ -73,7 +65,7 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 		// #wp-script-module-data-@wordpress/interactivity-router element
 		// in jsdom, takes the Core < 6.7 fallback, reads the deprecated
 		// state.navigation.texts getter, and so warns under SCRIPT_DEBUG
-		// -- which @wordpress/jest-console fails the suite on.
+		// -- which the console matcher setup fails the suite on.
 		// loadingAnimation: false keeps that same timer from writing
 		// navigation.hasStarted/hasFinished mid-measurement.
 		const outerNav = actions.navigate(
@@ -91,9 +83,9 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 		// pages.set() happens synchronously, before its own yield.
 		actions.prefetch( 'http://localhost/release-bound-dest' );
 
-		// window.location cannot be stubbed (investigation fact 5); a
+		// window.location cannot be stubbed; a
 		// same-document pushState is what actually fires the router's own
-		// popstate listener (investigation fact 9).
+		// popstate listener.
 		window.history.pushState( {}, '', '/release-bound-dest' );
 		window.dispatchEvent( new Event( 'popstate' ) );
 
@@ -124,18 +116,18 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 
 		// Phase-align the fake clock to a 16 ms boundary (any multiple of
 		// 16 works; 208 is the value that was measured and executed).
-		await jest.advanceTimersByTimeAsync( 208 );
+		await vi.advanceTimersByTimeAsync( 208 );
 
 		// The +1: the faked rAF's nested zero-delay setTimeout is bumped
 		// to 1 ms, so the pending flush lands at "next 16 ms boundary,
 		// plus 1". A 16 ms advance here yields an empty run log and reads
 		// as a dead watcher -- 17 ms is what the measured recipe
 		// requires. Must be the async variant: the synchronous
-		// jest.advanceTimersByTime() never drains the microtask that
+		// vi.advanceTimersByTime() never drains the microtask that
 		// resets useSignalEffect's isExecuting guard, so it would report
 		// one run at *every* bound -- a false result that looks like a
 		// pass of the wrong assertion.
-		await jest.advanceTimersByTimeAsync( 17 );
+		await vi.advanceTimersByTimeAsync( 17 );
 
 		expect( runs ).toEqual( [ true ] );
 
@@ -146,12 +138,12 @@ test( 'row 9 — the release never pre-empts the pending directive flush (the bo
 		// directive flush would collapse this to a single run reading the
 		// already-settled false, which is exactly the defect this row
 		// exists to catch.
-		await jest.advanceTimersByTimeAsync( 10200 );
+		await vi.advanceTimersByTimeAsync( 10200 );
 
 		expect( runs ).toEqual( [ true, false ] );
 
 		void outerNav;
 	} finally {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	}
 } );

@@ -1,5 +1,5 @@
 /**
- * Deriving the initiator from the ambient directive scope (Task 3), and the
+ * Deriving the initiator from the ambient directive scope, and the
  * three-clause `parseRegionId` mirror it is built on.
  *
  * Rows 1–8, in order. Rows 1 and 2 together pin the parse mirror against
@@ -10,50 +10,47 @@
  * drift guard that keeps this deliberate duplication from being "fixed"
  * into a reuse of `parseRegionAttribute`.
  *
- * `packages/interactivity/src/index.ts` cannot be imported for real under
- * Jest (investigation fact 1), so, like every other file in this
- * directory, this suite is exercised through the shim that assembles the
- * real implementations of everything the router destructures from
- * `privateApis` (investigation fact 2) — see
+ * Like every other file in this directory, this suite is exercised through a
+ * Vitest module mock that assembles the real implementations of everything
+ * the router destructures from `privateApis` — see
  * `__fixtures__/interactivity-shim.ts`. This file hydrates real
  * `data-wp-on--click` triggers, which call `performance.measure()`
- * (`packages/interactivity/src/directives/on.ts`), unimplemented by jsdom
- * (investigation fact 4) — stubbed below.
+ * (`packages/interactivity/src/directives/on.ts`), unimplemented by jsdom —
+ * stubbed below.
  *
- * `jest.resetModules()` is unusable here (see the harness comment in
+ * `vi.resetModules()` is unusable here (see the harness comment in
  * `lifecycle-navigate.ts`), so the router module is imported once and every
  * test in this file shares that one instance and its `core/router` store.
  * No row in this file depends on the lifecycle keys' pristine pre-navigation
  * value, so ordering between tests is not load-bearing here.
  */
 
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
 import { effect } from '@preact/signals';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
-);
-
 import { store, privateApis, withScope } from '@wordpress/interactivity';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
+);
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 const { getRegionRootFragment, toVdom, getScope, routerRegions } =
 	privateApis( CONSENT );
 
+/** Native timeout used to let fake-timer frame callbacks yield between tasks. */
+const nativeSetTimeout = globalThis.setTimeout;
+
 beforeAll( () => {
 	// See the module comment: this file hydrates real data-wp-on--click
 	// triggers, whose handler calls performance.measure(), unimplemented
 	// by jsdom.
-	window.performance.measure = jest.fn();
+	window.performance.measure = vi.fn();
+	window.performance.getEntriesByType = vi.fn( () => [] );
 } );
 
 const plainHtml = ( marker: string ) =>
@@ -212,7 +209,7 @@ function setupNestedRegionsTrigger( namespace: string ) {
  * navigation-commit routine) resets *every* entry already registered in
  * the shared `routerRegions` map — not only the ones present on the
  * destination page — which unmounts any region hydrated earlier whose id
- * the destination page doesn't happen to include (investigation: a region
+ * the destination page doesn't happen to include (a region
  * hydrated *before* an unrelated navigation completes loses its scope's
  * `ref.current`, the same guard row 5 exercises deliberately — so
  * completing a navigation from one instance before the next instance is
@@ -556,7 +553,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( state.initiator ).toBe( 'row6-region-derive' );
 	} );
 
-	test( 'row 7 — no derivation input causes a throw, including a detached element and an element inside a detached region carrier (characterisation of Requirement 11)', async () => {
+	test( 'row 7 — no derivation input is safe, including a detached element and an element inside a detached region carrier', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// A detached element, no region at all.
@@ -597,7 +594,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 
 	test( 'row 8 — parseRegionAttribute is unchanged (drift guard), asserted at source level against a literal', () => {
 		const routerIndexSource = readFileSync(
-			join( __dirname, '../index.ts' ),
+			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
 			'utf-8'
 		);
 
@@ -622,7 +619,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 } );
 
 /**
- * The frame-scope guard (Task 4).
+ * The frame-scope guard.
  *
  * `writeFrameScope` refuses to attribute a navigation to a scope that
  * reached derivation only because it is the ambient scope of one of the
@@ -641,7 +638,7 @@ describe( 'the frame-scope guard', () => {
 	// clock, that write would land during a later test and, being a
 	// same-value write (@preact/signals does not notify a signal set to
 	// its current value), silently swallow that test's own start batch's
-	// rising-edge notification too — investigation: a raw effect installed
+	// rising-edge notification too — a raw effect installed
 	// after such a pending write never observes the next navigation's
 	// `true` at all, because state.navigating was already (stale-)true.
 	// 150 ms comfortably exceeds afterNextFrame()'s 100 ms fallback arm
@@ -769,7 +766,7 @@ describe( 'the frame-scope guard', () => {
 	 * map at the start of every completed navigation, and only
 	 * repopulates the ids present in `page.regions`; an id absent from the
 	 * destination is left at `null`, which unmounts that region's content
-	 * (including a nested trigger) permanently (investigation: confirmed
+	 * (including a nested trigger) permanently (confirmed
 	 * by probing `scope.ref.current` and `element.isConnected` across a
 	 * completed navigation). Because the null-then-repopulate write is a
 	 * single batch, a destination that *does* include the id never
@@ -1001,7 +998,21 @@ describe( 'the frame-scope guard', () => {
 	} );
 
 	test( 'row 5 — a data-wp-watch in region B reacting to the end transition still reports guard-row5-region-b, not region-x and not null (characterisation)', async () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers( { shouldAdvanceTime: true } );
+		const fakeSetTimeout = globalThis.setTimeout;
+		const redirectSetTimeout = ( (
+			callback: TimerHandler,
+			delay?: number,
+			...args: unknown[]
+		) => {
+			if ( delay === undefined || delay === 0 ) {
+				return nativeSetTimeout( callback, 0, ...args );
+			}
+			return fakeSetTimeout( callback, delay, ...args );
+		} ) as typeof globalThis.setTimeout;
+		globalThis.setTimeout = redirectSetTimeout;
+		window.performance.measure = vi.fn();
+		window.performance.getEntriesByType = vi.fn( () => [] );
 		try {
 			const { state, actions } = await import( '../index' );
 
@@ -1009,7 +1020,12 @@ describe( 'the frame-scope guard', () => {
 			 * Settles afterNextFrame on either scheduler arm — see the
 			 * same helper's comment in directive-observability.ts.
 			 */
-			const advanceOneFrame = () => jest.advanceTimersByTimeAsync( 300 );
+			const advanceOneFrame = async () => {
+				await vi.advanceTimersByTimeAsync( 300 );
+				await new Promise( ( resolve ) =>
+					nativeSetTimeout( resolve, 0 )
+				);
+			};
 
 			// A real hydrated data-wp-watch, in region B, that reacts to
 			// the falling edge of state.navigating (true -> false, the
@@ -1092,7 +1108,8 @@ describe( 'the frame-scope guard', () => {
 
 			expect( state.initiator ).toBe( 'guard-row5-region-b' );
 		} finally {
-			jest.useRealTimers();
+			vi.useRealTimers();
+			globalThis.setTimeout = nativeSetTimeout;
 		}
 	} );
 
@@ -1133,7 +1150,7 @@ describe( 'the frame-scope guard', () => {
 
 	test( 'row 7 — the commit batch still contains the same statements in the same order (drift guard), asserted at source level against a literal', () => {
 		const routerIndexSource = readFileSync(
-			join( __dirname, '../index.ts' ),
+			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
 			'utf-8'
 		);
 

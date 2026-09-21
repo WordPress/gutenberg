@@ -1,8 +1,7 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
 
 /**
  * This suite guards the `privateApis` seam between `@wordpress/interactivity`
@@ -12,8 +11,8 @@ import { join } from 'node:path';
  * as text rather than importing them, for two independent reasons:
  *
  * 1. `packages/interactivity/src/index.ts` opens with a top-level
- *    `await import( 'preact/debug' )`, so any Jest suite that reaches it —
- *    directly or transitively — fails to parse before a single test runs.
+ *    `await import( 'preact/debug' )`, so evaluating the runtime module would
+ *    add unrelated module-loading behaviour to this source-level check.
  * 2. Even if it could be imported, `privateApis` is typed `( lock: … ): any`,
  *    so TypeScript does not check the shape the router destructures from it.
  *    Nothing short of reading both sides' source text can catch a name that
@@ -23,8 +22,8 @@ import { join } from 'node:path';
  * `interactivity` — because it reads both packages' source, and
  * `interactivity` is the lower architectural layer: it must not know the
  * router exists, so the cross-cutting test belongs to the higher layer that
- * consumes the seam. Both directories are in this change's js-unit gate
- * scope, so this does not add a new gate.
+ * consumes the seam. Keeping the check here avoids coupling the lower layer
+ * to the router.
  *
  * The suite deliberately covers both ends of the seam in one file: the
  * producer (what `privateApis` returns) and the consumer (what the router
@@ -38,11 +37,14 @@ const ROUTER_INDEX_PATH_FROM_REPO_ROOT =
 	'packages/interactivity-router/src/index.ts';
 
 const interactivityIndexSource = readFileSync(
-	join( __dirname, '../../../interactivity/src/index.ts' ),
+	join(
+		dirname( fileURLToPath( import.meta.url ) ),
+		'../../../interactivity/src/index.ts'
+	),
 	'utf-8'
 );
 const routerIndexSource = readFileSync(
-	join( __dirname, '../index.ts' ),
+	join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
 	'utf-8'
 );
 

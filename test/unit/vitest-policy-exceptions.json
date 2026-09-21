@@ -8,6 +8,7 @@
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
+		"packages/interactivity-router/src/test/directive-observability.jsdom.test.ts": "Stubs requestAnimationFrame only to select the timeout scheduler arm deterministically; assertions cover deferred watcher runs without reading browser layout or animation output.",
 		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver entries and requestAnimationFrame scheduling to test deterministic lane-placement state without browser layout.",
 		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout.",
 		"packages/editor/src/components/collaborators-overlay/test/cursor-dom-utils.jsdom.test.ts": "Supplies fixed element and range rectangles to verify cursor fallback and ancestor-selection algorithms without relying on browser layout.",

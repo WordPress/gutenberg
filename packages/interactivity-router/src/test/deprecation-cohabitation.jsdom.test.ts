@@ -15,8 +15,18 @@
  * `console.warn`.
  */
 
-jest.mock( '@wordpress/interactivity', () => {
-	const real = require( './__fixtures__/interactivity-shim' );
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
+
+vi.mock( import( '@wordpress/interactivity' ), async () => {
+	const real = await import( './__fixtures__/interactivity-shim' );
 	const warnCallCounter = { count: 0 };
 	return {
 		...real,
@@ -24,9 +34,9 @@ jest.mock( '@wordpress/interactivity', () => {
 			const apis = real.privateApis( lock );
 			return {
 				...apis,
-				warn: ( ...args: unknown[] ) => {
+				warn: ( message: string ) => {
 					warnCallCounter.count++;
-					return apis.warn( ...args );
+					return apis.warn( message );
 				},
 			};
 		},
@@ -35,20 +45,22 @@ jest.mock( '@wordpress/interactivity', () => {
 } );
 
 async function advanceOneFrame() {
-	await jest.advanceTimersByTimeAsync( 100 );
+	await vi.advanceTimersByTimeAsync( 100 );
 }
 
 describe( 'the deprecated state.navigation surface is unaffected by the new keys', () => {
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers( { shouldAdvanceTime: true } );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	test( 'a full new-key navigation cycle emits zero deprecation warnings and invokes the getter zero times; reading the deprecated surface still warns exactly once and reflects the loading-animation behaviour', async () => {
-		const { __warnCallCounter } = require( '@wordpress/interactivity' ) as {
+		const { __warnCallCounter } = ( await import(
+			'@wordpress/interactivity'
+		) ) as unknown as {
 			__warnCallCounter: { count: number };
 		};
 		const { state, actions } = await import( '../index' );
@@ -83,6 +95,6 @@ describe( 'the deprecated state.navigation surface is unaffected by the new keys
 			'The usage of state.navigation.{hasStarted|hasFinished} from core/router is deprecated and will stop working in WordPress 7.1.'
 		);
 		// eslint-disable-next-line no-console
-		expect( ( console.warn as jest.Mock ).mock.calls.length ).toBe( 1 );
+		expect( ( console.warn as Mock ).mock.calls.length ).toBe( 1 );
 	} );
 } );

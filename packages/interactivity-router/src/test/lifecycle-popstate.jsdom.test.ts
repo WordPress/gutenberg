@@ -1,14 +1,13 @@
 /**
  * The popstate handler: claim, uncached-first, conditional clear, guarded
- * start/end, `catch`, bounded release (Task 5).
+ * start/end, `catch`, and bounded release.
  *
- * `packages/interactivity/src/index.ts` cannot be imported for real under
- * Jest (investigation fact 1), so, like every other file in this directory,
- * this suite is exercised through the shim that assembles the real
- * implementations of everything the router destructures from `privateApis`
- * (investigation fact 2) -- see `__fixtures__/interactivity-shim.ts`.
+ * Like every other file in this directory, this suite is exercised through a
+ * Vitest module mock that assembles the real implementations of everything
+ * the router destructures from `privateApis` -- see
+ * `__fixtures__/interactivity-shim.ts`.
  *
- * `jest.resetModules()` is unusable here (`assets/dynamic-importmap`
+ * `vi.resetModules()` is unusable here (`assets/dynamic-importmap`
  * defines a non-configurable global that throws on redefinition -- see the
  * harness comment in `lifecycle-navigate.ts`), so the router module is
  * imported exactly once, in `beforeAll()` below, and every test in this
@@ -16,7 +15,7 @@
  *
  * Row 6 needs to *capture* the router's own `popstate` listener rather than
  * dispatch to it, so that a rejection from inside it becomes handled rather
- * than an unassertable unhandled rejection (build-plan Appendix E‴, R19).
+ * than an unassertable unhandled rejection.
  * That capture only works at the listener's registration, which happens
  * once, at module evaluation -- so `window.addEventListener` is wrapped
  * *before* the one-and-only `import( '../index' )` in `beforeAll()`, and
@@ -25,22 +24,25 @@
  * the real `addEventListener` and so registers the listener normally too.
  */
 
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+} from 'vitest';
 import { effect } from '@preact/signals';
 import { hydrate } from 'preact';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
-);
-
 import { store, privateApis } from '@wordpress/interactivity';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
+);
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
@@ -51,6 +53,28 @@ let actions: ( typeof import('../index') )[ 'actions' ];
 let capturedPopstateHandler: ( () => Promise< void > ) | undefined;
 
 const ORIGINAL_FETCH = window.fetch;
+
+/** Native timeout used to let fake-timer frame callbacks yield between tasks. */
+const nativeSetTimeout = globalThis.setTimeout;
+
+// Vitest's jsdom virtual console is created before the console matcher spies;
+// mirror navigation diagnostics onto the current console spy.
+const jsdomVirtualConsole = (
+	globalThis as typeof globalThis & {
+		jsdom: {
+			virtualConsole: {
+				on: (
+					event: string,
+					listener: ( error: unknown ) => void
+				) => void;
+			};
+		};
+	}
+ ).jsdom.virtualConsole;
+jsdomVirtualConsole.on( 'jsdomError', ( error ) => {
+	// eslint-disable-next-line no-console
+	console.error( error );
+} );
 
 beforeAll( async () => {
 	// Wrap addEventListener only long enough to capture the router's own
@@ -76,12 +100,30 @@ beforeAll( async () => {
 } );
 
 beforeEach( () => {
-	jest.useFakeTimers();
+	vi.useFakeTimers( { shouldAdvanceTime: true } );
+	const fakeSetTimeout = globalThis.setTimeout;
+	const redirectSetTimeout = ( (
+		callback: TimerHandler,
+		delay?: number,
+		...args: unknown[]
+	) => {
+		if ( delay === undefined || delay === 0 ) {
+			return nativeSetTimeout( callback, 0, ...args );
+		}
+		return fakeSetTimeout( callback, delay, ...args );
+	} ) as typeof globalThis.setTimeout;
+	globalThis.setTimeout = redirectSetTimeout;
+
+	// The hydrated watcher in the first row calls these APIs on every run.
+	// Install the stubs after fake timers so Vitest's faked performance object
+	// cannot replace them.
+	window.performance.measure = vi.fn();
+	window.performance.getEntriesByType = vi.fn( () => [] );
 } );
 
 afterEach( () => {
 	window.fetch = ORIGINAL_FETCH;
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
 /**
@@ -91,7 +133,8 @@ afterEach( () => {
  * the same name.
  */
 async function advanceOneFrame() {
-	await jest.advanceTimersByTimeAsync( 300 );
+	await vi.advanceTimersByTimeAsync( 300 );
+	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
 }
 
 /**
@@ -121,7 +164,7 @@ function rawLifecycleLog() {
  */
 function makeDeferredFetch() {
 	const pending: Array< { resolve: ( response: unknown ) => void } > = [];
-	const fetchMock = jest.fn( () => {
+	const fetchMock = vi.fn( () => {
 		let resolve!: ( response: unknown ) => void;
 		const promise = new Promise( ( res ) => {
 			resolve = res;
@@ -144,10 +187,9 @@ const plainHtml = ( marker: string ) =>
 	`<!doctype html><title>t</title><body>${ marker }</body>`;
 
 /**
- * Moves the document to `pathname` via a same-document `pushState`, exactly
- * the construction investigation fact 9 establishes as what actually fires
- * the router's own `popstate` listener (a cross-document traversal never
- * does).
+ * Moves the document to `pathname` via a same-document `pushState`, the
+ * construction that fires the router's own `popstate` listener (a
+ * cross-document traversal never does).
  *
  * @param pathname The path (and optional search) to push, e.g.
  *                 `/dest?x=1`.
@@ -189,7 +231,7 @@ function hydrateWatcher( namespace: string ) {
 }
 
 describe( 'the popstate handler', () => {
-	test( 'row 1 — cached, truthy entry, from idle: a full lifecycle cycle observed through a real hydrated data-wp-watch (AC6, AC7)', async () => {
+	test( 'row 1 — cached, truthy entry, from idle: a full lifecycle cycle observed through a real hydrated data-wp-watch', async () => {
 		const runs = hydrateWatcher( 'test/popstate-row1' );
 		await advanceOneFrame();
 		expect( runs ).toHaveLength( 1 );
@@ -207,7 +249,7 @@ describe( 'the popstate handler', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'row 1b — a cached traversal after a completed navigation reports no stale identity, only null, not the previous navigation’s (AC18)', async () => {
+	test( 'row 1b — a cached traversal after a completed navigation reports no stale identity, only null, not the previous navigation’s', async () => {
 		await actions.navigate( 'http://localhost/popstate-row1b-prior', {
 			initiator: 'region-x',
 			html: plainHtml( 'prior' ),
@@ -256,9 +298,8 @@ describe( 'the popstate handler', () => {
 		dispose();
 
 		expect( adversarialRuns ).toBe( 1 );
-		// jsdom logs "Not implemented: navigation (except hash changes)"
-		// through console.error when window.location.reload() runs -- see
-		// investigation fact 5.
+		// jsdom reports "Not implemented: navigation (except hash changes)"
+		// through console.error when window.location.reload() runs.
 		expect( console ).toHaveErrored();
 	} );
 
@@ -303,7 +344,7 @@ describe( 'the popstate handler', () => {
 		// deliberately no release of its own (see the design), and a
 		// timer armed under fake timers never fires once they're torn
 		// down.
-		await jest.advanceTimersByTimeAsync( 10600 );
+		await vi.advanceTimersByTimeAsync( 10600 );
 		expect( state.navigating ).toBe( false );
 
 		// Left permanently unresolved -- its own token is stale from the
@@ -313,7 +354,7 @@ describe( 'the popstate handler', () => {
 	} );
 
 	test( 'row 3 — a cached entry that resolves falsy: no start pair, no end, reload on a normal return', async () => {
-		window.fetch = jest.fn( async () => ( {
+		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',
 		} ) ) as unknown as typeof window.fetch;
@@ -454,16 +495,17 @@ describe( 'the popstate handler', () => {
 
 		test( 'characterisation — no `await` sits between the catch’s scheduled restoration and its rethrow (source-level guard)', () => {
 			const routerIndexSource = readFileSync(
-				join( __dirname, '../index.ts' ),
+				join(
+					dirname( fileURLToPath( import.meta.url ) ),
+					'../index.ts'
+				),
 				'utf-8'
 			);
 
 			// `await`-ing before the rethrow is byte-identical to the
 			// correct implementation on every behavioural observable
-			// (build-plan Appendix E″, R13; Appendix E‴, R19), so this
-			// clause is pinned at source level rather than claimed as a
-			// behavioural red -- the same disposition Task 3 row 8 takes,
-			// for the same reason.
+			// so this clause is pinned at source level rather than claimed as a
+			// behavioural assertion.
 			const catchBlockSource = '\t} catch ( error ) {\n';
 
 			expect( routerIndexSource ).toContain( catchBlockSource );
@@ -511,12 +553,12 @@ describe( 'the popstate handler', () => {
 
 			// Well before the bound: still in flight, nothing new
 			// published.
-			await jest.advanceTimersByTimeAsync( 5000 );
+			await vi.advanceTimersByTimeAsync( 5000 );
 			expect( state.navigating ).toBe( true );
 			expect( raw.slice( 1 ) ).toEqual( [ { n: true, i: null } ] );
 
 			// Past the bound: the release restores idle.
-			await jest.advanceTimersByTimeAsync( 5500 );
+			await vi.advanceTimersByTimeAsync( 5500 );
 			dispose();
 
 			expect( state.navigating ).toBe( false );
@@ -558,7 +600,7 @@ describe( 'the popstate handler', () => {
 			// Advance past the FIRST claim's (the popstate traversal's)
 			// 10 s bound -- it must find itself no longer current and
 			// write nothing.
-			await jest.advanceTimersByTimeAsync( 10600 );
+			await vi.advanceTimersByTimeAsync( 10600 );
 			dispose();
 
 			expect( state.navigating ).toBe( true );
@@ -607,7 +649,7 @@ describe( 'the popstate handler', () => {
 		expect( raw.slice( 1 ) ).toEqual( [ { n: true, i: null } ] );
 
 		// Past the release bound: the release restores idle.
-		await jest.advanceTimersByTimeAsync( 10600 );
+		await vi.advanceTimersByTimeAsync( 10600 );
 		expect( raw.slice( 1 ) ).toEqual( [
 			{ n: true, i: null },
 			{ n: false, i: null },
@@ -631,13 +673,13 @@ describe( 'the popstate handler', () => {
 
 	test( 'row 10 — the existing render batch is unchanged (drift guard), asserted at source level against a literal', () => {
 		const routerIndexSource = readFileSync(
-			join( __dirname, '../index.ts' ),
+			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
 			'utf-8'
 		);
 
 		// This must stay byte-identical to packages/interactivity-router/
 		// src/index.ts's popstate handler's render batch. What it
-		// protects: this task restructures the handler *around* an
+		// protects: the handler is structured *around* an
 		// existing batch without disturbing it, and state.url still
 		// updates on traversals exactly as today.
 		const popstateRenderBatchSource =

@@ -5,13 +5,23 @@
 		"composite": false,
 		"noEmit": true,
 		"emitDeclarationOnly": false,
-		"types": [ "gutenberg-vitest-test-env" ]
+		"noImplicitReturns": false,
+		"rootDir": "../..",
+		"types": [ "gutenberg-vitest-test-env", "node" ]
 	},
 	"files": [
 		"global.d.ts",
 		"src/assets/test/script-modules.jsdom.test.ts",
 		"src/assets/test/scs.test.ts",
-		"src/assets/test/styles.jsdom.test.ts"
+		"src/assets/test/styles.jsdom.test.ts",
+		"src/test/deprecation-cohabitation.jsdom.test.ts",
+		"src/test/directive-observability.jsdom.test.ts",
+		"src/test/initiator-invalid-warning.jsdom.test.ts",
+		"src/test/initiator-resolution.jsdom.test.ts",
+		"src/test/lifecycle-navigate.jsdom.test.ts",
+		"src/test/lifecycle-popstate.jsdom.test.ts",
+		"src/test/private-apis-seam.test.ts",
+		"src/test/release-bound-observability.jsdom.test.ts"
 	],
 	"include": [],
 	"exclude": []

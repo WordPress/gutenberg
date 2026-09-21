@@ -1,13 +1,11 @@
 /**
  * The `navigate()` lifecycle write protocol.
  *
- * `packages/interactivity/src/index.ts` cannot be imported for real under
- * Jest (investigation fact 1), so the router is exercised through a shim
- * that assembles the real implementations of everything it destructures
- * from `privateApis` (investigation fact 2). See
- * `__fixtures__/interactivity-shim.ts`.
+ * The router is exercised through a Vitest module mock that assembles the
+ * real implementations of everything it destructures from `privateApis`.
+ * See `__fixtures__/interactivity-shim.ts`.
  *
- * Because `jest.resetModules()` is unusable here (`assets/dynamic-importmap`
+ * Because `vi.resetModules()` is unusable here (`assets/dynamic-importmap`
  * defines a non-configurable global that throws on redefinition), the
  * router module is imported exactly once per file and every test in this
  * file shares that one instance and its `core/router` store. Row 1, row 14
@@ -16,24 +14,15 @@
  * navigation.
  */
 
-/**
- * External dependencies
- */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { effect } from '@preact/signals';
 import { hydrate } from 'preact';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
+import { store, privateApis } from '@wordpress/interactivity';
+import { populateServerData } from './__fixtures__/interactivity-shim';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
 );
-
-import {
-	store,
-	privateApis,
-	populateServerData,
-} from '@wordpress/interactivity';
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
@@ -45,13 +34,34 @@ let actions: ( typeof import('../index') )[ 'actions' ];
 
 const ORIGINAL_FETCH = window.fetch;
 
+// Vitest's jsdom environment forwards jsdom errors through the virtual
+// console created before the console matcher spies are installed. Mirror those
+// events onto the current spy so assertions about intentional navigation
+// diagnostics keep observing the same runtime signal.
+const jsdomVirtualConsole = (
+	globalThis as typeof globalThis & {
+		jsdom: {
+			virtualConsole: {
+				on: (
+					event: string,
+					listener: ( error: unknown ) => void
+				) => void;
+			};
+		};
+	}
+ ).jsdom.virtualConsole;
+jsdomVirtualConsole.on( 'jsdomError', ( error ) => {
+	// eslint-disable-next-line no-console
+	console.error( error );
+} );
+
 beforeEach( () => {
-	jest.useFakeTimers();
+	vi.useFakeTimers( { shouldAdvanceTime: true } );
 } );
 
 afterEach( () => {
 	window.fetch = ORIGINAL_FETCH;
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
 /**
@@ -61,12 +71,12 @@ afterEach( () => {
  * and to drain the microtask chains a fetch/render cycle depends on.
  */
 async function advanceOneFrame() {
-	await jest.advanceTimersByTimeAsync( 100 );
+	await vi.advanceTimersByTimeAsync( 100 );
 }
 
 /**
  * Binds a raw `effect()` to the two lifecycle keys, tagging each entry with
- * only the keys that are not `undefined` — the shape the acceptance rows'
+ * only the keys that are not `undefined` — the shape the lifecycle rows'
  * fingerprints are stated against (e.g. `{ n: true }` with no `i`).
  */
 function rawLifecycleLog() {
@@ -91,7 +101,7 @@ function rawLifecycleLog() {
  */
 function makeDeferredFetch() {
 	const pending: Array< { resolve: ( response: unknown ) => void } > = [];
-	const fetchMock = jest.fn( () => {
+	const fetchMock = vi.fn( () => {
 		let resolve!: ( response: unknown ) => void;
 		const promise = new Promise( ( res ) => {
 			resolve = res;
@@ -114,7 +124,7 @@ function respond(
  * Hydrates a `[data-wp-interactive][data-wp-router-region]` element for
  * real, using the same `getRegionRootFragment` + `toVdom` + `hydrate`
  * recipe `packages/interactivity/src/hydration.ts`'s `hydrateRegions` uses
- * (investigation fact 4) — done manually here because that function itself
+ * — done manually here because that function itself
  * lives inside the unimportable `packages/interactivity/src/index.ts`.
  *
  * @param id            Router region id — also used as the store namespace,
@@ -156,7 +166,9 @@ const plainHtml = ( marker: string ) =>
 
 describe( 'navigate() lifecycle write protocol', () => {
 	test( 'row 1 — before any navigation the lifecycle keys read undefined, and loading the router module alone does not re-run a watcher already bound to the namespace', async () => {
-		const { state: preState } = store( 'core/router', {} );
+		const { state: preState } = store( 'core/router', {} ) as {
+			state: typeof state;
+		};
 
 		expect( preState.navigating ).toBeUndefined();
 		expect( preState.initiator ).toBeUndefined();
@@ -180,7 +192,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		dispose();
 	} );
 
-	test( 'row 14 — actions.prefetch() alone produces no lifecycle transition at all (AC8)', async () => {
+	test( 'row 14 — actions.prefetch() alone produces no lifecycle transition at all', async () => {
 		const { raw, dispose } = rawLifecycleLog();
 
 		await actions.prefetch( 'http://localhost/row14-dest', {
@@ -194,7 +206,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		expect( state.initiator ).toBeUndefined();
 	} );
 
-	test( 'row 15 — an entry-check rejection produces no lifecycle transition, and the lifecycle reads idle throughout (AC14)', async () => {
+	test( 'row 15 — an entry-check rejection produces no lifecycle transition, and the lifecycle reads idle throughout', async () => {
 		populateServerData( {
 			config: { 'core/router': { clientNavigationDisabled: true } },
 		} );
@@ -215,7 +227,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 			}
 		);
 
-		await advanceOneFrame();
+		await vi.advanceTimersByTimeAsync( 0 );
 		dispose();
 
 		expect( raw.slice( 1 ) ).toEqual( [] );
@@ -224,7 +236,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		expect( settled ).toBe( false );
 		// jsdom logs "Not implemented: navigation (except hash changes)"
 		// through console.error when forcePageReload() calls
-		// window.location.assign() — see investigation fact 5.
+		// window.location.assign() — jsdom reports the attempted navigation.
 		expect( console ).toHaveErrored();
 
 		// This call never reached renderPage()'s own populateServerData()
@@ -376,7 +388,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 		await advanceOneFrame();
 		dispose();
 
-		expect( caught ).toBeInstanceOf( Error );
+		expect( caught ).toBeInstanceOf( window.DOMException );
 		expect( ( caught as Error ).name ).toBe( 'SyntaxError' );
 		expect( state.navigating ).toBe( false );
 		expect( raw.slice( 1 ) ).toEqual( [
@@ -408,7 +420,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 
 		// (a) the lifecycle clause — still in flight.
 		expect( state.navigating ).toBe( true );
-		// (b) the identity clause — AC23's in-phase pin.
+		// (b) the identity clause remains in phase with the navigation.
 		expect( state.initiator ).toBe( 'region-x' );
 
 		respond( pending[ 1 ], plainHtml( 'row9-b' ) );
@@ -526,7 +538,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 	// forever — that is the property under test — so it must run last: no
 	// later test can rely on the lifecycle having settled back to idle.
 	test( 'row 11 — a navigation that falls back mid-flight never produces an end', async () => {
-		window.fetch = jest.fn( async () => ( {
+		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',
 		} ) ) as unknown as typeof window.fetch;
@@ -550,7 +562,7 @@ describe( 'navigate() lifecycle write protocol', () => {
 
 		// Advance past every timer the call arms (the 400 ms loadingTimeout
 		// and the 60 s timeout promise), plus two afterNextFrame windows.
-		await jest.advanceTimersByTimeAsync( 60000 + 400 + 200 );
+		await vi.advanceTimersByTimeAsync( 60000 + 400 + 200 );
 		dispose();
 
 		expect( settled ).toBe( false );

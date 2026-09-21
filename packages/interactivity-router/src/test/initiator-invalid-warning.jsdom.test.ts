@@ -1,27 +1,20 @@
 /**
  * Row 5 — the `initiator` option's three declared arms, exercised from
- * inside a router region, narrowed to what can go red at Task 2 (the
- * `declared === undefined` arm derives nothing yet — Task 3 implements the
- * derivation, and states its own red for that arm separately).
+ * inside a router region, covering the declared values that this suite can
+ * distinguish. The omitted-value derivation has its own dedicated suite.
  *
  * Warning-count assertions live in their own file: `warn()`'s dedupe set
  * (`packages/interactivity/src/utils.ts`) is module-level, so a second
  * count in a file that already triggered it would read zero.
  */
 
-/**
- * External dependencies
- */
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
-);
-
 import { store, privateApis } from '@wordpress/interactivity';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
+);
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
@@ -29,16 +22,17 @@ const { getRegionRootFragment, toVdom } = privateApis( CONSENT );
 
 // This file hydrates a real data-wp-on--click trigger, whose handler calls
 // performance.measure() (packages/interactivity/src/directives/on.ts:183),
-// which jsdom does not implement (investigation fact 4).
+// which jsdom does not implement.
 beforeAll( () => {
-	window.performance.measure = jest.fn();
+	window.performance.measure = vi.fn();
 } );
 
 /**
  * Hydrates a `[data-wp-router-region]` with a real `data-wp-on--click`
  * trigger, so a call made through `runInScope()` runs from a genuine
  * ambient directive scope inside the region — the construction the row
- * requires, and the one that stays meaningful once Task 3 adds derivation.
+ * requires, and the one that remains meaningful when derivation is exercised
+ * by the companion suite.
  *
  * @param id Router region id — also used as the store namespace, so it must
  *           be unique per test.
@@ -79,7 +73,7 @@ function setupRegionTrigger( id: string ) {
 }
 
 describe( 'the initiator option — three arms, exercised in-region', () => {
-	test( "the string arm reports it verbatim; the null arm reports null; the invalid arm reports null and warns exactly once, all from inside region-x — narrowed to Task 2's in-phase reds", async () => {
+	test( 'the string arm reports it verbatim; the null arm reports null; the invalid arm reports null and warns exactly once, all from inside region-x', async () => {
 		const { actions, state } = await import( '../index' );
 		const region = setupRegionTrigger( 'row5' );
 

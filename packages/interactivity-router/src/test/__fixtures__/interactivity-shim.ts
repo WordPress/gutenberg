@@ -1,71 +1,51 @@
 /**
- * Jest harness for `@wordpress/interactivity-router` unit tests.
+ * Vitest harness for `@wordpress/interactivity-router` unit tests.
  *
- * `packages/interactivity/src/index.ts` opens with a top-level
- * `await import( 'preact/debug' )`, which Babel's CJS output keeps verbatim —
- * so any Jest suite that imports `@wordpress/interactivity` (or anything
- * reaching it, like the router) fails to parse before a single test runs
- * (investigation fact 1). Every router test file works around this with:
+ * The router tests mock `@wordpress/interactivity` with this module so they
+ * can use the real directive-runtime implementations from the deep source
+ * modules while keeping the private API seam under test:
  *
- *     jest.mock( '@wordpress/interactivity', () => require( './__fixtures__/interactivity-shim' ) );
+ *     vi.mock( import( '@wordpress/interactivity' ), async () => await import( './__fixtures__/interactivity-shim' ) );
  *
- * which swaps in this module wholesale wherever the router imports
+ * The mock swaps in this module wholesale wherever the router imports
  * `@wordpress/interactivity`. This file assembles the *real* implementations
  * of everything the shipped router destructures from `privateApis`
- * (investigation fact 2): nine from the deep source modules under
+ * (nine from the deep source modules under
  * `packages/interactivity/src`, and `render`, `h` and `batch` straight from
  * `preact` / `@preact/signals` — not from a source module, which does not
  * export them — exactly as `packages/interactivity/src/index.ts` itself
  * sources them.
  *
  * It also re-exports `withScope` and `populateServerData` as top-level named
- * exports (not only bundled inside `privateApis`), because `jest.mock`'s
+ * exports (not only bundled inside `privateApis`), because `vi.mock`'s
  * factory replaces the whole module: anything a test imports from
- * `@wordpress/interactivity` directly has to be provided here too.
+ * `@wordpress/interactivity` directly has to be provided here too. The
  * `withScope` is a public export of the real package and is load-bearing for
- * a later task's reddening row; `populateServerData` lets tests seed
- * `getConfig()` directly (e.g. to simulate `clientNavigationDisabled`).
+ * scoped calls, while `populateServerData` lets tests seed `getConfig()`
+ * directly (e.g. to simulate `clientNavigationDisabled`).
  *
- * Jest's `testMatch` glob `**\/test/*.[jt]s?(x)` is non-recursive, so this
- * `__fixtures__` subdirectory is never itself collected as a test suite.
+ * Vitest's `**\/test/*.[jt]s?(x)` include glob does not collect this
+ * `__fixtures__` subdirectory as a test suite.
  */
 
-/**
- * External dependencies
- */
 import { render, h } from 'preact';
 import { batch } from '@preact/signals';
-
-/**
- * Internal dependencies — the real source modules under
- * packages/interactivity/src, reached directly rather than through
- * packages/interactivity/src/index.ts (see the module comment above).
- */
-import {
-	getRegionRootFragment,
-	initialVdomPromise,
-} from '../../../../interactivity/src/hydration';
-import { toVdom } from '../../../../interactivity/src/vdom';
-import {
-	store,
-	getConfig,
-	parseServerData,
-	populateServerData,
-} from '../../../../interactivity/src/store';
-import { routerRegions } from '../../../../interactivity/src/directives/router-region';
-import {
-	navigationSignal,
-	sessionId,
-	warn,
-	afterNextFrame,
-	withScope,
-} from '../../../../interactivity/src/utils';
-import { getScope } from '../../../../interactivity/src/scopes';
-
+import * as hydrationApis from '../../../../interactivity/src/hydration';
+import * as vdomApis from '../../../../interactivity/src/vdom';
+import * as storeApis from '../../../../interactivity/src/store';
+import * as routerRegionApis from '../../../../interactivity/src/directives/router-region';
+import * as utilsApis from '../../../../interactivity/src/utils';
+import * as scopeApis from '../../../../interactivity/src/scopes';
 // Registers the real directive set (data-wp-watch, data-wp-on,
 // data-wp-router-region, …) as a side effect, so a test that hydrates real
 // markup exercises real directive behaviour.
 import '../../../../interactivity/src/directives';
+export {
+	store,
+	getConfig,
+	populateServerData,
+} from '../../../../interactivity/src/store';
+export { withScope } from '../../../../interactivity/src/utils';
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
@@ -81,24 +61,24 @@ const requiredConsent =
 function privateApis( lock: string ) {
 	if ( lock === requiredConsent ) {
 		return {
-			getRegionRootFragment,
-			initialVdomPromise,
-			toVdom,
+			getRegionRootFragment: hydrationApis.getRegionRootFragment,
+			initialVdomPromise: hydrationApis.initialVdomPromise,
+			toVdom: vdomApis.toVdom,
 			render,
-			parseServerData,
-			populateServerData,
+			parseServerData: storeApis.parseServerData,
+			populateServerData: storeApis.populateServerData,
 			batch,
-			routerRegions,
+			routerRegions: routerRegionApis.routerRegions,
 			h,
-			navigationSignal,
-			sessionId,
-			warn,
-			afterNextFrame,
-			getScope,
+			navigationSignal: utilsApis.navigationSignal,
+			sessionId: utilsApis.sessionId,
+			warn: utilsApis.warn,
+			afterNextFrame: utilsApis.afterNextFrame,
+			getScope: scopeApis.getScope,
 		};
 	}
 
 	throw new Error( 'Forbidden access.' );
 }
 
-export { store, getConfig, privateApis, withScope, populateServerData };
+export { privateApis };

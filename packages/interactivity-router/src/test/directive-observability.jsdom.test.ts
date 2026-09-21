@@ -3,64 +3,76 @@
  * as three distinct runs (hydration, in flight, ended), on both of
  * `afterNextFrame`'s scheduler arms.
  *
- * This is the one file in this task that hydrates a real `data-wp-watch`,
+ * This is the file that hydrates a real `data-wp-watch`,
  * so it is the one that must stub `performance.measure` and
- * `performance.getEntriesByType` (investigation fact 4): the directive
+ * `performance.getEntriesByType`: the directive
  * wrapper calls `performance.measure` on every run, which jsdom does not
  * implement, and an unstubbed throw there aborts the flusher's dependency
  * tracking silently — the watcher goes quiet rather than erroring visibly,
  * which is the exact false-pass this rule exists to prevent.
  */
 
-/**
- * External dependencies
- */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
-
-/**
- * WordPress dependencies
- */
-jest.mock( '@wordpress/interactivity', () =>
-	require( './__fixtures__/interactivity-shim' )
-);
-
 import { store, privateApis } from '@wordpress/interactivity';
+vi.mock(
+	import( '@wordpress/interactivity' ),
+	async () => await import( './__fixtures__/interactivity-shim' )
+);
 
 const CONSENT =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 const { getRegionRootFragment, toVdom } = privateApis( CONSENT );
 
-beforeAll( () => {
-	// See the module comment: only this file needs these stubs.
-
-	window.performance.measure = jest.fn();
-
-	window.performance.getEntriesByType = jest.fn( () => [] );
-} );
+/** Native timeout used to let fake-timer frame callbacks yield between tasks. */
+const nativeSetTimeout = globalThis.setTimeout;
 
 beforeEach( () => {
-	jest.useFakeTimers();
+	vi.useFakeTimers( { shouldAdvanceTime: true } );
+	const fakeSetTimeout = globalThis.setTimeout;
+	const redirectSetTimeout = ( (
+		callback: TimerHandler,
+		delay?: number,
+		...args: unknown[]
+	) => {
+		if ( delay === undefined || delay === 0 ) {
+			return nativeSetTimeout( callback, 0, ...args );
+		}
+		return fakeSetTimeout( callback, delay, ...args );
+	} ) as typeof globalThis.setTimeout;
+	globalThis.setTimeout = redirectSetTimeout;
+
+	// See the module comment: only this file needs these stubs. Install them
+	// after fake timers so Vitest's faked performance object cannot replace
+	// them.
+	window.performance.measure = vi.fn();
+	window.performance.getEntriesByType = vi.fn( () => [] );
 } );
 
 afterEach( () => {
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
 /**
- * Settles `afterNextFrame` on either scheduler arm. 300 ms comfortably
- * covers two chained `afterNextFrame` windows (the watcher's own flush and
- * the router's end write, each racing a 100 ms fallback) plus margin, which
- * the requestAnimationFrame-stubbed arm needs — a bare 100 ms advance
- * settles the standard rAF arm but not that one.
+ * Settles `afterNextFrame` on either scheduler arm. The first pass covers two
+ * chained frame windows (the watcher's own flush and the router's end write,
+ * each racing a 100 ms fallback), while the second pass drains a watcher flush
+ * that was scheduled by the native zero-delay task used to separate frame
+ * callbacks. The requestAnimationFrame-stubbed arm needs the full 300 ms
+ * advance; a bare 100 ms advance settles only the standard rAF arm.
  */
 async function advanceOneFrame() {
-	await jest.advanceTimersByTimeAsync( 300 );
+	await Promise.resolve();
+	await vi.advanceTimersByTimeAsync( 300 );
+	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
+	await vi.advanceTimersByTimeAsync( 100 );
+	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
 }
 
 /**
  * Hydrates a `data-wp-watch` that logs `core/router`'s `state.navigating` on
  * every run, into a fresh namespace/element so it does not collide with any
- * other hydrated island (investigation fact 8).
+ * other hydrated island.
  *
  * @param namespace              Store namespace for the hydrated island —
  *                               must be unique per test.
@@ -93,7 +105,7 @@ function hydrateWatcher(
 
 describe( 'directive observability — row 7', () => {
 	// Both tests below import the same router module instance
-	// (`jest.resetModules()` is unusable here — see the harness comment in
+	// (`vi.resetModules()` is unusable here — see the harness comment in
 	// `lifecycle-navigate.ts`), so the second test's hydration may observe
 	// a residual `navigating` reading left over from the first test's
 	// completed navigation, rather than a pristine `undefined`. Each test
@@ -123,7 +135,7 @@ describe( 'directive observability — row 7', () => {
 	} );
 
 	test( 'the 100 ms timeout scheduler arm (requestAnimationFrame stubbed never to fire) also produces three runs', async () => {
-		window.requestAnimationFrame = jest.fn( () => 0 );
+		window.requestAnimationFrame = vi.fn( () => 0 );
 
 		const { state, actions } = await import( '../index' );
 		const runs = hydrateWatcher( 'test/observability-timeout', state );
