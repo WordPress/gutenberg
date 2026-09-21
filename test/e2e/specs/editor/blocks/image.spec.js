@@ -241,17 +241,30 @@ test.describe( 'Image', () => {
 		await editor.clickBlockToolbarButton( 'Edit image' );
 		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
 		await expect( modal ).toBeVisible();
+		// The cropper is inert until its image has loaded; an edit applied
+		// before that is lost when it initializes.
+		await expect(
+			modal.locator( '.media-editor-canvas__cropper.is-loaded' )
+		).toBeVisible();
+		await expect(
+			modal.locator( '.wp-media-editor-image-editor__image' )
+		).toHaveJSProperty( 'complete', true );
 
 		// Rotate and save.
 		await modal
 			.locator( 'role=button[name="Rotate 90° clockwise"i]' )
 			.click();
+		await expect(
+			modal.locator( 'role=button[name="Reset"i]' )
+		).toBeEnabled();
 		await modal.locator( 'role=button[name="Save"i]' ).click();
 
 		// Modal closes and the block now points at a child attachment whose
-		// URL matches the rendered <img>. The `/edit` endpoint creates a new
-		// attachment rather than mutating the original, so id must change.
-		await expect( modal ).toBeHidden();
+		// URL matches the rendered <img>. The edit creates a new attachment
+		// rather than mutating the original, so id must change. Saving
+		// applies the edit and generates sub-sizes in the browser when
+		// client-side media processing is available, so allow for that.
+		await expect( modal ).toBeHidden( { timeout: 60_000 } );
 		await expect( image ).not.toHaveAttribute( 'src', initialUrl );
 		const [
 			{
