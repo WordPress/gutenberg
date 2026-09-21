@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 /*

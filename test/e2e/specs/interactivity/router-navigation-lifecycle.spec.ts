@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 type LogEntry = { navigating: string; initiator: string };
@@ -140,7 +133,7 @@ const collectConsoleActivity = ( page: Page ) => {
 /**
  * Registers a route on `url` *before* any request against it is expected,
  * holding it open until `release()` is called. This is the held-request
- * idiom from `router-navigate.spec.ts:84-91`, extended with a hit signal
+ * idiom from `router-navigate.spec.ts:89-102`, extended with a hit signal
  * (per the operational notes): `hit` resolves the moment the request
  * arrives -- the positive checkpoint that it was really made.
  *
@@ -1651,7 +1644,9 @@ test.describe( 'Router navigation lifecycle', () => {
 
 			// Explicit blur, so "focus did not move" below is
 			// distinguishable from "focus was already there".
-			await page.evaluate( () => document.activeElement?.blur?.() );
+			await page.evaluate(
+				() => ( document.activeElement as HTMLElement | null )?.blur?.()
+			);
 
 			await page.goBack();
 
