@@ -13,9 +13,11 @@ import {
 import { toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
+import { getScope } from './scopes';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 import {
+	afterNextFrame,
 	deepReadOnly,
 	navigationSignal,
 	onDOMReady,
@@ -87,6 +89,11 @@ export const privateApis = (
 			navigationSignal,
 			sessionId,
 			warn,
+			afterNextFrame,
+			// The router's scope probe. Unlike `getContext`/`getElement`/
+			// `getServerContext`, this returns `undefined` off-scope by
+			// design — it never throws.
+			getScope,
 		};
 	}
 

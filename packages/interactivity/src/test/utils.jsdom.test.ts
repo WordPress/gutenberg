@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { kebabToCamelCase, withScope } from '../utils';
+import { kebabToCamelCase, withScope, afterNextFrame } from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';
 
@@ -23,6 +23,62 @@ describe( 'Interactivity API', () => {
 			expect( kebabToCamelCase( '-my-item' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( 'my-item-' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( '-my-item-' ) ).toBe( 'myItem' );
+		} );
+	} );
+
+	describe( 'afterNextFrame', () => {
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
+		it( 'runs on a macrotask, never on microtasks alone, and only on the timeout arm when requestAnimationFrame never fires', async () => {
+			jest.useFakeTimers();
+			// Prevent the `requestAnimationFrame` arm from ever resolving, so
+			// only the 100 ms `setTimeout` fallback arm is left standing.
+			const raf = jest
+				.spyOn( window, 'requestAnimationFrame' )
+				.mockImplementation( () => 0 );
+
+			try {
+				const callback = jest.fn();
+				afterNextFrame( callback );
+
+				// Drain twenty microtask turns without advancing any timer.
+				// A body reduced to `Promise.resolve().then( callback )`
+				// would have already run by now; the real implementation
+				// needs a macrotask, so it must not have.
+				for ( let i = 0; i < 20; i++ ) {
+					await Promise.resolve();
+				}
+				expect( callback ).not.toHaveBeenCalled();
+
+				// Still short of the 100 ms timeout arm.
+				await jest.advanceTimersByTimeAsync( 50 );
+				expect( callback ).not.toHaveBeenCalled();
+
+				// The 100 ms timeout arm fires, and with it the trailing
+				// macrotask `setTimeout` that runs the callback.
+				await jest.advanceTimersByTimeAsync( 51 );
+				expect( callback ).toHaveBeenCalledTimes( 1 );
+			} finally {
+				raf.mockRestore();
+			}
+		} );
+
+		it( 'runs one macrotask after the arm that resolves it, not inside that arm’s own turn', async () => {
+			jest.useFakeTimers();
+
+			// The `requestAnimationFrame` arm is backed by a 16 ms fake
+			// timer here, so a callback registered at t=0 has not run by
+			// t=16 ms — it runs one macrotask later, at t=17 ms.
+			const callback = jest.fn();
+			afterNextFrame( callback );
+
+			await jest.advanceTimersByTimeAsync( 16 );
+			expect( callback ).not.toHaveBeenCalled();
+
+			await jest.advanceTimersByTimeAsync( 1 );
+			expect( callback ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
