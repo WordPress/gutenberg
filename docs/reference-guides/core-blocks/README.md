@@ -682,7 +682,7 @@ Display a custom date.
 
 -	**Name:** [core/post-date](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-date/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** datetime, format, isLink
 
 ## Excerpt
