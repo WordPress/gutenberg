@@ -7,8 +7,10 @@ import { data as allData, fields } from './fixtures';
 
 const HierarchicalLevelsComponent = ( {
 	showLevels = true,
+	groupBy = false,
 }: {
 	showLevels?: boolean;
+	groupBy?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
@@ -24,15 +26,27 @@ const HierarchicalLevelsComponent = ( {
 		},
 		titleField: 'title',
 		mediaField: 'image',
-		showLevels: true,
+		showLevels,
+		groupBy: groupBy
+			? {
+					field: 'isPlanet',
+					direction: 'asc',
+				}
+			: undefined,
 	} );
 
 	useEffect( () => {
 		setView( ( prevView ) => ( {
 			...prevView,
 			showLevels,
+			groupBy: groupBy
+				? {
+						field: 'isPlanet',
+						direction: 'asc',
+					}
+				: undefined,
 		} ) );
-	}, [ showLevels ] );
+	}, [ groupBy, showLevels ] );
 
 	const { data, paginationInfo } = filterSortAndPaginate(
 		allData,

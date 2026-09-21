@@ -254,6 +254,26 @@ export const HierarchicalLevels = {
 	},
 };
 
+export const GroupedHierarchicalLevels = {
+	render: HierarchicalLevelsComponent,
+	args: {
+		showLevels: true,
+		groupBy: true,
+	},
+	argTypes: {
+		showLevels: {
+			control: 'boolean',
+			description:
+				'Whether the table orders and indents loaded items using their parent relationships',
+		},
+		groupBy: {
+			control: 'boolean',
+			description:
+				'Whether items are grouped by "Is Planet". Parent relationships are resolved within each group, so an item whose parent is in another group renders as a root',
+		},
+	},
+};
+
 export const Empty = {
 	render: EmptyComponent,
 	args: {
