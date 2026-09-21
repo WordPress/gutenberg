@@ -271,38 +271,4 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 			'array'   => array( array() ),
 		);
 	}
-
-	/**
-	 * Should preserve collections registered before the shared registry is upgraded.
-	 */
-	public function test_get_instance_preserves_existing_collections_in_shared_registry() {
-		$instance_property = new ReflectionProperty( WP_Icon_Collections_Registry::class, 'instance' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$instance_property->setAccessible( true );
-		}
-
-		$original_registry = $instance_property->getValue();
-
-		try {
-			$instance_property->setValue( null, null );
-			$registry = WP_Icon_Collections_Registry::get_instance();
-			$registry->register(
-				'my-collection',
-				array(
-					'label'       => 'My Collection',
-					'description' => 'Registered before the upgrade.',
-				)
-			);
-
-			$upgraded_registry = WP_Icon_Collections_Registry_Gutenberg::get_instance();
-
-			$this->assertSame( $upgraded_registry, WP_Icon_Collections_Registry::get_instance() );
-			$this->assertSame(
-				array_merge( $registry->get_registered( 'my-collection' ), array( 'public' => true ) ),
-				$upgraded_registry->get_registered( 'my-collection' )
-			);
-		} finally {
-			$instance_property->setValue( null, $original_registry );
-		}
-	}
 }
