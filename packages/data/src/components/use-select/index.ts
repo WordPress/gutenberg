@@ -206,10 +206,14 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 
 			const unsubs: Array< () => number | void > = [];
 			function subscribeStore( storeName: string ) {
-				// A store that isn't registered anywhere yet gets a plain
-				// per-hook subscription: `registry.subscribe` would fall back
-				// to the registry-wide emitter, and a shared bucket must not
-				// pin that fallback for later subscribers.
+				// For a store that isn't registered yet, `registry.subscribe`
+				// falls back to the registry-wide emitter, which fires on
+				// every store's update. A shared bucket would cache that
+				// fallback and hand it to hooks that subscribe after the store
+				// registers, so those stores keep a plain per-hook
+				// subscription instead. `select` is the registration probe
+				// because it resolves through parent registries, the same way
+				// `subscribe` does.
 				if ( isAsync && registry.select( storeName ) !== undefined ) {
 					unsubs.push(
 						subscribeDeferred(
