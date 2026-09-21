@@ -194,7 +194,7 @@ Block hydration and initialization code should not depend on DOM ready events su
 </div>
 ```
 
-For code that needs to run on every navigation — such as analytics page-view tracking — use `data-wp-watch` with a reactive value that changes on each navigation, like the current URL from the global state:
+For code that needs to re-run whenever the URL changes — such as analytics page-view tracking — use `data-wp-watch` with a reactive value from the global state, like the current URL:
 
 ```js
 import { store } from '@wordpress/interactivity';
@@ -202,7 +202,7 @@ import { store } from '@wordpress/interactivity';
 store( 'myPlugin', {
 	callbacks: {
 		logPageView() {
-			// Re-runs on every navigation because state.url changes.
+			// Re-runs whenever state.url changes.
 			const { url } = store( 'core/router' ).state;
 			// Send analytics event for the new URL.
 			sendPageView( url );
@@ -217,7 +217,7 @@ store( 'myPlugin', {
 </div>
 ```
 
-From WordPress 7.0, you can also use the `watch` util to reexecute code on every navigation.
+From WordPress 7.0, you can also use the `watch` util to reexecute code when the URL changes.
 
 ```js
 import { store, watch } from '@wordpress/interactivity';
@@ -228,6 +228,17 @@ watch( () => {
 	sendPageView( url );
 } );
 ```
+
+**`state.url` does not change on every navigation.** Both examples above re-run when the URL changes, which is what page-view tracking asks for, but neither is a general "run this on every navigation" hook. Assigning a reactive value the same value it already holds publishes nothing, so a navigation to the page you are already on — the `navigate( window.location.href, { force: true } )` refresh pattern this handbook teaches for [showing fresh content after a form submission](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#the-internal-in-memory-page-cache) — produces no `state.url` notification at all, with either primitive above, and a callback keyed on `state.url` simply never runs. Nothing else about that navigation is unusual: the page is re-fetched, the regions are re-rendered, and the router publishes both of its navigation lifecycle transitions as it would for any other navigation.
+
+Work that has to run on _every_ navigation therefore belongs on the router's navigation lifecycle rather than on the URL. See [The navigation lifecycle keys](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#the-navigation-lifecycle-keys) and [When each transition happens](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#when-each-transition-happens) in the Client-Side Navigation guide, and [Recipe: region-scoped focus after navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#recipe-region-scoped-focus-after-navigation) for the shape of a callback that fires exactly once at the end of each navigation.
+
+**If the callback queries the DOM, the primitive you picked decides what it sees.** The router assigns `state.url` in the same batch that renders the new page, so the two examples above do not observe the same document:
+
+-   The `data-wp-watch` callback is deferred by a frame, which puts it after the new content has been committed: it observes the **new** DOM.
+-   The `watch()` callback runs synchronously the moment `state.url` changes, which is before the regions have re-rendered: it observes the **old** DOM.
+
+Neither example is affected, because both read store state and nothing else. It starts to matter as soon as a callback measures an element, reads its text, or attaches something to it — written with `watch()` and keyed on `state.url`, that callback is inspecting the outgoing page. Re-initialization that touches the newly rendered content belongs on the lifecycle end transition, which is published after the commit; [Choosing where to read the lifecycle](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#choosing-where-to-read-the-lifecycle) compares the primitives on this point.
 
 #### Use `getServerState()` and `getServerContext()` to sync server data
 
@@ -316,6 +327,7 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   The block uses script modules, not regular `<script>` tags.
 -   The block does not import from `window.wp.*` globals — it uses ES module imports instead.
 -   The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
+-   If the block has work that must run on every navigation, that work is keyed on the router's navigation lifecycle, not on `state.url`, which does not change on a navigation to the current URL.
 -   If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
 -   Lists of sibling elements that can change between navigations use `data-wp-key`.
 -   The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).
