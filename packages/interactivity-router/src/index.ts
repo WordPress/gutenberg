@@ -391,10 +391,11 @@ const LIFECYCLE_RELEASE_BOUND = 10000;
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 //
-// Five end-write sites exist in this file: `navigate()`'s `finally`, this
-// handler's cached-branch scheduled end, this handler's `catch`, and the
-// lifecycle release armed at the popstate claim frame and immediately before
-// `navigate()`'s fallback yield. Every one of them is guarded by
+// Six end-write sites exist in this file: `navigate()`'s `finally`, this
+// handler's cached-branch scheduled end, this handler's `catch`, the two
+// reload-path discharges, and the lifecycle release armed at the popstate
+// claim frame and immediately before `navigate()`'s fallback yield. Every one
+// of them is guarded by
 // `currentNavigationId === token`; a future lifecycle write added without
 // that guard would reintroduce spurious end transitions. The popstate frame
 // carries no directive scope, so -- unlike `navigate()`'s start and commit
@@ -416,7 +417,7 @@ window.addEventListener( 'popstate', async () => {
 	// between this timer's guard and its write, so it is the one end-write site
 	// legitimately exempt from the "re-check after every suspension" rule the
 	// other three follow, and the one write site outside a terminal-write
-	// structure (the `try`/`catch` below). Never cleared on a designed exit --
+	// structure (this claim-frame release). Never cleared on a designed exit --
 	// the guard already no-ops there.
 	setTimeout( () => {
 		if ( currentNavigationId === token && state.navigating ) {
@@ -430,7 +431,30 @@ window.addEventListener( 'popstate', async () => {
 	// code having run beforehand, so a throwing watcher can never suppress
 	// the reload -- structurally restoring that property of today's code.
 	if ( ! pages.has( pagePath ) ) {
-		window.location.reload();
+		try {
+			window.location.reload();
+		} finally {
+			// Discharge a displaced claim and clear an identity retained while
+			// idle. Reload remains first, so no effect-running write can prevent
+			// it; the per-key checks preserve absent keys and avoid notifying a
+			// watcher when there is nothing to clear. The release armed above
+			// sees the settled claim and its guard makes its later write a no-op.
+			if (
+				currentNavigationId === token &&
+				( state.navigating ||
+					( state.initiator !== null &&
+						state.initiator !== undefined ) )
+			) {
+				batch( () => {
+					if ( state.navigating ) {
+						state.navigating = false;
+					}
+					if ( state.initiator !== null ) {
+						state.initiator = null;
+					}
+				} );
+			}
+		}
 		return;
 	}
 
@@ -446,10 +470,30 @@ window.addEventListener( 'popstate', async () => {
 
 		const page = await pages.get( pagePath );
 
-		// A cached entry that resolves falsy reloads on a normal return,
-		// writing nothing beyond the clear above.
+		// A cached entry that resolves falsy reloads on a normal return. The
+		// reload remains first, and its finally discharges a displaced claim
+		// or clears an identity retained while idle, writing only keys whose
+		// values differ.
 		if ( ! page ) {
-			window.location.reload();
+			try {
+				window.location.reload();
+			} finally {
+				if (
+					currentNavigationId === token &&
+					( state.navigating ||
+						( state.initiator !== null &&
+							state.initiator !== undefined ) )
+				) {
+					batch( () => {
+						if ( state.navigating ) {
+							state.navigating = false;
+						}
+						if ( state.initiator !== null ) {
+							state.initiator = null;
+						}
+					} );
+				}
+			}
 			return;
 		}
 
@@ -483,18 +527,14 @@ window.addEventListener( 'popstate', async () => {
 			} );
 		}
 	} catch ( error ) {
-		// A `finally` is the wrong tool here, and the asymmetry with
-		// `navigate()` is deliberate, not an inconsistency: `navigate()`'s
-		// designed *non-writing* exit is a suspension (a parked generator
-		// never runs its `finally`), while this handler's designed
-		// non-writing exits are normal returns (the two reloads above),
-		// which a `finally` cannot tell apart from a writing path without
-		// destroying those reload-path readings. Only exceptional-vs-
-		// designed carves this handler correctly, so exceptional exits
-		// discharge through this `catch` instead, which schedules the
-		// guarded idle restoration and rethrows immediately, with nothing
-		// suspending between the two, so the rethrow's timing is
-		// unchanged from today's.
+		// The reload branches use narrow `try`/`finally` blocks so each
+		// discharge runs after its reload, even if the reload throws. A broad
+		// `finally` around this handler would still conflate those designed
+		// reload exits with the cached render path and publish an end where no
+		// lifecycle cycle began. Exceptional exits discharge through this
+		// `catch` instead, which schedules the guarded idle restoration and
+		// rethrows immediately, with nothing suspending between the two, so the
+		// rethrow's timing is unchanged from today's.
 		if ( currentNavigationId === token && state.navigating ) {
 			afterNextFrame( () => {
 				if ( currentNavigationId === token ) {

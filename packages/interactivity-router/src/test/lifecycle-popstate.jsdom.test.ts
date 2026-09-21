@@ -1,6 +1,6 @@
 /**
  * The popstate handler: claim, uncached-first, conditional clear, guarded
- * start/end, `catch`, and bounded release.
+ * start/end, reload-path discharge, `catch`, and bounded release.
  *
  * Like every other file in this directory, this suite is exercised through a
  * Vitest module mock that assembles the real implementations of everything
@@ -234,6 +234,37 @@ function hydrateWatcher( namespace: string ) {
 }
 
 describe( 'the popstate handler', () => {
+	test( 'row 2a — uncached traversal from a clean idle state runs no consumer code before the reload and writes nothing', async () => {
+		expect( state.navigating ).toBeUndefined();
+		expect( state.initiator ).toBeUndefined();
+
+		let adversarialRuns = 0;
+		const dispose = effect( () => {
+			// Read both keys to subscribe.
+			void state.navigating;
+			void state.initiator;
+			adversarialRuns++;
+			if ( adversarialRuns > 1 ) {
+				throw new Error(
+					'adversarial watcher must never run on an uncached traversal'
+				);
+			}
+		} );
+
+		pushStateTo( '/popstate-row2a-absent' );
+		dispatchPopstate();
+		await advanceOneFrame();
+
+		dispose();
+
+		expect( adversarialRuns ).toBe( 1 );
+		expect( state.navigating ).toBeUndefined();
+		expect( state.initiator ).toBeUndefined();
+		// jsdom reports "Not implemented: navigation (except hash changes)"
+		// through console.error when window.location.reload() runs.
+		expect( console ).toHaveErrored();
+	} );
+
 	test( 'row 1 — cached, truthy entry, from idle: a full lifecycle cycle observed through a real hydrated data-wp-watch', async () => {
 		const runs = hydrateWatcher( 'test/popstate-row1' );
 		await advanceOneFrame();
@@ -280,33 +311,7 @@ describe( 'the popstate handler', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
-	test( 'row 2a — uncached traversal, from idle: no consumer code runs before the reload, and no lifecycle write happens', async () => {
-		let adversarialRuns = 0;
-		const dispose = effect( () => {
-			// Read both keys to subscribe.
-			void state.navigating;
-			void state.initiator;
-			adversarialRuns++;
-			if ( adversarialRuns > 1 ) {
-				throw new Error(
-					'adversarial watcher must never run on an uncached traversal'
-				);
-			}
-		} );
-
-		pushStateTo( '/popstate-row2a-absent' );
-		dispatchPopstate();
-		await advanceOneFrame();
-
-		dispose();
-
-		expect( adversarialRuns ).toBe( 1 );
-		// jsdom reports "Not implemented: navigation (except hash changes)"
-		// through console.error when window.location.reload() runs.
-		expect( console ).toHaveErrored();
-	} );
-
-	test( 'row 2b — uncached traversal superseding a navigation in flight writes nothing at all (pins the uncached-first ordering)', async () => {
+	test( 'row 2b — uncached traversal superseding a navigation in flight discharges the displaced claim without starting a cycle', async () => {
 		const { fetchMock } = makeDeferredFetch();
 		window.fetch = fetchMock as unknown as typeof window.fetch;
 
@@ -331,32 +336,104 @@ describe( 'the popstate handler', () => {
 		dispatchPopstate();
 		await advanceOneFrame();
 
-		dispose();
-
-		expect( raw.slice( 1 ) ).toEqual( [] );
-		expect( state.navigating ).toBe( true );
-		expect( state.initiator ).toBe( 'region-x' );
+		expect( raw.slice( 1 ) ).toEqual( [ { n: false, i: null } ] );
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBeNull();
 		expect( console ).toHaveErrored();
 
-		// Clean up: popstate's own release (armed under its own claim,
-		// still current -- the in-flight navigate() above never
-		// superseded it) restores idle at its bound. Advancing past it
-		// here, before this test's fake timers are torn down, keeps a
-		// stale reading from leaking into a later test sharing this
-		// file's one module instance. The in-flight navigate() has not
-		// reached its fallback, so that navigation's release is not armed;
-		// a timer armed under fake timers never fires once they're torn
-		// down.
+		// The release armed by this traversal reaches its bound later, but
+		// its guard sees the already-settled claim and must not notify again.
 		await vi.advanceTimersByTimeAsync( 10600 );
+		expect( raw.slice( 1 ) ).toEqual( [ { n: false, i: null } ] );
 		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBeNull();
+		dispose();
 
 		// Left permanently unresolved -- its own token is stale from the
-		// moment popstate claimed a newer one, so it can never write
-		// again.
+		// moment popstate claimed a newer one, so it can never write again.
 		void inFlight;
 	} );
 
-	test( 'row 3 — a cached entry that resolves falsy: no start pair, no end, reload on a normal return', async () => {
+	test( 'row 2c — an uncached traversal clears an identity retained after a completed navigation with one notification', async () => {
+		await actions.navigate( 'http://localhost/popstate-row2c-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row2c-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBe( 'region-x' );
+
+		const { raw, dispose } = rawLifecycleLog();
+
+		pushStateTo( '/popstate-row2c-absent' );
+		dispatchPopstate();
+		await advanceOneFrame();
+
+		dispose();
+
+		expect( raw.slice( 1 ) ).toEqual( [ { n: false, i: null } ] );
+		expect( {
+			navigating: state.navigating,
+			initiator: state.initiator,
+		} ).toEqual( {
+			navigating: false,
+			initiator: null,
+		} );
+		expect( console ).toHaveErrored();
+	} );
+
+	test( 'row 2d — an uncached traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
+		await actions.navigate( 'http://localhost/popstate-row2d-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row2d-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+
+		let shouldThrow = false;
+		const dispose = effect( () => {
+			// Read both keys to subscribe to every lifecycle write.
+			void state.navigating;
+			void state.initiator;
+			if ( shouldThrow ) {
+				throw new Error( 'consumer-effect-throw-before-reload' );
+			}
+		} );
+		shouldThrow = true;
+
+		pushStateTo( '/popstate-row2d-absent' );
+
+		expect( capturedPopstateHandler ).toBeDefined();
+		let settled: 'resolved' | 'rejected' | undefined;
+		let rethrown: unknown;
+		capturedPopstateHandler!().then(
+			() => {
+				settled = 'resolved';
+			},
+			( error: unknown ) => {
+				settled = 'rejected';
+				rethrown = error;
+			}
+		);
+
+		await advanceOneFrame();
+
+		shouldThrow = false;
+		dispose();
+
+		// The reload's jsdom diagnostic proves that it ran before the
+		// discharge's effect-running write rejected the handler.
+		expect( console ).toHaveErrored();
+		expect( settled ).toBe( 'rejected' );
+		expect( ( rethrown as Error ).message ).toBe(
+			'consumer-effect-throw-before-reload'
+		);
+	} );
+
+	test( 'row 3a — a cached entry that resolves falsy from idle stays silent and reloads on a normal return', async () => {
 		window.fetch = vi.fn( async () => ( {
 			status: 404,
 			text: async () => '',
@@ -378,6 +455,95 @@ describe( 'the popstate handler', () => {
 		expect( state.navigating ).toBe( beforeNavigating );
 		expect( state.initiator ).toBe( beforeInitiator );
 		expect( console ).toHaveErrored();
+	} );
+
+	test( 'row 3b — a cached falsy entry clears an identity retained after a completed navigation', async () => {
+		await actions.navigate( 'http://localhost/popstate-row3b-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row3b-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBe( 'region-x' );
+
+		window.fetch = vi.fn( async () => ( {
+			status: 404,
+			text: async () => '',
+		} ) ) as unknown as typeof window.fetch;
+		await actions.prefetch( 'http://localhost/popstate-row3b-dest' );
+
+		const { raw, dispose } = rawLifecycleLog();
+
+		pushStateTo( '/popstate-row3b-dest' );
+		dispatchPopstate();
+		await advanceOneFrame();
+
+		dispose();
+
+		expect( raw.slice( 1 ) ).toEqual( [ { n: false, i: null } ] );
+		expect( {
+			navigating: state.navigating,
+			initiator: state.initiator,
+		} ).toEqual( {
+			navigating: false,
+			initiator: null,
+		} );
+		expect( console ).toHaveErrored();
+	} );
+
+	test( 'row 3c — a cached falsy traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
+		await actions.navigate( 'http://localhost/popstate-row3c-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row3c-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+
+		window.fetch = vi.fn( async () => ( {
+			status: 404,
+			text: async () => '',
+		} ) ) as unknown as typeof window.fetch;
+		await actions.prefetch( 'http://localhost/popstate-row3c-dest' );
+
+		let shouldThrow = false;
+		const dispose = effect( () => {
+			// Read both keys to subscribe to every lifecycle write.
+			void state.navigating;
+			void state.initiator;
+			if ( shouldThrow ) {
+				throw new Error( 'consumer-effect-throw-before-falsy-reload' );
+			}
+		} );
+		shouldThrow = true;
+
+		pushStateTo( '/popstate-row3c-dest' );
+
+		expect( capturedPopstateHandler ).toBeDefined();
+		let settled: 'resolved' | 'rejected' | undefined;
+		let rethrown: unknown;
+		capturedPopstateHandler!().then(
+			() => {
+				settled = 'resolved';
+			},
+			( error: unknown ) => {
+				settled = 'rejected';
+				rethrown = error;
+			}
+		);
+
+		await advanceOneFrame();
+
+		shouldThrow = false;
+		dispose();
+
+		expect( console ).toHaveErrored();
+		expect( settled ).toBe( 'rejected' );
+		expect( ( rethrown as Error ).message ).toBe(
+			'consumer-effect-throw-before-falsy-reload'
+		);
 	} );
 
 	test( 'row 4 — plain idle traversal to a cached entry: the clear notifies nobody (raw effect(), the opposite instrument of row 1)', async () => {
