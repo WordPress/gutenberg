@@ -770,7 +770,7 @@ store( 'myPlugin', {
 ```
 
 <div class="callout callout-info">
-Blocks can read the `core/router` store without importing the `@wordpress/interactivity-router` package. When the router module evaluates, it initializes `state.url` from the current location unless the server has already seeded it. If the module never loads, `state.url` is `undefined`; see [The navigation lifecycle keys](#the-navigation-lifecycle-keys) for the router-absent behavior.
+Blocks can read the `core/router` store without importing the `@wordpress/interactivity-router` package. When the router module evaluates, it initializes `state.url` from the current location unless the server has already seeded it. If the module never loads, `state.url` is `undefined` only when the server has not seeded `core/router.url`; `@wordpress/interactivity` merges a server-seeded value into the `core/router` store, so that value remains readable without the router module. See [The navigation lifecycle keys](#the-navigation-lifecycle-keys) for the router-absent behavior.
 </div>
 
 ## Reacting to the navigation lifecycle
