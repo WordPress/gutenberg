@@ -560,7 +560,8 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Filters`
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
--   `DataViews.Pagination`
+-   `DataViews.Pagination`: the page select and the previous/next buttons. Given children, it renders those in their place instead.
+-   `DataViews.PageSelect`: the pagination's "Page N of M" select on its own, for a footer with room for one pagination control next to its actions.
 -   `DataViews.BulkActionToolbar`
 -   `DataViews.ViewConfig`
 
@@ -773,7 +774,18 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition.
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer` (the bulk selection info, the pagination and the actions), `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`.
+
+`DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for, without wrappers or styles of its own:
+
+```jsx
+<DataViewsPicker.Footer>
+	<DataViewsPicker.Pagination>
+		<DataViewsPicker.PageSelect />
+	</DataViewsPicker.Pagination>
+	<DataViewsPicker.Actions />
+</DataViewsPicker.Footer>
+```
 
 **Unsupported properties:**
 

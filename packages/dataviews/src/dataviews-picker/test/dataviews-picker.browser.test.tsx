@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
@@ -114,6 +115,7 @@ function Picker( {
 	multiselect?: boolean;
 	layout?: PickerLayout;
 	fields?: Field< Data >[];
+	children?: ReactNode;
 } ) {
 	const [ view, setView ] = useState< View >( {
 		type: layout,
@@ -676,6 +678,46 @@ describe( 'DataViews Picker', () => {
 				data[ 0 ].id.toString(),
 				data[ 2 ].id.toString(),
 			] );
+		} );
+	} );
+
+	describe( 'Footer composition', () => {
+		it( 'renders the parts composed inside the footer and the pagination', async () => {
+			await render(
+				<Picker actions={ singleSelectActions } view={ { perPage: 2 } }>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer>
+						<DataViewsPicker.Pagination>
+							<DataViewsPicker.PageSelect />
+						</DataViewsPicker.Pagination>
+						<DataViewsPicker.Actions />
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			// The page select and the action render in place of the default
+			// footer parts: no selection info, no previous/next buttons.
+			const pageSelect = screen.getByRole( 'combobox', {
+				name: 'Current page',
+			} );
+			expect( pageSelect ).toHaveValue( '1' );
+			expect(
+				screen.getByRole( 'button', { name: 'Confirm' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByText( '2 of 3 Items' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Next page' } )
+			).not.toBeInTheDocument();
+
+			// The page select paginates on its own.
+			const user = userEvent.setup();
+			await user.selectOptions( pageSelect, '2' );
+			expect( pageSelect ).toHaveValue( '2' );
+			expect(
+				within( screen.getByRole( 'listbox' ) ).getAllByRole( 'option' )
+			).toHaveLength( 1 );
 		} );
 	} );
 

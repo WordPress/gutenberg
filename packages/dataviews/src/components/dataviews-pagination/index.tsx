@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
 	Button,
 	SelectControl as WCSelectControl,
@@ -20,7 +21,7 @@ export function hasPaginationControls(
 	);
 }
 
-export function DataViewsPagination() {
+export function DataViewsPageSelect() {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -52,75 +53,101 @@ export function DataViewsPagination() {
 	return (
 		<Stack
 			direction="row"
+			justify="flex-start"
+			align="center"
+			gap="xs"
+			className="dataviews-pagination__page-select"
+		>
+			{ createInterpolateElement(
+				sprintf(
+					// translators: 1: Current page number, 2: Total number of pages.
+					_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
+					'<CurrentPage />',
+					totalPages
+				),
+				{
+					div: <div aria-hidden />,
+					// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
+					CurrentPage: (
+						<WCSelectControl
+							aria-label={ __( 'Current page' ) }
+							value={ currentPage.toString() }
+							options={ pageSelectOptions }
+							onChange={ ( newValue ) => {
+								onChangeView( {
+									...view,
+									page: +newValue,
+								} );
+							} }
+							size="small"
+							variant="minimal"
+						/>
+					),
+				}
+			) }
+		</Stack>
+	);
+}
+
+// The page select and the previous/next buttons. Given children, it renders
+// those in their place instead, so a footer with room for one control can
+// compose the pagination from `DataViewsPageSelect` alone, for instance.
+export function DataViewsPagination( { children }: { children?: ReactNode } ) {
+	const { view, onChangeView, paginationInfo } =
+		useContext( DataViewsContext );
+
+	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+		return null;
+	}
+
+	const { totalPages } = paginationInfo;
+	const currentPage = view.page ?? 1;
+
+	return (
+		<Stack
+			direction="row"
 			className="dataviews-pagination"
 			justify="end"
 			align="center"
 			gap="xl"
 		>
-			<Stack
-				direction="row"
-				justify="flex-start"
-				align="center"
-				gap="xs"
-				className="dataviews-pagination__page-select"
-			>
-				{ createInterpolateElement(
-					sprintf(
-						// translators: 1: Current page number, 2: Total number of pages.
-						_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
-						'<CurrentPage />',
-						totalPages
-					),
-					{
-						div: <div aria-hidden />,
-						// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
-						CurrentPage: (
-							<WCSelectControl
-								aria-label={ __( 'Current page' ) }
-								value={ currentPage.toString() }
-								options={ pageSelectOptions }
-								onChange={ ( newValue ) => {
-									onChangeView( {
-										...view,
-										page: +newValue,
-									} );
-								} }
-								size="small"
-								variant="minimal"
-							/>
-						),
-					}
-				) }
-			</Stack>
-			<Stack direction="row" gap="xs" align="center">
-				<Button
-					onClick={ () =>
-						onChangeView( {
-							...view,
-							page: currentPage - 1,
-						} )
-					}
-					disabled={ currentPage === 1 }
-					accessibleWhenDisabled
-					label={ __( 'Previous page' ) }
-					icon={ isRTL() ? next : previous }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-				<Button
-					onClick={ () =>
-						onChangeView( { ...view, page: currentPage + 1 } )
-					}
-					disabled={ currentPage >= totalPages }
-					accessibleWhenDisabled
-					label={ __( 'Next page' ) }
-					icon={ isRTL() ? previous : next }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-			</Stack>
+			{ children ?? (
+				<>
+					<DataViewsPageSelect />
+					<Stack direction="row" gap="xs" align="center">
+						<Button
+							onClick={ () =>
+								onChangeView( {
+									...view,
+									page: currentPage - 1,
+								} )
+							}
+							disabled={ currentPage === 1 }
+							accessibleWhenDisabled
+							label={ __( 'Previous page' ) }
+							icon={ isRTL() ? next : previous }
+							showTooltip
+							size="compact"
+							tooltipPosition="top"
+						/>
+						<Button
+							onClick={ () =>
+								onChangeView( {
+									...view,
+									page: currentPage + 1,
+								} )
+							}
+							disabled={ currentPage >= totalPages }
+							accessibleWhenDisabled
+							label={ __( 'Next page' ) }
+							icon={ isRTL() ? previous : next }
+							showTooltip
+							size="compact"
+							tooltipPosition="top"
+						/>
+					</Stack>
+				</>
+			) }
 		</Stack>
 	);
 }
