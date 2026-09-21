@@ -115,8 +115,16 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, callback } = action;
+				const { id, label, icon, isPrimary, isEligible, callback } =
+					action;
 
+				// The label reflects the selection; eligibility only
+				// controls whether the action can run on it. `items` holds
+				// the current page only, so an action without `isEligible`
+				// stays enabled for a selection made on other pages.
+				const eligibleItems = isEligible
+					? items.filter( ( item ) => isEligible( item ) )
+					: items;
 				const _label =
 					typeof label === 'string' ? label : label( items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
@@ -127,11 +135,15 @@ function ActionButtons< Item >( {
 						key={ id }
 						accessibleWhenDisabled
 						icon={ icon }
-						disabled={ isInProgress || ! selection?.length }
+						disabled={
+							isInProgress ||
+							! selection?.length ||
+							( !! isEligible && ! eligibleItems.length )
+						}
 						isBusy={ isInProgress }
 						onClick={ async () => {
 							setActionInProgress( id );
-							await callback( items, {
+							await callback( eligibleItems, {
 								registry,
 							} );
 							setActionInProgress( null );
