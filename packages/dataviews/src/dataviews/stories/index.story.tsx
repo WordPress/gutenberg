@@ -12,7 +12,6 @@ import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-import './style.css';
 
 const meta = {
 	tags: [ 'manifest' ],
