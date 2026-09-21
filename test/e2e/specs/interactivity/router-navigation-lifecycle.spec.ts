@@ -52,6 +52,29 @@ const waitForLogLength = async (
 };
 
 /**
+ * Waits, by polling, for the counted lifecycle log to contain at least one
+ * truthy-navigating entry. This is the positive evidence Task 9's full-page
+ * flows lead with: in full-page mode the whole BODY is the router region, so
+ * the counted observer's own `data-wp-watch` element is torn down and
+ * re-created on every navigation and its run **count** is not a transition
+ * record there -- but `state.log` is module state and survives the region
+ * swap, so its **content** still is. Without this checkpoint, "the initiator
+ * reads absent" would also be satisfied by a lifecycle that never fired at
+ * all.
+ *
+ * @param page The Playwright page.
+ */
+const waitForTruthyLogEntry = async ( page: Page ) => {
+	await expect
+		.poll( async () =>
+			( await readLog( page, 'lifecycle log' ) ).some(
+				( entry ) => entry.navigating === 'navigating'
+			)
+		)
+		.toBe( true );
+};
+
+/**
  * The mandatory settle for every negative assertion in this file: two
  * animation frames flushed inside the page. `afterNextFrame` resolves on a
  * `setTimeout` nested inside its `requestAnimationFrame` callback, so a
@@ -284,6 +307,33 @@ test.describe( 'Router navigation lifecycle', () => {
 				page: 'nested-1',
 				nested: true,
 				next: nestedPage2,
+			},
+		} );
+
+		/*
+		 * Task 9's inventory, rows 13-14: the full-page mode fixture
+		 * (`test/router-navigation-full-page`), a distinct block from the
+		 * region-mode fixture above. Every plain link and every navigate
+		 * control on page 1 targets page 2, so Flows 21-23 differ only in
+		 * *what* was clicked, never in *where* it went.
+		 */
+
+		// Row 13: full-page mode's destination. No `next`.
+		const fullPagePage2 = await utils.addPostWithBlock(
+			'test/router-navigation-full-page',
+			{
+				alias: 'full-page - page 2',
+				attributes: { page: 'fp-2', regionId: 'full-page-a' },
+			}
+		);
+
+		// Row 14: the origin for Flows 21-23.
+		await utils.addPostWithBlock( 'test/router-navigation-full-page', {
+			alias: 'full-page - page 1',
+			attributes: {
+				page: 'fp-1',
+				regionId: 'full-page-a',
+				next: fullPagePage2,
 			},
 		} );
 	} );
@@ -1156,6 +1206,123 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect(
 				page.getByTestId( 'lifecycle initiator' )
 			).toHaveText( 'query-1' );
+		} );
+	} );
+
+	test.describe( 'Full-page navigation mode', () => {
+		/*
+		 * The first e2e coverage of `gutenberg-full-page-client-side-
+		 * navigation` in this repository -- there is no per-post switch, it
+		 * is global while enabled, and Playwright runs this project with a
+		 * single worker. So the reset in `afterAll` below is unconditional:
+		 * a leaked experiment would not fail this task, it would corrupt
+		 * every spec that runs after it, including the four existing router
+		 * suites in this task's own gate.
+		 */
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-full-page-client-side-navigation',
+			] );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		test( 'Flow 21a: a plain link outside every block region reads as having no initiator', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'full-page - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			await page.getByTestId( 'plain-link-outside-region' ).click();
+
+			// Positive evidence a transition fired at all, before asserting
+			// which identity was reported -- see `waitForTruthyLogEntry`.
+			await waitForTruthyLogEntry( page );
+			// The navigation actually landed on page 2.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: fp-2'
+			);
+			// `initiator` is retained through the end, so this reading is
+			// stable once the navigation has landed and needs no held
+			// request.
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+		} );
+
+		test( 'Flow 21b: a plain link inside a router region reads as having no initiator -- DOM containment is not initiation', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'full-page - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			await page.getByTestId( 'plain-link-inside-region' ).click();
+
+			await waitForTruthyLogEntry( page );
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: fp-2'
+			);
+			// Not `full-page-a`, even though the link sits inside that
+			// region: it is handled by the full-page document click
+			// listener, which carries no ambient directive scope, not by
+			// any scoped action.
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+		} );
+
+		test( "Flow 22: a click handled by a block's own action is identified", async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'full-page - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			await page.getByTestId( 'navigate-inside-region' ).click();
+
+			await waitForTruthyLogEntry( page );
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: fp-2'
+			);
+			// The identical reading region-mode would produce for the same
+			// shape of click -- not `core/body`, which would mean the
+			// full-page listener's own frame reached the derivation instead
+			// of the block's own scoped action (the full-page listener
+			// never even sees this event: it skips default-prevented
+			// clicks, and this action's first statement is
+			// `e.preventDefault()`).
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'full-page-a' );
+		} );
+
+		test( 'Flow 23: a scoped element outside every block region derives core/body', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'full-page - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			await page.getByTestId( 'navigate-outside-region' ).click();
+
+			await waitForTruthyLogEntry( page );
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: fp-2'
+			);
+			// This control's nearest enclosing `data-wp-router-region` is
+			// the BODY the full-page PHP class marks `core/body` -- the
+			// documented mode difference (Requirement 12). Together with
+			// Flow 21b (a plain link in the very same position reads
+			// absent), no single wrong derivation satisfies both: one that
+			// stops at block regions, or that special-cases BODY to `null`,
+			// would read absent here instead.
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'core/body' );
 		} );
 	} );
 } );
