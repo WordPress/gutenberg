@@ -588,15 +588,16 @@ let currentNavigationId = 0;
 //
 // Marked at exactly **two** sites — the start `batch()` and the existing
 // commit batch below — with save-and-restore
-// (`const prev = writeFrameScope; writeFrameScope = entryScope; …write…;
-// writeFrameScope = prev;`), never set-and-clear. Write spans nest (a
-// reactive navigation started from inside another navigation's write
-// span), and a set-and-clear form leaks: the inner span's clear re-opens
-// inheritance for an effect deferred to the outer flush, so a third-level
-// navigation started from that effect would wrongly inherit the outer
-// navigation's region. Save-and-restore keeps the outer span's scope
-// installed once the inner span closes, and for a top-level navigation the
-// restored value is `undefined`, so off-frame behaviour is unchanged.
+// (`const prev = writeFrameScope; writeFrameScope = entryScope; try {
+// …write…; } finally { writeFrameScope = prev; }`), never set-and-clear.
+// Write spans nest (a reactive navigation started from inside another
+// navigation's write span), and a set-and-clear form leaks: the inner
+// span's clear re-opens inheritance for an effect deferred to the outer
+// flush, so a third-level navigation started from that effect would
+// wrongly inherit the outer navigation's region. Save-and-restore keeps
+// the outer span's scope installed once the inner span closes, and for a
+// top-level navigation the restored value is `undefined`, so off-frame
+// behaviour is unchanged.
 //
 // No marker anywhere else, and the two consumer kinds resolve differently
 // there — which is the point. The scheduled end write and the popstate
@@ -758,6 +759,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
 		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
 		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param [options.initiator]                A string is published verbatim; `null` suppresses attribution so `state.initiator` reads `null` throughout; omitted derives from the ambient directive scope; any other value warns and resolves to `null`.
 		 *
 		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
@@ -825,11 +827,14 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// there before (see the `writeFrameScope` comment above).
 				const prevWriteFrameScopeAtStart = writeFrameScope;
 				writeFrameScope = entryScope;
-				batch( () => {
-					state.navigating = true;
-					state.initiator = initiator;
-				} );
-				writeFrameScope = prevWriteFrameScopeAtStart;
+				try {
+					batch( () => {
+						state.navigating = true;
+						state.initiator = initiator;
+					} );
+				} finally {
+					writeFrameScope = prevWriteFrameScopeAtStart;
+				}
 
 				const page = yield Promise.race( [
 					pages.get( pagePath ),
@@ -861,21 +866,24 @@ export const { state, actions } = store< Store >( 'core/router', {
 					// together.
 					const prevWriteFrameScopeAtCommit = writeFrameScope;
 					writeFrameScope = entryScope;
-					batch( () => {
-						// Updates the URL in the state.
-						state.url = href;
+					try {
+						batch( () => {
+							// Updates the URL in the state.
+							state.url = href;
 
-						// Updates the navigation status once the the new page rendering
-						// has been completed.
-						if ( loadingAnimation ) {
-							navigation.hasStarted = false;
-							navigation.hasFinished = true;
-						}
+							// Updates the navigation status once the the new page rendering
+							// has been completed.
+							if ( loadingAnimation ) {
+								navigation.hasStarted = false;
+								navigation.hasFinished = true;
+							}
 
-						// Renders the new page.
-						renderPage( page );
-					} );
-					writeFrameScope = prevWriteFrameScopeAtCommit;
+							// Renders the new page.
+							renderPage( page );
+						} );
+					} finally {
+						writeFrameScope = prevWriteFrameScopeAtCommit;
+					}
 
 					window.history[
 						options.replace ? 'replaceState' : 'pushState'

@@ -1148,6 +1148,136 @@ describe( 'the frame-scope guard', () => {
 		expect( state.initiator ).toBe( 'guard-row6-region-x' );
 	} );
 
+	test( 'row 7 — a throwing raw effect in the start batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
+		const { state, actions } = await import( '../index' );
+		const namespace = 'test/guard-row7-start';
+		const regionId = 'guard-row7-start-region-x';
+		const firstHref = 'http://localhost/guard-row7-start-first';
+		const trigger = setupRegionTrigger( namespace, regionId );
+		expect( state.navigating ).toBe( false );
+		// Capture the action wrapper from this element's scope, then invoke it
+		// outside the DOM event so a synchronous start-batch rejection remains
+		// observable to the test.
+		const navigateFromTrigger = trigger.runInScope( () =>
+			withScope( ( href: string, options: any ) =>
+				actions.navigate( href, options )
+			)
+		);
+		let throwOnStart = false;
+		let consumerError: unknown;
+		let effectRuns = 0;
+
+		const dispose = trigger.runInScope( () =>
+			effect(
+				withScope( () => {
+					effectRuns++;
+					const navigating = state.navigating;
+					if ( throwOnStart && navigating === true ) {
+						try {
+							throw new Error( 'start-consumer-effect-throw' );
+						} catch ( error ) {
+							consumerError = error;
+							throw error;
+						}
+					}
+				} )
+			)
+		);
+
+		throwOnStart = true;
+		let caught: unknown;
+		try {
+			await navigateFromTrigger( firstHref, {
+				html: regionHtml( namespace, regionId, 'first' ),
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			} );
+		} catch ( error ) {
+			caught = error;
+		}
+		throwOnStart = false;
+		dispose();
+
+		expect( caught ).toBeInstanceOf( Error );
+		expect( ( caught as Error ).message ).toBe(
+			'start-consumer-effect-throw'
+		);
+		expect( { effectRuns, consumerError } ).toEqual( {
+			effectRuns: 2,
+			consumerError: expect.any( Error ),
+		} );
+		expect( ( consumerError as Error ).message ).toBe(
+			'start-consumer-effect-throw'
+		);
+
+		// The rejected navigation's finally schedules its end write; let that
+		// write finish before starting the follow-up navigation.
+		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+
+		await navigateFromTrigger( 'http://localhost/guard-row7-start-second', {
+			html: regionHtml( namespace, regionId, 'second' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+
+		expect( state.initiator ).toBe( regionId );
+	} );
+
+	test( 'row 8 — a throwing raw effect in the commit batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
+		const { state, actions } = await import( '../index' );
+		const namespace = 'test/guard-row8-commit';
+		const regionId = 'guard-row8-commit-region-x';
+		const firstHref = 'http://localhost/guard-row8-commit-first';
+		const trigger = setupRegionTrigger( namespace, regionId );
+		const navigateFromTrigger = trigger.runInScope( () =>
+			withScope( ( href: string, options: any ) =>
+				actions.navigate( href, options )
+			)
+		);
+
+		const dispose = trigger.runInScope( () =>
+			effect(
+				withScope( () => {
+					if ( state.url === firstHref ) {
+						throw new Error( 'commit-consumer-effect-throw' );
+					}
+				} )
+			)
+		);
+
+		let caught: unknown;
+		try {
+			await navigateFromTrigger( firstHref, {
+				html: regionHtml( namespace, regionId, 'first' ),
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			} );
+		} catch ( error ) {
+			caught = error;
+		}
+		dispose();
+
+		expect( caught ).toBeInstanceOf( Error );
+		expect( ( caught as Error ).message ).toBe(
+			'commit-consumer-effect-throw'
+		);
+
+		// The rejected navigation's finally schedules its end write; let that
+		// write finish before starting the follow-up navigation.
+		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+
+		await navigateFromTrigger(
+			'http://localhost/guard-row8-commit-second',
+			{
+				html: regionHtml( namespace, regionId, 'second' ),
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			}
+		);
+
+		expect( state.initiator ).toBe( regionId );
+	} );
+
 	test( 'row 7 — the commit batch still contains the same statements in the same order (drift guard), asserted at source level against a literal', () => {
 		const routerIndexSource = readFileSync(
 			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
@@ -1161,20 +1291,20 @@ describe( 'the frame-scope guard', () => {
 		// state.url with renderPage() is what makes a rendering consumer
 		// see the URL and the DOM change together.
 		const commitBatchSource =
-			'\t\t\t\t\tbatch( () => {\n' +
-			'\t\t\t\t\t\t// Updates the URL in the state.\n' +
-			'\t\t\t\t\t\tstate.url = href;\n' +
+			'\t\t\t\t\t\tbatch( () => {\n' +
+			'\t\t\t\t\t\t\t// Updates the URL in the state.\n' +
+			'\t\t\t\t\t\t\tstate.url = href;\n' +
 			'\n' +
-			'\t\t\t\t\t\t// Updates the navigation status once the the new page rendering\n' +
-			'\t\t\t\t\t\t// has been completed.\n' +
-			'\t\t\t\t\t\tif ( loadingAnimation ) {\n' +
-			'\t\t\t\t\t\t\tnavigation.hasStarted = false;\n' +
-			'\t\t\t\t\t\t\tnavigation.hasFinished = true;\n' +
-			'\t\t\t\t\t\t}\n' +
+			'\t\t\t\t\t\t\t// Updates the navigation status once the the new page rendering\n' +
+			'\t\t\t\t\t\t\t// has been completed.\n' +
+			'\t\t\t\t\t\t\tif ( loadingAnimation ) {\n' +
+			'\t\t\t\t\t\t\t\tnavigation.hasStarted = false;\n' +
+			'\t\t\t\t\t\t\t\tnavigation.hasFinished = true;\n' +
+			'\t\t\t\t\t\t\t}\n' +
 			'\n' +
-			'\t\t\t\t\t\t// Renders the new page.\n' +
-			'\t\t\t\t\t\trenderPage( page );\n' +
-			'\t\t\t\t\t} );';
+			'\t\t\t\t\t\t\t// Renders the new page.\n' +
+			'\t\t\t\t\t\t\trenderPage( page );\n' +
+			'\t\t\t\t\t\t} );';
 
 		expect( routerIndexSource ).toContain( commitBatchSource );
 	} );
