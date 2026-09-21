@@ -1045,6 +1045,36 @@ describe( 'useSelect', () => {
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
+		it( 'notifies synchronously after switching from async to sync', () => {
+			const TestComponent = () => {
+				const count = useSelect(
+					( select ) => select( 'counter' ).get(),
+					[]
+				);
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { async } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { rerender } = render( <App async /> );
+
+			rerender( <App async={ false } /> );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// The listener has to have left the shared deferred subscription,
+			// otherwise this update would still be waiting for idle time.
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
+		} );
+
 		it( 'cancels scheduled updates when mapSelect function changes', async () => {
 			const selectA = vi.fn(
 				( select ) => 'a:' + select( 'counter' ).get()
