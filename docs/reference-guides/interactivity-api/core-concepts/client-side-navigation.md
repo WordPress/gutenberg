@@ -915,8 +915,6 @@ store( 'myPlugin', {
 </div>
 ```
 
-The `!!` makes the getter return a boolean rather than `undefined` before the first navigation. Directive bindings treat both as falsy, but a getter that other code may read is better off with a boolean.
-
 **One region per instance, with its ID in the context.** When the same block appears more than once on a page and each copy needs its own indicator, give each copy its own router region and write that ID into the block's context at render time:
 
 ```php
