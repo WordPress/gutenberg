@@ -129,12 +129,15 @@ afterEach( () => {
 /**
  * Settles `afterNextFrame` (`packages/interactivity/src/utils.ts`) on
  * either scheduler arm and drains the microtask chains a fetch/render
- * cycle depends on -- same recipe as `lifecycle-navigate.ts`'s helper of
- * the same name.
+ * cycle depends on. Two passes are required because frame callbacks yield
+ * through native zero-delay tasks before scheduling the next watcher flush.
  */
 async function advanceOneFrame() {
-	await vi.advanceTimersByTimeAsync( 300 );
-	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
+	await Promise.resolve();
+	for ( let i = 0; i < 2; i++ ) {
+		await vi.advanceTimersByTimeAsync( 300 );
+		await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
+	}
 }
 
 /**

@@ -54,19 +54,19 @@ afterEach( () => {
 } );
 
 /**
- * Settles `afterNextFrame` on either scheduler arm. The first pass covers two
- * chained frame windows (the watcher's own flush and the router's end write,
- * each racing a 100 ms fallback), while the second pass drains a watcher flush
- * that was scheduled by the native zero-delay task used to separate frame
- * callbacks. The requestAnimationFrame-stubbed arm needs the full 300 ms
- * advance; a bare 100 ms advance settles only the standard rAF arm.
+ * Settles `afterNextFrame` on either scheduler arm. Two identical passes
+ * cover the watcher's own flush, the router's end write, and a watcher flush
+ * scheduled by the native zero-delay task used to separate frame callbacks.
+ * Each pass needs the full 300 ms advance because the requestAnimationFrame-
+ * stubbed arm races a 100 ms fallback; a bare 100 ms advance settles only the
+ * standard rAF arm.
  */
 async function advanceOneFrame() {
 	await Promise.resolve();
-	await vi.advanceTimersByTimeAsync( 300 );
-	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
-	await vi.advanceTimersByTimeAsync( 100 );
-	await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
+	for ( let i = 0; i < 2; i++ ) {
+		await vi.advanceTimersByTimeAsync( 300 );
+		await new Promise( ( resolve ) => nativeSetTimeout( resolve, 0 ) );
+	}
 }
 
 /**
