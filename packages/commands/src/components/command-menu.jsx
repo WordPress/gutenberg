@@ -1,5 +1,4 @@
 import { Autocomplete, Input, InputLayout } from '@wordpress/ui';
-import commandScore from 'command-score';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useState,
@@ -21,6 +20,7 @@ import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { commandScore } from './command-score';
 import {
 	getRecentCommands,
 	recordUsage,
@@ -114,9 +114,7 @@ function dedupeCommands( commands ) {
 }
 
 /**
- * Ranks commands against the search term with `command-score`, the fuzzy
- * scoring algorithm `cmdk` used internally. Keywords are appended to the scored
- * string the way the copy vendored in `cmdk` folded in its `aliases` argument.
+ * Ranks commands against the search term, dropping the ones that do not match.
  *
  * @param {Object[]} commands The commands to rank.
  * @param {string}   search   The search term.
@@ -126,11 +124,11 @@ function dedupeCommands( commands ) {
 function rankCommands( commands, search ) {
 	const scored = [];
 	for ( const command of dedupeCommands( commands ) ) {
-		const label = command.searchLabel ?? command.label;
-		const keywords = command.keywords?.length
-			? ` ${ command.keywords.join( ' ' ) }`
-			: '';
-		const score = commandScore( label + keywords, search );
+		const score = commandScore(
+			command.searchLabel ?? command.label,
+			search,
+			command.keywords
+		);
 		if ( score > 0 ) {
 			scored.push( { command, score } );
 		}
