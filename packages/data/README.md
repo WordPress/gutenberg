@@ -1200,36 +1200,39 @@ getSomeDataById( 123 );
 getSomeDataById( '123' );
 ```
 
-This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+This is an opportunity to utilize the `normalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+
+`normalizeArgs` was previously named `__unstableNormalizeArgs`, and the old name still works.
 
 #### Example
 
 The _3rd_ argument of the following selector is intended to be a `Number`:
 
 ```js
-const getItemsSelector = ( name, type, id ) => {
+const getItemsSelector = ( state, name, type, id ) => {
 	return state.items[ name ][ type ][ id ] || null;
 };
 ```
 
-However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `normalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
 
 ```js
 // Define normalization method.
-getItemsSelector.__unstableNormalizeArgs = ( args ) {
+getItemsSelector.normalizeArgs = ( args ) => {
+	const newArgs = [ ...args ];
 	// "id" argument at the 2nd index
-	if (args[2] && typeof args[2] === 'string' ) {
-		args[2] = Number(args[2]);
+	if ( newArgs[ 2 ] && typeof newArgs[ 2 ] === 'string' ) {
+		newArgs[ 2 ] = Number( newArgs[ 2 ] );
 	}
 
-	return args;
-}
+	return newArgs;
+};
 ```
 
 With this in place the following code will behave consistently:
 
 ```js
-const getItemsSelector = ( name, type, id ) => {
+const getItemsSelector = ( state, name, type, id ) => {
 	// here 'id' is now guaranteed to be a number.
 	return state.items[ name ][ type ][ id ] || null;
 };
@@ -1253,8 +1256,8 @@ registry.registerStore( 'store', {
 registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
 
 // Call with the wrong string type, **but** here we have avoided an
-// wanted resolver call because '54' is guaranteed to have been
-// coerced to a number by the `__unstableNormalizeArgs` method.
+// unwanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `normalizeArgs` method.
 registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
 ```
 
@@ -1262,9 +1265,9 @@ Ensuring consistency of arguments for a given selector call is [an important opt
 
 ### Sharing a Resolution Between Selector Calls
 
-`__unstableNormalizeArgs` changes the arguments for the selector and the resolver together, so it can only coerce values the selector still needs. Sometimes a selector takes an argument the resolver has no use for, and every call that differs only in that argument should share one resolution.
+`normalizeArgs` changes the arguments for the selector and the resolver together, so it can only coerce values the selector still needs. Sometimes a selector takes an argument the resolver has no use for, and every call that differs only in that argument should share one resolution.
 
-Define `getResolutionArgs` on the _resolver_ to say which arguments the resolution is keyed by. It runs after `__unstableNormalizeArgs`. Its result is the resolution cache key, and it is what `fulfill`, `isFulfilled` and `shouldInvalidate` are called with. The selector keeps its own arguments.
+Define `getResolutionArgs` on the _resolver_ to say which arguments the resolution is keyed by. It runs after `normalizeArgs`. Its result is the resolution cache key, and it is what `fulfill`, `isFulfilled` and `shouldInvalidate` are called with. The selector keeps its own arguments.
 
 For example, `canUser( action, resource )` answers one action at a time, but a single request returns the permissions for every action on the resource. Leaving `action` out of the resolution arguments makes all the calls for a resource share one request:
 
