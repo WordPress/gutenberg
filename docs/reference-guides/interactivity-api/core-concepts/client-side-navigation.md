@@ -802,7 +802,7 @@ For the exact types and edge cases, see the [`core/router` state reference](http
 
 Normally, when `state.navigating` becomes `false` the new content is already in the DOM. Two cases break that rule:
 
--   **The router threw while rendering the new page.** `state.navigating` is still set to `false` on a later frame, so it does not stay truthy forever. `state.url` already holds the destination URL, but the regions may be only partially updated.
+-   **The router threw while rendering the new page.** `state.navigating` is still set to `false` on a later frame, so it does not stay truthy forever. `state.url` already holds the destination URL, but the regions may still contain their old content, be partially updated, or be absent.
 -   **The navigation fell back to a full page load.** A failed fetch, a non-200 response, an unparseable response, the navigation timeout, or a destination page whose configuration disables client-side navigation all make the router hand the navigation to the browser, which then replaces the document. Nothing was rendered, and `state.url` still holds the URL of the page you were on. `state.navigating` stays truthy while the browser replaces the document. If the document is still there 10 seconds after the fallback began — the visitor declined an unload prompt, say, or the reload is very slow — the router stops waiting and sets `state.navigating` to `false`. That is not an error report: it only means that nothing is in progress any more. The 10 seconds are measured on the page's own timers, so a backgrounded tab may run the reset later, and they are unrelated to `navigate()`'s `timeout` option, which happens to default to 10 seconds too.
 
 In both cases `state.initiator` keeps the navigation's value, as it does after any other navigation.
@@ -879,11 +879,11 @@ A derived initiator identifies the region, not the element: two blocks inside th
 
 Where you read the two properties decides when your code runs and what it can see:
 
--   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
--   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes. An unwrapped callback has **no directive scope** — `getContext()` and `getElement()` are not available inside it — while a callback wrapped with `withScope()` deliberately reinstalls its captured scope. Use an unwrapped watcher for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
+-   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame. For a navigation that reaches its content commit, a callback reacting to its end sees the newly committed destination DOM. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — publishes no destination content, so the callback may observe old, partially updated, or absent content and can't assume a committed destination. Derived state getters evaluated through a directive run in that element's scope too.
+-   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes. An unwrapped callback has **no directive scope** — `getContext()` and `getElement()` are not available inside it — while a callback wrapped with `withScope()` deliberately reinstalls its captured scope. Use an unwrapped watcher for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM. When it is keyed on the end of a navigation that reaches its content commit, it runs after the commit and observes the new destination DOM. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — publishes no destination content, so the callback may observe old, partially updated, or absent content and can't assume a committed destination. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
 -   **`data-wp-init`** runs in scope once per element, which makes it the place for setup that belongs to hydration rather than to a navigation.
 
-"The new DOM" above assumes the navigation rendered its content. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content), a callback reacting to the end with either primitive may find the previous page or a partially updated one, so look elements up inside the callback and check that they exist.
+"The new DOM" above applies only to a navigation that reaches its content commit. An end reached without that commit — because the navigation terminates exceptionally before or during the commit, or because a mid-flight fallback's release returns the reading to idle — promises no destination content, so a callback reacting to it may find old, partially updated, or absent content. Look elements up inside the callback and check that they exist.
 
 ### Recipes
 
@@ -981,8 +981,11 @@ store( 'myPlugin', {
 				routerState.initiator === regionId
 			) {
 				// Looked up after the navigation ends, never captured
-				// before it: the region's content has been replaced by now.
-				// The `?.` covers a navigation that ends without new content.
+				// before it: a navigation that reaches its content commit
+				// has its destination content in the DOM by this point.
+				// An end without that commit promises no destination content
+				// and may leave old, partially updated, or absent content.
+				// The `?.` covers a target that isn't there.
 				document
 					.querySelector(
 						`[data-wp-router-region="${ regionId }"] a`
@@ -1016,7 +1019,7 @@ If the region ID is a literal you wrote by hand, drop the `getContext()` line an
 
 **Keep the bookkeeping off the region element too.** A navigation can tear the region's DOM down and rebuild it while your module stays loaded, so anything stored on the element itself does not survive the very navigation it is trying to measure. A module-scope object keyed by region ID does, and one object serves every region on the page.
 
-**Capture no DOM reference across the navigation.** The focus target is looked up after the navigation ends, when the destination's content is already committed, so the lookup finds the new page's element. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content) the element may be missing, which is why the lookup ends in `?.focus()` rather than assuming success.
+**Capture no DOM reference across the navigation.** Look up the focus target after the falling edge, not before it. For a navigation that reaches its content commit, the end is published after the destination content is in the DOM, so the lookup finds the new page's element. An end reached without that commit promises no destination content and may leave the lookup against old, partially updated, or absent content. The `?.focus()` guard handles a target that isn't there.
 
 On the initial page load the callback runs once at hydration, reads `state.navigating` as `undefined`, records `false` and does nothing. On a back/forward traversal `state.initiator` is `null`, so the comparison fails and focus stays where the browser put it, which is usually what a visitor who pressed Back expects.
 
