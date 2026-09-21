@@ -15,7 +15,7 @@ import {
 import {
 	ToggleControl,
 	Disabled,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -654,7 +654,7 @@ const PlaylistEdit = ( {
 						hasValue={ () => order !== 'asc' }
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
@@ -702,7 +702,7 @@ const PlaylistEdit = ( {
 						}
 						panelId={ waveformPanelId }
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Shape' ) }
 							value={ waveformStyle }
 							options={ WAVEFORM_STYLE_OPTIONS }

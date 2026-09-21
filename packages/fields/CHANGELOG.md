@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
+-   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
+
 ### Bug Fixes
 
 -   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))

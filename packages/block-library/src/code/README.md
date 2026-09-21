@@ -22,6 +22,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -32,6 +36,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 

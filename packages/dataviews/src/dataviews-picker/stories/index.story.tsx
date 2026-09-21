@@ -10,7 +10,8 @@ import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViewsPicker',
+	id: 'dataviews-dataviewspicker',
+	title: 'Design System/DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
 
@@ -163,8 +164,8 @@ const DataViewsPickerContent = ( {
 			supportsBulk: isMultiselectable,
 			callback() {
 				const selectedItemNames = data
-					.filter(
-						( item ) => selection?.includes( String( item.id ) )
+					.filter( ( item ) =>
+						selection?.includes( String( item.id ) )
 					)
 					.map( ( item ) => item.name.title )
 					.join( ', ' );

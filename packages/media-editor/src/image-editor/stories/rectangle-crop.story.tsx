@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	RangeControl,
 	ToggleControl,
 	Flex,
@@ -118,7 +118,8 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
-	title: 'MediaEditor/ImageEditor',
+	id: 'mediaeditor-imageeditor',
+	title: 'Editor/Media Editor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
 };
@@ -198,7 +199,7 @@ const WithControlsComponent = () => {
 		? getSourceRegion( state, {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
-		  } )
+			} )
 		: null;
 
 	// The base cardinal angle (nearest 90° step) and the fine offset.
@@ -388,7 +389,7 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -409,7 +410,7 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -503,7 +504,7 @@ const WithControlsComponent = () => {
 										naturalWidth: state.image.naturalWidth,
 										naturalHeight:
 											state.image.naturalHeight,
-								  }
+									}
 								: null,
 						},
 						null,
@@ -615,7 +616,7 @@ const DebugComponent = () => {
 		: {
 				elementSize: { width: 0, height: 0 },
 				visualSize: { width: 0, height: 0 },
-		  };
+			};
 
 	// Camera and restriction.
 	const camera = hasImage
@@ -626,7 +627,7 @@ const DebugComponent = () => {
 				{ ...state, pan: { x: 0, y: 0 }, zoom: 1 },
 				containerSize,
 				imageSize
-		  )
+			)
 		: null;
 	const vb = baseCamera ? getVisibleBounds( baseCamera ) : null;
 
@@ -648,7 +649,7 @@ const DebugComponent = () => {
 							( state.cropRect.y + state.cropRect.height ) *
 								vb.height,
 					} ),
-			  ]
+				]
 			: null;
 
 	// Restriction result.
@@ -825,7 +826,7 @@ const DebugComponent = () => {
 						</Button>
 					</FlexItem>
 					<FlexItem>
-						<SelectControl
+						<WCSelectControl
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
