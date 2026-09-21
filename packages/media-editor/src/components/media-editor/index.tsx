@@ -652,7 +652,7 @@ function MediaEditorContent( {
 						'postType',
 						'attachment',
 						originalId
-				  ) as Media | undefined )
+					) as Media | undefined )
 				: undefined,
 		[ originalId ]
 	);
@@ -674,7 +674,7 @@ function MediaEditorContent( {
 					width: originalWidth,
 					height: originalHeight,
 					media: originalRecord,
-			  }
+				}
 			: undefined;
 	const canRestoreOriginal = !! originalSource;
 	const restoredSource =
@@ -683,7 +683,7 @@ function MediaEditorContent( {
 					id: originalSource.id,
 					url: originalSource.url,
 					media: originalSource.media,
-			  }
+				}
 			: undefined;
 	const canvasSrcOverride =
 		isOriginalRestored && originalSource
@@ -691,7 +691,7 @@ function MediaEditorContent( {
 					url: originalSource.url,
 					width: originalSource.width,
 					height: originalSource.height,
-			  }
+				}
 			: undefined;
 	const handleRestoreOriginal = useCallback( () => {
 		// Restoring discards every pending edit, as the menu item says, so
@@ -886,7 +886,7 @@ function MediaEditorContent( {
 						? fields.map( ( field ) => ( {
 								...field,
 								isDisabled: true,
-						  } ) )
+							} ) )
 						: fields,
 			} }
 		>
