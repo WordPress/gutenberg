@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getBlockContentSchemaFromTransforms` no longer recurses infinitely when merging recursive list-like paste schemas.
+
 ### New Features
 
 -   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
