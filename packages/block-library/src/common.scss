@@ -251,6 +251,7 @@ html :where(.is-position-sticky) {
 // feature query limits the rules to Chromium, which implements MathML Core
 // only. The rules key on the standard attributes, so they apply to any MathML
 // that carries them and can go once Chromium renders them itself.
+// Feature query from https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css#L64-L65
 //
 // Mathematical notation is written left to right in every language, so
 // nothing here is flipped for RTL.
