@@ -20,6 +20,7 @@ const {
 	navigationSignal,
 	sessionId,
 	warn,
+	afterNextFrame,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -35,6 +36,15 @@ export interface NavigateOptions {
 	timeout?: number;
 	loadingAnimation?: boolean;
 	screenReaderAnnouncement?: boolean;
+	/**
+	 * Identifies who initiated this navigation, published on `state.initiator`
+	 * for the duration of the navigation lifecycle. Three arms: a `string`
+	 * (e.g. a router region's id) is used verbatim; `null` explicitly
+	 * suppresses attribution, so `state.initiator` reads `null` throughout;
+	 * `undefined` (the default) derives the initiator from the ambient
+	 * directive scope the call was made from.
+	 */
+	initiator?: string | null;
 }
 
 export interface PrefetchOptions {
@@ -371,6 +381,15 @@ window.document
 // Variable to store the current navigation.
 let navigatingTo = '';
 
+// Monotonic token used to account for supersession of the lifecycle write
+// protocol (the `state.navigating`/`state.initiator` pair). A navigation
+// claims the token by setting `currentNavigationId = ++navigationId`; every
+// lifecycle write it performs thereafter is guarded by
+// `currentNavigationId === <its own token>`. Whoever claims the token owes
+// the lifecycle a terminal write on every exit path that resumes.
+let navigationId = 0;
+let currentNavigationId = 0;
+
 let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
 	loading: 'Loading page, please wait.',
@@ -384,6 +403,12 @@ interface Store {
 			hasStarted: boolean;
 			hasFinished: boolean;
 		};
+		// `navigating` and `initiator` are intentionally optional-honest:
+		// they read `undefined` until the first navigation claims the
+		// lifecycle. See the "do not declare" comment on the store literal
+		// below for why neither key is given an idle value here either.
+		navigating?: boolean;
+		initiator?: string | null;
 	};
 	actions: {
 		navigate: (
@@ -393,6 +418,40 @@ interface Store {
 		prefetch: ( url: string, options?: PrefetchOptions ) => Promise< void >;
 	};
 }
+
+/**
+ * Resolves the `initiator` option of `actions.navigate()` into the value
+ * published on `state.initiator`.
+ *
+ * The three declared arms are honoured verbatim: a `string` is returned as
+ * given, and `null` explicitly suppresses attribution. `undefined` (the
+ * option omitted) is meant to derive the initiator from the ambient
+ * directive scope the call was made from — this task returns `null` for
+ * that arm, and Task 3 implements the derivation. Anything else is not a
+ * valid arm; it warns and falls back to `null`, and it never falls through
+ * to derivation.
+ *
+ * @param declared The raw `options.initiator` value passed to `navigate()`.
+ * @return The value to publish on `state.initiator`.
+ */
+const resolveInitiator = ( declared: unknown ): string | null => {
+	if ( typeof declared === 'string' ) {
+		return declared;
+	}
+	if ( declared === null ) {
+		return null;
+	}
+	if ( declared === undefined ) {
+		// This task returns `null`; Task 3 derives it from the ambient scope.
+		return null;
+	}
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			'The `initiator` option of `actions.navigate()` must be a string or null. Ignoring the value.'
+		);
+	}
+	return null;
+};
 
 const { state: privateState } = store(
 	'core/router/private',
@@ -409,6 +468,12 @@ const { state: privateState } = store(
 
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
+		// `navigating` and `initiator` are deliberately *not* declared here,
+		// and neither is assigned at module scope. Declaring either with an
+		// idle value would change a tracked signal from `undefined` to a
+		// value the moment the router module lazily loads, which re-runs
+		// every watcher already bound to it and breaks the
+		// exactly-one-hydration-run guarantee.
 		get navigation() {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warn(
@@ -443,6 +508,8 @@ export const { state, actions } = store< Store >( 'core/router', {
 				yield forcePageReload( href );
 			}
 
+			const initiator = resolveInitiator( options.initiator );
+
 			const pagePath = getPagePath( href );
 			const { navigation } = privateState;
 			const {
@@ -475,58 +542,96 @@ export const { state, actions } = store< Store >( 'core/router', {
 				}
 			}, 400 );
 
-			const page = yield Promise.race( [
-				pages.get( pagePath ),
-				timeoutPromise,
-			] );
+			// Claim the lifecycle token. Whoever claims it owes the lifecycle
+			// a terminal write on every exit path that resumes — see the
+			// `finally` below.
+			const token = ++navigationId;
+			currentNavigationId = token;
 
-			// Dismisses loading message if it hasn't been added yet.
-			clearTimeout( loadingTimeout );
-
-			// Once the page is fetched, the destination URL could have changed
-			// (e.g., by clicking another link in the meantime). If so, bail
-			// out, and let the newer execution to update the HTML.
-			if ( navigatingTo !== href ) {
-				return;
-			}
-
-			if (
-				page &&
-				! page.initialData?.config?.[ 'core/router' ]
-					?.clientNavigationDisabled
-			) {
-				yield importScriptModules( page.scriptModules );
-
+			try {
+				// The start pair is a single, undebounced, atomic write:
+				// batching the two keys means watchers observe both change
+				// in one notification, so no consumer ever sees `navigating`
+				// truthy with `initiator` still absent. It needs no token
+				// guard because it runs synchronously in the claim's own
+				// frame, before any other navigation can supersede it.
 				batch( () => {
-					// Updates the URL in the state.
-					state.url = href;
-
-					// Updates the navigation status once the new page rendering
-					// has been completed.
-					if ( loadingAnimation ) {
-						navigation.hasStarted = false;
-						navigation.hasFinished = true;
-					}
-
-					// Renders the new page.
-					renderPage( page );
+					state.navigating = true;
+					state.initiator = initiator;
 				} );
 
-				window.history[
-					options.replace ? 'replaceState' : 'pushState'
-				]( { wpInteractivityId: sessionId }, '', href );
+				const page = yield Promise.race( [
+					pages.get( pagePath ),
+					timeoutPromise,
+				] );
 
-				if ( screenReaderAnnouncement ) {
-					a11ySpeak( 'loaded' );
+				// Dismisses loading message if it hasn't been added yet.
+				clearTimeout( loadingTimeout );
+
+				// Once the page is fetched, the destination URL could have changed
+				// (e.g., by clicking another link in the meantime). If so, bail
+				// out, and let the newer execution to update the HTML.
+				if ( navigatingTo !== href ) {
+					return;
 				}
 
-				// Scroll to the anchor if exits in the link.
-				const { hash } = new URL( href, window.location.href );
-				if ( hash ) {
-					document.querySelector( hash )?.scrollIntoView();
+				if (
+					page &&
+					! page.initialData?.config?.[ 'core/router' ]
+						?.clientNavigationDisabled
+				) {
+					yield importScriptModules( page.scriptModules );
+
+					batch( () => {
+						// Updates the URL in the state.
+						state.url = href;
+
+						// Updates the navigation status once the the new page rendering
+						// has been completed.
+						if ( loadingAnimation ) {
+							navigation.hasStarted = false;
+							navigation.hasFinished = true;
+						}
+
+						// Renders the new page.
+						renderPage( page );
+					} );
+
+					window.history[
+						options.replace ? 'replaceState' : 'pushState'
+					]( { wpInteractivityId: sessionId }, '', href );
+
+					if ( screenReaderAnnouncement ) {
+						a11ySpeak( 'loaded' );
+					}
+
+					// Scroll to the anchor if exits in the link.
+					const { hash } = new URL( href, window.location.href );
+					if ( hash ) {
+						document.querySelector( hash )?.scrollIntoView();
+					}
+				} else {
+					yield forcePageReload( href );
 				}
-			} else {
-				yield forcePageReload( href );
+			} finally {
+				// The single end-write site. Every lifecycle end write
+				// re-evaluates its guard inside its scheduled callback,
+				// after its suspension point: the frame-wide window between
+				// scheduling and running is reachable by any user-initiated
+				// navigation — a second click, a Back press — not merely by
+				// consumer code, so a stale scheduled end must find out it
+				// no longer owns the token before it writes. The end write
+				// itself must stay on `afterNextFrame` rather than a
+				// microtask or a bare `setTimeout`: moving it off the
+				// directive runtime's shared frame scheduler would silently
+				// un-observe transitions for every directive consumer.
+				if ( currentNavigationId === token ) {
+					afterNextFrame( () => {
+						if ( currentNavigationId === token ) {
+							state.navigating = false;
+						}
+					} );
+				}
 			}
 		},
 
