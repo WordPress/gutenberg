@@ -34,7 +34,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - `blockGap`: `{"sides":["horizontal","vertical"],"__experimentalDefault":{"top":"1.25em","left":"0.75em"}}`
+  - `blockGap`: `{"sides":["horizontal","vertical"],"__experimentalDefault":"0.75em"}`
   - `margin`: `true`
   - `padding`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
