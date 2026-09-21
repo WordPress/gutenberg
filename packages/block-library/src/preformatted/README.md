@@ -21,6 +21,10 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
