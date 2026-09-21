@@ -649,7 +649,7 @@ Display a post's comments count.
 
 -	**Name:** [core/post-comments-count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-count/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comments Form
 
