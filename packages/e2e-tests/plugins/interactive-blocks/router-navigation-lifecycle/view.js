@@ -17,7 +17,7 @@ const NAVIGATE_TIMEOUT = 100;
  * `core/router` is *read*, never imported: this namespace is auto-created by
  * the store proxy and later merges into the very same proxy the router
  * module registers, once (and if) that module loads. That is what makes
- * Flow 26 ("a page where the router module never loads") meaningful -- these
+ * the router-absent page meaningful -- these
  * getters must be safe to read before the router exists.
  */
 const { state: routerState } = store( 'core/router' );
@@ -35,8 +35,8 @@ const { state: routerState } = store( 'core/router' );
 let previousNavigating = false;
 
 /*
- * Flow 29's per-region previous-`navigating` bookkeeping, keyed by region
- * id. A plain module-scope object, not `context`: `watchFocus()` below
+ * Per-region previous-`navigating` bookkeeping for the region-scoped
+ * focus demo, keyed by region id. A plain module-scope object, not `context`: `watchFocus()` below
  * both reads and writes it in the same run, and reading it through the
  * reactive `context` proxy would subscribe that same effect to its own
  * write, re-triggering it. It also has to live outside any one region's
@@ -48,8 +48,8 @@ let previousNavigating = false;
 const focusWasNavigating = {};
 
 /*
- * Flow 30's debounce timer, for the bare `watch()` registered near the
- * bottom of this file.
+ * Debounce timer for the loading-bar-equivalent demo, for the bare
+ * `watch()` registered near the bottom of this file.
  */
 let debounceTimer;
 
@@ -63,7 +63,7 @@ const rawWriteLog = [];
 /**
  * Renders a `navigating` value the same way for the counted log and for the
  * `lifecycle navigating` readout. `undefined` (never navigated) and `false`
- * both read "not navigating", matching every flow's own wording -- the
+ * both read "not navigating", matching the tests' own wording -- the
  * distinction between them is only ever observable through the four
  * directive-bound elements (`state.navigating`, the raw value), not through
  * this human-readable form.
@@ -79,9 +79,8 @@ function describeNavigating( navigating ) {
  * Renders an `initiator` value the same way for the counted log and for the
  * `lifecycle initiator` readout. `undefined` (never set) and `null` (an
  * explicit "no initiator", see `{ initiator: null }`) are deliberately not
- * distinguished here: both are the documented "absence of identity" reading
- * (Requirement 11), and every flow's own wording says "reads absent" for
- * both.
+ * distinguished here: both are the documented "absence of identity"
+ * reading.
  *
  * @param {string|null|undefined} initiator
  * @return {string} The human-readable reading.
@@ -97,7 +96,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 		_log: [],
 		_settlementLog: [],
 
-		// Flow 30's debounced-bar flag. Declared with an idle default and
+		// Debounced-bar flag for the loading-bar-equivalent demo. Declared with an idle default and
 		// written directly (never derived), unlike `navigating`/`initiator`
 		// below -- this is *this* store's own state, not a passthrough of
 		// `core/router`'s, so none of the "don't declare" reasoning applies.
@@ -105,7 +104,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 
 		/*
 		 * Raw passthroughs of the router's own state, for the four
-		 * directive-bound elements Flow 24 enumerates. These need the real
+		 * directive-bound elements asserted before the first navigation. These need the real
 		 * `boolean | undefined` value, not the human-readable text below,
 		 * because their whole point is to exercise `data-wp-bind`'s and
 		 * `data-wp-class`'s real boolean/undefined handling.
@@ -130,7 +129,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 		 * `true` only while a navigation *this* element's own region
 		 * initiated is in flight. Context-dependent so the same getter
 		 * serves every region: each region co-renders its own id into
-		 * `data-wp-context`, and this getter reads it back -- see Flow 13.
+		 * `data-wp-context`, and this getter reads it back.
 		 */
 		get isOrigin() {
 			const { regionId } = getContext();
@@ -140,14 +139,14 @@ const { state } = store( 'router-navigation-lifecycle', {
 		},
 
 		/*
-		 * Flow 28's sufficiency demonstration: `true` only while a
+		 * Per-block spinner demonstration: `true` only while a
 		 * navigation *this* region's own element initiated is in flight.
 		 * Computationally identical to `isOrigin` above -- both are the
 		 * documented composition `state.navigating && state.initiator ===
 		 * myRegionId` -- but kept as its own getter because it stands in
 		 * for a real consumer's own per-block spinner, built from only the
 		 * two public keys and `getContext()`, independent of the
-		 * `isOrigin`/`is-origin` scaffolding the earlier identity flows use.
+		 * `isOrigin`/`is-origin` scaffolding used by the earlier identity tests.
 		 */
 		get isLoading() {
 			const { regionId } = getContext();
@@ -288,7 +287,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 			previousNavigating = navigating;
 		},
 		/*
-		 * Flow 29's sufficiency demonstration: region-scoped focus. Edge-
+		 * Region-scoped focus demonstration. Edge-
 		 * triggered like `watchSettlement` above, but per-instance -- it
 		 * lives on its own element inside *each* region (a third
 		 * `data-wp-watch`, never run-counted), so it is scoped and can read
@@ -319,7 +318,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 } );
 
 /*
- * Flow 30's sufficiency demonstration: a Core-loading-bar equivalent,
+ * Loading-bar-equivalent demonstration: a Core-loading-bar equivalent,
  * rebuilt purely from the two public keys plus a consumer-side 400 ms
  * debounce -- the debounced loading bar recipe from the Client-Side
  * Navigation guide. A bare `watch()`, not a
@@ -379,8 +378,8 @@ function persistLogBeforeUnload() {
 
 /*
  * Module-scope, no directive scope at all: dynamically imports the router
- * and navigates from an awaited continuation, for the scope-less flow
- * (Flow 18). The destination is read off the already-rendered `navigate`
+ * and navigates from an awaited continuation, for the scope-less
+ * programmatic navigation test. The destination is read off the already-rendered `navigate`
  * link rather than hardcoded, so this works on any page carrying a region.
  */
 window.addEventListener( '_test_navigate_scopeless_', async () => {

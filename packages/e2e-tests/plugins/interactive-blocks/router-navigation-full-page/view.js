@@ -53,7 +53,7 @@ const { state } = store( 'router-navigation-full-page', {
 		/*
 		 * A serialized array, so a spec can `JSON.parse` the readout and
 		 * assert on its *content*. This is the only instrument the full-page
-		 * flows use for "a transition fired at all": the whole BODY is one
+		 * tests use for "a transition fired at all": the whole BODY is one
 		 * router region in full-page mode, so this element -- and its
 		 * `data-wp-watch` -- is torn down and re-created on every
 		 * navigation, and its run *count* is therefore not a transition
@@ -69,8 +69,8 @@ const { state } = store( 'router-navigation-full-page', {
 			 * `e.preventDefault()` is not optional here either: without it,
 			 * every click also performs a full page load, and the full-page
 			 * document listener (`full-page.ts`) would also see the event,
-			 * since it gates on `! event.defaultPrevented` -- which is the
-			 * premise Flow 22 rests on.
+			 * since it gates on `! event.defaultPrevented` -- which is what
+			 * the block-action test relies on.
 			 */
 			e.preventDefault();
 			const { actions: router } = yield import(

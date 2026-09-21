@@ -28,7 +28,7 @@ $region_id = $attributes['regionId'] ?? '';
 <div data-wp-interactive="router-navigation-full-page">
 	<?php if ( isset( $next_href ) ) : ?>
 		<!--
-			Flow 21a: a plain <a>, outside every block region. No directive
+			A plain <a>, outside every block region. No directive
 			handles this click, so the full-page document click listener
 			(`packages/interactivity-router/src/full-page.ts`) does -- and
 			that listener's own `actions.navigate()` call carries no ambient
@@ -41,7 +41,7 @@ $region_id = $attributes['regionId'] ?? '';
 		>plain link (outside region)</a>
 
 		<!--
-			Flow 23: a directive-scoped click control, also outside every
+			A directive-scoped click control, also outside every
 			block region. Its own `data-wp-on--click` action *does* carry an
 			ambient scope, and this control's nearest enclosing
 			`data-wp-router-region` is the BODY the full-page PHP class marks
@@ -72,7 +72,7 @@ $region_id = $attributes['regionId'] ?? '';
 	>
 		<?php if ( isset( $next_href ) ) : ?>
 			<!--
-				Flow 21b: a plain <a>, this time *inside* the fixture's own
+				A plain <a>, this time *inside* the fixture's own
 				region. Still handled by the document listener, not by any
 				directive scope -- DOM containment must not change the
 				reading, which is exactly what makes this link and the one
@@ -84,7 +84,7 @@ $region_id = $attributes['regionId'] ?? '';
 			>plain link (inside region)</a>
 
 			<!--
-				Flow 22: a click handled by this block's own scoped action,
+				A click handled by this block's own scoped action,
 				inside its own region -- the identical shape to
 				`router-navigation-lifecycle`'s region-mode `navigate` link,
 				so the reading it produces here must match the region-mode
@@ -104,7 +104,7 @@ $region_id = $attributes['regionId'] ?? '';
 		The observer readout -- the same shape as
 		`router-navigation-lifecycle`'s counted lifecycle observer, reading
 		`core/router` state from this block's own store namespace. Its run
-		*count* is not asserted anywhere in this fixture's flows: the
+		*count* is not asserted anywhere in this fixture's tests: the
 		BODY-wide region tears this whole wrapper down and rebuilds it on
 		every navigation, so a count here is a function of reconciliation,
 		not of the lifecycle. Its *content* still is evidence, because

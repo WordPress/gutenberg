@@ -4,9 +4,9 @@
  * and `state.initiator`, published by `@wordpress/interactivity-router`) in
  * region-based client-side navigation.
  *
- * This single fixture block is shared by every flow of the
+ * This single fixture block is shared by every test of the
  * `router-navigation-lifecycle` e2e spec, so it supports more attributes
- * than any one flow exercises. The spec's `beforeAll` lists the published
+ * than any one test exercises. The spec's `beforeAll` lists the published
  * pages and which attribute combination each one uses.
  *
  * @package gutenberg-test-interactive-blocks
@@ -25,7 +25,7 @@ $page = $attributes['page'] ?? '';
 
 // Seeded into this block's own server context so `server-context-readout`
 // below is driven by the real `parseServerData` -> `populateServerData`
-// path rather than by static markup -- see Flow 7 and the "cascaded-commit
+// path rather than by static markup -- see the end-transition test and the "cascaded-commit
 // absorption on the real server-context path" verifier it discharges.
 wp_interactivity_state(
 	'router-navigation-lifecycle',
@@ -109,7 +109,8 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 				 * `refresh` takes its href from `window.location.href` at
 				 * click time, not from an attribute, so it renders on every
 				 * page regardless of `next`/`other` -- which is what lets
-				 * Flow 9 Part B start a navigation from page 2.
+				 * the superseded-navigation part of the uncached-traversal
+				 * test start a navigation from page 2.
 				 */
 				?>
 				<a
@@ -164,7 +165,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 				<?php
 				/*
-				 * Flow 28's sufficiency demonstration: a per-block spinner
+				 * Per-block spinner demonstration: a per-block spinner
 				 * that shows only while *this* region's own navigation is
 				 * in flight. `state.isLoading` reads `getContext().regionId`
 				 * the same way `state.isOrigin` above does, so one getter
@@ -178,7 +179,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 				<?php
 				/*
-				 * Flow 29's sufficiency demonstration: a third `data-wp-watch`
+				 * Region-scoped focus demonstration: a third `data-wp-watch`
 				 * (never run-counted), one per region, edge-triggered on the
 				 * `navigating` reading and scoped so it can read its own
 				 * `regionId` from context. See `watchFocus()` in `view.js`
@@ -196,7 +197,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 		<?php if ( ! empty( $attributes['nested'] ) ) : ?>
 			<?php
 			/*
-			 * Flow 19's fixture: an `inner-region` nested inside an
+			 * Nested-regions fixture: an `inner-region` nested inside an
 			 * `outer-region`, with the `navigate` link inside the inner
 			 * one, so a derivation that walks to the *outermost* region
 			 * (the reading a writer might reach for "because the router
@@ -257,7 +258,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 	<?php
 	/*
-	 * Flows 24-26: the two `hidden` bindings, deliberately opposite
+	 * The two `hidden` bindings, deliberately opposite
 	 * polarities on the same page. `bind-hidden-negated` is
 	 * `!state.navigating` -- the spinner shape, visible only while
 	 * navigating -- and `bind-hidden-plain` is the un-negated inverse. Do
@@ -276,7 +277,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 	<?php
 	/*
-	 * Flow 27: a replica of Core's WP 6.9 loading-bar markup, bound to the
+	 * A replica of Core's WP 6.9 loading-bar markup, bound to the
 	 * *public* `core/router` store's deprecated `state.navigation` getter --
 	 * not the private store WP 7.0 binds instead. `data-wp-interactive` is
 	 * repeated here (unlike the plain elements above) because this element
@@ -293,7 +294,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 	<?php
 	/*
-	 * Flow 30: a Core-loading-bar equivalent, rebuilt purely from the new
+	 * A Core-loading-bar equivalent, rebuilt purely from the new
 	 * public keys plus a consumer-side 400 ms debounce -- see the bare
 	 * `watch()` call in `view.js` that writes `state.showBar`.
 	 */

@@ -91,8 +91,8 @@ const settle = ( page: Page ) =>
 
 /**
  * A real-time wait, used only for the debounce negatives: comfortably
- * past the 400 ms window Flows 27 and 30's consumer-side
- * debounces key off of. Without it the corresponding negative assertion is
+ * past the 400 ms window the consumer-side debounces below
+ * key off of. Without it the corresponding negative assertion is
  * a coin flip at 400 ms and a guaranteed pass taken immediately -- true on
  * every implementation, including one whose cache-served navigation
  * produces no end transition at all. There is no locator-based condition to
@@ -112,9 +112,9 @@ const waitRealTime = ( browserPage: Page, ms: number ) =>
 
 /**
  * Registers a listener on `page` that collects every `pageerror` and every
- * `console.error`/`console.warning` message, for the two flows (26 and 27's
- * "SCRIPT_DEBUG is false" narrowing aside, plus 24 and 26 themselves) that
- * assert the browser console stays silent.
+ * `console.error`/`console.warning` message, for the tests below that
+ * assert the browser console stays silent (the loading-bar test's
+ * "SCRIPT_DEBUG is false" narrowing aside).
  *
  * @param page The Playwright page.
  * @return Three arrays, appended to for the lifetime of `page`.
@@ -146,13 +146,13 @@ const collectConsoleActivity = ( page: Page ) => {
  * outgoing document's execution context alive and assertable in this
  * environment, so neither is any safer than letting the request through.
  * See `readBeforeUnloadLog()` below for what this file uses instead
- * wherever a flow needs to inspect the *outgoing* document's state around a
+ * wherever a test needs to inspect the *outgoing* document's state around a
  * forced full page load.
  *
  * **`release()` alone is not a reliable "the browser has resumed" signal.**
  * It only tells you Playwright's own route handler returned; the browser's
- * fetch-then-parse pipeline can still be in flight well after that. Flows
- * 14 and 15 need the *browser* to have the full response before sampling a
+ * fetch-then-parse pipeline can still be in flight well after that. The
+ * supersession tests need the *browser* to have the full response before sampling a
  * mid-window reading, so they pair `release()` with a `page.waitForResponse`
  * promise created beforehand.
  *
@@ -178,7 +178,7 @@ const holdRoute = async ( page: Page, url: string ) => {
  * `view.js`'s `pagehide`/`beforeunload` listener into `localStorage`, which
  * survives a same-origin navigation even when the outgoing document's own
  * execution context does not (see the `holdRoute` doc comment). Call this
- * only *after* the forced full page load this flow
+ * only *after* the forced full page load this test
  * expects has landed: reading it any earlier would return a stale value
  * from whatever document last unloaded on this origin, or `null` on a
  * browser context that has never unloaded one.
@@ -201,7 +201,7 @@ const readBeforeUnloadLog = async ( page: Page ): Promise< LogEntry[] > => {
  * previous document (on the same origin) was last torn down -- persisted by
  * `view.js`'s `pagehide`/`beforeunload` listener into `localStorage`, which
  * survives a same-origin navigation. Call this only after the forced full
- * page load this flow expects has landed.
+ * page load this test expects has landed.
  *
  * @param page The Playwright page, already on the destination document.
  * @return The origin document's raw lifecycle-write log, or `[]` if none was
@@ -229,14 +229,15 @@ test.describe( 'Router navigation lifecycle', () => {
 		 * exist -- every row below is built strictly top to bottom.
 		 */
 
-		// Row 1: Flow 9's uncached URL, and the page the forced reload
-		// lands on. No flow navigates to it or prefetches it.
+		// Row 1: the uncached URL for the back/forward traversal test, and
+		// the page the forced reload lands on. No test navigates to it or
+		// prefetches it.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - page 3',
 			attributes: { page: 3, regionId: 'lifecycle-a' },
 		} );
 
-		// Row 2: Flow 6's second destination.
+		// Row 2: second destination for the consecutive-navigations test.
 		const page2b = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -245,7 +246,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 3: Flow 12's destination -- discovers `clientNavigationDisabled`
+		// Row 3: destination for the disabled-client-navigation test --
+		// discovers `clientNavigationDisabled`
 		// only after being fetched.
 		const disabledDestination = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
@@ -259,8 +261,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 4: destination of every Flow 1-9 navigation; origin of Flow
-		// 6's second hop.
+		// Row 4: destination of every basic lifecycle navigation; origin
+		// of the consecutive-navigations test's second hop.
 		const page2 = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -273,7 +275,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 5: the origin for Flows 1-9, 11, 12, 16, 17, 18, 24, 25, 27, 30.
+		// Row 5: the origin for the single-region tests below.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - page 1',
 			attributes: {
@@ -284,7 +286,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			},
 		} );
 
-		// Row 6: Flow 10's page -- the entry `clientNavigationDisabled`
+		// Row 6: page for the entry-check rejection test -- the entry `clientNavigationDisabled`
 		// check rejects the call.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - disabled origin',
@@ -296,7 +298,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			},
 		} );
 
-		// Row 7: Flow 26 -- no region, no navigation trigger, so the
+		// Row 7: page for the router-absent test -- no region, no navigation trigger, so the
 		// router's dynamic import never runs.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - observer only',
@@ -309,7 +311,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		 * already exist.
 		 */
 
-		// Row 8: region A's destination in Flows 13, 14, 15, 28, 29.
+		// Row 8: region A's destination in the two-region tests below.
 		const twoRegionDestA = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -323,7 +325,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		);
 
 		// Row 9: region B's destination, and region A's *second*
-		// destination in Flow 15. A different href from row 8.
+		// destination in the same-region overlap test. A different href from row 8.
 		const twoRegionDestB = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -336,7 +338,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 10: the origin for Flows 13, 14, 15, 28, 29. Region A's
+		// Row 10: the origin for the two-region tests below. Region A's
 		// `navigate` link -> `next` (row 8); region A's `navigate (other)`
 		// link -> `other` (row 9); region B's `navigate` link -> `other`
 		// (row 9), so that a cross-region flow has two distinct hrefs.
@@ -361,7 +363,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 12: Flow 19's origin -- `render.php`'s `nested` branch emits
+		// Row 12: the nested-regions origin -- `render.php`'s `nested` branch emits
 		// an `inner-region` inside an `outer-region`, with the `navigate`
 		// link inside the inner one.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
@@ -377,7 +379,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		 * The full-page mode fixture pages, rows 13-14: the fixture block
 		 * (`test/router-navigation-full-page`) is a distinct block from the
 		 * region-mode fixture above. Every plain link and every navigate
-		 * control on page 1 targets page 2, so Flows 21-23 differ only in
+		 * control on page 1 targets page 2, so the full-page tests below differ only in
 		 * *what* was clicked, never in *where* it went.
 		 */
 
@@ -390,7 +392,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 14: the origin for Flows 21-23.
+		// Row 14: the origin for the full-page tests.
 		await utils.addPostWithBlock( 'test/router-navigation-full-page', {
 			alias: 'full-page - page 1',
 			attributes: {
@@ -407,7 +409,7 @@ test.describe( 'Router navigation lifecycle', () => {
 	} );
 
 	test.describe( 'Region-mode lifecycle, end timing, settlement and failure', () => {
-		test( 'Flow 1: a navigation produces a start transition and then an end transition', async ( {
+		test( 'a navigation produces a start transition and then an end transition', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -430,7 +432,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			);
 		} );
 
-		test( 'Flow 2: a cache-served navigation still produces both transitions, in order', async ( {
+		test( 'a cache-served navigation still produces both transitions, in order', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -452,7 +454,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			] );
 		} );
 
-		test( 'Flow 3: prefetch() alone produces no lifecycle transition', async ( {
+		test( 'prefetch() alone produces no lifecycle transition', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -474,7 +476,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			expect( await readLog( page, 'lifecycle log' ) ).toHaveLength( 1 );
 		} );
 
-		test( 'Flow 4: navigation options do not suppress the lifecycle', async ( {
+		test( 'navigation options do not suppress the lifecycle', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -491,7 +493,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			] );
 		} );
 
-		test( 'Flow 5: a same-URL forced navigation produces a full cycle', async ( {
+		test( 'a same-URL forced navigation produces a full cycle', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -510,7 +512,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( page ).toHaveURL( page1Url );
 		} );
 
-		test( 'Flow 6: consecutive navigations are each distinctly observable', async ( {
+		test( 'consecutive navigations are each distinctly observable', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -535,7 +537,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			);
 		} );
 
-		test( "Flow 7: the end transition observes the committed DOM and the destination's server context", async ( {
+		test( "the end transition observes the committed DOM and the destination's server context", async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -563,7 +565,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			);
 		} );
 
-		test( 'Flow 8: a cached back/forward restore produces a full cycle with no initiator', async ( {
+		test( 'a cached back/forward restore produces a full cycle with no initiator', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -588,7 +590,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			);
 		} );
 
-		test.describe( 'Flow 9: an uncached back/forward traversal produces no lifecycle cycle, and discharges the reading to idle as it reloads', () => {
+		test.describe( 'an uncached back/forward traversal produces no lifecycle cycle, and discharges the reading to idle as it reloads', () => {
 			/**
 			 * The shared setup both parts build on: a real router
 			 * navigation (the positive control that the module
@@ -731,7 +733,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			} );
 		} );
 
-		test( 'Flow 10: an entry-check rejection produces no lifecycle transition', async ( {
+		test( 'an entry-check rejection produces no lifecycle transition', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -760,7 +762,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			] );
 		} );
 
-		test( 'Flow 11: a mid-flight fetch failure is never reported as a successful end', async ( {
+		test( 'a mid-flight fetch failure is never reported as a successful end', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -808,7 +810,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			] );
 		} );
 
-		test( 'Flow 12: a fetched page that disables client navigation is never reported as a successful end', async ( {
+		test( 'a fetched page that disables client navigation is never reported as a successful end', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -852,7 +854,7 @@ test.describe( 'Router navigation lifecycle', () => {
 	} );
 
 	test.describe( 'Initiator identity in region-based navigation mode', () => {
-		test( 'Flow 13: two regions -- only the initiating region reads as the origin', async ( {
+		test( 'two regions -- only the initiating region reads as the origin', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -884,7 +886,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( regionB ).not.toHaveClass( /is-origin/ );
 		} );
 
-		test( 'Flow 14: cross-region supersession hands the origin over at the moment of supersession', async ( {
+		test( 'cross-region supersession hands the origin over at the moment of supersession', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -943,7 +945,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( regionB ).not.toHaveClass( /is-origin/ );
 		} );
 
-		test( 'Flow 15: two overlapping navigations from one region keep the region reading as origin', async ( {
+		test( 'two overlapping navigations from one region keep the region reading as origin', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -993,7 +995,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( regionA ).not.toHaveClass( /is-origin/ );
 		} );
 
-		test( 'Flow 16: a declared identity is readable by a consumer in a different store', async ( {
+		test( 'a declared identity is readable by a consumer in a different store', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1023,7 +1025,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'my-plugin/declared' );
 		} );
 
-		test( 'Flow 17: `initiator: null` suppresses attribution', async ( {
+		test( '`initiator: null` suppresses attribution', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1052,7 +1054,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			heldPage2.release();
 		} );
 
-		test( 'Flow 18: a scope-less programmatic navigation reads as having no initiator', async ( {
+		test( 'a scope-less programmatic navigation reads as having no initiator', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1100,7 +1102,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			expect( consoleErrors ).toEqual( [] );
 		} );
 
-		test( 'Flow 19: nested regions attribute to the nearest enclosing region', async ( {
+		test( 'nested regions attribute to the nearest enclosing region', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1211,7 +1213,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			queryCanaryUrl = url.href;
 		} );
 
-		test( 'Flow 20: two Query blocks with enhanced pagination are distinguished per instance', async ( {
+		test( 'two Query blocks with enhanced pagination are distinguished per instance', async ( {
 			page,
 		} ) => {
 			await page.goto( queryCanaryUrl );
@@ -1284,7 +1286,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await requestUtils.setGutenbergExperiments( [] );
 		} );
 
-		test( 'Flow 21a: a plain link outside every block region reads as having no initiator', async ( {
+		test( 'a plain link outside every block region reads as having no initiator', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1308,7 +1310,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'absent' );
 		} );
 
-		test( 'Flow 21b: a plain link inside a router region reads as having no initiator -- DOM containment is not initiation', async ( {
+		test( 'a plain link inside a router region reads as having no initiator -- DOM containment is not initiation', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1330,7 +1332,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'absent' );
 		} );
 
-		test( "Flow 22: a click handled by a block's own action is identified", async ( {
+		test( "a click handled by a block's own action is identified", async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1355,7 +1357,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'full-page-a' );
 		} );
 
-		test( 'Flow 23: a scoped element outside every block region derives core/body', async ( {
+		test( 'a scoped element outside every block region derives core/body', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1371,7 +1373,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			// This control's nearest enclosing `data-wp-router-region` is
 			// the BODY the full-page PHP class marks `core/body` -- the
 			// documented mode difference (Requirement 12). Together with
-			// Flow 21b (a plain link in the very same position reads
+			// The plain-link-inside-region case above (a plain link in the very same position reads
 			// absent), no single wrong derivation satisfies both: one that
 			// stops at block regions, or that special-cases BODY to `null`,
 			// would read absent here instead.
@@ -1382,7 +1384,7 @@ test.describe( 'Router navigation lifecycle', () => {
 	} );
 
 	test.describe( 'Compatibility, degradation, directive bindings and sufficiency', () => {
-		test( 'Flow 24: initial state, hydration, and directive bindings before the first navigation', async ( {
+		test( 'initial state, hydration, and directive bindings before the first navigation', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1437,7 +1439,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			expect( consoleWarnings ).toEqual( [] );
 		} );
 
-		test( 'Flow 25: directive bindings track the lifecycle during a navigation', async ( {
+		test( 'directive bindings track the lifecycle during a navigation', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1475,7 +1477,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( hiddenPlain ).toHaveJSProperty( 'hidden', false ); // `false`.
 		} );
 
-		test( 'Flow 26: a page where the router module never loads', async ( {
+		test( 'a page where the router module never loads', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1494,7 +1496,7 @@ test.describe( 'Router navigation lifecycle', () => {
 				page.getByTestId( 'lifecycle initiator' )
 			).toHaveText( 'absent' );
 
-			// Same readings as Flow 24, for the same reason: the keys are
+			// Same readings as the initial-state test above, for the same reason: the keys are
 			// `undefined` here too, since the router module never loads on
 			// this page (no region, no navigation trigger).
 			await expect(
@@ -1515,7 +1517,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			expect( consoleWarnings ).toEqual( [] );
 		} );
 
-		test( "Flow 27: Core's loading bar keeps working alongside the new keys", async ( {
+		test( "Core's loading bar keeps working alongside the new keys", async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1585,7 +1587,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( bar ).not.toHaveClass( /finish-animation/ );
 		} );
 
-		test( 'Flow 28: sufficiency -- a per-block spinner shown only for own-initiated navigations, never stuck', async ( {
+		test( 'a per-block spinner shown only for own-initiated navigations, never stuck', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1630,7 +1632,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( spinnerB ).not.toHaveClass( /is-loading/ );
 		} );
 
-		test( 'Flow 29: sufficiency -- region-scoped focus that refrains on traversals', async ( {
+		test( 'region-scoped focus that refrains on traversals', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {
@@ -1672,7 +1674,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( focusedInRegionA ).toHaveCount( 0 );
 		} );
 
-		test( 'Flow 30: sufficiency -- a Core-loading-bar equivalent with a consumer-side 400 ms debounce', async ( {
+		test( 'a Core-loading-bar equivalent with a consumer-side 400 ms debounce', async ( {
 			page,
 			interactivityUtils: utils,
 		} ) => {

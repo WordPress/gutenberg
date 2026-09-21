@@ -434,28 +434,28 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		const { actions } = await import( '../index' );
 		const forms = [
 			{
-				namespace: 'test/r19-match-plain',
-				attribute: 'r19-match-plain',
-				id: 'r19-match-plain',
+				namespace: 'test/match-plain',
+				attribute: 'match-plain',
+				id: 'match-plain',
 				before: 'plain-before',
 				after: 'plain-after',
 			},
 			{
-				namespace: 'test/r19-match-object',
-				attribute: '{"id":"r19-match-object"}',
-				id: 'r19-match-object',
+				namespace: 'test/match-object',
+				attribute: '{"id":"match-object"}',
+				id: 'match-object',
 				before: 'object-before',
 				after: 'object-after',
 			},
 			{
-				namespace: 'test/r19-match-namespace',
-				attribute: 'myplugin::r19-match-namespace',
-				id: 'r19-match-namespace',
+				namespace: 'test/match-namespace',
+				attribute: 'myplugin::match-namespace',
+				id: 'match-namespace',
 				before: 'namespace-before',
 				after: 'namespace-after',
 			},
 			{
-				namespace: 'test/r19-match-scalar',
+				namespace: 'test/match-scalar',
 				attribute: '901',
 				id: '901',
 				before: 'scalar-before',
@@ -473,7 +473,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 			return element;
 		} );
 
-		await actions.navigate( 'http://localhost/r19-matching', {
+		await actions.navigate( 'http://localhost/matching', {
 			html: plainHtml(
 				forms
 					.map( ( form ) =>
@@ -496,7 +496,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 
 	test( 'a __proto__ region matches and its attachTo variant renders under its declared parent', async () => {
 		const { actions } = await import( '../index' );
-		const namespace = 'test/r19-match-proto';
+		const namespace = 'test/match-proto';
 		const region = setupNavigableRegion(
 			namespace,
 			'__proto__',
@@ -504,7 +504,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		);
 		expect( routerRegions.has( '__proto__' ) ).toBe( true );
 
-		await actions.navigate( 'http://localhost/r19-proto-match', {
+		await actions.navigate( 'http://localhost/proto-match', {
 			html: plainHtml(
 				regionMarkup( namespace, '__proto__', 'proto-after' )
 			),
@@ -514,14 +514,14 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		expect( region ).toHaveTextContent( 'proto-after' );
 
 		const parent = document.createElement( 'div' );
-		parent.id = 'r19-parent-proto';
+		parent.id = 'parent-proto';
 		document.body.appendChild( parent );
 
-		await actions.navigate( 'http://localhost/r19-proto-attach', {
+		await actions.navigate( 'http://localhost/proto-attach', {
 			html: plainHtml(
 				regionMarkup(
 					namespace,
-					'{"id":"__proto__","attachTo":"#r19-parent-proto"}',
+					'{"id":"__proto__","attachTo":"#parent-proto"}',
 					'proto-attached'
 				)
 			),
@@ -535,21 +535,21 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		const { state, actions } = await import( '../index' );
 		const malformedValue = '{"id":';
 		const trigger = setupRegionTrigger(
-			'test/r19-malformed-trigger',
+			'test/malformed-trigger',
 			malformedValue
 		);
 		const region = setupNavigableRegion(
-			'test/r19-malformed-region',
+			'test/malformed-region',
 			malformedValue,
 			'malformed-before'
 		);
 		expect( routerRegions.has( malformedValue ) ).toBe( true );
 
 		await trigger.runInScope( () =>
-			actions.navigate( 'http://localhost/r19-malformed', {
+			actions.navigate( 'http://localhost/malformed', {
 				html: plainHtml(
 					regionMarkup(
-						'test/r19-malformed-region',
+						'test/malformed-region',
 						malformedValue,
 						'malformed-after'
 					)
@@ -567,19 +567,18 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 		const { actions } = await import( '../index' );
 		const cases = [
 			{
-				namespace: 'test/r19-attach-namespace',
-				id: 'r19-attach-namespace',
-				parentId: 'r19-parent-namespace',
+				namespace: 'test/attach-namespace',
+				id: 'attach-namespace',
+				parentId: 'parent-namespace',
 				attribute:
-					'myplugin::{"id":"r19-attach-namespace","attachTo":"#r19-parent-namespace"}',
+					'myplugin::{"id":"attach-namespace","attachTo":"#parent-namespace"}',
 				marker: 'namespace-attached',
 			},
 			{
-				namespace: 'test/r19-attach-object',
-				id: 'r19-attach-object',
-				parentId: 'r19-parent-object',
-				attribute:
-					'{"id":"r19-attach-object","attachTo":"#r19-parent-object"}',
+				namespace: 'test/attach-object',
+				id: 'attach-object',
+				parentId: 'parent-object',
+				attribute: '{"id":"attach-object","attachTo":"#parent-object"}',
 				marker: 'object-attached',
 			},
 		];
@@ -593,7 +592,7 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 			setupNavigableRegion( item.namespace, item.id, 'before-attach' );
 		}
 
-		await actions.navigate( 'http://localhost/r19-attachment', {
+		await actions.navigate( 'http://localhost/attachment', {
 			html: plainHtml(
 				cases
 					.map( ( item ) =>
