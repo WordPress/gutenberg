@@ -256,6 +256,11 @@
 		margin: 0;
 		padding: 0;
 
+		// After the mixin so indicator hover does not replace the row's branded border.
+		&:hover {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+		}
+
 		&.is-selected {
 			background: var(--wpds-color-background-interactive-brand-strong);
 			border-color: var(--wpds-color-stroke-interactive-brand);
