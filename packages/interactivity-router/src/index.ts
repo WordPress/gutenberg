@@ -402,18 +402,139 @@ const forcePageReload = ( href: string ) => {
 	return new Promise( () => {} );
 };
 
+// Bound (in ms) for the popstate handler's lifecycle release below --
+// discharges a claim whose terminating structures (the `try`/`catch`) never
+// see its exit: a `pages.get()` await that never settles, or a `reload()`
+// whose document replacement the visitor declines. Same horizon as
+// `navigate()`'s own page race (`timeout = 10000` above); the two are
+// independent and changing one must not change the other.
+//
+// INVARIANT, invisible from the call graph: this bound must remain greater
+// than one frame. The release and the scheduled end write below are both
+// guarded and so compose safely at any bound, but a release firing *before*
+// the pending directive flush would pre-empt it and reintroduce the exact
+// coalescing defect the frame scheduler exists to fix (see the
+// `afterNextFrame` comment on `navigate()`'s end write above). At 10 s
+// versus a ~16 ms frame this is unreachable by three orders of magnitude --
+// a contributor tuning this constant down would not see it coming. This
+// comment is a signpost, not the protection: the protection is
+// `test/release-bound-observability.ts`, which goes red on a tuned-down
+// bound.
+const POPSTATE_RELEASE_BOUND = 10000;
+
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
+//
+// Four end-write sites exist in this file: `navigate()`'s `finally` above,
+// this handler's cached-branch scheduled end, this handler's `catch`, and
+// the lifecycle release armed below. Every one of them is guarded by
+// `currentNavigationId === token`; a future lifecycle write added without
+// that guard would reintroduce spurious end transitions. The popstate frame
+// carries no directive scope, so -- unlike `navigate()`'s start and commit
+// batches -- none of these writes needs a `writeFrameScope` marker.
 window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
-	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
-	if ( page ) {
+
+	// Claim the lifecycle token -- see the `navigationId`/
+	// `currentNavigationId` comment above `navigate()`. Whoever claims it
+	// owes the lifecycle a terminal write on every exit path that resumes.
+	const token = ++navigationId;
+	currentNavigationId = token;
+
+	// Arm the release *before* the uncached decision below, so a claim that
+	// never resumes -- a parked `await`, or a `reload()` whose document
+	// replacement never lands -- still discharges its debt. Guarded, and
+	// re-checked at fire time: no suspension sits between this timer's
+	// guard and its write, so it is the one end-write site legitimately
+	// exempt from the "re-check after every suspension" rule the other
+	// three follow, and the one write site outside a terminal-write
+	// structure (the `try`/`catch` below). Never cleared on a designed
+	// exit -- the guard already no-ops there.
+	setTimeout( () => {
+		if ( currentNavigationId === token && state.navigating ) {
+			state.navigating = false;
+		}
+	}, POPSTATE_RELEASE_BOUND );
+
+	// The uncached decision, before any effect-running write. This splits
+	// today's short-circuited `pages.has( … ) && ( await pages.get( … ) )`
+	// expression: a page absent from the cache reloads with no consumer
+	// code having run beforehand, so a throwing watcher can never suppress
+	// the reload -- structurally restoring that property of today's code.
+	if ( ! pages.has( pagePath ) ) {
+		window.location.reload();
+		return;
+	}
+
+	try {
+		// The conditional supersession-moment clear. Conditional, so a
+		// plain idle traversal writes nothing and no identity watcher is
+		// spuriously notified: if a navigation was in flight, this
+		// traversal supersedes it and that navigation's identity must not
+		// linger on a lifecycle this traversal is about to claim.
+		if ( state.navigating ) {
+			state.initiator = null;
+		}
+
+		const page = await pages.get( pagePath );
+
+		// A cached entry that resolves falsy reloads on a normal return,
+		// writing nothing beyond the clear above.
+		if ( ! page ) {
+			window.location.reload();
+			return;
+		}
+
+		// The token-guarded start pair. On a supersession path (this
+		// traversal landing while a `navigate()` call still holds an
+		// older claim) this write is entirely absorbed by same-value
+		// dedup on `navigating` -- the mechanism working as intended, not
+		// a gap.
+		if ( currentNavigationId === token ) {
+			batch( () => {
+				state.navigating = true;
+				state.initiator = null;
+			} );
+		}
+
+		// The existing render batch, untouched -- see Task 5 row 10.
 		batch( () => {
 			state.url = window.location.href;
 			renderPage( page );
 		} );
-	} else {
-		window.location.reload();
+
+		// The scheduled, re-checked guarded end. Must stay on
+		// `afterNextFrame`, exactly like `navigate()`'s own end write:
+		// publishing it any earlier would drop or un-paint the transition
+		// for directive consumers -- see the comment on that end write.
+		if ( currentNavigationId === token ) {
+			afterNextFrame( () => {
+				if ( currentNavigationId === token ) {
+					state.navigating = false;
+				}
+			} );
+		}
+	} catch ( error ) {
+		// A `finally` is the wrong tool here, and the asymmetry with
+		// `navigate()` is deliberate, not an inconsistency: `navigate()`'s
+		// designed *non-writing* exit is a suspension (a parked generator
+		// never runs its `finally`), while this handler's designed
+		// non-writing exits are normal returns (the two reloads above),
+		// which a `finally` cannot tell apart from a writing path without
+		// destroying those reload-path readings. Only exceptional-vs-
+		// designed carves this handler correctly, so exceptional exits
+		// discharge through this `catch` instead, which schedules the
+		// guarded idle restoration and rethrows immediately, with nothing
+		// suspending between the two, so the rethrow's timing is
+		// unchanged from today's.
+		if ( currentNavigationId === token && state.navigating ) {
+			afterNextFrame( () => {
+				if ( currentNavigationId === token ) {
+					state.navigating = false;
+				}
+			} );
+		}
+		throw error;
 	}
 } );
 
