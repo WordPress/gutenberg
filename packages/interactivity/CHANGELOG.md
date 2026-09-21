@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Add `afterNextFrame` and `getScope` to the `privateApis` bundle, which `@wordpress/interactivity-router` uses to publish its navigation lifecycle state. No public API is added or changed.
+-   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. No public API is added or changed.
 
 ## 6.55.0 (2026-09-10)
 
