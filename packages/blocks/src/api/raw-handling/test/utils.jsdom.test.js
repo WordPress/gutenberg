@@ -369,4 +369,57 @@ describe( 'getBlockContentSchema', () => {
 			output
 		);
 	} );
+
+	it( 'should merge recursive list schemas without infinite recursion', () => {
+		function createListSchema( extraLiClasses ) {
+			const listContentSchema = {
+				ul: {},
+				ol: { attributes: [ 'type', 'start', 'reversed' ] },
+			};
+
+			[ 'ul', 'ol' ].forEach( ( tag ) => {
+				listContentSchema[ tag ].children = {
+					li: {
+						children: listContentSchema,
+						...( extraLiClasses
+							? { classes: extraLiClasses }
+							: {} ),
+					},
+				};
+			} );
+
+			return listContentSchema;
+		}
+
+		const transforms = [
+			{
+				blockName: 'core/list',
+				type: 'raw',
+				schema: {
+					ol: createListSchema().ol,
+					ul: createListSchema().ul,
+				},
+			},
+			{
+				blockName: 'my/list',
+				type: 'raw',
+				schema: {
+					ol: createListSchema( [ 'custom-item' ] ).ol,
+					ul: createListSchema( [ 'custom-item' ] ).ul,
+				},
+			},
+		];
+
+		const schema = getBlockContentSchemaFromTransforms( transforms );
+
+		expect( schema.ul.children.li ).toBeDefined();
+		expect( schema.ol.children.li ).toBeDefined();
+		expect( schema.ul.children.li.children.ul ).toBeDefined();
+		expect( schema.ol.children.li.children.ol ).toBeDefined();
+		expect( schema.ol.attributes ).toEqual(
+			expect.arrayContaining( [ 'type', 'start', 'reversed' ] )
+		);
+		expect( schema.ul.children.li.classes ).toEqual( [ 'custom-item' ] );
+		expect( schema.ol.children.li.classes ).toEqual( [ 'custom-item' ] );
+	} );
 } );
