@@ -379,6 +379,33 @@ const forcePageReload = ( href: string ) => {
 // are independent.
 const LIFECYCLE_RELEASE_BOUND = 10000;
 
+// Reloads the page on the popstate exits below and ends a superseded
+// lifecycle. If a navigation was in flight, the traversal superseded it:
+// end its lifecycle and clear the retained `initiator`, writing only the
+// keys that actually change so no watcher is notified for nothing. The
+// `finally` guarantees the discharge runs even if `reload()` throws
+// synchronously or the new document never arrives.
+const reloadAndDischarge = ( token: number ) => {
+	try {
+		window.location.reload();
+	} finally {
+		if (
+			currentNavigationId === token &&
+			( state.navigating ||
+				( state.initiator !== null && state.initiator !== undefined ) )
+		) {
+			batch( () => {
+				if ( state.navigating ) {
+					state.navigating = false;
+				}
+				if ( state.initiator !== null ) {
+					state.initiator = null;
+				}
+			} );
+		}
+	}
+};
+
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 //
@@ -411,29 +438,7 @@ window.addEventListener( 'popstate', async () => {
 	// Reload first when the page is not cached, before any state write. This
 	// way no consumer effect can run (and throw) before the reload starts.
 	if ( ! pages.has( pagePath ) ) {
-		try {
-			window.location.reload();
-		} finally {
-			// If a navigation was in flight, this traversal superseded it. End
-			// its lifecycle and clear the retained `initiator`, writing only
-			// the keys that actually change so no watcher is notified for
-			// nothing.
-			if (
-				currentNavigationId === token &&
-				( state.navigating ||
-					( state.initiator !== null &&
-						state.initiator !== undefined ) )
-			) {
-				batch( () => {
-					if ( state.navigating ) {
-						state.navigating = false;
-					}
-					if ( state.initiator !== null ) {
-						state.initiator = null;
-					}
-				} );
-			}
-		}
+		reloadAndDischarge( token );
 		return;
 	}
 
@@ -451,25 +456,7 @@ window.addEventListener( 'popstate', async () => {
 		// clear above already ran; on this exit, reload comes before the
 		// discharge, which writes only what changes.
 		if ( ! page ) {
-			try {
-				window.location.reload();
-			} finally {
-				if (
-					currentNavigationId === token &&
-					( state.navigating ||
-						( state.initiator !== null &&
-							state.initiator !== undefined ) )
-				) {
-					batch( () => {
-						if ( state.navigating ) {
-							state.navigating = false;
-						}
-						if ( state.initiator !== null ) {
-							state.initiator = null;
-						}
-					} );
-				}
-			}
+			reloadAndDischarge( token );
 			return;
 		}
 
