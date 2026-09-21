@@ -48,20 +48,6 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 		$this->assertStringContainsString( '</svg>', $output );
 	}
 
-	public function test_wp_get_icon_returns_svg_for_non_public_collection() {
-		$output = wp_get_icon( 'test-private/visibility-icon' );
-		$this->assertStringStartsWith( '<svg ', $output );
-		$this->assertStringContainsString( '</svg>', $output );
-	}
-
-	public function test_get_registered_icon_returns_icon_from_non_public_collection() {
-		$icon = WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icon( 'test-private/visibility-icon' );
-
-		$this->assertSame( 'test-private/visibility-icon', $icon['name'] );
-		$this->assertStringStartsWith( '<svg ', $icon['content'] );
-		$this->assertArrayNotHasKey( 'public', $icon );
-	}
-
 	public function test_wp_get_icon_returns_empty_string_for_unknown_icon() {
 		$output = wp_get_icon( 'this-icon-does-not-exist' );
 		$this->assertSame( '', $output );
@@ -132,5 +118,19 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 	public function test_wp_get_icon_escapes_attributes() {
 		$output = wp_get_icon( 'core/plus', array( 'class' => '"><script>alert(1)</script>' ) );
 		$this->assertStringNotContainsString( '<script>', $output );
+	}
+
+	public function test_wp_get_icon_returns_svg_for_non_public_collection() {
+		$output = wp_get_icon( 'test-private/visibility-icon' );
+		$this->assertStringStartsWith( '<svg ', $output );
+		$this->assertStringContainsString( '</svg>', $output );
+	}
+
+	public function test_get_registered_icon_returns_icon_from_non_public_collection() {
+		$icon = WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icon( 'test-private/visibility-icon' );
+
+		$this->assertSame( 'test-private/visibility-icon', $icon['name'] );
+		$this->assertStringStartsWith( '<svg ', $icon['content'] );
+		$this->assertArrayNotHasKey( 'public', $icon );
 	}
 }

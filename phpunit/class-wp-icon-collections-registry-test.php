@@ -89,6 +89,114 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Data provider for invalid collection slug candidates.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_collection_slugs() {
+		return array(
+			'non-string slug'         => array( 1 ),
+			'contains slash'          => array( 'plugin/icons' ),
+			'uppercase characters'    => array( 'Plugin' ),
+			'underscore at the start' => array( '_my-plugin' ),
+			'underscore at the end'   => array( 'my-plugin_' ),
+			'hyphen at the start'     => array( '-my-plugin' ),
+			'hyphen at the end'       => array( 'my-plugin-' ),
+		);
+	}
+
+	/**
+	 * Should fail to register a collection with an invalid slug.
+	 *
+	 * @dataProvider data_invalid_collection_slugs
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
+	 *
+	 * @param mixed $slug Invalid slug candidate.
+	 */
+	public function test_register_rejects_invalid_slug( $slug ) {
+		$result = $this->collections->register( $slug, array( 'label' => 'X' ) );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Should fail to register the same collection twice.
+	 *
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
+	 */
+	public function test_register_twice_fails() {
+		$this->assertTrue( $this->collections->register( 'my-collection', array( 'label' => 'A' ) ) );
+		$this->assertFalse( $this->collections->register( 'my-collection', array( 'label' => 'A' ) ) );
+	}
+
+	/**
+	 * Should fail to register a collection with an unknown property.
+	 *
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
+	 */
+	public function test_register_rejects_unknown_property() {
+		$result = $this->collections->register(
+			'my-collection',
+			array(
+				'label' => 'A',
+				'bogus' => 'nope',
+			)
+		);
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Unregistering a collection should cascade and remove all icons
+	 * belonging to it, while leaving icons from other collections intact.
+	 */
+	public function test_unregister_collection_cascades_to_icons() {
+		$this->collections->register( 'plugin-a', array( 'label' => 'A' ) );
+		$this->collections->register( 'plugin-b', array( 'label' => 'B' ) );
+
+		$icons = WP_Icons_Registry_Gutenberg::get_instance();
+		$this->register_icon(
+			'plugin-a/alpha',
+			array(
+				'label'   => 'Alpha',
+				'content' => '<svg></svg>',
+			)
+		);
+		$this->register_icon(
+			'plugin-a/beta',
+			array(
+				'label'   => 'Beta',
+				'content' => '<svg></svg>',
+			)
+		);
+		$this->register_icon(
+			'plugin-b/gamma',
+			array(
+				'label'   => 'Gamma',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertTrue( $icons->is_registered( 'plugin-a/alpha' ) );
+		$this->assertTrue( $icons->is_registered( 'plugin-a/beta' ) );
+
+		$this->assertTrue( $this->collections->unregister( 'plugin-a' ) );
+
+		$this->assertFalse( $icons->is_registered( 'plugin-a/alpha' ) );
+		$this->assertFalse( $icons->is_registered( 'plugin-a/beta' ) );
+		$this->assertTrue( $icons->is_registered( 'plugin-b/gamma' ) );
+
+		$icons->unregister( 'plugin-b/gamma' );
+	}
+
+	/**
+	 * Should fail to unregister a collection that was never registered.
+	 *
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::unregister
+	 */
+	public function test_unregister_unknown_collection() {
+		$this->assertFalse( $this->collections->unregister( 'ghost' ) );
+	}
+
+	/**
 	 * Should register collections as public by default.
 	 */
 	public function test_register_collection_defaults_to_public() {
@@ -196,113 +304,5 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 		} finally {
 			$instance_property->setValue( null, $original_registry );
 		}
-	}
-
-	/**
-	 * Data provider for invalid collection slug candidates.
-	 *
-	 * @return array[]
-	 */
-	public function data_invalid_collection_slugs() {
-		return array(
-			'non-string slug'         => array( 1 ),
-			'contains slash'          => array( 'plugin/icons' ),
-			'uppercase characters'    => array( 'Plugin' ),
-			'underscore at the start' => array( '_my-plugin' ),
-			'underscore at the end'   => array( 'my-plugin_' ),
-			'hyphen at the start'     => array( '-my-plugin' ),
-			'hyphen at the end'       => array( 'my-plugin-' ),
-		);
-	}
-
-	/**
-	 * Should fail to register a collection with an invalid slug.
-	 *
-	 * @dataProvider data_invalid_collection_slugs
-	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
-	 *
-	 * @param mixed $slug Invalid slug candidate.
-	 */
-	public function test_register_rejects_invalid_slug( $slug ) {
-		$result = $this->collections->register( $slug, array( 'label' => 'X' ) );
-		$this->assertFalse( $result );
-	}
-
-	/**
-	 * Should fail to register the same collection twice.
-	 *
-	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
-	 */
-	public function test_register_twice_fails() {
-		$this->assertTrue( $this->collections->register( 'my-collection', array( 'label' => 'A' ) ) );
-		$this->assertFalse( $this->collections->register( 'my-collection', array( 'label' => 'A' ) ) );
-	}
-
-	/**
-	 * Should fail to register a collection with an unknown property.
-	 *
-	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::register
-	 */
-	public function test_register_rejects_unknown_property() {
-		$result = $this->collections->register(
-			'my-collection',
-			array(
-				'label' => 'A',
-				'bogus' => 'nope',
-			)
-		);
-		$this->assertFalse( $result );
-	}
-
-	/**
-	 * Unregistering a collection should cascade and remove all icons
-	 * belonging to it, while leaving icons from other collections intact.
-	 */
-	public function test_unregister_collection_cascades_to_icons() {
-		$this->collections->register( 'plugin-a', array( 'label' => 'A' ) );
-		$this->collections->register( 'plugin-b', array( 'label' => 'B' ) );
-
-		$icons = WP_Icons_Registry_Gutenberg::get_instance();
-		$this->register_icon(
-			'plugin-a/alpha',
-			array(
-				'label'   => 'Alpha',
-				'content' => '<svg></svg>',
-			)
-		);
-		$this->register_icon(
-			'plugin-a/beta',
-			array(
-				'label'   => 'Beta',
-				'content' => '<svg></svg>',
-			)
-		);
-		$this->register_icon(
-			'plugin-b/gamma',
-			array(
-				'label'   => 'Gamma',
-				'content' => '<svg></svg>',
-			)
-		);
-
-		$this->assertTrue( $icons->is_registered( 'plugin-a/alpha' ) );
-		$this->assertTrue( $icons->is_registered( 'plugin-a/beta' ) );
-
-		$this->assertTrue( $this->collections->unregister( 'plugin-a' ) );
-
-		$this->assertFalse( $icons->is_registered( 'plugin-a/alpha' ) );
-		$this->assertFalse( $icons->is_registered( 'plugin-a/beta' ) );
-		$this->assertTrue( $icons->is_registered( 'plugin-b/gamma' ) );
-
-		$icons->unregister( 'plugin-b/gamma' );
-	}
-
-	/**
-	 * Should fail to unregister a collection that was never registered.
-	 *
-	 * @expectedIncorrectUsage WP_Icon_Collections_Registry::unregister
-	 */
-	public function test_unregister_unknown_collection() {
-		$this->assertFalse( $this->collections->unregister( 'ghost' ) );
 	}
 }
