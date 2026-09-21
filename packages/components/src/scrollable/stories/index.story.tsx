@@ -5,7 +5,8 @@ import { Scrollable } from '..';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components/Scrollable',
+	id: 'components-scrollable',
+	title: 'Components/@wordpress-components/Scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },
