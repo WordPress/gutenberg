@@ -82,9 +82,8 @@ function BlockQuickNavigationItem( {
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 
-	// Highlight the block in the canvas while its item is hovered or focused,
-	// matching the List View. Debounced so that sweeping the pointer down the
-	// list does not dispatch for every item it crosses.
+	// Debounced, as in the List View, so sweeping the pointer down the list
+	// does not dispatch for every item it crosses.
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -97,14 +96,11 @@ function BlockQuickNavigationItem( {
 	);
 
 	// Selecting an item can switch the inspector to the List View tab, which
-	// unmounts this panel while the pointer is still over the item, so the
-	// pointer never leaves and `onMouseLeave` never runs. Drop the highlight
-	// on the way out instead. `useDebounce` only cancels calls still pending,
-	// so a highlight already applied has to be cleared explicitly.
-	const clearBlockHighlightOnUnmount = useEvent( () => {
-		debouncedToggleBlockHighlight.cancel();
-		toggleBlockHighlight( clientId, false );
-	} );
+	// unmounts this panel before the pointer leaves, so `onMouseLeave` never
+	// runs and the highlight would stick.
+	const clearBlockHighlightOnUnmount = useEvent( () =>
+		toggleBlockHighlight( clientId, false )
+	);
 	useEffect(
 		() => () => clearBlockHighlightOnUnmount(),
 		[ clearBlockHighlightOnUnmount ]
