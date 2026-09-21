@@ -227,7 +227,7 @@ Displays a link to reply to a comment.
 -	**Name:** [core/comment-reply-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-reply-link/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comment Template
 
