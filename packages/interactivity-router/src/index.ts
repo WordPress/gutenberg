@@ -39,12 +39,10 @@ export interface NavigateOptions {
 	loadingAnimation?: boolean;
 	screenReaderAnnouncement?: boolean;
 	/**
-	 * Identifies who initiated this navigation, published on `state.initiator`
-	 * for the duration of the navigation lifecycle. Three arms: a `string`
-	 * (e.g. a router region's id) is used verbatim; `null` explicitly
-	 * suppresses attribution, so `state.initiator` reads `null` throughout;
-	 * `undefined` (the default) derives the initiator from the ambient
-	 * directive scope the call was made from.
+	 * Who started this navigation, published on `state.initiator` while the
+	 * navigation is in flight. A string (for example a router region id) is
+	 * used as is. `null` publishes `null`. When omitted, the router derives it
+	 * from the directive scope the action was called from.
 	 */
 	initiator?: string | null;
 }
@@ -85,8 +83,8 @@ const getPagePath = ( url: string ) => {
 };
 
 /**
- * Parses the given region's directive with the shared directive-value
- * interpretation used by the runtime.
+ * Parses the given region's directive using the runtime's shared directive
+ * value parser.
  *
  * @param region Region element.
  * @return The region `id` and optional `attachTo` selector.
@@ -105,11 +103,10 @@ const parseRegionAttribute = ( region: Element ) => {
 };
 
 /**
- * Parses a region attribute into the initiator id used by the router.
+ * Extracts the region id from a `data-wp-router-region` attribute value.
  *
- * The shared directive-value interpretation supplies either a string or an
- * object. Region attribution keeps a nonempty string id and treats every
- * other value as absent.
+ * The parser returns either a string or an object with an `id` property. Only
+ * a nonempty string id counts; anything else yields `null`.
  *
  * @param value The raw `data-wp-router-region` attribute value, or `null`.
  * @return The region id, or `null` when no usable id is present.
@@ -360,84 +357,59 @@ const forcePageReload = ( href: string ) => {
 	return new Promise( () => {} );
 };
 
-// Bound (in ms) for the lifecycle release. The same guarded mechanism is
-// armed at two sites: in the popstate claim frame below and immediately
-// before `navigate()`'s mid-flight fallback yield. It discharges a claim whose
-// terminating structure never sees its exit, such as a parked await or a
-// full-page reload whose document replacement never lands. The horizon is the
-// same as `navigate()`'s page race (`timeout = 10000` above); the two are
-// independent and changing one must not change the other.
+// Safety timer (in ms) that resets a stuck `state.navigating`. It is armed in
+// two places: at the start of the popstate handler and right before
+// `navigate()` falls back to a full page reload. Both paths can leave a
+// navigation that never reaches its own end write (a promise that never
+// settles, or a reload whose new document never arrives), so this timer sets
+// `navigating` back to `false` after the bound. The callback only writes if
+// the navigation still holds the current token and `navigating` is still
+// `true`, so a navigation that ended normally or was superseded makes it a
+// no-op. It leaves `initiator` untouched, like every other end write.
+// Browsers may delay the callback in background tabs; the guard makes that
+// harmless.
 //
-// The predicate is a scheduling bound, not an abandonment test: a release
-// only writes when its token is still current and the lifecycle is in flight.
-// This bound is the release's scheduling target, not a wall-clock execution
-// instant. Its callback runs when the page's timer schedule runs it -- on the
-// normal timer schedule while the page runs, or on the platform's throttled
-// schedule in a backgrounded tab. The release writes only `navigating` and
-// retains `initiator`, exactly like every other end write.
-//
-// INVARIANT, invisible from the call graph: this bound must remain greater
-// than one frame. The release and every scheduled end write are guarded and
-// so compose safely at any bound, but a release firing *before* the pending
-// directive flush would pre-empt it and reintroduce the exact coalescing
-// defect the frame scheduler exists to fix (see the `afterNextFrame` comment
-// on `navigate()`'s end write above). At 10 s versus a ~16 ms frame this is
-// unreachable by three orders of magnitude -- a contributor tuning this
-// constant down would not see it coming. This comment is a signpost, not the
-// protection: the protection is `test/release-bound-observability.jsdom.test.ts`,
-// which goes red on a tuned-down bound.
+// The value matches `navigate()`'s default `timeout` by choice, but the two
+// are independent.
 const LIFECYCLE_RELEASE_BOUND = 10000;
 
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 //
-// Six end-write sites exist in this file: `navigate()`'s `finally`, this
-// handler's cached-branch scheduled end, this handler's `catch`, the two
-// reload-path discharges, and the lifecycle release armed at the popstate
-// claim frame and immediately before `navigate()`'s fallback yield. Every one
-// of them is guarded by
-// `currentNavigationId === token`; a future lifecycle write added without
-// that guard would reintroduce spurious end transitions. The popstate frame
-// carries no directive scope, so -- unlike `navigate()`'s start and commit
-// batches -- none of these writes needs a `writeFrameScope` marker.
+// Every write that ends a navigation lifecycle in this file (in `navigate()`'s
+// `finally`, in this handler, and in the release timers) is guarded by
+// `currentNavigationId === token`. Any new lifecycle write needs the same
+// guard, or a stale navigation could end a newer one. This handler runs
+// outside any directive scope, so its writes do not need `writeFrameScope`.
 window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 
-	// Claim the lifecycle token -- see the `navigationId`/
-	// `currentNavigationId` comment above `navigate()`. Whoever claims it
-	// owes the lifecycle a terminal write on every exit path that resumes.
+	// Claim the lifecycle token (see the `navigationId` comment above
+	// `navigate()`). From here on this handler is responsible for ending the
+	// lifecycle on every exit path.
 	const token = ++navigationId;
 	currentNavigationId = token;
 
-	// Arm the lifecycle release *before* the uncached decision below, so a
-	// claim that never resumes -- a parked `await`, or a `reload()` whose
-	// document replacement never lands -- still discharges its debt. The same
-	// mechanism is armed immediately before `navigate()`'s mid-flight fallback
-	// yield below. Guarded, and re-checked at fire time: no suspension sits
-	// between this timer's guard and its write, so it is the one end-write site
-	// legitimately exempt from the "re-check after every suspension" rule the
-	// other three follow, and the one write site outside a terminal-write
-	// structure (this claim-frame release). Never cleared on a designed exit --
-	// the guard already no-ops there.
+	// Arm the release timer before deciding whether to reload, so that a
+	// reload whose new document never arrives, or an `await` that never
+	// settles, still ends the lifecycle. The timer is never cleared: its guard
+	// already makes it a no-op once the lifecycle has ended.
 	setTimeout( () => {
 		if ( currentNavigationId === token && state.navigating ) {
 			state.navigating = false;
 		}
 	}, LIFECYCLE_RELEASE_BOUND );
 
-	// The uncached decision, before any effect-running write. A page absent
-	// from the cache reloads with no consumer code having run beforehand, so
-	// a throwing watcher can never suppress the reload. Keep this check
-	// ahead of the lifecycle writes below for that reason.
+	// Reload first when the page is not cached, before any state write. This
+	// way no consumer effect can run (and throw) before the reload starts.
 	if ( ! pages.has( pagePath ) ) {
 		try {
 			window.location.reload();
 		} finally {
-			// Discharge a displaced claim and clear an identity retained while
-			// idle. Reload remains first, so no effect-running write can prevent
-			// it; the per-key checks preserve absent keys and avoid notifying a
-			// watcher when there is nothing to clear. The release armed above
-			// sees the settled claim and its guard makes its later write a no-op.
+			// If a navigation was in flight, this traversal superseded it. End
+			// its lifecycle and clear the retained `initiator`, writing only
+			// the keys that actually change so no watcher is notified for
+			// nothing.
 			if (
 				currentNavigationId === token &&
 				( state.navigating ||
@@ -458,21 +430,17 @@ window.addEventListener( 'popstate', async () => {
 	}
 
 	try {
-		// The conditional supersession-moment clear. Conditional, so a
-		// plain idle traversal writes nothing and no identity watcher is
-		// spuriously notified: if a navigation was in flight, this
-		// traversal supersedes it and that navigation's identity must not
-		// linger on a lifecycle this traversal is about to claim.
+		// If a navigation is in flight, this traversal supersedes it. Clear
+		// its `initiator` now so the identity does not linger while this
+		// traversal takes over. An idle traversal writes nothing.
 		if ( state.navigating ) {
 			state.initiator = null;
 		}
 
 		const page = await pages.get( pagePath );
 
-		// A cached entry that resolves falsy reloads on a normal return. The
-		// reload remains first, and its finally discharges a displaced claim
-		// or clears an identity retained while idle, writing only keys whose
-		// values differ.
+		// A cached entry that resolved to nothing also reloads. Same as above:
+		// reload first, then end the lifecycle, writing only what changes.
 		if ( ! page ) {
 			try {
 				window.location.reload();
@@ -496,11 +464,8 @@ window.addEventListener( 'popstate', async () => {
 			return;
 		}
 
-		// The token-guarded start pair. On a supersession path (this
-		// traversal landing while a `navigate()` call still holds an
-		// older claim) this write is entirely absorbed by same-value
-		// dedup on `navigating` -- the mechanism working as intended, not
-		// a gap.
+		// Start of the lifecycle. If a `navigate()` call is still in flight,
+		// `navigating` is already `true` and the signal dedups the write.
 		if ( currentNavigationId === token ) {
 			batch( () => {
 				state.navigating = true;
@@ -508,17 +473,15 @@ window.addEventListener( 'popstate', async () => {
 			} );
 		}
 
-		// The render batch. It carries no lifecycle write of its own: the
-		// start pair is written above and the end is scheduled below.
 		batch( () => {
 			state.url = window.location.href;
 			renderPage( page );
 		} );
 
-		// The scheduled, re-checked guarded end. Must stay on
-		// `afterNextFrame`, exactly like `navigate()`'s own end write:
-		// publishing it any earlier would drop or un-paint the transition
-		// for directive consumers -- see the comment on that end write.
+		// Schedule the end write on the next frame, like `navigate()` does, so
+		// directives observe the transition (see the comment on that write).
+		// The guard is re-checked inside the callback because a newer
+		// navigation may have claimed the token in the meantime.
 		if ( currentNavigationId === token ) {
 			afterNextFrame( () => {
 				if ( currentNavigationId === token ) {
@@ -527,13 +490,10 @@ window.addEventListener( 'popstate', async () => {
 			} );
 		}
 	} catch ( error ) {
-		// The reload branches use narrow `try`/`finally` blocks so each
-		// discharge runs after its reload, even if the reload throws. A broad
-		// `finally` around this handler would still conflate those designed
-		// reload exits with the cached render path and publish an end where no
-		// lifecycle cycle began. Exceptional exits discharge through this
-		// `catch` instead, which schedules the guarded idle restoration and
-		// rethrows immediately, with nothing suspending between the two.
+		// The reload paths above handle their own end writes, so a `finally`
+		// here would wrongly end a lifecycle on those exits. Errors are handled
+		// here instead: schedule the guarded end write and rethrow at once,
+		// with nothing asynchronous in between.
 		if ( currentNavigationId === token && state.navigating ) {
 			afterNextFrame( () => {
 				if ( currentNavigationId === token ) {
@@ -576,48 +536,34 @@ window.document
 // Variable to store the current navigation.
 let navigatingTo = '';
 
-// Monotonic token used to account for supersession of the lifecycle write
-// protocol (the `state.navigating`/`state.initiator` pair). A navigation
-// claims the token by setting `currentNavigationId = ++navigationId`; every
-// lifecycle write it performs thereafter is guarded by
-// `currentNavigationId === <its own token>`. Whoever claims the token owes
-// the lifecycle a terminal write on every exit path that resumes.
+// Token that identifies the navigation currently in flight. A navigation
+// claims it with `currentNavigationId = ++navigationId` and then guards all
+// its lifecycle writes (`state.navigating` and `state.initiator`) with
+// `currentNavigationId === token`, so a superseded navigation never writes
+// over a newer one. Whoever claims the token must end the lifecycle on every
+// exit path.
 let navigationId = 0;
 let currentNavigationId = 0;
 
-// Frame-scope guard: identity marker for the ambient directive scope active
-// during one of the router's own lifecycle writes. `resolveInitiator()`'s
-// derive branch refuses to attribute a navigation to a scope that *is* this
-// marker, which stops a scope-less `watch()`/`effect()` reacting to one of
-// `navigate()`'s own writes from inheriting the previous navigation's
-// region id, without breaking attribution for a `withScope`-wrapped
-// callback that carries a scope of its own.
+// Marker for the directive scope that is active while `navigate()` performs
+// its own lifecycle writes. `resolveInitiator()` refuses to derive an
+// initiator from a scope equal to this marker. Without it, a scope-less
+// `watch()` or `effect()` reacting to one of those writes and calling
+// `navigate()` would inherit the previous navigation's region id. A
+// `withScope`-wrapped callback carries its own scope, so its attribution is
+// unaffected.
 //
-// Marked at exactly **two** sites — the start `batch()` and the commit
-// batch below — with save-and-restore
-// (`const prev = writeFrameScope; writeFrameScope = entryScope; try {
-// …write…; } finally { writeFrameScope = prev; }`), never set-and-clear.
-// Write spans nest (a reactive navigation started from inside another
-// navigation's write span), and a set-and-clear form leaks: the inner
-// span's clear re-opens inheritance for an effect deferred to the outer
-// flush, so a third-level navigation started from that effect would
-// wrongly inherit the outer navigation's region. Save-and-restore keeps
-// the outer span's scope installed once the inner span closes, and for a
-// top-level navigation the restored value is `undefined`, so no marker is
-// installed outside a write span.
+// It is set in exactly two places, the start batch and the commit batch in
+// `navigate()`, always with save-and-restore rather than set-and-clear.
+// Navigations can nest (a reactive navigation started from inside another
+// navigation's write), and a plain clear would remove the outer marker too,
+// letting a deferred effect inherit the outer region.
 //
-// No marker anywhere else, and the two consumer kinds resolve differently
-// there — which is the point. The scheduled end write and the popstate
-// lifecycle release both execute in detached macrotasks whose scope stack
-// is empty and whose marker has already been restored, so a **scope-less**
-// consumer navigating from either derives `null` by scope absence, while a
-// **`data-wp-watch`** consumer — which does run in scope — derives *its
-// own* region, because the restored marker refuses nothing. That second
-// reading is what the documented region-scoped focus pattern — a
-// `data-wp-watch` reacting to the end of a navigation — is built on. The
-// popstate handler's frame carries no scope at all. A future `navigate()`-
-// side scope-carrying write added without this marker would re-open
-// initiator inheritance for it.
+// The frame-scheduled end write and the release timers run in detached
+// callbacks with an empty scope stack, so they need no marker: a scope-less
+// consumer navigating from them derives `null`, while a `data-wp-watch`
+// consumer (which runs in its own scope) derives its own region. That second
+// case is what the documented region-scoped focus pattern relies on.
 let writeFrameScope: ReturnType< typeof getScope >;
 
 let hasLoadedNavigationTextsData = false;
@@ -633,10 +579,8 @@ interface Store {
 			hasStarted: boolean;
 			hasFinished: boolean;
 		};
-		// `navigating` and `initiator` are intentionally optional-honest:
-		// they read `undefined` until the first navigation claims the
-		// lifecycle. See the "do not declare" comment on the store literal
-		// below for why neither key is given an idle value here either.
+		// Both keys stay `undefined` until the first navigation. See the
+		// comment on the store literal below.
 		navigating?: boolean;
 		initiator?: string | null;
 	};
@@ -653,28 +597,21 @@ interface Store {
  * Resolves the `initiator` option of `actions.navigate()` into the value
  * published on `state.initiator`.
  *
- * The three declared arms are honoured verbatim, and declaration always
- * wins ahead of derivation: a `string` is returned as given, and `null`
- * explicitly suppresses attribution. `undefined` (the option omitted)
- * derives the initiator from the ambient directive scope the call was made
- * from — the nearest router region (self-inclusive) enclosing the element
- * whose directive invoked the action, or `null` if there is none. Anything
- * else is not a valid arm; it warns and falls back to `null`, and it never
- * falls through to derivation.
+ * A string is returned as is and `null` returns `null`. When the option is
+ * omitted, the initiator is derived from the directive scope the action was
+ * called from: the id of the closest router region (including the element
+ * itself), or `null` when there is none. Any other value warns and resolves
+ * to `null`.
  *
- * No branch throws: derivation degrades to `null` for a scope-less call
- * (e.g. a vendor `import()` + `navigate()`), for a scope whose `ref.current`
- * is not an element, and for an element with no enclosing router region.
- * There is no "derivation error" observable — absence of identity is a
- * documented normal value (Requirement 11). Deliberately no `isConnected`
- * check either: the rule is uniform over any tree, so a detached element
- * that still sits inside a region carrier reports that region's honest id.
+ * Derivation never throws. It returns `null` for a call made outside any
+ * scope, for a scope whose `ref.current` is not an element, and for an
+ * element with no enclosing region. There is no `isConnected` check on
+ * purpose: a detached element still inside a region reports that region.
  *
- * This must be called here, at a generator step in `navigate()`'s
- * synchronous prefix — the only place the caller's scope is reliably
- * ambient. The store proxy binds the ambient scope around every synchronous
- * span of a call, but resets it before awaited continuations and inside
- * timer callbacks, so this resolution must never move into either.
+ * It must run synchronously at the start of `navigate()`, before any
+ * `yield`, because the store proxy only keeps the caller's scope active for
+ * the synchronous part of the call. Timer callbacks and awaited
+ * continuations run without it.
  *
  * @param declared The raw `options.initiator` value passed to `navigate()`.
  * @return The value to publish on `state.initiator`.
@@ -687,18 +624,11 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 		return null;
 	}
 	if ( declared === undefined ) {
-		// Frame-scope guard, ahead of the ref/region walk: refuse a scope
-		// that reached here only because it is the marker
-		// `navigate()` installed around one of its own write frames — see
-		// the `writeFrameScope` comment above. The `scope &&` conjunct
-		// states intent ("we are refusing an *inherited* scope") rather
-		// than adding a guarantee: `getScope()` and `writeFrameScope` are
-		// each either an object or `undefined`, so a genuinely scope-less
-		// call (`scope` and the marker both `undefined`) falls through
-		// this clause and returns `null` below, via the `element` check,
-		// with or without the conjunct. It is kept so that a derivation
-		// clause added later that returns non-null off-scope cannot be
-		// reached through the marker comparison.
+		// Refuse the scope when it is the marker `navigate()` installs around
+		// its own writes (see `writeFrameScope`). The `scope &&` check is not
+		// strictly needed today, since a scope-less call returns `null` below
+		// anyway, but it keeps the intent explicit: only an inherited scope
+		// is refused.
 		const scope = getScope();
 		if ( scope && scope === writeFrameScope ) {
 			return null;
@@ -736,12 +666,10 @@ const { state: privateState } = store(
 
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
-		// `navigating` and `initiator` are deliberately *not* declared here,
-		// and neither is assigned at module scope. Declaring either with an
-		// idle value would change a tracked signal from `undefined` to a
-		// value the moment the router module lazily loads, which re-runs
-		// every watcher already bound to it and breaks the
-		// exactly-one-hydration-run guarantee.
+		// `navigating` and `initiator` are deliberately not declared here.
+		// Giving them an idle value would change a tracked signal from
+		// `undefined` to a value when the router module lazily loads, which
+		// would re-run every watcher already bound to them.
 		get navigation() {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warn(
@@ -767,7 +695,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
 		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
 		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
-		 * @param [options.initiator]                A string is published verbatim; `null` suppresses attribution so `state.initiator` reads `null` throughout; omitted derives from the ambient directive scope; any other value warns and resolves to `null`.
+		 * @param [options.initiator]                Who started the navigation. A string is used as is, `null` publishes `null`, and omitting it derives the value from the directive scope. Any other value warns and resolves to `null`.
 		 *
 		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
@@ -777,11 +705,9 @@ export const { state, actions } = store< Store >( 'core/router', {
 				yield forcePageReload( href );
 			}
 
-			// Captured once, at this generator step's synchronous prefix —
-			// the same place `resolveInitiator()` reads the ambient scope
-			// (see its own comment) — so the frame-scope guard marks its
-			// two write sites below with the *initiating* element's scope,
-			// not whatever happens to be ambient when each write runs.
+			// Read the scope now, before any `yield`, while the caller's scope
+			// is still active. It marks the two write sites below so the
+			// frame-scope guard sees the initiating element's scope.
 			const entryScope = getScope();
 			const initiator = resolveInitiator( options.initiator );
 
@@ -817,22 +743,17 @@ export const { state, actions } = store< Store >( 'core/router', {
 				}
 			}, 400 );
 
-			// Claim the lifecycle token. Whoever claims it owes the lifecycle
-			// a terminal write on every exit path that resumes — see the
-			// `finally` below.
+			// Claim the lifecycle token. This navigation must end the lifecycle
+			// on every exit path; see the `finally` below.
 			const token = ++navigationId;
 			currentNavigationId = token;
 
 			try {
-				// The start pair is a single, undebounced, atomic write:
-				// batching the two keys means watchers observe both change
-				// in one notification, so no consumer ever sees `navigating`
-				// truthy with `initiator` still absent. It needs no token
-				// guard because it runs synchronously in the claim's own
-				// frame, before any other navigation can supersede it.
-				// Frame-scope guard, save-and-restore: mark this write's
-				// span with the initiating scope, then restore whatever was
-				// there before (see the `writeFrameScope` comment above).
+				// Write both keys in one batch so no watcher sees `navigating`
+				// as `true` before `initiator` is set. No token guard is needed:
+				// this runs synchronously, before any other navigation can
+				// claim the token. The write is marked with the initiating
+				// scope for the frame-scope guard (see `writeFrameScope`).
 				const prevWriteFrameScopeAtStart = writeFrameScope;
 				writeFrameScope = entryScope;
 				try {
@@ -866,12 +787,10 @@ export const { state, actions } = store< Store >( 'core/router', {
 				) {
 					yield importScriptModules( page.scriptModules );
 
-					// Frame-scope guard, save-and-restore — see the
-					// `writeFrameScope` comment above. The batch below is
-					// otherwise untouched: its statements' order is what
-					// keeps `state.url` atomic with `renderPage()`, so a
-					// rendering consumer sees the URL and the DOM change
-					// together.
+					// Mark this write with the initiating scope as well (see
+					// `writeFrameScope`). The batch keeps `state.url` and
+					// `renderPage()` together so consumers see the URL and the
+					// DOM change at once.
 					const prevWriteFrameScopeAtCommit = writeFrameScope;
 					writeFrameScope = entryScope;
 					try {
@@ -879,7 +798,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 							// Updates the URL in the state.
 							state.url = href;
 
-							// Updates the navigation status once the the new page rendering
+							// Updates the navigation status once the new page rendering
 							// has been completed.
 							if ( loadingAnimation ) {
 								navigation.hasStarted = false;
@@ -907,12 +826,10 @@ export const { state, actions } = store< Store >( 'core/router', {
 						document.querySelector( hash )?.scrollIntoView();
 					}
 				} else {
-					// This fallback parks the generator at a never-resolving
-					// `forcePageReload()` yield, so it never enters the `finally`
-					// when the document is not replaced. Arm the same detached
-					// lifecycle release immediately before that yield. Its bound is
-					// a scheduling target, not an abandonment test; the guarded
-					// write restores only `navigating` and retains `initiator`.
+					// `forcePageReload()` never resolves, so the `finally` below
+					// never runs if the new document does not arrive. Arm the
+					// release timer so `navigating` is still reset. It leaves
+					// `initiator` untouched.
 					setTimeout( () => {
 						if (
 							currentNavigationId === token &&
@@ -924,31 +841,17 @@ export const { state, actions } = store< Store >( 'core/router', {
 					yield forcePageReload( href );
 				}
 			} finally {
-				// The single end-write site. Every lifecycle end write
-				// re-evaluates its guard inside its scheduled callback,
-				// after its suspension point: the frame-wide window between
-				// scheduling and running is reachable by any user-initiated
-				// navigation — a second click, a Back press — not merely by
-				// consumer code, so a stale scheduled end must find out it
-				// no longer owns the token before it writes. The end write
-				// itself must stay on `afterNextFrame` rather than a
-				// microtask or a bare `setTimeout`: moving it off the
-				// directive runtime's shared frame scheduler would silently
-				// un-observe transitions for every directive consumer.
+				// The end write. It runs on the next frame, like every other end
+				// write, so the directive runtime's frame scheduler observes the
+				// transition; a microtask or a plain `setTimeout` would hide it
+				// from directive consumers. The guard is re-checked inside the
+				// callback because a second click or a Back press can claim the
+				// token before the frame runs.
 				//
-				// Deliberately no `writeFrameScope` marker here. This write
-				// runs in a detached macrotask whose scope stack is already
-				// empty, so marking it correctly — with the same
-				// save-and-restore shape used above — is behaviourally
-				// inert: every consumer of this write reads exactly what it
-				// reads without a marker, because the guard compares scope
-				// identity and no consumer runs inside this callback's span
-				// in the first place. What is not inert is marking it and
-				// forgetting to restore, which is the shape a fire-and-
-				// forget `afterNextFrame` callback invites: it would pin
-				// `writeFrameScope` to this navigation's entry scope
-				// permanently, silently nulling the *next* navigation from
-				// the same element.
+				// No `writeFrameScope` marker here: the callback runs with an
+				// empty scope stack, so a marker would change nothing, and a
+				// forgotten restore would pin the marker to this navigation's
+				// scope and null the next navigation from the same element.
 				if ( currentNavigationId === token ) {
 					afterNextFrame( () => {
 						if ( currentNavigationId === token ) {
