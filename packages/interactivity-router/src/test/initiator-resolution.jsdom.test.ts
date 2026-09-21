@@ -5,8 +5,8 @@
  * The attribute-form tests pin attribution against **real, hydrated
  * directive-side registration** for all six `data-wp-router-region`
  * attribute forms — the four id-bearing forms and the two absent-id forms —
- * and two further tests exercise matching, updates, and attachment through
- * navigation for those forms.
+ * and the navigation tests cover matching, updates, attachment (including a
+ * `__proto__` id), and malformed-but-nonempty attribution.
  *
  * Like every other file in this directory, this suite is exercised through a
  * Vitest module mock that assembles the real implementations of everything
