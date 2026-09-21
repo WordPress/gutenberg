@@ -538,4 +538,148 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		);
 		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A navigation without submenus should not enqueue the view module because a previous navigation had a submenu.' );
 	}
+
+	/**
+	 * Markup for a Navigation block that would open an overlay of its own.
+	 *
+	 * @return string The block markup.
+	 */
+	private function nested_navigation_markup() {
+		return '<!-- wp:navigation {"overlayMenu":"always","ariaLabel":"Nested"} --><!-- wp:navigation-link {"label":"Nested link","url":"/nested"} /--><!-- /wp:navigation -->';
+	}
+
+	/**
+	 * Renders a Navigation block whose overlay reaches a nested Navigation block.
+	 *
+	 * @param string $slug         The overlay template part slug.
+	 * @param string $overlay_body The overlay content that reaches the nested Navigation block.
+	 * @return string The rendered markup.
+	 */
+	private function render_navigation_with_overlay( $slug, $overlay_body ) {
+		$this->create_navigation_overlay_template_part( $slug, '<!-- wp:navigation-overlay-close /-->' . $overlay_body );
+
+		return do_blocks( '<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always","ariaLabel":"Outer"} /-->' );
+	}
+
+	/**
+	 * Asserts that the overlay did not render a Navigation block of its own.
+	 *
+	 * @param string $output The rendered markup.
+	 */
+	private function assert_overlay_has_no_nested_navigation( $output ) {
+		$this->assertSame( 1, preg_match_all( '/<nav\\b/', $output ), 'The overlay should not add a second <nav> landmark.' );
+		$this->assertSame( 1, preg_match_all( '/class="[^"]*wp-block-navigation__responsive-container[ "]/', $output ), 'The overlay should not add a second responsive container.' );
+	}
+
+	/**
+	 * Test that a Navigation block written straight into the overlay does not open an overlay of its own.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82286
+	 */
+	public function test_navigation_written_into_an_overlay_is_suppressed() {
+		$output = $this->render_navigation_with_overlay( 'test-overlay-direct-navigation', $this->nested_navigation_markup() );
+
+		$this->assert_overlay_has_no_nested_navigation( $output );
+	}
+
+	/**
+	 * Test that the overlay suppression of one navigation block is not reused for the
+	 * next navigation block rendered in the same request.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82286
+	 */
+	public function test_overlay_suppression_does_not_leak_to_the_next_navigation_block() {
+		$this->render_navigation_with_overlay( 'test-overlay-suppression-leak', $this->nested_navigation_markup() );
+
+		$output = do_blocks( '<!-- wp:navigation {"overlayMenu":"always","ariaLabel":"Later"} /-->' );
+
+		$this->assertSame( 1, preg_match_all( '/<nav\\b/', $output ), 'A navigation rendered after an overlay should still be a <nav> landmark.' );
+		$this->assertStringContainsString( 'wp-block-navigation__responsive-container-open', $output, 'A navigation rendered after an overlay should still open an overlay of its own.' );
+	}
+
+	/**
+	 * Test that a Navigation block reached through a pattern does not open an overlay of its own.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82286
+	 */
+	public function test_navigation_in_a_pattern_in_an_overlay_is_suppressed() {
+		register_block_pattern(
+			'testsuite/overlay-navigation',
+			array(
+				'title'   => 'Overlay Navigation',
+				'content' => $this->nested_navigation_markup(),
+			)
+		);
+
+		$output = $this->render_navigation_with_overlay(
+			'test-overlay-pattern-navigation',
+			'<!-- wp:pattern {"slug":"testsuite/overlay-navigation"} /-->'
+		);
+
+		unregister_block_pattern( 'testsuite/overlay-navigation' );
+
+		$this->assert_overlay_has_no_nested_navigation( $output );
+	}
+
+	/**
+	 * Test that a Navigation block reached through a synced pattern does not open an overlay of its own.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82286
+	 */
+	public function test_navigation_in_a_synced_pattern_in_an_overlay_is_suppressed() {
+		$synced_pattern_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_block',
+				'post_status'  => 'publish',
+				'post_title'   => 'Overlay Navigation',
+				'post_content' => $this->nested_navigation_markup(),
+			),
+			true
+		);
+		$this->assertNotWPError( $synced_pattern_id );
+
+		$output = $this->render_navigation_with_overlay(
+			'test-overlay-synced-pattern-navigation',
+			'<!-- wp:block {"ref":' . $synced_pattern_id . '} /-->'
+		);
+
+		$this->assert_overlay_has_no_nested_navigation( $output );
+	}
+
+	/**
+	 * Test that a Navigation block reached through a nested template part does not open an overlay of its own.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82286
+	 */
+	public function test_navigation_in_a_nested_template_part_in_an_overlay_is_suppressed() {
+		$nested_slug = 'test-overlay-nested-template-part';
+		$this->create_navigation_overlay_template_part( $nested_slug, $this->nested_navigation_markup() );
+
+		$output = $this->render_navigation_with_overlay(
+			'test-overlay-template-part-navigation',
+			'<!-- wp:template-part {"slug":"' . $nested_slug . '","theme":"' . get_stylesheet() . '"} /-->'
+		);
+
+		$this->assert_overlay_has_no_nested_navigation( $output );
+	}
 }
