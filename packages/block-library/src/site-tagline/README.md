@@ -38,6 +38,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `fitText`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Block Markup
 
