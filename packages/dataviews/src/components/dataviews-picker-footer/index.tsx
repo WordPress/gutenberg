@@ -116,10 +116,9 @@ function ActionButtons< Item >( {
 				const { id, label, icon, isPrimary, isEligible, callback } =
 					action;
 
-				// The label reflects the selection; eligibility only
-				// controls whether the action can run on it. `items` holds
-				// the current page only, so an action without `isEligible`
-				// stays enabled for a selection made on other pages.
+				// `items` holds the current page's selection only, so an
+				// action without `isEligible` stays enabled for a selection
+				// made on other pages.
 				const eligibleItems = isEligible
 					? items.filter( ( item ) => isEligible( item ) )
 					: items;
@@ -254,8 +253,7 @@ export function DataViewsPickerBulkActionToolbar() {
 
 // The full picker footer: bulk-selection info, pagination, and actions — the
 // picker counterpart to `DataViews.Footer`. Given children, it renders those
-// in their place instead, so a picker can compose its footer from
-// `DataViewsPagination` and `PickerActions` alone, for instance.
+// in their place instead.
 export function DataViewsPickerFooter( {
 	children,
 }: {

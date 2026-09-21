@@ -9,8 +9,8 @@
 	align-self: flex-end;
 }
 
-// A composed footer can hold the actions alone, without the selection info
-// that precedes them in the default footer; keep them at the end of the row.
+// Composed without the selection info before them, the actions still keep
+// to the end of the row.
 .dataviews-footer > .dataviews-picker-footer__actions:only-child {
 	margin-inline-start: auto;
 }

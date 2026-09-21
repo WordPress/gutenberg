@@ -89,9 +89,8 @@ export function DataViewsPageSelect() {
 	);
 }
 
-// The page select and the previous/next buttons. Given children, it renders
-// those in their place instead, so a footer with room for one control can
-// compose the pagination from `DataViewsPageSelect` alone, for instance.
+// Given children, renders those in place of the page select and the
+// previous/next buttons.
 export function DataViewsPagination( { children }: { children?: ReactNode } ) {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );

@@ -773,9 +773,7 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer` (the bulk selection info, the pagination and the actions), `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`.
-
-`DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for, without wrappers or styles of its own:
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar`, `DataViewsPicker.Actions` and `DataViewsPicker.PageSelect`. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
 
 ```jsx
 <DataViewsPicker.Footer>
