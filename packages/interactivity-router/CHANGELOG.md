@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Require a matched `@wordpress/interactivity` runtime release for the router's ESM entry (`import`/WordPress script modules). The runtime must carry the shared `parseDirectiveValue` directive-value interpretation, the shared `afterNextFrame` scheduler, and the `getScope` scope probe—all three accessed by the router through `privateApis()`—plus the `watch()` scope-isolation contract, which runs callbacks without an ambient directive scope and restores the previous scope afterwards. For npm's ESM entry, the router resolves the runtime as a package dependency. The Gutenberg plugin re-registers both module IDs from one build, and a WordPress release that ships this feature ships both at that release's version. The advertised CommonJS entry (`main`/`exports.require` → `build/index.cjs`) isn't supported: it calls `require( '@wordpress/interactivity' )`, but `@wordpress/interactivity` exposes only an `import` condition, so `require( '@wordpress/interactivity-router' )` fails at module resolution. The router provides no capability gate or fallback for an older or mismatched runtime.
-
 ### New Features
 
 -   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads.
