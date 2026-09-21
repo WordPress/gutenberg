@@ -438,10 +438,10 @@ window.addEventListener( 'popstate', async () => {
 	}
 
 	try {
-		// If a navigation is in flight, this traversal supersedes it. Clear
-		// its `initiator` now so the identity does not linger while this
-		// traversal takes over. An idle traversal writes nothing.
-		if ( state.navigating ) {
+		// Clear an identity retained from either a superseded in-flight
+		// navigation or a completed navigation while idle. A plain idle
+		// traversal leaves a never-written key absent.
+		if ( state.initiator !== null && state.initiator !== undefined ) {
 			state.initiator = null;
 		}
 

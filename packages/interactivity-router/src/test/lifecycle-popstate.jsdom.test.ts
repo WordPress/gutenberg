@@ -233,6 +233,40 @@ function hydrateWatcher( namespace: string ) {
 	return runs;
 }
 
+/**
+ * Hydrates a `data-wp-watch` that logs both lifecycle keys on every run.
+ *
+ * @param namespace Store namespace for the hydrated island — must be unique
+ *                  per test.
+ * @return The log of lifecycle readings, one entry per watcher run.
+ */
+function hydrateLifecycleWatcher( namespace: string ) {
+	const runs: Array< { n?: boolean; i?: string | null } > = [];
+	store( namespace, {
+		callbacks: {
+			logLifecycle() {
+				const entry: { n?: boolean; i?: string | null } = {};
+				if ( state.navigating !== undefined ) {
+					entry.n = state.navigating;
+				}
+				if ( state.initiator !== undefined ) {
+					entry.i = state.initiator;
+				}
+				runs.push( entry );
+			},
+		},
+	} );
+
+	const container = document.createElement( 'div' );
+	container.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-watch="callbacks.logLifecycle"></div>`;
+	document.body.appendChild( container );
+	const el = container.firstElementChild as Element;
+
+	hydrate( toVdom( el ), getRegionRootFragment( el ) );
+
+	return runs;
+}
+
 describe( 'the popstate handler', () => {
 	test( 'uncached traversal from a clean idle state runs no consumer code before the reload and writes nothing', async () => {
 		expect( state.navigating ).toBeUndefined();
@@ -307,9 +341,81 @@ describe( 'the popstate handler', () => {
 		dispose();
 
 		expect( raw.slice( 1 ) ).toEqual( [
+			{ n: false, i: null },
 			{ n: true, i: null },
 			{ n: false, i: null },
 		] );
+		expect( state.initiator ).toBeNull();
+	} );
+
+	test( 'a cached traversal with a retained identity keeps its hydrated lifecycle runs coalesced', async () => {
+		await actions.navigate( 'http://localhost/popstate-row1c-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row1c-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+
+		const runs = hydrateLifecycleWatcher( 'test/popstate-row1c' );
+		await advanceOneFrame();
+		expect( runs ).toHaveLength( 1 );
+		expect( runs[ 0 ] ).toEqual( { n: false, i: 'region-x' } );
+		const baseline = runs[ 0 ];
+
+		await actions.prefetch( 'http://localhost/popstate-row1c-dest', {
+			html: plainHtml( 'row1c-dest' ),
+		} );
+		pushStateTo( '/popstate-row1c-dest' );
+		dispatchPopstate();
+		await advanceOneFrame();
+
+		expect( runs ).toEqual( [
+			baseline,
+			{ n: true, i: null },
+			{ n: false, i: null },
+		] );
+		expect( state.initiator ).toBeNull();
+	} );
+
+	test( 'a cached traversal with a retained identity clears it before a pending entry settles', async () => {
+		await actions.navigate( 'http://localhost/popstate-row1d-prior', {
+			initiator: 'region-x',
+			html: plainHtml( 'row1d-prior' ),
+			loadingAnimation: false,
+			screenReaderAnnouncement: false,
+		} );
+		await advanceOneFrame();
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBe( 'region-x' );
+
+		const { fetchMock, pending } = makeDeferredFetch();
+		window.fetch = fetchMock as unknown as typeof window.fetch;
+		const pendingPage = actions.prefetch(
+			'http://localhost/popstate-row1d-dest'
+		);
+		expect( pending ).toHaveLength( 1 );
+
+		const { raw, dispose } = rawLifecycleLog();
+		pushStateTo( '/popstate-row1d-dest' );
+		dispatchPopstate();
+
+		// The claim-frame clear is the only write before the cache entry settles.
+		expect( raw.slice( 1 ) ).toEqual( [ { n: false, i: null } ] );
+		expect( state.navigating ).toBe( false );
+		expect( state.initiator ).toBeNull();
+
+		respond( pending[ 0 ], plainHtml( 'row1d-dest' ) );
+		await pendingPage;
+		await advanceOneFrame();
+		dispose();
+
+		expect( raw.slice( 1 ) ).toEqual( [
+			{ n: false, i: null },
+			{ n: true, i: null },
+			{ n: false, i: null },
+		] );
+		expect( state.navigating ).toBe( false );
 		expect( state.initiator ).toBeNull();
 	} );
 
@@ -496,13 +602,22 @@ describe( 'the popstate handler', () => {
 	} );
 
 	test( 'a cached falsy traversal reaches reload before its discharge can run a throwing consumer effect', async () => {
-		await actions.navigate( 'http://localhost/popstate-row3c-prior', {
-			initiator: 'region-x',
-			html: plainHtml( 'row3c-prior' ),
-			loadingAnimation: false,
-			screenReaderAnnouncement: false,
-		} );
-		await advanceOneFrame();
+		// Keep the in-flight navigation's identity explicitly null. With an
+		// identity present, the claim-frame clear can drop a cached-falsy
+		// traversal by design, so no reload guarantee is claimed for that case.
+		const { fetchMock, pending } = makeDeferredFetch();
+		window.fetch = fetchMock as unknown as typeof window.fetch;
+		const inFlight = actions.navigate(
+			'http://localhost/popstate-row3c-inflight',
+			{
+				timeout: 60000,
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			}
+		);
+		expect( pending ).toHaveLength( 1 );
+		expect( state.navigating ).toBe( true );
+		expect( state.initiator ).toBeNull();
 
 		window.fetch = vi.fn( async () => ( {
 			status: 404,
@@ -546,6 +661,8 @@ describe( 'the popstate handler', () => {
 		expect( ( rethrown as Error ).message ).toBe(
 			'consumer-effect-throw-before-falsy-reload'
 		);
+
+		void inFlight;
 	} );
 
 	test( 'plain idle traversal to a cached entry: the clear notifies nobody (raw effect(), the opposite instrument of the hydrated-watcher test)', async () => {
