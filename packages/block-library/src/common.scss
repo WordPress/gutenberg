@@ -253,6 +253,9 @@ html :where(.is-position-sticky) {
 // that carries them and can go once Chromium renders them itself.
 // Feature query from https://github.com/ronkok/Temml/blob/v0.10.34/dist/Temml-Local.css#L64-L65
 //
+// The rules live here because both the Math block and the inline math format
+// produce this MathML.
+//
 // Mathematical notation is written left to right in every language, so
 // nothing here is flipped for RTL.
 /*!rtl:begin:ignore*/
