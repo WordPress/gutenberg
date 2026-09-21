@@ -93,6 +93,51 @@ const settle = ( page: Page ) =>
 	);
 
 /**
+ * A real-time wait, used only where the plan explicitly calls for one:
+ * comfortably past the 400 ms window Flows 27 and 30's consumer-side
+ * debounces key off of. Without it the corresponding negative assertion is
+ * a coin flip at 400 ms and a guaranteed pass taken immediately -- true on
+ * every implementation, including one whose cache-served navigation
+ * produces no end transition at all. There is no locator-based condition to
+ * wait on instead: the thing being asserted is the *absence* of a DOM
+ * change at this specific real-time distance from the trigger.
+ *
+ * The parameter is deliberately not named `page`: `no-restricted-syntax`
+ * bans a literal `page.waitForTimeout(…)` call in this directory in favour
+ * of `page.locator`-based waits, for the ordinary case where one is
+ * available.
+ *
+ * @param browserPage The Playwright page.
+ * @param ms          Milliseconds to wait.
+ */
+const waitRealTime = ( browserPage: Page, ms: number ) =>
+	browserPage.waitForTimeout( ms );
+
+/**
+ * Registers a listener on `page` that collects every `pageerror` and every
+ * `console.error`/`console.warning` message, for the two flows (26 and 27's
+ * "SCRIPT_DEBUG is false" narrowing aside, plus 24 and 26 themselves) that
+ * assert the browser console stays silent.
+ *
+ * @param page The Playwright page.
+ * @return Three arrays, appended to for the lifetime of `page`.
+ */
+const collectConsoleActivity = ( page: Page ) => {
+	const pageErrors: Error[] = [];
+	const consoleErrors: string[] = [];
+	const consoleWarnings: string[] = [];
+	page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
+	page.on( 'console', ( message ) => {
+		if ( message.type() === 'error' ) {
+			consoleErrors.push( message.text() );
+		} else if ( message.type() === 'warning' ) {
+			consoleWarnings.push( message.text() );
+		}
+	} );
+	return { pageErrors, consoleErrors, consoleWarnings };
+};
+
+/**
  * Registers a route on `url` *before* any request against it is expected,
  * holding it open until `release()` is called. This is the held-request
  * idiom from `router-navigate.spec.ts:84-91`, extended with a hit signal
@@ -1323,6 +1368,353 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect(
 				page.getByTestId( 'lifecycle initiator' )
 			).toHaveText( 'core/body' );
+		} );
+	} );
+
+	test.describe( 'Compatibility, degradation, directive bindings and sufficiency', () => {
+		test( 'Flow 24: initial state, hydration, and directive bindings before the first navigation', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			const { pageErrors, consoleErrors, consoleWarnings } =
+				collectConsoleActivity( page );
+
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+			expect( await readLog( page, 'lifecycle log' ) ).toEqual( [
+				{ navigating: 'not navigating', initiator: 'absent' },
+			] );
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+
+			// `aria-busy` absent entirely -- not `"false"` -- is a declared
+			// `navigating: false` seen through the binding. **Correction to
+			// the build plan, verified by red-driving it**: this does *not*
+			// discriminate Task 2's "neither key is declared in the router's
+			// own store literal" decision -- at this point in the flow the
+			// router module has not been imported at all (confirmed: zero
+			// `interactivity-router` network requests before the first
+			// click), so a mutation to that literal has no effect here.
+			// That decision's only browser-reachable consequence is the
+			// spurious hydration-time re-run the design doc names, which is
+			// pinned at unit level (Task 2's first acceptance row) as the
+			// plan itself says. This assertion still stands as a real
+			// regression check: it pins that this binding renders no
+			// attribute at all for an `undefined` value, before hydration
+			// has ever touched it.
+			await expect(
+				page.getByTestId( 'bind-aria-busy' )
+			).not.toHaveAttribute( 'aria-busy' );
+			await expect(
+				page.getByTestId( 'bind-class-busy' )
+			).not.toHaveClass( /busy/ );
+
+			// The two `hidden` bindings, in opposite directions. Asserted
+			// on the `hidden` IDL property directly (`toHaveJSProperty`),
+			// not on rendered visibility: both elements are empty `<span>`s
+			// with no content of their own, so Playwright's own visibility
+			// check (a non-empty bounding box) reads "not visible" for
+			// *either* state and would not discriminate anything. Do not
+			// "fix" either binding by flipping it if this goes red -- see
+			// `render.php`'s comment on `bind-hidden-negated`.
+			await expect(
+				page.getByTestId( 'bind-hidden-negated' )
+			).toHaveJSProperty( 'hidden', true ); // `!undefined` -> `true`.
+			await expect(
+				page.getByTestId( 'bind-hidden-plain' )
+			).toHaveJSProperty( 'hidden', false ); // `undefined` -> `''` -> `false`.
+
+			expect( pageErrors ).toEqual( [] );
+			expect( consoleErrors ).toEqual( [] );
+			expect( consoleWarnings ).toEqual( [] );
+		} );
+
+		test( 'Flow 25: directive bindings track the lifecycle during a navigation', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const heldPage2 = await holdRoute( page, page2Url );
+
+			const ariaBusy = page.getByTestId( 'bind-aria-busy' );
+			const classBusy = page.getByTestId( 'bind-class-busy' );
+			const hiddenNegated = page.getByTestId( 'bind-hidden-negated' );
+			const hiddenPlain = page.getByTestId( 'bind-hidden-plain' );
+
+			await page.getByTestId( 'navigate' ).click();
+			await heldPage2.hit;
+
+			// Mid-flight (`state.navigating === true`). Each state leads
+			// with a positive assertion before any "is absent" clause.
+			await expect( ariaBusy ).toHaveAttribute( 'aria-busy', 'true' );
+			await expect( classBusy ).toHaveClass( /busy/ );
+			await expect( hiddenNegated ).toHaveJSProperty( 'hidden', false ); // `!true` -> `false`.
+			await expect( hiddenPlain ).toHaveJSProperty( 'hidden', true ); // `true`.
+
+			heldPage2.release();
+
+			// After the end (`state.navigating === false`). The positive
+			// checkpoint first, then the readings settle back.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await expect( ariaBusy ).toHaveAttribute( 'aria-busy', 'false' );
+			await expect( classBusy ).not.toHaveClass( /busy/ );
+			await expect( hiddenNegated ).toHaveJSProperty( 'hidden', true ); // `!false` -> `true`.
+			await expect( hiddenPlain ).toHaveJSProperty( 'hidden', false ); // `false`.
+		} );
+
+		test( 'Flow 26: a page where the router module never loads', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			const { pageErrors, consoleErrors, consoleWarnings } =
+				collectConsoleActivity( page );
+
+			await page.goto( utils.getLink( 'lifecycle - observer only' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+			expect( await readLog( page, 'lifecycle log' ) ).toEqual( [
+				{ navigating: 'not navigating', initiator: 'absent' },
+			] );
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'absent' );
+
+			// Same readings as Flow 24, for the same reason: the keys are
+			// `undefined` here too, since the router module never loads on
+			// this page (no region, no navigation trigger).
+			await expect(
+				page.getByTestId( 'bind-aria-busy' )
+			).not.toHaveAttribute( 'aria-busy' );
+			await expect(
+				page.getByTestId( 'bind-class-busy' )
+			).not.toHaveClass( /busy/ );
+			await expect(
+				page.getByTestId( 'bind-hidden-negated' )
+			).toHaveJSProperty( 'hidden', true );
+			await expect(
+				page.getByTestId( 'bind-hidden-plain' )
+			).toHaveJSProperty( 'hidden', false );
+
+			expect( pageErrors ).toEqual( [] );
+			expect( consoleErrors ).toEqual( [] );
+			expect( consoleWarnings ).toEqual( [] );
+		} );
+
+		test( "Flow 27: Core's loading bar keeps working alongside the new keys", async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			const page1Url = utils.getLink( 'lifecycle - page 1' );
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const bar = page.getByTestId( 'loading-bar' );
+
+			await page.goto( page1Url );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			// Default options: the bar animates exactly as today.
+			const heldPage2 = await holdRoute( page, page2Url );
+			await page.getByTestId( 'navigate' ).click();
+			await heldPage2.hit;
+
+			// Positive, waiting assertion: the 400 ms delay has elapsed
+			// (Playwright's own polling absorbs the wait) and the bar has
+			// started.
+			await expect( bar ).toHaveClass( /start-animation/ );
+
+			heldPage2.release();
+
+			// Positive checkpoint (the navigation ended), then the settle,
+			// then the negative it protects.
+			await expect( bar ).toHaveClass( /finish-animation/ );
+			await settle( page );
+			await expect( bar ).not.toHaveClass( /start-animation/ );
+
+			/*
+			 * A fresh page load before the `loadingAnimation: false` half.
+			 * `hasFinished` above is left `true` indefinitely once set --
+			 * matching today's bar, which only fades the class away via
+			 * CSS rather than ever removing it -- so continuing on the same
+			 * document would make "gains neither" trivially true for the
+			 * wrong reason: the class would already be there from before
+			 * this half even started.
+			 */
+			await page.unroute( page2Url );
+			await page.goto( page1Url );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const heldPage2Again = await holdRoute( page, page2Url );
+			await page.getByTestId( 'navigate (silent)' ).click();
+			await heldPage2Again.hit;
+
+			// Positive checkpoint: the new keys transitioned even though
+			// the loading animation option is off.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'navigating' );
+
+			// The real-time wait is the settle that matters here: at 400 ms
+			// an implementation that ignored `loadingAnimation` would just
+			// be writing the flags.
+			await waitRealTime( page, 500 );
+			await settle( page );
+			await expect( bar ).not.toHaveClass( /start-animation/ );
+			await expect( bar ).not.toHaveClass( /finish-animation/ );
+
+			heldPage2Again.release();
+
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await settle( page );
+			await expect( bar ).not.toHaveClass( /start-animation/ );
+			await expect( bar ).not.toHaveClass( /finish-animation/ );
+		} );
+
+		test( 'Flow 28: sufficiency -- a per-block spinner shown only for own-initiated navigations, never stuck', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle two-region - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const destAUrl = utils.getLink( 'lifecycle two-region - dest A' );
+			const heldDestA = await holdRoute( page, destAUrl );
+
+			const spinnerA = page.getByTestId( 'spinner-lifecycle-a' );
+			const spinnerB = page.getByTestId( 'spinner-lifecycle-b' );
+			const regionA = page.getByTestId( 'region-lifecycle-a' );
+
+			await regionA.getByTestId( 'navigate' ).click();
+			await heldDestA.hit;
+
+			// Positive checkpoint, then the negative it protects: never for
+			// the other region's own navigation.
+			await expect( spinnerA ).toHaveClass( /is-loading/ );
+			await expect( spinnerB ).not.toHaveClass( /is-loading/ );
+
+			heldDestA.release();
+
+			// Positive checkpoint (the navigation really ended), then the
+			// settle, then the negative: never left on after the end.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: two-a'
+			);
+			await settle( page );
+			await expect( spinnerA ).not.toHaveClass( /is-loading/ );
+			await expect( spinnerB ).not.toHaveClass( /is-loading/ );
+
+			// A back/forward traversal: `initiator` reads absent throughout,
+			// so neither spinner should show -- the clause a stale-identity
+			// implementation would fail.
+			await page.goBack();
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: two-1'
+			);
+			await settle( page );
+			await expect( spinnerA ).not.toHaveClass( /is-loading/ );
+			await expect( spinnerB ).not.toHaveClass( /is-loading/ );
+		} );
+
+		test( 'Flow 29: sufficiency -- region-scoped focus that refrains on traversals', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle two-region - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const focusedInRegionA = page.locator(
+				'[data-wp-router-region="lifecycle-a"] :focus'
+			);
+
+			const regionA = page.getByTestId( 'region-lifecycle-a' );
+			await regionA.getByTestId( 'navigate' ).click();
+
+			// Positive: the navigation reached its destination.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: two-a'
+			);
+
+			// Focus landed inside region A -- the falling edge fired, and
+			// `initiator` still read `lifecycle-a` at that moment.
+			await expect( focusedInRegionA ).toHaveCount( 1 );
+
+			// Explicit blur, so "focus did not move" below is
+			// distinguishable from "focus was already there".
+			await page.evaluate( () => document.activeElement?.blur?.() );
+
+			await page.goBack();
+
+			// Positive checkpoint: the traversal completed.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: two-1'
+			);
+			await settle( page );
+
+			// The falling edge fired again (`navigating` did transition),
+			// but `initiator` read absent, so the watcher refrained.
+			await expect( focusedInRegionA ).toHaveCount( 0 );
+		} );
+
+		test( 'Flow 30: sufficiency -- a Core-loading-bar equivalent with a consumer-side 400 ms debounce', async ( {
+			page,
+			interactivityUtils: utils,
+		} ) => {
+			await page.goto( utils.getLink( 'lifecycle - page 1' ) );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			const bar = page.getByTestId( 'debounced-bar' );
+
+			// Slow: held well past 400 ms. Positive, waiting assertion: the
+			// bar appears.
+			const page2Url = utils.getLink( 'lifecycle - page 2' );
+			const heldPage2 = await holdRoute( page, page2Url );
+			await page.getByTestId( 'navigate' ).click();
+			await heldPage2.hit;
+			await expect( bar ).toHaveClass( /show-bar/ );
+
+			heldPage2.release();
+
+			// Positive checkpoint (the navigation ended), then the settle,
+			// then the negative: the bar clears once `navigating` goes
+			// false, same as the timer's own `clearTimeout` branch.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: 2'
+			);
+			await settle( page );
+			await expect( bar ).not.toHaveClass( /show-bar/ );
+
+			// Fast: prefetched, so the next navigation is served from cache,
+			// well under 400 ms.
+			const page2bUrl = utils.getLink( 'lifecycle - page 2b' );
+			const response = page.waitForResponse( page2bUrl );
+			await page.getByTestId( 'prefetch' ).click();
+			await response;
+
+			await page.getByTestId( 'navigate' ).click();
+
+			// Positive checkpoint: the navigation ended.
+			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
+				'page marker: 2b'
+			);
+
+			// The 600 ms wait is the settle, and it is not optional: at
+			// 400 ms the assertion is a coin flip, and taken immediately it
+			// passes on every implementation, including one whose
+			// cache-served navigation produces no end transition at all.
+			await waitRealTime( page, 600 );
+			await settle( page );
+			await expect( bar ).not.toHaveClass( /show-bar/ );
 		} );
 	} );
 } );

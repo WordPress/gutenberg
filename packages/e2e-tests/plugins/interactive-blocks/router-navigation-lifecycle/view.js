@@ -6,6 +6,7 @@ import {
 	withSyncEvent,
 	getContext,
 	getServerState,
+	watch,
 } from '@wordpress/interactivity';
 
 /*
@@ -35,6 +36,25 @@ const { state: routerState } = store( 'core/router' );
  * `router-regions/view.js`) does notify.
  */
 let previousNavigating = false;
+
+/*
+ * Flow 29's per-region previous-`navigating` bookkeeping, keyed by region
+ * id. A plain module-scope object, not `context`: `watchFocus()` below
+ * both reads and writes it in the same run, and reading it through the
+ * reactive `context` proxy would subscribe that same effect to its own
+ * write, re-triggering it. It also has to live outside any one region's
+ * DOM, since the region element it would otherwise sit on can be torn
+ * down and recreated by a client-side navigation while this module stays
+ * loaded -- the same reason `previousNavigating` above is module scope
+ * rather than an element-local variable.
+ */
+const focusWasNavigating = {};
+
+/*
+ * Flow 30's debounce timer, for the bare `watch()` registered near the
+ * bottom of this file.
+ */
+let debounceTimer;
 
 /**
  * Renders a `navigating` value the same way for the counted log and for the
@@ -73,6 +93,12 @@ const { state } = store( 'router-navigation-lifecycle', {
 		_log: [],
 		_settlementLog: [],
 
+		// Flow 30's debounced-bar flag. Declared with an idle default and
+		// written directly (never derived), unlike `navigating`/`initiator`
+		// below -- this is *this* store's own state, not a passthrough of
+		// `core/router`'s, so none of the "don't declare" reasoning applies.
+		showBar: false,
+
 		/*
 		 * Raw passthroughs of the router's own state, for the four
 		 * directive-bound elements Flow 24 enumerates. These need the real
@@ -103,6 +129,23 @@ const { state } = store( 'router-navigation-lifecycle', {
 		 * `data-wp-context`, and this getter reads it back -- see Flow 13.
 		 */
 		get isOrigin() {
+			const { regionId } = getContext();
+			return (
+				!! routerState.navigating && routerState.initiator === regionId
+			);
+		},
+
+		/*
+		 * Flow 28's sufficiency demonstration: `true` only while a
+		 * navigation *this* region's own element initiated is in flight.
+		 * Computationally identical to `isOrigin` above -- both are the
+		 * documented composition `state.navigating && state.initiator ===
+		 * myRegionId` -- but kept as its own getter because it stands in
+		 * for a real consumer's own per-block spinner, built from only the
+		 * two public keys and `getContext()`, independent of the
+		 * `isOrigin`/`is-origin` scaffolding the earlier identity flows use.
+		 */
+		get isLoading() {
 			const { regionId } = getContext();
 			return (
 				!! routerState.navigating && routerState.initiator === regionId
@@ -241,7 +284,53 @@ const { state } = store( 'router-navigation-lifecycle', {
 			}
 			previousNavigating = navigating;
 		},
+		/*
+		 * Flow 29's sufficiency demonstration: region-scoped focus. Edge-
+		 * triggered like `watchSettlement` above, but per-instance -- it
+		 * lives on its own element inside *each* region (a third
+		 * `data-wp-watch`, never run-counted), so it is scoped and can read
+		 * its own `regionId` from context. Only fires on the falling edge
+		 * when `initiator` still reads as *this* region's own id, which is
+		 * what makes it refrain on a traversal (`initiator` reads absent
+		 * there). No DOM reference is captured across the navigation: the
+		 * target link is looked up fresh, by region id, only once the
+		 * falling edge actually fires -- never stored ahead of time.
+		 */
+		watchFocus() {
+			const { regionId } = getContext();
+			const navigating = !! routerState.navigating;
+			if (
+				focusWasNavigating[ regionId ] &&
+				! navigating &&
+				routerState.initiator === regionId
+			) {
+				document
+					.querySelector(
+						`[data-wp-router-region="${ regionId }"] a`
+					)
+					?.focus();
+			}
+			focusWasNavigating[ regionId ] = navigating;
+		},
 	},
+} );
+
+/*
+ * Flow 30's sufficiency demonstration: a Core-loading-bar equivalent,
+ * rebuilt purely from the two public keys plus a consumer-side 400 ms
+ * debounce -- design doc pattern (c), verbatim. A bare `watch()`, not a
+ * `data-wp-watch`: the timer callback writes this store's own `state`
+ * (`showBar`), not `context`, so it needs no scope at all.
+ */
+watch( () => {
+	if ( routerState.navigating ) {
+		debounceTimer = setTimeout( () => {
+			state.showBar = true;
+		}, 400 );
+	} else {
+		clearTimeout( debounceTimer );
+		state.showBar = false;
+	}
 } );
 
 /*

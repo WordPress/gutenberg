@@ -166,6 +166,35 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 						data-wp-text="state.readout"
 					>not hydrated</p>
 				<?php endif; ?>
+
+				<?php
+				/*
+				 * Flow 28's sufficiency demonstration: a per-block spinner
+				 * that shows only while *this* region's own navigation is
+				 * in flight. `state.isLoading` reads `getContext().regionId`
+				 * the same way `state.isOrigin` above does, so one getter
+				 * serves every region on the page.
+				 */
+				?>
+				<span
+					data-testid="spinner-<?php echo esc_attr( $region_id ); ?>"
+					data-wp-class--is-loading="state.isLoading"
+				></span>
+
+				<?php
+				/*
+				 * Flow 29's sufficiency demonstration: a third `data-wp-watch`
+				 * (never run-counted), one per region, edge-triggered on the
+				 * `navigating` reading and scoped so it can read its own
+				 * `regionId` from context. See `watchFocus()` in `view.js`
+				 * for why its previous-`navigating` bookkeeping is kept
+				 * outside `context` rather than in it.
+				 */
+				?>
+				<span
+					data-testid="focus-watcher-<?php echo esc_attr( $region_id ); ?>"
+					data-wp-watch="callbacks.watchFocus"
+				></span>
 			</div>
 		<?php endforeach; ?>
 
@@ -231,6 +260,50 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 
 	<span data-testid="bind-aria-busy" data-wp-bind--aria-busy="state.navigating"></span>
 	<span data-testid="bind-class-busy" data-wp-class--busy="state.navigating"></span>
+
+	<?php
+	/*
+	 * Flows 24-26 (Task 10): the two `hidden` bindings, deliberately
+	 * opposite polarities on the same page. `bind-hidden-negated` is
+	 * `!state.navigating` -- the spinner shape, visible only while
+	 * navigating -- and `bind-hidden-plain` is the un-negated inverse. Do
+	 * not "fix" either expression to make a failing assertion pass: an
+	 * earlier plan revision had these two inverted and a reviewer caught
+	 * it, precisely because a writer following an inverted expectation
+	 * would go red against *correct* code here and "fix" it by dropping
+	 * the negation, planting the bug in the fixture instead of the test.
+	 * Check polarity against the spec/plan text, not intuition, and see
+	 * `getEvaluate`/`bind.ts`'s handling of the `!` prefix and of `hidden`
+	 * specifically (`packages/interactivity/src/hooks.tsx:249,283-284` and
+	 * `packages/interactivity/src/directives/bind.ts:67-72`).
+	 */
+	?>
 	<span data-testid="bind-hidden-negated" data-wp-bind--hidden="!state.navigating"></span>
 	<span data-testid="bind-hidden-plain" data-wp-bind--hidden="state.navigating"></span>
+
+	<?php
+	/*
+	 * Flow 27: a replica of Core's WP 6.9 loading-bar markup, bound to the
+	 * *public* `core/router` store's deprecated `state.navigation` getter --
+	 * not the private store WP 7.0 binds instead. `data-wp-interactive` is
+	 * repeated here (unlike the plain elements above) because this element
+	 * switches namespace away from `router-navigation-lifecycle`, not
+	 * because of the region-detection trap noted earlier in this file.
+	 */
+	?>
+	<div
+		data-testid="loading-bar"
+		data-wp-interactive="core/router"
+		data-wp-class--start-animation="state.navigation.hasStarted"
+		data-wp-class--finish-animation="state.navigation.hasFinished"
+	></div>
+
+	<?php
+	/*
+	 * Flow 30: a Core-loading-bar equivalent, rebuilt purely from the new
+	 * public keys plus a consumer-side 400 ms debounce -- see the bare
+	 * `watch()` call in `view.js` that writes `state.showBar`.
+	 */
+	?>
+	<span data-testid="debounced-bar" data-wp-class--show-bar="state.showBar"></span>
 </div>
