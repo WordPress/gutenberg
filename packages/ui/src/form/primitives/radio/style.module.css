@@ -3,13 +3,13 @@
 
 	@layer components {
 		.root {
-			--wp-ui-radio-input-size: 16px;
+			--_radio-input-size: var(--wp-ui-radio-input-size, var(--wpds-dimension-size-2xs));
 
 			position: relative;
 			display: inline-block;
 			flex-shrink: 0;
-			width: var(--wp-ui-radio-input-size);
-			height: var(--wp-ui-radio-input-size);
+			width: var(--_radio-input-size);
+			aspect-ratio: 1;
 			border-radius: 50%;
 			border:
 				var(--wpds-border-width-xs) solid
@@ -42,6 +42,17 @@
 					border-color: GrayText;
 				}
 			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical centering technique used with transform: translate(-50%, -50%) */
+				left: 50%;
+				width: max(var(--_radio-input-size), var(--wpds-dimension-size-sm));
+				aspect-ratio: 1;
+				transform: translate(-50%, -50%);
+			}
 		}
 
 		.indicator {
@@ -49,8 +60,8 @@
 			position: absolute;
 			inset: 0;
 			margin: auto;
-			width: calc(var(--wp-ui-radio-input-size) / 2);
-			height: calc(var(--wp-ui-radio-input-size) / 2);
+			width: calc(var(--_radio-input-size) / 2);
+			aspect-ratio: 1;
 			border-radius: 50%;
 			background-color: currentColor;
 
