@@ -53,6 +53,13 @@ const focusWasNavigating = {};
  */
 let debounceTimer;
 
+/*
+ * Raw lifecycle-write log. Unlike the counted `data-wp-watch` observer, a
+ * bare `watch()` runs synchronously for each notification, so it can observe
+ * the discharge immediately before this document is replaced.
+ */
+const rawWriteLog = [];
+
 /**
  * Renders a `navigating` value the same way for the counted log and for the
  * `lifecycle navigating` readout. `undefined` (never navigated) and `false`
@@ -330,6 +337,13 @@ watch( () => {
 	}
 } );
 
+watch( () => {
+	rawWriteLog.push( {
+		navigating: routerState.navigating,
+		initiator: routerState.initiator,
+	} );
+} );
+
 /*
  * Persists the counted log to `localStorage` right before this document is
  * torn down, so a test can recover the *outgoing* document's last known
@@ -358,6 +372,10 @@ function persistLogBeforeUnload() {
 		localStorage.setItem(
 			'router-navigation-lifecycle:log-before-unload',
 			state.log
+		);
+		localStorage.setItem(
+			'router-navigation-lifecycle:raw-write-log-before-unload',
+			JSON.stringify( rawWriteLog )
 		);
 	} catch {}
 }

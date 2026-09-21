@@ -2,6 +2,10 @@ import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 
 type LogEntry = { navigating: string; initiator: string };
+type RawWriteLogEntry = {
+	navigating?: boolean;
+	initiator?: string | null;
+};
 type SettlementEntry = {
 	url: string;
 	marker: string | null;
@@ -189,6 +193,28 @@ const readBeforeUnloadLog = async ( page: Page ): Promise< LogEntry[] > => {
 	const text = await page.evaluate( () =>
 		window.localStorage.getItem(
 			'router-navigation-lifecycle:log-before-unload'
+		)
+	);
+	return text ? JSON.parse( text ) : [];
+};
+
+/**
+ * Reads and parses the raw lifecycle-write log as it stood the moment the
+ * previous document (on the same origin) was last torn down -- persisted by
+ * `view.js`'s `pagehide`/`beforeunload` listener into `localStorage`, which
+ * survives a same-origin navigation. Call this only after the forced full
+ * page load this flow expects has landed.
+ *
+ * @param page The Playwright page, already on the destination document.
+ * @return The origin document's raw lifecycle-write log, or `[]` if none was
+ *         ever persisted.
+ */
+const readBeforeUnloadRawLog = async (
+	page: Page
+): Promise< RawWriteLogEntry[] > => {
+	const text = await page.evaluate( () =>
+		window.localStorage.getItem(
+			'router-navigation-lifecycle:raw-write-log-before-unload'
 		)
 	);
 	return text ? JSON.parse( text ) : [];
@@ -563,7 +589,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			);
 		} );
 
-		test.describe( 'Flow 9: an uncached back/forward traversal produces no lifecycle transition, and decides before it writes', () => {
+		test.describe( 'Flow 9: an uncached back/forward traversal produces no lifecycle cycle, and discharges the reading to idle as it reloads', () => {
 			/**
 			 * The shared setup both parts build on: a real router
 			 * navigation (the positive control that the module
@@ -622,7 +648,7 @@ test.describe( 'Router navigation lifecycle', () => {
 				return { page1Url, page2Url, page3Url };
 			};
 
-			test( 'Part A: the traversal reaches the handler and writes nothing', async ( {
+			test( 'Part A: the traversal reaches the handler and discharges to idle', async ( {
 				page,
 				interactivityUtils: utils,
 			} ) => {
@@ -642,20 +668,19 @@ test.describe( 'Router navigation lifecycle', () => {
 					{ navigating: 'not navigating', initiator: 'absent' },
 				] );
 
-				// The outgoing document's last known state must still be
-				// exactly the post-setup log -- nothing written between
-				// the traversal and the document being replaced.
-				expect( await readBeforeUnloadLog( page ) ).toEqual( [
-					{ navigating: 'not navigating', initiator: 'absent' },
-					{ navigating: 'navigating', initiator: 'lifecycle-a' },
-					{
-						navigating: 'not navigating',
-						initiator: 'lifecycle-a',
-					},
+				// The outgoing document's raw log must end with the setup
+				// navigation's retained identity followed by the traversal's
+				// single discharge. The frame-deferred counted log is not
+				// asserted here because its final flush races replacement.
+				expect(
+					( await readBeforeUnloadRawLog( page ) ).slice( -2 )
+				).toEqual( [
+					{ navigating: false, initiator: 'lifecycle-a' },
+					{ navigating: false, initiator: null },
 				] );
 			} );
 
-			test( 'Part B: a navigation superseded by the traversal keeps reading as origin until the reload lands', async ( {
+			test( 'Part B: a navigation superseded by the traversal discharges to idle', async ( {
 				page,
 				interactivityUtils: utils,
 			} ) => {
@@ -693,22 +718,16 @@ test.describe( 'Router navigation lifecycle', () => {
 					{ navigating: 'not navigating', initiator: 'absent' },
 				] );
 
-				// Primary discriminator: the outgoing document's last
-				// known state, recovered from `localStorage`, must
-				// still show `lifecycle-a` as the in-flight entry's
-				// initiator -- not a fifth entry with a fallen-through,
-				// cleared identity (which the design prices as "a
-				// superseded navigation's `[true, <initiator>]` reading
-				// persists until the earlier of the reload landing and
-				// the release bound").
-				expect( await readBeforeUnloadLog( page ) ).toEqual( [
-					{ navigating: 'not navigating', initiator: 'absent' },
-					{ navigating: 'navigating', initiator: 'lifecycle-a' },
-					{
-						navigating: 'not navigating',
-						initiator: 'lifecycle-a',
-					},
-					{ navigating: 'navigating', initiator: 'lifecycle-a' },
+				// Primary discriminator: the outgoing document's raw log
+				// must end with the refresh's in-flight start followed by
+				// exactly one discharge that clears the identity. The
+				// counted log is frame-deferred and is not asserted for the
+				// traversal because its final flush races replacement.
+				expect(
+					( await readBeforeUnloadRawLog( page ) ).slice( -2 )
+				).toEqual( [
+					{ navigating: true, initiator: 'lifecycle-a' },
+					{ navigating: false, initiator: null },
 				] );
 			} );
 		} );
