@@ -62,6 +62,69 @@ export function getActiveViewOverrides(
 	return viewList?.find( ( v ) => v.slug === slug )?.view ?? {};
 }
 
+export const TEMPLATE_PAGE_ITEM_ID_PREFIX = 'template:';
+export const TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX = 'template-placeholder:';
+
+export const DEFAULT_TEMPLATE_VIEW: View = {
+	type: 'grid' as const,
+	search: '',
+	filters: [],
+	page: 1,
+	perPage: 20,
+	sort: {
+		field: 'title',
+		direction: 'asc' as const,
+	},
+	fields: [ 'author', 'active', 'slug' ],
+	titleField: 'title',
+	descriptionField: 'description',
+	mediaField: 'preview',
+};
+
+export const DEFAULT_TEMPLATE_LAYOUTS: SupportedLayouts = {
+	table: {
+		showMedia: false,
+	},
+	grid: {
+		showMedia: true,
+	},
+	list: {
+		showMedia: false,
+	},
+};
+
+export function getTemplateViewSlug( postType: string ) {
+	return `post-list-${ postType }-templates`;
+}
+
+export function getPostTypeViewSlug( postType: string ) {
+	return `post-list-${ postType }-content`;
+}
+
+export function getTemplatePageItemId( templateId: string | number ) {
+	return `${ TEMPLATE_PAGE_ITEM_ID_PREFIX }${ templateId }`;
+}
+
+export function getTemplateIdFromPageItemId( itemId: string ) {
+	if ( ! itemId.startsWith( TEMPLATE_PAGE_ITEM_ID_PREFIX ) ) {
+		return undefined;
+	}
+
+	return itemId.slice( TEMPLATE_PAGE_ITEM_ID_PREFIX.length );
+}
+
+export function getTemplatePlaceholderItemId( templateSlug: string ) {
+	return `${ TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX }${ templateSlug }`;
+}
+
+export function getTemplateSlugFromPlaceholderItemId( itemId: string ) {
+	if ( ! itemId.startsWith( TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX ) ) {
+		return undefined;
+	}
+
+	return itemId.slice( TEMPLATE_PLACEHOLDER_ITEM_ID_PREFIX.length );
+}
+
 export async function ensureView(
 	type: string,
 	slug?: string,
@@ -80,10 +143,24 @@ export async function ensureView(
 	return loadView( {
 		kind: 'postType',
 		name: type,
-		slug: 'default-new',
+		slug: getPostTypeViewSlug( type ),
 		defaultView,
 		defaultLayouts,
 		activeViewOverrides: getActiveViewOverrides( viewList, slug ?? 'all' ),
+		queryParams: search,
+	} );
+}
+
+export async function ensureTemplateView(
+	postType: string,
+	search?: { page?: number; search?: string }
+) {
+	return loadView( {
+		kind: 'postType',
+		name: 'wp_template',
+		slug: getTemplateViewSlug( postType ),
+		defaultView: DEFAULT_TEMPLATE_VIEW,
+		activeViewOverrides: {},
 		queryParams: search,
 	} );
 }
@@ -126,7 +203,9 @@ export function viewToQuery( view: View, postType: string ) {
 		( filter ) => filter.field === 'status'
 	);
 	if ( status ) {
-		result.status = status.value;
+		result.status = Array.isArray( status.value )
+			? status.value.join( ',' )
+			: status.value;
 	} else if ( postType === 'attachment' ) {
 		result.status = 'inherit';
 	} else {
@@ -136,10 +215,14 @@ export function viewToQuery( view: View, postType: string ) {
 	const author = view.filters?.find(
 		( filter ) => filter.field === 'author'
 	);
-	if ( author && author.operator === 'is' ) {
-		result.author = author.value;
-	} else if ( author && author.operator === 'isNot' ) {
-		result.author_exclude = author.value;
+	if ( author && [ 'is', 'isAny' ].includes( author.operator ) ) {
+		result.author = Array.isArray( author.value )
+			? author.value.join( ',' )
+			: author.value;
+	} else if ( author && [ 'isNot', 'isNone' ].includes( author.operator ) ) {
+		result.author_exclude = Array.isArray( author.value )
+			? author.value.join( ',' )
+			: author.value;
 	}
 
 	const commentStatus = view.filters?.find(
@@ -171,6 +254,31 @@ export function viewToQuery( view: View, postType: string ) {
 	// For attachments, we need to embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
 		result._embed = 'wp:attached-to';
+	}
+
+	return result;
+}
+
+export function templateViewToQuery( view: View, postType: string ) {
+	const result: Record< string, any > = {
+		per_page: -1,
+		post_type: postType,
+	};
+
+	if ( undefined !== view.page ) {
+		result.page = view.page;
+	}
+
+	if ( ! [ undefined, '' ].includes( view.search ) ) {
+		result.search = view.search;
+	}
+
+	if ( undefined !== view.sort?.field ) {
+		result.orderby = view.sort.field;
+	}
+
+	if ( undefined !== view.sort?.direction ) {
+		result.order = view.sort.direction;
 	}
 
 	return result;

@@ -1,18 +1,41 @@
 type Style = {
 	src: string;
-	deps?: string[];
+	deps?: string[] | Record< string, string >;
 	version?: string;
 	media?: string;
 };
 type InlineStyle = string | string[];
 type Script = {
 	src: string;
-	deps?: string[];
+	deps?: string[] | Record< string, string >;
 	version?: string;
 	in_footer?: boolean;
 };
 type InlineScript = string | string[];
 type ScriptModules = Record< string, string >;
+
+let importMapIndex = 0;
+
+function getImportMapImports(): Record< string, string > {
+	const imports: Record< string, string > = {};
+	const importMapElements = document.querySelectorAll< HTMLScriptElement >(
+		'script[type=importmap]'
+	);
+
+	for ( const importMapElement of importMapElements ) {
+		try {
+			Object.assign(
+				imports,
+				JSON.parse( importMapElement.text ).imports || {}
+			);
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to parse import map:', error );
+		}
+	}
+
+	return imports;
+}
 
 /**
  * Injects or extends the import map with new module entries.
@@ -24,47 +47,38 @@ function injectImportMap( scriptModules: Record< string, string > ): void {
 		return;
 	}
 
-	// Find the existing import map script element
-	const existingMapElement = document.querySelector< HTMLScriptElement >(
-		'script#wp-importmap[type=importmap]'
+	const existingImports = getImportMapImports();
+	const newImports = Object.fromEntries(
+		Object.entries( scriptModules ).filter(
+			( [ id ] ) => ! existingImports[ id ]
+		)
 	);
 
-	if ( existingMapElement ) {
-		try {
-			// Parse the existing import map
-			const existingMap = JSON.parse( existingMapElement.text );
-
-			// Ensure the imports object exists
-			if ( ! existingMap.imports ) {
-				existingMap.imports = {};
-			}
-
-			// Merge new imports with existing ones (new entries take precedence)
-			existingMap.imports = {
-				...existingMap.imports,
-				...scriptModules,
-			};
-
-			// Update the script element's content
-			existingMapElement.text = JSON.stringify( existingMap, null, 2 );
-		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.error( 'Failed to parse or update import map:', error );
-		}
-	} else {
-		// If no import map exists, create a new one
-		const script = document.createElement( 'script' );
-		script.type = 'importmap';
-		script.id = 'wp-importmap';
-		script.text = JSON.stringify(
-			{
-				imports: scriptModules,
-			},
-			null,
-			2
-		);
-		document.head.appendChild( script );
+	if ( Object.keys( newImports ).length === 0 ) {
+		return;
 	}
+
+	const script = document.createElement( 'script' );
+	script.type = 'importmap';
+	script.id = document.getElementById( 'wp-importmap' )
+		? `wp-importmap-lazy-${ ++importMapIndex }`
+		: 'wp-importmap';
+	script.text = JSON.stringify(
+		{
+			imports: newImports,
+		},
+		null,
+		2
+	);
+	document.head.appendChild( script );
+}
+
+function getDependencies( deps?: string[] | Record< string, string > ) {
+	if ( Array.isArray( deps ) ) {
+		return deps;
+	}
+
+	return Object.values( deps ?? {} );
 }
 
 function loadStylesheet( handle: string, styleData: Style ): Promise< void > {
@@ -186,8 +200,7 @@ function buildDependencyOrderedList< T extends Style | Script >(
 
 		if ( assetsData[ handle ] ) {
 			// Visit all dependencies first
-			const deps = assetsData[ handle ].deps || [];
-			deps.forEach( ( dep ) => {
+			getDependencies( assetsData[ handle ].deps ).forEach( ( dep ) => {
 				if ( assetsData[ dep ] ) {
 					visit( dep );
 				}

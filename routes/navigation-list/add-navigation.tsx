@@ -6,6 +6,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import {
 	Button,
+	CheckboxControl,
 	Modal,
 	TextControl,
 	__experimentalVStack as VStack,
@@ -13,6 +14,7 @@ import {
 } from '@wordpress/components';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
+const PAGE_LIST_BLOCK_CONTENT = '<!-- wp:core/page-list /-->';
 
 export const AddNavigationModal = ( {
 	closeModal,
@@ -20,6 +22,7 @@ export const AddNavigationModal = ( {
 	closeModal?: () => void;
 } ) => {
 	const [ menuTitle, setMenuTitle ] = useState( '' );
+	const [ autoSyncWithPages, setAutoSyncWithPages ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const navigate = useNavigate();
 
@@ -42,6 +45,9 @@ export const AddNavigationModal = ( {
 				{
 					title: trimmedTitle,
 					status: 'publish',
+					...( autoSyncWithPages
+						? { content: PAGE_LIST_BLOCK_CONTENT }
+						: {} ),
 				},
 				{
 					throwOnError: true,
@@ -103,6 +109,15 @@ export const AddNavigationModal = ( {
 						label={ __( 'Name' ) }
 						placeholder={ __( 'Enter menu name' ) }
 						disabled={ isBusy }
+					/>
+					<CheckboxControl
+						label={ __( 'Auto sync with site pages' ) }
+						checked={ autoSyncWithPages }
+						onChange={ setAutoSyncWithPages }
+						disabled={ isBusy }
+						help={ __(
+							'This menu will update automatically when you add, rename, or remove pages, until you choose to customize it manually.'
+						) }
 					/>
 					<HStack justify="right" spacing={ 2 }>
 						<Button

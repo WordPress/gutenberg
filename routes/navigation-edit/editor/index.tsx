@@ -1,39 +1,66 @@
 import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
-import { useEditorAssets } from '@wordpress/lazy-editor';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
+import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import './style.scss';
 import NavigationMenuContent from './content';
 
-const noop = () => {};
-
-export default function NavigationMenuEditor( { id }: { id: number } ) {
+export default function NavigationMenuEditor( {
+	id,
+	isAddingItems,
+	navigationMenu,
+	onCloseAddMenuItems,
+	onAutoMenuChange,
+}: {
+	id: number;
+	isAddingItems: boolean;
+	navigationMenu: {
+		id: number;
+		title?: {
+			raw?: string;
+			rendered?: string;
+		};
+		content?: {
+			raw?: string;
+			rendered?: string;
+		};
+	};
+	onCloseAddMenuItems: () => void;
+	onAutoMenuChange: ( isAutoMenu: boolean ) => void;
+} ) {
 	const { isReady: assetsReady } = useEditorAssets();
+	const { isReady: settingsReady, editorSettings } = useEditorSettings();
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{ id }
+	) as [
+		unknown[] | undefined,
+		( blocks: unknown[], options?: Record< string, unknown > ) => void,
+		( blocks: unknown[], options?: Record< string, unknown > ) => void,
+	];
 
-	const blocks = useMemo( () => {
-		if ( ! assetsReady || ! id ) {
-			return [];
+	const settings = useMemo( () => {
+		if ( ! editorSettings ) {
+			return editorSettings;
 		}
 
-		return [ createBlock( 'core/navigation', { ref: id } ) ];
-	}, [ assetsReady, id ] );
-
-	// The link UI's search needs a suggestions fetcher, which the block
-	// editor takes from its settings.
-	const settings = useMemo(
-		() => ( {
+		return {
+			...editorSettings,
 			__experimentalFetchLinkSuggestions: (
 				search: string,
 				searchOptions: Record< string, unknown >
-			) => fetchLinkSuggestions( search, searchOptions, {} ),
-		} ),
-		[]
-	);
+			) => fetchLinkSuggestions( search, searchOptions, editorSettings ),
+		};
+	}, [ editorSettings ] );
 
-	if ( ! assetsReady || ! blocks.length ) {
+	if ( ! assetsReady || ! settingsReady || ! blocks ) {
 		return (
 			<div
 				style={ {
@@ -50,12 +77,18 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
+			key={ id }
 			settings={ settings }
 			value={ blocks }
-			onChange={ noop }
-			onInput={ noop }
+			onChange={ onChange }
+			onInput={ onInput }
 		>
-			<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
+			<NavigationMenuContent
+				isAddingItems={ isAddingItems }
+				navigationMenu={ navigationMenu }
+				onCloseAddMenuItems={ onCloseAddMenuItems }
+				onAutoMenuChange={ onAutoMenuChange }
+			/>
 		</BlockEditorProvider>
 	);
 }

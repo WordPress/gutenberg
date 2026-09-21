@@ -123,6 +123,8 @@ function VisualEditor( {
 	iframeProps,
 	contentRef,
 	className,
+	isGlobalEditorColorScheme = false,
+	editorSettings: currentEditorSettings,
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
@@ -135,8 +137,8 @@ function VisualEditor( {
 		isFocusedEntity,
 		isDesignPostType,
 		postType,
-		isPreview,
-		styles,
+		isPreview: storeIsPreview,
+		styles: storeStyles,
 		hasCanvasWidth,
 		canvasWidth,
 	} = useSelect( ( select ) => {
@@ -194,6 +196,8 @@ function VisualEditor( {
 			canvasWidth: _canvasWidth,
 		};
 	}, [] );
+	const isPreview = currentEditorSettings?.isPreviewMode ?? storeIsPreview;
+	const styles = currentEditorSettings?.styles ?? storeStyles;
 	const { isCleanNewPost } = useSelect( editorStore );
 	const {
 		hasRootPaddingAwareAlignments,
@@ -400,6 +404,20 @@ function VisualEditor( {
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const iframeBodyMinHeightCSS =
 		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
+	const globalEditorColorSchemeCSS = isGlobalEditorColorScheme
+		? `:where(.block-editor-iframe__html, .block-editor-iframe__body, .editor-styles-wrapper, .block-editor-block-list__layout, .is-root-container){
+			--wp-admin-theme-color: var(--wp-block-synced-color, #7a00df);
+			--wp-admin-theme-color--rgb: var(--wp-block-synced-color--rgb, 122, 0, 223);
+			--wp-admin-theme-color-darker-10: #6700bd;
+			--wp-admin-theme-color-darker-20: #540099;
+			--wp-components-color-accent: var(--wp-block-synced-color, #7a00df);
+			--wp-components-color-accent-darker-10: #6700bd;
+			--wp-components-color-accent-darker-20: #540099;
+		}
+		:where(.block-editor-block-list__block.is-hovered, .block-editor-block-list__block.is-selected, .block-editor-block-list__block.is-highlighted)::after{
+			outline-color: var(--wp-block-synced-color, #7a00df);
+		}`
+		: '';
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -424,7 +442,8 @@ function VisualEditor( {
 					isNavigationPreview
 						? `.block-editor-iframe__body{${ centerContentCSS }padding:var(--wp--style--block-gap,2em);}`
 						: ''
-				}`,
+				}
+				${ globalEditorColorSchemeCSS }`,
 				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
@@ -437,6 +456,7 @@ function VisualEditor( {
 		iframeBodyMinHeightCSS,
 		isNavigationPreview,
 		paddingStyle,
+		globalEditorColorSchemeCSS,
 	] );
 
 	const typewriterRef = useTypewriter();

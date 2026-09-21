@@ -77,6 +77,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
+	'disableStartPageOptions',
 	'onNavigateToEntityRecord',
 	'imageDefaultSize',
 	'imageDimensions',
@@ -443,10 +444,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			].includes( postType ),
 			[ isNavigationPostEditorKey ]: postType === 'wp_navigation',
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
-			// don't treat template parts as contentOnly sections.
+			// don't treat template parts as contentOnly sections. The Extensible Site
+			// Editor prototype opts back in for the universal canvas so global
+			// template parts can be selected first, then explicitly edited inline.
 			disableContentOnlyForTemplateParts:
-				renderingMode === 'template-locked' ||
-				settings.disableContentOnlyForTemplateParts,
+				settings.disableContentOnlyForTemplateParts ||
+				( renderingMode === 'template-locked' &&
+					! settings.__experimentalUniversalCanvas ),
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
