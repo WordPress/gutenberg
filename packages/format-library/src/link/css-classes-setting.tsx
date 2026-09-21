@@ -3,7 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as WCInputControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import type { CSSClassesSettingProps } from '../types';
@@ -60,7 +60,7 @@ const CSSClassesSettingComponent = ( {
 				{ setting.title }
 			</VisuallyHidden>
 			<Stack direction="column" gap="md">
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ setting.title }
 					onChange={ handleCheckboxChange }
 					checked={ isSettingActive || hasValue }

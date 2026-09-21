@@ -4,7 +4,8 @@ import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Badge',
+	title: 'Components/@wordpress-ui/Badge',
+	id: 'design-system-components-badge',
 	component: Badge,
 	parameters: {
 		componentStatus: {

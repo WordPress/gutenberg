@@ -31,7 +31,7 @@
 	"overrides": {
 		"sharp": "0.35.4",
 		"onnxruntime-node": {
-			"adm-zip": "0.6.0"
+			"adm-zip": "0.6.1"
 		}
 	},
 	"publishConfig": {

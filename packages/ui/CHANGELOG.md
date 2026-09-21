@@ -9,10 +9,14 @@
 
 ### New Features
 
+-   Add `SwitchControl` component. ([#83146](https://github.com/WordPress/gutenberg/pull/83146))
+-   Add `Switch` form primitive ([#83039](https://github.com/WordPress/gutenberg/pull/83039)).
+-   Add `RadioGroup` form primitive ([#83038](https://github.com/WordPress/gutenberg/pull/83038)).
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
 
 ### Enhancements
 
+-   `Fieldset`: Use a tighter gap between the legend and an immediately following description or details ([#82729](https://github.com/WordPress/gutenberg/pull/82729)).
 -   `Select`, `SelectControl`: Mark as recommended for use in a WordPress environment ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
@@ -26,9 +30,6 @@
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
-
-### Bug Fixes
-
 -   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
 
 ### Internal

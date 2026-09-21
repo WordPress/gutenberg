@@ -80,15 +80,15 @@ For example, to change the `indentation` to four spaces and turn off the `number
 
 ### `custom-property-pattern`
 
-The preset disallows `--_gcd-*` custom properties. These are private internals to `@wordpress/ui` and will break at any time.
+The preset disallows `--_gcd-*` and `--_wp-*` custom properties. These are private and will break at any time.
 
-Stylelint does not merge `custom-property-pattern` values. If your project already sets this rule, the preset ban is replaced — include `(?!_gcd-)` in your pattern if you want to keep it, for example:
+Stylelint does not merge `custom-property-pattern` values. If your project already sets this rule, the preset ban is replaced — include `(?!_(?:gcd|wp)-)` in your pattern if you want to keep it, for example:
 
 ```json
 {
 	"extends": "@wordpress/stylelint-config",
 	"rules": {
-		"custom-property-pattern": "^(?!_gcd-)my-prefix-.+"
+		"custom-property-pattern": "^(?!_(?:gcd|wp)-)my-prefix-.+"
 	}
 }
 ```
