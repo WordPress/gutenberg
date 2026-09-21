@@ -121,7 +121,7 @@ Prompt visitors to take action with a group of button-style links.
 -	**Name:** [core/buttons](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
