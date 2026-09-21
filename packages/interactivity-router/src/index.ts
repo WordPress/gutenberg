@@ -40,9 +40,11 @@ export interface NavigateOptions {
 	screenReaderAnnouncement?: boolean;
 	/**
 	 * Who started this navigation, published on `state.initiator` while the
-	 * navigation is in flight. A string (for example a router region id) is
-	 * used as is. `null` publishes `null`. When omitted, the router derives it
-	 * from the directive scope the action was called from.
+	 * navigation is in flight. A nonempty string (for example a router region
+	 * id) is used as is. `null` suppresses attribution silently. When omitted,
+	 * the router derives it from the directive scope the action was called from.
+	 * An empty string or any other invalid value resolves to `null`, warns when
+	 * `SCRIPT_DEBUG` is enabled, and never derives an initiator.
 	 */
 	initiator?: string | null;
 }
@@ -578,13 +580,14 @@ interface Store {
  * Resolves the `initiator` option of `actions.navigate()` into the value
  * published on `state.initiator`.
  *
- * A string is returned as is and `null` returns `null`. When the option is
- * omitted, the initiator is derived from whatever directive scope is ambient
- * when the action is called: the id of the closest router region (including
- * the element itself), or `null` when there is none. An unwrapped `watch()`
- * callback contributes no scope, while a `withScope()`-wrapped callback
- * contributes the scope it installed. Any other value warns and resolves to
- * `null`.
+ * A nonempty string is returned as is; `null` suppresses attribution silently.
+ * When the option is omitted, the initiator is derived from
+ * whatever directive scope is ambient when the action is called: the id of
+ * the closest router region (including the element itself), or `null` when
+ * there is none. An unwrapped `watch()` callback contributes no scope, while
+ * a `withScope()`-wrapped callback contributes the scope it installed. An
+ * empty string or any other invalid value warns when `SCRIPT_DEBUG` is
+ * enabled, resolves to `null`, and never derives an initiator.
  *
  * Derivation never throws. It returns `null` for a call made outside any
  * scope, for a scope whose `ref.current` is not an element, and for an
@@ -600,7 +603,7 @@ interface Store {
  * @return The value to publish on `state.initiator`.
  */
 const resolveInitiator = ( declared: unknown ): string | null => {
-	if ( typeof declared === 'string' ) {
+	if ( typeof declared === 'string' && declared !== '' ) {
 		return declared;
 	}
 	if ( declared === null ) {
@@ -620,7 +623,7 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 	}
 	if ( globalThis.SCRIPT_DEBUG ) {
 		warn(
-			'The `initiator` option of `actions.navigate()` must be a string or null. Ignoring the value.'
+			'The `initiator` option of `actions.navigate()` must be a nonempty string or null. Ignoring the value.'
 		);
 	}
 	return null;
@@ -670,7 +673,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
 		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
 		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
-		 * @param [options.initiator]                Who started the navigation. A string is used as is, `null` publishes `null`, and omitting it derives the value from the directive scope. Any other value warns and resolves to `null`.
+		 * @param [options.initiator]                Who started the navigation. A nonempty string is used as is; `null` suppresses attribution silently; omitting it derives the value from the directive scope. An empty string or any other invalid value warns when `SCRIPT_DEBUG` is enabled, resolves to `null`, and never derives an initiator.
 		 *
 		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */

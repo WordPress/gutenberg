@@ -1,7 +1,7 @@
 /**
- * The `initiator` option's three declared arms, exercised from
- * inside a router region, covering the declared values that this suite can
- * distinguish. The omitted-value derivation has its own dedicated suite.
+ * The `initiator` option's declared values, exercised from inside a router
+ * region, covering the declared values that this suite can distinguish. The
+ * omitted-value derivation has its own dedicated suite.
  *
  * Warning-count assertions live in their own file: `warn()`'s dedupe set
  * (`packages/interactivity/src/utils.ts`) is module-level, so a second
@@ -72,8 +72,8 @@ function setupRegionTrigger( id: string ) {
 	};
 }
 
-describe( 'the initiator option — three arms, exercised in-region', () => {
-	test( 'the string arm reports it verbatim; the null arm reports null; the invalid arm reports null and warns exactly once, all from inside region-x', async () => {
+describe( 'the initiator option — declared values, exercised in-region', () => {
+	test( 'a nonempty string reports verbatim; null suppresses attribution; empty and invalid values report null and warn exactly once, all from inside region-x', async () => {
 		const { actions, state } = await import( '../index' );
 		const region = setupRegionTrigger( 'row5' );
 
@@ -99,8 +99,20 @@ describe( 'the initiator option — three arms, exercised in-region', () => {
 		);
 		expect( state.initiator ).toBeNull();
 
+		// Empty-string arm: reports null and never derives the enclosing region's
+		// id. Its warning is deduped with the non-string invalid arm below.
+		await region.runInScope( () =>
+			actions.navigate( 'http://localhost/row5-empty', {
+				initiator: '',
+				html: '<!doctype html><title>t</title><body>a</body>',
+				loadingAnimation: false,
+				screenReaderAnnouncement: false,
+			} )
+		);
+		expect( state.initiator ).toBeNull();
+
 		// Invalid arm: a non-string, non-null, non-undefined value. Reports
-		// null and warns exactly once with the specified message.
+		// null and shares the one warning emission with the empty-string arm.
 		await region.runInScope( () =>
 			actions.navigate( 'http://localhost/row5-invalid', {
 				// @ts-expect-error — deliberately invalid for this test.
@@ -112,7 +124,7 @@ describe( 'the initiator option — three arms, exercised in-region', () => {
 		);
 		expect( state.initiator ).toBeNull();
 		expect( console ).toHaveWarnedWith(
-			'The `initiator` option of `actions.navigate()` must be a string or null. Ignoring the value.'
+			'The `initiator` option of `actions.navigate()` must be a nonempty string or null. Ignoring the value.'
 		);
 	} );
 } );
