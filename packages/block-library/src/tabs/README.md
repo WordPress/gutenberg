@@ -40,6 +40,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `blockGap`: `true`
   - `margin`: `true`
   - `padding`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 
