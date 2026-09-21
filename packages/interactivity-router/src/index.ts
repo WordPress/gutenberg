@@ -447,8 +447,9 @@ window.addEventListener( 'popstate', async () => {
 
 		const page = await pages.get( pagePath );
 
-		// A cached entry that resolved to nothing also reloads. Same as above:
-		// reload first, then end the lifecycle, writing only what changes.
+		// A cached entry that resolved to nothing also reloads. The claim-frame
+		// clear above already ran; on this exit, reload comes before the
+		// discharge, which writes only what changes.
 		if ( ! page ) {
 			try {
 				window.location.reload();
