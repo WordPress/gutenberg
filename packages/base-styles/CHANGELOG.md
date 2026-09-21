@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `radio-control`: Use the design system tokens for the default border, hover border, selected thumb, and disabled fill, border, and thumb.
 -   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 
 ## 13.1.0 (2026-09-10)
