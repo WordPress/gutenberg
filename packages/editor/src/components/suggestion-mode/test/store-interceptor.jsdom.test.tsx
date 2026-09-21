@@ -9,9 +9,9 @@ import {
 } from 'vitest';
 import { render, act } from '@testing-library/react';
 import {
-	createRegistry,
-	createReduxStore,
 	RegistryProvider,
+	createReduxStore,
+	createRegistry,
 } from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -35,6 +35,7 @@ import SuggestionStoreInterceptor, {
 	withSuggestionMarker,
 	lcsClientIds,
 	stableSiblingSet,
+	pairReplacedBlocks,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -210,7 +211,6 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 	function setup( { initialBlocks }: { initialBlocks?: any[] } = {} ) {
 		const registry = createRegistry();
-		registry.register( createStubCoreStore() );
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
 		// where the intent is persisted as a preference; later branches
@@ -219,6 +219,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
+		registry.register( createStubCoreStore() );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
@@ -628,6 +629,182 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			anchorClientId: clientId,
 			parentClientId: null,
 		} );
+	} );
+
+	it( 'links the two halves of a block-switcher transform with a shared group id', async () => {
+		// A transform dispatches `replaceBlocks`: the old block disappears
+		// and a new one appears in the same store update. Diffed
+		// independently that is a removal suggestion plus an insertion
+		// suggestion, and resolving one without the other leaves either a
+		// duplicate block or a hole. Both halves must carry one group id.
+		const original = createBlock( TEST_BLOCK_NAME, { content: 'Before' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ original ],
+		} );
+
+		const replacement = createBlock( TEST_BLOCK_NAME, {
+			content: 'After',
+		} );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.replaceBlocks( original.clientId, replacement );
+		} );
+		await flushSubscribers();
+
+		const select = registry.select( blockEditorStore );
+		const removedMarker = select.getBlockAttributes( original.clientId )
+			?.metadata?.suggestion;
+		const insertedMarker = select.getBlockAttributes( replacement.clientId )
+			?.metadata?.suggestion;
+
+		expect( removedMarker?.type ).toBe( 'pending-remove' );
+		expect( insertedMarker?.type ).toBe( 'pending-insert' );
+		expect( insertedMarker?.groupId ).toEqual( expect.any( String ) );
+		expect( removedMarker?.groupId ).toBe( insertedMarker?.groupId );
+
+		// The persisted ops carry the same id, so the linkage survives a
+		// reload where every captured clientId is stale.
+		const entries = getOverlay().entries;
+		expect( entries[ original.clientId ]?.structuralOp ).toMatchObject( {
+			type: 'block-remove',
+			groupId: removedMarker.groupId,
+		} );
+		expect( entries[ replacement.clientId ]?.structuralOp ).toMatchObject( {
+			type: 'block-insert-after',
+			groupId: removedMarker.groupId,
+		} );
+	} );
+
+	it( 'leaves a plain insertion ungrouped', async () => {
+		// Only a fire that holds BOTH halves is a replacement. Inserting a
+		// block on its own must stay a standalone suggestion, or an
+		// unrelated note would be dragged into its decision.
+		const { registry } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.groupId
+		).toBeUndefined();
+	} );
+
+	it( 'adopts a resetBlocks as the new baseline instead of capturing it', async () => {
+		// A `resetBlocks` is content handed down by the controlling entity —
+		// the sync manager applying another session's changes, a revision
+		// restore, a refetch. Every block in it carries a fresh clientId, so
+		// without the external-reset check the interceptor read the arriving
+		// document as a page of insertions and the outgoing one as a page of
+		// removals, doubling the post in the canvas and opening a note per
+		// block (issue #73411, finding F-21).
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Hello' } ),
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( block: any ) => block.clientId ) ).toEqual(
+			incoming.map( ( block ) => block.clientId )
+		);
+		expect(
+			liveBlocks.map(
+				( block: any ) => block.attributes?.metadata?.suggestion
+			)
+		).toEqual( [ undefined, undefined ] );
+		expect( Object.keys( getOverlay().entries ) ).toEqual( [] );
+	} );
+
+	it( 'still captures an edit made after a resetBlocks', async () => {
+		// The adoption above must re-seed the baseline, not switch capture
+		// off: the next real edit — on a block that only exists because of
+		// the reset — is still a suggestion.
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Edited',
+				} );
+		} );
+		await flushSubscribers();
+
+		// Reverted on the live block, captured in the overlay — the ordinary
+		// attribute-suggestion path.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'From the server' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Edited' );
+	} );
+
+	it( 'does not leave an undo adoption token armed after a resetBlocks', async () => {
+		// An undo/redo IS a `resetBlocks` in the post editor: the guard arms
+		// an adoption token, core-data reverts the `blocks` edit, and
+		// `useBlockSync` hands the result down. The external-reset branch
+		// adopts that landing, so it must also spend the token — a token left
+		// armed stays live for a second, and the user's very next keystroke
+		// would spend it and be adopted as baseline rather than captured.
+		const { registry, getOverlay } = setup();
+
+		await act( async () => {
+			getOverlay().armUndoRedoAdoption();
+		} );
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Undone' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		// The keystroke that follows the undo is an ordinary suggestion.
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Undone and typed',
+				} );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'Undone' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Undone and typed' );
 	} );
 
 	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
@@ -1598,5 +1775,79 @@ describe( 'isPartOfPendingInsertion', () => {
 
 	it( 'returns false when selectors are unavailable', () => {
 		expect( isPartOfPendingInsertion( undefined, 'a' ) ).toBe( false );
+	} );
+} );
+
+describe( 'pairReplacedBlocks', () => {
+	it( 'returns no groups when the fire held only insertions', () => {
+		expect(
+			pairReplacedBlocks(
+				[ { clientId: 'new', parentClientId: null } ],
+				[],
+				new Map()
+			).size
+		).toBe( 0 );
+	} );
+
+	it( 'returns no groups when the fire held only removals', () => {
+		expect(
+			pairReplacedBlocks(
+				[],
+				[ 'gone' ],
+				new Map( [ [ 'gone', null ] ] )
+			).size
+		).toBe( 0 );
+	} );
+
+	it( 'gives both halves of a same-parent replacement one shared id', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'quote', parentClientId: null } ],
+			[ 'paragraph' ],
+			new Map( [ [ 'paragraph', null ] ] )
+		);
+		expect( groups.get( 'quote' ) ).toEqual( expect.any( String ) );
+		expect( groups.get( 'paragraph' ) ).toBe( groups.get( 'quote' ) );
+	} );
+
+	it( 'groups a many-to-one transform under a single id', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'quote', parentClientId: null } ],
+			[ 'p1', 'p2', 'p3' ],
+			new Map( [
+				[ 'p1', null ],
+				[ 'p2', null ],
+				[ 'p3', null ],
+			] )
+		);
+		const groupId = groups.get( 'quote' );
+		expect( groups.get( 'p1' ) ).toBe( groupId );
+		expect( groups.get( 'p2' ) ).toBe( groupId );
+		expect( groups.get( 'p3' ) ).toBe( groupId );
+	} );
+
+	it( 'does not pair an insertion with a removal in a different parent', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'inGroup', parentClientId: 'group' } ],
+			[ 'atRoot' ],
+			new Map( [ [ 'atRoot', null ] ] )
+		);
+		expect( groups.size ).toBe( 0 );
+	} );
+
+	it( 'mints a distinct id per parent', () => {
+		const groups = pairReplacedBlocks(
+			[
+				{ clientId: 'newRoot', parentClientId: null },
+				{ clientId: 'newInner', parentClientId: 'group' },
+			],
+			[ 'oldRoot', 'oldInner' ],
+			new Map( [
+				[ 'oldRoot', null ],
+				[ 'oldInner', 'group' ],
+			] )
+		);
+		expect( groups.get( 'newRoot' ) ).toBe( groups.get( 'oldRoot' ) );
+		expect( groups.get( 'newInner' ) ).toBe( groups.get( 'oldInner' ) );
+		expect( groups.get( 'newRoot' ) ).not.toBe( groups.get( 'newInner' ) );
 	} );
 } );
