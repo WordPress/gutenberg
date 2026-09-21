@@ -32,7 +32,7 @@
 
 ### Internal
 
--   Update Ariakit to 0.4.40.
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).

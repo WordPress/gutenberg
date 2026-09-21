@@ -9,7 +9,7 @@
 
 ### Internal
 
--   Update Ariakit to 0.4.40.
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Update `@base-ui/react` to 1.8.0 for the bundled UI components in the `/wp` entrypoint ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Update Ariakit to 0.4.39 and wait for scheduled composite item registration in jsdom tests ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
