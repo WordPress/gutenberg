@@ -746,7 +746,7 @@ Use cases for disabling feedback:
 
 ### Subscribing to page changes
 
-The `core/router` store exposes a reactive `state.url` property that updates every time a client-side navigation occurs. By reading this value inside a `data-wp-watch` or `watch` callbacks, you create a reactive subscription that re-runs whenever the URL changes.
+The `core/router` store exposes a reactive `state.url` property that holds the current page's URL. By reading this value inside a `data-wp-watch` or `watch` callback, you create a reactive subscription that re-runs when the URL changes. The router assigns the value in the commit batch that renders a client-side destination and when it renders a cache-served back/forward traversal. A same-URL assignment—such as the `navigate( window.location.href, { force: true } )` refresh pattern—doesn't change the value, so it doesn't notify subscribers. A navigation that falls back to a full page load commits no destination and leaves `state.url` at the source page's URL. Use the lifecycle keys below for work that must react to every covered navigation.
 
 ```js
 // view.js
@@ -770,7 +770,7 @@ store( 'myPlugin', {
 ```
 
 <div class="callout callout-info">
-The `core/router` store and `state.url` are available and populated on page load, so there's no need to import the `@wordpress/interactivity-router` package to access them.
+Blocks can read the `core/router` store without importing the `@wordpress/interactivity-router` package. When the router module evaluates, it initializes `state.url` from the current location unless the server has already seeded it. If the module never loads, `state.url` is `undefined`; see [The navigation lifecycle keys](#the-navigation-lifecycle-keys) for the router-absent behavior.
 </div>
 
 ## Reacting to the navigation lifecycle
