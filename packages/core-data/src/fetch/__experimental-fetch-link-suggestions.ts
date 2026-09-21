@@ -273,6 +273,22 @@ function getMatchTier( title: string, search: string ): number {
 }
 
 /**
+ * Whether a result is of a type a link search is rarely looking for.
+ *
+ * An attachment or a post format is almost never the target of a link, and on a site with a large
+ * media library they crowd out the pages and posts that are. Neither is dropped, because either can
+ * still be the answer when its title is what was typed; the match tier is consulted first, so an
+ * exact match is never demoted.
+ *
+ * @param result
+ *
+ * @return True when the result should rank below the other types.
+ */
+function isDemotedType( result: SearchResult ): boolean {
+	return result.kind === 'media' || result.type === 'post-format';
+}
+
+/**
  * Sort search results by relevance to the given query.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
@@ -283,6 +299,10 @@ function getMatchTier( title: string, search: string ): number {
  * the match sits in the title is a stronger signal than how much of the title it covers, and the
  * score below cannot see it: it divides by the title's length, so a long title is marked down for
  * being long even when the search term is its first word.
+ *
+ * Below that, attachments and post formats rank under the other types, because a link search is
+ * rarely looking for one. This is only consulted when two results answer the search equally well,
+ * so an attachment whose title is what was typed still comes first.
  *
  * The rest is sorted by scoring each result, where the score is the number of tokens in the title
  * that are also in the search query, divided by the total number of tokens in the title. This gives
@@ -337,6 +357,7 @@ export function sortResults( results: SearchResult[], search: string ) {
 	return results.sort(
 		( a, b ) =>
 			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
+			Number( isDemotedType( a ) ) - Number( isDemotedType( b ) ) ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
 }

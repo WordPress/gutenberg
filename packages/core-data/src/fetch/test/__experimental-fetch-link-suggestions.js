@@ -530,6 +530,75 @@ describe( 'sortResults', () => {
 			2, 1,
 		] );
 	} );
+
+	it( 'orders an attachment below an entity that matches the search term as well', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Sunny Beach',
+				url: 'http://wordpress.local/wp-content/uploads/sunny-beach.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'A Day At The Beach',
+				url: 'http://wordpress.local/a-day-at-the-beach/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( results, 'beach' ).map( ( { title } ) => title )
+		).toEqual( [ 'A Day At The Beach', 'Sunny Beach' ] );
+	} );
+
+	it( 'orders a post format below an entity that matches the search term as well', () => {
+		const results = [
+			{
+				id: 'gallery',
+				title: 'Gallery',
+				url: 'http://wordpress.local/type/gallery/',
+				type: 'post-format',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'The Gallery Show Of The Year',
+				url: 'http://wordpress.local/the-gallery-show-of-the-year/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( results, 'gallery show' ).map( ( { title } ) => title )
+		).toEqual( [ 'The Gallery Show Of The Year', 'Gallery' ] );
+	} );
+
+	it( 'keeps an attachment first when its title is what was typed', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Day',
+				url: 'http://wordpress.local/day/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Beach Day',
+				url: 'http://wordpress.local/wp-content/uploads/beach-day.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+		];
+
+		expect(
+			sortResults( results, 'beach day' ).map( ( { title } ) => title )
+		).toEqual( [ 'Beach Day', 'Day' ] );
+	} );
 } );
 
 describe( 'tokenize', () => {
