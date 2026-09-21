@@ -138,7 +138,7 @@ Display a list of all terms of a given taxonomy.
 
 -	**Name:** [core/categories](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
