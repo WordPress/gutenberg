@@ -117,7 +117,7 @@ Example:
 
 #### `getItemLevel`: `function`
 
-A function that receives an item and returns its hierarchical level. It's optional. DataViews uses it to indent table rows when `view.showLevels` is true and `getItemParentId` is not provided.
+A function that receives an item and returns its hierarchical level. It's optional. DataViews uses it to indent table rows when `view.showLevels` is true and either `getItemParentId` is not provided or `view.groupBy` is set.
 
 Example:
 
@@ -130,7 +130,7 @@ Example:
 
 #### `getItemParentId`: `function`
 
-A function that receives an item and returns its parent's unique id, or `null`/`undefined` for a root item. When `view.showLevels` is true, the table orders loaded items by these relationships and calculates their indentation. Items with an unloaded parent are treated as roots. DataViews does not fetch missing items.
+A function that receives an item and returns its parent's unique id, or `null`/`undefined` for a root item. When `view.showLevels` is true and `view.groupBy` is not set, the table orders loaded items by these relationships and calculates their indentation. Items with an unloaded parent are treated as roots. DataViews does not fetch missing items.
 
 Example:
 

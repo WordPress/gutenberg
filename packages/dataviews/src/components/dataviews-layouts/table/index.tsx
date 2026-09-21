@@ -58,7 +58,8 @@ function getRows< Item >(
 	getItemId: ( item: Item ) => string,
 	getItemLevel: ( ( item: Item ) => number ) | undefined,
 	getItemParentId:
-		( ( item: Item ) => string | number | null | undefined ) | undefined,
+		| ( ( item: Item ) => string | number | null | undefined )
+		| undefined,
 	showLevels: boolean | undefined
 ): HierarchicalRow< Item >[] {
 	if ( showLevels && getItemParentId ) {
@@ -301,6 +302,8 @@ function ViewTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	// Parent-based hierarchy is not supported with grouping. Preserve the
+	// existing group order and `getItemLevel` indentation.
 	const rowsByGroup = dataByGroup
 		? new Map(
 				Array.from( dataByGroup.entries() ).map(
@@ -310,12 +313,12 @@ function ViewTable< Item >( {
 							groupItems,
 							getItemId,
 							getItemLevel,
-							getItemParentId,
+							undefined,
 							view.showLevels
 						),
 					]
 				)
-			)
+		  )
 		: null;
 	const rows = rowsByGroup
 		? Array.from( rowsByGroup.values() ).flat()
@@ -325,7 +328,7 @@ function ViewTable< Item >( {
 				getItemLevel,
 				getItemParentId,
 				view.showLevels
-			);
+		  );
 	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = rows.map( ( row ) => row.item );
 	const { getSelectionProps } = useSelectionProps( {
@@ -550,15 +553,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? ( view.layout?.enableMoving ??
-													true )
+												? view.layout?.enableMoving ??
+												  true
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: ( view.layout?.enableMoving ??
-													true )
+												: view.layout?.enableMoving ??
+												  true
 										}
 									/>
 								) }
@@ -614,7 +617,8 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky': true,
+										'dataviews-view-table__actions-column--sticky':
+											true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -649,7 +653,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-												) }
+											  ) }
 									</td>
 								</tr>
 								{ groupRows.map( ( row ) => {
