@@ -178,6 +178,18 @@ This step is only required if you use the Interactivity API outside WordPress.
 
 Within WordPress, the package is already bundled in Core. To ensure it's enqueued, add `@wordpress/interactivity-router` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
 
+### Runtime compatibility
+
+`@wordpress/interactivity-router` and `@wordpress/interactivity` are supported as a matched pair. Use the `@wordpress/interactivity` release that carries all of the runtime pieces this router consumes: the shared `parseDirectiveValue` directive-value interpretation, the shared `afterNextFrame` scheduler, and the `getScope` scope probe—all three accessed by the router through `privateApis()`—plus the `watch()` scope-isolation contract, which runs callbacks without an ambient directive scope and restores the previous scope afterwards.
+
+Keep the pair together in each deployment:
+
+-   **npm:** Installing `@wordpress/interactivity-router` resolves `@wordpress/interactivity` as a package dependency.
+-   **Gutenberg plugin:** The plugin re-registers both module IDs from one build.
+-   **WordPress:** A WordPress release that ships this feature ships both modules at that release's version.
+
+This is the supported pairing. The router has no capability gate or fallback for an older or mismatched runtime.
+
 Furthermore, this package assumes your code will run in an **ES2015+** environment. If you're using an environment with limited or no support for such language features and APIs, you should include the polyfill shipped in [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.
 
 ## License
