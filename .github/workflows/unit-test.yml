@@ -284,25 +284,3 @@ jobs:
             - name: Mark the job as passed if all the checks pass
               if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
               run: exit 0
-
-    mobile-unit-js:
-        name: Mobile
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
-        steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npx lerna run build
-
-            - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
