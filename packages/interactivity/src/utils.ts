@@ -100,6 +100,34 @@ export const onDOMReady = ( callback: () => void ) => {
 };
 
 /**
+ * Subscribes to changes in any signal accessed inside the callback, re-running
+ * the callback whenever those signals change. The callback runs without an
+ * ambient directive scope and the previous scope is restored afterwards.
+ *
+ * @example
+ * ```js
+ * const unwatch = watch( () => {
+ *   console.log( state.counter );
+ * } );
+ *
+ * // Later, to stop watching:
+ * unwatch();
+ * ```
+ *
+ * @param callback The callback to execute when a dependency changes.
+ * @return A cleanup function to stop watching.
+ */
+export const watch: typeof effect = ( callback ) =>
+	effect( () => {
+		setScope();
+		try {
+			return callback();
+		} finally {
+			resetScope();
+		}
+	} );
+
+/**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
  *
  * Using the mangled properties:
