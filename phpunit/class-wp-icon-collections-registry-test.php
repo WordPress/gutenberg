@@ -89,6 +89,116 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should register collections as public by default.
+	 */
+	public function test_register_collection_defaults_to_public() {
+		$this->collections->register( 'my-collection', array( 'label' => 'My Collection' ) );
+
+		$this->assertTrue( $this->collections->get_registered( 'my-collection' )['public'] );
+	}
+
+	/**
+	 * Should preserve explicitly configured collection visibility.
+	 *
+	 * @dataProvider data_boolean_public_properties
+	 *
+	 * @param bool $is_public Whether the collection is public.
+	 */
+	public function test_register_collection_accepts_boolean_public_property( $is_public ) {
+		$result = $this->collections->register(
+			'my-collection',
+			array(
+				'label'  => 'My Collection',
+				'public' => $is_public,
+			)
+		);
+
+		$this->assertTrue( $result );
+		$this->assertSame( $is_public, $this->collections->get_registered( 'my-collection' )['public'] );
+	}
+
+	/**
+	 * Provides supported collection visibility values.
+	 *
+	 * @return array[]
+	 */
+	public function data_boolean_public_properties() {
+		return array(
+			'public collection'     => array( true ),
+			'non-public collection' => array( false ),
+		);
+	}
+
+	/**
+	 * Should reject collection visibility values that are not booleans.
+	 *
+	 * @dataProvider data_non_boolean_public_properties
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry_Gutenberg::register
+	 *
+	 * @param mixed $is_public Invalid collection visibility value.
+	 */
+	public function test_register_collection_rejects_non_boolean_public_property( $is_public ) {
+		$result = $this->collections->register(
+			'my-collection',
+			array(
+				'label'  => 'My Collection',
+				'public' => $is_public,
+			)
+		);
+
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->collections->is_registered( 'my-collection' ) );
+	}
+
+	/**
+	 * Provides unsupported collection visibility values.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_boolean_public_properties() {
+		return array(
+			'null'    => array( null ),
+			'string'  => array( 'false' ),
+			'integer' => array( 0 ),
+			'array'   => array( array() ),
+		);
+	}
+
+	/**
+	 * Should preserve collections registered before the shared registry is upgraded.
+	 */
+	public function test_get_instance_preserves_existing_collections_in_shared_registry() {
+		$instance_property = new ReflectionProperty( WP_Icon_Collections_Registry::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
+
+		$original_registry = $instance_property->getValue();
+
+		try {
+			$instance_property->setValue( null, null );
+			$registry = WP_Icon_Collections_Registry::get_instance();
+			$registry->register(
+				'my-collection',
+				array(
+					'label'       => 'My Collection',
+					'description' => 'Registered before the upgrade.',
+				)
+			);
+
+			$upgraded_registry = WP_Icon_Collections_Registry_Gutenberg::get_instance();
+
+			$this->assertSame( $upgraded_registry, WP_Icon_Collections_Registry::get_instance() );
+			$this->assertSame(
+				array_merge( $registry->get_registered( 'my-collection' ), array( 'public' => true ) ),
+				$upgraded_registry->get_registered( 'my-collection' )
+			);
+		} finally {
+			$instance_property->setValue( null, $original_registry );
+		}
+	}
+
+	/**
 	 * Data provider for invalid collection slug candidates.
 	 *
 	 * @return array[]

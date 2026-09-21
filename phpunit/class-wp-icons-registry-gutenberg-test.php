@@ -498,17 +498,17 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should fail to register an icon whose `public` property is not a boolean.
+	 * Should reject visibility configured on an icon instead of its collection.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
-	public function test_register_icon_rejects_non_boolean_public_property() {
+	public function test_register_icon_rejects_public_property() {
 		$result = $this->registry->register(
 			'test-collection/invalid-visibility',
 			array(
 				'label'   => 'Icon',
 				'content' => '<svg></svg>',
-				'public'  => 'yes',
+				'public'  => false,
 			)
 		);
 

@@ -20,12 +20,46 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
+
+		wp_register_icon_collection(
+			'test-private',
+			array(
+				'label'  => 'Private Collection',
+				'public' => false,
+			)
+		);
+		wp_register_icon(
+			'test-private/visibility-icon',
+			array(
+				'label'   => 'Visibility Icon',
+				'content' => '<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z" /></svg>',
+			)
+		);
+	}
+
+	public function tear_down() {
+		wp_unregister_icon_collection( 'test-private' );
+		parent::tear_down();
 	}
 
 	public function test_wp_get_icon_returns_svg_for_known_icon() {
 		$output = wp_get_icon( 'core/plus' );
 		$this->assertStringStartsWith( '<svg ', $output );
 		$this->assertStringContainsString( '</svg>', $output );
+	}
+
+	public function test_wp_get_icon_returns_svg_for_non_public_collection() {
+		$output = wp_get_icon( 'test-private/visibility-icon' );
+		$this->assertStringStartsWith( '<svg ', $output );
+		$this->assertStringContainsString( '</svg>', $output );
+	}
+
+	public function test_get_registered_icon_returns_icon_from_non_public_collection() {
+		$icon = WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icon( 'test-private/visibility-icon' );
+
+		$this->assertSame( 'test-private/visibility-icon', $icon['name'] );
+		$this->assertStringStartsWith( '<svg ', $icon['content'] );
+		$this->assertArrayNotHasKey( 'public', $icon );
 	}
 
 	public function test_wp_get_icon_returns_empty_string_for_unknown_icon() {
