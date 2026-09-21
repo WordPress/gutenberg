@@ -1021,4 +1021,141 @@ test.describe( 'Router navigation lifecycle', () => {
 			heldNestedPage2.release();
 		} );
 	} );
+
+	test.describe( 'The two-Query per-instance derivation canary', () => {
+		/*
+		 * `core/query` is not part of the `interactive-blocks` test plugin,
+		 * and `InteractivityUtils.addPostWithBlock` only ever generates a
+		 * single root block, so this page is built directly with
+		 * `requestUtils.createPost` and raw block markup, per the build
+		 * plan's Task 8 notes -- rather than through `interactivityUtils`.
+		 */
+		const QUERY_PAGE_SIZE = 2;
+
+		/**
+		 * Raw markup for one independent (non-inheriting) `core/query`
+		 * instance with enhanced pagination on and a "next page" link --
+		 * the same shape `phpunit/blocks/render-query-test.php` already
+		 * exercises for the `enhancedPagination` attribute, with
+		 * `query.inherit` set to `false` instead of `true` so this works
+		 * on a single-post page rather than an archive. No markup or
+		 * JavaScript change is made to any Query block for this: the
+		 * region attribute (`data-wp-router-region="query-<queryId>"`) is
+		 * written by `packages/block-library/src/query/index.php:26-37`'s
+		 * own render callback, unmodified.
+		 *
+		 * @param queryId The block's own `queryId`, 0 or 1.
+		 * @return The block's raw comment-delimited markup.
+		 */
+		const queryBlockMarkup = ( queryId: 0 | 1 ) =>
+			`<!-- wp:query {"queryId":${ queryId },"query":{"inherit":false,"postType":"post","perPage":${ QUERY_PAGE_SIZE },"pages":0,"order":"desc","orderBy":"date"},"enhancedPagination":true} -->` +
+			'<div class="wp-block-query">' +
+			'<!-- wp:post-template --><!-- /wp:post-template -->' +
+			'<!-- wp:query-pagination --><!-- wp:query-pagination-next /--><!-- /wp:query-pagination -->' +
+			'</div>' +
+			'<!-- /wp:query -->';
+
+		let queryCanaryUrl: string;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			// Dedicated filler posts, so pagination is guaranteed by this
+			// flow's own setup rather than by however many posts the rest
+			// of the site happens to carry.
+			for ( let i = 1; i <= QUERY_PAGE_SIZE + 1; i++ ) {
+				await requestUtils.createPost( {
+					title: `lifecycle query canary - filler ${ i }`,
+					content:
+						'<!-- wp:paragraph --><p>filler</p><!-- /wp:paragraph -->',
+					status: 'publish' as 'publish',
+					date_gmt: '2023-01-01T00:00:00',
+				} );
+			}
+
+			// The observer fixture block, in `observerOnly` mode so it
+			// renders no region of its own and survives every region
+			// update, placed outside both queries -- plus the two Query
+			// block instances themselves, `queryId` 0 and 1.
+			const content =
+				'<!-- wp:test/router-navigation-lifecycle {"page":"query-canary","observerOnly":true} /-->' +
+				queryBlockMarkup( 0 ) +
+				queryBlockMarkup( 1 );
+
+			// `CreatePostPayload` makes `date_gmt` required alongside
+			// `status`, so this copies the payload shape
+			// `InteractivityUtils.addPostWithBlock` uses.
+			const { link } = await requestUtils.createPost( {
+				title: 'lifecycle query canary',
+				content,
+				status: 'publish' as 'publish',
+				date_gmt: '2023-01-01T00:00:00',
+			} );
+
+			// `createPost` returns a bare link; `InteractivityUtils.getLink`
+			// is what normally appends this param, but it is scoped to that
+			// class's own `links` map, so it is added here directly. This
+			// does not disturb Query: the region attribute is written by
+			// Query's own render callback with `WP_HTML_Tag_Processor`, not
+			// through directive processing, so it survives
+			// `disable_server_directive_processing=true`.
+			const url = new URL( link );
+			url.searchParams.append(
+				'disable_server_directive_processing',
+				'true'
+			);
+			queryCanaryUrl = url.href;
+		} );
+
+		test( 'Flow 20: two Query blocks with enhanced pagination are distinguished per instance', async ( {
+			page,
+		} ) => {
+			await page.goto( queryCanaryUrl );
+			await waitForLogLength( page, 'lifecycle log', 1 );
+
+			// The second Query instance's own region and its own "next
+			// page" link. Query's `data-wp-router-region` is
+			// `query-<queryId>`, and its own click handler
+			// (`packages/block-library/src/query/view.js`) calls
+			// `actions.navigate` with no `initiator` option, so the
+			// reading below exercises derivation end to end.
+			const query1Region = page.locator(
+				'[data-wp-router-region="query-1"]'
+			);
+			const nextLink = query1Region.locator(
+				'.wp-block-query-pagination-next'
+			);
+			const destHref = await nextLink.getAttribute( 'href' );
+			if ( ! destHref ) {
+				throw new Error(
+					'The second Query block rendered no "next page" link -- pagination did not trigger, so this flow cannot discriminate.'
+				);
+			}
+			// Resolve against the current page: `add_query_arg()` (used by
+			// `query-pagination-next`'s render callback) returns a
+			// domain-relative path when given no explicit URL.
+			const destUrl = new URL( destHref, page.url() ).href;
+
+			const heldDest = await holdRoute( page, destUrl );
+			await nextLink.click();
+			await heldDest.hit;
+
+			// In flight: the readable initiator is the second Query
+			// instance's own region id -- never the first's, and never
+			// absent.
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'query-1' );
+
+			const destResponse = page.waitForResponse( destUrl );
+			heldDest.release();
+			await destResponse;
+
+			// At the moment the navigation ends: still `query-1`.
+			await expect(
+				page.getByTestId( 'lifecycle navigating' )
+			).toHaveText( 'not navigating' );
+			await expect(
+				page.getByTestId( 'lifecycle initiator' )
+			).toHaveText( 'query-1' );
+		} );
+	} );
 } );
