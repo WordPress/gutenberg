@@ -21,6 +21,7 @@ const {
 	sessionId,
 	warn,
 	afterNextFrame,
+	getScope,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -96,6 +97,72 @@ const parseRegionAttribute = ( region: Element ) => {
 	} catch {
 		return { id: value };
 	}
+};
+
+/**
+ * The same shape as the directive runtime's own namespace regular
+ * expression (`nsPathRegExp`, `packages/interactivity/src/vdom.ts:77`),
+ * matching an optional `namespace::` prefix on a directive attribute value.
+ */
+const namespacedValueRegExp = /^([\w_\/-]+)::(.+)$/;
+
+/**
+ * Parses a `data-wp-router-region` attribute value into the region id the
+ * **directive side** registers it under — the key
+ * `packages/interactivity/src/directives/router-region.ts` uses for
+ * `routerRegions`.
+ *
+ * This is a **deliberate duplication** of the directive runtime's generic
+ * directive-value parse (`packages/interactivity/src/vdom.ts`'s
+ * per-attribute loop), mirrored here in its three clauses and in order:
+ *
+ * 1. Apply `namespacedValueRegExp` above and keep the post-`::` remainder
+ *    when it matches.
+ * 2. `try JSON.parse` the remainder, swallowing failures.
+ * 3. If the parsed value is a plain object, take its `id` (defaulting to
+ *    `null`); otherwise take the remainder string.
+ *
+ * The final `typeof id === 'string' && id ? id : null` keeps the public
+ * `string | null` contract and maps an empty region attribute — and any
+ * other non-string or falsy id — to `null`.
+ *
+ * **Do not reuse `parseRegionAttribute` above for this, and do not modify
+ * it.** Its bare `JSON.parse` plus unconditional destructure disagrees with
+ * directive-side registration on two of six attribute forms: for
+ * `myplugin::sidebar` its `catch` returns the *whole* string as `id`, where
+ * the directive side registers `sidebar` (the namespace is stripped before
+ * parsing there); and for a JSON-scalar id such as `123` its destructure
+ * yields `id: undefined`, where the directive side registers the string
+ * `'123'` (a parsed value that is not a plain object is discarded in favor
+ * of the raw string). Reusing `parseRegionAttribute` here would make a
+ * consumer's `state.initiator === myRegionId` comparison silently fail for
+ * those blocks; modifying it would change *which regions client navigation
+ * updates* — region semantics are frozen, and `parseRegionAttribute` stays
+ * untouched for its existing caller in `preparePage()`. This duplication is
+ * drift-guarded by a source-level test asserting `parseRegionAttribute`'s
+ * source is unchanged — see
+ * `packages/interactivity-router/src/test/initiator-resolution.ts`.
+ *
+ * @param value The raw `data-wp-router-region` attribute value, or `null`.
+ * @return      The region id the directive side would register, or `null`.
+ */
+const parseRegionId = ( value: string | null ): string | null => {
+	if ( value === null ) {
+		return null;
+	}
+	const remainder = namespacedValueRegExp.exec( value )?.[ 2 ] ?? value;
+	let parsed: unknown = remainder;
+	try {
+		parsed = JSON.parse( remainder );
+	} catch {}
+	const isPlainObject =
+		parsed !== null &&
+		typeof parsed === 'object' &&
+		( parsed as object ).constructor === Object;
+	const id = isPlainObject
+		? ( parsed as { id?: unknown } ).id ?? null
+		: remainder;
+	return typeof id === 'string' && id ? id : null;
 };
 
 /**
@@ -423,13 +490,28 @@ interface Store {
  * Resolves the `initiator` option of `actions.navigate()` into the value
  * published on `state.initiator`.
  *
- * The three declared arms are honoured verbatim: a `string` is returned as
- * given, and `null` explicitly suppresses attribution. `undefined` (the
- * option omitted) is meant to derive the initiator from the ambient
- * directive scope the call was made from — this task returns `null` for
- * that arm, and Task 3 implements the derivation. Anything else is not a
- * valid arm; it warns and falls back to `null`, and it never falls through
- * to derivation.
+ * The three declared arms are honoured verbatim, and declaration always
+ * wins ahead of derivation: a `string` is returned as given, and `null`
+ * explicitly suppresses attribution. `undefined` (the option omitted)
+ * derives the initiator from the ambient directive scope the call was made
+ * from — the nearest router region (self-inclusive) enclosing the element
+ * whose directive invoked the action, or `null` if there is none. Anything
+ * else is not a valid arm; it warns and falls back to `null`, and it never
+ * falls through to derivation.
+ *
+ * No branch throws: derivation degrades to `null` for a scope-less call
+ * (e.g. a vendor `import()` + `navigate()`), for a scope whose `ref.current`
+ * is not an element, and for an element with no enclosing router region.
+ * There is no "derivation error" observable — absence of identity is a
+ * documented normal value (Requirement 11). Deliberately no `isConnected`
+ * check either: the rule is uniform over any tree, so a detached element
+ * that still sits inside a region carrier reports that region's honest id.
+ *
+ * This must be called here, at a generator step in `navigate()`'s
+ * synchronous prefix — the only place the caller's scope is reliably
+ * ambient. The store proxy binds the ambient scope around every synchronous
+ * span of a call, but resets it before awaited continuations and inside
+ * timer callbacks, so this resolution must never move into either.
  *
  * @param declared The raw `options.initiator` value passed to `navigate()`.
  * @return The value to publish on `state.initiator`.
@@ -442,8 +524,16 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 		return null;
 	}
 	if ( declared === undefined ) {
-		// This task returns `null`; Task 3 derives it from the ambient scope.
-		return null;
+		const scope = getScope();
+		const element = scope?.ref?.current;
+		if ( typeof element?.closest !== 'function' ) {
+			return null;
+		}
+		const region = element.closest( `[${ regionAttr }]` );
+		if ( ! region ) {
+			return null;
+		}
+		return parseRegionId( region.getAttribute( regionAttr ) );
 	}
 	if ( globalThis.SCRIPT_DEBUG ) {
 		warn(
