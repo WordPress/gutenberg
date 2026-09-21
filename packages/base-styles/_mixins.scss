@@ -427,14 +427,14 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) wpds.var("--wpds-color-stroke-focus");
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
 	}
 
 	&:checked {
-		background: var(--wp-admin-theme-color);
+		background: wpds.var("--wpds-color-background-interactive-brand-strong");
 		border-color: transparent;
 		color: wpds.var("--wpds-color-foreground-interactive-brand-strong");
 	}
