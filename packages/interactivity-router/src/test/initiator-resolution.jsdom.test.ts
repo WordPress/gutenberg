@@ -23,10 +23,12 @@
  * value, so ordering between tests is not load-bearing here.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { hydrate } from 'preact';
-import { effect } from '@preact/signals';
-import { store, privateApis, withScope } from '@wordpress/interactivity';
+import { store, privateApis, watch, withScope } from '@wordpress/interactivity';
 vi.mock(
 	import( '@wordpress/interactivity' ),
 	async () => await import( './__fixtures__/interactivity-shim' )
@@ -752,17 +754,13 @@ describe( 'deriving the initiator from the ambient directive scope', () => {
 } );
 
 /**
- * The frame-scope guard.
+ * The scope semantics of watcher-driven navigation derivation.
  *
- * `writeFrameScope` refuses to attribute a navigation to a scope that
- * reached derivation only because it is the ambient scope of one of the
- * router's own lifecycle writes.
- *
- * Every test below shares one construction: the outer navigation is started
- * from an action whose scope sits inside a region with a known id
- * (`…-region-x`). Without that, the guard has nothing to refuse.
+ * `watch()` derives `null` without an ambient directive scope, while
+ * `data-wp-watch` and callbacks explicitly wrapped with `withScope()` derive
+ * from the scope their author installed.
  */
-describe( 'the frame-scope guard', () => {
+describe( 'watcher scope semantics for navigation derivation', () => {
 	// navigate()'s end write is fire-and-forget (`finally` schedules it via
 	// afterNextFrame() without yielding it — see index.ts), so a completed
 	// `await actions.navigate( … )` does not guarantee state.navigating has
@@ -770,7 +768,7 @@ describe( 'the frame-scope guard', () => {
 	// clock, that write would land during a later test and, being a
 	// same-value write (@preact/signals does not notify a signal set to
 	// its current value), silently swallow that test's own start batch's
-	// rising-edge notification too — a raw effect installed
+	// rising-edge notification too — a watcher installed
 	// after such a pending write never observes the next navigation's
 	// `true` at all, because state.navigating was already (stale-)true.
 	// 150 ms comfortably exceeds afterNextFrame()'s 100 ms fallback arm
@@ -779,11 +777,26 @@ describe( 'the frame-scope guard', () => {
 		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
 	} );
 
+	test( 'derivation reads the ambient scope without a router-side marker', () => {
+		/** Source text used to pin the router's scope derivation mechanism. */
+		const routerIndexSource = readFileSync(
+			join( dirname( fileURLToPath( import.meta.url ) ), '../index.ts' ),
+			'utf-8'
+		);
+
+		expect( routerIndexSource ).not.toContain( 'writeFrameScope' );
+		expect( routerIndexSource ).not.toContain( 'entryScope' );
+		expect( routerIndexSource ).not.toContain(
+			'scope === writeFrameScope'
+		);
+		expect( routerIndexSource ).toContain( 'const scope = getScope();' );
+	} );
+
 	/**
 	 * Builds a reactive-navigate callback for this describe block's tests:
 	 * `react()` calls `actions.navigate( innerHref, options )` the first
 	 * time `read()`'s signal changes *after* `react` starts being called —
-	 * its second call, since the first is the baseline call `effect()`
+	 * its second call, since the first is the baseline call `watch()`
 	 * performs immediately at creation, which may observe a value left
 	 * over from an earlier test in this file's shared module state (see
 	 * the module comment above the first describe block). Usable for a
@@ -801,7 +814,7 @@ describe( 'the frame-scope guard', () => {
 	 * @param options          Extra `navigate()` options (e.g. a declared
 	 *                         `initiator`).
 	 * @return An object exposing the raw `react` callback (to pass to
-	 *         `effect()`, optionally wrapped in `withScope()` first) and
+	 *         `watch()`, optionally wrapped in `withScope()` first) and
 	 *         `settled()`, a promise for the reactive call once it has
 	 *         fired (`undefined` before then).
 	 */
@@ -924,7 +937,7 @@ describe( 'the frame-scope guard', () => {
 		);
 	}
 
-	test( 'a scope-less subscriber reacting to state.navigating, state.initiator or state.url reports null, not region-x, for all three trigger points', async () => {
+	test( 'an unwrapped watch() subscriber reacting to state.navigating, state.initiator or state.url derives null for all three trigger points', async () => {
 		const { state, actions } = await import( '../index' );
 
 		// state.navigating — written inside the start batch.
@@ -938,7 +951,7 @@ describe( 'the frame-scope guard', () => {
 				() => state.navigating,
 				'http://localhost/guard-row1-navigating-inner'
 			);
-			const dispose = effect( nav.react );
+			const dispose = watch( nav.react );
 			await outer.runInScope( () =>
 				actions.navigate(
 					'http://localhost/guard-row1-navigating-outer',
@@ -965,7 +978,7 @@ describe( 'the frame-scope guard', () => {
 				() => state.initiator,
 				'http://localhost/guard-row1-initiator-inner'
 			);
-			const dispose = effect( nav.react );
+			const dispose = watch( nav.react );
 			await outer.runInScope( () =>
 				actions.navigate(
 					'http://localhost/guard-row1-initiator-outer',
@@ -982,8 +995,7 @@ describe( 'the frame-scope guard', () => {
 		}
 
 		// state.url — written only in the commit batch, later than the
-		// other two; this is the trigger point that catches a marker
-		// applied to the start batch and not the commit batch.
+		// other two, so this covers both lifecycle write batches.
 		{
 			const outer = setupRegionTrigger(
 				'test/guard-row1-url',
@@ -994,7 +1006,7 @@ describe( 'the frame-scope guard', () => {
 				() => state.url,
 				'http://localhost/guard-row1-url-inner'
 			);
-			const dispose = effect( nav.react );
+			const dispose = watch( nav.react );
 			await outer.runInScope( () =>
 				actions.navigate( 'http://localhost/guard-row1-url-outer', {
 					html: plainHtml( 'outer' ),
@@ -1008,29 +1020,27 @@ describe( 'the frame-scope guard', () => {
 		}
 	} );
 
-	test( "a withScope-wrapped raw effect() carrying region B's own scope, reacting to the rising edge of state.navigating, still reports lifecycle-b", async () => {
+	test( 'a withScope-wrapped watch callback keeps its captured region when another region writes the trigger signal', async () => {
 		const { state, actions } = await import( '../index' );
 
-		// withScope() captures getScope() at *wrap* time, so the wrap
-		// must happen inside a scoped callback belonging to region B —
-		// here, region B's own hydrated trigger, via runInScope().
+		const regionA = setupRegionTrigger(
+			'test/watch-row2-a',
+			'watch-row2-region-a'
+		);
+		const nav = buildReactiveNavigateOnRise(
+			actions,
+			() => state.navigating,
+			'http://localhost/watch-row2-inner'
+		);
+		const wrappedReact = regionA.runInScope( () => withScope( nav.react ) );
+		const dispose = watch( wrappedReact );
+
 		const regionB = setupRegionTrigger(
-			'test/guard-row2-b',
-			'lifecycle-b'
+			'test/watch-row2-b',
+			'watch-row2-region-b'
 		);
-		const nav = buildReactiveNavigateOnRise(
-			actions,
-			() => state.navigating,
-			'http://localhost/guard-row2-inner'
-		);
-		regionB.runInScope( () => effect( withScope( nav.react ) ) );
-
-		const outer = setupRegionTrigger(
-			'test/guard-row2-outer',
-			'guard-row2-region-x'
-		);
-		await outer.runInScope( () =>
-			actions.navigate( 'http://localhost/guard-row2-outer', {
+		await regionB.runInScope( () =>
+			actions.navigate( 'http://localhost/watch-row2-outer', {
 				html: plainHtml( 'outer' ),
 				loadingAnimation: false,
 				screenReaderAnnouncement: false,
@@ -1038,98 +1048,11 @@ describe( 'the frame-scope guard', () => {
 		);
 		await nav.settled();
 
-		expect( state.initiator ).toBe( 'lifecycle-b' );
+		expect( state.initiator ).toBe( 'watch-row2-region-a' );
+		dispose();
 	} );
 
-	test( "an explicit initiator string still wins even when called from inside the router's own write frame, by a callback whose captured scope is the initiating element's own", async () => {
-		const { state, actions } = await import( '../index' );
-
-		// The third-level navigation test's construction, with one effect instead of two: the
-		// withScope-wrapped reacting effect and the outer trigger share
-		// the *same* hydrated element, so the scope the effect captures
-		// is the very object the outer navigation itself carries.
-		const trigger = setupRegionTrigger(
-			'test/guard-row3',
-			'guard-row3-region-x'
-		);
-		const nav = buildReactiveNavigateOnRise(
-			actions,
-			() => state.navigating,
-			'http://localhost/guard-row3-inner',
-			{ initiator: 'declared-x' }
-		);
-		trigger.runInScope( () => effect( withScope( nav.react ) ) );
-
-		trigger.runInScope( () =>
-			actions.navigate( 'http://localhost/guard-row3-outer', {
-				html: plainHtml( 'outer' ),
-				loadingAnimation: false,
-				screenReaderAnnouncement: false,
-			} )
-		);
-
-		// The reactive call's synchronous prefix — including its start
-		// batch, which writes state.initiator — has already run by this
-		// point, nested inside the outer's own synchronous span; no need
-		// to wait for either navigation to fully settle before reading it.
-		expect( state.initiator ).toBe( 'declared-x' );
-
-		await nav.settled();
-		expect( state.initiator ).toBe( 'declared-x' );
-	} );
-
-	test( "a third-level navigation started from a withScope effect, after a nested navigation's own write span has closed, still reports null", async () => {
-		const { state, actions } = await import( '../index' );
-
-		const trigger = setupRegionTrigger(
-			'test/guard-row4',
-			'guard-row4-region-x'
-		);
-
-		// Effect 1 — scope-less, registered *first*: reacts to the outer
-		// navigation's rising edge and starts a second-level (inner)
-		// navigation, whose own write span opens and closes before
-		// effect 2 below gets its turn.
-		const innerNav = buildReactiveNavigateOnRise(
-			actions,
-			() => state.navigating,
-			'http://localhost/guard-row4-inner'
-		);
-		trigger.runInScope( () => effect( innerNav.react ) );
-
-		// Effect 2 — withScope-wrapped with the *same* element's scope,
-		// registered second: also reacts to the outer navigation's rising
-		// edge, and starts the third-level navigation this row asserts
-		// on, after the inner span above has already closed.
-		const thirdNav = buildReactiveNavigateOnRise(
-			actions,
-			() => state.navigating,
-			'http://localhost/guard-row4-third'
-		);
-		trigger.runInScope( () => effect( withScope( thirdNav.react ) ) );
-
-		const outerPromise = trigger.runInScope( () =>
-			actions.navigate( 'http://localhost/guard-row4-outer', {
-				html: plainHtml( 'outer' ),
-				loadingAnimation: false,
-				screenReaderAnnouncement: false,
-			} )
-		);
-
-		// Both reactive calls' synchronous prefixes have already run,
-		// nested inside the outer's own synchronous span.
-		expect( thirdNav.settled() ).toBeDefined();
-		expect( state.initiator ).toBeNull();
-
-		await Promise.all( [
-			outerPromise,
-			innerNav.settled(),
-			thirdNav.settled(),
-		] );
-		expect( state.initiator ).toBeNull();
-	} );
-
-	test( 'a data-wp-watch in region B reacting to the end transition still reports guard-row5-region-b, not region-x and not null (characterisation)', async () => {
+	test( 'a data-wp-watch in region B reacting to the end transition derives region B', async () => {
 		vi.useFakeTimers( { shouldAdvanceTime: true } );
 		const fakeSetTimeout = globalThis.setTimeout;
 		const redirectSetTimeout = ( (
@@ -1205,9 +1128,9 @@ describe( 'the frame-scope guard', () => {
 			// watch survives the outer navigation's own commit to observe
 			// its end write afterwards. The id itself
 			// (guard-row5-region-b) is unique across this file —
-			// routerRegions is keyed by id regardless of namespace, and
-			// reusing the withScope raw-effect test's "lifecycle-b" here would silently inherit
-			// that already-nulled signal instead of a fresh one.
+			// routerRegions is keyed by id regardless of namespace, so
+			// reusing an earlier region id would silently inherit that
+			// already-nulled signal instead of a fresh one.
 			const regionBMarkup = ( marker: string ) =>
 				`<div data-wp-interactive="${ namespace }" data-wp-router-region="guard-row5-region-b" data-wp-watch="callbacks.reactToEnd">${ marker }</div>`;
 
@@ -1266,8 +1189,7 @@ describe( 'the frame-scope guard', () => {
 		// above does not guarantee it has run yet — wait for it, so the
 		// second navigation genuinely starts after the first's lifecycle
 		// has fully ended, matching the row's own "has fully ended"
-		// premise (and letting a marker wrongly set there, and never
-		// restored, actually land before the second navigation reads it).
+		// premise.
 		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
 
 		await trigger.runInScope( () =>
@@ -1278,135 +1200,5 @@ describe( 'the frame-scope guard', () => {
 			} )
 		);
 		expect( state.initiator ).toBe( 'guard-row6-region-x' );
-	} );
-
-	test( 'a throwing raw effect in the start batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
-		const { state, actions } = await import( '../index' );
-		const namespace = 'test/guard-row7-start';
-		const regionId = 'guard-row7-start-region-x';
-		const firstHref = 'http://localhost/guard-row7-start-first';
-		const trigger = setupRegionTrigger( namespace, regionId );
-		expect( state.navigating ).toBe( false );
-		// Capture the action wrapper from this element's scope, then invoke it
-		// outside the DOM event so a synchronous start-batch rejection remains
-		// observable to the test.
-		const navigateFromTrigger = trigger.runInScope( () =>
-			withScope( ( href: string, options: any ) =>
-				actions.navigate( href, options )
-			)
-		);
-		let throwOnStart = false;
-		let consumerError: unknown;
-		let effectRuns = 0;
-
-		const dispose = trigger.runInScope( () =>
-			effect(
-				withScope( () => {
-					effectRuns++;
-					const navigating = state.navigating;
-					if ( throwOnStart && navigating === true ) {
-						try {
-							throw new Error( 'start-consumer-effect-throw' );
-						} catch ( error ) {
-							consumerError = error;
-							throw error;
-						}
-					}
-				} )
-			)
-		);
-
-		throwOnStart = true;
-		let caught: unknown;
-		try {
-			await navigateFromTrigger( firstHref, {
-				html: regionHtml( namespace, regionId, 'first' ),
-				loadingAnimation: false,
-				screenReaderAnnouncement: false,
-			} );
-		} catch ( error ) {
-			caught = error;
-		}
-		throwOnStart = false;
-		dispose();
-
-		expect( caught ).toBeInstanceOf( Error );
-		expect( ( caught as Error ).message ).toBe(
-			'start-consumer-effect-throw'
-		);
-		expect( { effectRuns, consumerError } ).toEqual( {
-			effectRuns: 2,
-			consumerError: expect.any( Error ),
-		} );
-		expect( ( consumerError as Error ).message ).toBe(
-			'start-consumer-effect-throw'
-		);
-
-		// The rejected navigation's finally schedules its end write; let that
-		// write finish before starting the follow-up navigation.
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
-
-		await navigateFromTrigger( 'http://localhost/guard-row7-start-second', {
-			html: regionHtml( namespace, regionId, 'second' ),
-			loadingAnimation: false,
-			screenReaderAnnouncement: false,
-		} );
-
-		expect( state.initiator ).toBe( regionId );
-	} );
-
-	test( 'a throwing raw effect in the commit batch does not pin the frame marker (a restore outside finally would make the second navigation report null)', async () => {
-		const { state, actions } = await import( '../index' );
-		const namespace = 'test/guard-row8-commit';
-		const regionId = 'guard-row8-commit-region-x';
-		const firstHref = 'http://localhost/guard-row8-commit-first';
-		const trigger = setupRegionTrigger( namespace, regionId );
-		const navigateFromTrigger = trigger.runInScope( () =>
-			withScope( ( href: string, options: any ) =>
-				actions.navigate( href, options )
-			)
-		);
-
-		const dispose = trigger.runInScope( () =>
-			effect(
-				withScope( () => {
-					if ( state.url === firstHref ) {
-						throw new Error( 'commit-consumer-effect-throw' );
-					}
-				} )
-			)
-		);
-
-		let caught: unknown;
-		try {
-			await navigateFromTrigger( firstHref, {
-				html: regionHtml( namespace, regionId, 'first' ),
-				loadingAnimation: false,
-				screenReaderAnnouncement: false,
-			} );
-		} catch ( error ) {
-			caught = error;
-		}
-		dispose();
-
-		expect( caught ).toBeInstanceOf( Error );
-		expect( ( caught as Error ).message ).toBe(
-			'commit-consumer-effect-throw'
-		);
-
-		// The rejected navigation's finally schedules its end write; let that
-		// write finish before starting the follow-up navigation.
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
-
-		await navigateFromTrigger(
-			'http://localhost/guard-row8-commit-second',
-			{
-				html: regionHtml( namespace, regionId, 'second' ),
-				loadingAnimation: false,
-				screenReaderAnnouncement: false,
-			}
-		);
-
-		expect( state.initiator ).toBe( regionId );
 	} );
 } );

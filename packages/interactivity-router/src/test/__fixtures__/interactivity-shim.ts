@@ -14,13 +14,14 @@
  * `@preact/signals` — not from a source module, which does not export them —
  * exactly as `packages/interactivity/src/index.ts` itself sources them.
  *
- * It also re-exports `withScope` and `populateServerData` as top-level named
+ * It also re-exports `watch`, `withScope`, and `populateServerData` as top-level
  * exports (not only bundled inside `privateApis`), because `vi.mock`'s
  * factory replaces the whole module: anything a test imports from
  * `@wordpress/interactivity` directly has to be provided here too. The
- * `withScope` is a public export of the real package and is load-bearing for
- * scoped calls, while `populateServerData` lets tests seed `getConfig()`
- * directly (e.g. to simulate `clientNavigationDisabled`).
+ * `watch` and `withScope` are public exports of the real package and are
+ * load-bearing for watcher scope behavior and scoped calls, while
+ * `populateServerData` lets tests seed `getConfig()` directly (e.g. to
+ * simulate `clientNavigationDisabled`).
  *
  * Vitest's `**\/test/*.[jt]s?(x)` include glob does not collect this
  * `__fixtures__` subdirectory as a test suite.
@@ -43,7 +44,7 @@ export {
 	getConfig,
 	populateServerData,
 } from '../../../../interactivity/src/store';
-export { withScope } from '../../../../interactivity/src/utils';
+export { watch, withScope } from '../../../../interactivity/src/utils';
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';

@@ -379,8 +379,10 @@ const LIFECYCLE_RELEASE_BOUND = 10000;
 // Every write that ends a navigation lifecycle in this file (in `navigate()`'s
 // `finally`, in this handler, and in the release timers) is guarded by
 // `currentNavigationId === token`. Any new lifecycle write needs the same
-// guard, or a stale navigation could end a newer one. This handler runs
-// outside any directive scope, so its writes do not need `writeFrameScope`.
+// guard, or a stale navigation could end a newer one. Derivation reads
+// whatever scope is ambient at `navigate()` entry: an unwrapped `watch()`
+// callback contributes no scope, while a `withScope()`-wrapped callback
+// contributes the scope it installed.
 window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 
@@ -545,27 +547,6 @@ let navigatingTo = '';
 let navigationId = 0;
 let currentNavigationId = 0;
 
-// Marker for the directive scope that is active while `navigate()` performs
-// its own lifecycle writes. `resolveInitiator()` refuses to derive an
-// initiator from a scope equal to this marker. Without it, a scope-less
-// `watch()` or `effect()` reacting to one of those writes and calling
-// `navigate()` would inherit the previous navigation's region id. A
-// `withScope`-wrapped callback carries its own scope, so its attribution is
-// unaffected.
-//
-// It is set in exactly two places, the start batch and the commit batch in
-// `navigate()`, always with save-and-restore rather than set-and-clear.
-// Navigations can nest (a reactive navigation started from inside another
-// navigation's write), and a plain clear would remove the outer marker too,
-// letting a deferred effect inherit the outer region.
-//
-// The frame-scheduled end write and the release timers run in detached
-// callbacks with an empty scope stack, so they need no marker: a scope-less
-// consumer navigating from them derives `null`, while a `data-wp-watch`
-// consumer (which runs in its own scope) derives its own region. That second
-// case is what the documented region-scoped focus pattern relies on.
-let writeFrameScope: ReturnType< typeof getScope >;
-
 let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
 	loading: 'Loading page, please wait.',
@@ -598,10 +579,12 @@ interface Store {
  * published on `state.initiator`.
  *
  * A string is returned as is and `null` returns `null`. When the option is
- * omitted, the initiator is derived from the directive scope the action was
- * called from: the id of the closest router region (including the element
- * itself), or `null` when there is none. Any other value warns and resolves
- * to `null`.
+ * omitted, the initiator is derived from whatever directive scope is ambient
+ * when the action is called: the id of the closest router region (including
+ * the element itself), or `null` when there is none. An unwrapped `watch()`
+ * callback contributes no scope, while a `withScope()`-wrapped callback
+ * contributes the scope it installed. Any other value warns and resolves to
+ * `null`.
  *
  * Derivation never throws. It returns `null` for a call made outside any
  * scope, for a scope whose `ref.current` is not an element, and for an
@@ -624,15 +607,7 @@ const resolveInitiator = ( declared: unknown ): string | null => {
 		return null;
 	}
 	if ( declared === undefined ) {
-		// Refuse the scope when it is the marker `navigate()` installs around
-		// its own writes (see `writeFrameScope`). The `scope &&` check is not
-		// strictly needed today, since a scope-less call returns `null` below
-		// anyway, but it keeps the intent explicit: only an inherited scope
-		// is refused.
 		const scope = getScope();
-		if ( scope && scope === writeFrameScope ) {
-			return null;
-		}
 		const element = scope?.ref?.current;
 		if ( typeof element?.closest !== 'function' ) {
 			return null;
@@ -705,10 +680,10 @@ export const { state, actions } = store< Store >( 'core/router', {
 				yield forcePageReload( href );
 			}
 
-			// Read the scope now, before any `yield`, while the caller's scope
-			// is still active. It marks the two write sites below so the
-			// frame-scope guard sees the initiating element's scope.
-			const entryScope = getScope();
+			// Derive the initiator now, before any `yield`, while the caller's
+			// scope is still active. An unwrapped `watch()` callback contributes
+			// no scope, while a `withScope()`-wrapped callback contributes the
+			// scope it installed.
 			const initiator = resolveInitiator( options.initiator );
 
 			const pagePath = getPagePath( href );
@@ -752,18 +727,12 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// Write both keys in one batch so no watcher sees `navigating`
 				// as `true` before `initiator` is set. No token guard is needed:
 				// this runs synchronously, before any other navigation can
-				// claim the token. The write is marked with the initiating
-				// scope for the frame-scope guard (see `writeFrameScope`).
-				const prevWriteFrameScopeAtStart = writeFrameScope;
-				writeFrameScope = entryScope;
-				try {
-					batch( () => {
-						state.navigating = true;
-						state.initiator = initiator;
-					} );
-				} finally {
-					writeFrameScope = prevWriteFrameScopeAtStart;
-				}
+				// claim the token. Derivation reads whatever scope is ambient at
+				// the `navigate()` entry, before this batch begins.
+				batch( () => {
+					state.navigating = true;
+					state.initiator = initiator;
+				} );
 
 				const page = yield Promise.race( [
 					pages.get( pagePath ),
@@ -787,30 +756,23 @@ export const { state, actions } = store< Store >( 'core/router', {
 				) {
 					yield importScriptModules( page.scriptModules );
 
-					// Mark this write with the initiating scope as well (see
-					// `writeFrameScope`). The batch keeps `state.url` and
-					// `renderPage()` together so consumers see the URL and the
-					// DOM change at once.
-					const prevWriteFrameScopeAtCommit = writeFrameScope;
-					writeFrameScope = entryScope;
-					try {
-						batch( () => {
-							// Updates the URL in the state.
-							state.url = href;
+					// The batch keeps `state.url` and `renderPage()` together so
+					// consumers see the URL and the DOM change at once. Derivation
+					// reads whatever scope is ambient at the `navigate()` entry.
+					batch( () => {
+						// Updates the URL in the state.
+						state.url = href;
 
-							// Updates the navigation status once the new page rendering
-							// has been completed.
-							if ( loadingAnimation ) {
-								navigation.hasStarted = false;
-								navigation.hasFinished = true;
-							}
+						// Updates the navigation status once the new page rendering
+						// has been completed.
+						if ( loadingAnimation ) {
+							navigation.hasStarted = false;
+							navigation.hasFinished = true;
+						}
 
-							// Renders the new page.
-							renderPage( page );
-						} );
-					} finally {
-						writeFrameScope = prevWriteFrameScopeAtCommit;
-					}
+						// Renders the new page.
+						renderPage( page );
+					} );
 
 					window.history[
 						options.replace ? 'replaceState' : 'pushState'
@@ -848,10 +810,9 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// callback because a second click or a Back press can claim the
 				// token before the frame runs.
 				//
-				// No `writeFrameScope` marker here: the callback runs with an
-				// empty scope stack, so a marker would change nothing, and a
-				// forgotten restore would pin the marker to this navigation's
-				// scope and null the next navigation from the same element.
+				// Derivation reads whatever scope is ambient at `navigate()` entry.
+				// An unwrapped `watch()` callback contributes no scope, while a
+				// `withScope()`-wrapped callback contributes the scope it installed.
 				if ( currentNavigationId === token ) {
 					afterNextFrame( () => {
 						if ( currentNavigationId === token ) {
