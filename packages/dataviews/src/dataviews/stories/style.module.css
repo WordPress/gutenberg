@@ -10,7 +10,7 @@
 	background-color: #fff;
 }
 
-.layout thead {
+.layout:global(.dataviews-view-table) thead {
 	inset-block-start: 67px;
 }
 
