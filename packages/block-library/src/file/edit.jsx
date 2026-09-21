@@ -281,46 +281,41 @@ function FileEdit( {
 						) }
 					</ResizableBox>
 				) }
-				<div className="wp-block-file__content-wrapper">
-					<RichText
-						identifier="fileName"
-						tagName="a"
-						value={ fileName }
-						placeholder={ __( 'Write file name…' ) }
-						withoutInteractiveFormatting
-						onChange={ ( text ) =>
-							setAttributes( {
-								fileName: removeAnchorTag( text ),
-							} )
-						}
-						href={ textLinkHref }
-					/>
-					{ showDownloadButton && (
-						<div className="wp-block-file__button-richtext-wrapper">
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
-							<RichText
-								identifier="downloadButtonText"
-								tagName="div" // Must be block-level or else cursor disappears.
-								aria-label={ __( 'Download button text' ) }
-								className={ clsx(
-									'wp-block-file__button',
-									__experimentalGetElementClassName(
-										'button'
-									)
-								) }
-								value={ downloadButtonText }
-								withoutInteractiveFormatting
-								placeholder={ __( 'Add text…' ) }
-								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText:
-											removeAnchorTag( text ),
-									} )
-								}
-							/>
-						</div>
-					) }
-				</div>
+				<RichText
+					identifier="fileName"
+					tagName="a"
+					value={ fileName }
+					placeholder={ __( 'Write file name…' ) }
+					withoutInteractiveFormatting
+					onChange={ ( text ) =>
+						setAttributes( {
+							fileName: removeAnchorTag( text ),
+						} )
+					}
+					href={ textLinkHref }
+				/>
+				{ showDownloadButton && (
+					<div className="wp-block-file__button-richtext-wrapper">
+						{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
+						<RichText
+							identifier="downloadButtonText"
+							tagName="div" // Must be block-level or else cursor disappears.
+							aria-label={ __( 'Download button text' ) }
+							className={ clsx(
+								'wp-block-file__button',
+								__experimentalGetElementClassName( 'button' )
+							) }
+							value={ downloadButtonText }
+							withoutInteractiveFormatting
+							placeholder={ __( 'Add text…' ) }
+							onChange={ ( text ) =>
+								setAttributes( {
+									downloadButtonText: removeAnchorTag( text ),
+								} )
+							}
+						/>
+					</div>
+				) }
 			</div>
 		</>
 	);
