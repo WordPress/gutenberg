@@ -9,8 +9,12 @@
 	align-self: flex-end;
 }
 
-// Composed without the selection info before them, the actions still keep
-// to the end of the row.
-.dataviews-footer > .dataviews-picker-footer__actions:only-child {
+// The row spreads its parts with `space-between`, which leaves a lone part at
+// the start. Whichever part ends up on its own keeps to the end of the row
+// instead, where the `DataViews` footer puts both its pagination and its
+// actions: the actions once a single page drops the pagination, the pagination
+// in a picker that declares no actions, or whatever a composed footer is left
+// holding.
+.dataviews-picker-footer > :only-child {
 	margin-inline-start: auto;
 }

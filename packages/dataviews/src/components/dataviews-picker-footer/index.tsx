@@ -270,7 +270,12 @@ export function DataViewsPickerFooter( {
 		!! paginationInfo.totalItems &&
 		paginationInfo.totalPages > 1;
 
-	if ( ! actions.length && ! hasPagination ) {
+	// Without actions and without pagination every default part renders
+	// nothing, leaving the row's border and padding around an empty line. The
+	// check belongs to those parts alone: children are the consumer's, and
+	// what they need is not something this can work out.
+	const rendersDefaultContents = children === undefined || children === null;
+	if ( rendersDefaultContents && ! actions.length && ! hasPagination ) {
 		return null;
 	}
 
@@ -279,7 +284,7 @@ export function DataViewsPickerFooter( {
 			direction="row"
 			justify="space-between"
 			align="center"
-			className="dataviews-footer"
+			className="dataviews-footer dataviews-picker-footer"
 			gap="sm"
 		>
 			{ children ?? (

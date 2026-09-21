@@ -764,6 +764,36 @@ describe( 'DataViews Picker', () => {
 				within( screen.getByRole( 'listbox' ) ).getAllByRole( 'option' )
 			).toHaveLength( 1 );
 		} );
+
+		it( 'renders the composed children when no default part has anything to show', async () => {
+			// Without actions and with every item on one page, the default
+			// selection info, pagination and actions all render nothing. The
+			// children belong to the consumer, so they render regardless.
+			await render(
+				<Picker>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer>
+						<span>Upload status</span>
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			expect( screen.getByText( 'Upload status' ) ).toBeInTheDocument();
+		} );
+
+		it( 'renders no footer at all when the default contents have nothing to show', async () => {
+			const { container } = await render( <Picker /> );
+
+			// Without actions and with every item on one page each default part
+			// renders nothing, so the row goes too rather than keep its border
+			// and padding. A row that is not there has nothing for a role or a
+			// text query to find.
+			// eslint-disable-next-line testing-library/no-node-access
+			const footer = container.querySelector(
+				'.dataviews-picker-footer'
+			);
+			expect( footer ).toBeNull();
+		} );
 	} );
 
 	describe( 'Table layout', () => {
