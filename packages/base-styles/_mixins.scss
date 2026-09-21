@@ -385,11 +385,6 @@
 		&[aria-checked="mixed"]::before {
 			color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
 		}
-
-		@media (forced-colors: active) {
-			color: GrayText;
-			border-color: GrayText;
-		}
 	}
 }
 
