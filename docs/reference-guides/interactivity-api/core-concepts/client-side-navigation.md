@@ -129,6 +129,8 @@ Without this, the router will not load your script module when navigating to a p
 
 A router region is a section of your page that the router updates during client-side navigation. You define one by adding both `data-wp-router-region` and `data-wp-interactive` to the same element — both directives are required at this moment.
 
+**Leaving out `data-wp-interactive` produces no error, and nothing looks wrong until the first navigation.** The Interactivity API resolves a directive's namespace from the nearest ancestor carrying `data-wp-interactive`, so a region element that inherits its namespace from an ancestor hydrates normally and all of its directives work. The router, however, looks for regions with a selector that requires `data-wp-interactive` on the region element _itself_, so it never finds that region on the pages it fetches. On every client-side navigation the router clears the regions it knows about before writing the destination's content back into them, and a region it could not find on the destination page is left cleared. So the symptom is a region that works perfectly on load and then **silently empties the first time you navigate**, with nothing in the console. If that is what you are seeing, check this attribute first.
+
 The `data-wp-router-region` directive takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched. Each region ID must be unique within a page; if two regions share the same ID, the router won't know which one to update.
 
 Here's a basic router region:
@@ -193,6 +195,8 @@ Router regions can be placed anywhere on the page. Their behavior depends on whe
     	</div>
     </div>
     ```
+
+    Nesting does change what a navigation started from inside the inner region reports as its initiator. The outer region is still the update unit, but a derived initiator is the **nearest** enclosing region — so a navigation started from inside `myPlugin/sidebar` publishes `"myPlugin/sidebar"` on `state.initiator`, even though `myPlugin/main` is what the router replaces. Identity here is attribution — who started this navigation — not a claim about what gets updated. See [Who initiated the navigation](#who-initiated-the-navigation).
 
 ### Implementing navigation
 
@@ -536,7 +540,9 @@ Use data-derived identifiers whenever possible — post IDs, term IDs, or any va
 
 During client-side navigation, the client-side state persists while the server provides new state for the target page. In some cases, you may want parts of your client state to stay in sync with what the server provides for each page — for example, updating a product count that changes across pages, or resetting an "expanded" flag based on the new page's context.
 
-Use `getServerState()` and `getServerContext()` to react specifically to server-provided values and selectively update the client state in a callback:
+**That syncing does not happen on its own, and it is worth knowing why before you rely on a server-seeded value.** When the router loads a page, it merges that page's server data into the client state _without overriding_: a key that already exists keeps the value it has, and only genuinely new keys are added. This is deliberate — it lets blocks that first appear on the new page initialize from the server without discarding changes the visitor made on the current one. The consequence is that a binding reading a server-seeded key goes on showing whatever the **first** page seeded it with, on every later navigation, unless you re-sync it yourself. Nothing warns and nothing errors; the value simply stops tracking the page.
+
+Use `getServerState()` and `getServerContext()` to react specifically to server-provided values and selectively update the client state in a callback. Unlike the client state they update, these two always return the current page's server data:
 
 ```js
 import {
@@ -567,7 +573,7 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md#subscribing-to-server-state-and-context) guide.
+For the full account of the merge, including what happens to context as well as to state, see [How server context and state merging works during navigation](/docs/reference-guides/interactivity-api/directives-and-store.md#how-server-context-and-state-merging-works-during-navigation). For more on the two functions themselves, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md#subscribing-to-server-state-and-context) guide.
 
 ### Overriding router's internal in-memory cached pages
 
@@ -1557,11 +1563,12 @@ When `prefetch()` is called (for example, on link hover):
 
 When `navigate()` is called (for example, on link click):
 
-1. The router checks if client navigation is disabled; if so, falls back to full page load.
-2. If not already prefetched, the fetch process from Phase 1 runs now.
-3. The router waits for the page to be ready (fetch complete, styles loaded).
-4. A loading indicator may appear if the wait exceeds a threshold (400ms).
-5. The rendering phase begins:
+1. The router checks if client navigation is disabled; if so, falls back to full page load. Nothing below happens, and no lifecycle transition is published.
+2. The navigation's start is published: `state.navigating` and `state.initiator` are written together in a single batch. This is the first moment the navigation is observable to anyone. It happens in the same synchronous step that kicks off the fetch below, before any waiting, and nothing gates, debounces or delays it.
+3. If not already prefetched, the fetch process from Phase 1 runs now.
+4. The router waits for the page to be ready (fetch complete, styles loaded).
+5. A loading indicator may appear if the wait exceeds a threshold (400ms), together with a "loading" announcement for screen readers. That threshold gates only this built-in feedback and the deprecated `state.navigation` flags — it does **not** gate `state.navigating`, which has read truthy since step 2 no matter how fast the navigation is.
+6. The rendering phase begins:
     - Styles are activated/deactivated as needed.
     - Script modules for the new page are executed.
     - In a batch for efficiency:
@@ -1569,10 +1576,13 @@ When `navigate()` is called (for example, on link click):
         - Each router region is updated with its new virtual DOM.
         - Regions with `attachTo` that don't exist are created and appended.
     - The document title is updated.
-6. Browser history is updated (pushState or replaceState).
-7. Screen reader announcement is made for accessibility.
-8. If the URL has a hash, the page scrolls to that element.
-9. Navigation is complete.
+7. Browser history is updated (pushState or replaceState).
+8. Screen reader announcement is made for accessibility.
+9. If the URL has a hash, the page scrolls to that element.
+10. Navigation is complete.
+11. On a later frame, after the commit in step 6 has landed in the DOM, the navigation's end is published: `state.navigating` is set back to `false`. This is later than it looks — `navigate()`'s own promise has already resolved by then. `state.initiator` is not cleared here; it keeps the finished navigation's value until the next navigation's start replaces it.
+
+Steps 2 and 11 are the two lifecycle writes. [The navigation lifecycle keys](#the-navigation-lifecycle-keys) covers what a consumer can rely on about them, including why the end is published on a later frame instead of inside step 6.
 
 #### Race condition protection
 
@@ -1581,6 +1591,10 @@ A subtle but important detail: users don't always wait for navigation to complet
 When `navigate()` is called, the router remembers the target URL. If another `navigate()` call comes in before the first completes, the router updates its target and the first navigation is abandoned. When the first navigation's fetch completes, it checks whether its URL is still the current target — if not, it simply returns without rendering.
 
 This ensures that rapid clicking through multiple links doesn't cause visual glitches or render stale content. Only the most recent navigation completes.
+
+The lifecycle keys follow the same latest-wins rule, which is what a loading indication needs. From the first navigation's start through the winning navigation's end, `state.navigating` reads truthy **continuously**: an abandoned navigation leaves no idle gap in the middle and publishes no end of its own, so an indicator bound to it never blinks off between two clicks, and a callback watching for the end runs once, when the winner finishes. `state.initiator` always identifies the most recent navigation, so a region whose navigation has been superseded by another region's stops reading as the origin at the moment it is superseded.
+
+The lifecycle writes are not governed by the target-URL comparison described above; the end write carries a latest-wins check of its own. That is what stops an abandoned navigation from publishing an end while the winner is still in flight, and it holds for every way one navigation can supersede another, including a Back press landing mid-navigation. [Overlapping navigations](#overlapping-navigations) states the contract a consumer can rely on.
 
 ## Full-page client-side navigation (experimental)
 
