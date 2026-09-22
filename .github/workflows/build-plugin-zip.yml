@@ -206,6 +206,7 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+                  package-manager-cache: false
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
@@ -384,6 +385,7 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  package-manager-cache: false
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
