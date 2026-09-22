@@ -1098,9 +1098,6 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
