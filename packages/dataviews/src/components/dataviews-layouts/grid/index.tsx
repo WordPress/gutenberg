@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
@@ -107,7 +96,7 @@ function ViewGrid< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }

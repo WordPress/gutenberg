@@ -1,35 +1,29 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { IconButton, Link } from '@wordpress/ui';
-import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { IconButton, Menu } from '@wordpress/ui';
+import { HostLink } from '@wordpress/widget-primitives';
+import type { WidgetAction } from '@wordpress/widget-primitives';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
 
-import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
-
 type WidgetActionsProps = {
 	/**
-	 * The widget type whose declared actions render here.
+	 * The actions this menu materializes. The host routes by relevance:
+	 * the footer takes `'high'` and `'medium'`, this menu the rest, and
+	 * every action for full-bleed widgets, which have no footer.
 	 */
-	widgetType: WidgetType;
+	actions: WidgetAction[];
 };
 
 /**
- * Materializes a widget type's declared `actions` as a "more" menu in the
- * chrome: a three-dots trigger surfacing each action. This host mounts a real
- * anchor for the link fulfillment, so middle-click and copy address survive;
- * the menu exposes it as a menu item rather than as a link.
+ * Materializes widget actions as a "more" menu in the chrome: a three-dots
+ * trigger surfacing each given action. This host mounts a real anchor for the
+ * link fulfillment, so middle-click and copy address survive; the menu exposes
+ * it as a menu item rather than as a link.
+ *
+ * A target the host recognizes as one of its own routes mounts the host
+ * router's link through `HostLink`, so it navigates client-side.
  *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.
@@ -37,9 +31,8 @@ type WidgetActionsProps = {
  * @param {WidgetActionsProps} props Component props.
  */
 export function WidgetActions( {
-	widgetType,
+	actions,
 }: WidgetActionsProps ): React.ReactNode {
-	const actions = widgetType.actions ?? [];
 	const reserveRef = useReserveHeaderSpace< HTMLSpanElement >( 'actions' );
 
 	if ( actions.length === 0 ) {
@@ -48,8 +41,8 @@ export function WidgetActions( {
 
 	return (
 		<span ref={ reserveRef } className={ styles[ 'widget-actions' ] }>
-			<Menu>
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
 					render={
 						<IconButton
 							icon={ moreVertical }
@@ -61,28 +54,29 @@ export function WidgetActions( {
 					}
 				/>
 
-				<Menu.Popover>
-					<Menu.Group className={ styles[ 'widget-action-items' ] }>
+				<Menu.Popup>
+					<Menu.Group>
 						{ actions.map( ( action ) => (
-							<Menu.Item
+							<Menu.LinkItem
 								key={ action.id }
-								render={
-									<Link
-										href={ action.href }
-										download={ action.download }
-										openInNewTab={ action.openInNewTab }
-										className={
-											styles[ 'widget-action-link' ]
-										}
-									/>
+								download={ action.download }
+								openInNewTab={ action.openInNewTab }
+								render={ <HostLink href={ action.href } /> }
+								closeOnClick
+								prefix={
+									action.icon ? (
+										<Menu.PrefixIcon icon={ action.icon } />
+									) : undefined
 								}
 							>
-								{ action.label }
-							</Menu.Item>
+								<Menu.ItemLabel>
+									{ action.label }
+								</Menu.ItemLabel>
+							</Menu.LinkItem>
 						) ) }
 					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 		</span>
 	);
 }

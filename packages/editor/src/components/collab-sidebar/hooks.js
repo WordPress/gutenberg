@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,10 +17,6 @@ import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -99,7 +92,7 @@ export function useNoteThreads( postId ) {
 				reply: [],
 				blockClientId:
 					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
+						? ( clientIdByNoteId.get( item.id ) ?? null )
 						: null,
 			};
 			threadsById.set( item.id, thread );
@@ -537,7 +530,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			if (
 				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
 			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+				disableComplementaryArea( 'core' );
 			}
 		};
 	}, [ enabled, registry ] );

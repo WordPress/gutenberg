@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { getBlockType, parse } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import {
 	hasAlignSupport,

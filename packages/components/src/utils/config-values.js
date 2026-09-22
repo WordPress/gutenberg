@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '36px';
@@ -23,10 +20,6 @@ const CONTROL_PROPS = {
 // TypeScript type declarations.
 export default Object.assign( {}, CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
-	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
-	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
-	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
-	elevationIntensity: 1,
 	radiusXSmall: '1px',
 	radiusSmall: '2px',
 	radiusMedium: '4px',
@@ -36,7 +29,6 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
-	spinnerSize: 16,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',
@@ -65,6 +57,5 @@ export default Object.assign( {}, CONTROL_PROPS, {
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',
 	transitionDurationFastest: '100ms',
-	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
 	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
 } );

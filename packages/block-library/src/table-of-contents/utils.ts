@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { escapeAttribute, escapeEditableHTML } from '@wordpress/escape-html';
@@ -100,7 +97,7 @@ export function createListItemBlocks(
 					content: link
 						? `<a href="${ escapeAttribute(
 								link
-						  ) }">${ escapeEditableHTML( content ) }</a>`
+							) }">${ escapeEditableHTML( content ) }</a>`
 						: escapeEditableHTML( content ),
 				},
 				children?.length
@@ -110,7 +107,7 @@ export function createListItemBlocks(
 								{ ordered },
 								createListItemBlocks( children, ordered )
 							),
-					  ]
+						]
 					: []
 			)
 	);

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import {
@@ -15,10 +8,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -33,6 +22,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from '../table/column-header-menu';
 import ColumnPrimary from '../table/column-primary';
 import getDataByGroup from '../utils/get-data-by-group';
+import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
 import type { SelectionProps } from '../utils/use-selection-props';
 import { useIntersectionObserver } from '../utils/use-infinite-scroll';
@@ -118,7 +108,7 @@ function TableRow< Item >( {
 		setIsHovered( false );
 	};
 
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
@@ -308,7 +298,7 @@ function ViewPickerTable< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -445,7 +435,7 @@ function ViewPickerTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {

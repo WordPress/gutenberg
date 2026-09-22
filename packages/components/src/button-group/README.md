@@ -1,8 +1,6 @@
 # ButtonGroup
 
-<div class="callout callout-alert">
-	This component is deprecated. Use `ToggleGroupControl` instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Use `ToggleGroupControl` instead.</p>
 
 ButtonGroup can be used to group any related buttons together. To emphasize related buttons, a group should share a common container.
 

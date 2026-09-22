@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -246,7 +238,7 @@ test.describe( 'Image', () => {
 		] = await editor.getBlocks();
 
 		// Open the media editor modal from the block toolbar.
-		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Edit image' );
 		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
 		await expect( modal ).toBeVisible();
 
@@ -276,11 +268,11 @@ test.describe( 'Image', () => {
 			imageBlock.locator( '.components-spinner' )
 		).toBeHidden();
 
-		// Closing the modal returns focus to the Crop toolbar button. The
-		// button is disabled (not hidden) while the edit loads, so it stays in
-		// the DOM to receive focus rather than dropping it to the canvas.
+		// Closing the modal returns focus to the "Edit image" toolbar button.
+		// The button is disabled (not hidden) while the edit loads, so it stays
+		// in the DOM to receive focus rather than dropping it to the canvas.
 		await expect(
-			page.locator( 'role=button[name="Crop"i]' )
+			page.locator( 'role=button[name="Edit image"i]' )
 		).toBeFocused();
 	} );
 
@@ -1063,6 +1055,109 @@ test.describe( 'Image - Site editor', () => {
 <!-- \\/wp:image -->`
 		);
 		expect( await editor.getEditedPostContent() ).toMatch( regex );
+	} );
+} );
+
+// Regression test for https://github.com/WordPress/gutenberg/pull/70575.
+test.describe( 'Image - dimensions forced by global styles', () => {
+	let uploadedMedia;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
+		);
+
+		// Mimic a theme that forces a fixed height on image blocks. User
+		// global styles load after the block's own stylesheet, so this rule
+		// wins the equal-specificity cascade against the block's `height: auto`
+		// unless the block sets an inline `height: auto` (which always wins).
+		const stylesPostId =
+			await requestUtils.getCurrentThemeGlobalStylesPostId();
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/global-styles/${ stylesPostId }`,
+			data: {
+				id: stylesPostId,
+				styles: {
+					css: '.wp-block-image img { height: 100px; }',
+				},
+			},
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.resetThemeGlobalStyles();
+		await requestUtils.deleteAllMedia();
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'preserves the aspect ratio when only the width is set', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: uploadedMedia.id,
+				url: uploadedMedia.source_url,
+				sizeSlug: 'full',
+				width: '200px',
+			},
+		} );
+
+		const image = editor.canvas.locator(
+			'role=document[name="Block: Image"i] >> role=img'
+		);
+		await expect( image ).toBeVisible();
+		await image.evaluate( ( img ) => img.decode() );
+
+		const box = await image.boundingBox();
+		// The 200x150 image displayed at 200px wide keeps its 4:3 aspect
+		// ratio (150px tall) instead of being squished to the 100px height
+		// forced by global styles.
+		expect( box.width / box.height ).toBeCloseTo( 4 / 3, 1 );
+	} );
+
+	test( 'preserves the aspect ratio for images in a grid gallery', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				layout: { type: 'grid' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+			],
+		} );
+
+		// The grid variation relabels the block to "Gallery Grid", so select
+		// by data-type rather than by the block's accessible name.
+		const image = editor.canvas.locator(
+			'[data-type="core/gallery"] [data-type="core/image"] img'
+		);
+		await expect( image ).toBeVisible();
+
+		// Grid galleries do not crop images, so the image keeps its baseline
+		// `height: auto` and is not squished by the global styles. Poll so the
+		// assertion waits for the image to load and the layout to settle.
+		await expect
+			.poll( async () => {
+				const box = await image.boundingBox();
+				return box ? box.width / box.height : 0;
+			} )
+			.toBeCloseTo( 4 / 3, 1 );
 	} );
 } );
 

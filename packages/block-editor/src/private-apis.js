@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';
@@ -16,16 +9,14 @@ import {
 	extractWords,
 	getNormalizedSearchTerms,
 	normalizeString,
+	searchItems,
 } from './components/inserter/search-items';
+import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './hooks/block-style-state';
+import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -88,6 +79,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -111,9 +103,7 @@ lock( privateApis, {
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
-	getStyleForState,
 	isDefaultBlockStyleState,
-	setStyleForState,
 	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
@@ -166,4 +156,7 @@ lock( privateApis, {
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,
+	isElementVisible,
+	getPopulatedCategories,
+	searchItems,
 } );

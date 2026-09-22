@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { BasePreset } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { useSetting } from '../hooks';
 
 const EMPTY_ARRAY: any[] = [];

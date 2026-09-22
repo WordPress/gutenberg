@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';

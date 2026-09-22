@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 
 export { default as __experimentalFetchLinkSuggestions } from './__experimental-fetch-link-suggestions';

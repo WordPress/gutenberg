@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
