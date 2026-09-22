@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add Markdown-style shortcuts for bold and italic text. ([#62289](https://github.com/WordPress/gutenberg/pull/62289))
+
 ## 5.55.0 (2026-09-10)
 
 ### Bug Fixes
