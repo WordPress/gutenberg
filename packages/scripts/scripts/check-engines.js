@@ -1,5 +1,6 @@
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
+const tools = require( 'check-node-version/tools' );
 const { getArgsFromCLI, hasArgInCLI, getPackageProp } = require( '../utils' );
 
 const getConfig = () => {
@@ -12,10 +13,13 @@ const getConfig = () => {
 	if ( hasConfig ) {
 		return [];
 	}
-	const { node, npm } =
+	const engines =
 		getPackageProp( 'engines' ) || require( '../package.json' ).engines;
 
-	return [ '--node', node, '--npm', npm ];
+	// Only pass the engines that `check-node-version` knows how to check.
+	return Object.entries( engines )
+		.filter( ( [ name ] ) => name in tools )
+		.flatMap( ( [ name, range ] ) => [ `--${ name }`, range ] );
 };
 
 const result = spawn(
