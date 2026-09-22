@@ -561,20 +561,8 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.PageSelect`
--   `DataViews.PageNavigation`
 -   `DataViews.BulkActionToolbar`
 -   `DataViews.ViewConfig`
-
-`DataViews.Pagination` renders its children in place of its own page select and previous/next buttons, so a layout short on space can keep only the parts it has room for:
-
-```jsx
-<DataViews.Pagination>
-	<DataViews.PageSelect />
-</DataViews.Pagination>
-```
-
-Like the default contents it stands in for, a composed `DataViews.Pagination` renders nothing at all while the dataset fits on a single page. `DataViews.Pagination`, `DataViews.PageSelect` and `DataViews.PageNavigation` each take a `className`, as `DataViews.Layout` does.
 
 #### example
 
@@ -785,7 +773,7 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar`, `DataViewsPicker.Actions`, `DataViewsPicker.PageSelect` and `DataViewsPicker.PageNavigation`, the page select and the previous/next buttons on their own. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
 
 ```jsx
 <DataViewsPicker.Footer>
@@ -796,7 +784,7 @@ Optional. Custom UI to render instead of the default picker layout. When provide
 </DataViewsPicker.Footer>
 ```
 
-Placing a composed footer is the consumer's business: `DataViewsPicker.Footer`, `DataViewsPicker.Actions` and `DataViewsPicker.BulkActionToolbar` each take a `className` too, so a footer can be laid out from the consumer's own stylesheet without wrapping its parts in extra elements.
+Placing a composed footer is the consumer's business, so each of those parts takes a `className` too, as `DataViews.Layout` does, and a footer can be laid out from the consumer's own stylesheet without wrapping its parts in extra elements.
 
 **Unsupported properties:**
 

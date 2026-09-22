@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Let a consumer compose a footer and a pagination row from their parts: `DataViewsPicker.Footer` and `DataViews.Pagination` render their children in place of their default contents, the new `PageSelect`, `PageNavigation` and `DataViewsPicker.Actions` sub-components are the parts to put inside them, and each takes a `className` ([#83281](https://github.com/WordPress/gutenberg/pull/83281)).
+-   Let a picker compose its footer from its parts: `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, the new `DataViewsPicker.PageSelect`, `DataViewsPicker.PageNavigation` and `DataViewsPicker.Actions` sub-components are the parts to put inside them, and each takes a `className` ([#83281](https://github.com/WordPress/gutenberg/pull/83281)).
 
 ### Enhancements
 
