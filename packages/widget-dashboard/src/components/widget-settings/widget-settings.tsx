@@ -101,7 +101,7 @@ export function WidgetSettings(): React.ReactNode {
 									...( instance.attributes as object ),
 									...edits,
 								},
-						  }
+							}
 						: instance
 				)
 			);

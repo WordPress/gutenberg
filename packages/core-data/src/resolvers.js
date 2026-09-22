@@ -107,19 +107,7 @@ export const getEntityRecord =
 				}
 			}
 
-			let { baseURL } = entityConfig;
-
-			// For "string" IDs, use the old templates endpoint.
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				( ( key && typeof key === 'string' && ! /^\d+$/.test( key ) ) ||
-					! window?.__experimentalTemplateActivate )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 
 			const path = addQueryArgs( baseURL + ( key ? '/' + key : '' ), {
 				...entityConfig.baseURLParams,
@@ -131,7 +119,6 @@ export const getEntityRecord =
 				response.headers?.get( 'allow' )
 			);
 
-			const canUserResolutionsArgs = [];
 			const receiveUserPermissionArgs = {};
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				receiveUserPermissionArgs[
@@ -141,12 +128,11 @@ export const getEntityRecord =
 						id: key,
 					} )
 				] = permissions[ action ];
-
-				canUserResolutionsArgs.push( [
-					action,
-					{ kind, name, id: key },
-				] );
 			}
+
+			// `canUser` is keyed by the resource, so one entry covers all
+			// four actions.
+			const canUserResolutionsArgs = [ [ { kind, name, id: key } ] ];
 
 			// Entity supports syncing.
 			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
@@ -418,24 +404,7 @@ export const getEntityRecords =
 				};
 			}
 
-			let { baseURL } = entityConfig;
-			// `combinedTemplates` means that we fetch templates from the "old"
-			// /templates endpoint, which combines active user templates with
-			// the registered templates and rewrites IDs in the form of
-			// `theme-slug/template-slug`. When turned off, we only fetch
-			// database templates (posts). To fetch registered templates without
-			// edits applied, use the `registeredTemplate` entity.
-			const { combinedTemplates = true } = query;
-
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				combinedTemplates
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 
 			const path = addQueryArgs( baseURL, {
 				...entityConfig.baseURLParams,
@@ -568,12 +537,13 @@ export const getEntityRecords =
 				const canUserResolutionsArgs = [];
 				const receiveUserPermissionArgs = {};
 				for ( const targetHint of targetHints ) {
-					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-						canUserResolutionsArgs.push( [
-							action,
-							{ kind, name, id: targetHint.id },
-						] );
+					// `canUser` is keyed by the resource, so one entry covers
+					// all four actions.
+					canUserResolutionsArgs.push( [
+						{ kind, name, id: targetHint.id },
+					] );
 
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 						receiveUserPermissionArgs[
 							getUserPermissionCacheKey( action, {
 								kind,
@@ -668,36 +638,13 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                        'delete'.
- * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
- *                                        or REST base as a string - `media`.
- * @param {?string}       id              ID of the rest resource to check.
+ * @param {string|Object} resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
+ *                                 or REST base as a string - `media`.
+ * @param {?string}       id       ID of the rest resource to check.
  */
 export const canUser =
-	( requestedAction, resource, id ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
-		if ( ! ALLOWED_RESOURCE_ACTIONS.includes( requestedAction ) ) {
-			throw new Error( `'${ requestedAction }' is not a valid action.` );
-		}
-
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		// Prevent resolving the same resource twice.
-		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
-			if ( relatedAction === requestedAction ) {
-				continue;
-			}
-			const isAlreadyResolving = hasStartedResolution( 'canUser', [
-				relatedAction,
-				resource,
-				id,
-			] );
-			if ( isAlreadyResolving ) {
-				return;
-			}
-		}
-
+	( resource, id ) =>
+	async ( { dispatch, resolveSelect } ) => {
 		let resourcePath = null;
 		if ( typeof resource === 'object' ) {
 			if ( ! resource.kind || ! resource.name ) {
@@ -742,22 +689,26 @@ export const canUser =
 			response.headers?.get( 'allow' )
 		);
 		const receiveUserPermissionArgs = {};
-		const canUserResolutionsArgs = [];
 		for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 			receiveUserPermissionArgs[
 				getUserPermissionCacheKey( action, resource, id )
 			] = permissions[ action ];
-
-			// Mark related action resolutions as finished.
-			if ( action !== requestedAction ) {
-				canUserResolutionsArgs.push( [ action, resource, id ] );
-			}
 		}
-		registry.batch( () => {
-			dispatch.receiveUserPermissions( receiveUserPermissionArgs );
-			dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
-		} );
+		dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 	};
+
+/**
+ * One OPTIONS request returns the permissions for every action, so the action
+ * is left out of the key and all four `canUser` calls for a resource share a
+ * single resolver run.
+ *
+ * @param {string}        action   Action the selector was called with.
+ * @param {string|Object} resource Entity resource to check.
+ * @param {?string}       id       ID of the rest resource to check.
+ *
+ * @return {Array} The cache key arguments.
+ */
+canUser.getResolutionArgs = ( action, resource, id ) => [ resource, id ];
 
 /**
  * Checks whether the current user can perform the given action on the given
@@ -769,8 +720,8 @@ export const canUser =
  */
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
-	async ( { dispatch } ) => {
-		await dispatch( canUser( 'update', { kind, name, id: recordId } ) );
+	async ( { resolveSelect } ) => {
+		await resolveSelect.canUser( 'update', { kind, name, id: recordId } );
 	};
 
 /**
@@ -881,7 +832,7 @@ export const getCurrentThemeGlobalStylesRevisions =
 					'root',
 					'globalStyles',
 					globalStylesId
-			  )
+				)
 			: undefined;
 		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
 
@@ -1005,15 +956,10 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		// Wait for the the entities config to be loaded, otherwise receiving
+		// Wait for the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		// When active_templates experiment is enabled, use numeric wp_id if it
-		// exists, otherwise fall back to string ID format (theme//slug) as the
-		// frontend expects string IDs for templates.
-		const id = window?.__experimentalTemplateActivate
-			? template?.wp_id || template?.id
-			: template?.id;
+		const id = template?.id;
 
 		registry.batch( () => {
 			dispatch.receiveDefaultTemplateId( query, id || '' );
@@ -1034,18 +980,6 @@ export const getDefaultTemplateId =
 			}
 		} );
 	};
-
-getDefaultTemplateId.shouldInvalidate = ( action ) => {
-	// Only invalidate on real saves; `persistedEdits` is absent on
-	// initial fetches so the kickoff's own site read doesn't wipe
-	// the just-resolved template id.
-	return (
-		action.type === 'RECEIVE_ITEMS' &&
-		action.kind === 'root' &&
-		action.name === 'site' &&
-		!! action.persistedEdits
-	);
-};
 
 /**
  * Requests an entity's revisions from the REST API.

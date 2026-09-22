@@ -12,16 +12,15 @@ const sizeClassName = {
 };
 
 export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+	const { isList, spacedAround, size: contextSize } = useItemGroupContext();
 	const {
 		as: asProp,
 		className,
 		onClick,
-		role = 'listitem',
+		role = isList ? 'listitem' : undefined,
 		size: sizeProp,
 		...otherProps
 	} = useContextSystem( props, 'Item' );
-
-	const { spacedAround, size: contextSize } = useItemGroupContext();
 
 	const size = sizeProp || contextSize;
 

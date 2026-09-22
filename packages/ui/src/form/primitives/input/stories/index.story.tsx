@@ -5,13 +5,9 @@ import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-l
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Input',
+	title: 'Components/@wordpress-ui/Form/Primitives/Input',
+	id: 'design-system-components-form-primitives-input',
 	component: Input,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <Input { ...args } />,
 	argTypes: {
 		defaultValue: { control: false },
 		onValueChange: { action: 'onValueChange' },
@@ -32,6 +28,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -42,18 +39,15 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
 
 export const WithSuffixControl: Story = {
 	args: {
+		'aria-label': 'Value',
 		suffix: InputLayoutWithSuffixControl.args?.suffix,
-	},
-	parameters: {
-		// FIXME: Story shows Input without a visible label (label).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 	},
 };
 
