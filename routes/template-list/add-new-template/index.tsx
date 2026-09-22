@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -13,7 +6,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
@@ -42,10 +35,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useNavigate, useInvalidate } from '@wordpress/route';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import AddCustomTemplateModalContent, {
 	type EntityForSuggestions,
 } from './add-custom-template-modal-content';
@@ -127,7 +116,7 @@ function TemplateListItem( {
 				direction={ direction }
 			>
 				<div className="template-list-add-new-template__template-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 				<VStack
 					className="template-list-add-new-template__template-name"
@@ -136,7 +125,7 @@ function TemplateListItem( {
 				>
 					<WCText
 						align="center"
-						weight={ 500 }
+						weight="var(--wpds-typography-font-weight-emphasis)"
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }
@@ -185,12 +174,14 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 
 	const homeUrl = useSelect( ( select ) => {
 		// Site index.
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
+		return select( coreStore ).getEntityRecord< { home?: string } >(
+			'root',
+			'__unstableBase'
+		)?.home;
 	}, [] );
 
 	const TEMPLATE_SHORT_DESCRIPTIONS: Record< string, string > = {
-		'front-page': homeUrl,
+		'front-page': homeUrl ?? '',
 		date: sprintf(
 			// translators: %s: The homepage url.
 			__( 'E.g. %s' ),
@@ -231,12 +222,8 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds post meta fields in template
-					meta: {
-						is_wp_suggestion: isWPSuggestion,
-						// Mark as inactive by default when template activation is enabled
-						is_inactive_by_default: true,
-					},
+					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);

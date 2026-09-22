@@ -1,25 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { useState, useRef, useLayoutEffect } from '@wordpress/element';
 import type { Attachment } from '@wordpress/core-data';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-/**
- * Internal dependencies
- */
 import { getMediaTypeFromMimeType } from '../utils/get-media-type-from-mime-type';
 import type { MediaItem } from '../types';
 
@@ -91,7 +81,7 @@ function FallbackView( {
 				className="dataviews-media-field__media-thumbnail__stack"
 				spacing={ 0 }
 			>
-				<Icon
+				<WCIcon
 					className="dataviews-media-field__media-thumbnail--icon"
 					icon={ getMediaTypeFromMimeType( item.mime_type ).icon }
 					size={ 24 }
@@ -179,7 +169,7 @@ export default function MediaThumbnailView( {
 			if ( ! item.featured_media ) {
 				return;
 			}
-			return select( coreStore ).getEntityRecord< Attachment >(
+			return select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
 				item.featured_media

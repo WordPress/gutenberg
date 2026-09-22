@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './hooks';
 export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
@@ -17,6 +14,7 @@ export {
 	useCachedTruthy,
 	useStyleOverride,
 } from './hooks';
+export { getStyleForState, setStyleForState } from './hooks/block-style-state';
 export * from './components';
 export * from './elements';
 export * from './utils';

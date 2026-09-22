@@ -1,14 +1,16 @@
 import type { Select as _Select } from '@base-ui/react/select';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
-
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
+export type PortalProps = ComponentProps< typeof _Select.Portal >;
+
+export type PositionerProps = ComponentProps< typeof _Select.Positioner >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
-export type SelectRootProps = Omit<
-	_Select.Root.Props< string, false >,
+export type SelectRootProps< Value = unknown > = Omit<
+	_Select.Root.Props< Value, false >,
 	'multiple'
 >;
 
@@ -42,38 +44,86 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
-	/**
-	 * The content to be rendered inside the popup.
-	 */
+export type SelectGroupProps = ComponentProps< typeof _Select.Group > & {
 	children?: React.ReactNode;
-	/**
-	 * Optional portal element, typically `<Select.Portal />` with custom
-	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
-	 * default props. Do not pass `children` on the portal element; they would
-	 * be ignored.
-	 */
-	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
+
+export type SelectGroupLabelProps = ComponentProps<
+	typeof _Select.GroupLabel
+> & {
+	children?: React.ReactNode;
+};
+
+export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
+	ItemPopupWidthProps & {
+		/**
+		 * The content to be rendered inside the popup.
+		 */
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Select.Portal />` with custom
+		 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
+		 * default props. Do not pass `children` on the portal element; they would
+		 * be ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Select.Positioner />` with
+		 * custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
+		 * with default props. Do not pass `children` on the positioner element;
+		 * they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
+
+export interface SelectItemLabelProps extends ComponentProps< 'div' > {
+	/**
+	 * The primary label for a select item. Use as the first direct child of
+	 * every select item. The trigger label still comes from the selected
+	 * item's `label` or from `Select.Trigger` children.
+	 */
+	children: ReactNode;
+}
+
+export interface SelectItemDescriptionProps extends ComponentProps< 'span' > {
+	/**
+	 * Supplementary content displayed below a select item label. Use as a
+	 * direct child after `Select.ItemLabel`. Content should be text or
+	 * non-interactive inline markup.
+	 */
+	children: ReactNode;
+}
+
+type SelectItemChildren =
+	| ReactElement< SelectItemLabelProps >
+	| [
+			ReactElement< SelectItemLabelProps >,
+			...(
+				| ReactElement< SelectItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
 
 export type SelectItemProps = Omit<
 	ComponentProps< typeof _Select.Item >,
-	'value'
+	'value' | 'children'
 > & {
 	/**
 	 * A unique value that identifies this select item.
 	 */
-	value?: string | null;
+	value?: unknown;
 	/**
 	 * The size of the item.
 	 *
 	 * @default 'default'
 	 */
-	size?: InputLayoutProps[ 'size' ];
+	size?: 'default' | 'small';
 	/**
-	 * The content of the item.
-	 *
-	 * @default `value`
+	 * One direct `Select.ItemLabel`, followed by zero or more direct
+	 * `Select.ItemDescription` components.
 	 */
-	children?: _Select.Item.Props[ 'children' ];
+	children: SelectItemChildren;
 };

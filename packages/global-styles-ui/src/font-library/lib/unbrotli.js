@@ -28,8 +28,6 @@
  * SOFTWARE.
  */
 
-/* eslint @eslint-community/eslint-comments/no-unlimited-disable: 0 */
-/* eslint-disable */
 export default ( function () {
 	var define, module, exports;
 	return ( function () {
@@ -995,7 +993,7 @@ export default ( function () {
 							br
 						);
 
-						for ( i = 0; i < context_map_size;  ) {
+						for ( i = 0; i < context_map_size; ) {
 							var code;
 
 							br.readMoreInput();
@@ -2685,4 +2683,3 @@ export default ( function () {
 		[ 12 ]
 	)( 12 );
 } )();
-/* eslint-enable */

@@ -1,7 +1,31 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+async function setNavigationOrientationToVertical( page ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+
+	await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+
+	const stylesPanel = editorSettings.getByRole( 'tabpanel', {
+		name: 'Styles',
+	} );
+
+	await stylesPanel
+		.getByRole( 'radiogroup', { name: 'Orientation' } )
+		.getByRole( 'radio', { name: 'Vertical' } )
+		.click();
+}
+
+async function getSettingsPanel( page ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+
+	await editorSettings.getByRole( 'tab', { name: 'Settings' } ).click();
+
+	return editorSettings.getByRole( 'tabpanel', { name: 'Settings' } );
+}
 
 test.describe( 'Navigation block - Submenu Visibility', () => {
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
@@ -28,6 +52,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		// Wait for navigation block to be visible
 		const navBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 		await expect( navBlock ).toBeVisible();
 		await editor.selectBlocks( navBlock );
@@ -45,23 +70,10 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		await test.step( 'Switch to vertical orientation and select Always', async () => {
 			await editor.openDocumentSettingsSidebar();
 
-			// Click the Settings tab button
-			const settingsTab = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tab', { name: 'Settings' } );
-			await settingsTab.click();
-
-			const settingsPanel = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tabpanel', { name: 'Settings' } );
-
-			// Switch to vertical orientation
-			const verticalOption = settingsPanel.getByRole( 'radio', {
-				name: 'Vertical',
-			} );
-			await verticalOption.click();
+			await setNavigationOrientationToVertical( page );
 
 			// Select Always from Submenu Visibility
+			const settingsPanel = await getSettingsPanel( page );
 			const submenuVisibilityGroup = settingsPanel.getByRole(
 				'radiogroup',
 				{
@@ -135,6 +147,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 	} ) => {
 		const navBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 		const pageListBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Page List',
@@ -187,17 +200,8 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			await editor.selectBlocks( navBlock );
 			await editor.openDocumentSettingsSidebar();
 
-			// Click the Settings tab
-			const settingsTab = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tab', { name: 'Settings' } );
-			await settingsTab.click();
-
-			const settingsPanel = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tabpanel', { name: 'Settings' } );
-
 			// Check if Submenu Visibility control exists
+			const settingsPanel = await getSettingsPanel( page );
 			const submenuVisibilityGroup = settingsPanel.getByRole(
 				'radiogroup',
 				{
@@ -209,17 +213,11 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		} );
 
 		await test.step( 'Set submenu visibility to always', async () => {
-			const settingsPanel = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'tabpanel', { name: 'Settings' } );
-
 			// Switch to vertical orientation first (required for Always option)
-			const verticalOption = settingsPanel.getByRole( 'radio', {
-				name: 'Vertical',
-			} );
-			await verticalOption.click();
+			await setNavigationOrientationToVertical( page );
 
 			// Select Always from Submenu Visibility
+			const settingsPanel = await getSettingsPanel( page );
 			const submenuVisibilityGroup = settingsPanel.getByRole(
 				'radiogroup',
 				{

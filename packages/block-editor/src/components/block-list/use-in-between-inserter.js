@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
@@ -103,17 +96,28 @@ export function useInBetweenInserter() {
 
 				const children = Array.from( event.target.children );
 				let element = children.find( ( blockEl ) => {
+					if ( ! blockEl.classList.contains( 'wp-block' ) ) {
+						return false;
+					}
+
 					const blockElRect = blockEl.getBoundingClientRect();
-					return (
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'vertical' &&
-							blockElRect.top > offsetTop ) ||
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'horizontal' &&
-							( isRTL()
-								? blockElRect.right < offsetLeft
-								: blockElRect.left > offsetLeft ) )
-					);
+
+					if ( orientation === 'vertical' ) {
+						return blockElRect.top > offsetTop;
+					}
+
+					// A horizontal list can wrap, so only blocks on the
+					// pointer's line are candidates.
+					if (
+						offsetTop < blockElRect.top ||
+						offsetTop > blockElRect.bottom
+					) {
+						return false;
+					}
+
+					return isRTL()
+						? blockElRect.right < offsetLeft
+						: blockElRect.left > offsetLeft;
 				} );
 
 				if ( ! element ) {
@@ -157,18 +161,19 @@ export function useInBetweenInserter() {
 				) {
 					return;
 				}
-				const elementRect = element.getBoundingClientRect();
 
-				if (
-					( orientation === 'horizontal' &&
-						( event.clientY > elementRect.bottom ||
-							event.clientY < elementRect.top ) ) ||
-					( orientation === 'vertical' &&
-						( event.clientX > elementRect.right ||
-							event.clientX < elementRect.left ) )
-				) {
-					hideInsertionPoint();
-					return;
+				// Don't show the insertion point when the pointer sits beside
+				// the block rather than before it.
+				if ( orientation === 'vertical' ) {
+					const elementRect = element.getBoundingClientRect();
+
+					if (
+						event.clientX > elementRect.right ||
+						event.clientX < elementRect.left
+					) {
+						hideInsertionPoint();
+						return;
+					}
 				}
 
 				const index = getBlockIndex( clientId );

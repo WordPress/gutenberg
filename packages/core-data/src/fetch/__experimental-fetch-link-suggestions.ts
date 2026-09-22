@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -116,7 +113,7 @@ export default async function fetchLinkSuggestions(
 			? {
 					...searchOptions,
 					...searchOptions.initialSuggestionsSearchOptions,
-			  }
+				}
 			: searchOptions;
 
 	const {
@@ -266,6 +263,11 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
+	// Give each result a unique key to avoid duplicate ids from different tables
+	// overwriting another's score.
+	const scoreKey = ( result: SearchResult ) =>
+		`${ result.kind }:${ result.type }:${ result.id }`;
+
 	const scores = {};
 	for ( const result of results ) {
 		if ( result.title ) {
@@ -292,13 +294,15 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 			const subMatchScore = subMatchingTokens.length / titleTokens.length;
 
-			scores[ result.id ] = exactMatchScore + subMatchScore;
+			scores[ scoreKey( result ) ] = exactMatchScore + subMatchScore;
 		} else {
-			scores[ result.id ] = 0;
+			scores[ scoreKey( result ) ] = 0;
 		}
 	}
 
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return results.sort(
+		( a, b ) => scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+	);
 }
 
 /**

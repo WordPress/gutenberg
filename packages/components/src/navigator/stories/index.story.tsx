@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';
@@ -19,7 +12,7 @@ const meta: Meta< typeof Navigator > = {
 		Button: Navigator.Button,
 		BackButton: Navigator.BackButton,
 	},
-	title: 'Components/Navigation/Navigator',
+	title: 'Components/@wordpress-components/Navigation/Navigator',
 	id: 'components-navigator',
 	argTypes: {
 		as: { control: false },
@@ -30,7 +23,7 @@ const meta: Meta< typeof Navigator > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

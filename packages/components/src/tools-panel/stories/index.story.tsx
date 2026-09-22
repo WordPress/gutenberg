@@ -1,33 +1,19 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import styled from '@emotion/styled';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../../toggle-group-control';
-
-/**
- * Internal dependencies
- */
 import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ToolsPanel > = {
-	title: 'Components/ToolsPanel',
+	id: 'components-toolspanel',
+	title: 'Components/@wordpress-components/ToolsPanel',
 	component: ToolsPanel,
 	subcomponents: { ToolsPanelItem },
 	argTypes: {
@@ -46,7 +32,7 @@ const meta: Meta< typeof ToolsPanel > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},
@@ -81,7 +67,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
@@ -94,7 +79,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
@@ -107,7 +91,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Minimum height"
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
@@ -119,7 +102,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) => setScale( next ) }
@@ -176,7 +158,6 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
@@ -189,7 +170,6 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
@@ -248,7 +228,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							}
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Minimum width"
 								value={ minWidth }
 								onChange={ ( next ) => setMinWidth( next ) }
@@ -261,7 +240,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Width"
 								value={ width }
 								onChange={ ( next ) => setWidth( next ) }
@@ -274,7 +252,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Height"
 								value={ height }
 								onChange={ ( next ) => setHeight( next ) }
@@ -355,7 +332,6 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Width"
 						value={ width }
 						onChange={ ( next ) =>
@@ -371,7 +347,6 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
@@ -457,7 +432,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
@@ -474,7 +448,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -557,7 +530,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
@@ -577,7 +549,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>

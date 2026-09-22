@@ -1,12 +1,6 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
+import { isValidElementType } from 'react-is';
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 import type { IconType } from '@wordpress/components';
@@ -153,9 +147,9 @@ export function registerPlugin(
 
 	const { render, scope } = settings;
 
-	if ( typeof render !== 'function' ) {
+	if ( ! isValidElementType( render ) ) {
 		console.error(
-			'The "render" property must be specified and must be a valid function.'
+			'The "render" property must be specified and must be a valid component.'
 		);
 		return null;
 	}

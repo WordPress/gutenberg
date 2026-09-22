@@ -4,10 +4,18 @@ import { InputLayout } from '../';
 import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
-	title: 'Design System/Components/Form/Primitives/InputLayout',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/InputLayout',
+	id: 'design-system-components-form-primitives-inputlayout',
 	component: InputLayout,
 	subcomponents: {
-		Slot: InputLayout.Slot,
+		'InputLayout.Slot': InputLayout.Slot,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import type { Field } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 import FileNameView from './view';
 

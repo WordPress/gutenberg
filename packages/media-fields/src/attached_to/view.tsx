@@ -1,12 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 import { getRenderedContent } from '../utils/get-rendered-content';
 
@@ -28,9 +22,7 @@ export default function MediaAttachedToView( {
 	useEffect( () => {
 		if ( !! parentId && parentId === embeddedPostId ) {
 			setAttachedPostTitle(
-				getRenderedContent( embeddedPostTitle ) ||
-					embeddedPostId?.toString() ||
-					''
+				getRenderedContent( embeddedPostTitle ) || __( '(no title)' )
 			);
 		}
 

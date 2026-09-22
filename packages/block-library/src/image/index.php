@@ -171,13 +171,13 @@ function block_core_image_get_lightbox_settings( $block ) {
  *
  * @since 6.4.0
  *
- * @param string $block_content  Rendered block content.
- * @param array  $block          Block object.
- * @param array  $block_instance Block instance.
+ * @param string   $block_content  Rendered block content.
+ * @param array    $block          Block object.
+ * @param WP_Block $block_instance Block instance.
  *
  * @return string Filtered block content.
  */
-function block_core_image_render_lightbox( $block_content, $block, $block_instance ) {
+function block_core_image_render_lightbox( $block_content, array $block, WP_Block $block_instance ) {
 	/*
 	 * If there's no IMG tag in the block then return the given block content
 	 * as-is. There's nothing that this code can knowingly modify to add the
@@ -250,7 +250,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
-					'triggerButtonAriaLabel' => null,
+					'triggerButtonAriaLabel' => __( 'Enlarge' ),
 				),
 			),
 		)
@@ -290,12 +290,12 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 	$body_content = $processor->get_updated_html();
 
 	// Adds a button alongside image in the body content.
+	// Extract the img tag using preg_match for structured access.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
-	$button =
-		$img[0]
-		. '<button
+	if ( isset( $img[0] ) ) {
+		$button_html = '<button
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
@@ -310,7 +310,13 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 			</svg>
 		</button>';
 
-	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
+		// Build the replacement: img tag + button.
+		// Use str_replace for literal replacement instead of preg_replace to avoid
+		// PCRE backreference interpretation of $ and \ sequences in user-controlled
+		// image attributes (e.g., alt="Just $5 today").
+		$button       = $img[0] . $button_html;
+		$body_content = str_replace( $img[0], $button, $body_content );
+	}
 
 	add_action( 'wp_footer', 'block_core_image_print_lightbox_overlay' );
 
@@ -389,7 +395,6 @@ function block_core_image_print_lightbox_overlay() {
 							data-wp-bind--class="state.selectedImage.imgClassNames"
 							data-wp-bind--style="state.imgStyles"
 							data-wp-bind--src="state.enlargedSrc"
-							data-wp-bind--srcset="state.enlargedSrcset"
 							data-wp-bind--srcset="state.enlargedSrcset"
 							sizes="100vw"
 						>

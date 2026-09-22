@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, more, link } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import Button from '../../button';
@@ -20,7 +9,7 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Containers/Tabs',
+	title: 'Components/@wordpress-components/Containers/Tabs',
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
@@ -35,9 +24,9 @@ const meta: Meta< typeof Tabs > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
 		},
 	},
 	args: {

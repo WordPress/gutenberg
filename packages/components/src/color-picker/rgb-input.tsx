@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * Internal dependencies
- */
 import { InputWithSlider } from './input-with-slider';
 import type { RgbInputProps } from './types';
 

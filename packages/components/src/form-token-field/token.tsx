@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { VisuallyHidden } from '../visually-hidden';
 import type { TokenProps } from './types';

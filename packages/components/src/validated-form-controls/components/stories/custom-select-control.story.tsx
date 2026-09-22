@@ -1,21 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ValidatedCustomSelectControl } from '../custom-select-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedCustomSelectControl > = {
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
+	parameters: {
+		// FIXME: Select lacks an accessible name in this story (select-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
+	title: 'Components/@wordpress-components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
 	id: 'components-validatedcustomselectcontrol',
 	component: ValidatedCustomSelectControl,
 	tags: [ 'status-private' ],
@@ -49,7 +44,7 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 						? {
 								type: 'invalid',
 								message: 'Option A is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>
