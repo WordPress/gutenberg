@@ -82,7 +82,6 @@ import { evalAspectRatio, mediaPosition } from './utils';
 
 const {
 	DimensionsTool,
-	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
@@ -767,20 +766,23 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const selectedStyleState = useSelect(
+	const { selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
-				return undefined;
+				return {
+					selectedStyleState: undefined,
+					hasSelectedStyleState: false,
+				};
 			}
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
-			return getSelectedBlockStyleState( clientId );
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
+			return {
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
 		},
 		[ clientId, isSingleSelected ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,

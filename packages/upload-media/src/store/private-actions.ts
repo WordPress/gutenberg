@@ -877,8 +877,8 @@ export function prepareItem( id: QueueItemId ) {
 		 * as an animated GIF does, so the attachment stays an image and the
 		 * block starts as a valid core/image. The converted video is sideloaded
 		 * as a companion of that same attachment after upload (see
-		 * generateThumbnails), and the editor swaps the block to the Video
-		 * block's Live photo variation playing it.
+		 * generateThumbnails), and the editor swaps the block to a Live photo
+		 * Video block playing it.
 		 *
 		 * The file type cannot be trusted for detection: exported Live Photos
 		 * routinely arrive as `.heic`/`image/heic` while carrying a movie

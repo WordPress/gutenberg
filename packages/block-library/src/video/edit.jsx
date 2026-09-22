@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -34,8 +35,8 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation, isLivePhotoVariation } from './variations';
 import { getCarriedMotionConversionAttributes } from '../utils/motion-companion';
+import { isLivePhoto as isLivePhotoAttributes } from './live-photo';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -49,11 +50,20 @@ function VideoEdit( {
 	onReplace,
 } ) {
 	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks, width, height } = attributes;
-	const isGif = isGifVariation( attributes );
-	const isLivePhoto = isLivePhotoVariation( attributes );
-	// Both variations play with the same attributes; only autoplay differs.
-	const playsLikeMotion = isGif || isLivePhoto;
+	const {
+		id,
+		controls,
+		poster,
+		src,
+		tracks,
+		width,
+		height,
+		autoplay,
+		loop,
+		muted,
+		playsInline,
+	} = attributes;
+	const isLivePhoto = isLivePhotoAttributes( attributes );
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -63,6 +73,10 @@ function VideoEdit( {
 	// swap. A non-`auto` ratio governs the box height throughout the load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const videoStyle = {
+		...( aspectRatio && { aspectRatio } ),
+		...getShadowClassesAndStyles( attributes ).style,
+	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
@@ -81,17 +95,6 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
-
-	// The GIF variation plays like an animated GIF in the editor (the playback
-	// attributes are applied to the preview <video> below). Regular videos do
-	// not autoplay in the editor, so only nudge GIFs into playing after a
-	// source change in case the muted autoplay did not start on its own.
-	useEffect( () => {
-		if ( isGif ) {
-			// Browsers allow muted videos to be played programmatically.
-			videoPlayer.current?.play().catch( () => {} );
-		}
-	}, [ isGif, src, poster ] );
 
 	// A Live photo rests on its still frame and plays only while the pointer
 	// is over it (or it holds focus, so the motion is reachable without a
@@ -286,38 +289,36 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! playsLikeMotion && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					/>
+					<PosterImage
+						poster={ poster }
+						onChange={ ( posterImage ) =>
 							setAttributes( {
-								autoplay: false,
-								controls: true,
-								loop: false,
-								muted: false,
-								playsInline: false,
-								preload: 'metadata',
-								poster: undefined,
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<PosterImage
-							poster={ poster }
-							onChange={ ( posterImage ) =>
-								setAttributes( {
-									poster: posterImage?.url,
-								} )
-							}
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+								poster: posterImage?.url,
+							} )
+						}
+					/>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
@@ -325,17 +326,21 @@ function VideoEdit( {
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ isGif }
-					loop={ playsLikeMotion }
-					muted={ playsLikeMotion }
-					playsInline={ playsLikeMotion }
+					autoPlay={ autoplay }
+					loop={ loop }
+					muted={ muted }
+					playsInline={ playsInline }
 					onPointerEnter={ isLivePhoto ? playLivePhoto : undefined }
 					onPointerLeave={ isLivePhoto ? pauseLivePhoto : undefined }
 					onFocus={ isLivePhoto ? playLivePhoto : undefined }
 					onBlur={ isLivePhoto ? pauseLivePhoto : undefined }
 					width={ width }
 					height={ height }
-					style={ aspectRatio ? { aspectRatio } : undefined }
+					style={
+						Object.keys( videoStyle ).length
+							? videoStyle
+							: undefined
+					}
 				>
 					<Tracks tracks={ tracks } />
 				</video>
