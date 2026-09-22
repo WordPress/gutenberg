@@ -192,28 +192,15 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 			// async listeners share one deferred subscription per store, sync
 			// ones listen to the store directly.
 			function listenToStore( storeName: string ) {
-				// For a store that isn't registered yet, `registry.subscribe`
-				// falls back to the registry-wide emitter, which fires on
-				// every store's update. A shared bucket would cache that
-				// fallback and hand it to hooks that subscribe after the store
-				// registers, so those stores keep a plain per-hook
-				// subscription instead. `select` is the registration probe
-				// because it resolves through parent registries, the same way
-				// `subscribe` does.
-				if (
-					lastIsAsync &&
-					registry.select( storeName ) !== undefined
-				) {
+				if ( lastIsAsync ) {
 					return subscribeDeferred(
 						registry,
 						storeName,
 						deferredListener
 					);
 				}
-				const onChange = lastIsAsync
-					? () => renderQueue.add( queueContext, onStoreChange )
-					: onStoreChange;
-				return registry.subscribe( onChange, storeName );
+
+				return registry.subscribe( onStoreChange, storeName );
 			}
 
 			// The unsubscribe of each store this subscription listens to. The
