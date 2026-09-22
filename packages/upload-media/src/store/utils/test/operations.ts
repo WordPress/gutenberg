@@ -3,10 +3,10 @@ import {
 	applyOperationPlacement,
 	getOperationArgs,
 	getOperationName,
-	isValidConcurrencyLimit,
 	planOperations,
 	resolveConcurrencyLimit,
 } from '../operations';
+import { isValidConcurrencyLimit } from '../registry';
 import {
 	OperationType,
 	type Operation,

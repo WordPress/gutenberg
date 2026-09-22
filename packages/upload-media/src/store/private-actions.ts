@@ -24,9 +24,14 @@ import { debug, measure } from './utils/debug-logger';
 import {
 	getOperationArgs,
 	getOperationName,
-	isValidConcurrencyLimit,
 	planOperations,
+	snapshotItem,
 } from './utils/operations';
+import {
+	getRegisterConcurrencyPoolError,
+	getRegisterOperationError,
+	getUnregisterOperationError,
+} from './utils/registry';
 import { IMAGE_PROCESSING_POOL, isCoreOperation } from './operations';
 import type { PrivilegedOperationContext } from './operations';
 import {
@@ -559,6 +564,15 @@ function createOperationContext(
 				operations: operations ?? [ OperationType.Upload ],
 			} );
 		},
+		createBlobURL: ( file ) => {
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id: item.id,
+				blobUrl,
+			} );
+			return blobUrl;
+		},
 	};
 
 	if ( isPrivileged ) {
@@ -638,7 +652,11 @@ export function runOperation(
 
 		let result: OperationResult | void;
 		try {
-			result = await definition.handler( item, args, context );
+			result = await definition.handler(
+				snapshotItem( item ),
+				args,
+				context
+			);
 		} catch ( error ) {
 			// Hand the rejection to cancelItem as is. Upload transports do
 			// not always reject with an Error: the editor's media-upload
@@ -660,8 +678,6 @@ export function runOperation(
 	};
 }
 
-const OPERATION_NAME_PATTERN = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
-
 /**
  * Registers a concurrency pool so operations can join it.
  *
@@ -679,34 +695,10 @@ export function registerConcurrencyPool(
 		select,
 		dispatch,
 	}: ThunkArgs ): ConcurrencyPoolDefinition | void => {
-		if ( typeof definition?.name !== 'string' || ! definition.name ) {
+		const error = getRegisterConcurrencyPoolError( definition, select );
+		if ( error ) {
 			// eslint-disable-next-line no-console
-			console.error(
-				'Concurrency pool names must be non-empty strings, like "upload".'
-			);
-			return;
-		}
-
-		if ( select.getConcurrencyPool( definition.name ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Concurrency pool "${ definition.name }" is already registered.`
-			);
-			return;
-		}
-
-		/*
-		 * A limit read from the settings is checked when the pool is
-		 * consulted, not here: the settings it reads can change afterwards.
-		 */
-		if (
-			typeof definition.limit !== 'function' &&
-			! isValidConcurrencyLimit( definition.limit )
-		) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Concurrency pool "${ definition.name }" must have a "limit" that is a positive number, or a function returning one.`
-			);
+			console.error( error );
 			return;
 		}
 
@@ -722,9 +714,9 @@ export function registerConcurrencyPool(
 /**
  * Registers an operation so items can run it as a step of their pipeline.
  *
- * Names are namespaced like block names (`namespace/operation-name`) and
- * must be unique: to replace an operation, including one that ships with
- * the package, unregister it first.
+ * Names are namespaced like block names. A name that is already registered
+ * is rejected, so replacing a step, core's included, is an explicit
+ * unregister followed by a register under the same name.
  *
  * @param definition Operation definition.
  *
@@ -732,53 +724,10 @@ export function registerConcurrencyPool(
  */
 export function registerOperation( definition: OperationDefinition ) {
 	return ( { select, dispatch }: ThunkArgs ): OperationDefinition | void => {
-		if (
-			typeof definition?.name !== 'string' ||
-			! OPERATION_NAME_PATTERN.test( definition.name )
-		) {
+		const error = getRegisterOperationError( definition, select );
+		if ( error ) {
 			// eslint-disable-next-line no-console
-			console.error(
-				'Upload operation names must be strings in the form "namespace/operation-name", like "core/upload".'
-			);
-			return;
-		}
-
-		if ( select.getOperation( definition.name ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Upload operation "${ definition.name }" is already registered.`
-			);
-			return;
-		}
-
-		if ( typeof definition.handler !== 'function' ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Upload operation "${ definition.name }" must have a "handler" function.`
-			);
-			return;
-		}
-
-		if ( typeof definition.label !== 'string' || ! definition.label ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Upload operation "${ definition.name }" must have a "label" string.`
-			);
-			return;
-		}
-
-		/*
-		 * The pool holds the limit, so joining one that does not exist would
-		 * leave the step unthrottled while reading as throttled.
-		 */
-		if (
-			definition.concurrency !== undefined &&
-			! select.getConcurrencyPool( definition.concurrency )
-		) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Upload operation "${ definition.name }" joins the concurrency pool "${ definition.concurrency }", which is not registered.`
-			);
+			console.error( error );
 			return;
 		}
 
@@ -803,36 +752,14 @@ export function registerOperation( definition: OperationDefinition ) {
  */
 export function unregisterOperation( name: OperationName ) {
 	return ( { select, dispatch }: ThunkArgs ): OperationDefinition | void => {
+		const error = getUnregisterOperationError( name, select );
+		if ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( error );
+			return;
+		}
+
 		const definition = select.getOperation( name );
-		if ( ! definition ) {
-			// eslint-disable-next-line no-console
-			console.error( `Upload operation "${ name }" is not registered.` );
-			return;
-		}
-
-		/*
-		 * Queued items carry their pipeline as a list of names. Removing one
-		 * out from under them fails every item that reaches the missing step,
-		 * and a sideload failing that way takes its parent's already uploaded
-		 * attachment with it. Wait for the queue to drain instead.
-		 */
-		const isInUse = select
-			.getAllItems()
-			.some(
-				( item ) =>
-					item.currentOperation === name ||
-					item.operations?.some(
-						( operation ) => getOperationName( operation ) === name
-					)
-			);
-		if ( isInUse ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Upload operation "${ name }" cannot be unregistered while items in the queue still use it.`
-			);
-			return;
-		}
-
 		dispatch< UnregisterOperationAction >( {
 			type: Type.UnregisterOperation,
 			name,

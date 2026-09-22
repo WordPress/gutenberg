@@ -1,13 +1,17 @@
-import type {
-	ConcurrencyPoolDefinition,
-	Operation,
-	OperationDefinition,
-	OperationName,
-	OperationPlacement,
-	OperationPlanContext,
-	QueueItem,
-	Settings,
+import {
+	ITEM_IDENTITY_KEYS,
+	PROTECTED_ITEM_KEYS,
+	type ConcurrencyPoolDefinition,
+	type Operation,
+	type OperationDefinition,
+	type OperationItem,
+	type OperationName,
+	type OperationPlacement,
+	type OperationPlanContext,
+	type QueueItem,
+	type Settings,
 } from '../types';
+import { isValidConcurrencyLimit } from './registry';
 
 /**
  * Default `priority` for an operation's `plan()`.
@@ -37,18 +41,34 @@ export function getOperationArgs( operation: Operation ): unknown {
 }
 
 /**
- * Whether a value can serve as a concurrency pool's limit.
+ * Takes the snapshot of an item that an operation is handed.
  *
- * A pool exists to throttle, so its limit has to be a finite positive
- * number: zero would stall the pool for good and `NaN` would compare
- * false against every count, letting the pool run unbounded.
+ * The queue's own record of the item holds its callbacks, its abort
+ * controller and its pipeline, none of which a step should see or be able
+ * to change; what a handler gets is the item's data and its identity. The
+ * snapshot is frozen and `additionalData` is copied, so a handler that
+ * writes to what it was handed changes nothing in the store — updates go
+ * through the handler's result.
  *
- * @param limit Value to check.
+ * @param item Queue item.
  *
- * @return True when the value is a usable limit.
+ * @return What an operation is told about the item.
  */
-export function isValidConcurrencyLimit( limit: unknown ): limit is number {
-	return typeof limit === 'number' && Number.isFinite( limit ) && limit > 0;
+export function snapshotItem( item: QueueItem ): OperationItem {
+	const snapshot: Record< string, unknown > = {};
+	for ( const [ key, value ] of Object.entries( item ) ) {
+		if (
+			( PROTECTED_ITEM_KEYS as readonly string[] ).includes( key ) &&
+			! ( ITEM_IDENTITY_KEYS as readonly string[] ).includes( key )
+		) {
+			continue;
+		}
+		snapshot[ key ] = value;
+	}
+	if ( item.additionalData ) {
+		snapshot.additionalData = { ...item.additionalData };
+	}
+	return Object.freeze( snapshot ) as OperationItem;
 }
 
 /**
@@ -139,6 +159,7 @@ export async function planOperations(
 	settings: Settings
 ): Promise< Operation[] > {
 	let planned = [ ...operations ];
+	const snapshot = snapshotItem( item );
 
 	// Array.prototype.sort is stable, so equal priorities keep registration order.
 	const sorted = [ ...definitions ].sort(
@@ -156,7 +177,7 @@ export async function planOperations(
 			operations: [ ...planned ],
 			settings,
 		};
-		const result = await definition.plan( item, context );
+		const result = await definition.plan( snapshot, context );
 
 		if ( ! result ) {
 			continue;
