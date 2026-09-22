@@ -63,6 +63,15 @@
 	}
 }
 
+// The block's text decoration is serialized onto the list wrapper, which paints
+// it across the titles. The title is a link, so the browser's own underline is
+// drawn on top of that: "None" looks like it does nothing, and "Strikethrough"
+// shows a strikethrough and an underline. Taking the decoration from the list
+// item leaves the block's as the only one, as Post Title and Site Title do.
+.wp-block-latest-posts__post-title {
+	text-decoration: inherit;
+}
+
 .wp-block-latest-posts__post-date,
 .wp-block-latest-posts__post-author {
 	display: block;
