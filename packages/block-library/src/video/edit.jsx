@@ -96,20 +96,48 @@ function VideoEdit( {
 		}
 	}, [ poster ] );
 
-	// A Live photo rests on its still frame and plays only while the pointer
-	// is over it (or it holds focus, so the motion is reachable without a
-	// pointer). Rewinding on the way out returns it to that still frame.
-	// These read the element from the event rather than the ref, matching the
-	// front-end module, which has only the event's element to work with.
+	/*
+	 * A Live photo rests on its still frame and plays only while the pointer
+	 * is over it, while it has keyboard focus, or, on a touch screen, from one
+	 * tap to the next. These mirror the front-end module (view.js).
+	 */
 	function playLivePhoto( event ) {
+		if ( event.pointerType === 'touch' ) {
+			return;
+		}
+		// A tap focuses the video too; only keyboard focus plays it.
+		if (
+			event.type === 'focus' &&
+			! event.currentTarget.matches( ':focus-visible' )
+		) {
+			return;
+		}
 		// Browsers allow muted videos to be played programmatically.
 		event.currentTarget.play().catch( () => {} );
 	}
 
-	function pauseLivePhoto( event ) {
-		const player = event.currentTarget;
+	// Reloading, rather than rewinding, brings back the poster, which may be
+	// a frame picked from the middle of the motion.
+	function restLivePhoto( player ) {
 		player.pause();
-		player.currentTime = 0;
+		player.load();
+	}
+
+	function pauseLivePhoto( event ) {
+		if ( event.pointerType !== 'touch' ) {
+			restLivePhoto( event.currentTarget );
+		}
+	}
+
+	function toggleLivePhoto( event ) {
+		if ( event.nativeEvent.pointerType !== 'touch' ) {
+			return;
+		}
+		if ( event.currentTarget.paused ) {
+			event.currentTarget.play().catch( () => {} );
+		} else {
+			restLivePhoto( event.currentTarget );
+		}
 	}
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
@@ -334,6 +362,7 @@ function VideoEdit( {
 					onPointerLeave={ isLivePhoto ? pauseLivePhoto : undefined }
 					onFocus={ isLivePhoto ? playLivePhoto : undefined }
 					onBlur={ isLivePhoto ? pauseLivePhoto : undefined }
+					onClick={ isLivePhoto ? toggleLivePhoto : undefined }
 					width={ width }
 					height={ height }
 					style={

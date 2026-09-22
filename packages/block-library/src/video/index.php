@@ -78,7 +78,8 @@ function render_block_core_video( array $attributes, string $content ): string {
 }
 
 /**
- * Makes a Live photo play while the reader points at or focuses it.
+ * Makes a Live photo play while the reader points at or focuses it, or after
+ * they tap it on a touch screen.
  *
  * A Live photo is a converted HEIC/HEIF image sequence, shown as a muted
  * looping video that does not autoplay so it rests on its still frame. Playing
@@ -131,6 +132,8 @@ function block_core_video_add_live_photo_directives( array $metadata, WP_HTML_Ta
 	// Focus events reach the motion without a pointer, e.g. by keyboard.
 	$p->set_attribute( 'data-wp-on--focus', 'actions.playLivePhoto' );
 	$p->set_attribute( 'data-wp-on--blur', 'actions.pauseLivePhoto' );
+	// A touch screen has no hover, so a tap toggles the motion instead.
+	$p->set_attribute( 'data-wp-on--click', 'actions.toggleLivePhoto' );
 	// Without this the video is not focusable, since it has no controls.
 	if ( null === $p->get_attribute( 'tabindex' ) ) {
 		$p->set_attribute( 'tabindex', '0' );

@@ -72,6 +72,7 @@ class Tests_Blocks_Render_Video extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'data-wp-on--pointerenter="actions.playLivePhoto"', $rendered );
 		$this->assertStringContainsString( 'data-wp-on--pointerleave="actions.pauseLivePhoto"', $rendered );
 		$this->assertStringContainsString( 'data-wp-on--focus="actions.playLivePhoto"', $rendered );
+		$this->assertStringContainsString( 'data-wp-on--click="actions.toggleLivePhoto"', $rendered );
 		$this->assertStringContainsString( 'tabindex="0"', $rendered );
 	}
 
@@ -90,11 +91,12 @@ class Tests_Blocks_Render_Video extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The GIF variation autoplays in pure HTML and needs no script.
+	 * An autoplaying loop, such as a converted GIF, plays in pure HTML and
+	 * needs no script.
 	 *
 	 * @covers ::render_block_core_video
 	 */
-	public function test_gif_variation_gets_no_directives() {
+	public function test_autoplaying_loop_gets_no_directives() {
 		$this->add_motion_companion();
 
 		$rendered = gutenberg_render_block_core_video(
