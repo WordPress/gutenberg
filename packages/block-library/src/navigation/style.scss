@@ -758,9 +758,23 @@ button.wp-block-navigation-item__content {
 					// expanded submenu pushes the items after it down.
 					// See https://github.com/WordPress/gutenberg/issues/83319.
 					.wp-block-navigation-item.has-child:not(.open-always) {
-						// Keeps the label and its indicator on one line, with the
-						// submenu wrapping onto its own line below them.
+						// Wraps the submenu onto a line of its own, below the
+						// label and its indicator.
 						flex-wrap: wrap;
+
+						> .wp-block-navigation-item__content {
+							// A label wider than the line would take a line of
+							// its own, leaving the indicator after it stranded
+							// on the next one. Grow into the line from nothing
+							// instead of starting out as wide as the text.
+							flex-basis: 0;
+							flex-grow: 1;
+							min-width: 0;
+							// The indicator of a top level item sits next to
+							// its label, so the label must not grow past its
+							// text when the submenu below it is wider.
+							max-width: max-content;
+						}
 
 						> .wp-block-navigation__submenu-container {
 							// A collapsed flyout is out of the flow, so its zero
@@ -786,6 +800,12 @@ button.wp-block-navigation-item__content {
 						> .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
 							display: flex;
 						}
+					}
+
+					// In a submenu the indicator is right aligned, so the label
+					// there grows to the full width, as it does in a flyout.
+					.wp-block-navigation__submenu-container .wp-block-navigation-item.has-child:not(.open-always) > .wp-block-navigation-item__content {
+						max-width: none;
 					}
 
 					// Wide viewports turn the chevron of a nested submenu
