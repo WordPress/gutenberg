@@ -23,6 +23,8 @@
 
 ### Bug Fixes
 
+-   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
+-   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
