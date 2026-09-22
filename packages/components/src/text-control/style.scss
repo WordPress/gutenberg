@@ -39,6 +39,7 @@
 	&[aria-disabled="true"] {
 		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		// Override the disabled background from WP forms.css.
 		background: $components-color-background;
 
 		@media ( forced-colors: active ) {
