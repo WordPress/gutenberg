@@ -149,26 +149,7 @@ export default function CoverInspectorControls( {
 		},
 		[ clientId ]
 	);
-	/*
-	 * The block only resolves the featured image record, so the record of a
-	 * media selection of its own is resolved here to name it in the panel.
-	 */
-	const selectedMedia = useSelect(
-		( select ) =>
-			id && ! useFeaturedImage
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
-				: undefined,
-		[ id, useFeaturedImage ]
-	);
-	const mediaRecord = useFeaturedImage ? featuredImage : selectedMedia;
 
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const stateMinHeight = getActiveDimensionValue( {
 		attributes,
@@ -329,8 +310,8 @@ export default function CoverInspectorControls( {
 						mediaId={ id }
 						mediaUrl={ url }
 						filename={
-							mediaRecord?.media_details?.sizes?.full?.file ||
-							mediaRecord?.slug ||
+							image?.media_details?.sizes?.full?.file ||
+							image?.slug ||
 							getFilename( url )
 						}
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
