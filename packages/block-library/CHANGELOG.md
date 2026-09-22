@@ -18,6 +18,10 @@
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
 
+### Internal
+
+-   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
@@ -41,7 +45,6 @@
 
 ### Internal
 
--   Playlist: Replace the `@arraypress/waveform-player` patch with the dependency's own `data-waveform-autoinit` opt-out, applied around a single wrapped import site ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
 -   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
 
 ## 11.0.0 (2026-09-10)
