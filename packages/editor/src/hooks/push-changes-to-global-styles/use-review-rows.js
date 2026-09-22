@@ -1,9 +1,11 @@
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	getStyle,
 	getValueFromVariable,
 } from '@wordpress/global-styles-engine';
 import { getStyleLabel } from './style-labels';
+import { getSiblingCurrentValue } from './sibling-styles';
 import {
 	formatStyleValue,
 	formatBorderShorthand,
@@ -84,4 +86,45 @@ export function useReviewRows( rows, merged, name ) {
 			};
 		} );
 	}, [ rows, merged, name ] );
+}
+
+/**
+ * The sibling equivalent of `useReviewRows`.
+ *
+ * The "Current" column means something different here: rather than the block
+ * type's Global Styles value, it's the value the siblings already share, or
+ * `Varies` when they disagree.
+ *
+ * @param {Array}  rows     Grouped rows from `useChangesToPush`.
+ * @param {Array}  siblings Siblings as `{ clientId, attributes }`.
+ * @param {Object} merged   Merged Global Styles config, used to resolve presets.
+ * @param {string} name     Block name.
+ *
+ * @return {Array} Rows with `label`, `currentValue`, `formattedCurrentValue`
+ *                 and `formattedNewValue` added.
+ */
+export function useSiblingReviewRows( rows, siblings, merged, name ) {
+	return useMemo( () => {
+		const resolve = ( value ) =>
+			getValueFromVariable( merged, name, value );
+
+		return rows.map( ( row ) => {
+			const { value, varies } = getSiblingCurrentValue( row, siblings );
+
+			return {
+				...row,
+				label: getStyleLabel( row.primaryPath ),
+				currentValue: value,
+				formattedCurrentValue: varies
+					? // Shown when the siblings don't share one value.
+						__( 'Varies' )
+					: formatReviewValue( row.format, value, resolve ),
+				formattedNewValue: formatReviewValue(
+					row.format,
+					row.newValue,
+					resolve
+				),
+			};
+		} );
+	}, [ rows, siblings, merged, name ] );
 }
