@@ -72,17 +72,22 @@ function gutenberg_register_default_icons() {
 			return;
 		}
 
+		if ( empty( $icon_data['collections'] ) || ! is_array( $icon_data['collections'] ) ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				__( 'Core icon collection manifest must provide a non-empty "collections" array for each icon.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return;
+		}
+
 		$icon_args = array(
 			'label'     => $icon_data['label'],
 			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
 
-		if ( ! empty( $icon_data['public'] ) ) {
-			wp_register_icon( 'core/' . $icon_name, $icon_args );
-		}
-
-		if ( ! empty( $icon_data['admin'] ) ) {
-			wp_register_icon( 'core-admin/' . $icon_name, $icon_args );
+		foreach ( $icon_data['collections'] as $collection_slug ) {
+			wp_register_icon( $collection_slug . '/' . $icon_name, $icon_args );
 		}
 	}
 }
