@@ -15,9 +15,14 @@ function isNonValue( ancestors ) {
 			return true;
 		}
 		if (
-			[ 'source', 'key', 'property', 'imported', 'exported' ].includes(
-				key
-			)
+			[
+				'source',
+				'key',
+				'property',
+				'imported',
+				'exported',
+				'local',
+			].includes( key )
 		) {
 			return true;
 		}

@@ -1,6 +1,7 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { build as esbuild, transform as esbuildTransform } from 'esbuild';
 import { build as vite, createServer } from 'vite';
@@ -168,6 +169,24 @@ export const manual = 'var(--wpds-dimension-gap-sm,)';
 			} );
 		} );
 
+		it( 'preserves string-named re-exports', async () => {
+			await writeFile(
+				join( directory, 'provider.js' ),
+				'const value = "var(--wpds-dimension-gap-sm)"; export { value as "var(--wpds-dimension-gap-sm)" };'
+			);
+			const filename = join( directory, 'fixture.js' );
+			await writeFile(
+				filename,
+				'export { "var(--wpds-dimension-gap-sm)" as gap } from "./provider.js";'
+			);
+			const result = await bundle( bundler, filename );
+			const module = { exports: {} };
+			runInNewContext( result.code, { module, exports: module.exports } );
+			expect( module.exports ).toMatchObject( {
+				gap: 'var(--wpds-dimension-gap-sm, 8px)',
+			} );
+		} );
+
 		it.each( [
 			[
 				'auto-accessors',
@@ -261,6 +280,11 @@ it( 'builds JSX in JavaScript files containing only manual fallbacks', async () 
 it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 	'preserves original sources through %s esbuild input maps',
 	async ( encoding ) => {
+		const sourceDirectory = join(
+			await realpath( directory ),
+			'project #1%'
+		);
+		await mkdir( sourceDirectory );
 		const source =
 			'export function fail(): never { const css: string = "var(--wpds-typography-font-family-mono)"; throw new Error(css); }\n';
 		const compiled = await esbuildTransform( source, {
@@ -271,9 +295,12 @@ it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 		let directive;
 		const external = encoding === 'external' || encoding === 'indexed';
 		if ( external ) {
-			await mkdir( join( directory, 'maps' ) );
-			await mkdir( join( directory, 'src' ) );
-			await writeFile( join( directory, 'src/original.ts' ), source );
+			await mkdir( join( sourceDirectory, 'maps' ) );
+			await mkdir( join( sourceDirectory, 'src' ) );
+			await writeFile(
+				join( sourceDirectory, 'src/original.ts' ),
+				source
+			);
 			let map = JSON.parse( compiled.map );
 			map.sourceRoot = '../src';
 			if ( encoding === 'indexed' ) {
@@ -284,7 +311,7 @@ it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 				compiled.code = `// Concatenated input\n${ compiled.code }`;
 			}
 			await writeFile(
-				join( directory, 'maps/compiled.js.map' ),
+				join( sourceDirectory, 'maps/compiled.js.map' ),
 				JSON.stringify( map )
 			);
 			directive = 'maps/compiled.js.map';
@@ -294,7 +321,7 @@ it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 					? `data:application/json;base64,${ Buffer.from( compiled.map ).toString( 'base64' ) }`
 					: `data:application/json,${ encodeURIComponent( compiled.map ) }`;
 		}
-		const filename = join( directory, 'compiled.js' );
+		const filename = join( sourceDirectory, 'compiled.js' );
 		// A later directive-shaped template must not replace the real comment.
 		await writeFile(
 			filename,
@@ -308,8 +335,18 @@ it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 		expect( original ).toMatchObject(
 			positionOf( source, 'throw new Error' )
 		);
-		expect( original.source ).toMatch(
-			external ? /src\/original\.ts$/ : /original\.ts$/
+		expect(
+			new URL(
+				original.source!,
+				pathToFileURL( join( directory, 'bundle.js' ) )
+			).href
+		).toBe(
+			pathToFileURL(
+				join(
+					sourceDirectory,
+					external ? 'src/original.ts' : 'original.ts'
+				)
+			).href
 		);
 		expect( consumer.sourceContentFor( original.source! ) ).toBe( source );
 	}

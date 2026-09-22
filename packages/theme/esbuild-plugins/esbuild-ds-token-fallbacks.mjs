@@ -81,7 +81,7 @@ const plugin = {
 								result.map.toString(),
 								new AnyMap(
 									inputMap,
-									mapPath.replaceAll( '\\', '/' )
+									pathToFileURL( mapPath ).href
 								),
 							],
 							() => null
