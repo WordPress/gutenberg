@@ -97,8 +97,8 @@ export function useInBetweenInserter() {
 				const offsetTop = event.clientY;
 				const offsetLeft = event.clientX;
 
-				// Not the container's children: a block may put its block
-				// props on an inner element, as Social Icons does.
+				// Use block refs, not the container's DOM children: a block
+				// can render its block props on an inner element.
 				const clientId = getBlockOrder( rootClientId ).find(
 					( childClientId ) => {
 						const blockEl = refsMap.get( childClientId );
