@@ -2,26 +2,6 @@
 version: 2
 
 updates:
-    # Check for updates to GitHub Actions.
-    - package-ecosystem: 'github-actions'
-      directories:
-          - '.github/workflows'
-          - '.github/setup-*'
-      schedule:
-          interval: 'daily'
-      open-pull-requests-limit: 20
-      cooldown:
-          default-days: 7
-      labels:
-          - 'GitHub Actions'
-          - '[Type] Build Tooling'
-      groups:
-          github-actions:
-              applies-to: version-updates
-              update-types:
-                  - minor
-                  - patch
-
     # Manage npm security updates only.
     - package-ecosystem: 'npm'
       directory: '/'
