@@ -10,6 +10,7 @@
 
 ### Enhancements
 
+-   `check-engines`: Check only the tools listed in `engines`, instead of always passing `--node` and `--npm`. Without an `engines` field in the project, it now checks only the Node.js version ([#83326](https://github.com/WordPress/gutenberg/pull/83326)).
 -   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
 -   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 -   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).

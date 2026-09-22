@@ -9,6 +9,8 @@
 
 ### New Features
 
+-   Add `RadioGroupControl` component. ([#83143](https://github.com/WordPress/gutenberg/pull/83143))
+-   Add `SwitchControl` component. ([#83146](https://github.com/WordPress/gutenberg/pull/83146))
 -   Add `Switch` form primitive ([#83039](https://github.com/WordPress/gutenberg/pull/83039)).
 -   Add `RadioGroup` form primitive ([#83038](https://github.com/WordPress/gutenberg/pull/83038)).
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
