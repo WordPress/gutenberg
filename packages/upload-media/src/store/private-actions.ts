@@ -27,6 +27,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
+	vipsCancelOperations,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
@@ -753,6 +754,82 @@ export async function getTranscodeImageOperation(
 			interlaced,
 		},
 	];
+}
+
+/**
+ * Mime types `compressImagePreview` can re-encode in their own format.
+ */
+const PREVIEW_MIME_TYPES = [
+	'image/jpeg',
+	'image/png',
+	'image/webp',
+	'image/avif',
+] as const;
+
+type PreviewMimeType = ( typeof PREVIEW_MIME_TYPES )[ number ];
+
+/**
+ * ID of the preview currently being encoded, so a newer request can cancel it.
+ */
+let currentPreviewId: string | undefined;
+
+/**
+ * Re-encodes an image at a given quality without adding it to the queue.
+ *
+ * Used to preview the result of optimizing existing media before anything is
+ * uploaded. Starting a new preview cancels the one still in flight, so
+ * dragging a quality slider only ever encodes the latest value.
+ *
+ * Resolves to `null` when the preview was superseded by a newer one.
+ *
+ * @param file    Original image file.
+ * @param quality Encode quality (0-1).
+ * @return The re-encoded file, or null when cancelled.
+ */
+export function compressImagePreview( file: File, quality: number ) {
+	return async ( { select }: ThunkArgs ): Promise< File | null > => {
+		if ( ! PREVIEW_MIME_TYPES.includes( file.type as PreviewMimeType ) ) {
+			throw new UploadError( {
+				code: ErrorCode.MIME_TYPE_NOT_SUPPORTED,
+				message: 'This file type cannot be optimized in the browser.',
+				file,
+			} );
+		}
+
+		// Mark this preview as current before cancelling the previous one, so
+		// the cancelled encode sees it was superseded and resolves to null.
+		const previousId = currentPreviewId;
+		const previewId = uuidv4();
+		currentPreviewId = previewId;
+		if ( previousId ) {
+			await vipsCancelOperations( previousId );
+		}
+
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
+		try {
+			return await vipsConvertImageFormat(
+				previewId,
+				file,
+				file.type as PreviewMimeType,
+				{
+					quality,
+					interlaced: false,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
+			);
+		} catch ( error ) {
+			if ( currentPreviewId !== previewId ) {
+				return null;
+			}
+			throw error;
+		} finally {
+			if ( currentPreviewId === previewId ) {
+				currentPreviewId = undefined;
+			}
+		}
+	};
 }
 
 /**
