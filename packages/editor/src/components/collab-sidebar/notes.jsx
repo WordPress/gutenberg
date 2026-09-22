@@ -250,7 +250,7 @@ export function Notes( {
 		: threads.findIndex(
 				( thread ) =>
 					thread.status === 'approved' && !! thread.blockClientId
-		  );
+			);
 
 	return (
 		<Stack
@@ -309,7 +309,7 @@ export function Notes( {
 												y: notePositions[ thread.id ],
 												registerThread,
 												unregisterThread,
-										  }
+											}
 										: undefined
 								}
 								onKeyDown={ ( event ) =>

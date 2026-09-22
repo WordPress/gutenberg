@@ -345,7 +345,8 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground',
+	id: 'widget-dashboard-playground',
+	title: 'Widgets/Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -907,7 +908,7 @@ function GridSettingsStory( {
 						model,
 						columns,
 						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
-				  },
+					},
 		[ model, columns, flowTolerance, rowHeight ]
 	);
 

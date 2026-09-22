@@ -401,7 +401,7 @@ function ListViewComponent(
 							? `${
 									BLOCK_LIST_ITEM_HEIGHT *
 									( draggedClientIds.length - 1 )
-							  }px`
+								}px`
 							: null,
 				} }
 			>

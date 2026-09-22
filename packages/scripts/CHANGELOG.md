@@ -10,7 +10,13 @@
 
 ### Enhancements
 
+-   `check-engines`: Check only the tools listed in `engines`, instead of always passing `--node` and `--npm`. Without an `engines` field in the project, it now checks only the Node.js version ([#83326](https://github.com/WordPress/gutenberg/pull/83326)).
 -   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+-   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+-   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The default ESLint config now lints `.jsx`, `.ts`, `.tsx`, `.mts` and `.cts` files, which ESLint's own file discovery skips ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `build` and `start`: Discover `.cjs`, `.cts` and `.mts` entry points, resolve them from extensionless imports, and transpile `.cjs` and `.cts` modules ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
 
 ### Bug Fixes
 

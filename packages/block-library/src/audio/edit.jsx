@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -223,7 +223,7 @@ function AudioEdit( {
 							} )
 						}
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'
