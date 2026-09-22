@@ -2,6 +2,7 @@
 	{
 		"blockName": "core/media-text",
 		"attrs": {
+			"align": "wide",
 			"mediaType": "image",
 			"imageFill": true,
 			"focalPoint": {
@@ -23,9 +24,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=);background-position:84% 84%\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-media-text alignwide is-image-fill-element is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" style=\"object-position:84% 84%\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-media-text alignwide is-image-fill is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=);background-position:84% 84%\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t",
+			"\n<div class=\"wp-block-media-text alignwide is-image-fill-element is-stacked-on-mobile\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\"\n\t\t\talt=\"My alt text\" style=\"object-position:84% 84%\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t",
 			null,
 			"\n\t</div>\n</div>\n"
 		]

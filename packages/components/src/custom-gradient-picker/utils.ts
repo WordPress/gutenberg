@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import gradientParser from 'gradient-parser';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_GRADIENT,
 	HORIZONTAL_GRADIENT_ORIENTATION,
@@ -108,9 +101,19 @@ export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
 			return `#${ colorStop.value }`;
 		case 'literal':
 			return colorStop.value;
+		case 'var':
+			return `${ colorStop.type }(${ colorStop.value })`;
 		case 'rgb':
 		case 'rgba':
 			return `${ colorStop.type }(${ colorStop.value.join( ',' ) })`;
+		case 'hsl': {
+			const [ hue, saturation, lightness ] = colorStop.value;
+			return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
+		}
+		case 'hsla': {
+			const [ hue, saturation, lightness, alpha ] = colorStop.value;
+			return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
+		}
 		default:
 			// Should be unreachable if passing an AST from gradient-parser.
 			// See https://github.com/rafaelcaricio/gradient-parser#ast.

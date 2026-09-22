@@ -1,9 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid functions css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid functions css > snapshot matches warnings 1`] = `
 [
   {
     "column": 9,
+    "endColumn": 13,
+    "endLine": 4,
     "line": 4,
     "rule": "function-name-case",
     "severity": "error",

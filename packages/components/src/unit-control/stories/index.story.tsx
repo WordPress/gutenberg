@@ -1,36 +1,37 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { UnitControl } from '../';
 import { CSS_UNITS } from '../utils';
 
 const meta: Meta< typeof UnitControl > = {
 	component: UnitControl,
-	title: 'Components (Experimental)/UnitControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/UnitControl',
+	id: 'components-unitcontrol',
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
-		__unstableStateReducer: { control: { type: null } },
-		onChange: { control: { type: null } },
-		onUnitChange: { control: { type: null } },
+		__unstableStateReducer: { control: false },
+		onChange: { control: false },
+		onUnitChange: { control: false },
 		prefix: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
+	},
+	tags: [ 'status-experimental', 'manifest' ],
+	args: {
+		onChange: fn(),
+		onUnitChange: fn(),
+		onFocus: fn(),
+		onBlur: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

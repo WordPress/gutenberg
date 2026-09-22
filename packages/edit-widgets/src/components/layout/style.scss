@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-widgets-layout__inserter-panel {
 	height: 100%;
 	display: flex;
@@ -5,13 +8,6 @@
 	.block-editor-inserter__menu {
 		overflow: hidden;
 	}
-}
-
-.edit-widgets-layout__inserter-panel-header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
 }
 
 .edit-widgets-layout__inserter-panel-content {

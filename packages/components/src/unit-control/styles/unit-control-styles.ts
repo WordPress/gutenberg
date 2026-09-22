@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 import { BackdropUI } from '../../input-control/styles/input-control-styles';
@@ -64,6 +58,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			field-sizing: content;
 
 			&:not( :disabled ) {
 				color: ${ COLORS.theme.accent };
@@ -114,7 +109,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			align-items: center;
 
 			&:where( :not( :disabled ) ):hover {
-				box-shadow: inset 0 0 0
+				box-shadow: 0 0 0
 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
 				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
 			}
@@ -135,7 +130,7 @@ export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		appearance: none;
 		background: transparent;
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusXSmall };
 		border: none;
 		display: block;
 		outline: none;

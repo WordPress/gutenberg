@@ -1,24 +1,14 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
-	title: 'Components/Tooltip',
+	title: 'Components/@wordpress-components/Overlays/Tooltip',
+	id: 'components-tooltip',
 	component: Tooltip,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		position: {
 			control: { type: 'select' },
 			options: [
@@ -35,6 +25,11 @@ const meta: Meta< typeof Tooltip > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Tooltip`](?path=/docs/design-system-components-tooltip--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;
@@ -45,13 +40,21 @@ const Template: StoryFn< typeof Tooltip > = ( props ) => (
 
 export const Default: StoryFn< typeof Tooltip > = Template.bind( {} );
 Default.args = {
-	children: <Button variant="primary">Tooltip Anchor</Button>,
+	children: (
+		<Button __next40pxDefaultSize variant="primary">
+			Tooltip Anchor
+		</Button>
+	),
 	text: 'Tooltip Text',
 };
 
 export const KeyboardShortcut = Template.bind( {} );
 KeyboardShortcut.args = {
-	children: <Button variant="secondary">Keyboard Shortcut</Button>,
+	children: (
+		<Button __next40pxDefaultSize variant="secondary">
+			Keyboard Shortcut
+		</Button>
+	),
 	shortcut: {
 		display: '⇧⌘,',
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
@@ -69,7 +72,9 @@ export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
 Nested.args = {
 	children: (
 		<Tooltip text="Nested tooltip text (that will never show)">
-			<Button variant="primary">Tooltip Anchor</Button>
+			<Button __next40pxDefaultSize variant="primary">
+				Tooltip Anchor
+			</Button>
 		</Tooltip>
 	),
 	text: 'Outer tooltip text',

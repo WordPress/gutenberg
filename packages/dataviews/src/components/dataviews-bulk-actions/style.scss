@@ -1,7 +1,8 @@
-.dataviews-bulk-actions__modal {
-	z-index: z-index(".dataviews-bulk-actions__modal");
+.dataviews-bulk-actions-footer__item-count {
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
-.dataviews-bulk-actions__edit-button.components-button {
-	flex-shrink: 0;
+.dataviews-bulk-actions-footer__container {
+	margin-right: auto;
+	min-height: var(--wpds-dimension-size-md);
 }

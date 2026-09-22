@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis } from '@wordpress/interactivity';
 
 const { directive, h } = privateApis(
@@ -12,9 +9,13 @@ const { directive, h } = privateApis(
 directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
-		const entry = showMock.find( ( { suffix } ) => suffix === 'default' );
+		const entry = showMock.find( ( { suffix } ) => suffix === null );
 
-		if ( ! evaluate( entry ) ) {
+		let result = evaluate( entry );
+		if ( typeof result === 'function' ) {
+			result = result();
+		}
+		if ( ! result ) {
 			element.props.children = h(
 				'template',
 				null,

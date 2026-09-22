@@ -34,10 +34,10 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
+			isLoading={ isLoading }
 			options={ filteredOptions }
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
@@ -90,9 +90,9 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
--   Type: `( value: string | null | undefined ) => void`
+-   Type: `( value: string | null ) => void`
 -   Required: No
 
 #### value
@@ -111,20 +111,26 @@ If the control is clicked, the dropdown will expand regardless of this prop.
 -   Required: No
 -   Default: `true`
 
+#### placeholder
+
+If passed, the combobox input will show a placeholder string if no values are present.
+
+-   Type: `string`
+-   Required: No
+
+#### isLoading
+
+Show a spinner (and hide the suggestions dropdown) while data about the matching suggestions (ie the `options` prop) is loading
+
+-   Type: `Boolean`
+-   Required: No
+
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
-
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

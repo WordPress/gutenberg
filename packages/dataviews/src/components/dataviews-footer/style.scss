@@ -1,0 +1,41 @@
+@use "../../dataviews/style" as *;
+
+.dataviews-footer {
+	position: sticky;
+	bottom: 0;
+	left: 0;
+	background-color: inherit;
+	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	flex-shrink: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
+	// Ensure the footer stays above the scrolling content, independent of DOM order.
+	z-index: 1;
+
+	.is-refreshing {
+		@include dataviews-refreshing();
+	}
+}
+
+@container (max-width: 560px) {
+	.dataviews-footer__content {
+		flex-direction: column !important;
+
+		.dataviews-bulk-actions-footer__container {
+			width: 100%;
+		}
+
+		.dataviews-bulk-actions-footer__item-count {
+			flex-grow: 1;
+		}
+
+		.dataviews-pagination {
+			width: 100%;
+			justify-content: space-between;
+		}
+	}
+}

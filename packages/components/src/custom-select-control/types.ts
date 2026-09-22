@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
 /**
@@ -55,7 +52,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
-	onChange?: ( newValue: CustomSelectChangeObject< T > ) => void;
+	onChange?: ( newValue: CustomSelectChangeObject< NoInfer< T > > ) => void;
 	/**
 	 * A handler for `blur` events on the trigger button.
 	 *
@@ -83,17 +80,17 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * The list of options that can be chosen from.
 	 */
-	options: Array< T >;
+	options: ReadonlyArray< T >;
 	/**
 	 * The size of the control.
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: T;
+	value?: NoInfer< T >;
 	/**
 	 * Use the `showSelectedHint` property instead.
 	 * @deprecated
@@ -117,7 +114,8 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 };

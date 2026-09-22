@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Switcher', () => {
@@ -14,10 +11,10 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page
@@ -34,7 +31,14 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Quote', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Quote',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
 	test( 'Should show the expected block transforms on the list block when the quote block is removed', async ( {
@@ -54,10 +58,10 @@ test.describe( 'Block Switcher', () => {
 
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page
@@ -74,7 +78,13 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
 	test( 'Should not show the block switcher if the block has no styles and cannot be removed', async ( {
@@ -84,18 +94,22 @@ test.describe( 'Block Switcher', () => {
 	} ) => {
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'alt+F10' );
 		const button = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Paragraph' } );
+			.getByRole( 'button', { name: 'Paragraph', exact: true } );
 		await expect( button ).toBeEnabled();
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
-		await page.click( 'role=checkbox[name="Prevent removal"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock removal', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
 
 		// Verify the block switcher isn't enabled.
 		await expect( button ).toBeDisabled();
@@ -108,7 +122,7 @@ test.describe( 'Block Switcher', () => {
 	} ) => {
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await pageUtils.pressKeys( 'alt+F10' );
@@ -126,7 +140,7 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -152,7 +166,7 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await page.keyboard.press( 'ArrowUp' );

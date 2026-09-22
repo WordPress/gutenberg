@@ -1,23 +1,16 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Flex, FlexItem, FlexBlock } from '../';
 import { View } from '../../view';
 
 const meta: Meta< typeof Flex > = {
 	component: Flex,
-	title: 'Components/Flex',
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	id: 'components-flex',
+	title: 'Components/@wordpress-components/Flex',
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: false },
 		gap: { control: { type: 'text' } },
 		justify: { control: { type: 'text' } },
 		// Disabled isReversed because it's deprecated.
@@ -32,6 +25,11 @@ const meta: Meta< typeof Flex > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. For use cases not covered by [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui`, write your own CSS.',
+		},
 	},
 };
 export default meta;

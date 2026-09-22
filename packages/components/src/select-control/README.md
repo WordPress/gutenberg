@@ -92,7 +92,6 @@ const MySelectControl = () => {
 				{ label: 'Small', value: '25%' },
 			] }
 			onChange={ ( newSize ) => setSize( newSize ) }
-			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -103,7 +102,7 @@ Render a user interface to select multiple users from a list.
 ```jsx
 <SelectControl
 	multiple
-	label={ __( 'Select some users:' ) }
+	label={ __( 'User' ) }
 	value={ this.state.users } // e.g: value = [ 'a', 'c' ]
 	onChange={ ( users ) => {
 		this.setState( { users } );
@@ -114,7 +113,6 @@ Render a user interface to select multiple users from a list.
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
 	] }
-	__nextHasNoMarginBottom
 />
 ```
 
@@ -126,10 +124,9 @@ const [ item, setItem ] = useState( '' );
 // ...
 
 <SelectControl
-    label={ __( 'Select an item:' ) }
+    label={ __( 'My dinosaur' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
-    __nextHasNoMarginBottom
 >
 	<optgroup label="Theropods">
 		<option value="Tyrannosaurus">Tyrannosaurus</option>
@@ -228,14 +225,6 @@ The style variant of the control.
 -   Type: `'default' | 'minimal'`
 -   Required: No
 -   Default: `'default'`
-
-### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

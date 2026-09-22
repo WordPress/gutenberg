@@ -1,26 +1,21 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { SVG, Path } from '@wordpress/primitives';
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	title: 'Components/Icon',
+	id: 'components-icon',
+	title: 'Components/@wordpress-components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When rendering SVGs, use [`Icon`](?path=/docs/design-system-components-icon--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;
@@ -32,41 +27,68 @@ Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
-	return (
-		<div
-			style={ {
-				fill: 'blue',
-			} }
-		>
-			<Icon { ...args } />
-		</div>
-	);
-};
-FillColor.args = {
-	...Default.args,
-};
-
+/**
+ * When `icon` is a function, it will be passed the `size` prop and any other additional props.
+ */
 export const WithAFunction = Template.bind( {} );
 WithAFunction.args = {
 	...Default.args,
-	icon: () => (
-		<SVG>
-			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
-		</SVG>
+	icon: ( { size }: { size?: number } ) => (
+		<img
+			width={ size }
+			height={ size }
+			src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+			alt="WordPress"
+		/>
 	),
 };
+WithAFunction.parameters = {
+	docs: {
+		source: {
+			code: `
+<Icon
+  icon={ ( { size } ) => (
+    <img
+      width={ size }
+      height={ size }
+      src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+      alt="WordPress"
+    />
+  ) }
+/>
+		`,
+		},
+	},
+};
 
-const MyIconComponent = () => (
-	<SVG>
+const MyIconComponent = ( { size }: { size?: number } ) => (
+	<SVG width={ size } height={ size }>
 		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 	</SVG>
 );
 
+/**
+ * When `icon` is a component, it will be passed the `size` prop and any other additional props.
+ */
 export const WithAComponent = Template.bind( {} );
 WithAComponent.args = {
 	...Default.args,
-	icon: MyIconComponent,
+	icon: <MyIconComponent />,
+};
+WithAComponent.parameters = {
+	docs: {
+		source: {
+			code: `
+const MyIconComponent = ( { size } ) => (
+  <SVG width={ size } height={ size }>
+    <Path d="M5 4v3h5.5v12h3V7H19V4z" />
+  </SVG>
+);
+
+<Icon icon={ <MyIconComponent /> } />
+		`,
+		},
+	},
 };
 
 export const WithAnSVG = Template.bind( {} );
@@ -80,7 +102,7 @@ WithAnSVG.args = {
 };
 
 /**
- * Although it's preferred to use icons from the `@wordpress/icons` package, Dashicons are still supported,
+ * Although it's preferred to use icons from the `@wordpress/icons` package, [Dashicons](https://developer.wordpress.org/resource/dashicons/) are still supported,
  * as long as you are in a context where the Dashicons stylesheet is loaded. To simulate that here,
  * use the Global CSS Injector in the Storybook toolbar at the top and select the "WordPress" preset.
  */

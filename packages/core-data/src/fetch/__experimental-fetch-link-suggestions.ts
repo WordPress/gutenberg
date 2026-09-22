@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -116,7 +113,7 @@ export default async function fetchLinkSuggestions(
 			? {
 					...searchOptions,
 					...searchOptions.initialSuggestionsSearchOptions,
-			  }
+				}
 			: searchOptions;
 
 	const {
@@ -266,22 +263,46 @@ export default async function fetchLinkSuggestions(
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
+	// Give each result a unique key to avoid duplicate ids from different tables
+	// overwriting another's score.
+	const scoreKey = ( result: SearchResult ) =>
+		`${ result.kind }:${ result.type }:${ result.id }`;
+
 	const scores = {};
 	for ( const result of results ) {
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
-			const matchingTokens = titleTokens.filter( ( titleToken ) =>
-				searchTokens.some( ( searchToken ) =>
-					titleToken.includes( searchToken )
+			const exactMatchingTokens = titleTokens.filter( ( titleToken ) =>
+				searchTokens.some(
+					( searchToken ) => titleToken === searchToken
 				)
 			);
-			scores[ result.id ] = matchingTokens.length / titleTokens.length;
+			const subMatchingTokens = titleTokens.filter( ( titleToken ) =>
+				searchTokens.some(
+					( searchToken ) =>
+						titleToken !== searchToken &&
+						titleToken.includes( searchToken )
+				)
+			);
+
+			// The score is a combination of exact matches and sub-matches.
+			// More weight is given to exact matches, as they are more relevant (e.g. "cat" vs "caterpillar").
+			// Diving by the total number of tokens in the title normalizes the score and skews
+			// the results towards shorter titles.
+			const exactMatchScore =
+				( exactMatchingTokens.length / titleTokens.length ) * 10;
+
+			const subMatchScore = subMatchingTokens.length / titleTokens.length;
+
+			scores[ scoreKey( result ) ] = exactMatchScore + subMatchScore;
 		} else {
-			scores[ result.id ] = 0;
+			scores[ scoreKey( result ) ] = 0;
 		}
 	}
 
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return results.sort(
+		( a, b ) => scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+	);
 }
 
 /**

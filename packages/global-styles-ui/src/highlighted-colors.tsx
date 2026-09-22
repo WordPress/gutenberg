@@ -1,0 +1,37 @@
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useStylesPreviewColors } from './preview-hooks';
+
+interface HighlightedColorsProps {
+	normalizedColorSwatchSize: number;
+	ratio: number;
+}
+
+export default function HighlightedColors( {
+	normalizedColorSwatchSize,
+	ratio,
+}: HighlightedColorsProps ) {
+	const { highlightedColors } = useStylesPreviewColors();
+	const scaledSwatchSize = normalizedColorSwatchSize * ratio;
+	return highlightedColors.map( ( { slug, color }, index ) => (
+		<motion.div
+			key={ `${ slug }-${ index }` }
+			style={ {
+				height: scaledSwatchSize,
+				width: scaledSwatchSize,
+				background: color,
+				borderRadius: scaledSwatchSize / 2,
+			} }
+			animate={ {
+				scale: 1,
+				opacity: 1,
+			} }
+			initial={ {
+				scale: 0.1,
+				opacity: 0,
+			} }
+			transition={ {
+				delay: index === 1 ? 0.2 : 0.1,
+			} }
+		/>
+	) );
+}

@@ -1,7 +1,9 @@
-/**
- * Internal dependencies
- */
-import { appendSelectors, getBlockGapCSS } from '../utils';
+import { describe, expect, it } from 'vitest';
+import {
+	appendSelectors,
+	getBlockGapCSS,
+	normalizeLegacyLayout,
+} from '../utils';
 
 const layoutDefinitions = {
 	default: {
@@ -37,7 +39,7 @@ const layoutDefinitions = {
 describe( 'getBlockGapCSS', () => {
 	it( 'should output default blockGap rules', () => {
 		const expected =
-			'.editor-styles-wrapper .my-container > * { margin-block-start: 0; margin-block-end: 0; }.editor-styles-wrapper .my-container > * + * { margin-block-start: 3em; margin-block-end: 0; }';
+			'.my-container > * { margin-block-start: 0; margin-block-end: 0; }.my-container > * + * { margin-block-start: 3em; margin-block-end: 0; }';
 
 		const result = getBlockGapCSS(
 			'.my-container',
@@ -50,7 +52,7 @@ describe( 'getBlockGapCSS', () => {
 	} );
 
 	it( 'should output flex blockGap rules', () => {
-		const expected = '.editor-styles-wrapper .my-container { gap: 3em; }';
+		const expected = '.my-container { gap: 3em; }';
 
 		const result = getBlockGapCSS(
 			'.my-container',
@@ -97,7 +99,7 @@ describe( 'getBlockGapCSS', () => {
 	} );
 
 	it( 'should treat a blockGap string containing 0 as a valid value', () => {
-		const expected = '.editor-styles-wrapper .my-container { gap: 0; }';
+		const expected = '.my-container { gap: 0; }';
 
 		const result = getBlockGapCSS(
 			'.my-container',
@@ -113,21 +115,62 @@ describe( 'getBlockGapCSS', () => {
 describe( 'appendSelectors', () => {
 	it( 'should append a subselector without an appended selector', () => {
 		expect( appendSelectors( '.original-selector' ) ).toBe(
-			'.editor-styles-wrapper .original-selector'
+			'.original-selector'
 		);
 	} );
 
 	it( 'should append a subselector to a single selector', () => {
 		expect( appendSelectors( '.original-selector', '.appended' ) ).toBe(
-			'.editor-styles-wrapper .original-selector .appended'
+			'.original-selector .appended'
 		);
 	} );
 
 	it( 'should append a subselector to multiple selectors', () => {
 		expect(
 			appendSelectors( '.first-selector,.second-selector', '.appended' )
-		).toBe(
-			'.editor-styles-wrapper .first-selector .appended,.editor-styles-wrapper .second-selector .appended'
-		);
+		).toBe( '.first-selector .appended,.second-selector .appended' );
+	} );
+} );
+
+describe( 'normalizeLegacyLayout', () => {
+	it( 'should promote a layout using the legacy inherit flag to constrained', () => {
+		expect( normalizeLegacyLayout( { inherit: true } ) ).toEqual( {
+			inherit: true,
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should promote a layout with only a content size to constrained', () => {
+		expect( normalizeLegacyLayout( { contentSize: '600px' } ) ).toEqual( {
+			contentSize: '600px',
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should promote a layout with only a wide size to constrained', () => {
+		expect( normalizeLegacyLayout( { wideSize: '1200px' } ) ).toEqual( {
+			wideSize: '1200px',
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should return a typed layout unchanged', () => {
+		const layout = { type: 'flex', orientation: 'vertical' };
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+	} );
+
+	it( 'should return an explicitly flow layout unchanged', () => {
+		const layout = { type: 'default' };
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+	} );
+
+	it( 'should return an empty or missing layout unchanged', () => {
+		const layout = {};
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+		expect( normalizeLegacyLayout( null ) ).toBeNull();
+		expect( normalizeLegacyLayout( undefined ) ).toBeUndefined();
 	} );
 } );

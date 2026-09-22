@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
 import { isRTL } from '@wordpress/i18n';
 
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
@@ -51,9 +44,9 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {import('react').CSSProperties} ltrStyles
+ * @param {React.CSSProperties} ltrStyles
  *
- * @return {import('react').CSSProperties} Converted ltr -> rtl styles
+ * @return {React.CSSProperties} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
 	return Object.fromEntries(
@@ -67,19 +60,19 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+ * @param {React.CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {React.CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
  *
  * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
 		if ( rtlStyles ) {
-			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+			// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+		// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
 		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

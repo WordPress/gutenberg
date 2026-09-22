@@ -1,194 +1,348 @@
-/**
- * WordPress dependencies
- */
+import type { ReactElement } from 'react';
 import {
-	privateApis as componentsPrivateApis,
 	Button,
-	Modal,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
-import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback, useContext } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { closeSmall } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
-import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
-import { unlock } from '../../lock-unlock';
-import type { Action, ActionModal } from '../../types';
-
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+import { ActionModal } from '../dataviews-item-actions';
+import type { Action, ActionModal as ActionModalType } from '../../types';
+import type { SetSelection } from '../../types/private';
+import type { ActionTriggerProps } from '../dataviews-item-actions';
+import getFooterMessage from '../../utils/get-footer-message';
 
 interface ActionWithModalProps< Item > {
-	action: ActionModal< Item >;
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
-	onMenuOpenChange: ( isOpen: boolean ) => void;
+	action: ActionModalType< Item >;
+	items: Item[];
+	ActionTriggerComponent: (
+		props: ActionTriggerProps< Item >
+	) => ReactElement;
 }
 
-interface BulkActionsItemProps< Item > {
-	action: Action< Item >;
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
+function ActionWithModal< Item >( {
+	action,
+	items,
+	ActionTriggerComponent,
+}: ActionWithModalProps< Item > ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const actionTriggerProps = {
+		action,
+		onClick: () => {
+			setIsModalOpen( true );
+		},
+		items,
+	};
+	return (
+		<>
+			<ActionTriggerComponent { ...actionTriggerProps } />
+			{ isModalOpen && (
+				<ActionModal
+					action={ action }
+					items={ items }
+					closeModal={ () => setIsModalOpen( false ) }
+				/>
+			) }
+		</>
+	);
 }
 
-interface ActionsMenuGroupProps< Item > {
-	actions: Action< Item >[];
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
+export function hasAPossibleBulkAction< Item >(
+	actions: Action< Item >[],
+	item: Item
+) {
+	return actions.some(
+		( action ) =>
+			action.supportsBulk &&
+			( ! action.isEligible || action.isEligible( item ) )
+	);
 }
 
 export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
-	return useMemo( () => {
-		return actions.some( ( action ) => {
-			return (
-				action.supportsBulk &&
-				( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ actions, item ] );
+	return useMemo(
+		() => hasAPossibleBulkAction( actions, item ),
+		[ actions, item ]
+	);
 }
 
 export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
+	return useMemo(
+		() => data.some( ( item ) => hasAPossibleBulkAction( actions, item ) ),
+		[ actions, data ]
+	);
+}
+
+interface BulkSelectionCheckboxProps< Item > {
+	selection: string[];
+	onChangeSelection: SetSelection;
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
+}
+
+export function BulkSelectionCheckbox< Item >( {
+	selection,
+	onChangeSelection,
+	data,
+	actions,
+	getItemId,
+	disableSelectAll = false,
+}: BulkSelectionCheckboxProps< Item > ) {
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return actions.some(
+				( action ) =>
 					action.supportsBulk &&
 					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
-}
-
-function ActionWithModal< Item >( {
-	action,
-	selectedItems,
-	setActionWithModal,
-	onMenuOpenChange,
-}: ActionWithModalProps< Item > ) {
-	const eligibleItems = useMemo( () => {
-		return selectedItems.filter(
-			( item ) => ! action.isEligible || action.isEligible( item )
-		);
-	}, [ action, selectedItems ] );
-	const { RenderModal, hideModalHeader } = action;
-	const onCloseModal = useCallback( () => {
-		setActionWithModal( undefined );
-	}, [ setActionWithModal ] );
-	const label =
-		typeof action.label === 'string'
-			? action.label
-			: action.label( selectedItems );
-	return (
-		<Modal
-			title={ ! hideModalHeader ? label : undefined }
-			__experimentalHideHeader={ !! hideModalHeader }
-			onRequestClose={ onCloseModal }
-			overlayClassName="dataviews-bulk-actions__modal"
-		>
-			<RenderModal
-				items={ eligibleItems }
-				closeModal={ onCloseModal }
-				onActionPerformed={ () => onMenuOpenChange( false ) }
-			/>
-		</Modal>
-	);
-}
-
-function BulkActionItem< Item >( {
-	action,
-	selectedItems,
-	setActionWithModal,
-}: BulkActionsItemProps< Item > ) {
-	const registry = useRegistry();
-	const eligibleItems = useMemo( () => {
-		return selectedItems.filter(
-			( item ) => ! action.isEligible || action.isEligible( item )
-		);
-	}, [ action, selectedItems ] );
-
-	const shouldShowModal = 'RenderModal' in action;
-
-	return (
-		<DropdownMenuItem
-			key={ action.id }
-			hideOnClick={ ! shouldShowModal }
-			onClick={ async () => {
-				if ( shouldShowModal ) {
-					setActionWithModal( action );
-				} else {
-					action.callback( eligibleItems, { registry } );
-				}
-			} }
-			suffix={ eligibleItems.length }
-		>
-			{ action.label }
-		</DropdownMenuItem>
-	);
-}
-
-function ActionsMenuGroup< Item >( {
-	actions,
-	selectedItems,
-	setActionWithModal,
-}: ActionsMenuGroupProps< Item > ) {
-	const elligibleActions = useMemo( () => {
-		return actions.filter( ( action ) => {
-			return selectedItems.some(
-				( item ) => ! action.isEligible || action.isEligible( item )
 			);
 		} );
-	}, [ actions, selectedItems ] );
-	if ( ! elligibleActions.length ) {
-		return null;
+	}, [ data, actions ] );
+	const selectedItems = data.filter(
+		( item ) =>
+			selection.includes( getItemId( item ) ) &&
+			selectableItems.includes( item )
+	);
+	const hasSelection = selection.length > 0;
+	const areAllSelected = selectedItems.length === selectableItems.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<WCCheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
 	}
+
 	return (
-		<>
-			<DropdownMenuGroup>
-				{ elligibleActions.map( ( action ) => (
-					<BulkActionItem
-						key={ action.id }
-						action={ action }
-						selectedItems={ selectedItems }
-						setActionWithModal={ setActionWithModal }
-					/>
-				) ) }
-			</DropdownMenuGroup>
-			<DropdownMenuSeparator />
-		</>
+		<WCCheckboxControl
+			className="dataviews-view-table-selection-checkbox"
+			checked={ areAllSelected }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
+			onChange={ () => {
+				if ( areAllSelected ) {
+					onChangeSelection( [] );
+				} else {
+					onChangeSelection(
+						selectableItems.map( ( item ) => getItemId( item ) )
+					);
+				}
+			} }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
+		/>
 	);
 }
 
-function _BulkActions() {
-	const {
-		data,
-		actions = [],
-		selection,
-		onChangeSelection,
-		getItemId,
-	} = useContext( DataViewsContext );
+interface ActionButtonProps< Item > {
+	action: Action< Item >;
+	selectedItems: Item[];
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
+}
+
+interface ToolbarContentProps< Item > {
+	selection: string[];
+	onChangeSelection: SetSelection;
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
+	isInfiniteScroll: boolean;
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+	};
+}
+
+function ActionTrigger< Item >( {
+	action,
+	onClick,
+	isBusy,
+	items,
+}: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	if ( isMobile ) {
+		return (
+			<Button
+				disabled={ isBusy }
+				accessibleWhenDisabled
+				label={ label }
+				icon={ action.icon }
+				size="compact"
+				onClick={ onClick }
+				isBusy={ isBusy }
+			/>
+		);
+	}
+
+	return (
+		<Button
+			disabled={ isBusy }
+			accessibleWhenDisabled
+			size="compact"
+			onClick={ onClick }
+			isBusy={ isBusy }
+		>
+			{ label }
+		</Button>
+	);
+}
+
+const EMPTY_ARRAY: [] = [];
+
+function ActionButton< Item >( {
+	action,
+	selectedItems,
+	actionInProgress,
+	setActionInProgress,
+}: ActionButtonProps< Item > ) {
+	const registry = useRegistry();
+	const selectedEligibleItems = useMemo( () => {
+		return selectedItems.filter( ( item ) => {
+			return ! action.isEligible || action.isEligible( item );
+		} );
+	}, [ action, selectedItems ] );
+	if ( 'RenderModal' in action ) {
+		return (
+			<ActionWithModal
+				key={ action.id }
+				action={ action }
+				items={ selectedEligibleItems }
+				ActionTriggerComponent={ ActionTrigger }
+			/>
+		);
+	}
+	return (
+		<ActionTrigger
+			key={ action.id }
+			action={ action }
+			onClick={ async () => {
+				setActionInProgress( action.id );
+				await action.callback( selectedEligibleItems, {
+					registry,
+				} );
+				setActionInProgress( null );
+			} }
+			items={ selectedEligibleItems }
+			isBusy={ actionInProgress === action.id }
+		/>
+	);
+}
+
+function renderFooterContent< Item >(
+	data: Item[],
+	actions: Action< Item >[],
+	getItemId: ( item: Item ) => string,
+	isInfiniteScroll: boolean,
+	selection: string[],
+	actionsToShow: Action< Item >[],
+	selectedItems: Item[],
+	actionInProgress: string | null,
+	setActionInProgress: ( actionId: string | null ) => void,
+	onChangeSelection: SetSelection,
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+	}
+) {
+	const message = getFooterMessage(
+		selection.length,
+		data.length,
+		paginationInfo.totalItems,
+		isInfiniteScroll
+	);
+	return (
+		<Stack
+			direction="row"
+			className="dataviews-bulk-actions-footer__container"
+			gap="md"
+			align="center"
+		>
+			<BulkSelectionCheckbox
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				data={ data }
+				actions={ actions }
+				getItemId={ getItemId }
+				disableSelectAll={ isInfiniteScroll }
+			/>
+			<span className="dataviews-bulk-actions-footer__item-count">
+				{ message }
+			</span>
+			<Stack
+				direction="row"
+				className="dataviews-bulk-actions-footer__action-buttons"
+				gap="xs"
+			>
+				{ actionsToShow.map( ( action ) => {
+					return (
+						<ActionButton
+							key={ action.id }
+							action={ action }
+							selectedItems={ selectedItems }
+							actionInProgress={ actionInProgress }
+							setActionInProgress={ setActionInProgress }
+						/>
+					);
+				} ) }
+				{ selectedItems.length > 0 && (
+					<Button
+						icon={ closeSmall }
+						showTooltip
+						tooltipPosition="top"
+						size="compact"
+						label={ __( 'Cancel' ) }
+						disabled={ !! actionInProgress }
+						accessibleWhenDisabled={ false }
+						onClick={ () => {
+							onChangeSelection( EMPTY_ARRAY );
+						} }
+					/>
+				) }
+			</Stack>
+		</Stack>
+	);
+}
+
+function FooterContent< Item >( {
+	selection,
+	actions,
+	onChangeSelection,
+	data,
+	getItemId,
+	isInfiniteScroll,
+	paginationInfo,
+}: ToolbarContentProps< Item > ) {
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
+	const footerContentRef = useRef< React.JSX.Element >( undefined );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
-	const [ actionWithModal, setActionWithModal ] = useState<
-		ActionModal< any > | undefined
-	>();
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return bulkActions.some(
@@ -196,8 +350,6 @@ function _BulkActions() {
 			);
 		} );
 	}, [ data, bulkActions ] );
-
-	const numberSelectableItems = selectableItems.length;
 
 	const selectedItems = useMemo( () => {
 		return data.filter(
@@ -207,94 +359,74 @@ function _BulkActions() {
 		);
 	}, [ selection, data, getItemId, selectableItems ] );
 
-	const areAllSelected = selectedItems.length === numberSelectableItems;
-
-	if ( bulkActions.length === 0 ) {
-		return null;
-	}
-	return (
-		<>
-			<DropdownMenu
-				open={ isMenuOpen }
-				onOpenChange={ onMenuOpenChange }
-				label={ __( 'Bulk actions' ) }
-				style={ { minWidth: '240px' } }
-				trigger={
-					<Button
-						className="dataviews-bulk-actions__edit-button"
-						__next40pxDefaultSize
-						variant="tertiary"
-						size="compact"
-					>
-						{ selectedItems.length
-							? sprintf(
-									/* translators: %d: Number of items. */
-									_n(
-										'Edit %d item',
-										'Edit %d items',
-										selectedItems.length
-									),
-									selectedItems.length
-							  )
-							: __( 'Bulk edit' ) }
-					</Button>
-				}
-			>
-				<ActionsMenuGroup
-					actions={ bulkActions }
-					setActionWithModal={ setActionWithModal }
-					selectedItems={ selectedItems }
-				/>
-				<DropdownMenuGroup>
-					<DropdownMenuItem
-						disabled={ areAllSelected }
-						hideOnClick={ false }
-						onClick={ () => {
-							onChangeSelection(
-								selectableItems.map( ( item ) =>
-									getItemId( item )
-								)
-							);
-						} }
-						suffix={ numberSelectableItems }
-					>
-						{ __( 'Select all' ) }
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						disabled={ selection.length === 0 }
-						hideOnClick={ false }
-						onClick={ () => {
-							onChangeSelection( [] );
-						} }
-					>
-						{ __( 'Deselect' ) }
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-			</DropdownMenu>
-			{ actionWithModal && (
-				<ActionWithModal
-					action={ actionWithModal }
-					selectedItems={ selectedItems }
-					setActionWithModal={ setActionWithModal }
-					onMenuOpenChange={ onMenuOpenChange }
-				/>
-			) }
-		</>
+	const actionsToShow = useMemo(
+		() =>
+			actions.filter( ( action ) => {
+				return (
+					action.supportsBulk &&
+					( ! isMobile || action.icon ) &&
+					selectedItems.some(
+						( item ) =>
+							! action.isEligible || action.isEligible( item )
+					)
+				);
+			} ),
+		[ actions, selectedItems, isMobile ]
 	);
+	if ( ! actionInProgress ) {
+		if ( footerContentRef.current ) {
+			footerContentRef.current = undefined;
+		}
+		return renderFooterContent(
+			data,
+			actions,
+			getItemId,
+			isInfiniteScroll,
+			selection,
+			actionsToShow,
+			selectedItems,
+			actionInProgress,
+			setActionInProgress,
+			onChangeSelection,
+			paginationInfo
+		);
+	} else if ( ! footerContentRef.current ) {
+		footerContentRef.current = renderFooterContent(
+			data,
+			actions,
+			getItemId,
+			isInfiniteScroll,
+			selection,
+			actionsToShow,
+			selectedItems,
+			actionInProgress,
+			setActionInProgress,
+			onChangeSelection,
+			paginationInfo
+		);
+	}
+	return footerContentRef.current;
 }
 
-export default function BulkActions() {
-	const { data, actions = [], view } = useContext( DataViewsContext );
-	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
-		actions,
-		data
+export function BulkActionsFooter() {
+	const {
+		data,
+		selection,
+		actions = EMPTY_ARRAY,
+		onChangeSelection,
+		getItemId,
+		paginationInfo,
+		view,
+	} = useContext( DataViewsContext );
+	return (
+		<FooterContent
+			selection={ selection }
+			onChangeSelection={ onChangeSelection }
+			data={ data }
+			actions={ actions }
+			getItemId={ getItemId }
+			isInfiniteScroll={ !! view.infiniteScrollEnabled }
+			paginationInfo={ paginationInfo }
+		/>
 	);
-	if (
-		! [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) ||
-		! hasPossibleBulkAction
-	) {
-		return null;
-	}
-
-	return <_BulkActions />;
 }

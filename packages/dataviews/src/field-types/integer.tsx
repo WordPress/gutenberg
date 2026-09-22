@@ -1,100 +1,113 @@
-/**
- * WordPress dependencies
- */
-import {
-	__experimentalNumberControl as NumberControl,
-	SelectControl,
-} from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { FormatInteger, NormalizedField } from '../types';
+import type { FieldType } from '../types/private';
+import {
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_LESS_THAN,
+	OPERATOR_GREATER_THAN,
+	OPERATOR_LESS_THAN_OR_EQUAL,
+	OPERATOR_GREATER_THAN_OR_EQUAL,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_NOT_ALL,
+	OPERATOR_BETWEEN,
+} from '../constants';
+import sort from './utils/sort-number';
+import isValidRequired from './utils/is-valid-required';
+import isValidMin from './utils/is-valid-min';
+import isValidMax from './utils/is-valid-max';
+import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
-/**
- * Internal dependencies
- */
-import type {
-	SortDirection,
-	ValidationContext,
-	DataFormControlProps,
-} from '../types';
+const format = {
+	separatorThousand: ',',
+};
 
-function sort( a: any, b: any, direction: SortDirection ) {
-	return direction === 'asc' ? a - b : b - a;
-}
-
-function isValid( value: any, context?: ValidationContext ) {
-	// TODO: this implicitely means the value is required.
-	if ( value === '' ) {
-		return false;
-	}
-
-	if ( ! Number.isInteger( Number( value ) ) ) {
-		return false;
-	}
-
-	if ( context?.elements ) {
-		const validValues = context?.elements.map( ( f ) => f.value );
-		if ( ! validValues.includes( Number( value ) ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-function Edit< Item >( {
-	data,
+function getValueFormatted< Item >( {
+	item,
 	field,
-	onChange,
-}: DataFormControlProps< Item > ) {
-	const { id, label, description } = field;
-	const value = field.getValue( { item: data } ) ?? '';
-	const onChangeControl = useCallback(
-		( newValue: string | undefined ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
-				[ id ]: newValue,
-			} ) ),
-		[ id, onChange ]
-	);
-
-	if ( field.elements ) {
-		const elements = [
-			/*
-			 * Value can be undefined when:
-			 *
-			 * - the field is not required
-			 * - in bulk editing
-			 *
-			 */
-			{ label: __( 'Select item' ), value: '' },
-			...field.elements,
-		];
-
-		return (
-			<SelectControl
-				label={ label }
-				value={ value }
-				options={ elements }
-				onChange={ onChangeControl }
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
-		);
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	let value = field.getValue( { item } );
+	if ( value === null || value === undefined ) {
+		return '';
 	}
 
-	return (
-		<NumberControl
-			label={ label }
-			help={ description }
-			value={ value }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-		/>
+	value = Number( value );
+	if ( ! Number.isFinite( value ) ) {
+		return String( value );
+	}
+
+	let formatInteger: Required< FormatInteger >;
+	if ( field.type !== 'integer' ) {
+		formatInteger = format;
+	} else {
+		formatInteger = field.format as Required< FormatInteger >;
+	}
+
+	const { separatorThousand } = formatInteger;
+	const integerValue = Math.trunc( value );
+	if ( ! separatorThousand ) {
+		return String( integerValue );
+	}
+
+	return String( integerValue ).replace(
+		/\B(?=(\d{3})+(?!\d))/g,
+		separatorThousand
 	);
+}
+
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! Number.isInteger( value )
+	) {
+		return __( 'Value must be an integer.' );
+	}
+	return null;
 }
 
 export default {
+	type: 'integer',
+	render,
+	Edit: 'integer',
 	sort,
-	isValid,
-	Edit,
-};
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_LESS_THAN,
+		OPERATOR_GREATER_THAN,
+		OPERATOR_LESS_THAN_OR_EQUAL,
+		OPERATOR_GREATER_THAN_OR_EQUAL,
+		OPERATOR_BETWEEN,
+	],
+	validOperators: [
+		// Single-selection
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_LESS_THAN,
+		OPERATOR_GREATER_THAN,
+		OPERATOR_LESS_THAN_OR_EQUAL,
+		OPERATOR_GREATER_THAN_OR_EQUAL,
+		OPERATOR_BETWEEN,
+		// Multiple-selection
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_NOT_ALL,
+	],
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		min: isValidMin,
+		max: isValidMax,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
+} satisfies FieldType< any >;

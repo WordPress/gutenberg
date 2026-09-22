@@ -1,6 +1,5 @@
-/**
- * Internal dependencies
- */
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import { unlock } from '../lock-unlock';
 import EditorKeyboardShortcuts from './global-keyboard-shortcuts';
 
 // Block Creation Components.
@@ -17,8 +16,6 @@ export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
 export { default as EditorSnackbars } from './editor-snackbars';
-export { default as EntitiesSavedStates } from './entities-saved-states';
-export { useIsDirty as useEntitiesSavedStatesIsDirty } from './entities-saved-states/hooks/use-is-dirty';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -32,6 +29,7 @@ export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
+export { default as PluginPreviewMenuItem } from './plugin-preview-menu-item';
 export { default as PluginSidebar } from './plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './plugin-sidebar-more-menu-item';
 export { default as PostTemplatePanel } from './post-template/panel';
@@ -67,8 +65,6 @@ export {
 	usePostScheduleLabel,
 } from './post-schedule/label';
 export { default as PostSchedulePanel } from './post-schedule/panel';
-export { default as PostSlug } from './post-slug';
-export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
@@ -123,3 +119,8 @@ export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
  * and toggling the sidebar.
  */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+const { EntitiesSavedStates, useEntitiesSavedStatesIsDirty } =
+	unlock( coreDataPrivateApis );
+
+export { EntitiesSavedStates, useEntitiesSavedStatesIsDirty };

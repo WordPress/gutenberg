@@ -1,27 +1,18 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
+	tags: [ 'manifest' ],
 	component: RadioControl,
-	title: 'Components/RadioControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/RadioControl',
+	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		selected: {
-			control: { type: null },
+			control: false,
 		},
 		label: {
 			control: { type: 'text' },
@@ -35,6 +26,11 @@ const meta: Meta< typeof RadioControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -89,5 +85,17 @@ WithOptionDescriptions.args = {
 			value: 'password',
 			description: 'Protected by a password',
 		},
+	],
+};
+
+export const WithDisabledOption: StoryFn< typeof RadioControl > = Template.bind(
+	{}
+);
+WithDisabledOption.args = {
+	...Default.args,
+	options: [
+		{ label: 'Public', value: 'public' },
+		{ label: 'Private', value: 'private', disabled: true },
+		{ label: 'Password Protected', value: 'password' },
 	],
 };

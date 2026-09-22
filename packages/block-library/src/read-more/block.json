@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -17,7 +18,13 @@
 	},
 	"usesContext": [ "postId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"text": true
@@ -51,6 +58,7 @@
 				"width": true
 			}
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

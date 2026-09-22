@@ -1,10 +1,43 @@
-@mixin edit-post__fade-in-animation($speed: 0.2s, $delay: 0s) {
-	animation: edit-post__fade-in-animation $speed ease-out $delay;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+@mixin keyframes($name) {
+	@keyframes #{$name} {
+		@content;
+	}
 }
 
-@mixin editor-canvas-resize-animation() {
-	transition: all 0.5s cubic-bezier(0.65, 0, 0.45, 1);
-	@include reduce-motion("transition");
+@mixin animation__fade-in($speed: 0.08s, $delay: 0s, $easing: linear) {
+	@include keyframes(__wp-base-styles-fade-in) {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-in $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
+}
+
+@mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
+	@include keyframes(__wp-base-styles-fade-out) {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-out $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
+}
+
+// Deprecated
+@mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
+	@warn "The `edit-post__fade-in-animation` mixin is deprecated. Use `animation__fade-in` instead.";
+	@include animation__fade-in($speed, $delay);
 }

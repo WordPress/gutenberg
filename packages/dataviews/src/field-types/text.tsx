@@ -1,90 +1,50 @@
-/**
- * WordPress dependencies
- */
-import { SelectControl, TextControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import type {
-	SortDirection,
-	ValidationContext,
-	DataFormControlProps,
-} from '../types';
-
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
-}
-
-function isValid( value: any, context?: ValidationContext ) {
-	if ( context?.elements ) {
-		const validValues = context?.elements?.map( ( f ) => f.value );
-		if ( ! validValues.includes( value ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-function Edit< Item >( {
-	data,
-	field,
-	onChange,
-}: DataFormControlProps< Item > ) {
-	const { id, label, placeholder } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
-				[ id ]: newValue,
-			} ) ),
-		[ id, onChange ]
-	);
-
-	if ( field.elements ) {
-		const elements = [
-			/*
-			 * Value can be undefined when:
-			 *
-			 * - the field is not required
-			 * - in bulk editing
-			 *
-			 */
-			{ label: __( 'Select item' ), value: '' },
-			...field.elements,
-		];
-
-		return (
-			<SelectControl
-				label={ label }
-				value={ value }
-				options={ elements }
-				onChange={ onChangeControl }
-			/>
-		);
-	}
-
-	return (
-		<TextControl
-			label={ label }
-			placeholder={ placeholder }
-			value={ value ?? '' }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-		/>
-	);
-}
+import type { FieldType } from '../types/private';
+import {
+	OPERATOR_CONTAINS,
+	OPERATOR_IS,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_NOT,
+	OPERATOR_IS_NOT_ALL,
+	OPERATOR_NOT_CONTAINS,
+	OPERATOR_STARTS_WITH,
+} from '../constants';
+import render from './utils/render-default';
+import sort from './utils/sort-text';
+import isValidRequired from './utils/is-valid-required';
+import isValidMinLength from './utils/is-valid-min-length';
+import isValidMaxLength from './utils/is-valid-max-length';
+import isValidPattern from './utils/is-valid-pattern';
+import isValidElements from './utils/is-valid-elements';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 export default {
+	type: 'text',
+	render,
+	Edit: 'text',
 	sort,
-	isValid,
-	Edit,
-};
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		// Single selection
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_CONTAINS,
+		OPERATOR_NOT_CONTAINS,
+		OPERATOR_STARTS_WITH,
+		// Multiple selection
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_NOT_ALL,
+	],
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		pattern: isValidPattern,
+		minLength: isValidMinLength,
+		maxLength: isValidMaxLength,
+		elements: isValidElements,
+	},
+} satisfies FieldType< any >;

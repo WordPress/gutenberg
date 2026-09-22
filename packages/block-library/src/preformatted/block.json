@@ -12,11 +12,16 @@
 			"source": "rich-text",
 			"selector": "pre",
 			"__unstablePreserveWhiteSpace": true,
-			"__experimentalRole": "content"
+			"role": "content"
 		}
 	},
 	"supports": {
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -24,6 +29,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"padding": true,
 			"margin": true
@@ -43,6 +49,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
 	"style": "wp-block-preformatted"

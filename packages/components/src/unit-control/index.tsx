@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
@@ -26,7 +15,6 @@ import {
 import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -56,7 +44,7 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+	} = unitControlProps;
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -189,10 +177,7 @@ function UnforwardedUnitControl(
 			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
 			size={
-				[ 'small', 'compact' ].includes( size ) ||
-				( size === 'default' && ! props.__next40pxDefaultSize )
-					? 'small'
-					: 'default'
+				[ 'small', 'compact' ].includes( size ) ? 'small' : 'default'
 			}
 			unit={ unit }
 			units={ units }
@@ -251,6 +236,7 @@ function UnforwardedUnitControl(
  * ```
  */
 export const UnitControl = forwardRef( UnforwardedUnitControl );
+UnitControl.displayName = 'UnitControl';
 
 export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
 export default UnitControl;

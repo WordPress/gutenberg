@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { page, addSubmenu } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { _x } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -28,15 +22,24 @@ export const settings = {
 
 		const customName = attributes?.metadata?.name;
 
-		// In the list view, use the block's menu label as the label.
+		// In the list view and breadcrumb, use the block's menu label as the label.
 		// If the menu label is empty, fall back to the default label.
-		if ( context === 'list-view' && ( customName || label ) ) {
-			return attributes?.metadata?.name || label;
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
+			return customName;
 		}
 
 		return label;
 	},
 	edit,
+	example: {
+		attributes: {
+			label: _x( 'About', 'Example link text for Navigation Submenu' ),
+			type: 'page',
+		},
+	},
 	save,
 	transforms,
 };

@@ -1,30 +1,11 @@
-/**
- * External dependencies
- */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
-/**
- * Internal dependencies
- */
-const config = require( '../' ),
-	validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/commenting-valid.css',
-		'utf-8'
-	),
-	invalidCss = fs.readFileSync(
-		'./packages/stylelint-config/test/commenting-invalid.css',
-		'utf-8'
-	);
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid commenting css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validCss,
-			config,
-		} );
+		result = getStylelintResult( './commenting-valid.css' );
 	} );
 
 	it( 'did not error', () => {
@@ -42,10 +23,7 @@ describe( 'flags warnings with invalid commenting css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: invalidCss,
-			config,
-		} );
+		result = getStylelintResult( './commenting-invalid.css' );
 	} );
 
 	it( 'did error', () => {

@@ -1,0 +1,13 @@
+{
+	"rules": {},
+	"overrides": [
+		{
+			"files": [ "*.scss", "**/*.scss" ],
+			"extends": "@wordpress/stylelint-config/scss-stylistic"
+		},
+		{
+			"files": [ "*.css", "**/*.css" ],
+			"extends": "@wordpress/stylelint-config/stylistic"
+		}
+	]
+}

@@ -7,7 +7,7 @@ This will either appear in the controls for each block or at the Top Toolbar dep
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
+import { PluginBlockSettingsMenuItem } from '@wordpress/editor';
 
 const PluginBlockSettingsMenuGroupTest = () => (
 	<PluginBlockSettingsMenuItem
@@ -27,4 +27,4 @@ registerPlugin( 'block-settings-menu-group-test', {
 
 ## Location
 
-![Location](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-block-settings-menu-item-screenshot.png?raw=true 'PluginBlockSettingsMenuItem Location')
+![Location](https://developer.wordpress.org/files/2026/06/plugin-block-settings-menu-item-screenshot.png 'PluginBlockSettingsMenuItem Location')

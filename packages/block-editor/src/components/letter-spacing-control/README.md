@@ -12,7 +12,7 @@ This component is used for blocks that display text, commonly inside a
 Renders a letter spacing control.
 
 ```jsx
-import { LetterSpacingControl } from '@wordpress/block-editor';
+import { __experimentalLetterSpacingControl as LetterSpacingControl } from '@wordpress/block-editor';
 
 const MyLetterSpacingControl = () => (
 	<LetterSpacingControl
@@ -38,7 +38,7 @@ The current value of the letter spacing setting.
 
 A callback function invoked when the value is changed.
 
-### `_unstableInputWidth`
+### `__unstableInputWidth`
 
 -   **Type:** `string|number|undefined`
 -   **Default:** `undefined`

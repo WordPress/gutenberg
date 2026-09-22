@@ -29,6 +29,29 @@ _Note:_ A block name can only contain lowercase alphanumeric characters and dash
 
 _Note:_ This name is used on the comment delimiters as `<!-- wp:my-plugin/book -->`. Those blocks provided by core don't include a namespace when serialized.
 
+#### Important: Choose Your Namespace Carefully
+
+Block names cannot be changed later without consequences. The block name is stored in the post content of every post using that block, so changing it requires editing all affected posts or running database scripts.
+
+#### Namespace Best Practices
+
+-   Use your actual plugin/theme name: `my-awesome-plugin/block-name`
+-   Avoid generic names like `editorial/`, `block/`, or `create-block/`
+-   Use the same namespace for all blocks in your plugin/theme
+-   Make it unique to prevent conflicts with other plugins
+
+```js
+// Good examples
+registerBlockType( 'my-company-blocks/hero', {} );
+registerBlockType( 'awesome-gallery-plugin/slideshow', {} );
+
+// Avoid these
+registerBlockType( 'create-block/example', {} ); // Too generic
+registerBlockType( 'block/content', {} ); // Too generic
+```
+
+_Note:_ `registerBlockCollection()` only works with blocks from a single namespace.
+
 ### Block configuration
 
 -   **Type:** `Object` [ `{ key: value }` ]
@@ -253,13 +276,14 @@ Transforms provide rules for what a block can be transformed from and what it ca
 #### parent (optional)
 
 -   **Type:** `Array`
+-   **Default:** `undefined`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available in a specific location. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
-Setting `parent` lets a block require that it is only available when nested within the specified blocks.
+When `parent` is omitted, the block is not restricted by parent block type. Setting `parent` to an array of block names requires that the block is only available when nested directly inside one of the specified blocks.
 
 ```js
-// Only allow this block when it is nested in a Columns block
+// Only allow this block when it is nested directly in a Columns block
 parent: [ 'core/columns' ],
 ```
 
@@ -311,10 +335,6 @@ The key is the name of the block (`string`) to hook into, and the value is the p
 	}
 }
 ```
-
-It’s crucial to emphasize that the Block Hooks feature is only designed to work with _static_ block-based templates, template parts, and patterns. For patterns, this includes those provided by the theme, from [Block Pattern Directory](https://wordpress.org/patterns/), or from calls to [`register_block_pattern`](https://developer.wordpress.org/reference/functions/register_block_pattern/).
-
-Block Hooks will not work with post content or patterns crafted by the user, such as synced patterns, or theme templates and template parts that have been modified by the user.
 
 ## Block collections
 

@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
-import { useBaseControlProps } from '../base-control/hooks';
 import { StyledHelp } from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
 
 function generateOptionDescriptionId( radioGroupId: string, index: number ) {
 	return `${ radioGroupId }-${ index }-option-description`;
@@ -25,6 +14,10 @@ function generateOptionDescriptionId( radioGroupId: string, index: number ) {
 
 function generateOptionId( radioGroupId: string, index: number ) {
 	return `${ radioGroupId }-${ index }`;
+}
+
+function generateHelpId( radioGroupId: string ) {
+	return `${ radioGroupId }__help`;
 }
 
 /**
@@ -61,7 +54,9 @@ export function RadioControl(
 		selected,
 		help,
 		onChange,
+		onClick,
 		hideLabelFromVision,
+		disabled,
 		options = [],
 		id: preferredId,
 		...additionalProps
@@ -75,24 +70,26 @@ export function RadioControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
-	// Use `useBaseControlProps` to get the id of the help text.
-	const {
-		controlProps: { 'aria-describedby': helpTextId },
-	} = useBaseControlProps( { id, help } );
-
 	if ( ! options?.length ) {
 		return null;
 	}
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			label={ label }
+		<fieldset
 			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
+			role="radiogroup"
 			className={ clsx( className, 'components-radio-control' ) }
+			disabled={ disabled }
+			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+			) : (
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+
 			<VStack
 				spacing={ 3 }
 				className={ clsx( 'components-radio-control__group-wrapper', {
@@ -110,18 +107,20 @@ export function RadioControl(
 							type="radio"
 							name={ id }
 							value={ option.value }
+							disabled={ option.disabled }
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={
-								clsx( [
-									!! option.description &&
-										generateOptionDescriptionId(
-											id,
-											index
-										),
-									helpTextId,
-								] ) || undefined
+								!! option.description
+									? generateOptionDescriptionId( id, index )
+									: undefined
 							}
+							onClick={ ( event ) => {
+								// Compat code for Safari to ensure that the radio is focused when clicked.
+								event.currentTarget.focus();
+
+								onClick?.( event );
+							} }
 							{ ...additionalProps }
 						/>
 						<label
@@ -132,7 +131,6 @@ export function RadioControl(
 						</label>
 						{ !! option.description ? (
 							<StyledHelp
-								__nextHasNoMarginBottom
 								id={ generateOptionDescriptionId( id, index ) }
 								className="components-radio-control__option-description"
 							>
@@ -142,7 +140,15 @@ export function RadioControl(
 					</div>
 				) ) }
 			</VStack>
-		</BaseControl>
+			{ !! help && (
+				<StyledHelp
+					id={ generateHelpId( id ) }
+					className="components-base-control__help"
+				>
+					{ help }
+				</StyledHelp>
+			) }
+		</fieldset>
 	);
 }
 

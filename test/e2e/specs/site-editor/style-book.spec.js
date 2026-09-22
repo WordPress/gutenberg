@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -14,25 +11,25 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
-	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin, styleBook, page } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
 		).toBeVisible();
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
-			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).toBeDisabled();
-		await expect(
-			page.locator( 'role=button[name="Tools"i]' )
+			page.locator( 'role=button[name="Block Inserter"i]' )
 		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Document Overview"i]' )
@@ -43,9 +40,6 @@ test.describe( 'Style Book', () => {
 		await expect( page.locator( 'role=tab[name="Text"i]' ) ).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Media"i]' ) ).toBeVisible();
 		await expect(
-			page.locator( 'role=tab[name="Design"i]' )
-		).toBeVisible();
-		await expect(
 			page.locator( 'role=tab[name="Widgets"i]' )
 		).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
@@ -55,18 +49,14 @@ test.describe( 'Style Book', () => {
 			'[name="style-book-canvas"]'
 		);
 
+		// In the Overview tab, expect a button for the main typography section.
 		await expect(
 			styleBookIframe.getByRole( 'button', {
-				name: 'Open Headings styles in Styles panel',
-			} )
-		).toBeVisible();
-		await expect(
-			styleBookIframe.getByRole( 'button', {
-				name: 'Open Paragraph styles in Styles panel',
+				name: 'Open Typography styles in Styles panel',
 			} )
 		).toBeVisible();
 
-		await page.click( 'role=tab[name="Media"i]' );
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
 
 		await expect(
 			styleBookIframe.getByRole( 'button', {
@@ -86,13 +76,13 @@ test.describe( 'Style Book', () => {
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
 			.getByRole( 'button', {
-				name: 'Open Headings styles in Styles panel',
+				name: 'Open Image styles in Styles panel',
 			} )
 			.click();
 
 		await expect(
 			page.locator(
-				'role=region[name="Editor settings"i] >> role=heading[name="Heading"i]'
+				'role=region[name="Editor settings"i] >> role=heading[name="Image"i]'
 			)
 		).toBeVisible();
 	} );
@@ -100,21 +90,31 @@ test.describe( 'Style Book', () => {
 	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Blocks styles"]' );
-		await page.click( 'role=button[name="Heading block styles"]' );
+		await page
+			.getByRole( 'button', { name: 'Blocks', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Heading', exact: true } )
+			.click();
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
 			.getByRole( 'button', {
-				name: 'Open Quote styles in Styles panel',
+				name: 'Open Pullquote styles in Styles panel',
 			} )
 			.click();
 
-		await page.click( 'role=button[name="Back"]' );
-		await page.click( 'role=button[name="Back"]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await expect(
-			page.locator( 'role=button[name="Blocks styles"]' )
+			page.locator( 'role=button[name="Blocks"]' )
 		).toBeVisible();
 	} );
 
@@ -164,7 +164,10 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Back"]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -175,6 +178,33 @@ test.describe( 'Style Book', () => {
 			styleBookRegion,
 			'style book should be visible'
 		).toBeVisible();
+	} );
+
+	test( 'should reflect unsaved global styles edits', async ( { page } ) => {
+		const styleBookIframe = page.frameLocator(
+			'[name="style-book-canvas"]'
+		);
+		await expect(
+			styleBookIframe.getByRole( 'grid', { name: 'Examples of blocks' } )
+		).toBeVisible();
+
+		// Edit the user global styles without saving.
+		await page.evaluate( async () => {
+			const globalStylesId = await window.wp.data
+				.resolveSelect( 'core' )
+				.__experimentalGetCurrentGlobalStylesId();
+			window.wp.data
+				.dispatch( 'core' )
+				.editEntityRecord( 'root', 'globalStyles', globalStylesId, {
+					styles: { color: { background: '#ff0000' } },
+				} );
+		} );
+
+		// The Style Book should pick up the edit without a save or reload.
+		await expect( styleBookIframe.locator( 'body' ) ).toHaveCSS(
+			'background-color',
+			'rgb(255, 0, 0)'
+		);
 	} );
 
 	test( 'should allow opening the command menu from the header when open', async ( {
@@ -190,6 +220,30 @@ test.describe( 'Style Book', () => {
 		await expect(
 			page.getByLabel( 'Search commands and settings' )
 		).toBeVisible();
+	} );
+} );
+
+test.describe( 'Style Book for classic themes', () => {
+	test( 'Should show Style Book for a theme that supports it', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		// Make sure a classic theme is active.
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Go to site editor.
+		await admin.visitAdminPage( 'site-editor.php' );
+
+		// Open the Style Book.
+		await page.getByRole( 'button', { name: 'Styles' } ).click();
+
+		// Block examples should be visible.
+		const blockExamples = page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'grid', {
+				name: 'Examples of blocks',
+			} );
+		await expect( blockExamples ).toBeVisible();
 	} );
 } );
 

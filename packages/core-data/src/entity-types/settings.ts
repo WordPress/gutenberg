@@ -1,13 +1,9 @@
-/**
- * Internal dependencies
- */
 import type {
 	CommentingStatus,
 	Context,
 	OmitNevers,
 	PingStatus,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -22,6 +18,14 @@ declare module './base-entity-records' {
 			 * The ID of the page that should be displayed on the front page
 			 */
 			page_on_front: number;
+			/**
+			 * The ID of the page that should display the latest posts
+			 */
+			page_for_posts: number;
+			/**
+			 * The ID of the page that should be displayed as the privacy policy page
+			 */
+			page_for_privacy_policy: number;
 			/**
 			 * Site title.
 			 */

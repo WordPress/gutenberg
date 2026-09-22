@@ -1,0 +1,46 @@
+%red-focus-ring {
+	--focus-color: var(--wpds-color-stroke-interactive-error);
+}
+
+%red-error-border {
+	@extend %red-focus-ring;
+
+	border-color: var(--wpds-color-stroke-interactive-error);
+}
+
+.components-validated-control {
+	// For components based on InputBase
+	&:has(:is(input, select):invalid[data-validity-visible])
+	.components-input-control__backdrop {
+		@extend %red-error-border;
+	}
+
+	// For TextareaControl
+	textarea:invalid[data-validity-visible] {
+		@extend %red-error-border;
+	}
+}
+
+.components-validated-control__wrapper-with-error-delegate {
+	position: relative;
+
+	// For CustomSelectControl
+	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
+		@extend %red-error-border;
+	}
+
+	// For ContentEditableControl
+	&:has(input:invalid[data-validity-visible])
+	.components-validated-control__content-editable [role="textbox"] {
+		@extend %red-error-border;
+	}
+}
+
+.components-validated-control__error-delegate {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0;
+	pointer-events: none;
+}

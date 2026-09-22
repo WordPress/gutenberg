@@ -3,8 +3,7 @@
  * Gutenberg Coding Standards.
  *
  * @package gutenberg/gutenberg-coding-standards
- * @link    https://github.com/WordPress/gutenberg
- * @license https://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/WordPress/gutenberg/tree/trunk/test/php/gutenberg-coding-standards
  */
 
 namespace GutenbergCS\Gutenberg\Sniffs\NamingConventions;
@@ -147,7 +146,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * and non-digit characters with underscores.
 	 *
 	 * @param string $directory_name Directory name.
-	 *
 	 * @return string
 	 */
 	private static function sanitize_directory_name( $directory_name ) {
@@ -162,7 +160,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * Sanitize an array of values by trimming each element and removing empty elements.
 	 *
 	 * @param array $values The values being sanitized.
-	 *
 	 * @return array
 	 */
 	private static function sanitize( $values ) {

@@ -12,16 +12,15 @@
 		"ordered": {
 			"type": "boolean",
 			"default": false,
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"values": {
 			"type": "string",
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
-			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"type": {
 			"type": "string"
@@ -38,7 +37,14 @@
 	},
 	"supports": {
 		"anchor": true,
+		"align": [ "wide", "full" ],
 		"html": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -73,7 +79,11 @@
 		"__experimentalSlashInserter": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"listView": true
+	},
+	"selectors": {
+		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)"
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

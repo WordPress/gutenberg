@@ -1,37 +1,25 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ForwardedRef } from 'react';
-import { css } from '@emotion/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ToggleControlProps } from './types';
 import { HStack } from '../h-stack';
-import { useCx } from '../utils';
-import { space } from '../utils/space';
 
 function UnforwardedToggleControl(
 	{
-		__nextHasNoMarginBottom,
 		label,
 		checked,
 		help,
 		className,
 		onChange,
 		disabled,
+		// Prevent passing to internal component.
+		__nextHasNoMarginBottom: _,
+		...additionalProps
 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
@@ -40,13 +28,6 @@ function UnforwardedToggleControl(
 	}
 	const instanceId = useInstanceId( ToggleControl );
 	const id = `inspector-toggle-control-${ instanceId }`;
-
-	const cx = useCx();
-	const classes = cx(
-		'components-toggle-control',
-		className,
-		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
-	);
 
 	let describedBy, helpLabel;
 	if ( help ) {
@@ -75,8 +56,7 @@ function UnforwardedToggleControl(
 					</span>
 				)
 			}
-			className={ classes }
-			__nextHasNoMarginBottom
+			className={ clsx( 'components-toggle-control', className ) }
 		>
 			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
@@ -86,6 +66,7 @@ function UnforwardedToggleControl(
 					aria-describedby={ describedBy }
 					disabled={ disabled }
 					ref={ ref }
+					{ ...additionalProps }
 				/>
 				<FlexBlock
 					as="label"
@@ -122,5 +103,6 @@ function UnforwardedToggleControl(
  * ```
  */
 export const ToggleControl = forwardRef( UnforwardedToggleControl );
+ToggleControl.displayName = 'ToggleControl';
 
 export default ToggleControl;

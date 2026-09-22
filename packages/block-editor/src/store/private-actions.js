@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { Platform } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from './index';
-import { unlock } from '../lock-unlock';
+import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
+import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -23,6 +17,7 @@ const castArray = ( maybeArray ) =>
 const privateSettings = [
 	'inserterMediaCategories',
 	'blockInspectorAnimation',
+	'mediaSideload',
 ];
 
 /**
@@ -39,14 +34,30 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
-	// There are no plugins in the mobile apps, so there is no
-	// need to strip the experimental settings:
-	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
+	if ( stripExperimentalSettings ) {
 		cleanSettings = {};
-		for ( const key in settings ) {
+		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+				cleanSettings[ key ] = incomingSettings[ key ];
 			}
 		}
 	}
@@ -153,14 +164,44 @@ export const privateRemoveBlocks =
 			}
 		}
 
+		// When the removal covers all the inner blocks of an otherwise
+		// unmodified container, remove the container as well: an empty
+		// husk requiring a second removal is never the intention.
+		let removeRoot = false;
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		// A wrapper that only exists as a slot of a larger block (a column
+		// in columns) keeps its place: emptying it must not reshape the
+		// parent layout.
+		if (
+			rootClientId &&
+			! getBlockType( select.getBlockName( rootClientId ) )?.parent
+				?.length
+		) {
+			const blockOrder = select.getBlockOrder( rootClientId );
+			removeRoot =
+				blockOrder.length === clientIds.length &&
+				blockOrder.every( ( clientId ) =>
+					clientIds.includes( clientId )
+				) &&
+				isUnmodifiedBlock(
+					select.__unstableGetBlockWithoutInnerBlocks( rootClientId )
+				);
+		}
+
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
+			dispatch.selectPreviousBlock(
+				removeRoot ? rootClientId : clientIds[ 0 ],
+				selectPrevious
+			);
 		}
 
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
-			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			dispatch( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: removeRoot ? [ rootClientId ] : clientIds,
+			} );
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch( ensureDefaultBlock() );
@@ -259,19 +300,6 @@ export function setBlockRemovalRules( rules = false ) {
 	};
 }
 
-/**
- * Sets the client ID of the block settings menu that is currently open.
- *
- * @param {?string} clientId The block client ID.
- * @return {Object} Action object.
- */
-export function setOpenedBlockSettingsMenu( clientId ) {
-	return {
-		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-		clientId,
-	};
-}
-
 export function setStyleOverride( id, style ) {
 	return {
 		type: 'SET_STYLE_OVERRIDE',
@@ -299,29 +327,6 @@ export function setLastFocus( lastFocus = null ) {
 	return {
 		type: 'LAST_FOCUS',
 		lastFocus,
-	};
-}
-
-/**
- * Action that stops temporarily editing as blocks.
- *
- * @param {string} clientId The block's clientId.
- */
-export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch, registry } ) => {
-		const focusModeToRevert = unlock(
-			registry.select( blockEditorStore )
-		).getTemporarilyEditingFocusModeToRevert();
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateSettings( { focusMode: focusModeToRevert } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks();
 	};
 }
 
@@ -360,25 +365,255 @@ export function expandBlock( clientId ) {
 }
 
 /**
- * Temporarily modify/unlock the content-only block for editions.
+ * @param {Object} value
+ * @param {string} value.rootClientId The root client ID to insert at.
+ * @param {number} value.index        The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setInsertionPoint( value ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		value,
+	};
+}
+
+/**
+ * Mark a contentOnly section as being edited.
  *
  * @param {string} clientId The client id of the block.
  */
-export const modifyContentLockBlock =
-	( clientId ) =>
-	( { select, dispatch } ) => {
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: undefined,
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: false,
-		} );
-		const focusModeToRevert = select.getSettings().focusMode;
-		dispatch.updateSettings( { focusMode: true } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks(
-			clientId,
-			focusModeToRevert
-		);
+export function editContentOnlySection( clientId ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
 	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
+
+/**
+ * Sets the zoom level.
+ *
+ * @param {number} zoom the new zoom level
+ * @return {Object} Action object.
+ */
+export const setZoomLevel =
+	( zoom = 100 ) =>
+	( { select, dispatch } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
+		if ( zoom !== 100 ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			const sectionRootClientId = select.getSectionRootClientId();
+
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
+				}
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
+
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		}
+
+		dispatch( {
+			type: 'SET_ZOOM_LEVEL',
+			zoom,
+		} );
+	};
+
+/**
+ * Resets the Zoom state.
+ * @return {Object} Action object.
+ */
+export function resetZoomLevel() {
+	return {
+		type: 'RESET_ZOOM_LEVEL',
+	};
+}
+
+/**
+ * Action that toggles the spotlighted block state.
+ *
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
+ * @return {Object} Action object.
+ */
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+	return {
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
+		clientId,
+		hasBlockSpotlight,
+	};
+}
+
+/**
+ * Opens the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function openListViewContentPanel() {
+	return {
+		type: 'OPEN_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Closes the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function closeListViewContentPanel() {
+	return {
+		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Returns an action object used to open the viewport modal
+ * for the given client IDs.
+ *
+ * @param {string[]} clientIds Client IDs of blocks to configure viewport settings for.
+ * @return {Object} Action object.
+ */
+export function showViewportModal( clientIds ) {
+	return {
+		type: 'SHOW_VIEWPORT_MODAL',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object used to close the viewport modal.
+ *
+ * @return {Object} Action object.
+ */
+export function hideViewportModal() {
+	return {
+		type: 'HIDE_VIEWPORT_MODAL',
+	};
+}
+
+/**
+ * Requests to open a specific inspector tab, optionally with additional options.
+ * This action signals intent to switch to a particular tab in the block inspector.
+ *
+ * @param {string} tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
+ * @param {Object} [options]           Optional configuration.
+ * @param {string} [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
+ *
+ * @return {Object} Action object.
+ */
+export function requestInspectorTab( tabName, options = {} ) {
+	return {
+		type: 'REQUEST_INSPECTOR_TAB',
+		tabName,
+		options,
+	};
+}
+
+/**
+ * Clears the requested inspector tab state after it has been handled.
+ *
+ * @return {Object} Action object.
+ */
+export function clearRequestedInspectorTab() {
+	return {
+		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}
+
+/**
+ * Sets the selected style state for a block's style controls.
+ *
+ * @param {string} clientId The block client ID.
+ * @param {Object} value    The selected state value.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleState( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets whether the selected style state is shown on the canvas.
+ *
+ * @param {string}  clientId The block client ID.
+ * @param {boolean} value    Whether to show the selected state on the canvas.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ * Driven by the editor's device preview while Responsive editing is enabled.
+ *
+ * @param {string} viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
+ *
+ * @return {Object} Action object.
+ */
+export function setStyleStateViewport( viewport ) {
+	return {
+		type: 'SET_STYLE_STATE_VIEWPORT',
+		viewport,
+	};
+}
+
+/**
+ * Sets whether Responsive editing is enabled. When enabled, the device preview
+ * also drives which viewport block style edits are applied to. Session-only.
+ *
+ * @param {boolean} enabled Whether Responsive editing is enabled.
+ *
+ * @return {Object} Action object.
+ */
+export function setResponsiveEditing( enabled ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
+	};
+}

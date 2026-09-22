@@ -4,8 +4,8 @@
 	margin-bottom: 1.75em;
 	color: currentColor;
 
-	cite,
-	footer,
+	:where(cite),
+	:where(footer),
 	&__citation {
 		color: currentColor;
 		text-transform: uppercase;

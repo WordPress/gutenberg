@@ -8,13 +8,9 @@ export const EDIT_MERGE_PROPERTIES = new Set( [ 'meta' ] );
 
 /**
  * Constant for the store module (or reducer) key.
- *
- * @type {string}
  */
 export const STORE_NAME = 'core/editor';
 
-export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
-export const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 export const ONE_MINUTE_IN_MS = 60 * 1000;
 export const AUTOSAVE_PROPERTIES = [ 'title', 'excerpt', 'content' ];
@@ -23,6 +19,7 @@ export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const PATTERN_POST_TYPE = 'wp_block';
 export const NAVIGATION_POST_TYPE = 'wp_navigation';
+export const ATTACHMENT_POST_TYPE = 'attachment';
 export const TEMPLATE_ORIGINS = {
 	custom: 'custom',
 	theme: 'theme',
@@ -33,4 +30,10 @@ export const GLOBAL_POST_TYPES = [
 	...TEMPLATE_POST_TYPES,
 	'wp_block',
 	'wp_navigation',
+];
+export const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
 ];

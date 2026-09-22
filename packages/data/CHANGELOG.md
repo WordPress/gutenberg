@@ -2,6 +2,140 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Optimized store listener registration and execution ([#82842](https://github.com/WordPress/gutenberg/pull/82842)).
+-   Resolvers can define `getResolutionArgs` to derive the resolution arguments from the selector arguments, letting several selector calls share a single resolution ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
+-   Stabilize the `__unstableNormalizeArgs` selector property as `normalizeArgs`. The old name still works ([#83067](https://github.com/WordPress/gutenberg/pull/83067)).
+-   Optimized `registry.subscribe` behavior when the subscribed store doesn't yet exist ([#83346](https://github.com/WordPress/gutenberg/pull/83346)).
+
+## 10.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove unused dependency `use-memo-one` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 10.54.0 (2026-08-26)
+
+## 10.53.0 (2026-08-12)
+
+
+## 10.52.0 (2026-07-29)
+
+## 10.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 10.50.0 (2026-07-01)
+
+## 10.49.0 (2026-06-24)
+
+## 10.48.1 (2026-06-16)
+
+## 10.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 10.47.0 (2026-05-27)
+
+## 10.46.0 (2026-05-14)
+
+## 10.45.0 (2026-04-29)
+
+### New Features
+
+-   Export `keyedReducer` higher-order reducer helper, consolidating duplicated copies previously maintained in `@wordpress/core-data` and `@wordpress/notices` ([#77364](https://github.com/WordPress/gutenberg/pull/77364)).
+
+## 10.44.0 (2026-04-15)
+
+## 10.43.0 (2026-04-01)
+
+## 10.42.0 (2026-03-18)
+
+## 10.41.0 (2026-03-04)
+
+## 10.40.0 (2026-02-18)
+
+## 10.39.0 (2026-01-29)
+
+## 10.38.0 (2026-01-16)
+
+## 10.36.0 (2025-11-26)
+
+## 10.35.0 (2025-11-12)
+
+## 10.34.0 (2025-10-29)
+
+## 10.33.0 (2025-10-17)
+
+## 10.32.0 (2025-10-01)
+
+## 10.31.0 (2025-09-17)
+
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+## 10.28.0 (2025-08-07)
+
+## 10.27.0 (2025-07-23)
+
+## 10.26.0 (2025-06-25)
+
+### Bug Fixes
+
+-   Add support for private selectors to `resolveSelect` and `suspendSelect` ([#52036](https://github.com/WordPress/gutenberg/pull/52036)).
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
+## 10.23.0 (2025-05-07)
+
+## 10.22.0 (2025-04-11)
+
+## 10.21.0 (2025-03-27)
+
+## 10.20.0 (2025-03-13)
+
+## 10.19.0 (2025-02-28)
+
+## 10.18.0 (2025-02-12)
+
+## 10.17.0 (2025-01-29)
+
+## 10.16.0 (2025-01-15)
+
+## 10.15.0 (2025-01-02)
+
+## 10.14.0 (2024-12-11)
+
+## 10.13.0 (2024-11-27)
+
+### Enhancements
+
+-   Upgrade `redux` dependency to `^5.0.1` ([#66966](https://github.com/WordPress/gutenberg/pull/66966))
+
+## 10.12.0 (2024-11-16)
+
+## 10.11.0 (2024-10-30)
+
+## 10.10.0 (2024-10-16)
+
+## 10.9.0 (2024-10-03)
+
+## 10.8.0 (2024-09-19)
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
 ## 10.4.0 (2024-07-24)
 
 ## 10.3.0 (2024-07-10)

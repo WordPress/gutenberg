@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { Select, StyledInputBase } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -42,11 +30,15 @@ function SelectOptions( {
 	} );
 }
 
-function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+function UnforwardedSelectControl< V extends string >(
+	props: WordPressComponentProps< SelectControlProps< V >, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
+		// Prevent passing legacy props to internal components.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
 		className,
 		disabled = false,
 		help,
@@ -63,14 +55,11 @@ function UnforwardedSelectControl(
 		prefix,
 		suffix,
 		variant = 'default',
-		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom = false,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
-	// Disable reason: A select with an onchange throws a warning.
 	if ( ! options?.length && ! children ) {
 		return null;
 	}
@@ -82,24 +71,21 @@ function UnforwardedSelectControl(
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
-			const newValues = selectedOptions.map( ( { value } ) => value );
+			const newValues = selectedOptions.map(
+				( { value } ) => value as V
+			);
 			props.onChange?.( newValues, { event } );
 			return;
 		}
 
-		props.onChange?.( event.target.value, { event } );
+		props.onChange?.( event.target.value as V, { event } );
 	};
 
 	const classes = clsx( 'components-select-control', className );
 
 	return (
-		<BaseControl
-			help={ help }
-			id={ id }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-		>
+		<BaseControl help={ help } id={ id } className={ classes }>
 			<StyledInputBase
-				className={ classes }
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
@@ -115,11 +101,9 @@ function UnforwardedSelectControl(
 					variant === 'minimal' ? 'auto' : undefined
 				}
 				variant={ variant }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
 					{ ...restProps }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
@@ -164,6 +148,17 @@ function UnforwardedSelectControl(
  * };
  * ```
  */
-export const SelectControl = forwardRef( UnforwardedSelectControl );
+export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
+	V extends string,
+>(
+	props: WordPressComponentProps<
+		SelectControlProps< V >,
+		'select',
+		false
+	> & { ref?: React.Ref< HTMLSelectElement > }
+) => React.JSX.Element | null;
+
+// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
+SelectControl.displayName = 'SelectControl';
 
 export default SelectControl;

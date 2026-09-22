@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
 
 /**
@@ -75,7 +72,7 @@ export const getFormatTypes = createSelector(
  * };
  * ```
  *
- * @return {Object?} Format type.
+ * @return {?Object} Format type.
  */
 export function getFormatType( state, name ) {
 	return state.formatTypes[ name ];

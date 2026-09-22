@@ -1,16 +1,8 @@
-/**
- * WordPress dependencies
- */
-
+import { useStoreState } from '@ariakit/react';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import warning from '@wordpress/warning';
 import type { TabPanelProps } from './types';
 import { TabPanel as StyledTabPanel } from './styles';
-
-import warning from '@wordpress/warning';
 import { useTabsContext } from './context';
 import type { WordPressComponentProps } from '../context';
 
@@ -22,13 +14,13 @@ export const TabPanel = forwardRef<
 	ref
 ) {
 	const context = useTabsContext();
+	const selectedId = useStoreState( context?.store, 'selectedId' );
 	if ( ! context ) {
 		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
 	const { store, instanceId } = context;
 	const instancedTabId = `${ instanceId }-${ tabId }`;
-	const selectedId = store.useState( ( state ) => state.selectedId );
 
 	return (
 		<StyledTabPanel

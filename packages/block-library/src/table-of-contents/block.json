@@ -14,21 +14,37 @@
 			"items": {
 				"type": "object"
 			},
-			"default": []
+			"default": [],
+			"role": "local"
 		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
 			"default": false
+		},
+		"maxLevel": {
+			"type": "number"
+		},
+		"ordered": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
+		"anchor": true,
+		"ariaLabel": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"text": true,
 			"background": true,
 			"gradients": true,
 			"link": true
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -62,6 +78,5 @@
 			}
 		}
 	},
-	"example": {},
 	"style": "wp-block-table-of-contents"
 }

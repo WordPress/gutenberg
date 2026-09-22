@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "22.4.0",
+	"version": "25.0.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -20,23 +20,41 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": "^20.19.0 || >=22.13.0"
 	},
 	"files": [
 		"CHANGELOG.md",
 		"LICENSE",
 		"README.md",
 		"index.js",
-		"scss.js"
+		"scss.js",
+		"scss-stylistic.js",
+		"stylistic.js"
 	],
+	"type": "module",
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./scss": "./scss.js",
+		"./scss-stylistic": "./scss-stylistic.js",
+		"./stylistic": "./stylistic.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
-		"stylelint-config-recommended": "^6.0.0",
-		"stylelint-config-recommended-scss": "^5.0.2"
+		"@stylistic/stylelint-plugin": "^5.2.1",
+		"@wordpress/theme": "file:../theme",
+		"stylelint-config-recommended": "^18.0.0",
+		"stylelint-config-recommended-scss": "^17.0.1"
+	},
+	"devDependencies": {
+		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
+		"stylelint": "^17.14.1",
+		"stylelint-scss": "^7.2.0",
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
-		"stylelint": "^14.2"
+		"stylelint": "^17.14.1",
+		"stylelint-scss": "^7.2.0"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

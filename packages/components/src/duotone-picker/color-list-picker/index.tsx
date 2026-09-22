@@ -1,20 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { swatch } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useInstanceId } from '@wordpress/compose';
 import Button from '../../button';
 import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
 import Icon from '../../icon';
-import { HStack } from '../../h-stack';
 import type { ColorListPickerProps, ColorOptionProps } from './types';
-import { useInstanceId } from '@wordpress/compose';
 
 function ColorOption( {
 	label,
@@ -32,23 +24,24 @@ function ColorOption( {
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="components-color-list-picker__swatch-button"
+				id={ labelId }
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 				aria-expanded={ isOpen }
 				aria-controls={ contentId }
-			>
-				<HStack justify="flex-start" spacing={ 2 }>
-					{ value ? (
+				icon={
+					value ? (
 						<ColorIndicator
 							colorValue={ value }
 							className="components-color-list-picker__swatch-color"
 						/>
 					) : (
 						<Icon icon={ swatch } />
-					) }
-					<span id={ labelId }>{ label }</span>
-				</HStack>
-			</Button>
+					)
+				}
+				text={ label }
+			/>
 			<div
 				role="group"
 				id={ contentId }
