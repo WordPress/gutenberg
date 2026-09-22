@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83241](https://github.com/WordPress/gutenberg/pull/83241)).
+-   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83315](https://github.com/WordPress/gutenberg/pull/83315)).
 
 ### Bug Fixes
 
