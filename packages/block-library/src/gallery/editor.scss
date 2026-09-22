@@ -150,10 +150,14 @@
 	}
 }
 
-// In static mode the Source panel is a PanelBody with no grid gap, so space the
-// "Order by" control from the entry button above it when both render.
-.wp-block-gallery__source-settings + .wp-block-gallery__source-order {
-	margin-top: $grid-unit-20;
+// The static gallery's "Order by" control is a plain (non-ToolsPanelItem) child
+// of the Settings ToolsPanel, so span both grid columns rather than defaulting
+// to one, and drop the block inspector's default bottom margin on base controls
+// (which ToolsPanelItem strips for its own children) so the grid gap alone
+// spaces it from the next row.
+.wp-block-gallery__sort-images.wp-block-gallery__sort-images {
+	grid-column: 1 / -1;
+	margin-bottom: 0;
 }
 
 // The "showing the first N" notice is a plain (non-ToolsPanelItem) child of the

@@ -5,7 +5,6 @@ import {
 	Notice,
 	PanelBody,
 	Placeholder,
-	SelectControl as WCSelectControl,
 	Spinner,
 	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
@@ -21,67 +20,8 @@ import {
 import { sharedIcon } from './shared-icon';
 import { isGalleryFlexLayout } from './shared';
 import { Caption } from '../utils/caption';
-import {
-	DEFAULT_ORDERBY,
-	DEFAULT_ORDER,
-	MAX_IMAGES,
-	ORDER_OPTIONS,
-} from './dynamic-source';
-
-const CUSTOM_ORDER = 'custom';
-
-/**
- * Options for a static gallery's "Order by" control: the shared orders plus a
- * "Custom" entry the select can display when the images are in none of them.
- * It's disabled because it isn't an order to apply — the user gets there by
- * dragging images — so it only ever reflects state.
- */
-const STATIC_ORDER_OPTIONS = [
-	{ label: __( 'Custom' ), value: CUSTOM_ORDER, disabled: true },
-	...ORDER_OPTIONS,
-];
-
-/**
- * "Order by" control for a gallery, mirroring the Query Loop block's
- * `OrderControl`: a single `SelectControl` whose value composites `orderby` and
- * `order`, split apart again on change.
- *
- * @param {Object}   props
- * @param {?string}  props.orderby     Current `orderby` value, or `null` for a custom order.
- * @param {?string}  props.order       Current `order` value (`asc`/`desc`).
- * @param {Function} props.onChange    Called with `{ orderby, order }` on change.
- * @param {boolean}  props.allowCustom Whether a custom (manual) order can be shown.
- * @param {string}   props.help        Help text shown below the control.
- * @param {boolean}  props.disabled    Whether the control is disabled.
- * @param {string}   props.className   Class name for the control's wrapper.
- */
-function OrderControl( {
-	orderby,
-	order,
-	onChange,
-	allowCustom = false,
-	help,
-	disabled,
-	className,
-} ) {
-	return (
-		<WCSelectControl
-			className={ className }
-			label={ __( 'Order by' ) }
-			value={ orderby ? `${ orderby }/${ order }` : CUSTOM_ORDER }
-			options={ allowCustom ? STATIC_ORDER_OPTIONS : ORDER_OPTIONS }
-			help={ help }
-			disabled={ disabled }
-			onChange={ ( value ) => {
-				if ( value === CUSTOM_ORDER ) {
-					return;
-				}
-				const [ newOrderby, newOrder ] = value.split( '/' );
-				onChange( { orderby: newOrderby, order: newOrder } );
-			} }
-		/>
-	);
-}
+import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
+import { SourceOrderControl } from './order-controls';
 
 /**
  * Confirmation for leaving dynamic mode, shown from both the block toolbar and
@@ -118,26 +58,19 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
  *
  * In dynamic mode it shows the resolved source, a control to detach the gallery
  * from it, and the source ordering. In static mode it offers the entry point
- * into dynamic mode and an "Order by" control that sorts the gallery's images
- * in place. Either mode change is a one-way change, so both are behind a
+ * into dynamic mode. Either direction is a one-way change, so both are behind a
  * confirmation dialog this panel owns. Rendered inside the block's
  * `InspectorControls`, alongside the Settings panel.
  *
- * @param {Object}   props
- * @param {Object}   props.dynamic           The `useDynamicGallery` result.
- * @param {Object}   props.dropdownMenuProps Shared ToolsPanel dropdown menu props.
- * @param {boolean}  props.hasImages         Whether the gallery has manually-added images.
- * @param {?Object}  props.currentOrder      The order the static images are in (`{ orderby, order }`), or `null` for a custom order.
- * @param {boolean}  props.canSortImages     Whether the static images can be sorted right now.
- * @param {Function} props.onSortImages      Called with `{ orderby, order }` to sort the static images.
+ * @param {Object}  props
+ * @param {Object}  props.dynamic           The `useDynamicGallery` result.
+ * @param {Object}  props.dropdownMenuProps Shared ToolsPanel dropdown menu props.
+ * @param {boolean} props.hasImages         Whether the gallery has manually-added images.
  */
 export function GallerySourcePanel( {
 	dynamic,
 	dropdownMenuProps,
 	hasImages,
-	currentOrder,
-	canSortImages,
-	onSortImages,
 } ) {
 	const {
 		dynamicContent,
@@ -221,7 +154,7 @@ export function GallerySourcePanel( {
 							setSourceOrder( undefined, undefined )
 						}
 					>
-						<OrderControl
+						<SourceOrderControl
 							orderby={ sourceOrderby }
 							order={ sourceOrder }
 							onChange={ ( { orderby, order } ) =>
@@ -243,53 +176,36 @@ export function GallerySourcePanel( {
 		);
 	}
 
-	// In static mode the entry into dynamic mode is hidden when there's no post
-	// type to preview against. This is intentionally stricter than the
-	// placeholder's entry button (see `edit.jsx`), which stays available
-	// anywhere because the source resolves at render time. Sorting doesn't
-	// depend on that context, so the panel still renders for it when there are
-	// images; with neither, there's nothing to show.
-	if ( ! canUseDynamicSource && ! hasImages ) {
+	// In static mode this panel is just an entry into dynamic mode, so hide it
+	// when there's no post type to preview against. This is intentionally
+	// stricter than the placeholder's entry button (see `edit.jsx`), which stays
+	// available anywhere because the source resolves at render time.
+	if ( ! canUseDynamicSource ) {
 		return null;
 	}
 
 	return (
 		<>
 			<PanelBody title={ __( 'Source' ) }>
-				{ canUseDynamicSource && (
-					<div className="wp-block-gallery__source-settings">
-						{ /*
-						 * Hardcoded on purpose: this single-source entry button (and
-						 * its confirm dialog below) is temporary. Once more sources
-						 * exist it becomes a "Choose source" select whose options read
-						 * from each source descriptor's `title`, with help text
-						 * carrying the per-source explanation these strings do today.
-						 */ }
-						<p className="wp-block-gallery__source-description">
-							{ __( 'Images added to the gallery.' ) }
-						</p>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ requestEnableDynamicMode }
-						>
-							{ __( 'Use attached images' ) }
-						</Button>
-					</div>
-				) }
-				{ hasImages && (
-					<OrderControl
-						className="wp-block-gallery__source-order"
-						allowCustom
-						orderby={ currentOrder?.orderby ?? null }
-						order={ currentOrder?.order ?? null }
-						disabled={ ! canSortImages }
-						help={ __(
-							'Sorts the images now. You can still drag them into a different order.'
-						) }
-						onChange={ onSortImages }
-					/>
-				) }
+				<div className="wp-block-gallery__source-settings">
+					{ /*
+					 * Hardcoded on purpose: this single-source entry button (and
+					 * its confirm dialog below) is temporary. Once more sources
+					 * exist it becomes a "Choose source" select whose options read
+					 * from each source descriptor's `title`, with help text
+					 * carrying the per-source explanation these strings do today.
+					 */ }
+					<p className="wp-block-gallery__source-description">
+						{ __( 'Images added to the gallery.' ) }
+					</p>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ requestEnableDynamicMode }
+					>
+						{ __( 'Use attached images' ) }
+					</Button>
+				</div>
 			</PanelBody>
 			{ isConfirming && (
 				<ConfirmDialog

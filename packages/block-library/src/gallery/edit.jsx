@@ -23,7 +23,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -64,8 +64,13 @@ import useGetMedia from './use-get-media';
 import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
+import { SortImagesControl } from './order-controls';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
-import { getCurrentOrder, sortImageBlocks } from './order-images';
+import {
+	getCurrentOrder,
+	hasSortableImages,
+	sortImageBlocks,
+} from './order-images';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -315,16 +320,15 @@ export default function GalleryEdit( props ) {
 	const isDynamic = !! attributes.dynamicContent;
 
 	// The order the static images are in, derived rather than stored so the
-	// "Order by" control reads honestly after images are dragged around.
+	// "Order by" control reads honestly after images are dragged around. The
+	// last order applied from the control is only a tie-break for detection
+	// (see `getCurrentOrder`), so it's local state, never an attribute.
+	const [ lastAppliedOrder, setLastAppliedOrder ] = useState( null );
 	const currentOrder = useMemo(
-		() => getCurrentOrder( innerBlockImages, imageData ),
-		[ innerBlockImages, imageData ]
+		() => getCurrentOrder( innerBlockImages, imageData, lastAppliedOrder ),
+		[ innerBlockImages, imageData, lastAppliedOrder ]
 	);
-	// Sorting needs at least two placeable images and their attachment records;
-	// until the media resolves there's nothing to sort by.
-	const canSortImages =
-		images.filter( ( image ) => image.id !== undefined ).length > 1 &&
-		imageData.length > 0;
+	const canSortImages = hasSortableImages( innerBlockImages, imageData );
 
 	// Dynamic mode (resolving images from a source instead of inner blocks):
 	// source resolution, the editor-preview blocks, and the mode/ordering
@@ -570,6 +574,7 @@ export default function GalleryEdit( props ) {
 				order
 			)
 		);
+		setLastAppliedOrder( { orderby, order } );
 	}
 
 	function onUploadError( message ) {
@@ -891,9 +896,6 @@ export default function GalleryEdit( props ) {
 						dynamic={ dynamic }
 						dropdownMenuProps={ dropdownMenuProps }
 						hasImages={ hasImages }
-						currentOrder={ currentOrder }
-						canSortImages={ canSortImages }
-						onSortImages={ sortImages }
 					/>
 				) }
 				<ToolsPanel
@@ -1023,6 +1025,17 @@ export default function GalleryEdit( props ) {
 								onChange={ toggleRandomOrder }
 							/>
 						</ToolsPanelItem>
+					) }
+					{ ! isViewportStyleState && ! isDynamic && (
+						// A one-off action rather than a value, so it's a plain
+						// child of the panel (like the Source controls) instead
+						// of a resettable ToolsPanelItem. A dynamic gallery
+						// orders its images from the Source panel instead.
+						<SortImagesControl
+							currentOrder={ currentOrder }
+							disabled={ ! canSortImages }
+							onSort={ sortImages }
+						/>
 					) }
 					{ ! isViewportStyleState && hasLinkTo && (
 						<ToolsPanelItem
