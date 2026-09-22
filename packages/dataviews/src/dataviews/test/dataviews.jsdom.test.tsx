@@ -338,6 +338,177 @@ describe( 'DataViews component', () => {
 		] );
 	} );
 
+	it( 'renders independent continuations after loaded subtrees', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const onChangeView = vi.fn();
+		const hierarchyData = [
+			{ id: 3, title: 'Grandchild' },
+			{ id: 2, title: 'Child B' },
+			{ id: 1, title: 'Parent A' },
+			{ id: 4, title: 'Root D' },
+		];
+		const renderDataView = (
+			items: typeof hierarchyData,
+			hasParentContinuation = true
+		) => (
+			<DataViewWrapper
+				actions={ actions }
+				data={ items }
+				getItemParentId={ ( item ) => {
+					if ( item.id === 2 || item.id === 5 ) {
+						return 1;
+					}
+					return item.id === 3 ? 2 : undefined;
+				} }
+				getItemHasChildren={ ( item ) => item.id < 3 }
+				expandedItemIds={ [ '1', '2' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( parentId ) => {
+						if ( parentId === '2' ) {
+							return { hasMore: true, isLoading: true };
+						}
+						return {
+							hasMore:
+								parentId === '1' ? hasParentContinuation : true,
+						};
+					},
+					onLoadMore,
+				} }
+				onChangeView={ onChangeView }
+				paginationInfo={ { totalItems: 100, totalPages: 10 } }
+				view={ {
+					...DEFAULT_VIEW,
+					page: 15,
+					fields: [],
+					groupBy: { field: 'missing', direction: 'asc' },
+					showLevels: true,
+					titleField: 'title',
+					infiniteScrollEnabled: true,
+				} }
+			/>
+		);
+		const { rerender } = render( renderDataView( hierarchyData ) );
+
+		const rows = screen.getAllByRole( 'row' );
+		expect( rows[ 1 ] ).toHaveTextContent( 'Parent A' );
+		expect( rows[ 2 ] ).toHaveTextContent( 'Child B' );
+		expect( rows[ 3 ] ).toHaveTextContent( 'Grandchild' );
+		expect( rows[ 4 ] ).toHaveTextContent( 'Loading…' );
+		expect( rows[ 5 ] ).toHaveTextContent( 'Load more' );
+		expect( rows[ 6 ] ).toHaveTextContent( 'Root D' );
+		expect( rows[ 7 ] ).toHaveTextContent( 'Load more' );
+
+		const childContinuation = screen.getByRole( 'button', {
+			name: 'Loading children of Child B',
+		} );
+		expect( childContinuation ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( childContinuation ).toHaveAttribute( 'aria-busy', 'true' );
+		const parentContinuation = screen.getByRole( 'button', {
+			name: 'Load more children of Parent A',
+		} );
+		await user.click( parentContinuation );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Load more items' } )
+		);
+		expect( onLoadMore.mock.calls ).toEqual( [ [ '1' ], [ null ] ] );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Next page' } )
+		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'table' ) ).toBeInTheDocument();
+		expect( screen.queryByRole( 'article' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( '4 Items' ) ).toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: 'View options' } )
+		);
+		expect(
+			screen.queryByText( 'Items per page' )
+		).not.toBeInTheDocument();
+		expect( onChangeView ).not.toHaveBeenCalled();
+
+		parentContinuation.focus();
+		rerender(
+			renderDataView( [
+				...hierarchyData,
+				{ id: 5, title: 'New child' },
+			] )
+		);
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Load more children of Parent A',
+			} )
+		).toHaveFocus();
+
+		rerender(
+			renderDataView(
+				[ ...hierarchyData, { id: 5, title: 'New child' } ],
+				false
+			)
+		);
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Collapse Parent A',
+				} )
+			).toHaveFocus()
+		);
+	} );
+
+	it( 'keeps an empty root error retryable', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const hierarchyProps = {
+			data: [],
+			getItemParentId: () => undefined,
+			getItemHasChildren: () => undefined,
+			expandedItemIds: [],
+			onChangeExpandedItemIds: vi.fn(),
+			paginationInfo: { totalItems: 0, totalPages: 0 },
+			view: {
+				...DEFAULT_VIEW,
+				fields: [],
+				showLevels: true,
+				titleField: 'title',
+			},
+		};
+		const { rerender } = render(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( {
+						hasMore: false,
+						error: 'Pages could not be loaded.',
+					} ),
+					onLoadMore,
+				} }
+			/>
+		);
+
+		expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+			'Pages could not be loaded.'
+		);
+		expect( screen.queryByText( 'No results' ) ).not.toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Retry loading items' } )
+		);
+		expect( onLoadMore ).toHaveBeenCalledWith( null );
+
+		rerender(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( { hasMore: false } ),
+					onLoadMore,
+				} }
+			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'status' ) ).toHaveFocus()
+		);
+	} );
+
 	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
 		render(
 			<DataViewWrapper

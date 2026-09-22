@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   DataViews: Add controlled per-level pagination to hierarchical tables ([#83320](https://github.com/WordPress/gutenberg/pull/83320)).
 -   DataViews: Add controlled expand/collapse controls to hierarchical tables ([#83316](https://github.com/WordPress/gutenberg/pull/83316)).
 -   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83315](https://github.com/WordPress/gutenberg/pull/83315)).
 

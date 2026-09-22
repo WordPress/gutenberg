@@ -152,6 +152,15 @@ The ids of expanded items in a hierarchical table. DataViews does not store thes
 
 A function called with the next list of expanded item ids when a row or header disclosure control is used.
 
+#### `hierarchyPagination`: `Object`
+
+Controlled per-level loading for an ungrouped hierarchical table. It is enabled together with `getItemParentId`, `getItemHasChildren`, `expandedItemIds`, and `onChangeExpandedItemIds` when `view.showLevels` is true.
+
+-   `getPaginationInfo( parentId )` returns `{ hasMore, isLoading?, error? }` for the next batch of a parent's direct children. `null` identifies the root level. `error` must be a normalized, user-facing string.
+-   `onLoadMore( parentId )` is called when a load-more or retry control is used.
+
+DataViews renders the controls but does not fetch, merge, or deduplicate items. The consumer supplies the accumulated loaded items and owns request cancellation and stale responses. While enabled, this replaces flat pagination, infinite scroll, and the items-per-page control without modifying the persisted `view`.
+
 #### `fields`: `Object[]`
 
 The fields describe the visible items for each record in the dataset and how they behave (how to sort them, display them, etc.). See "Fields API" for a description of every property.
@@ -811,6 +820,7 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `getItemHasChildren`
 -   `expandedItemIds`
 -   `onChangeExpandedItemIds`
+-   `hierarchyPagination`
 -   `header`
 
 ## `DataForm`
