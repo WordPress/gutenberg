@@ -121,7 +121,7 @@ Prompt visitors to take action with a group of button-style links.
 -	**Name:** [core/buttons](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
@@ -138,7 +138,7 @@ Display a list of all terms of a given taxonomy.
 
 -	**Name:** [core/categories](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
@@ -157,7 +157,7 @@ A single column within a columns block.
 -	**Name:** [core/column](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-column/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/columns
--	**Supports:** allowedBlocks, anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** allowedBlocks, anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** templateLock, verticalAlignment, width
 
 ## Columns
@@ -217,7 +217,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** [core/comment-edit-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-edit-link/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** linkTarget
 
 ## Comment Reply Link
@@ -244,7 +244,7 @@ An advanced block that allows displaying post comments using different visual co
 
 -	**Name:** [core/comments](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** legacy, tagName
 
 ## Comments Pagination
@@ -265,7 +265,7 @@ Displays the next comment's page link.
 -	**Name:** [core/comments-pagination-next](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-next/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/comments-pagination
--	**Supports:** anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Comments Page Numbers
@@ -275,7 +275,7 @@ Displays a list of page numbers for comments pagination.
 -	**Name:** [core/comments-pagination-numbers](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-numbers/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/comments-pagination
--	**Supports:** anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Comments Previous Page
 
@@ -385,7 +385,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 -	**Name:** [core/home-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-home-link/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/navigation
--	**Supports:** anchor, interactivity (clientNavigation), shadow, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), interactivity (clientNavigation), shadow, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, label, opensInNewTab
 
 ## Custom HTML
@@ -421,7 +421,7 @@ Display a list of your most recent comments.
 
 -	**Name:** [core/latest-comments](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-comments/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** commentsToShow, displayAvatar, displayContent, displayDate
 
 ## Latest Posts
@@ -469,7 +469,7 @@ Display mathematical notation using LaTeX.
 
 -	**Name:** [core/math](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-math/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** latex, mathML
 
 ## Media & Text
@@ -657,7 +657,7 @@ Display a post's comments form.
 
 -	**Name:** [core/post-comments-form](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-form/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comments Link
 
@@ -736,7 +736,7 @@ Show minutes required to finish reading the post. Can also show a word count.
 
 -	**Name:** [core/post-time-to-read](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-time-to-read/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** averageReadingSpeed, displayAsRange, displayMode
 
 ## Title
@@ -792,7 +792,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable.
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
 -	**Allowed Blocks:** core/query-pagination-previous, core/query-pagination-numbers, core/query-pagination-next
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, anchor, background (gradient), color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
 ## Next Page
@@ -812,7 +812,7 @@ Displays a list of page numbers for pagination.
 -	**Name:** [core/query-pagination-numbers](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-numbers/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/query-pagination
--	**Supports:** anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** midSize
 
 ## Previous Page
@@ -841,7 +841,7 @@ Display the total number of results in a query.
 -	**Name:** [core/query-total](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-total/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align (full, wide), anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType
 
 ## Quote
@@ -913,7 +913,7 @@ Describe in a few words what this site is about. This is important for search re
 
 -	**Name:** [core/site-tagline](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-tagline/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, text), contentRole, interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), contentRole, interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** level, levelOptions
 
 ## Site Title
@@ -922,7 +922,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 -	**Name:** [core/site-title](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-title/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget
 
 ## Social Icon
@@ -971,7 +971,7 @@ Content for a tab in a tabbed interface.
 -	**Name:** [core/tab-panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
--	**Supports:** anchor, color (background, text), layout, shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, text), layout, shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
 -	**Attributes:** label
 
 ## Tab Panels
@@ -982,7 +982,7 @@ Container for tab panel content in a tabbed interface.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab-panel
--	**Supports:** color (background, heading, link, text), shadow, spacing (padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
+-	**Supports:** background (backgroundImage, backgroundSize, gradient), color (background, heading, link, text), shadow, spacing (padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 
 ## Table
 
@@ -1000,7 +1000,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** [core/table-of-contents](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/)
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
--	**Supports:** anchor, ariaLabel, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
 
 ## Tabs
@@ -1010,7 +1010,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Name:** [core/tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
--	**Supports:** align, anchor, color (background, text), interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, text), interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tag Cloud
@@ -1019,7 +1019,7 @@ A cloud of popular keywords, each sized by how often it appears.
 
 -	**Name:** [core/tag-cloud](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-tag-cloud/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, color (background, link, ~~text~~), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, link, ~~text~~), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
 ## Template Part
@@ -1037,7 +1037,7 @@ Displays the post count of a taxonomy term.
 
 -	**Name:** [core/term-count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-count/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** bracketType
 
 ## Term Description
@@ -1046,7 +1046,7 @@ Display the description of categories, tags and custom taxonomies when viewing a
 
 -	**Name:** [core/term-description](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-description/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Term Name
 
@@ -1054,7 +1054,7 @@ Displays the name of a taxonomy term.
 
 -	**Name:** [core/term-name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-name/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions
 
 ## Term Template
@@ -1064,7 +1064,7 @@ Contains the block elements used to render a taxonomy term, like the name, descr
 -	**Name:** [core/term-template](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-template/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/terms-query
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Terms Query
 

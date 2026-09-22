@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
 -   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
 
 ### Bug Fixes
