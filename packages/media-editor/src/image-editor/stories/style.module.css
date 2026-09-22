@@ -1,4 +1,4 @@
-.image-editor-story__container {
+.container {
 	width: 100%;
 	max-width: 600px;
 	aspect-ratio: 3 / 2;
@@ -6,7 +6,7 @@
 	position: relative;
 }
 
-.image-editor-story__resizable {
+.resizable {
 	width: 600px;
 	height: 400px;
 	max-width: 100%;
@@ -18,7 +18,7 @@
 	position: relative;
 }
 
-.image-editor-story__toolbar {
+.toolbar {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -29,25 +29,18 @@
 	background: #fafafa;
 }
 
-.image-editor-story__sliders {
+.sliders {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 16px;
 	padding: 0 4px;
 }
 
-.image-editor-story__hidden-file {
+.hidden-file {
 	display: none;
 }
 
-.image-editor-story__json {
-	width: 100%;
-	min-height: 80px;
-	font-family: monospace;
-	font-size: 12px;
-}
-
-.image-editor-story__state {
+.state {
 	font-family: monospace;
 	font-size: 11px;
 	background: #f5f5f5;
@@ -58,34 +51,12 @@
 	overflow: auto;
 }
 
-.image-editor-story__vertex-count {
-	font-variant-numeric: tabular-nums;
-	min-width: 120px;
-}
-
-.image-editor-story__instructions {
-	background: #f9f9f9;
-	border: 1px solid #e0e0e0;
-	border-radius: 4px;
-	padding: 12px;
-	font-size: 13px;
-	line-height: 1.5;
-}
-
-.image-editor-story__instructions p {
-	margin: 0 0 4px;
-}
-
-.image-editor-story__instructions p:last-child {
-	margin-bottom: 0;
-}
-
-.image-editor-story__export-preview {
+.export-preview {
 	margin-bottom: 16px;
 	max-width: 200px;
 }
 
-.image-editor-story__export-image {
+.export-image {
 	display: block;
 	max-width: 100%;
 	border: 1px solid #ccc;

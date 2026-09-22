@@ -77,7 +77,7 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalScrollable: '{{ name }} is planned for deprecation.',
+		__experimentalScrollable: 'Write your own CSS instead.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
 		__experimentalSurface:
 			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
