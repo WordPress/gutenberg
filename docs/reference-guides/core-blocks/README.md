@@ -198,7 +198,7 @@ Displays the contents of a comment.
 -	**Name:** [core/comment-content](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-content/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, background (gradient), color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (gradient), color (background, button, gradients, heading, link, text), spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comment Date
 
