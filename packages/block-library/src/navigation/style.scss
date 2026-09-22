@@ -787,6 +787,22 @@ button.wp-block-navigation-item__content {
 							display: flex;
 						}
 					}
+
+					// Wide viewports turn the chevron of a nested submenu
+					// sideways, since a nested flyout opens to the side there. In
+					// the overlay it opens downwards at every width.
+					.wp-block-navigation__submenu-container {
+						.wp-block-navigation__submenu-icon > svg {
+							transform: none;
+						}
+
+						.wp-block-navigation-submenu__toggle[aria-expanded="true"] {
+							+ .wp-block-navigation__submenu-icon > svg,
+							> svg {
+								transform: rotate(180deg);
+							}
+						}
+					}
 				}
 			}
 		}
