@@ -29,6 +29,7 @@
 -   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
 -   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Gallery and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
 -   In-between inserter: Resolve the hovered block through the block refs rather than the container's DOM children, so the inserter also appears in lists whose blocks apply their block props to an inner element, such as Social Icons ([#83327](https://github.com/WordPress/gutenberg/pull/83327)).
+-   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 
 ### Internal
 
