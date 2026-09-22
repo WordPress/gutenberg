@@ -1,6 +1,7 @@
 const STYLESHEET_EXTENSIONS = /\.(?:css|scss|sass)$/i;
 const MODULE_STYLESHEET_EXTENSIONS = /\.module\.(?:css|scss|sass)$/i;
 const BUILD_STYLE_SEGMENT = /(^|\/)build-style\//;
+const NON_INJECTING_QUERIES = [ 'inline', 'raw', 'url' ];
 
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
@@ -8,13 +9,15 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Disallow side-effect imports of package build-style stylesheets from Storybook stories.',
-			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/storybook/eslint/no-build-style-imports.md',
+				'Disallow Storybook imports of non-module stylesheets that inject into the preview document.',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/storybook/eslint/no-non-module-stylesheet-imports.md',
 		},
 		schema: [],
 		messages: {
 			usePackageStylesMatcher:
 				'Do not import package build-style stylesheets as a Vite side effect. Add a matcher in storybook/package-styles/config.js (and a *.lazy.scss wrapper if the package is missing), then drop this import.',
+			useCssModule:
+				'Import story styles as a CSS module so they do not leak across stories. If this is a package stylesheet, load it through storybook/package-styles/config.js instead.',
 		},
 	},
 	create( context ) {
@@ -23,12 +26,15 @@ module.exports = {
 				return;
 			}
 
-			if ( isBuildStyleLeak( sourceValue ) ) {
-				context.report( {
-					node,
-					messageId: 'usePackageStylesMatcher',
-				} );
+			const messageId = getLeakMessageId( sourceValue );
+			if ( ! messageId ) {
+				return;
 			}
+
+			context.report( {
+				node,
+				messageId,
+			} );
 		}
 
 		function reportExportedModule( node ) {
@@ -60,24 +66,28 @@ module.exports = {
 	},
 };
 
-function isBuildStyleLeak( sourceValue ) {
+function getLeakMessageId( sourceValue ) {
 	const { pathname, queryKeys } = parseImportSource( sourceValue );
 
 	if ( ! STYLESHEET_EXTENSIONS.test( pathname ) ) {
-		return false;
+		return null;
 	}
 
 	if ( MODULE_STYLESHEET_EXTENSIONS.test( pathname ) ) {
-		return false;
+		return null;
 	}
 
-	if ( ! BUILD_STYLE_SEGMENT.test( pathname ) ) {
-		return false;
+	if (
+		NON_INJECTING_QUERIES.some( ( query ) => queryKeys.includes( query ) )
+	) {
+		return null;
 	}
 
-	return ! [ 'inline', 'raw', 'url' ].some( ( query ) =>
-		queryKeys.includes( query )
-	);
+	if ( BUILD_STYLE_SEGMENT.test( pathname ) ) {
+		return 'usePackageStylesMatcher';
+	}
+
+	return 'useCssModule';
 }
 
 function getStaticModuleSpecifier( sourceNode ) {
