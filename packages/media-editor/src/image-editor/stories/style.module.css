@@ -61,5 +61,5 @@
 	max-width: 100%;
 	border: 1px solid #ccc;
 	border-radius: 4px;
-	background: repeating-conic-gradient(#e0e0e0 25%, #0000 0) 0 / 16px 16px;
+	background: repeating-conic-gradient(#e0e0e0 0% 25%, transparent 0% 50%) 50% / 16px 16px;
 }
