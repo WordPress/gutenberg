@@ -19,7 +19,7 @@ const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 const gutenbergStorybookPlugin = {
 	rules: {
-		'no-build-style-imports': require( '../../storybook/eslint/no-build-style-imports.js' ),
+		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
 	},
 };
 const vitestTestsByProject = getVitestTestsByProject(
@@ -523,9 +523,21 @@ export default dedupePlugins( [
 			`storybook/stories/**/*.${ SCRIPT_EXT }`,
 		],
 		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
+		},
+	},
+
+	// Story files are omitted here. storybook/stories is not in this list, and
+	// package stories are turned off in the Storybook override below.
+	{
+		files: [
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+		],
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
 	},
 
@@ -732,6 +744,9 @@ export default dedupePlugins( [
 	// load through package-styles/config.js. The production stylesheet
 	// import rule does not apply; Storybook loads package CSS through
 	// package-styles/config.js, not the enqueue path.
+	// The package stylesheet rule strips ?raw, ?inline, and ?url and reports
+	// those imports. Package stories live under packages/*/src, so they still
+	// match the block that enables that rule. Turn it off here.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		plugins: {
@@ -740,7 +755,7 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-			'gutenberg-storybook/no-build-style-imports': 'error',
+			'gutenberg-storybook/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
