@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
+
+// A wavy underline, distinguishable by shape rather than color alone,
+// flags a link whose URL doesn't look valid. Editor-only: applied directly
+// to the DOM by the link format's edit component, never part of saved
+// content.
+.is-format-link-invalid {
+	text-decoration-line: underline;
+	text-decoration-style: wavy;
+	text-decoration-color: $alert-red;
+}
