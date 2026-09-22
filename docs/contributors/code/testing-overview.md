@@ -559,7 +559,7 @@ Use the browser's debugger for browser code; the Node inspector command targets 
 
 The **JavaScript Browser (Chromium, Node.js 24)** job in the **Unit Tests** workflow uploads failure screenshots. Download the `vitest-browser-failures` artifact from the workflow run's summary page within three days of the run. The artifact is only uploaded when the job fails and files exist; a failure before browser tests start might have no artifact.
 
-Tracing is off by default. For a focused diagnostic run, select **Run workflow**, choose the failing branch, and enter one repository-relative `*.browser.test.*` file in **browser-trace-file**. The Browser job runs that file with Playwright tracing and retains its trace only if the file fails. Other jobs keep their usual scope. This is a separate diagnostic run, so its result does not establish that the full Browser suite passes.
+Tracing is off by default. For a focused diagnostic run, select **Run workflow**, choose the failing branch, and enter one repository-relative `*.browser.test.*` file in **browser-trace-file**. The Browser job runs that file with Playwright tracing and retains its trace if the file fails or raises an unhandled browser error. Other jobs keep their usual scope. This is a separate diagnostic run, so its result does not establish that the full Browser suite passes.
 
 The artifact preserves these directories relative to the local `test-results/` directory:
 
@@ -581,7 +581,7 @@ To record the same diagnostics locally:
 WP_VITEST_BROWSER_TRACE=1 npm run test:unit -- --project=browser path/to/example.browser.test.jsx
 ```
 
-Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Passing recordings are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses each file's existing isolated browser context and does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
+Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Recordings from files that pass without unhandled errors are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses each file's existing isolated browser context and does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
 
 ## End-to-end testing
 

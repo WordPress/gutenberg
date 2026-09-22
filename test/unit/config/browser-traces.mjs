@@ -2,7 +2,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * Record each isolated Browser Mode file and retain only failed files.
+ * Record each isolated Browser Mode file and retain failures and unhandled errors.
  * Per-file traces avoid copying network data for every test and using long or
  * duplicate test titles as filenames in Vitest's native per-test tracing.
  *
@@ -54,9 +54,16 @@ export function createBrowserTraceArtifacts( rootDir ) {
 				await rm( tracesDir, { recursive: true, force: true } );
 			},
 			async onTestModuleEnd( testModule ) {
+				// Unhandled browser errors fail the run without failing the module.
+				const hasUnhandledError = testModule.project.vitest.state
+					.getUnhandledErrors()
+					.some(
+						( error ) =>
+							error?.VITEST_TEST_PATH === testModule.moduleId
+					);
 				await finishTrace(
 					testModule.moduleId,
-					testModule.state() === 'failed'
+					testModule.state() === 'failed' || hasUnhandledError
 				);
 			},
 			async onTestRunEnd() {
