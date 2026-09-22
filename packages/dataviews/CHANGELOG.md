@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `DataViewsPicker` `pickerTable` layout: put the `listbox` role on the same element that holds `aria-activedescendant` (the `table`), so screen readers announce the row the arrow keys move to. The layout also honors `itemListLabel` and marks the listbox as `aria-multiselectable` now, and grouped data renders as one listbox of labelled `group`s instead of one listbox per group ([#83354](https://github.com/WordPress/gutenberg/pull/83354)).
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
 -   DataForm: Hide the edit button of disabled fields in the panel layout, as it already is for read-only fields ([#82957](https://github.com/WordPress/gutenberg/pull/82957)).
 
