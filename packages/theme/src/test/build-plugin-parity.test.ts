@@ -193,7 +193,6 @@ describe( 'design token fallback build plugin parity', () => {
 	} );
 
 	it( 'leaves virtual modules to the plugin that owns their namespace', async () => {
-		let virtualModuleLoaded = false;
 		const result = await esbuildBuild( {
 			bundle: true,
 			format: 'esm',
@@ -217,21 +216,17 @@ describe( 'design token fallback build plugin parity', () => {
 								filter: /.*/,
 								namespace: 'virtual-test',
 							},
-							() => {
-								virtualModuleLoaded = true;
-								return {
-									contents:
-										'const value = "var(--wpds-dimension-gap-sm)"; export default value;',
-									loader: 'ts',
-								};
-							}
+							() => ( {
+								contents:
+									'const value = "var(--wpds-dimension-gap-sm)"; export default value;',
+								loader: 'ts',
+							} )
 						);
 					},
 				},
 			],
 		} );
 
-		expect( virtualModuleLoaded ).toBe( true );
 		expect( result.outputFiles[ 0 ].text ).toContain(
 			'var(--wpds-dimension-gap-sm)'
 		);
