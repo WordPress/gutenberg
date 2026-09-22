@@ -1,5 +1,9 @@
 import valueParser from 'postcss-value-parser';
 
+const identifierPattern = String.raw`(?:[\w\u0080-\uFFFF-]|\\(?:[\da-f]{1,6}(?:\r\n|[ \t\n\r\f])?|[^\n\r\f]))+`;
+const identifierStart = new RegExp( `^${ identifierPattern }`, 'i' );
+const identifiers = new RegExp( identifierPattern, 'gi' );
+
 /**
  * Decode CSS escapes without changing the source nodes used for serialization.
  *
@@ -37,15 +41,35 @@ function isFallbackSeparator( node ) {
  * String, URL, and comment contents are not treated as CSS functions.
  *
  * @param {string} value A CSS declaration value.
- * @return {{ parsed: import('postcss-value-parser').ParsedValue, references: Array<{ name: string, fallbackSeparator: import('postcss-value-parser').DivNode | undefined, node: import('postcss-value-parser').FunctionNode }> }} The parsed value and its custom property references.
+ * @return {{ parsed: import('postcss-value-parser').ParsedValue, references: Array<{ name: string, sourceIndex: number, fallbackSeparator: import('postcss-value-parser').DivNode | undefined, node: import('postcss-value-parser').FunctionNode }> }} The parsed value and its custom property references.
  */
 export function parseCSSVariableReferences( value ) {
 	const parsed = valueParser( value );
-	/** @type {Array<{ name: string, fallbackSeparator: import('postcss-value-parser').DivNode | undefined, node: import('postcss-value-parser').FunctionNode }>} */
+	/** @type {Map<number, number>} */
+	const variableFunctionStarts = new Map();
+	// Hexadecimal escapes can split function names across value-parser nodes.
+	// Scan once to locate their complete source spelling.
+	for ( const identifier of value.matchAll( identifiers ) ) {
+		const end = identifier.index + identifier[ 0 ].length;
+		if (
+			value[ end ] === '(' &&
+			decodeIdentifier( identifier[ 0 ] ) === 'var'
+		) {
+			variableFunctionStarts.set( end, identifier.index );
+		}
+	}
+	/** @type {Array<{ name: string, sourceIndex: number, fallbackSeparator: import('postcss-value-parser').DivNode | undefined, node: import('postcss-value-parser').FunctionNode }>} */
 	const references = [];
 
 	parsed.walk( ( node ) => {
-		if ( node.type !== 'function' || node.value !== 'var' ) {
+		if ( node.type !== 'function' ) {
+			return;
+		}
+
+		const sourceIndex = variableFunctionStarts.get(
+			node.sourceIndex + node.value.length
+		);
+		if ( sourceIndex === undefined ) {
 			return;
 		}
 
@@ -61,9 +85,7 @@ export function parseCSSVariableReferences( value ) {
 		// across value-parser nodes. Read the whole identifier from its source.
 		const spelling = value
 			.slice( nameNode.sourceIndex )
-			.match(
-				/^(?:[\w\u0080-\uFFFF-]|\\(?:[\da-f]{1,6}(?:\r\n|[ \t\n\r\f])?|[^\n\r\f]))+/i
-			)?.[ 0 ];
+			.match( identifierStart )?.[ 0 ];
 		const name = decodeIdentifier( spelling ?? '' );
 		if ( ! name.startsWith( '--' ) ) {
 			return;
@@ -71,6 +93,7 @@ export function parseCSSVariableReferences( value ) {
 
 		references.push( {
 			name,
+			sourceIndex,
 			fallbackSeparator: node.nodes.find( isFallbackSeparator ),
 			node,
 		} );

@@ -4,7 +4,7 @@ exports[`flags warnings with invalid wpds tokens css > snapshot matches warnings
 [
   {
     "column": 2,
-    "endColumn": 39,
+    "endColumn": 41,
     "endLine": 3,
     "line": 3,
     "rule": "plugin-wpds/no-unknown-ds-tokens",
@@ -13,7 +13,7 @@ exports[`flags warnings with invalid wpds tokens css > snapshot matches warnings
   },
   {
     "column": 2,
-    "endColumn": 42,
+    "endColumn": 45,
     "endLine": 7,
     "line": 7,
     "rule": "plugin-wpds/no-unknown-ds-tokens",

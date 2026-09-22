@@ -26,8 +26,11 @@ const ruleFunction = ( primary ) => {
 		}
 
 		root.walkDecls( ( ruleNode ) => {
-			const { value } = ruleNode;
-			const references = parseCSSVariableReferences( value ).references;
+			// Include the property and raw comments so parser offsets match the
+			// declaration's source positions, even when token text is repeated.
+			const references = parseCSSVariableReferences(
+				ruleNode.toString()
+			).references;
 
 			for ( const reference of references ) {
 				if (
@@ -40,11 +43,10 @@ const ruleFunction = ( primary ) => {
 				report( {
 					message: messages.rejected( reference.name ),
 					node: ruleNode,
-					word: value.slice(
-						reference.node.sourceIndex,
+					index: reference.sourceIndex,
+					endIndex:
 						reference.fallbackSeparator.sourceEndIndex -
-							reference.fallbackSeparator.after.length
-					),
+						reference.fallbackSeparator.after.length,
 					result,
 					ruleName,
 				} );
