@@ -180,13 +180,17 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
 /**
  * Registers the default fields of every post type exposed in the REST API.
  *
- * Mirrors the fields the editor derives client-side for a post type in
- * packages/editor/src/dataviews/store/private-actions.ts, for the fields
- * ported to the server so far. The fields depend on the supports of the
- * post type, hence it runs late on `init`: after the post types registered
- * at the default priority. A plugin that wants to alter the defaults with
- * gutenberg_register_fields() or gutenberg_unregister_fields() hooks `init`
- * at a later priority.
+ * These are the fields ported to the server so far; the editor still derives
+ * the rest client-side in packages/editor/src/dataviews/store/private-actions.ts
+ * and merges these into them. The JavaScript parts of the fields that have
+ * any (the author field: its render component, elements, value setter, and
+ * visibility) ship in the `@wordpress/fields/server-fields` script module,
+ * see packages/fields/src/server-fields.ts, registered along with the field.
+ *
+ * The fields depend on the supports of the post type, hence it runs late on
+ * `init`: after the post types registered at the default priority. A plugin
+ * that wants to alter the defaults with gutenberg_register_fields() or
+ * gutenberg_unregister_fields() hooks `init` at a later priority.
  *
  * The post types whose fields differ from the defaults derived from their
  * supports (templates, attachments) adjust them in their own step, hooked
@@ -195,21 +199,29 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
 function _gutenberg_register_posttype_fields() {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 	foreach ( $post_types as $post_type ) {
-		$fields = array();
-
 		if ( post_type_supports( $post_type, 'author' ) ) {
 			// packages/fields/src/fields/author/index.tsx: `render`,
 			// `getElements`, `setValue`, and `isVisible` come from the script
 			// module.
-			$fields[] = array(
-				'id'       => 'author',
-				'type'     => 'integer',
-				'label'    => __( 'Author', 'gutenberg' ),
-				'filterBy' => array(
-					'operators' => array( 'isAny', 'isNone' ),
+			gutenberg_register_fields(
+				'postType',
+				$post_type,
+				array(
+					array(
+						'id'       => 'author',
+						'type'     => 'integer',
+						'label'    => __( 'Author', 'gutenberg' ),
+						'filterBy' => array(
+							'operators' => array( 'isAny', 'isNone' ),
+						),
+					),
 				),
+				'@wordpress/fields/server-fields'
 			);
 		}
+
+		// The remaining default fields are plain data: no script module.
+		$fields = array();
 
 		if ( post_type_supports( $post_type, 'comments' ) ) {
 			// packages/fields/src/fields/comment-status/index.tsx

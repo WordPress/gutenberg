@@ -64,12 +64,19 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 	/**
 	 * Tears down each test.
+	 *
+	 * Unregistering an entity drops its default fields too, so they are
+	 * registered again afterwards.
 	 */
 	public function tear_down() {
 		foreach ( $this->registered_field_entities as $args ) {
 			gutenberg_unregister_fields( ...$args );
 		}
 		$this->registered_field_entities = array();
+		_gutenberg_register_posttype_fields();
+		_gutenberg_register_wp_template_fields();
+		_gutenberg_register_wp_template_part_fields();
+		_gutenberg_register_attachment_fields();
 
 		parent::tear_down();
 	}
@@ -322,6 +329,16 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertContains( 'author', $ids, 'Pages support authors.' );
 		$this->assertContains( 'comment_status', $ids, 'Pages support comments.' );
 		$this->assertSame( gutenberg_get_registered_fields( 'postType', 'page' ), $data['fields'] );
+		$this->assertSame(
+			array(
+				array(
+					'id'     => '@wordpress/fields/server-fields',
+					'fields' => array( 'author' ),
+				),
+			),
+			$data['script_modules'],
+			'The author field ships its JavaScript parts in the default fields module.'
+		);
 	}
 
 	/**
@@ -367,11 +384,11 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			'type'  => 'integer',
 			'label' => 'Size',
 		);
-		$this->register_fields( 'postType', 'page', array( $color, $size ), 'plugin/appearance' );
-		$this->register_fields( 'postType', 'page', array( $size ), 'plugin/sizes' );
+		$this->register_fields( 'customKind', 'customName', array( $color, $size ), 'plugin/appearance' );
+		$this->register_fields( 'customKind', 'customName', array( $size ), 'plugin/sizes' );
 
 		wp_set_current_user( self::$editor_id );
-		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
+		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
 
 		$fields = array_column( $data['fields'], null, 'id' );
 		$this->assertSame( $color, $fields['color'] );

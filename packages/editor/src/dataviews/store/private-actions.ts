@@ -23,12 +23,10 @@ import {
 	dateField,
 	parentField,
 	passwordField,
-	commentStatusField,
 	pingStatusField,
 	discussionField,
 	slugField,
 	statusField,
-	authorField,
 	templateAuthorField,
 	templatePartAuthorField,
 	titleField,
@@ -38,7 +36,6 @@ import {
 	patternTitleField,
 	patternDescriptionField,
 	patternSyncStatusField,
-	notesField,
 	scheduledDateField,
 	lastEditedDateField,
 	formatField,
@@ -55,7 +52,6 @@ import {
 	attachedToField,
 	authorField as mediaAuthorField,
 	captionField,
-	dateAddedField,
 	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
@@ -66,20 +62,6 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
-
-/**
- * Check if a post type supports editor notes.
- *
- * @param supports The post type supports object.
- * @return Whether editor notes are supported.
- */
-function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
-	const editor = supports?.editor;
-	if ( Array.isArray( editor ) ) {
-		return !! editor[ 0 ]?.notes;
-	}
-	return false;
-}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -283,8 +265,8 @@ function mergeServerFields< Item >(
  * Note: media_thumbnail is not included as it's shown in the canvas preview
  */
 const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	dateAddedField,
+	// Metadata in panels (collapsed by default). The date added field is
+	// registered on the server.
 	mediaAuthorField,
 	filenameField,
 	mimeTypeField,
@@ -395,9 +377,9 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				! isDesignPostType &&
-					postTypeConfig.supports?.author &&
-					authorField,
+				// The author field of the post types supporting authors is
+				// registered on the server; templates and template parts
+				// unregister it there and keep their own.
 				postTypeSlug === 'wp_template' && templateAuthorField,
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
@@ -415,7 +397,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				postTypeConfig.supports?.comments && commentStatusField,
+				// The comment status field is registered on the server.
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
@@ -441,7 +423,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
-				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				// The notes field is registered on the server.
 				isPattern && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {

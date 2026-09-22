@@ -22,14 +22,59 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * Tears down each test.
+	 *
+	 * Unregistering an entity drops its default fields too, so they are
+	 * registered again afterwards.
 	 */
 	public function tear_down() {
 		foreach ( $this->registered_field_entities as $args ) {
 			gutenberg_unregister_fields( ...$args );
 		}
 		$this->registered_field_entities = array();
+		self::register_default_fields();
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Registers the default fields of the post types, as the plugin does on
+	 * `init`.
+	 */
+	public static function register_default_fields() {
+		_gutenberg_register_posttype_fields();
+		_gutenberg_register_wp_template_fields();
+		_gutenberg_register_wp_template_part_fields();
+		_gutenberg_register_attachment_fields();
+	}
+
+	/**
+	 * Unregisters the fields of every entity with a script module, so a
+	 * test can start from a registry without modules. The defaults are
+	 * registered again on tear down.
+	 */
+	private function unregister_all_field_modules() {
+		foreach ( array_keys( gutenberg_get_all_registered_field_modules() ) as $entity ) {
+			list( $kind, $name )               = explode( '/', $entity, 2 );
+			$this->registered_field_entities[] = array( $kind, $name );
+			gutenberg_unregister_fields( $kind, $name );
+		}
+	}
+
+	/**
+	 * Returns the module ids among the module dependencies of a script.
+	 *
+	 * @param WP_Scripts $scripts The scripts registry.
+	 * @param string     $handle  The script handle.
+	 * @return string[] The module ids, in order.
+	 */
+	private function get_module_dependency_ids( WP_Scripts $scripts, $handle ) {
+		$dependencies = $scripts->get_data( $handle, 'module_dependencies' );
+		return array_map(
+			static function ( $dependency ) {
+				return is_array( $dependency ) ? $dependency['id'] : $dependency;
+			},
+			is_array( $dependencies ) ? $dependencies : array()
+		);
 	}
 
 	/**
@@ -89,6 +134,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * a script module registered.
 	 */
 	public function test_nothing_happens_without_registered_field_modules() {
+		$this->unregister_all_field_modules();
 		$this->assertSame( array(), gutenberg_get_all_registered_field_modules(), 'No field script module is registered.' );
 
 		$scripts = new WP_Scripts();
@@ -104,6 +150,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * script.
 	 */
 	public function test_field_script_modules_become_dynamic_dependencies_of_the_editor_script() {
+		$this->unregister_all_field_modules();
 		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' );
 
 		$scripts = new WP_Scripts();
@@ -135,17 +182,19 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array( '@wordpress/existing' ) );
 
 		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		$dependencies = $scripts->get_data( 'wp-editor', 'module_dependencies' );
 		_gutenberg_add_field_modules_to_editor_script( $scripts );
 
-		$this->assertSame(
+		$this->assertSame( $dependencies, $scripts->get_data( 'wp-editor', 'module_dependencies' ), 'A second run adds nothing.' );
+		$ids = $this->get_module_dependency_ids( $scripts, 'wp-editor' );
+		$this->assertSame( '@wordpress/existing', $ids[0], 'The declared dependency is kept first.' );
+		$this->assertSame( 1, count( array_keys( $ids, 'plugin/color', true ) ), 'The module is declared once.' );
+		$this->assertContains(
 			array(
-				'@wordpress/existing',
-				array(
-					'id'      => 'plugin/color',
-					'dynamic' => true,
-				),
+				'id'      => 'plugin/color',
+				'dynamic' => true,
 			),
-			$scripts->get_data( 'wp-editor', 'module_dependencies' )
+			$dependencies
 		);
 	}
 
@@ -162,12 +211,25 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
 		_gutenberg_add_field_modules_to_editor_script( $scripts );
 
-		$this->assertSame(
+		$ids = $this->get_module_dependency_ids( $scripts, 'wp-editor' );
+		$this->assertSame( array( 'plugin/fields' ), array_values( array_intersect( $ids, array( 'plugin/fields' ) ) ) );
+	}
+
+	/**
+	 * The script module of the default post fields is declared by default,
+	 * since the author field of every post type supporting authors ships its
+	 * JavaScript parts in it.
+	 */
+	public function test_the_default_fields_module_is_a_dependency_of_the_editor_script() {
+		$scripts = new WP_Scripts();
+		$scripts->add( 'wp-editor', '/editor.js' );
+		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
+		_gutenberg_add_field_modules_to_editor_script( $scripts );
+
+		$this->assertContains(
 			array(
-				array(
-					'id'      => 'plugin/fields',
-					'dynamic' => true,
-				),
+				'id'      => '@wordpress/fields/server-fields',
+				'dynamic' => true,
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
 		);
@@ -183,6 +245,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$wp_scripts       = new WP_Scripts();
 
 		try {
+			// Only the test module is of interest: the built modules may not be
+			// registered in the test environment.
+			$this->unregister_all_field_modules();
 			$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' );
 			$wp_scripts->add( 'wp-editor', '/editor.js' );
 			wp_register_script_module( 'plugin/color', '/color.js' );
@@ -227,6 +292,20 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The author field is the only default field with JavaScript parts, so
+	 * it is the only one registered with the default fields script module.
+	 */
+	public function test_the_author_field_ships_its_script_module() {
+		_gutenberg_register_posttype_fields();
+
+		$this->assertSame(
+			array( '@wordpress/fields/server-fields' => array( 'author' ) ),
+			gutenberg_get_registered_field_modules( 'postType', 'post' )
+		);
+		$this->assertContains( 'comment_status', array_column( gutenberg_get_registered_fields( 'postType', 'post' ), 'id' ), 'The comment status field is registered without a module.' );
+	}
+
+	/**
 	 * Templates and template parts support authors but have their own
 	 * client-side author field, so the default one is removed.
 	 *
@@ -260,6 +339,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertNotContains( 'author', $ids );
 		$this->assertNotContains( 'comment_status', $ids );
 		$this->assertContains( 'date', $ids );
+		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'attachment' ), 'The media fields registered so far are plain data: no script module.' );
 	}
 
 	/**
