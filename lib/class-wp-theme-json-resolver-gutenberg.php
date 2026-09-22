@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -144,7 +144,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === static::$i18n_schema ) {
 			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
-			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+			static::$i18n_schema = $i18n_schema ?? array();
 		}
 
 		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
@@ -224,7 +224,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              Added registration and merging of block style variations from partial theme.json files and the block styles registry.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
-	 * @param array $options {
+	 * @param array $options    {
 	 *     Options arguments.
 	 *
 	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
@@ -297,13 +297,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					static::$theme = $parent_theme;
 				}
 			}
-
-			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
-				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
-			}
-			// END OF EXPERIMENTAL CODE.
-
 		}
 
 		if ( ! $options['with_supports'] ) {
@@ -459,17 +452,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme = wp_get_theme();
 		}
 
-		/*
-		 * Bail early if the theme does not support a theme.json.
-		 *
-		 * Since wp_theme_has_theme_json only supports the active
-		 * theme, the extra condition for whether $theme is the active theme is
-		 * present here.
-		 */
-		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
-			return array();
-		}
-
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
@@ -494,7 +476,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
-		if ( count( $recent_posts ) === 1 ) {
+		if ( count( $recent_posts ) === 1 && $recent_posts[0] instanceof WP_Post ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
@@ -511,7 +493,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+				$post = get_post( $cpt_post_id );
+				if ( $post instanceof WP_Post ) {
+					$user_cpt = get_object_vars( $post );
+				}
 			}
 		}
 
@@ -935,7 +920,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data       Array following the theme.json specification.
 	 * @param array $variations Shared block style variations.
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
@@ -977,7 +962,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data Array following the theme.json specification.
 	 * @return array Theme json data including variations from the block styles registry.
 	 */
 	private static function inject_variations_from_block_styles_registry( $data ) {

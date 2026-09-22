@@ -1,23 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { trash } from '@wordpress/icons';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import {
 	getItemTitle,
 	isTemplateOrTemplatePart,
@@ -35,7 +28,7 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 // moves the post to trash.
 const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	id: 'delete-post',
-	label: __( 'Delete' ),
+	label: __( 'Delete…' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
@@ -47,6 +40,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const isResetting = items.every(
@@ -54,7 +48,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 		);
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length > 1
 						? sprintf(
 								// translators: %d: number of items to delete.
@@ -64,13 +58,13 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 									items.length
 								),
 								items.length
-						  )
+							)
 						: sprintf(
 								// translators: %s: The template or template part's title
 								_x( 'Delete "%s"?', 'template part' ),
 								getItemTitle( items[ 0 ] )
-						  ) }
-				</Text>
+							) }
+				</WCText>
 				<HStack justify="right">
 					<Button
 						variant="tertiary"
@@ -93,12 +87,12 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
-														/* translators: The template/part's name. */
+														/* translators: %s: The template/part's name. */
 														__( '"%s" reset.' ),
 														decodeEntities(
 															getItemTitle( item )
 														)
-												  )
+													)
 												: sprintf(
 														/* translators: %s: The template/part's name. */
 														_x(
@@ -108,7 +102,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														decodeEntities(
 															getItemTitle( item )
 														)
-												  );
+													);
 										},
 										getBatchMessage: () => {
 											return isResetting
@@ -126,20 +120,20 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 											return isResetting
 												? __(
 														'An error occurred while reverting the item.'
-												  )
+													)
 												: __(
 														'An error occurred while deleting the item.'
-												  );
+													);
 										},
 										getBatchMessage: ( errors ) => {
 											if ( errors.size === 0 ) {
 												return isResetting
 													? __(
 															'An error occurred while reverting the items.'
-													  )
+														)
 													: __(
 															'An error occurred while deleting the items.'
-													  );
+														);
 											}
 
 											if ( errors.size === 1 ) {
@@ -150,14 +144,14 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 																'An error occurred while reverting the items: %s'
 															),
 															[ ...errors ][ 0 ]
-													  )
+														)
 													: sprintf(
 															/* translators: %s: an error message */
 															__(
 																'An error occurred while deleting the items: %s'
 															),
 															[ ...errors ][ 0 ]
-													  );
+														);
 											}
 
 											return isResetting
@@ -169,7 +163,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														[ ...errors ].join(
 															','
 														)
-												  )
+													)
 												: sprintf(
 														/* translators: %s: a list of comma separated error messages */
 														__(
@@ -178,7 +172,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														[ ...errors ].join(
 															','
 														)
-												  );
+													);
 										},
 									},
 								},

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ModalProps } from '../modal/types';
 
 export type Page = {
@@ -40,6 +33,18 @@ export type GuideProps = {
 	 * @default 'Finish'
 	 */
 	finishButtonText?: string;
+	/**
+	 * Use this to customize the label of the _Next_ button shown on each page of the guide.
+	 *
+	 * @default 'Next'
+	 */
+	nextButtonText?: string;
+	/**
+	 * Use this to customize the label of the _Previous_ button shown on each page of the guide except the first.
+	 *
+	 * @default 'Previous'
+	 */
+	previousButtonText?: string;
 	/**
 	 * A function which is called when the guide is finished.
 	 */

@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -40,7 +41,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 
@@ -75,20 +75,8 @@ Private exports:
 - `ColorPanel`
 - `DimensionsPanel`
 - `FiltersPanel`
-- `GlobalStylesContext`
 - `ImageSettingsPanel`
 - `TypographyPanel`
-- `areGlobalStyleConfigsEqual`
-- `getBlockCSSSelector`
-- `getBlockSelectors`
-- `getGlobalStylesChanges`
-- `getLayoutStyles`
-- `toStyles`
-- `useGlobalSetting`
-- `useGlobalStyle`
-- `useGlobalStylesOutput`
-- `useGlobalStylesOutputWithConfig`
-- `useGlobalStylesReset`
 - `useHasBackgroundPanel`
 - `useHasBorderPanel`
 - `useHasBorderPanelControls`
@@ -108,7 +96,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -134,23 +121,25 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
 - `clearBlockRemovalPrompt`
+- `clearRequestedInspectorTab`
 - `deleteStyleOverride`
 - `ensureDefaultBlock`
 - `expandBlock`
 - `hideBlockInterface`
 - `modifyContentLockBlock`
 - `privateRemoveBlocks`
+- `requestInspectorTab`
 - `resetZoomLevel`
 - `setBlockRemovalRules`
 - `setInsertionPoint`
@@ -184,6 +173,7 @@ Private selectors:
 - `getPatternBySlug`
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
+- `getRequestedInspectorTab`
 - `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`
@@ -201,12 +191,17 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
 
 Private actions:
 - `receiveRegisteredPostMeta`
+- `editMediaEntity`
 
 Private selectors:
 - `getBlockPatternsForPostType`
@@ -224,7 +219,6 @@ Private exports:
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
 - `isOverridableBlock`
-- `hasOverridableBlocks`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
 - `PatternsMenuItems`
@@ -238,7 +232,6 @@ Private exports:
 - `PATTERN_USER_CATEGORY`
 - `EXCLUDED_PATTERN_SOURCES`
 - `PATTERN_SYNC_TYPES`
-- `PARTIAL_SYNCING_SUPPORTED_BLOCKS`
 
 ### `core/patterns` store
 
@@ -254,7 +247,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 
@@ -273,11 +267,7 @@ Private exports:
 Private exports:
 - `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
-- `EditorContentSlotFill`
-- `GlobalStylesProvider`
-- `mergeBaseAndUserConfigs`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`
@@ -292,7 +282,6 @@ Private exports:
 - `ComplementaryAreaMoreMenuItem`
 - `FullscreenMode`
 - `InterfaceSkeleton`
-- `NavigableRegion`
 - `PinnedItems`
 
 ### `core/editor` store
@@ -317,7 +306,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post

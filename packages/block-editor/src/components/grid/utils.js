@@ -187,10 +187,12 @@ export function getGridInfo( gridElement ) {
 			gridTemplateColumns,
 			gridTemplateRows,
 			gap: getComputedCSS( gridElement, 'gap' ),
-			paddingTop: `calc(${ paddingTop } + ${ borderTopWidth })`,
-			paddingRight: `calc(${ paddingRight } + ${ borderRightWidth })`,
-			paddingBottom: `calc(${ paddingBottom } + ${ borderBottomWidth })`,
-			paddingLeft: `calc(${ paddingLeft } + ${ borderLeftWidth })`,
+			inset: `
+				calc(${ paddingTop } + ${ borderTopWidth })
+				calc(${ paddingRight } + ${ borderRightWidth })
+				calc(${ paddingBottom } + ${ borderBottomWidth })
+				calc(${ paddingLeft } + ${ borderLeftWidth })
+			`,
 		},
 	};
 }

@@ -1,26 +1,24 @@
-/**
- * WordPress dependencies
- */
 import { _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import useTitle from '../routes/use-title';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
-const { getTemplateInfo } = unlock( editorPrivateApis );
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 function useEditorTitle( postType, postId ) {
 	const { title, isLoaded } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getCurrentTheme,
+				hasFinishedResolution,
+			} = select( coreStore );
 
 			if ( ! postId ) {
 				return { isLoaded: false };
@@ -33,10 +31,7 @@ function useEditorTitle( postType, postId ) {
 			);
 
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				) ?? {};
+				getCurrentTheme() ?? {};
 
 			const templateInfo = getTemplateInfo( {
 				template: _record,

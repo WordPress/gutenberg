@@ -15,17 +15,23 @@
 	},
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
 		},
 		"color": {
 			"gradients": true,
-			"text": true,
 			"__experimentalDefaultControls": {
-				"background": true
+				"background": true,
+				"text": true
 			}
 		},
 		"typography": {
@@ -52,6 +58,10 @@
 				"width": true,
 				"style": true
 			}
+		},
+		"shadow": true,
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-query-total"

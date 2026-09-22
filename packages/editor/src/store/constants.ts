@@ -19,6 +19,7 @@ export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const PATTERN_POST_TYPE = 'wp_block';
 export const NAVIGATION_POST_TYPE = 'wp_navigation';
+export const ATTACHMENT_POST_TYPE = 'attachment';
 export const TEMPLATE_ORIGINS = {
 	custom: 'custom',
 	theme: 'theme',
@@ -29,4 +30,10 @@ export const GLOBAL_POST_TYPES = [
 	...TEMPLATE_POST_TYPES,
 	'wp_block',
 	'wp_navigation',
+];
+export const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
 ];

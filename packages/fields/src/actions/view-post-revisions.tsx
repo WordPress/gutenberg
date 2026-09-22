@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Post } from '../types';
 
 const viewPostRevisions: Action< Post > = {
@@ -17,8 +10,8 @@ const viewPostRevisions: Action< Post > = {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return sprintf(
-			/* translators: %s: number of revisions. */
-			__( 'View revisions (%s)' ),
+			/* translators: %d: number of revisions. */
+			__( 'View revisions (%d)' ),
 			revisionsCount
 		);
 	},

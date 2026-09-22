@@ -1,0 +1,52 @@
+import { Spinner } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
+import type { DataFormControlProps } from '../../types';
+import useElements from '../../hooks/use-elements';
+import { ValidatedSelectControl } from '../validated-form-controls';
+import getCustomValidity from './utils/get-custom-validity';
+
+export default function Select< Item >( {
+	data,
+	field,
+	onChange,
+	hideLabelFromVision,
+	markWhenOptional,
+	validity,
+}: DataFormControlProps< Item > ) {
+	const { type, label, description, getValue, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
+
+	const isMultiple = type === 'array';
+	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
+
+	const onChangeControl = useCallback(
+		( newValue: any ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
+	const { elements, isLoading } = useElements( {
+		elements: field.elements,
+		getElements: field.getElements,
+	} );
+
+	if ( isLoading ) {
+		return <Spinner />;
+	}
+
+	return (
+		<ValidatedSelectControl
+			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
+			customValidity={ getCustomValidity( isValid, validity ) }
+			label={ label }
+			value={ value }
+			help={ description }
+			options={ elements }
+			onChange={ onChangeControl }
+			hideLabelFromVision={ hideLabelFromVision }
+			multiple={ isMultiple }
+			disabled={ disabled }
+		/>
+	);
+}

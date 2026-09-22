@@ -1,133 +1,276 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
+}
 
-	.interface-complementary-area-header {
-		display: none;
-	}
+.editor-collab-sidebar__header {
+	display: none;
 }
 
 .editor-collab-sidebar {
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
-	padding: $grid-unit-20;
+	position: relative;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
+	overflow: hidden;
+}
 
-	&__thread {
-		position: relative;
-		padding: $grid-unit-20;
-		border-radius: $radius-large;
-		border: 1.5px solid $gray-300;
-		background-color: $gray-100;
-		margin-bottom: $grid-unit-20;
-	}
+.editor-collab-sidebar-panel__thread,
+.editor-collab-sidebar-panel__add-note {
+	position: relative;
+	padding: $grid-unit-20;
+	border-radius: $radius-large;
+	border: $border-width solid $gray-300;
+	background-color: $gray-100;
+	overflow: hidden;
+	width: auto;
 
-	&__active-thread {
-		border: 1.5px solid #3858e9;
-	}
-
-	&__focus-thread {
-		border: 1.5px solid #3858e9;
+	&.is-selected {
 		background-color: $white;
-		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
-	}
-
-	&__comment-field {
-		flex: 1;
-	}
-
-	&__child-thread {
-		margin-top: 15px;
-	}
-
-	&__user-name {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-		text-transform: capitalize;
-	}
-
-	&__user-time {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-	}
-
-	&__user-comment {
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 20px;
-		text-align: left;
-		color: $gray-900;
-
-		p {
-			margin-bottom: 0;
-		}
-	}
-
-	&__user-avatar {
-		border-radius: $radius-round;
-		flex-shrink: 0;
-	}
-
-	&__thread-overlay {
-		background-color: rgba(0, 0, 0, 0.7);
-		width: 100%;
-		height: 100%;
-		text-align: center;
-		position: absolute;
-		top: 0;
-		left: 0;
+		box-shadow: $elevation-medium;
 		z-index: 1;
-		padding: 15px;
-		border-radius: $radius-large;
-		color: $white;
-
-		p {
-			margin-bottom: 15px;
-		}
-
-		button {
-			padding: 4px 10px;
-			color: $white;
-		}
 	}
 
-	&__comment-status {
-		margin-left: auto;
+	&:focus {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+	}
 
-		button {
-			&.has-icon:not(.has-text) {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-				flex-shrink: 0;
-			}
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas scroll.
+		transform: translateY(var(--canvas-scroll, 0));
+		will-change: transform;
+		// Keep the reply input reachable when a thread is taller than the viewport
+		// (e.g. many replies on short content where the canvas can't scroll).
+		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
+		overflow-y: auto;
+	}
+}
+
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
+}
+
+.editor-collab-sidebar-panel__user-name {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+	overflow-wrap: anywhere;
+}
+
+.editor-collab-sidebar-panel__user-time {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__show-more-button {
+	width: fit-content;
+	color: var(--wpds-color-foreground-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+}
+
+.editor-collab-sidebar-panel__note-content {
+	overflow-wrap: break-word;
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+
+	&.is-collapsed {
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+}
+
+.editor-collab-sidebar-panel__user-avatar {
+	border-radius: $radius-round;
+	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+}
+
+.editor-collab-sidebar-panel__note-actions {
+	margin-left: auto;
+
+	button {
+		&.has-icon:not(.has-text) {
+			min-width: 24px;
+			padding: 0;
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
 		}
 	}
+}
 
-	&__comment-dropdown-menu {
-		flex-shrink: 0;
+.editor-collab-sidebar-panel__more-reply-separator,
+.editor-collab-sidebar-panel__status-separator {
+	&::before,
+	&::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background-color: $gray-300;
+	}
+}
 
-		button {
-			&.has-icon {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-			}
+.editor-collab-sidebar-panel__more-reply-button {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.editor-collab-sidebar-panel__deleted-block-notice {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
+}
+
+// The ContentEditableControl shell provides its own base styling (border, focus
+// ring, padding). Scope the few multi-line and inline-format tweaks the note
+// form needs to the editable element as rendered inside the note form. The
+// shell exposes no stable class name, so target the editable by its role.
+.editor-collab-sidebar-panel__note-form [role="textbox"] {
+	line-height: 20px;
+	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
+	overflow-y: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+
+	// Inline formats inherit the surrounding text styles but keep
+	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
+	code {
+		font-family: Menlo, Consolas, monaco, monospace;
+		font-size: 0.9em;
+		padding: 0 2px;
+		background: $gray-100;
+		border-radius: 2px;
+	}
+
+	a {
+		color: var(--wp-admin-theme-color);
+		text-decoration: underline;
+	}
+}
+
+// Visually hidden until focused (skip link pattern)
+.editor-collab-sidebar-panel__skip-to-note,
+.editor-collab-sidebar-panel__skip-to-block {
+	position: absolute;
+	top: -9999px;
+	right: -9999px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	background: $white !important;
+	z-index: -1;
+
+	&:focus {
+		overflow: visible;
+		clip-path: none;
+		z-index: 1;
+		right: $grid-unit-10;
+	}
+}
+.editor-collab-sidebar-panel__skip-to-note:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
+}
+
+.editor-note-indicator__avatar {
+	width: $icon-size;
+	border-radius: $radius-round;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+	box-sizing: border-box;
+
+	&:first-child {
+		margin-left: 0;
+	}
+}
+
+.editor-note-indicator__overflow {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.show-icon-labels {
+	.editor-note-indicator {
+		width: auto;
+		// Hide the user avatars container when labels are set to display...
+		div {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
 		}
 	}
+}
 
-	&__show-more-reply {
-		font-weight: 500;
-		font-style: italic;
-		padding: 0;
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}
+
+// Mention chips, both in the note input and the rendered note content. A
+// mention is a non-interactive `span` carrying the mentioned user's ID in a
+// `user-N` class, styled as a chip.
+.wp-note-mention {
+	display: inline;
+	padding: 0 var(--wpds-dimension-padding-xs);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+
+	// Keep the chip boundary visible when forced-colors drops the background tint.
+	@media (forced-colors: active) {
+		border: 1px solid;
 	}
+}
+
+// Match the rounded avatars used for note bylines and the block toolbar
+// indicator in the mention suggestions popover (the shared completer style
+// leaves them square).
+.editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
+	border-radius: $radius-round;
 }

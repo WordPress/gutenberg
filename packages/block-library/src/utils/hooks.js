@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -66,6 +63,10 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
+		if ( ! mediaUpload ) {
+			return;
+		}
+
 		hasUploadStartedRef.current = true;
 
 		mediaUpload( {
@@ -89,6 +90,15 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	}, [ getSettings ] );
 }
 
+export function useDefaultAvatar() {
+	const avatarURL = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.avatarURL ?? '';
+	}, [] );
+	return avatarURL;
+}
+
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -98,6 +108,6 @@ export function useToolsPanelDropdownMenuProps() {
 					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 					offset: 259,
 				},
-		  }
+			}
 		: {};
 }

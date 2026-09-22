@@ -59,9 +59,9 @@ function getPrecision( value ) {
 /**
  * Clamps a value based on a min/max range.
  *
- * @param {number} value The value.
- * @param {number} min   The minimum range.
- * @param {number} max   The maximum range.
+ * @param {number|string} value The value.
+ * @param {number}        min   The minimum range.
+ * @param {number}        max   The maximum range.
  *
  * @return {number} The clamped value.
  */
@@ -71,28 +71,23 @@ export function clamp( value, min, max ) {
 }
 
 /**
- * Clamps a value based on a min/max range with rounding
+ * Rounds a value to the nearest step offset by a minimum.
  *
- * @param {number | string} value The value.
- * @param {number}          min   The minimum range.
- * @param {number}          max   The maximum range.
- * @param {number}          step  A multiplier for the value.
+ * @param {number|string} value The value.
+ * @param {number}        min   The minimum range.
+ * @param {number}        step  The increment for the value.
  *
- * @return {number} The rounded and clamped value.
+ * @return {number} The value as a valid step.
  */
-export function roundClamp(
-	value = 0,
-	min = Infinity,
-	max = Infinity,
-	step = 1
-) {
+export function ensureValidStep( value, min, step ) {
 	const baseValue = getNumber( value );
+	const minValue = getNumber( min );
 	const stepValue = getNumber( step );
-	const precision = getPrecision( step );
-	const rounded = Math.round( baseValue / stepValue ) * stepValue;
-	const clampedValue = clamp( rounded, min, max );
-
-	return precision
-		? getNumber( clampedValue.toFixed( precision ) )
-		: clampedValue;
+	const precision = Math.max( getPrecision( step ), getPrecision( min ) );
+	// If the step is not a factor of the minimum then the step must be
+	// offset by the minimum.
+	const tare = minValue % stepValue ? minValue : 0;
+	const rounded = Math.round( ( baseValue - tare ) / stepValue ) * stepValue;
+	const fromMin = rounded + tare;
+	return precision ? getNumber( fromMin.toFixed( precision ) ) : fromMin;
 }

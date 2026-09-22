@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Inner blocks templates', () => {
@@ -11,7 +8,9 @@ test.describe( 'Inner blocks templates', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.createNewPost( {
+			postType: 'page',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

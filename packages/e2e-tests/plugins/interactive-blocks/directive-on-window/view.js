@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis } from '@wordpress/interactivity';
 
 const { directive } = privateApis(
@@ -13,7 +10,11 @@ directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
 		const entry = showMock.find( ( { suffix } ) => suffix === null );
-		if ( ! evaluate( entry ) ) {
+		const result = evaluate( entry );
+		if ( ! result ) {
+			return null;
+		}
+		if ( typeof result === 'function' && ! result() ) {
 			return null;
 		}
 		return element;
@@ -27,6 +28,7 @@ const { state } = store( 'directive-on-window', {
 		isEventAttached: 'no',
 		resizeHandler: 'no',
 		resizeSecondHandler: 'no',
+		resizeThirdHandler: 'no',
 	},
 	callbacks: {
 		resizeHandler() {
@@ -46,6 +48,9 @@ const { state } = store( 'directive-on-window', {
 		},
 		resizeSecondHandler: () => {
 			state.resizeSecondHandler = 'yes';
+		},
+		resizeThirdHandler: () => {
+			state.resizeThirdHandler = 'yes';
 		},
 	},
 } );

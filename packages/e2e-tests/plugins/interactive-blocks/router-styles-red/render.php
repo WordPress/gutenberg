@@ -33,3 +33,12 @@ $wrapper_attributes = get_block_wrapper_attributes(
 );
 ?>
 <p <?php echo $wrapper_attributes; ?>>Red</p>
+
+<noscript>
+	<style>
+		.noscript-style-test {
+			color: rgb(255, 0, 0) !important;
+			font-weight: bold !important;
+		}
+	</style>
+</noscript>
