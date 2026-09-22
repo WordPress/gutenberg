@@ -1,3 +1,9 @@
+import { describe, expect, it } from 'vitest';
+import type { Attachment } from '../attachment';
+import imageAttachmentFixture from './fixtures/attachment-image.json';
+import zipAttachmentFixture from './fixtures/attachment-zip.json';
+import audioAttachmentFixture from './fixtures/attachment-audio.json';
+import videoAttachmentFixture from './fixtures/attachment-video.json';
 /**
  * Tests for the Attachment type against real REST API responses.
  *
@@ -7,20 +13,11 @@
  * permalink_template, generated_slug, and missing_image_sizes.
  */
 
-/**
- * Internal dependencies
- */
-import type { Attachment } from '../attachment';
-import imageAttachmentFixture from './fixtures/attachment-image.json';
-import zipAttachmentFixture from './fixtures/attachment-zip.json';
-import audioAttachmentFixture from './fixtures/attachment-audio.json';
-import videoAttachmentFixture from './fixtures/attachment-video.json';
-
 describe( 'Attachment type', () => {
 	describe( 'Image attachment', () => {
 		it( 'should validate against real image attachment from REST API', () => {
 			const attachment: Attachment< 'edit' > =
-				imageAttachmentFixture as Attachment< 'edit' >;
+				imageAttachmentFixture as unknown as Attachment< 'edit' >;
 
 			// Edit-context fields
 			expect( attachment.permalink_template ).toBeDefined();
@@ -38,7 +35,7 @@ describe( 'Attachment type', () => {
 	describe( 'Zip file attachment', () => {
 		it( 'should validate against real zip file attachment from REST API', () => {
 			const attachment: Attachment< 'edit' > =
-				zipAttachmentFixture as Attachment< 'edit' >;
+				zipAttachmentFixture as unknown as Attachment< 'edit' >;
 
 			// Edit-context fields
 			expect( attachment.permalink_template ).toBeDefined();
@@ -58,7 +55,7 @@ describe( 'Attachment type', () => {
 	describe( 'Audio file attachment', () => {
 		it( 'should validate against real audio attachment from REST API', () => {
 			const attachment: Attachment< 'edit' > =
-				audioAttachmentFixture as Attachment< 'edit' >;
+				audioAttachmentFixture as unknown as Attachment< 'edit' >;
 
 			// Edit-context fields
 			expect( attachment.permalink_template ).toBeDefined();
@@ -79,7 +76,7 @@ describe( 'Attachment type', () => {
 	describe( 'Video file attachment', () => {
 		it( 'should validate against real video attachment from REST API', () => {
 			const attachment: Attachment< 'edit' > =
-				videoAttachmentFixture as Attachment< 'edit' >;
+				videoAttachmentFixture as unknown as Attachment< 'edit' >;
 
 			// Edit-context fields
 			expect( attachment.permalink_template ).toBeDefined();

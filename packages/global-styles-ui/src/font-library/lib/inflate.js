@@ -28,27 +28,8 @@
  * SOFTWARE.
  */
 
-/* eslint eslint-comments/no-unlimited-disable: 0 */
-/* eslint-disable */
-/* pako 1.0.10 nodeca/pako */ ( function ( f ) {
-	if ( typeof exports === 'object' && typeof module !== 'undefined' ) {
-		module.exports = f();
-	} else if ( typeof define === 'function' && define.amd ) {
-		define( [], f );
-	} else {
-		var g;
-		if ( typeof window !== 'undefined' ) {
-			g = window;
-		} else if ( typeof global !== 'undefined' ) {
-			g = global;
-		} else if ( typeof self !== 'undefined' ) {
-			g = self;
-		} else {
-			g = this;
-		}
-		g.pako = f();
-	}
-} )( function () {
+/* pako 1.0.10 nodeca/pako */
+export default ( function () {
 	var define, module, exports;
 	return ( function () {
 		function r( e, n, t ) {
@@ -259,14 +240,14 @@
 							q >= 252
 								? 6
 								: q >= 248
-								? 5
-								: q >= 240
-								? 4
-								: q >= 224
-								? 3
-								: q >= 192
-								? 2
-								: 1;
+									? 5
+									: q >= 240
+										? 4
+										: q >= 224
+											? 3
+											: q >= 192
+												? 2
+												: 1;
 					}
 					_utf8len[ 254 ] = _utf8len[ 254 ] = 1; // Invalid sequence start
 
@@ -300,10 +281,10 @@
 								c < 0x80
 									? 1
 									: c < 0x800
-									? 2
-									: c < 0x10000
-									? 3
-									: 4;
+										? 2
+										: c < 0x10000
+											? 3
+											: 4;
 						}
 
 						// allocate buffer
@@ -397,7 +378,7 @@
 						//     String.fromCharCode.apply than Uint16Array.
 						var utf16buf = new Array( len * 2 );
 
-						for ( out = 0, i = 0; i < len;  ) {
+						for ( out = 0, i = 0; i < len; ) {
 							c = buf[ i++ ];
 							// quick process ascii
 							if ( c < 0x80 ) {
@@ -862,20 +843,20 @@
 
 							dolen: for (;;) {
 								// Goto emulation
-								op = here >>> 24 /*here.bits*/;
+								op = here >>> 24; /*here.bits*/
 								hold >>>= op;
 								bits -= op;
-								op = ( here >>> 16 ) & 0xff /*here.op*/;
+								op = ( here >>> 16 ) & 0xff; /*here.op*/
 								if ( op === 0 ) {
 									/* literal */
 									//Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ?
 									//        "inflate:         literal '%c'\n" :
 									//        "inflate:         literal 0x%02x\n", here.val));
 									output[ _out++ ] =
-										here & 0xffff /*here.val*/;
+										here & 0xffff; /*here.val*/
 								} else if ( op & 16 ) {
 									/* length base */
-									len = here & 0xffff /*here.val*/;
+									len = here & 0xffff; /*here.val*/
 									op &= 15; /* number of extra bits */
 									if ( op ) {
 										if ( bits < op ) {
@@ -897,14 +878,14 @@
 
 									dodist: for (;;) {
 										// goto emulation
-										op = here >>> 24 /*here.bits*/;
+										op = here >>> 24; /*here.bits*/
 										hold >>>= op;
 										bits -= op;
-										op = ( here >>> 16 ) & 0xff /*here.op*/;
+										op = ( here >>> 16 ) & 0xff; /*here.op*/
 
 										if ( op & 16 ) {
 											/* distance base */
-											dist = here & 0xffff /*here.val*/;
+											dist = here & 0xffff; /*here.val*/
 											op &= 15; /* number of extra bits */
 											if ( bits < op ) {
 												hold += input[ _in++ ] << bits;
@@ -1344,7 +1325,7 @@
 						state.last = 0;
 						state.havedict = 0;
 						state.dmax = 32768;
-						state.head = null /*Z_NULL*/;
+						state.head = null; /*Z_NULL*/
 						state.hold = 0;
 						state.bits = 0;
 						//state.lencode = state.distcode = state.next = state.codes;
@@ -1429,10 +1410,10 @@
 						//if (state === Z_NULL) return Z_MEM_ERROR;
 						//Tracev((stderr, "inflate: allocated\n"));
 						strm.state = state;
-						state.window = null /*Z_NULL*/;
+						state.window = null; /*Z_NULL*/
 						ret = inflateReset2( strm, windowBits );
 						if ( ret !== Z_OK ) {
-							strm.state = null /*Z_NULL*/;
+							strm.state = null; /*Z_NULL*/
 						}
 						return ret;
 					}
@@ -1674,7 +1655,7 @@
 									//===//
 									if ( state.wrap & 2 && hold === 0x8b1f ) {
 										/* gzip header */
-										state.check = 0 /*crc32(0L, Z_NULL, 0)*/;
+										state.check = 0; /*crc32(0L, Z_NULL, 0)*/
 										//=== CRC2(state.check, hold);
 										hbuf[ 0 ] = hold & 0xff;
 										hbuf[ 1 ] = ( hold >>> 8 ) & 0xff;
@@ -1732,7 +1713,7 @@
 									state.dmax = 1 << len;
 									//Tracev((stderr, "inflate:   zlib header ok\n"));
 									strm.adler =
-										state.check = 1 /*adler32(0L, Z_NULL, 0)*/;
+										state.check = 1; /*adler32(0L, Z_NULL, 0)*/
 									state.mode = hold & 0x200 ? DICTID : TYPE;
 									//=== INITBITS();
 									hold = 0;
@@ -1885,7 +1866,7 @@
 										bits = 0;
 										//===//
 									} else if ( state.head ) {
-										state.head.extra = null /*Z_NULL*/;
+										state.head.extra = null; /*Z_NULL*/
 									}
 									state.mode = EXTRA;
 								/* falls through */
@@ -2081,7 +2062,7 @@
 										return Z_NEED_DICT;
 									}
 									strm.adler =
-										state.check = 1 /*adler32(0L, Z_NULL, 0)*/;
+										state.check = 1; /*adler32(0L, Z_NULL, 0)*/
 									state.mode = TYPE;
 								/* falls through */
 								case TYPE:
@@ -2111,7 +2092,7 @@
 										bits += 8;
 									}
 									//===//
-									state.last = hold & 0x01 /*BITS(1)*/;
+									state.last = hold & 0x01; /*BITS(1)*/
 									//--- DROPBITS(1) ---//
 									hold >>>= 1;
 									bits -= 1;
@@ -2658,7 +2639,7 @@
 										state.length +=
 											hold &
 											( ( 1 << state.extra ) -
-												1 ) /*BITS(state.extra)*/;
+												1 ); /*BITS(state.extra)*/
 										//--- DROPBITS(state.extra) ---//
 										hold >>>= state.extra;
 										bits -= state.extra;
@@ -2763,7 +2744,7 @@
 										state.offset +=
 											hold &
 											( ( 1 << state.extra ) -
-												1 ) /*BITS(state.extra)*/;
+												1 ); /*BITS(state.extra)*/
 										//--- DROPBITS(state.extra) ---//
 										hold >>>= state.extra;
 										bits -= state.extra;
@@ -2873,13 +2854,13 @@
 															output,
 															_out,
 															put - _out
-													  )
+														)
 													: adler32(
 															state.check,
 															output,
 															_out,
 															put - _out
-													  );
+														);
 										}
 										_out = left;
 										// NB: crc32 stored as signed 32-bit int, zswap32 returns signed too
@@ -2994,13 +2975,13 @@
 											output,
 											_out,
 											strm.next_out - _out
-									  )
+										)
 									: adler32(
 											state.check,
 											output,
 											_out,
 											strm.next_out - _out
-									  );
+										);
 						}
 						strm.data_type =
 							state.bits +
@@ -3590,11 +3571,11 @@
 						/* total number of bytes output so far */
 						this.total_out = 0;
 						/* last error message, NULL if no error */
-						this.msg = '' /*Z_NULL*/;
+						this.msg = ''; /*Z_NULL*/
 						/* not visible by applications */
 						this.state = null;
 						/* best guess about the data type: binary or text */
-						this.data_type = 2 /*Z_UNKNOWN*/;
+						this.data_type = 2; /*Z_UNKNOWN*/
 						/* adler32 value of the uncompressed data */
 						this.adler = 0;
 					}
@@ -3837,8 +3818,8 @@
 							mode === ~~mode
 								? mode
 								: mode === true
-								? c.Z_FINISH
-								: c.Z_NO_FLUSH;
+									? c.Z_FINISH
+									: c.Z_NO_FLUSH;
 
 						// Convert data if needed
 						if ( typeof data === 'string' ) {
@@ -4108,5 +4089,4 @@
 		{},
 		[]
 	)( '/lib/inflate.js' );
-} );
-/* eslint-enable */
+} )();

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { html as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
@@ -20,12 +13,11 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
-		attributes: {
-			content:
-				'<marquee>' +
+		innerContent: [
+			'<marquee>' +
 				__( 'Welcome to the wonderful world of blocks…' ) +
 				'</marquee>',
-		},
+		],
 	},
 	edit,
 	save,

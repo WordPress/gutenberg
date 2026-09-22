@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { HStack } from '../h-stack';
 import type { CheckboxControlProps } from './types';
@@ -95,7 +84,6 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			label={ heading }
 			id={ id }
 			help={
@@ -131,6 +119,8 @@ export function CheckboxControl(
 							icon={ reset }
 							className="components-checkbox-control__indeterminate"
 							role="presentation"
+							size={ 16 }
+							viewBox="4 4 16 16"
 						/>
 					) : null }
 					{ showCheckedIcon ? (
@@ -138,6 +128,8 @@ export function CheckboxControl(
 							icon={ check }
 							className="components-checkbox-control__checked"
 							role="presentation"
+							size={ 16 }
+							viewBox="4 4 16 16"
 						/>
 					) : null }
 				</span>

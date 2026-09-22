@@ -1,165 +1,102 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { Type } from '@wordpress/core-data';
-import type { View } from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
-const DEFAULT_VIEW: View = {
-	type: 'grid' as const,
-	sort: {
-		field: 'date',
-		direction: 'desc' as const,
-	},
-	fields: [],
-	titleField: 'title',
-	mediaField: 'preview',
+const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
+
+/**
+ * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
+ * `@wordpress/views`, which is not exported.
+ */
+export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
+	layout?: Record< string, unknown >;
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
-};
-
-export const DEFAULT_VIEWS: {
+export interface ViewListEntry {
+	title: string;
 	slug: string;
-	label: string;
-	view: View;
-}[] = [
-	{
-		slug: 'all',
-		label: 'All Template Parts',
-		view: {
-			...DEFAULT_VIEW,
-		},
-	},
-	{
-		slug: 'header',
-		label: 'Headers',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'header',
-				},
-			],
-		},
-	},
-	{
-		slug: 'footer',
-		label: 'Footers',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'footer',
-				},
-			],
-		},
-	},
-	{
-		slug: 'sidebar',
-		label: 'Sidebars',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'sidebar',
-				},
-			],
-		},
-	},
-	{
-		slug: 'overlay',
-		label: 'Overlays',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'overlay',
-				},
-			],
-		},
-	},
-	{
-		slug: 'uncategorized',
-		label: 'General',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'area',
-					operator: 'is',
-					value: 'uncategorized',
-				},
-			],
-		},
-	},
-];
+	view?: ViewOverrides;
+}
 
-export function getDefaultView(
-	postType: Type | undefined,
-	area?: string
-): View {
-	// Find the view configuration by area
-	const viewConfig = DEFAULT_VIEWS.find( ( v ) => v.slug === area );
+interface EntityViewConfig {
+	default_view: View | undefined;
+	default_layouts: SupportedLayouts | undefined;
+	view_list: ViewListEntry[] | undefined;
+}
 
-	// Use the view from the config if found, otherwise use default
-	return viewConfig?.view || DEFAULT_VIEW;
+/**
+ * Resolves the server-provided view configuration for the template part
+ * post type, for use in the route loader that runs outside React (where
+ * `useViewConfig` is unavailable).
+ *
+ * @return The entity view configuration.
+ */
+export async function loadTemplatePartViewConfig(): Promise< EntityViewConfig > {
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		TEMPLATE_PART_POST_TYPE
+	);
+	return {
+		default_view: config?.default_view,
+		default_layouts: config?.default_layouts,
+		view_list: config?.view_list,
+	};
+}
+
+/**
+ * Returns the template part area the given view overrides lock the list to,
+ * or `undefined` when they do not.
+ *
+ * Only a locked `area` filter counts: it is the one the user cannot change,
+ * so the list can hide the area column and preselect the area for a new
+ * template part. An editable area filter is a starting point the user may
+ * clear or change, not a lock.
+ *
+ * @param viewOverrides The view overrides of the active view.
+ * @return The template part area, if any.
+ */
+export function getAreaFromViewOverrides(
+	viewOverrides: ViewOverrides
+): string | undefined {
+	const areaFilter = viewOverrides.filters?.find(
+		( filter ) => filter.field === 'area' && filter.isLocked
+	);
+	return typeof areaFilter?.value === 'string' ? areaFilter.value : undefined;
 }
 
 export async function ensureView(
-	area?: string,
+	area: string,
 	search?: { page?: number; search?: string }
 ) {
-	const postTypeObject =
-		await resolveSelect( coreStore ).getPostType( 'wp_template_part' );
-	const defaultView = getDefaultView( postTypeObject, area );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = await loadTemplatePartViewConfig();
+	if ( ! defaultView ) {
+		throw new Error(
+			`Missing view configuration for the ${ TEMPLATE_PART_POST_TYPE } post type.`
+		);
+	}
 	return loadView( {
 		kind: 'postType',
-		name: 'wp_template_part',
-		slug: area ?? 'all',
+		name: TEMPLATE_PART_POST_TYPE,
+		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
+		activeViewOverrides:
+			viewList?.find( ( v ) => v.slug === area )?.view ?? {},
 		queryParams: search,
 	} );
 }
 
 export function viewToQuery( view: View ) {
-	const result: Record< string, any > = {};
+	// The endpoint only supports `area`. Everything else is handled client-side.
+	const result: Record< string, any > = { per_page: -1 };
 
-	// Pagination, sorting, search.
-	if ( undefined !== view.perPage ) {
-		result.per_page = view.perPage;
-	}
-
-	if ( undefined !== view.page ) {
-		result.page = view.page;
-	}
-
-	if ( ! [ undefined, '' ].includes( view.search ) ) {
-		result.search = view.search;
-	}
-
-	if ( undefined !== view.sort?.field ) {
-		result.orderby = view.sort.field;
-	}
-
-	if ( undefined !== view.sort?.direction ) {
-		result.order = view.sort.direction;
-	}
-
-	// Area filtering for template parts
 	const areaFilter = view.filters?.find(
 		( filter ) => filter.field === 'area'
 	);

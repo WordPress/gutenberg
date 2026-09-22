@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { redirect } from '@wordpress/route';
 
 /**
@@ -12,7 +9,7 @@ export const route = {
 			throw: true,
 			to: '/templates/list/$activeView',
 			params: {
-				activeView: 'active',
+				activeView: 'all',
 			},
 		} );
 	},

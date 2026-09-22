@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { memo, useContext, useRef } from '@wordpress/element';
-import { __experimentalHStack as HStack } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { Stack } from '@wordpress/ui';
 import Filter from './filter';
 import { default as AddFilter } from './add-filter';
 import ResetFilters from './reset-filters';
@@ -59,14 +52,16 @@ function Filters( { className }: { className?: string } ) {
 	);
 
 	return (
-		<HStack
+		<Stack
+			direction="row"
 			justify="flex-start"
+			gap="sm"
 			style={ { width: 'fit-content' } }
-			wrap
+			wrap="wrap"
 			className={ className }
 		>
 			{ filterComponents }
-		</HStack>
+		</Stack>
 	);
 }
 

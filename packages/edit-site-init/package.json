@@ -18,16 +18,23 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"dependencies": {
 		"@wordpress/boot": "file:../boot",
 		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
 		"access": "public"

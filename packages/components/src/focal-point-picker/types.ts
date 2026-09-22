@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	CSSProperties,
 	ReactEventHandler,
 	Ref,
 	VideoHTMLAttributes,
 } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type FocalPoint = Record< FocalPointAxis, number >;
@@ -18,17 +11,8 @@ export type FocalPointAxis = 'x' | 'y';
 
 export type FocalPointPickerProps = Pick<
 	BaseControlProps,
-	'help' | 'hideLabelFromVision' | 'label'
+	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
 > & {
-	/**
-	 * Start opting into the new margin-free styles that will become the default in a future version.
-	 *
-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
-	 * @ignore
-	 *
-	 * @default false
-	 */
-	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *

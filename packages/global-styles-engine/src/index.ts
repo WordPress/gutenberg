@@ -16,16 +16,23 @@ export {
 	transformToStyles as toStyles,
 	getBlockSelectors,
 	getLayoutStyles,
+	processCSSNesting,
 } from './core/render';
 export { getBlockSelector } from './core/selectors';
 
 // Utilities (Ideally these shouldn't be exposed)
 export { getTypographyFontSizeValue } from './utils/typography';
+export { getDimensionPresetCssVar } from './utils/dimensions';
+export { getViewportMediaQueries } from './utils/viewport';
 export {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 	getResolvedValue,
+	splitSelectorList,
 } from './utils/common';
+export { privateApis } from './private-apis';
 
 // Types
 export type * from './types';
+
+export { generatePreviewStateStyles as __unstableGeneratePreviewStateStyles } from './preview-state-styles';

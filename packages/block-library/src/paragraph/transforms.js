@@ -1,12 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import metadata from './block.json';
 
-/**
- * Internal dependencies
- */
-import { name } from './block.json';
+const { name } = metadata;
 
 const transforms = {
 	from: [

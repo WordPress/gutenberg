@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import QueryControls from '..';
 import type {
 	Category,
@@ -20,7 +9,8 @@ import type {
 } from '../types';
 
 const meta: Meta< typeof QueryControls > = {
-	title: 'Components/QueryControls',
+	id: 'components-querycontrols',
+	title: 'Components/@wordpress-components/QueryControls',
 	component: QueryControls,
 	argTypes: {
 		numberOfItems: { control: false },
@@ -40,6 +30,10 @@ const meta: Meta< typeof QueryControls > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

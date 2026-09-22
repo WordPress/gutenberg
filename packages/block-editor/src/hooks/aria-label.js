@@ -1,8 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { shouldSkipSerialization } from './utils';
 
 /**
  * Filters registered block settings, extending attributes with ariaLabel using aria-label
@@ -42,7 +40,10 @@ export function addAttribute( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'ariaLabel' ) ) {
+	if (
+		hasBlockSupport( blockType, 'ariaLabel' ) &&
+		! shouldSkipSerialization( blockType, 'ariaLabel', 'ariaLabel' )
+	) {
 		extraProps[ 'aria-label' ] =
 			attributes.ariaLabel === '' ? null : attributes.ariaLabel;
 	}

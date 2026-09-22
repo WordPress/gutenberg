@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	RangeControl,
@@ -21,14 +18,9 @@ interface SizeControlProps {
 	fallbackValue?: number;
 	disabled?: boolean;
 	label?: string;
-	__nextHasNoMarginBottom?: boolean;
 }
 
-function SizeControl( {
-	// Do not allow manipulation of margin bottom
-	__nextHasNoMarginBottom,
-	...props
-}: SizeControlProps ) {
+function SizeControl( props: SizeControlProps ) {
 	const { baseControlProps } = useBaseControlProps( props );
 	const { value, onChange, fallbackValue, disabled, label } = props;
 
@@ -57,11 +49,10 @@ function SizeControl( {
 	};
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ label }
 						hideLabelFromVision
 						value={ value }
@@ -74,8 +65,6 @@ function SizeControl( {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ label }
 							hideLabelFromVision
 							value={ valueQuantity }

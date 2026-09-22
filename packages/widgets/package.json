@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "4.36.0",
+	"version": "4.55.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,19 +17,25 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpCopyFiles": {
 		"files": [
@@ -71,8 +77,8 @@
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

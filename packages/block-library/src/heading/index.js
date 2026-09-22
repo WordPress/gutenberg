@@ -1,17 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	privateApis as blocksPrivateApis,
-	getBlockType,
-	unregisterBlockVariation,
-} from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { getBlockType, unregisterBlockVariation } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -19,9 +8,6 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
-import { unlock } from '../lock-unlock';
-
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -33,7 +19,11 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
@@ -48,19 +38,23 @@ export const settings = {
 			return customName || content;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasContent
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
 						level
-				  )
+					)
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
 						content
-				  );
+					);
 		}
 	},
 	transforms,
@@ -76,19 +70,6 @@ export const settings = {
 	save,
 	variations,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'content',
-			label: __( 'Content' ),
-			type: 'richtext',
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'content' ],
-	};
-}
 
 export const init = () => {
 	const block = initBlock( { name, metadata, settings } );

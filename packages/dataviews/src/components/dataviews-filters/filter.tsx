@@ -1,47 +1,27 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Dropdown,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	FlexItem,
-	SelectControl,
-	Tooltip,
-	Icon,
+	SelectControl as WCSelectControl,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { dateI18n, getDate } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
+import { Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
 	NormalizedField,
-	NormalizedFieldDate,
-	NormalizedFieldNumber,
-	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
-import parseDateTime from '../../field-types/utils/parse-date-time';
-import { formatNumber } from '../../field-types/number';
-import { formatInteger } from '../../field-types/integer';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -59,7 +39,7 @@ interface OperatorSelectorProps {
 }
 
 interface FilterProps extends OperatorSelectorProps {
-	addFilterRef: RefObject< HTMLButtonElement >;
+	addFilterRef: RefObject< HTMLButtonElement | null >;
 	openedFilter: string | null;
 	fields: NormalizedField< any >[];
 }
@@ -100,16 +80,18 @@ function OperatorSelector( {
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
 		operatorOptions.length > 1 && (
-			<HStack
-				spacing={ 2 }
+			<Stack
+				direction="row"
+				gap="sm"
 				justify="flex-start"
 				className="dataviews-filters__summary-operators-container"
+				align="center"
 			>
 				<FlexItem className="dataviews-filters__summary-operators-filter-name">
 					{ filter.name }
 				</FlexItem>
 
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-filters__summary-operators-filter-select"
 					label={ __( 'Conditions' ) }
 					value={ value }
@@ -152,7 +134,7 @@ function OperatorSelector( {
 											return _filter;
 										}
 									),
-							  ]
+								]
 							: [
 									...( view.filters ?? [] ),
 									{
@@ -160,7 +142,7 @@ function OperatorSelector( {
 										operator: newOperator,
 										value: undefined,
 									},
-							  ];
+								];
 						onChangeView( {
 							...view,
 							page: 1,
@@ -169,10 +151,9 @@ function OperatorSelector( {
 					} }
 					size="small"
 					variant="minimal"
-					__nextHasNoMarginBottom
 					hideLabelFromVision
 				/>
-			</HStack>
+			</Stack>
 		)
 	);
 }
@@ -190,6 +171,20 @@ export default function Filter( {
 	);
 
 	let activeElements: Option[] = [];
+	const field = useMemo( () => {
+		const currentField = fields.find( ( f ) => f.id === filter.field );
+		if ( currentField ) {
+			return {
+				...currentField,
+				// Configure getValue as if Item was a plain object.
+				// See related input-widget.tsx
+				getValue: ( { item }: { item: any } ) =>
+					item[ currentField.id ],
+			};
+		}
+
+		return currentField;
+	}, [ fields, filter.field ] );
 
 	const { elements } = useElements( {
 		elements: filter.elements,
@@ -197,44 +192,52 @@ export default function Filter( {
 	} );
 
 	if ( elements.length > 0 ) {
+		// When there are elements, we favor those
 		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
 			return filterInView?.value?.includes( element.value );
 		} );
-	} else if ( filterInView?.value !== undefined ) {
-		const field = fields.find( ( f ) => f.id === filter.field );
-		let label = filterInView.value;
+	} else if ( Array.isArray( filterInView?.value ) ) {
+		// or, filterInView.value can also be array
+		// for the between operator, as in [ 1, 2 ]. A range with an unfilled
+		// bound does not filter, so the chip renders as if no value were set.
+		const isComplete = ! filterInView.value.some(
+			( v ) => v === undefined || v === null || v === ''
+		);
+		if ( isComplete ) {
+			const label = filterInView.value.map( ( v ) => {
+				const formattedValue = field?.getValueFormatted( {
+					item: { [ field.id ]: v },
+					field,
+				} );
+				return formattedValue || String( v );
+			} );
 
-		if ( field?.type === 'date' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateI18n(
-						( field as NormalizedFieldDate< any > ).format.date,
-						getDate( label )
-					);
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateValue.toLocaleString();
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'number' && typeof label === 'number' ) {
-			const numberField = field as NormalizedFieldNumber< any >;
-			label = formatNumber( label, numberField.format );
-		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
-			const integerField = field as NormalizedFieldInteger< any >;
-			label = formatInteger( label, integerField.format );
+			activeElements = [
+				{
+					value: filterInView.value,
+					// @ts-expect-error `label` is a `string[]` here, but the element type expects a `string`.
+					label,
+				},
+			];
 		}
+	} else if ( typeof filterInView?.value === 'object' ) {
+		// or, it can also be object for the inThePast/over operators,
+		// as in { value: '1', units: 'days' }
+		activeElements = [
+			{ value: filterInView.value, label: filterInView.value },
+		];
+	} else if ( filterInView?.value !== undefined ) {
+		// otherwise, filterInView.value is a single value
+		const label =
+			field !== undefined
+				? field.getValueFormatted( {
+						item: { [ field.id ]: filterInView.value },
+						field,
+					} )
+				: String( filterInView.value );
 
 		activeElements = [
 			{
@@ -248,6 +251,10 @@ export default function Filter( {
 	const isLocked = filterInView?.isLocked;
 	const hasValues = ! isLocked && filterInView?.value !== undefined;
 	const canResetOrRemove = ! isLocked && ( ! isPrimary || hasValues );
+	// TODO: revisit once `@wordpress/ui`'s `IconButton` is ready — it should
+	// collapse the manual icon-only `<button>` + `aria-label` + Tooltip
+	// composition below into a single primitive.
+	const resetOrRemoveLabel = isPrimary ? __( 'Reset' ) : __( 'Remove' );
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -258,89 +265,101 @@ export default function Filter( {
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<div className="dataviews-filters__summary-chip-container">
-					<Tooltip
-						text={ sprintf(
-							/* translators: 1: Filter name. */
-							__( 'Filter by: %1$s' ),
-							filter.name.toLowerCase()
-						) }
-						placement="top"
-					>
-						<div
-							className={ clsx(
-								'dataviews-filters__summary-chip',
-								{
-									'has-reset': canResetOrRemove,
-									'has-values': hasValues,
-									'is-not-clickable': isLocked,
-								}
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<div
+									className={ clsx(
+										'dataviews-filters__summary-chip',
+										{
+											'has-reset': canResetOrRemove,
+											'has-values': hasValues,
+											'is-not-clickable': isLocked,
+										}
+									) }
+									role="button"
+									tabIndex={ isLocked ? -1 : 0 }
+									onClick={ () => {
+										if ( ! isLocked ) {
+											onToggle();
+										}
+									} }
+									onKeyDown={ ( event ) => {
+										if (
+											! isLocked &&
+											[ ENTER, SPACE ].includes(
+												event.key
+											)
+										) {
+											onToggle();
+											event.preventDefault();
+										}
+									} }
+									aria-disabled={ isLocked }
+									aria-pressed={ isOpen }
+									aria-expanded={ isOpen }
+									ref={ toggleRef }
+								>
+									<FilterText
+										activeElements={ activeElements }
+										filterInView={ filterInView }
+										filter={ filter }
+									/>
+								</div>
+							}
+						/>
+						<Tooltip.Popup>
+							{ sprintf(
+								/* translators: 1: Filter name. */
+								__( 'Filter by: %1$s' ),
+								filter.name.toLowerCase()
 							) }
-							role="button"
-							tabIndex={ isLocked ? -1 : 0 }
-							onClick={ () => {
-								if ( ! isLocked ) {
-									onToggle();
-								}
-							} }
-							onKeyDown={ ( event ) => {
-								if (
-									! isLocked &&
-									[ ENTER, SPACE ].includes( event.key )
-								) {
-									onToggle();
-									event.preventDefault();
-								}
-							} }
-							aria-disabled={ isLocked }
-							aria-pressed={ isOpen }
-							aria-expanded={ isOpen }
-							ref={ toggleRef }
-						>
-							<FilterText
-								activeElements={ activeElements }
-								filterInView={ filterInView }
-								filter={ filter }
-							/>
-						</div>
-					</Tooltip>
+						</Tooltip.Popup>
+					</Tooltip.Root>
 					{ canResetOrRemove && (
-						<Tooltip
-							text={ isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
-							placement="top"
-						>
-							<button
-								className={ clsx(
-									'dataviews-filters__summary-chip-remove',
-									{ 'has-values': hasValues }
-								) }
-								onClick={ () => {
-									onChangeView( {
-										...view,
-										page: 1,
-										filters: view.filters?.filter(
-											( _filter ) =>
-												_filter.field !== filter.field
-										),
-									} );
-									// If the filter is not primary and can be removed, it will be added
-									// back to the available filters from `Add filter` component.
-									if ( ! isPrimary ) {
-										addFilterRef.current?.focus();
-									} else {
-										// If is primary, focus the toggle button.
-										toggleRef.current?.focus();
-									}
-								} }
-							>
-								<Icon icon={ closeSmall } />
-							</button>
-						</Tooltip>
+						<Tooltip.Root>
+							<Tooltip.Trigger
+								render={
+									<button
+										className={ clsx(
+											'dataviews-filters__summary-chip-remove',
+											{ 'has-values': hasValues }
+										) }
+										aria-label={ resetOrRemoveLabel }
+										onClick={ () => {
+											onChangeView( {
+												...view,
+												page: 1,
+												filters: view.filters?.filter(
+													( _filter ) =>
+														_filter.field !==
+														filter.field
+												),
+											} );
+											// If the filter is not primary and can be removed, it will be added
+											// back to the available filters from `Add filter` component.
+											if ( ! isPrimary ) {
+												addFilterRef.current?.focus();
+											} else {
+												// If is primary, focus the toggle button.
+												toggleRef.current?.focus();
+											}
+										} }
+									>
+										<WCIcon icon={ closeSmall } />
+									</button>
+								}
+							/>
+							<Tooltip.Popup>
+								{ resetOrRemoveLabel }
+							</Tooltip.Popup>
+						</Tooltip.Root>
 					) }
 				</div>
 			) }
 			renderContent={ () => {
 				return (
-					<VStack spacing={ 0 } justify="flex-start">
+					<Stack direction="column" justify="flex-start">
 						<OperatorSelector { ...commonProps } />
 						{ commonProps.filter.hasElements ? (
 							<SearchWidget
@@ -353,7 +372,7 @@ export default function Filter( {
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />
 						) }
-					</VStack>
+					</Stack>
 				);
 			} }
 		/>

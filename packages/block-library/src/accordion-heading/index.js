@@ -1,11 +1,8 @@
-/**
- * Internal dependencies
- */
+import { accordionHeading as icon } from '@wordpress/icons';
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import initBlock from '../utils/init-block';
-import icon from './icon';
 import deprecated from './deprecated';
 
 const { name } = metadata;

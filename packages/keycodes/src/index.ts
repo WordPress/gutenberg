@@ -8,27 +8,12 @@
  * on Windows Control will usually come first. So don't provide your own
  * shortcut combos directly to keyboardShortcut().
  */
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { isAppleOS } from './platform';
 
-/**
- * External dependencies
- */
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-
 export type WPModifierPart =
-	| typeof ALT
-	| typeof CTRL
-	| typeof COMMAND
-	| typeof SHIFT;
+	typeof ALT | typeof CTRL | typeof COMMAND | typeof SHIFT;
 
 export type WPKeycodeModifier =
 	| 'primary'
@@ -61,6 +46,30 @@ export type WPEventKeyHandler = (
 ) => boolean;
 
 export type WPModifier = ( isApple: () => boolean ) => WPModifierPart[];
+
+/**
+ * The values used to display and describe a keyboard shortcut.
+ */
+export type WPKeyboardShortcut = {
+	/**
+	 * The visual representation of the shortcut (e.g. "⌘S" on macOS or
+	 * "Ctrl+S" on Windows).
+	 */
+	displayShortcut: string;
+
+	/**
+	 * The shortcut in a format compatible with the
+	 * [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts)
+	 * (e.g. "Meta+S").
+	 */
+	ariaKeyShortcut: string;
+
+	/**
+	 * A plain-text label for the shortcut, for use in an accessible
+	 * description (e.g. "Command S").
+	 */
+	label: string;
+};
 
 /**
  * Keycode for BACKSPACE key.
@@ -163,6 +172,7 @@ export const SHIFT = 'shift';
 export const ZERO = 48;
 
 export { isAppleOS };
+export { withIgnoreIMEEvents } from './with-ignore-ime-events';
 
 /**
  * Capitalise the first character of a string.
@@ -221,13 +231,13 @@ export const modifiers: WPModifierHandler< WPModifier > = {
 /**
  * An object that contains functions to get raw shortcuts.
  *
- * These are intended for user with the KeyboardShortcuts.
+ * These are intended for use with the KeyboardShortcuts.
  *
  * @example
  * ```js
  * // Assuming macOS:
  * rawShortcut.primary( 'm' )
- * // "meta+m""
+ * // "meta+m"
  * ```
  */
 export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
@@ -237,6 +247,53 @@ export const rawShortcut: WPModifierHandler< WPKeyHandler< string > > =
 			return [ ...modifier( _isApple ), character.toLowerCase() ].join(
 				'+'
 			);
+		};
+	} );
+
+/**
+ * An object that contains functions to get shortcuts in a format compatible
+ * with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+ *
+ * **Note**: The provided shortcut character strings (ie. not the modifiers) should follow
+ * the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown",
+ * "Escape", "Plus", or "F1". The spacebar key should be represented with the
+ * "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts
+ * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts
+ * @see https://www.w3.org/TR/uievents-key/
+ *
+ * @example
+ * ```js
+ * // Assuming macOS:
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Meta+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "Meta+Alt+M"
+ *
+ * // Assuming Windows:
+ * ariaKeyShortcut.primary( 'm' )
+ * // "Control+M"
+ *
+ * ariaKeyShortcut.primaryAlt( 'm' )
+ * // "Control+Alt+M"
+ *
+ * ariaKeyShortcut.primaryShift( 'del' )
+ * // "Control+Shift+Delete"
+ * ```
+ */
+export const ariaKeyShortcut: WPModifierHandler< WPKeyHandler< string > > =
+	/* @__PURE__ */
+	mapValues( modifiers, ( modifier: WPModifier ) => {
+		return ( character: string, _isApple = isAppleOS ) => {
+			return [
+				...modifier( _isApple )
+					// Swap 'ctrl' for 'control' (spec-compliant)
+					.map( ( key ) => ( key === CTRL ? 'Control' : key ) )
+					.map( ( key ) => capitaliseFirstCharacter( key ) ),
+				capitaliseFirstCharacter( character ),
+			].join( '+' );
 		};
 	} );
 
@@ -351,6 +408,53 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 				.join( isApple ? ' ' : ' + ' );
 		};
 	} );
+
+/**
+ * An object that contains functions returning the three values used to
+ * display and describe a keyboard shortcut: its display string, its
+ * `aria-keyshortcuts` value and its plain-text label.
+ *
+ * The raw representation is not included; use `rawShortcut` for that.
+ *
+ * Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and
+ * `shortcutAriaLabel` separately, for example to build the `shortcut` prop of
+ * the `@wordpress/ui` components.
+ *
+ * @example
+ * ```js
+ * // Assuming macOS:
+ * keyboardShortcut.primaryShift( 'm' );
+ * // {
+ * //   displayShortcut: "⇧⌘M",
+ * //   ariaKeyShortcut: "Shift+Meta+M",
+ * //   label: "Shift Command M",
+ * // }
+ * ```
+ *
+ * Keyed map of functions to shortcut display values.
+ */
+export const keyboardShortcut: WPModifierHandler<
+	WPKeyHandler< WPKeyboardShortcut >
+> =
+	/* @__PURE__ */
+	Object.fromEntries(
+		( Object.keys( modifiers ) as WPKeycodeModifier[] ).map(
+			( modifier ) => [
+				modifier,
+				( character: string, _isApple = isAppleOS ) => ( {
+					displayShortcut: displayShortcut[ modifier ](
+						character,
+						_isApple
+					),
+					ariaKeyShortcut: ariaKeyShortcut[ modifier ](
+						character,
+						_isApple
+					),
+					label: shortcutAriaLabel[ modifier ]( character, _isApple ),
+				} ),
+			]
+		)
+	) as WPModifierHandler< WPKeyHandler< WPKeyboardShortcut > >;
 
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for

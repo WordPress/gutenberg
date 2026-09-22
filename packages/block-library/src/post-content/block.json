@@ -17,12 +17,14 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
 				"backgroundImage": true
 			}
@@ -30,6 +32,7 @@
 		"dimensions": {
 			"minHeight": true
 		},
+		"shadow": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,

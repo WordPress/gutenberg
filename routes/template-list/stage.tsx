@@ -1,46 +1,30 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
 	useSearch,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
-import { store as coreStore } from '@wordpress/core-data';
+import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
-	Button,
-	Modal,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+	store as coreStore,
+	privateApis as corePrivateApis,
+} from '@wordpress/core-data';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { published, commentAuthorAvatar } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-import { getDefaultView, DEFAULT_LAYOUTS } from './view-utils';
+import { unlock } from '@wordpress/routes-lock-unlock';
+import type { ViewListEntry, ViewOverrides } from './view-utils';
 import { previewField } from './fields/preview';
-import { authorField } from './fields/author';
-import { descriptionField } from './fields/description';
-import { activeField } from './fields/active';
-import { slugField } from './fields/slug';
-import { useTemplates } from './use-templates';
-import { useSetActiveTemplateAction } from './actions/set-active-template';
 import AddNewTemplate from './add-new-template';
-
 // Unlock WordPress private APIs
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -48,26 +32,67 @@ import './style.scss';
 import './add-new-template/style.scss';
 import type { Template } from './types';
 
+const TEMPLATE_POST_TYPE = 'wp_template';
+const EMPTY_ARRAY: Template[] = [];
+
 function getItemId( item: Template ) {
 	return item.id.toString();
 }
 
 function TemplateList() {
-	const invalidate = useInvalidate();
-	const { activeView = 'active' } = useParams( {
+	const { activeView = 'all' } = useParams( {
 		from: '/templates/list/$activeView',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
+	);
+
+	if ( ! defaultView ) {
+		// The route canvas resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<TemplateListView
+			activeView={ activeView }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+		/>
+	);
+}
+
+function TemplateListView( {
+	activeView,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+}: {
+	activeView: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/templates/list/$activeView' } );
 	const postTypeObject = useSelect(
-		( select ) => select( coreStore ).getPostType( 'wp_template' ),
+		( select ) => select( coreStore ).getPostType( TEMPLATE_POST_TYPE ),
 		[]
 	);
-	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
-		useState< Template | null >( null );
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -85,9 +110,11 @@ function TemplateList() {
 	// Use the new view persistence hook
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
-		name: 'wp_template',
-		slug: activeView,
+		name: TEMPLATE_POST_TYPE,
+		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -105,50 +132,20 @@ function TemplateList() {
 		}
 	};
 
-	// Fetch templates using our custom hook
-	const { records, isLoading, staticRecords } = useTemplates( activeView );
+	// Fetch every template. Filtering by author happens client-side through
+	// the view: the active view's locked `author` filter is applied by
+	// `filterSortAndPaginate`.
+	const { records: templates, isResolving: isLoading } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
+	const records = ( templates ?? EMPTY_ARRAY ) as Template[];
 
-	// Get users for author field
-	const users = useSelect(
-		( select ) => {
-			const { getUser } = select( coreStore );
-			return records.reduce( ( acc: any, record: any ) => {
-				if ( record.author_text ) {
-					if ( ! acc[ record.author_text ] ) {
-						acc[ record.author_text ] = record.author_text;
-					}
-				} else if ( record.author ) {
-					if ( ! acc[ record.author ] ) {
-						acc[ record.author ] = getUser( record.author );
-					}
-				}
-				return acc;
-			}, {} );
-		},
-		[ records ]
+	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	const fields = useMemo(
+		() => [ previewField, ...postFields ],
+		[ postFields ]
 	);
-
-	// Build fields array with author elements
-	const fields = useMemo( () => {
-		const elements = [];
-		for ( const author in users ) {
-			elements.push( {
-				value: users[ author ]?.id ?? author,
-				label: users[ author ]?.name ?? author,
-			} );
-		}
-		return [
-			previewField,
-			templateTitleField,
-			descriptionField,
-			activeField,
-			slugField,
-			{
-				...authorField,
-				elements,
-			},
-		];
-	}, [ users ] );
 
 	// Apply filtering, sorting, and pagination on the client side
 	const { data: posts, paginationInfo } = useMemo( () => {
@@ -193,69 +190,26 @@ function TemplateList() {
 			) {
 				cleanupDeletedPostIdsFromUrl( items );
 			}
-
-			// Handle duplicate action - navigate to Created templates tab
-			if ( actionId === 'duplicate-post' ) {
-				navigate( {
-					to: `/templates/list/user`,
-				} );
-			}
 		},
-		[ cleanupDeletedPostIdsFromUrl, navigate ]
+		[ cleanupDeletedPostIdsFromUrl ]
 	);
 
-	const setActiveTemplateAction = useSetActiveTemplateAction();
-
 	const postTypeActions: Action< Template >[] = usePostActions( {
-		postType: 'wp_template',
+		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 		onActionPerformed,
 	} );
 
 	const actions = useMemo( () => {
-		return [
-			setActiveTemplateAction,
-			...postTypeActions?.flatMap< Action< Template > >( ( action ) => {
-				// Skip revisions as the admin does not support it
-				if ( action.id === 'view-post-revisions' ) {
-					return [];
-				}
-
-				return [ action ];
-			} ),
-		];
-	}, [ setActiveTemplateAction, postTypeActions ] );
-
-	// Build tabs array dynamically
-	const tabs = useMemo( () => {
-		const baseTabs = [
-			{
-				slug: 'active',
-				label: __( 'Active' ),
-				icon: published,
-			},
-			{
-				slug: 'user',
-				label: __( 'Created templates' ),
-				icon: commentAuthorAvatar,
-			},
-		];
-
-		// Extract unique authors from static records
-		const authorMap = new Map();
-		staticRecords.forEach( ( record: Template ) => {
-			if ( record.author_text && ! authorMap.has( record.author_text ) ) {
-				authorMap.set( record.author_text, {
-					slug: record.author_text,
-					label: record.author_text,
-				} );
+		return postTypeActions?.flatMap< Action< Template > >( ( action ) => {
+			// Skip revisions as the admin does not support it
+			if ( action.id === 'view-post-revisions' ) {
+				return [];
 			}
+
+			return [ action ];
 		} );
-
-		const authorTabs = Array.from( authorMap.values() );
-
-		return [ ...baseTabs, ...authorTabs ];
-	}, [ staticRecords ] );
+	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( viewSlug: string ) => {
@@ -282,45 +236,26 @@ function TemplateList() {
 		selection.splice( 1 );
 	}
 
-	const duplicateAction = actions.find(
-		( action ) => action.id === 'duplicate-post'
-	);
-	if ( duplicateAction && ! ( 'RenderModal' in duplicateAction ) ) {
-		throw new Error(
-			'Expected duplicate action to have a RenderModal component'
-		);
-	}
-
 	return (
 		<Page
 			title={ __( 'Templates' ) }
 			className="template-page"
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
-			{ tabs.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-template-list__tabs-wrapper">
 					<Tabs
 						onSelect={ handleTabChange }
-						selectedTabId={ activeView ?? 'active' }
+						selectedTabId={ activeView }
 					>
 						<Tabs.TabList>
-							{ tabs.map( ( tab ) => (
-								<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
-									{ tab.label }
+							{ viewList.map( ( entry ) => (
+								<Tabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
 								</Tabs.Tab>
 							) ) }
 						</Tabs.TabList>
@@ -335,9 +270,10 @@ function TemplateList() {
 				actions={ actions }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {
@@ -352,33 +288,13 @@ function TemplateList() {
 				} }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					if ( typeof item.id === 'string' ) {
-						setSelectedRegisteredTemplate( item );
-					} else {
-						navigate( {
-							to: `/types/wp_template/edit/${ encodeURIComponent(
-								item.id
-							) }`,
-						} );
-					}
+					navigate( {
+						to: `/types/wp_template/edit/${ encodeURIComponent(
+							item.id
+						) }`,
+					} );
 				} }
 			/>
-			{ selectedRegisteredTemplate && duplicateAction && (
-				<Modal
-					title={ __( 'Duplicate' ) }
-					onRequestClose={ () =>
-						setSelectedRegisteredTemplate( null )
-					}
-					size="small"
-				>
-					<duplicateAction.RenderModal
-						items={ [ selectedRegisteredTemplate ] }
-						closeModal={ () =>
-							setSelectedRegisteredTemplate( null )
-						}
-					/>
-				</Modal>
-			) }
 		</Page>
 	);
 }

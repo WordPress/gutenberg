@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useDefaultAvatar } from '../utils/hooks';
 
 function getAvatarSizes( sizes ) {
@@ -44,7 +37,7 @@ export function useCommentAvatar( { commentId } ) {
 		maxSize,
 		alt: authorName
 			? // translators: %s: Author name.
-			  sprintf( __( '%s Avatar' ), authorName )
+				sprintf( __( '%s Avatar' ), authorName )
 			: __( 'Default Avatar' ),
 	};
 }
@@ -84,7 +77,7 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		maxSize,
 		alt: authorDetails
 			? // translators: %s: Author name.
-			  sprintf( __( '%s Avatar' ), authorDetails?.name )
+				sprintf( __( '%s Avatar' ), authorDetails?.name )
 			: __( 'Default Avatar' ),
 	};
 }

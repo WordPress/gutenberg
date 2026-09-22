@@ -1,30 +1,14 @@
-/**
- * External dependencies
- */
 import type { MouseEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Button,
-	Modal,
-	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
+import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
-
-const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -171,9 +155,6 @@ export function ActionsMenuGroup< Item >( {
 	return (
 		<Menu.Group>
 			{ renderActionGroup( primaryActions ) }
-			{ primaryActions.length > 0 && regularActions.length > 0 && (
-				<Menu.Separator />
-			) }
 			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);
@@ -200,6 +181,8 @@ export default function ItemActions< Item >( {
 		};
 	}, [ actions, item ] );
 
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -212,8 +195,8 @@ export default function ItemActions< Item >( {
 	}
 
 	return (
-		<HStack
-			spacing={ 0 }
+		<Stack
+			direction="row"
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
@@ -226,14 +209,17 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			{ primaryActions.length < eligibleActions.length && (
+			{ ( primaryActions.length < eligibleActions.length ||
+				// Since we hide primary actions on mobile, we need to show the menu
+				// there if there are any actions at all.
+				isMobileViewport ) && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }
 					registry={ registry }
 				/>
 			) }
-		</HStack>
+		</Stack>
 	);
 }
 
@@ -248,8 +234,11 @@ function CompactItemActions< Item >( {
 	);
 	return (
 		<>
-			<Menu placement="bottom-end">
-				<Menu.TriggerButton
+			{ /* The `disabled` prop on `Menu.Root` (rather than on the trigger)
+			     keeps the menu from opening while letting the trigger button
+			     stay focusable via its own `accessibleWhenDisabled`. */ }
+			<Menu.Root disabled={ ! actions.length }>
+				<Menu.Trigger
 					render={
 						<Button
 							size={ isSmall ? 'small' : 'compact' }
@@ -261,15 +250,15 @@ function CompactItemActions< Item >( {
 						/>
 					}
 				/>
-				<Menu.Popover>
+				<Menu.Popup positioner={ <Menu.Positioner align="end" /> }>
 					<ActionsMenuGroup
 						actions={ actions }
 						item={ item }
 						registry={ registry }
 						setActiveModalAction={ setActiveModalAction }
 					/>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 			{ !! activeModalAction && (
 				<ActionModal
 					action={ activeModalAction }

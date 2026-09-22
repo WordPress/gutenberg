@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -10,10 +7,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useNavigateToEntityRecord from './use-navigate-to-entity-record';
@@ -41,8 +34,7 @@ function useNavigateToPreviousEntityRecord() {
 export function useSpecificEditorSettings() {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
-	const [ onNavigateToEntityRecord, initialBlockSelection ] =
-		useNavigateToEntityRecord();
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 
 	/*
 	 * Generate global styles directly to avoid circular dependency with GlobalStylesRenderer
@@ -73,9 +65,15 @@ export function useSpecificEditorSettings() {
 	}, [ mergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
 		return {
 			...settings,
 			styles: [
+				...nonGlobalStyles,
 				...globalStyles,
 				{
 					// Forming a "block formatting context" to prevent margin collapsing.
@@ -86,18 +84,16 @@ export function useSpecificEditorSettings() {
 									currentPostIsTrashed
 										? ''
 										: 'cursor: pointer;'
-							  }}`
+								}}`
 							: undefined,
 				},
 			],
 			__experimentalFeatures: globalSettings,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvas !== 'view',
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
-			initialBlockSelection,
 		};
 	}, [
 		settings,
@@ -107,7 +103,6 @@ export function useSpecificEditorSettings() {
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		initialBlockSelection,
 	] );
 
 	return defaultEditorSettings;

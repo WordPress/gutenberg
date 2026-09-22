@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-// @ts-expect-error Commands is not typed properly.
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
-import { EditorSnackbars } from '@wordpress/editor';
+import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	__unstableMotion as motion,
@@ -19,22 +9,23 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Page } from '@wordpress/admin-ui';
-
-/**
- * Internal dependencies
- */
+import { UnsavedChangesWarning } from '@wordpress/editor';
+import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
+import { Tooltip } from '@wordpress/ui';
+import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import ErrorBoundary from '../error-boundary';
+import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
-import './style.scss';
+import useSyncBodyBackground from './use-sync-body-background';
+import styles from './style.module.scss';
 
-const { ThemeProvider } = unlock( themePrivateApis );
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
 
 export default function Root() {
@@ -42,9 +33,7 @@ export default function Root() {
 	const location = useLocation();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
@@ -60,134 +49,171 @@ export default function Root() {
 		setIsMobileSidebarOpen( false );
 	}, [ location.pathname, isMobileViewport ] );
 
+	const themeColors = useMemo( getAdminThemeColors, [] );
+
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
-			<ThemeProvider
-				isRoot
-				color={ { bg: '#f8f8f8', primary: '#3858e9' } }
-			>
-				<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
-					<div
-						className={ clsx( 'boot-layout', {
-							'has-canvas': !! canvas || canvas === null,
-							'has-full-canvas': isFullScreen,
-						} ) }
-					>
-						<CommandMenu />
-						<SavePanel />
-						<EditorSnackbars />
-						{ isMobileViewport && (
-							<Page.SidebarToggleFill>
-								<Button
-									icon={ menu }
-									onClick={ () =>
-										setIsMobileSidebarOpen( true )
-									}
-									label={ __( 'Open navigation panel' ) }
-									size="compact"
-								/>
-							</Page.SidebarToggleFill>
-						) }
-						{ /* Mobile Sidebar Backdrop */ }
-						<AnimatePresence>
-							{ isMobileViewport &&
-								isMobileSidebarOpen &&
-								! isFullScreen && (
-									<motion.div
-										initial={ { opacity: 0 } }
-										animate={ { opacity: 1 } }
-										exit={ { opacity: 0 } }
-										transition={ {
-											type: 'tween',
-											duration: disableMotion ? 0 : 0.2,
-											ease: 'easeOut',
-										} }
-										className="boot-layout__sidebar-backdrop"
+			<Tooltip.Provider>
+				<PluginArea />
+				<ThemeProvider
+					isRoot
+					color={ { ...themeColors, background: '#f8f8f8' } }
+				>
+					<ThemeProvider color={ themeColors }>
+						<div
+							ref={ layoutRef }
+							className={ clsx( styles.layout, {
+								[ styles[ 'has-canvas' ] ]:
+									!! canvas || canvas === null,
+								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
+							} ) }
+						>
+							<UnsavedChangesWarning />
+							<SavePanel />
+							<SnackbarNotices
+								className={ styles[ 'notices-snackbar' ] }
+							/>
+							{ isMobileViewport && (
+								<Page.SidebarToggleFill>
+									<Button
+										icon={ menu }
 										onClick={ () =>
-											setIsMobileSidebarOpen( false )
+											setIsMobileSidebarOpen( true )
 										}
-										onKeyDown={ ( event ) => {
-											if ( event.key === 'Escape' ) {
-												setIsMobileSidebarOpen( false );
+										label={ __( 'Open navigation panel' ) }
+										size="compact"
+									/>
+								</Page.SidebarToggleFill>
+							) }
+							{ /* Mobile Sidebar Backdrop */ }
+							<AnimatePresence>
+								{ isMobileViewport &&
+									isMobileSidebarOpen &&
+									! isFullScreen && (
+										<motion.div
+											initial={ { opacity: 0 } }
+											animate={ { opacity: 1 } }
+											exit={ { opacity: 0 } }
+											transition={ {
+												type: 'tween',
+												duration: disableMotion
+													? 0
+													: 0.2,
+												ease: 'easeOut',
+											} }
+											className={
+												styles[ 'sidebar-backdrop' ]
 											}
-										} }
-										role="button"
-										tabIndex={ -1 }
-										aria-label={ __(
-											'Close navigation panel'
-										) }
-									/>
-								) }
-						</AnimatePresence>
-						{ /* Mobile Sidebar */ }
-						<AnimatePresence>
-							{ isMobileViewport &&
-								isMobileSidebarOpen &&
-								! isFullScreen && (
-									<motion.div
-										initial={ { x: '-100%' } }
-										animate={ { x: 0 } }
-										exit={ { x: '-100%' } }
-										transition={ {
-											type: 'tween',
-											duration: disableMotion ? 0 : 0.2,
-											ease: 'easeOut',
-										} }
-										className="boot-layout__sidebar is-mobile"
-									>
-										<Sidebar />
-									</motion.div>
-								) }
-						</AnimatePresence>
-						{ /* Desktop Sidebar */ }
-						{ ! isMobileViewport && ! isFullScreen && (
-							<div className="boot-layout__sidebar">
-								<Sidebar />
-							</div>
-						) }
-						<div className="boot-layout__surfaces">
-							<ThemeProvider
-								color={ { bg: '#ffffff', primary: '#3858e9' } }
-							>
-								<Outlet />
-							</ThemeProvider>
-							{ /* Render Canvas in Root to prevent remounting on route changes */ }
-							{ ( canvas || canvas === null ) && (
-								<div
-									className={ clsx( 'boot-layout__canvas', {
-										'has-mobile-drawer':
-											canvas?.isPreview &&
-											isMobileViewport,
-									} ) }
-								>
-									{ canvas?.isPreview && isMobileViewport && (
-										<div className="boot-layout__mobile-sidebar-drawer">
-											<Button
-												icon={ menu }
-												onClick={ () =>
+											onClick={ () =>
+												setIsMobileSidebarOpen( false )
+											}
+											onKeyDown={ ( event ) => {
+												if ( event.key === 'Escape' ) {
 													setIsMobileSidebarOpen(
-														true
-													)
+														false
+													);
 												}
-												label={ __(
-													'Open navigation panel'
-												) }
-												size="compact"
-											/>
-										</div>
+											} }
+											role="button"
+											tabIndex={ -1 }
+											aria-label={ __(
+												'Close navigation panel'
+											) }
+										/>
 									) }
-									<CanvasRenderer
-										canvas={ canvas }
-										routeContentModule={
-											routeContentModule
-										}
-									/>
+							</AnimatePresence>
+							{ /* Mobile Sidebar */ }
+							<AnimatePresence>
+								{ isMobileViewport &&
+									isMobileSidebarOpen &&
+									! isFullScreen && (
+										<motion.div
+											initial={ { x: '-100%' } }
+											animate={ { x: 0 } }
+											exit={ { x: '-100%' } }
+											transition={ {
+												type: 'tween',
+												duration: disableMotion
+													? 0
+													: 0.2,
+												ease: 'easeOut',
+											} }
+											className={ clsx(
+												styles.sidebar,
+												styles[ 'is-mobile' ]
+											) }
+										>
+											<Sidebar />
+										</motion.div>
+									) }
+							</AnimatePresence>
+							{ /* Desktop Sidebar */ }
+							{ ! isMobileViewport && ! isFullScreen && (
+								<div className={ styles.sidebar }>
+									<Sidebar />
 								</div>
 							) }
+							<div className={ styles.surfaces }>
+								<ThemeProvider
+									color={ {
+										...themeColors,
+										// Reset to the default background color.
+										background: '#fcfcfc',
+									} }
+								>
+									<Outlet />
+									{ /* Render Canvas in Root to prevent remounting on route changes */ }
+									{ ( canvas || canvas === null ) && (
+										<div
+											className={ clsx( styles.canvas, {
+												[ styles[
+													'has-mobile-drawer'
+												] ]:
+													canvas?.isPreview &&
+													isMobileViewport,
+											} ) }
+										>
+											{ canvas?.isPreview &&
+												isMobileViewport && (
+													<div
+														className={
+															styles[
+																'mobile-sidebar-drawer'
+															]
+														}
+													>
+														<Button
+															icon={ menu }
+															onClick={ () =>
+																setIsMobileSidebarOpen(
+																	true
+																)
+															}
+															label={ __(
+																'Open navigation panel'
+															) }
+															size="compact"
+														/>
+													</div>
+												) }
+											<ErrorBoundary>
+												<CanvasRenderer
+													canvas={ canvas }
+													routeContentModule={
+														routeContentModule
+													}
+												/>
+											</ErrorBoundary>
+										</div>
+									) }
+								</ThemeProvider>
+							</div>
 						</div>
-					</div>
+					</ThemeProvider>
 				</ThemeProvider>
-			</ThemeProvider>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BoxControl from '../';
 
 const meta: Meta< typeof BoxControl > = {
-	title: 'Components/BoxControl',
+	id: 'components-boxcontrol',
+	title: 'Components/@wordpress-components/BoxControl',
 	component: BoxControl,
 	argTypes: {
 		values: { control: false },
@@ -26,6 +16,11 @@ const meta: Meta< typeof BoxControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'editor',
+			notes: 'This component is a fallback for themes that do not supply spacing presets. Most of the time `SpacingSizesControl` from `@wordpress/block-editor` is used instead.',
+		},
 	},
 };
 export default meta;
@@ -52,7 +47,6 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 export const Default = TemplateUncontrolled.bind( {} );
 Default.args = {
 	label: 'Label',
-	__next40pxDefaultSize: true,
 };
 
 export const Controlled = TemplateControlled.bind( {} );

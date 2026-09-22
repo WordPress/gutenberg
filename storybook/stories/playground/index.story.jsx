@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import EditorFullPage from './fullpage';
 import EditorBox from './box';
 import EditorWithUndoRedo from './with-undo-redo';
@@ -18,7 +15,7 @@ export const _default = () => {
 };
 
 _default.parameters = {
-	sourceLink: 'storybook/stories/playground/fullpage/index.js',
+	sourceLink: 'storybook/stories/playground/fullpage/index.jsx',
 };
 
 export const Box = () => {
@@ -26,7 +23,7 @@ export const Box = () => {
 };
 
 Box.parameters = {
-	sourceLink: 'storybook/stories/playground/box/index.js',
+	sourceLink: 'storybook/stories/playground/box/index.jsx',
 };
 
 export const UndoRedo = () => {
@@ -34,7 +31,7 @@ export const UndoRedo = () => {
 };
 
 UndoRedo.parameters = {
-	sourceLink: 'storybook/stories/playground/with-undo-redo/index.js',
+	sourceLink: 'storybook/stories/playground/with-undo-redo/index.jsx',
 };
 
 export const ZoomOut = ( props ) => {
@@ -42,7 +39,7 @@ export const ZoomOut = ( props ) => {
 };
 
 ZoomOut.parameters = {
-	sourceLink: 'storybook/stories/playground/zoom-out/index.js',
+	sourceLink: 'storybook/stories/playground/zoom-out/index.jsx',
 };
 ZoomOut.argTypes = {
 	zoomLevel: { control: { type: 'range', min: 10, max: 100, step: 5 } },

@@ -1,20 +1,10 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CustomGradientPicker from '../';
 
 const meta: Meta< typeof CustomGradientPicker > = {
-	title: 'Components/Selection & Input/Color/CustomGradientPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/CustomGradientPicker',
 	id: 'components-customgradientpicker',
 	component: CustomGradientPicker,
 	args: {
@@ -23,6 +13,11 @@ const meta: Meta< typeof CustomGradientPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Mostly an internal component. Use `GradientPicker` instead.',
+		},
 	},
 };
 export default meta;

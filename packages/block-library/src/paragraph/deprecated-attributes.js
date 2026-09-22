@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
@@ -36,7 +33,11 @@ export default function useDeprecatedAlign( align, style, setAttributes ) {
 	} );
 	const lastUpdatedAlignRef = useRef();
 	useEffect( () => {
-		if ( align === lastUpdatedAlignRef.current ) {
+		if (
+			align === 'full' ||
+			align === 'wide' ||
+			align === lastUpdatedAlignRef.current
+		) {
 			return;
 		}
 		lastUpdatedAlignRef.current = align;

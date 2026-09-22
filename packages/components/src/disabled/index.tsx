@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { disabledStyles } from './styles/disabled-styles';
+import clsx from 'clsx';
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import { useCx } from '../utils';
-
-const Context = createContext< boolean >( false );
-Context.displayName = 'DisabledContext';
+import Context from './context';
+import styles from './style.module.scss';
 
 const { Consumer, Provider } = Context;
 
@@ -35,7 +25,6 @@ const { Consumer, Provider } = Context;
  *
  *	let input = (
  *		<TextControl
- *			__next40pxDefaultSize
  *			label="Input"
  *			onChange={ () => {} }
  *		/>
@@ -65,17 +54,19 @@ function Disabled( {
 	isDisabled = true,
 	...props
 }: WordPressComponentProps< DisabledProps, 'div' > ) {
-	const cx = useCx();
-
 	return (
 		<Provider value={ isDisabled }>
 			<div
-				// @ts-ignore Reason: inert is a recent HTML attribute
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ isDisabled ? 'true' : undefined }
+				// Only the disabled styling is conditional. The consumer's own
+				// className has to stick around so the wrapper stays targetable
+				// whether or not it is currently disabled.
 				className={
-					isDisabled
-						? cx( disabledStyles, className, 'components-disabled' )
-						: undefined
+					clsx(
+						className,
+						isDisabled && [ styles.disabled, 'components-disabled' ]
+					) || undefined
 				}
 				{ ...props }
 			>

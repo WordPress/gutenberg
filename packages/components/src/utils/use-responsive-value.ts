@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 
 const breakpoints = [ '40em', '52em', '64em' ];
@@ -66,9 +63,5 @@ export function useResponsiveValue< T >(
 
 	const array = values || [];
 
-	/* eslint-disable jsdoc/no-undefined-types */
-	return /** @type {T[]} */ array[
-		/* eslint-enable jsdoc/no-undefined-types */
-		index >= array.length ? array.length - 1 : index
-	];
+	return array[ index >= array.length ? array.length - 1 : index ];
 }

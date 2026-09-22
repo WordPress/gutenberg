@@ -1,37 +1,19 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
-import { createIndexedDbProvider } from './indexeddb-provider';
-import { createWebRTCProvider } from './webrtc-provider';
+import { createHttpPollingProvider } from './http-polling/http-polling-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns provider creators for IndexedDB and WebRTC with HTTP signaling. These
- * are the current default providers.
+ * Returns the default provider creators. HTTP polling is the default when
+ * real-time collaboration is enabled.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
-function getDefaultProviderCreators(): ProviderCreator[] {
-	const signalingUrl = window?.wp?.ajax?.settings?.url;
-
-	if ( ! signalingUrl ) {
-		return [];
-	}
-
-	return [
-		createIndexedDbProvider,
-		createWebRTCProvider( {
-			password: window?.__experimentalCollaborativeEditingSecret,
-			signaling: [ signalingUrl ],
-		} ),
-	];
+export function getDefaultProviderCreators(): ProviderCreator[] {
+	return window.__experimentalEnableRealTimeCollaboration
+		? [ createHttpPollingProvider() ]
+		: [];
 }
 
 /**
@@ -54,8 +36,13 @@ export function getProviderCreators(): ProviderCreator[] {
 		return providerCreators;
 	}
 
+	// Check if real-time collaboration is enabled.
+	if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+		return [];
+	}
+
 	/**
-	 * Filter the
+	 * Filter the available provider creators.
 	 */
 	const filteredProviderCreators: unknown = applyFilters(
 		'sync.providers',

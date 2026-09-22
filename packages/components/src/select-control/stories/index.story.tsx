@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SelectControl from '../';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Components/Selection & Input/Common/SelectControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/SelectControl',
 	id: 'components-selectcontrol',
 	component: SelectControl,
 	argTypes: {
@@ -32,6 +21,11 @@ const meta: Meta< typeof SelectControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui` instead. For the `minimal` variant, use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive rather than `SelectControl`.',
+		},
 	},
 };
 export default meta;
@@ -68,8 +62,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
@@ -91,8 +83,6 @@ WithLabelAndHelpText.args = {
  */
 export const WithCustomChildren = SelectControlWithState.bind( {} );
 WithCustomChildren.args = {
-	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	children: (
 		<>

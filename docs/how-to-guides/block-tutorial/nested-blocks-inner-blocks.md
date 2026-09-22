@@ -71,7 +71,9 @@ By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` wh
 />
 ```
 
-This behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
+Set `directInsert` to `true` to force the appender to insert the `defaultBlock` immediately, bypassing the inserter dropdown, including any registered inserter variations of that block type. Leave it unset (or `false`) to let the appender open the inserter so users can pick a variation.
+
+Note: redundant when `allowedBlocks` resolves to a single block type with no variations, the appender already inserts directly.
 
 ## Template
 
@@ -145,7 +147,7 @@ When defining a direct descendent block, use the `parent` block setting to defin
 
 An example of this is the Comment Author Name block, which is assigned the `ancestor` block setting. This allows the Comment Author Name block to only be available as a nested descendant in its ancestral Comment Template block. Otherwise, the Comment Author Name block will not be available as an option within the block inserter. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
 
-The `ancestor` relationship allows the Comment Author Name block to be anywhere in the hierarchical tree, and not _just_ a direct child of the parent Comment Template block, while still limiting its availability within the block inserter to only be visible an an option to insert if the Comment Template block is available.
+The `ancestor` relationship allows the Comment Author Name block to be anywhere in the hierarchical tree, and not _just_ a direct child of the parent Comment Template block, while still limiting its availability within the block inserter to only be visible as an option to insert if the Comment Template block is available.
 
 When defining a descendent block, use the `ancestor` block setting. This prevents the nested block from showing in the inserter outside of the InnerBlock it is defined for.
 
@@ -275,7 +277,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		return (
 			<div {...innerBlocksProps}>
     			{ children }
-				<!-- Insert any arbitrary html here at the same level as the children -->
+				{/* Insert any arbitrary html here at the same level as the children */}
 			</div>
 		);
 	},

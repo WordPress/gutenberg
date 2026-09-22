@@ -1,19 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * Internal dependencies
- */
-import { DropdownMenu } from '..';
-import MenuItem from '../../menu-item';
-import MenuGroup from '../../menu-group';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import {
 	menu,
 	arrowUp,
@@ -22,14 +8,22 @@ import {
 	more,
 	trash,
 } from '@wordpress/icons';
+import { DropdownMenu } from '..';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/Actions/DropdownMenu',
+	title: 'Components/@wordpress-components/Actions/DropdownMenu',
 	component: DropdownMenu,
 	id: 'components-dropdownmenu',
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use `Menu` instead. Otherwise, continue using for now.',
+		},
 	},
 	args: {
 		onToggle: fn(),

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -17,6 +14,28 @@ const focusableSelectors = [
 	'[contenteditable]',
 	'[tabindex]:not([tabindex^="-"])',
 ];
+
+/**
+ * Gets all visible focusable elements within a container.
+ * Filters out elements that are hidden.
+ *
+ * @param {HTMLElement} ref - The container element to search within
+ * @return {HTMLElement[]} Array of visible focusable elements
+ */
+function getFocusableElements( ref ) {
+	const focusableElements = ref.querySelectorAll( focusableSelectors );
+	return Array.from( focusableElements ).filter( ( element ) => {
+		// Use modern checkVisibility API if available (Chrome 105+, Firefox 106+, Safari 17.4+)
+		if ( typeof element.checkVisibility === 'function' ) {
+			return element.checkVisibility( {
+				checkOpacity: false,
+				checkVisibilityCSS: true,
+			} );
+		}
+		// Fallback for older browsers
+		return element.offsetParent !== null;
+	} );
+}
 
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
@@ -58,27 +77,39 @@ const { state, actions } = store(
 					? ctx.overlayOpenedBy
 					: ctx.submenuOpenedBy;
 			},
+			get isSubmenuOpen() {
+				const ctx = getContext();
+				const isDefaultOverlayOpen =
+					! ctx.hasCustomOverlay &&
+					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
+						.length > 0;
+
+				// A submenu can be opened by user interaction or by being in a default overlay.
+				// If it is a regular navigation or within a custom overlay, it is opened by user interaction.
+				// If it's in a default overlay, it is forced opened via CSS.
+				// Because default overlays always force submenus open, we return true
+				// if the default overlay is open.
+				return isDefaultOverlayOpen || state.isMenuOpen;
+			},
 		},
 		actions: {
-			openMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only open on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			openMenuOnHover( event ) {
+				// Pointer events from touch should not open the submenu on hover;
+				// touch devices toggle via the click action instead.
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.openMenu( 'hover' );
 				}
 			},
-			closeMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only close on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			closeMenuOnHover( event ) {
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.closeMenu( 'hover' );
 				}
 			},
@@ -106,6 +137,10 @@ const { state, actions } = store(
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					// Also clear hover in case it was set by a synthetic pointerenter
+					// on touch (e.g. the browser-fired mouseenter-equivalent before
+					// the click event), ensuring the submenu fully closes.
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
@@ -198,8 +233,7 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					ctx.modal = ref;
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
@@ -209,8 +243,7 @@ const { state, actions } = store(
 			focusFirstElement() {
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					focusableElements?.[ 0 ]?.focus();
 				}
 			},

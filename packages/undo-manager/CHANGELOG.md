@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 1.55.0 (2026-09-10)
+
+### Internal
+
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+
+## 1.54.0 (2026-08-26)
+
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+## 1.42.0 (2026-03-18)
+
+## 1.41.0 (2026-03-04)
+
+## 1.40.0 (2026-02-18)
+
+## 1.39.0 (2026-01-29)
+
+## 1.38.0 (2026-01-16)
+
 ## 1.36.0 (2025-11-26)
 
 ## 1.35.0 (2025-11-12)

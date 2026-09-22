@@ -1,23 +1,15 @@
-/**
- * External dependencies
- */
-import { get, OKLCH, parse } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './lib/register-color-spaces';
-import { buildRamp } from './lib/index';
-import { clampAccentScaleReferenceLightness } from './lib/utils';
-import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
+import { get, OKLCH } from 'colorjs.io/fn';
+import { buildRamp } from './lib/index.ts';
+import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
+import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
 import type {
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
-} from './lib/types';
-import { getContrast } from './lib/color-utils';
-import { CONTRAST_COMBINATIONS } from './lib/constants';
-export { DEFAULT_SEED_COLORS } from './lib/constants';
+} from './lib/types.ts';
+import { getContrast } from './lib/color-utils.ts';
+import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
+export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
 /**
  * Creates a background ramp.
@@ -44,7 +36,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				get( parse( ramp.ramp[ STEP_TO_PIN ] ), [ OKLCH, 'l' ] ),
+				get( ramp.ramp[ STEP_TO_PIN ], [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},

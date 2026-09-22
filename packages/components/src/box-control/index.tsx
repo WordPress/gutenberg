@@ -1,38 +1,24 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { BaseControl } from '../base-control';
-import InputControl from './input-control';
+import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
+import Button from '../button';
 import { Grid } from '../grid';
-import {
-	InputWrapper,
-	ResetButton,
-	LinkedButtonWrapper,
-} from './styles/box-control-styles';
+import { HStack } from '../h-stack';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	getInitialSide,
 	isValueMixed,
 	isValuesDefined,
 	getAllowedSides,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
-import type {
-	BoxControlIconProps,
-	BoxControlProps,
-	BoxControlValue,
-} from './types';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+import type { BoxControlProps, BoxControlValue } from './types';
+import styles from './style.module.scss';
 
 const defaultInputProps = {
 	min: 0,
@@ -63,17 +49,12 @@ function useUniqueId( idProp?: string ) {
  *   } );
  *
  *   return (
- *     <BoxControl
- *       __next40pxDefaultSize
- *       values={ values }
- *       onChange={ setValues }
- *     />
+ *     <BoxControl values={ values } onChange={ setValues } />
  *   );
  * };
  * ```
  */
 function BoxControl( {
-	__next40pxDefaultSize = false,
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
@@ -101,10 +82,6 @@ function BoxControl( {
 		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
-		getInitialSide( isLinked, splitOnAxis )
-	);
-
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
@@ -120,14 +97,6 @@ function BoxControl( {
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
-	};
-
-	const handleOnFocus = (
-		_event: React.FocusEvent< HTMLInputElement >,
-		{ side: nextSide }: { side: typeof side }
-	) => {
-		setSide( nextSide );
 	};
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
@@ -148,23 +117,16 @@ function BoxControl( {
 		onMouseOut,
 		...inputProps,
 		onChange: handleOnChange,
-		onFocus: handleOnFocus,
 		isLinked,
 		units,
 		selectedUnits,
 		setSelectedUnits,
 		sides,
 		values: inputValues,
-		__next40pxDefaultSize,
 		presets,
 		presetKey,
 	};
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'BoxControl',
-		__next40pxDefaultSize,
-		size: undefined,
-	} );
 	const sidesToRender = getAllowedSides( sides );
 
 	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
@@ -187,23 +149,23 @@ function BoxControl( {
 				{ label }
 			</BaseControl.VisualLabel>
 			{ isLinked && (
-				<InputWrapper>
-					<InputControl side="all" { ...inputControlProps } />
-				</InputWrapper>
+				<HStack className={ styles[ 'input-wrapper' ] }>
+					<BoxInputControl side="all" { ...inputControlProps } />
+				</HStack>
 			) }
 			{ ! hasOneSide && (
-				<LinkedButtonWrapper>
+				<div className={ styles[ 'linked-button-wrapper' ] }>
 					<LinkedButton
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
-				</LinkedButtonWrapper>
+				</div>
 			) }
 
 			{ ! isLinked &&
 				splitOnAxis &&
 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
-					<InputControl
+					<BoxInputControl
 						key={ axis }
 						side={ axis as 'horizontal' | 'vertical' }
 						{ ...inputControlProps }
@@ -212,26 +174,29 @@ function BoxControl( {
 			{ ! isLinked &&
 				! splitOnAxis &&
 				Array.from( sidesToRender ).map( ( axis ) => (
-					<InputControl
+					<BoxInputControl
 						key={ axis }
 						side={ axis }
 						{ ...inputControlProps }
 					/>
 				) ) }
 			{ allowReset && (
-				<ResetButton
-					className="component-box-control__reset-button"
+				<Button
+					className={ clsx(
+						styles[ 'reset-button' ],
+						'component-box-control__reset-button'
+					) }
 					variant="secondary"
 					size="small"
 					onClick={ handleOnReset }
 					disabled={ ! isDirty }
+					accessibleWhenDisabled
 				>
 					{ __( 'Reset' ) }
-				</ResetButton>
+				</Button>
 			) }
 		</Grid>
 	);
 }
 
-export { applyValueToSides } from './utils';
 export default BoxControl;

@@ -1,10 +1,6 @@
-/**
- * Internal dependencies
- */
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
-	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
@@ -20,6 +16,7 @@ import isValidMinLength from './utils/is-valid-min-length';
 import isValidMaxLength from './utils/is-valid-max-length';
 import isValidPattern from './utils/is-valid-pattern';
 import isValidElements from './utils/is-valid-elements';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 export default {
 	type: 'telephone',
@@ -38,10 +35,10 @@ export default {
 		// Multiple selection
 		OPERATOR_IS_ANY,
 		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
-	getFormat: () => ( {} ),
+	format: {},
+	getValueFormatted,
 	validate: {
 		required: isValidRequired,
 		pattern: isValidPattern,

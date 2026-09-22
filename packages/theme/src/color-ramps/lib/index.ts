@@ -1,38 +1,26 @@
-/**
- * External dependencies
- */
+import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 import {
-	clone,
-	get,
-	OKLCH,
-	parse,
-	set,
-	type ColorTypes,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
-import { clampToGamut, getContrast, getColorString } from './color-utils';
-import { findColorMeetingRequirements } from './find-color-with-constraints';
+	clampToGamut,
+	getContrast,
+	getColorString,
+	parseSeedColor,
+} from './color-utils.ts';
+import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
 	stepsForStep,
 	solveWithBisect,
-} from './utils';
-
+} from './utils.ts';
 import type {
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
-} from './types';
-import { CONTRAST_EPSILON } from './constants';
+} from './types.ts';
+import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -67,7 +55,7 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: string[] | undefined;
+	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -85,12 +73,19 @@ function calculateRamp( {
 			sameAsIfPossible,
 		} = config[ stepName ];
 
-		const referenceColor = calculatedColors.get( contrast.reference );
-		if ( ! referenceColor ) {
-			throw new Error(
-				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
-			);
-		}
+		const referenceNames = [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		];
+		const referenceColors = referenceNames.map( ( referenceName ) => {
+			const referenceColor = calculatedColors.get( referenceName );
+			if ( ! referenceColor ) {
+				throw new Error(
+					`Reference color for step ${ stepName } not found: ${ referenceName }`
+				);
+			}
+			return referenceColor;
+		} );
 
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
@@ -101,13 +96,14 @@ function calculateRamp( {
 				);
 			}
 
-			const candidateContrast = getContrast(
-				referenceColor,
-				candidateColor
-			);
 			const adjustedTarget = adjustContrastTarget( contrast.target );
-			// If the candidate meets the contrast requirement, use it
-			if ( candidateContrast >= adjustedTarget ) {
+			const candidateMeetsTarget = referenceColors.every(
+				( referenceColor ) =>
+					getContrast( referenceColor, candidateColor ) >=
+					adjustedTarget
+			);
+			// If the candidate meets every contrast requirement, use it.
+			if ( candidateMeetsTarget ) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
@@ -117,7 +113,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: ColorTypes,
+			colors: readonly PlainColorObject[],
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -130,7 +126,7 @@ function calculateRamp( {
 
 			if ( followDirection === 'best' ) {
 				return computeBetterFgColorDirection(
-					color,
+					colors,
 					contrast.preferLighter
 				).better;
 			}
@@ -139,8 +135,14 @@ function calculateRamp( {
 		}
 
 		const computedDir = computeDirection(
-			referenceColor,
+			referenceColors,
 			contrast.followDirection
+		);
+		const endpoint = computedDir === 'lighter' ? WHITE : BLACK;
+		const referenceColor = referenceColors.reduce( ( tightest, current ) =>
+			getContrast( current, endpoint ) < getContrast( tightest, endpoint )
+				? current
+				: tightest
 		);
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );
@@ -220,9 +222,12 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
+	// Parse and validate here: the single point where user-supplied color strings enter.
+	const parsedSeed = parseSeedColor( seedArg );
+
 	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( parse( seedArg ) );
+		seed = clampToGamut( parsedSeed );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
@@ -263,6 +268,7 @@ export function buildRamp(
 	} );
 
 	let bestRamp = rampResults;
+	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -307,14 +313,16 @@ export function buildRamp(
 		);
 
 		// Calculate the final ramp with adjusted seed.
-		bestRamp = calculateRamp( {
+		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
 			mainDir,
 			oppDir,
 			pinLightness,
-		} ).rampResults;
+		} );
+		bestRamp = finalResult.rampResults;
+		bestWarnings = finalResult.warnings;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
@@ -328,7 +336,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings,
+		warnings: bestWarnings,
 		direction: mainDir,
 	};
 }

@@ -74,6 +74,15 @@ $wrapper_attributes = get_block_wrapper_attributes();
 				<?php echo $label; ?>
 			</a>
 		<?php endforeach; ?>
+		<?php foreach ( $attributes['links'] as $label => $link ) : ?>
+			<a
+				data-testid="force link <?php echo $label; ?>"
+				data-wp-on--click="actions.navigateForce"
+				href="<?php echo $link; ?>"
+			>
+				<?php echo $label; ?> (force)
+			</a>
+		<?php endforeach; ?>
 	</nav>
 
 	<!-- HTML updated on navigation. -->

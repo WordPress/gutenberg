@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import AlignmentMatrixControl from '..';
 import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
 const meta: Meta< typeof AlignmentMatrixControl > = {
-	title: 'Components/AlignmentMatrixControl',
+	id: 'components-alignmentmatrixcontrol',
+	title: 'Components/@wordpress-components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
@@ -34,6 +23,10 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

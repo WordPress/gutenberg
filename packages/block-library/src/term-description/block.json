@@ -7,14 +7,18 @@
 	"description": "Display the description of categories, tags and custom taxonomies when viewing an archive.",
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"color": {
 			"link": true,
 			"__experimentalDefaultControls": {
@@ -29,6 +33,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -42,6 +47,7 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"shadow": true,
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,

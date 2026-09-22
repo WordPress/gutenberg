@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
 	DataViewRenderFieldProps,
 	NormalizedField,
@@ -21,18 +14,31 @@ import {
 import isValidRequiredForArray from './utils/is-valid-required-for-array';
 import isValidElements from './utils/is-valid-elements';
 
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	const value = field.getValue( { item } );
+	const arr = Array.isArray( value ) ? value : [];
+	return arr.join( ', ' );
+}
+
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	const value = field.getValue( { item } ) || [];
-	return value.join( ', ' );
+	return getValueFormatted( { item, field } );
 }
 
 function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 	const value = field.getValue( { item } );
 
-	if (
-		! [ undefined, '', null ].includes( value ) &&
-		! Array.isArray( value )
-	) {
+	// Allow empty values; use the `required` rule to enforce non-empty ones.
+	if ( [ undefined, '', null ].includes( value ) ) {
+		return null;
+	}
+
+	if ( ! Array.isArray( value ) ) {
 		return __( 'Value must be an array.' );
 	}
 
@@ -75,7 +81,8 @@ export default {
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
-	getFormat: () => ( {} ),
+	format: {},
+	getValueFormatted,
 	validate: {
 		required: isValidRequiredForArray,
 		elements: isValidElements,

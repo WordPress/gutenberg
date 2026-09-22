@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-editor",
-	"version": "1.2.0",
+	"version": "1.21.0",
 	"description": "Lazy-loading editor component with automatic asset and settings management.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,21 +21,26 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/asset-loader": "file:../asset-loader",
@@ -50,6 +55,15 @@
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

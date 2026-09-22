@@ -1,21 +1,13 @@
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type TextControlProps = Pick<
 	BaseControlProps,
-	'className' | 'hideLabelFromVision' | 'help' | 'label'
+	| '__nextHasNoMarginBottom'
+	| 'className'
+	| 'hideLabelFromVision'
+	| 'help'
+	| 'label'
 > & {
-	/**
-	 * Start opting into the new margin-free styles that will become the default in a future version.
-	 *
-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
-	 * @ignore
-	 *
-	 * @default false
-	 */
-	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * A function that receives the value of the input.
 	 */
@@ -44,7 +36,8 @@ export type TextControlProps = Pick<
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 };
