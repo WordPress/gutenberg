@@ -10,6 +10,9 @@ const HierarchicalLevelsComponent = ( {
 }: {
 	showLevels?: boolean;
 } ) => {
+	const [ expandedItemIds, setExpandedItemIds ] = useState< string[] >( [
+		'38',
+	] );
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
@@ -39,11 +42,19 @@ const HierarchicalLevelsComponent = ( {
 		view,
 		fields
 	);
+	const parentIds = new Set(
+		allData
+			.map( ( item ) => item.parent )
+			.filter( ( parent ) => parent !== null )
+	);
 
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
 			getItemParentId={ ( item ) => item.parent }
+			getItemHasChildren={ ( item ) => parentIds.has( item.id ) }
+			expandedItemIds={ expandedItemIds }
+			onChangeExpandedItemIds={ setExpandedItemIds }
 			data={ data }
 			paginationInfo={ paginationInfo }
 			view={ view }

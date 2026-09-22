@@ -140,6 +140,18 @@ Example:
 }
 ```
 
+#### `getItemHasChildren`: `function`
+
+A function that receives an item and returns whether it has children. Return `undefined` when this is not known yet. Together with `expandedItemIds` and `onChangeExpandedItemIds`, it enables disclosure controls in an ungrouped table when `view.showLevels` is true and `getItemParentId` is provided.
+
+#### `expandedItemIds`: `string[]`
+
+The ids of expanded items in a hierarchical table. DataViews does not store these ids in `view`.
+
+#### `onChangeExpandedItemIds`: `function`
+
+A function called with the next list of expanded item ids when a row or header disclosure control is used.
+
 #### `fields`: `Object[]`
 
 The fields describe the visible items for each record in the dataset and how they behave (how to sort them, display them, etc.). See "Fields API" for a description of every property.
@@ -796,6 +808,9 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `onClickItem`
 -   `getItemLevel`
 -   `getItemParentId`
+-   `getItemHasChildren`
+-   `expandedItemIds`
+-   `onChangeExpandedItemIds`
 -   `header`
 
 ## `DataForm`
