@@ -148,13 +148,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 		const hasAnyColorWarning = warnings.length > 0;
 
 		return (
-			<div
-				role="region"
-				aria-label={ `${ label } color ramps` }
-				tabIndex={ 0 }
-				style={ { width: '100%', overflowX: 'auto' } }
-				ref={ forwardedRef }
-			>
+			<div style={ { minWidth: 0 } }>
 				{ hasAdjustedSeed || hasAnyColorWarning ? (
 					<p style={ { marginBlock: '0 0.5rem' } }>
 						<strong>Markers:</strong>{ ' ' }
@@ -164,7 +158,13 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 					</p>
 				) : null }
 				<div
+					role="region"
+					aria-label={ `${ label } color ramps` }
+					tabIndex={ 0 }
+					ref={ forwardedRef }
 					style={ {
+						width: '100%',
+						overflowX: 'auto',
 						display: 'grid',
 						gridTemplateColumns: `repeat(${ RAMP_TOKENS_ORDER.length }, minmax(max-content, 1fr))`,
 						fontFamily: 'var(--wpds-typography-font-family-body)',
