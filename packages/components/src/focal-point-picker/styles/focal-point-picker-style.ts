@@ -18,7 +18,7 @@ export const MediaWrapper = styled.div`
 	display: flex;
 	text-align: center;
 	width: 100%;
-	overflow: hidden;
+	contain: layout;
 `;
 
 export const MediaContainer = styled.div`
