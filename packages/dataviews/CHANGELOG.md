@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83241](https://github.com/WordPress/gutenberg/pull/83241)).
+
 ### Bug Fixes
 
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
@@ -55,7 +59,6 @@
 
 ### Enhancements
 
--   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83241](https://github.com/WordPress/gutenberg/pull/83241)).
 -   DataForm: Add a `showPlaceholderIfEmpty` option to the `panel` layout, which shows the field's `placeholder` in the summary when the value is empty ([#82527](https://github.com/WordPress/gutenberg/pull/82527)).
 -   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
