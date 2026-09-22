@@ -18,8 +18,8 @@
 	}
 }
 
-// Keep the alignment of File blocks added before the flex layout. Zero
-// specificity, so a justification chosen in the editor wins.
+// Map the block alignment to a justification: `text-align` no longer positions
+// a flex container's contents. Zero specificity, so an editor choice wins.
 :where(.wp-block-file.is-layout-flex.aligncenter) {
 	justify-content: center;
 }
