@@ -105,6 +105,59 @@ export function getFileNameFromUrl( url: string ) {
 }
 
 /**
+ * Maps a file extension to its corresponding image mime type.
+ *
+ * Used to recover a usable mime type when a server response omits one or
+ * returns a generic `application/octet-stream` for a known image extension.
+ */
+const EXTENSION_TO_MIME_TYPE: Record< string, string > = {
+	jpg: 'image/jpeg',
+	jpeg: 'image/jpeg',
+	png: 'image/png',
+	gif: 'image/gif',
+	webp: 'image/webp',
+	avif: 'image/avif',
+};
+
+/**
+ * Fetches a file from a URL and returns it as a File object.
+ *
+ * Used to download an existing attachment's original file so it can be
+ * re-processed client-side. When the server response does not include a
+ * usable `Content-Type` (or returns a generic one), the mime type is
+ * inferred from the file extension.
+ *
+ * @param url        URL of the file to fetch.
+ * @param [fileName] Optional file name to use. Defaults to the name derived from the URL.
+ * @return File object.
+ */
+export async function fetchFile(
+	url: string,
+	fileName?: string
+): Promise< File > {
+	const name = fileName || getFileNameFromUrl( url );
+
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error(
+			`Could not fetch file from ${ url } (${ response.status })`
+		);
+	}
+
+	const blob = await response.blob();
+
+	let { type } = blob;
+	if ( ! type || type === 'application/octet-stream' ) {
+		const ext = getFileExtension( name )?.toLowerCase();
+		if ( ext && EXTENSION_TO_MIME_TYPE[ ext ] ) {
+			type = EXTENSION_TO_MIME_TYPE[ ext ];
+		}
+	}
+
+	return new File( [ blob ], name, { type } );
+}
+
+/**
  * Detects whether a file buffer contains an animated GIF.
  *
  * Performs binary analysis of the GIF file structure:
