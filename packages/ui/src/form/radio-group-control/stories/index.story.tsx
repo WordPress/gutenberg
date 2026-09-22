@@ -6,7 +6,8 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof RadioGroupControl > = {
-	title: 'Design System/Components/Form/RadioGroupControl',
+	title: 'Components/@wordpress-ui/Form/RadioGroupControl',
+	id: 'design-system-components-form-radiogroupcontrol',
 	component: RadioGroupControl,
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
