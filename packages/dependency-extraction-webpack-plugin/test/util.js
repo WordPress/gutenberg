@@ -64,6 +64,15 @@ describe( 'defaultRequestToExternal', () => {
 			'ReactDOM'
 		);
 	} );
+
+	test( 'Does not externalize bundled @wordpress packages', () => {
+		expect(
+			defaultRequestToExternal( '@wordpress/global-styles-engine' )
+		).toBeUndefined();
+		expect(
+			defaultRequestToExternal( '@wordpress/global-styles-ui' )
+		).toBeUndefined();
+	} );
 } );
 
 describe( 'defaultRequestToHandle', () => {

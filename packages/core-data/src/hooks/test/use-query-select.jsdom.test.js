@@ -1,4 +1,13 @@
 import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import {
 	createReduxStore,
 	createRegistry,
 	RegistryProvider,
@@ -39,8 +48,8 @@ describe( 'useQuerySelect', () => {
 	}
 
 	it( 'passes the relevant data to the hook', () => {
-		const renderSpy = jest.fn();
-		const selectSpy = jest.fn();
+		const renderSpy = vi.fn();
+		const selectSpy = vi.fn();
 
 		const { result } = renderHookWithRegistry( () => {
 			renderSpy();

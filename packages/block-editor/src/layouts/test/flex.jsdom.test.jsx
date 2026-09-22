@@ -1,18 +1,23 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import flex from '../flex';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
 
 const FlexLayoutInspectorControls = flex.inspectorControls;
 const PANEL_ID = 'test-panel';
 
 function renderInspectorControls( props = {} ) {
 	return render(
-		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+		<ToolsPanel label="Layout" resetAll={ vi.fn() } panelId={ PANEL_ID }>
 			<FlexLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ {} }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				{ ...props }
 			/>
 		</ToolsPanel>
@@ -82,8 +87,9 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
-	it( 'should not render the wrap toggle by default', () => {
+	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
+		await screen.findByRole( 'radio', { name: 'Justify items left' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {
@@ -92,13 +98,13 @@ describe( 'FlexLayoutInspectorControls', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the wrap toggle when it has a value', () => {
+	it( 'should render the wrap toggle when it has a value', async () => {
 		renderInspectorControls( {
 			layout: { flexWrap: 'nowrap' },
 		} );
 
 		expect(
-			screen.getByRole( 'checkbox', {
+			await screen.findByRole( 'checkbox', {
 				name: 'Allow to wrap to multiple lines',
 			} )
 		).toBeInTheDocument();

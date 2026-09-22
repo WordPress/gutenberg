@@ -1,3 +1,5 @@
+import { expect } from 'vitest';
+
 /**
  * Temporary test helper while `URLInput` still unlocks the deprecated private
  * `ValidatedInputControl` from `@wordpress/components`.
@@ -14,7 +16,7 @@ export const VALIDATED_INPUT_CONTROL_DEPRECATION =
  * private `ValidatedInputControl`. No-op when validation did not run.
  */
 export function expectValidatedInputControlDeprecationIfCalled() {
-	// eslint-disable-next-line no-console -- jest-console mock inspection.
+	// eslint-disable-next-line no-console -- Inspect expected console warnings.
 	const deprecationCalls = console.warn.mock.calls.filter(
 		( [ message ] ) => message === VALIDATED_INPUT_CONTROL_DEPRECATION
 	);
