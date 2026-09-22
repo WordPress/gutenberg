@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Added a private entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store.
+
 ### Bug Fixes
 
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
