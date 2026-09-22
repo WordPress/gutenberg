@@ -1,15 +1,11 @@
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-import {
-	Dropdown,
-	FlexItem,
-	SelectControl as WCSelectControl,
-	Icon as WCIcon,
-} from '@wordpress/components';
+import { Dropdown, FlexItem, Icon as WCIcon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { Stack, Tooltip } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Select, pending WordPress/gutenberg#76135.
+import { Select, Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -91,12 +87,9 @@ function OperatorSelector( {
 					{ filter.name }
 				</FlexItem>
 
-				<WCSelectControl
-					className="dataviews-filters__summary-operators-filter-select"
-					label={ __( 'Conditions' ) }
+				<Select.Root
 					value={ value }
-					options={ operatorOptions }
-					onChange={ ( newValue ) => {
+					onValueChange={ ( newValue ) => {
 						const newOperator = newValue as Operator;
 						const currentOperator = currentFilter?.operator;
 						const newFilters = currentFilter
@@ -149,10 +142,43 @@ function OperatorSelector( {
 							filters: newFilters,
 						} );
 					} }
-					size="small"
-					variant="minimal"
-					hideLabelFromVision
-				/>
+				>
+					<Select.Trigger
+						size="small"
+						variant="minimal"
+						aria-label={ __( 'Conditions' ) }
+						className="dataviews-filters__summary-operators-filter-select"
+					>
+						{
+							operatorOptions.find(
+								( option ) => option.value === value
+							)?.label
+						}
+					</Select.Trigger>
+					<Select.Popup
+						width="content"
+						portal={
+							<Select.Portal
+								style={ {
+									// Sit above `.components-popover` (1000000). The native select painted over the filter dropdown; the Select popup is portaled to the document and needs this to do the same.
+									'--wp-ui-select-z-index': '1000001',
+								} }
+							/>
+						}
+					>
+						{ operatorOptions.map( ( option ) => (
+							<Select.Item
+								key={ option.value }
+								value={ option.value }
+								size="small"
+							>
+								<Select.ItemLabel>
+									{ option.label }
+								</Select.ItemLabel>
+							</Select.Item>
+						) ) }
+					</Select.Popup>
+				</Select.Root>
 			</Stack>
 		)
 	);

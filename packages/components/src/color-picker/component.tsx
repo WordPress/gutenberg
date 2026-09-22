@@ -12,10 +12,11 @@ import {
 } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Select } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
 import {
 	ColorfulWrapper,
-	SelectControl,
+	ColorFormatSelect,
 	AuxiliaryColorArtefactWrapper,
 	AuxiliaryColorArtefactHStackHeader,
 	ColorInputWrapper,
@@ -208,17 +209,38 @@ const UnconnectedColorPicker = (
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
-					<SelectControl
-						size="compact"
-						options={ options }
-						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-						variant="minimal"
-					/>
+					<ColorFormatSelect>
+						<Select.Root
+							value={ colorType }
+							onValueChange={ ( nextColorType ) =>
+								setColorType( nextColorType as ColorType )
+							}
+						>
+							<Select.Trigger
+								size="compact"
+								variant="minimal"
+								aria-label={ __( 'Color format' ) }
+							>
+								{
+									options.find(
+										( option ) => option.value === colorType
+									)?.label
+								}
+							</Select.Trigger>
+							<Select.Popup width="content">
+								{ options.map( ( option ) => (
+									<Select.Item
+										key={ option.value }
+										value={ option.value }
+									>
+										<Select.ItemLabel>
+											{ option.label }
+										</Select.ItemLabel>
+									</Select.Item>
+								) ) }
+							</Select.Popup>
+						</Select.Root>
+					</ColorFormatSelect>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
