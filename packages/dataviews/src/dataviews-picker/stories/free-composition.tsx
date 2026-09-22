@@ -43,9 +43,9 @@ const STYLES = `
  * </DataViewsPicker.Footer>
  * ```
  *
- * Which part earns the room is the consumer's call: `pagination` swaps the page
- * select for `DataViewsPicker.PageNavigation`, the previous/next buttons, which
- * suit a list short enough to walk through a page at a time.
+ * Which part earns the room is the consumer's call, so the `pagination` control
+ * swaps the page select for `DataViewsPicker.PageNavigation`, the previous/next
+ * buttons, which suit a list short enough to walk through a page at a time.
  *
  * Each part takes a `className`, so where they sit is decided by the stylesheet
  * of whoever composed them rather than by the picker.

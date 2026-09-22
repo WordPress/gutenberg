@@ -245,16 +245,15 @@ Default.parameters = {
 
 export const FreeComposition = {
 	render: FreeCompositionComponent,
-	parameters: {
-		// FIXME: Picker UI nests interactive controls (nested-interactive).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
+	args: { pagination: 'page-select' as const },
+	argTypes: {
+		pagination: {
+			control: 'select',
+			options: [ 'page-select', 'page-navigation' ],
+			description:
+				'Which pagination part the composed footer keeps: the "Page N of M" select, or the previous/next buttons',
+		},
 	},
-};
-
-export const FreeCompositionWithPageNavigation = {
-	render: FreeCompositionComponent,
-	args: { pagination: 'page-navigation' as const },
 	parameters: {
 		// FIXME: Picker UI nests interactive controls (nested-interactive).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
