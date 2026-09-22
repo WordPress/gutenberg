@@ -11,12 +11,19 @@
 
 ### Enhancements
 
+-   `SelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 -   `Snackbar`: Show the action's focus ring with the design system's outline instead of a legacy dotted outline, and let `Button`/`ExternalLink` own the ring ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
 -   `CircularOptionPicker`: Updated to show outline via design system's mixin for focus ring instead of previous border implementation ([#82521](https://github.com/WordPress/gutenberg/pull/82521)).
 -   `Autocomplete`: Show focus ring with the design system's outline instead of previous box-shadow implementation ([#82766](https://github.com/WordPress/gutenberg/pull/82766)).
 -   `CustomGradientPicker`: Show the control point's focus ring with the design system's outline and a contrasting backing to separate it from the gradient ([#82834](https://github.com/WordPress/gutenberg/pull/82834)).
+
+### Deprecations
+
+-   `Scrollable`: Deprecate the component, planned for removal in WordPress 7.4 ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
+-   `Elevation`: Deprecate the component, planned for removal in WordPress 7.4 ([#83269](https://github.com/WordPress/gutenberg/pull/83269)).
+-   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
 
 ### Bug Fixes
 
@@ -27,6 +34,7 @@
 
 ### Internal
 
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
 -   `Notice`: Remove dismiss button style overrides that now duplicate `Button` defaults, and drop an unused Sass import ([#82640](https://github.com/WordPress/gutenberg/pull/82640)).
