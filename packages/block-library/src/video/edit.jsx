@@ -37,6 +37,7 @@ import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { getCarriedMotionConversionAttributes } from '../utils/motion-companion';
 import { isLivePhoto as isLivePhotoAttributes } from './live-photo';
+import LivePhotoStillFrame from './live-photo-still-frame';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -229,7 +230,9 @@ function VideoEdit( {
 			createBlock( 'core/image', {
 				...getCarriedMotionConversionAttributes( attributes ),
 				id,
-				url: stillImage.source_url,
+				// Show the frame the Live photo rests on, which the author may
+				// have picked from the motion.
+				url: poster || stillImage.source_url,
 				alt: stillImage.alt_text,
 				caption: attributes.caption,
 				/*
@@ -337,15 +340,28 @@ function VideoEdit( {
 						setAttributes={ setAttributes }
 						attributes={ attributes }
 					/>
-					<PosterImage
+					{ ! isLivePhoto && (
+						<PosterImage
+							poster={ poster }
+							onChange={ ( posterImage ) =>
+								setAttributes( {
+									poster: posterImage?.url,
+								} )
+							}
+						/>
+					) }
+				</ToolsPanel>
+				{ /* A Live photo's poster is a frame of its own motion. */ }
+				{ isLivePhoto && !! stillImage?.source_url && (
+					<LivePhotoStillFrame
+						src={ src }
 						poster={ poster }
-						onChange={ ( posterImage ) =>
-							setAttributes( {
-								poster: posterImage?.url,
-							} )
+						stillImage={ stillImage }
+						onChange={ ( newPoster ) =>
+							setAttributes( { poster: newPoster } )
 						}
 					/>
-				</ToolsPanel>
+				) }
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<video

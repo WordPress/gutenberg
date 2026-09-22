@@ -46,6 +46,7 @@ import {
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	createBlock,
 	getBlockBindingsSource,
@@ -60,6 +61,7 @@ import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { LIVE_PHOTO_ATTRIBUTES } from '../video/live-photo';
 import {
 	getCarriedMotionConversionAttributes,
 	getMotionCompanion,
@@ -493,8 +495,8 @@ export default function Image( {
 	 * A HEIC/HEIF image sequence — an Apple Live Photo or Android burst —
 	 * uploads as a still frame with the motion re-encoded to a companion
 	 * video. What the author dropped in was something that moves, so once that
-	 * companion is available the block becomes the Video block's Live photo
-	 * variation, which rests on this still and plays on hover. "Display as
+	 * companion is available the block becomes a Live photo Video block, which
+	 * rests on this still and plays on hover. "Display as
 	 * still image" in the toolbar undoes it.
 	 *
 	 * An animated GIF is deliberately not converted here: it already animates
@@ -529,13 +531,14 @@ export default function Image( {
 				...getCarriedMotionConversionAttributes( attributes ),
 				id,
 				src: companion.src,
-				poster: companion.poster,
+				/*
+				 * Rest on the frame this block shows, which may be one the
+				 * author picked from the motion earlier. A sub-size of the
+				 * original still is the same frame, and smaller.
+				 */
+				poster: url && ! isBlobURL( url ) ? url : companion.poster,
 				caption: attributes.caption,
-				controls: false,
-				loop: true,
-				autoplay: false,
-				muted: true,
-				playsInline: true,
+				...LIVE_PHOTO_ATTRIBUTES,
 				/*
 				 * Carry the still's intrinsic dimensions so the <video> holds
 				 * its aspect ratio from the first paint, rather than
@@ -552,6 +555,7 @@ export default function Image( {
 		isInGallery,
 		clientId,
 		id,
+		url,
 		attributes,
 		replaceBlocks,
 	] );
