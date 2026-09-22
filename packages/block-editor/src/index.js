@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './hooks';
 export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
@@ -11,11 +8,13 @@ export {
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+	getDimensionsClassesAndStyles as __experimentalGetDimensionsClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,
 	useStyleOverride,
 } from './hooks';
+export { getStyleForState, setStyleForState } from './hooks/block-style-state';
 export * from './components';
 export * from './elements';
 export * from './utils';

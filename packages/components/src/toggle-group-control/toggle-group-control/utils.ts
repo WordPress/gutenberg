@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ToggleGroupControlProps } from '../types';
 
 type ValueProp = ToggleGroupControlProps[ 'value' ];

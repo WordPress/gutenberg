@@ -6,12 +6,7 @@
  * Value that can be resolved from various sources (direct value, reference, or URL)
  */
 export type UnresolvedValue =
-	| string
-	| number
-	| { ref: string }
-	| { url: string }
-	| undefined
-	| null;
+	string | number | { ref: string } | { url: string } | undefined | null;
 
 /**
  * Origin of a preset (theme, user customizations, or WordPress defaults)
@@ -156,11 +151,19 @@ export interface FluidTypographySettings {
 /**
  * Typography settings collection
  */
+export interface TextShadowPreset extends BasePreset {
+	textShadow: string;
+}
+
 export interface TypographySettings {
 	fluid?: boolean | FluidTypographySettings;
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
 	defaultFontSizes?: boolean;
+	textShadow?: boolean;
+	textShadowPresets?:
+		TextShadowPreset[] | Record< string, TextShadowPreset[] >;
+	defaultTextShadowPresets?: boolean;
 }
 
 // =============================================================================
@@ -185,47 +188,6 @@ export interface SpacingSettings {
 }
 
 // =============================================================================
-// BLOCK SYSTEM TYPES (need to move to the blocks package eventually)
-// =============================================================================
-
-/**
- * Block type definition with global styles support
- */
-export interface BlockType {
-	name: string;
-	title: string;
-	category: string;
-	example?: any;
-	attributes?: Record< string, unknown >;
-	supports?: {
-		__experimentalSelector?: string;
-		inserter?: boolean;
-		spacing?:
-			| boolean
-			| {
-					blockGap?:
-						| boolean
-						| string[]
-						| {
-								__experimentalDefault?: string;
-								sides: string[];
-						  };
-			  };
-		[ key: string ]: unknown;
-	};
-	selectors?: Record< string, string | Record< string, string > >;
-}
-
-/**
- * Block style variation
- */
-export interface BlockStyleVariation {
-	name: string;
-	label: string;
-	styles?: Record< string, any >;
-}
-
-// =============================================================================
 // GLOBAL STYLES STRUCTURE TYPES
 // =============================================================================
 
@@ -234,6 +196,10 @@ export interface BlockStyleVariation {
  */
 export interface GlobalStylesSettings {
 	useRootPaddingAwareAlignments?: boolean;
+	viewport?: {
+		mobile?: string;
+		tablet?: string;
+	};
 	typography?: TypographySettings;
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
@@ -290,7 +256,7 @@ export interface GlobalStylesStyles {
 	spacing?: {
 		padding?: UnresolvedValue | Record< string, UnresolvedValue >;
 		margin?: UnresolvedValue | Record< string, UnresolvedValue >;
-		blockGap?: string;
+		blockGap?: string | { top: string; left: string };
 	};
 	background?: BackgroundStyle;
 	border?: {

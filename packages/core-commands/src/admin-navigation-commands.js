@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCommandLoader, useCommands } from '@wordpress/commands';
 import { __, sprintf } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';

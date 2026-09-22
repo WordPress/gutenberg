@@ -41,7 +41,16 @@ add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_controller_end
  * Registers the Icons Registry REST API routes.
  */
 function gutenberg_register_icon_controller_endpoints() {
-	$icons_registry = new WP_REST_Icons_Controller();
-	$icons_registry->register_routes();
+	$icons_controller = new WP_REST_Icons_Controller_Gutenberg();
+	$icons_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_icon_controller_endpoints' );
+
+/**
+ * Registers the Icon Collections Registry REST API routes.
+ */
+function gutenberg_register_icon_collections_controller_endpoints() {
+	$icon_collections_controller = new WP_REST_Icon_Collections_Controller_Gutenberg();
+	$icon_collections_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_icon_collections_controller_endpoints' );

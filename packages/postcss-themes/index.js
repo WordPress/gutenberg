@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const postcss = require( 'postcss' );
 
 module.exports = ( options ) => {

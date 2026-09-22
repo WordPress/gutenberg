@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../dependency-group';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -59,6 +55,14 @@ import { camelCase } from 'change-case';
 import clsx from 'clsx';
 import { Component } from '@wordpress/element';
 import edit from './edit';`,
+			options: [ 'never' ],
+		},
+		{
+			code: `
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';`,
 			options: [ 'never' ],
 		},
 	],
@@ -163,6 +167,58 @@ import { Component } from '@wordpress/element';`,
 			output: `
 import { camelCase } from 'change-case';
 import { Component } from '@wordpress/element';`,
+		},
+		{
+			code: `
+/*
+ * external Dependencies.
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+
+/**
+ * NODE DEPENDENCIES
+ */
+import 'node:fs';
+
+/**
+ * wordpress dependencies.
+ */
+import { Component } from '@wordpress/element';
+
+/**
+ * internal Dependencies.
+ */
+import edit from './edit';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+import 'node:fs';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
 		},
 	],
 } );

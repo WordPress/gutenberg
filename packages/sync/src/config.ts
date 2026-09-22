@@ -24,13 +24,13 @@ export const CRDT_RECORD_MAP_KEY = 'document';
 export const CRDT_STATE_MAP_KEY = 'state';
 
 /**
- * Y.Map key representing the timestamp of the last save operation.
+ * Y.Map key representing the timestamp of the last user-facing entity save.
  */
 export const CRDT_STATE_MAP_SAVED_AT_KEY = 'savedAt';
 
 /**
- * Y.Map key representing the Y.Doc client ID of the user who performed the last
- * save operation.
+ * Y.Map key representing the Y.Doc client ID of the user who performed the
+ * last user-facing entity save.
  */
 export const CRDT_STATE_MAP_SAVED_BY_KEY = 'savedBy';
 
@@ -48,3 +48,13 @@ export const LOCAL_EDITOR_ORIGIN = 'gutenberg';
  * Origin string for CRDT document changes originating from the sync manager.
  */
 export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
+
+/**
+ * Origin string for CRDT document changes that should be synced but not
+ * recorded in the undo history (e.g. status changes during publish).
+ *
+ * This origin is intentionally NOT included in the UndoManager's
+ * `trackedOrigins`, so changes made with this origin will be applied to
+ * the CRDT document (and synced to peers) without creating undo levels.
+ */
+export const LOCAL_UNDO_IGNORED_ORIGIN = 'gutenberg-undo-ignored';

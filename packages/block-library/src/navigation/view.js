@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -80,27 +77,39 @@ const { state, actions } = store(
 					? ctx.overlayOpenedBy
 					: ctx.submenuOpenedBy;
 			},
+			get isSubmenuOpen() {
+				const ctx = getContext();
+				const isDefaultOverlayOpen =
+					! ctx.hasCustomOverlay &&
+					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
+						.length > 0;
+
+				// A submenu can be opened by user interaction or by being in a default overlay.
+				// If it is a regular navigation or within a custom overlay, it is opened by user interaction.
+				// If it's in a default overlay, it is forced opened via CSS.
+				// Because default overlays always force submenus open, we return true
+				// if the default overlay is open.
+				return isDefaultOverlayOpen || state.isMenuOpen;
+			},
 		},
 		actions: {
-			openMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only open on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			openMenuOnHover( event ) {
+				// Pointer events from touch should not open the submenu on hover;
+				// touch devices toggle via the click action instead.
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.openMenu( 'hover' );
 				}
 			},
-			closeMenuOnHover() {
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only close on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+			closeMenuOnHover( event ) {
+				if ( event?.pointerType === 'touch' ) {
+					return;
+				}
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.closeMenu( 'hover' );
 				}
 			},
@@ -128,6 +137,10 @@ const { state, actions } = store(
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
+					// Also clear hover in case it was set by a synthetic pointerenter
+					// on touch (e.g. the browser-fired mouseenter-equivalent before
+					// the click event), ensuring the submenu fully closes.
+					actions.closeMenu( 'hover' );
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );

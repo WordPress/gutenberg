@@ -1,19 +1,17 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-i18n-in-save';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 		sourceType: 'module',
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );
@@ -90,7 +88,6 @@ function render() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -103,7 +100,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -116,7 +112,6 @@ const save = () => {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -129,7 +124,6 @@ const save = function() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -142,7 +136,6 @@ export default function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -157,7 +150,6 @@ const settings = {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -170,7 +162,6 @@ const settings = {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -183,7 +174,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -197,7 +187,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -211,7 +200,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -228,7 +216,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -243,11 +230,9 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},
@@ -262,7 +247,6 @@ function save() {
 			errors: [
 				{
 					messageId: 'noI18nInSave',
-					type: 'CallExpression',
 				},
 			],
 		},

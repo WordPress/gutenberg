@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Utilities/Composite',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
@@ -48,7 +38,7 @@ const meta: Meta< typeof Composite > = {
 			canvas: { sourceState: 'shown' },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
@@ -70,7 +60,6 @@ const meta: Meta< typeof Composite > = {
 							fontStyle: 'italic',
 						} }
 					>
-						{ /* eslint-disable-next-line no-restricted-syntax */ }
 						<p id="list-title">Notes</p>
 						<ul aria-labelledby="list-title">
 							<li>

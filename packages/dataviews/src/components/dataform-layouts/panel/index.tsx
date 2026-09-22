@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FieldLayoutProps, NormalizedPanelLayout } from '../../../types';
 import PanelModal from './modal';
 import PanelDropdown from './dropdown';
@@ -13,7 +10,7 @@ export default function FormPanelField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const layout = field.layout as NormalizedPanelLayout;
 
-	if ( layout.openAs === 'modal' ) {
+	if ( layout.openAs.type === 'modal' ) {
 		return (
 			<PanelModal
 				data={ data }

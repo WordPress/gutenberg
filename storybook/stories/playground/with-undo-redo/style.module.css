@@ -1,0 +1,17 @@
+.root {
+	border: 1px solid #ddd;
+}
+
+.toolbar {
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid #ddd;
+	height: 46px;
+}
+
+.toolbar
+	:global(
+		.components-accessible-toolbar.block-editor-block-contextual-toolbar
+	) {
+	border-bottom: none;
+}

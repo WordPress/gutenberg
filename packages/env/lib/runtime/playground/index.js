@@ -1,21 +1,9 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Promisified dependencies
- */
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Internal dependencies
- */
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
@@ -62,7 +50,7 @@ class PlaygroundRuntime {
 	 * @return {Promise<boolean>} True if Playground CLI is available.
 	 */
 	async isAvailable() {
-		// npx will fetch it if not installed locally
+		// @wp-playground/cli is a dependency of this package, so it is installed.
 		return true;
 	}
 
@@ -87,13 +75,11 @@ class PlaygroundRuntime {
 	/**
 	 * Start the WordPress Playground environment.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Start options.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug   True if debug mode is enabled.
-	 * @param {string}  options.xdebug  The Xdebug mode to set.
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Start options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
-	async start( config, { spinner, debug, xdebug } ) {
+	async start( config, { spinner } ) {
 		const envConfig = config.env.development;
 
 		spinner.text = 'Starting WordPress Playground.';
@@ -127,7 +113,7 @@ class PlaygroundRuntime {
 					downloadSource( source, {
 						onProgress: () => {}, // Progress tracking could be added
 						spinner,
-						debug,
+						debug: config.debug,
 					} )
 				)
 			);
@@ -148,7 +134,6 @@ class PlaygroundRuntime {
 		// Get mount arguments
 		const mountArgs = getMountArgs( config );
 
-		// Determine port
 		const port = envConfig.port || 8888;
 		const phpVersion = envConfig.phpVersion || '8.2';
 
@@ -166,7 +151,7 @@ class PlaygroundRuntime {
 			...mountArgs,
 		];
 
-		if ( debug ) {
+		if ( config.debug ) {
 			cliArgs.push( '--verbosity', 'debug' );
 		}
 
@@ -174,7 +159,7 @@ class PlaygroundRuntime {
 			cliArgs.push( '--phpmyadmin' );
 		}
 
-		if ( xdebug ) {
+		if ( config.xdebug && config.xdebug !== 'off' ) {
 			cliArgs.push( '--xdebug' );
 		}
 
@@ -191,9 +176,8 @@ class PlaygroundRuntime {
 		// Resolve the CLI binary directly so that it is found even when
 		// the package is nested inside workspace node_modules (where npx
 		// cannot discover it).
-		const cliPackageJson = require.resolve(
-			'@wp-playground/cli/package.json'
-		);
+		const cliPackageJson =
+			require.resolve( '@wp-playground/cli/package.json' );
 		const cliEntryPoint = path.join(
 			path.dirname( cliPackageJson ),
 			'wp-playground.js'
@@ -330,7 +314,7 @@ class PlaygroundRuntime {
 			try {
 				const pidContent = await fs.readFile( pidFile, 'utf8' );
 				pid = parseInt( pidContent.trim(), 10 );
-			} catch ( error ) {
+			} catch {
 				// PID file doesn't exist or can't be read
 				spinner.text = 'Stopped WordPress Playground.';
 				return;
@@ -353,7 +337,7 @@ class PlaygroundRuntime {
 				} catch {
 					// Process group already terminated
 				}
-			} catch ( error ) {
+			} catch {
 				// Process group doesn't exist or already terminated
 			}
 
@@ -425,17 +409,16 @@ class PlaygroundRuntime {
 	/**
 	 * Reset the WordPress database.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Reset options.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Reset options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
-	async clean( config, { spinner, debug } ) {
+	async clean( config, { spinner } ) {
 		spinner.text = 'Resetting WordPress Playground environment.';
 
 		// For Playground, we restart the server to reset the database
 		await this.stop( config, { spinner } );
-		await this.start( config, { spinner, debug } );
+		await this.start( config, { spinner } );
 
 		spinner.text = 'Reset WordPress Playground environment.';
 	}

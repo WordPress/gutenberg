@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
@@ -67,6 +56,7 @@ export function RadioControl(
 		onChange,
 		onClick,
 		hideLabelFromVision,
+		disabled,
 		options = [],
 		id: preferredId,
 		...additionalProps
@@ -87,7 +77,9 @@ export function RadioControl(
 	return (
 		<fieldset
 			id={ id }
+			role="radiogroup"
 			className={ clsx( className, 'components-radio-control' ) }
+			disabled={ disabled }
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
 			{ hideLabelFromVision ? (
@@ -115,6 +107,7 @@ export function RadioControl(
 							type="radio"
 							name={ id }
 							value={ option.value }
+							disabled={ option.disabled }
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={

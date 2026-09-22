@@ -58,3 +58,28 @@
 		outline: auto;
 	}
 }
+
+.wp-block-tab {
+	// Button elements can have colors applied with high CSS specificity,
+	// and since this specificity is impossible to predict, we use
+	// `!important` to reset the color.
+	&:not(.has-text-color) {
+		color: inherit !important;
+	}
+	&:not(.has-background) {
+		background-color: inherit !important;
+	}
+
+	&:hover,
+	&:focus {
+		// Sometimes styles are applied when the button element is
+		// hovered over or focused. This isn't expected for tab
+		// buttons, so reset those styles here.
+		text-decoration: none;
+	}
+
+	&:focus-visible {
+		outline-offset: 0;
+		outline: auto;
+	}
+}

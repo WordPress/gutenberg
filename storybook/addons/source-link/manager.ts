@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement } from 'react';
 import { addons, types, useStorybookApi } from 'storybook/manager-api';
@@ -17,12 +14,19 @@ const SourceLinkTool = () => {
 	if ( storyData?.parameters?.sourceLink ) {
 		sourcePath = storyData.parameters.sourceLink;
 	} else if ( storyData?.importPath ) {
-		// importPath is like "../packages/components/src/button/stories/index.story.tsx"
-		// Convert to component directory path: "packages/components/src/button"
-		sourcePath = storyData.importPath
-			.replace( /^\.\.\//, '' ) // Remove leading "../"
-			.replace( /^\.\//, '' ) // Remove leading "./" (for stories in storybook folder)
-			.replace( /\/stories\/.*$/, '' ); // Remove "/stories/..." suffix
+		if ( storyData.importPath.startsWith( './' ) ) {
+			// Stories defined in storybook/ directory.
+			// importPath is like "./stories/introduction.mdx"
+			// Prepend "storybook/" to get the repo-root-relative path.
+			sourcePath = 'storybook/' + storyData.importPath.slice( 2 );
+		} else {
+			// Stories defined in the component package.
+			// importPath is like "../packages/components/src/button/stories/index.story.tsx"
+			// Convert to component directory path: "packages/components/src/button"
+			sourcePath = storyData.importPath
+				.replace( /^\.\.\//, '' ) // Remove leading "../"
+				.replace( /\/stories\/.*$/, '' ); // Remove "/stories/..." suffix
+		}
 	}
 
 	if ( ! sourcePath ) {

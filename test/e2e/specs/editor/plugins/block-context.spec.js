@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block context', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-context' );
 	} );
 
@@ -17,9 +11,6 @@ test.describe( 'Block context', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-context' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test( 'Block context propagates to inner blocks', async ( { editor } ) => {
@@ -74,7 +65,7 @@ test.describe( 'Block context', () => {
 			} )
 			.click();
 		await editorPage
-			.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
 			.click();
 
 		// Check non-default context values are populated.

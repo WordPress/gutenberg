@@ -1,19 +1,41 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const gotPath = require.resolve( 'got' );
+const originalGot = require( gotPath );
+require.cache[ gotPath ].exports = vi.fn();
+const readRawConfigFilePath = require.resolve( '../read-raw-config-file' );
+const originalReadRawConfigFile = require( readRawConfigFilePath );
+const readRawConfigFile = vi.fn();
+require.cache[ readRawConfigFilePath ].exports = readRawConfigFile;
+const detectDirectoryTypePath = require.resolve( '../detect-directory-type' );
+const originalDetectDirectoryType = require( detectDirectoryTypePath );
+const detectDirectoryType = vi.fn();
+require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
+const wordpressModule = require( '../../wordpress' );
+const originalGetLatestWordPressVersion =
+	wordpressModule.getLatestWordPressVersion;
+const getLatestWordPressVersion = vi.fn();
+wordpressModule.getLatestWordPressVersion = getLatestWordPressVersion;
 const { parseConfig } = require( '../parse-config' );
-const readRawConfigFile = require( '../read-raw-config-file' );
-const { getLatestWordPressVersion } = require( '../../wordpress' );
 const { ValidationError } = require( '../validate-config' );
-const detectDirectoryType = require( '../detect-directory-type' );
-
-jest.mock( 'got', () => jest.fn() );
-jest.mock( '../read-raw-config-file', () => jest.fn() );
-jest.mock( '../detect-directory-type', () => jest.fn() );
-jest.mock( '../../wordpress', () => ( {
-	getLatestWordPressVersion: jest.fn(),
-} ) );
+afterAll( () => {
+	require.cache[ gotPath ].exports = originalGot;
+	require.cache[ readRawConfigFilePath ].exports = originalReadRawConfigFile;
+	require.cache[ detectDirectoryTypePath ].exports =
+		originalDetectDirectoryType;
+	wordpressModule.getLatestWordPressVersion =
+		originalGetLatestWordPressVersion;
+	delete require.cache[ require.resolve( '../parse-config' ) ];
+} );
 
 /**
  * Since our configurations are merged, we will want to refer to the parsed default config frequently.
@@ -21,6 +43,7 @@ jest.mock( '../../wordpress', () => ( {
 const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
+	autoPort: false,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
@@ -76,7 +99,7 @@ describe( 'parseConfig', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		delete process.env.WP_ENV_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
@@ -190,6 +213,19 @@ describe( 'parseConfig', () => {
 			},
 		};
 		expect( parsed ).toEqual( expected );
+	} );
+
+	it( 'should accept autoPort as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: true,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.autoPort ).toEqual( true );
 	} );
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
@@ -377,6 +413,24 @@ describe( 'parseConfig', () => {
 		);
 	} );
 
+	it( 'throws for non-boolean autoPort', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: 'true',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "autoPort" must be a boolean.`
+			)
+		);
+	} );
+
 	it( 'throws for root-only config options', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
@@ -402,6 +456,42 @@ describe( 'parseConfig', () => {
 		).rejects.toEqual(
 			new ValidationError(
 				`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
+			)
+		);
+	} );
+
+	it( 'throws when port is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					port: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "port" must be an integer.`
+			)
+		);
+	} );
+
+	it( 'throws when testsPort is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsPort: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsPort" must be an integer.`
 			)
 		);
 	} );

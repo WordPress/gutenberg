@@ -1,15 +1,13 @@
-/**
- * WordPress dependencies
- */
-import { Button, CheckboxControl } from '@wordpress/components';
+import type { ReactNode } from 'react';
+import clsx from 'clsx';
+import {
+	Button,
+	CheckboxControl as WCCheckboxControl,
+} from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
@@ -22,7 +20,10 @@ export function useIsMultiselectPicker< Item >(
 	actions: Action< Item >[] | undefined
 ) {
 	return useMemo( () => {
-		return actions?.every( ( action ) => action.supportsBulk );
+		return (
+			!! actions?.length &&
+			actions?.every( ( action ) => action.supportsBulk )
+		);
 	}, [ actions ] );
 }
 
@@ -32,17 +33,34 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	disableSelectAll = false,
 }: {
 	selection: string[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 } ) {
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === data.length;
 
+	if ( disableSelectAll ) {
+		return (
+			<WCCheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
+
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
@@ -96,8 +114,15 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, callback } = action;
+				const { id, label, icon, isPrimary, isEligible, callback } =
+					action;
 
+				// `items` holds the current page's selection only, so an
+				// action without `isEligible` stays enabled for a selection
+				// made on other pages.
+				const eligibleItems = isEligible
+					? items.filter( ( item ) => isEligible( item ) )
+					: items;
 				const _label =
 					typeof label === 'string' ? label : label( items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
@@ -108,11 +133,15 @@ function ActionButtons< Item >( {
 						key={ id }
 						accessibleWhenDisabled
 						icon={ icon }
-						disabled={ isInProgress || ! selection?.length }
+						disabled={
+							isInProgress ||
+							! selection?.length ||
+							( !! isEligible && ! eligibleItems.length )
+						}
 						isBusy={ isInProgress }
 						onClick={ async () => {
 							setActionInProgress( id );
-							await callback( items, {
+							await callback( eligibleItems, {
 								registry,
 							} );
 							setActionInProgress( null );
@@ -128,7 +157,7 @@ function ActionButtons< Item >( {
 	);
 }
 
-export function DataViewsPickerFooter() {
+function PickerBulkSelectionInfo() {
 	const {
 		data,
 		selection,
@@ -136,15 +165,10 @@ export function DataViewsPickerFooter() {
 		getItemId,
 		actions = EMPTY_ARRAY,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
-
-	const message = getFooterMessage(
-		selection.length,
-		data.length,
-		paginationInfo.totalItems
-	);
 
 	const selectedItems = useMemo(
 		() =>
@@ -152,42 +176,132 @@ export function DataViewsPickerFooter() {
 		[ selection, getItemId, data ]
 	);
 
+	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
+	if ( ! actions.length ) {
+		return null;
+	}
+
+	const message = getFooterMessage(
+		selection.length,
+		data.length,
+		paginationInfo.totalItems,
+		!! view.infiniteScrollEnabled
+	);
+
+	return (
+		<Stack
+			direction="row"
+			className="dataviews-picker-footer__bulk-selection"
+			gap="md"
+			align="center"
+		>
+			{ isMultiselect && (
+				<BulkSelectionCheckbox
+					selection={ selection }
+					selectedItems={ selectedItems }
+					onChangeSelection={ onChangeSelection }
+					data={ data }
+					getItemId={ getItemId }
+					disableSelectAll={ !! view.infiniteScrollEnabled }
+				/>
+			) }
+			<span className="dataviews-bulk-actions-footer__item-count">
+				{ message }
+			</span>
+		</Stack>
+	);
+}
+
+export function PickerActions( { className }: { className?: string } ) {
+	const {
+		data,
+		selection,
+		getItemId,
+		actions = EMPTY_ARRAY,
+	} = useContext( DataViewsContext );
+
+	const selectedItems = useMemo(
+		() =>
+			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
+		[ selection, getItemId, data ]
+	);
+
+	if ( ! actions.length ) {
+		return null;
+	}
+
+	return (
+		<div
+			className={ clsx( 'dataviews-picker-footer__actions', className ) }
+		>
+			<ActionButtons
+				actions={ actions }
+				items={ selectedItems }
+				selection={ selection }
+			/>
+		</div>
+	);
+}
+
+// The bulk-selection info and action buttons without pagination — the picker
+// counterpart to `DataViews.BulkActionToolbar`, for free composition.
+export function DataViewsPickerBulkActionToolbar( {
+	className,
+}: {
+	className?: string;
+} ) {
+	return (
+		<Stack direction="row" gap="md" align="center" className={ className }>
+			<PickerBulkSelectionInfo />
+			<PickerActions />
+		</Stack>
+	);
+}
+
+// The full picker footer: bulk-selection info, pagination, and actions — the
+// picker counterpart to `DataViews.Footer`. Given children, it renders those
+// in their place instead.
+export function DataViewsPickerFooter( {
+	children,
+	className,
+}: {
+	children?: ReactNode;
+	className?: string;
+} ) {
+	const {
+		actions = EMPTY_ARRAY,
+		paginationInfo,
+		view,
+	} = useContext( DataViewsContext );
+
+	const hasPagination =
+		! view.infiniteScrollEnabled &&
+		!! paginationInfo.totalItems &&
+		paginationInfo.totalPages > 1;
+
+	// Without actions and without pagination every default part renders
+	// nothing, leaving the row's border and padding around an empty line. The
+	// check belongs to those parts alone: children are the consumer's, and
+	// what they need is not something this can work out.
+	const rendersDefaultContents = children === undefined || children === null;
+	if ( rendersDefaultContents && ! actions.length && ! hasPagination ) {
+		return null;
+	}
+
 	return (
 		<Stack
 			direction="row"
 			justify="space-between"
 			align="center"
-			className="dataviews-footer"
+			className={ clsx( 'dataviews-footer', className ) }
 			gap="sm"
 		>
-			<Stack
-				direction="row"
-				className="dataviews-picker-footer__bulk-selection"
-				gap="md"
-				align="center"
-			>
-				{ isMultiselect && (
-					<BulkSelectionCheckbox
-						selection={ selection }
-						selectedItems={ selectedItems }
-						onChangeSelection={ onChangeSelection }
-						data={ data }
-						getItemId={ getItemId }
-					/>
-				) }
-				<span className="dataviews-bulk-actions-footer__item-count">
-					{ message }
-				</span>
-			</Stack>
-			<DataViewsPagination />
-			{ Boolean( actions?.length ) && (
-				<div className="dataviews-picker-footer__actions">
-					<ActionButtons
-						actions={ actions }
-						items={ selectedItems }
-						selection={ selection }
-					/>
-				</div>
+			{ children ?? (
+				<>
+					<PickerBulkSelectionInfo />
+					<DataViewsPagination />
+					<PickerActions />
+				</>
 			) }
 		</Stack>
 	);

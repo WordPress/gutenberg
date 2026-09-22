@@ -1,19 +1,13 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import { ZStack } from '..';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
-	title: 'Components/ZStack',
+	id: 'components-zstack',
+	title: 'Components/@wordpress-components/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: { control: false },

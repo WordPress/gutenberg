@@ -10,6 +10,7 @@
 			"style": false,
 			"width": false
 		},
+		"background": { "gradient": true },
 		"color": {
 			"background": true,
 			"button": true,
@@ -310,12 +311,51 @@
 			"textDecoration": true,
 			"textIndent": "subsequent",
 			"textTransform": true,
+			"textShadow": true,
+			"defaultTextShadowPresets": true,
+			"textShadowPresets": [
+				{
+					"name": "Light",
+					"slug": "light",
+					"textShadow": "0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3)"
+				},
+				{
+					"name": "Strong",
+					"slug": "strong",
+					"textShadow": "0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5)"
+				}
+			],
 			"writingMode": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
 					"radius": true
+				},
+				"dimensions": {
+					"width": true,
+					"dimensionSizes": [
+						{
+							"name": "25%",
+							"slug": "25",
+							"size": "25%"
+						},
+						{
+							"name": "50%",
+							"slug": "50",
+							"size": "50%"
+						},
+						{
+							"name": "75%",
+							"slug": "75",
+							"size": "75%"
+						},
+						{
+							"name": "100%",
+							"slug": "100",
+							"size": "100%"
+						}
+					]
 				}
 			},
 			"core/image": {

@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const os = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( './validate-config' );
 
 /**
@@ -106,7 +99,7 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 				basename,
 			};
 		}
-	} catch ( err ) {}
+	} catch {}
 
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/

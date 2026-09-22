@@ -1,24 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
-	privateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
-import { unlock } from '../../../lock-unlock';
+import { ValidatedNumberControl } from '../../validated-form-controls';
 import getCustomValidity from './get-custom-validity';
-
-const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
@@ -65,7 +55,6 @@ function BetweenControls( {
 					value={ min }
 					max={ max ? Number( max ) - step : undefined }
 					onChange={ onChangeMin }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -74,7 +63,6 @@ function BetweenControls( {
 					value={ max }
 					min={ min ? Number( min ) + step : undefined }
 					onChange={ onChangeMax }
-					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
 				/>
@@ -96,6 +84,7 @@ export default function ValidatedNumber< Item >( {
 	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {
@@ -156,11 +145,19 @@ export default function ValidatedNumber< Item >( {
 			help={ description }
 			value={ value }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid.min ? isValid.min.constraint : undefined }
-			max={ isValid.max ? isValid.max.constraint : undefined }
+			min={
+				typeof isValid.min?.constraint === 'number'
+					? isValid.min.constraint
+					: undefined
+			}
+			max={
+				typeof isValid.max?.constraint === 'number'
+					? isValid.max.constraint
+					: undefined
+			}
+			disabled={ disabled }
 		/>
 	);
 }

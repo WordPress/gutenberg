@@ -1,19 +1,12 @@
 if ( globalThis.SCRIPT_DEBUG ) {
 	await import( 'preact/debug' );
 }
-
-/**
- * External dependencies
- */
 import { h, cloneElement, render } from 'preact';
 import { batch, effect } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
-import registerDirectives, { routerRegions } from './directives';
+import './directives'; // Registers all the core directives.
+import { routerRegions } from './directives/router-region';
 import {
-	initialVdom,
+	initialVdomPromise,
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
@@ -78,7 +71,7 @@ export const privateApis = (
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,
-			initialVdom,
+			initialVdomPromise,
 			toVdom,
 			directive,
 			getNamespace,
@@ -100,10 +93,8 @@ export const privateApis = (
 	throw new Error( 'Forbidden access.' );
 };
 
-// Parses and populates the initial state and config. All the core directives
-// are registered at this point as well.
+// Parses and populates the initial state and config.
 populateServerData( parseServerData() );
-registerDirectives();
 
 // Hydrates all interactive regions when `DOMContentLoaded` is dispatched, or as
 // soon as the `@wordpress/interactivity` module is evaluated in the case that
@@ -125,8 +116,16 @@ window.history.replaceState(
 // server can render the correct content. Without this, the URL would change but
 // the page content would remain stale because the interactivity router — which
 // handles client-side navigations — might not be loaded yet.
+//
+// Some `popstate` events (e.g., anchor/fragment navigations like
+// clicking `<a href="#section">`) have `null` state. These are
+// same-document navigations and must NOT trigger a reload — the browser
+// should just scroll to the target element as normal.
 window.addEventListener( 'popstate', ( event ) => {
-	if ( event.state?.wpInteractivityId !== sessionId ) {
+	if (
+		event.state !== null &&
+		event.state?.wpInteractivityId !== sessionId
+	) {
 		window.location.reload();
 	}
 } );

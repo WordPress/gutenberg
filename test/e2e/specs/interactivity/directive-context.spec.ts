@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import type { Locator } from '@playwright/test';
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 const parseContent = async ( loc: Locator ) =>
@@ -366,7 +360,7 @@ test.describe( 'data-wp-context', () => {
 		await expect( isProxyPreservedOnCopy ).toHaveText( 'true' );
 	} );
 
-	test( 'objects referenced from the context inherit properties where they are originally defined ', async ( {
+	test( 'objects referenced from the context inherit properties where they are originally defined', async ( {
 		page,
 	} ) => {
 		await page.getByTestId( 'child copy obj' ).click();

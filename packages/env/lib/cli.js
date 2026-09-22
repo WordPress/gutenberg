@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
-
-/**
- * Internal dependencies
- */
 const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
@@ -150,6 +143,11 @@ module.exports = function cli() {
 					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
 				choices: getAvailableRuntimes(),
 				default: 'docker',
+			} );
+			args.option( 'auto-port', {
+				type: 'boolean',
+				describe:
+					'Automatically find available ports when configured ports are busy. Overrides the .wp-env.json "autoPort" setting.',
 			} );
 		},
 		withSpinner( env.start )

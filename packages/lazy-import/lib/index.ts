@@ -1,11 +1,8 @@
-/**
- * External dependencies
- */
+import { join } from 'path';
+import { createHash } from 'crypto';
 import npmPackageArg from 'npm-package-arg';
 import semver from 'semver';
 import execa from 'execa';
-import { join } from 'path';
-import { createHash } from 'crypto';
 
 /**
  * Options for lazy importing a package.

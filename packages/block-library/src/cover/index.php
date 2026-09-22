@@ -66,6 +66,14 @@ function render_block_core_cover( $attributes, $content ) {
 						$query_params['controls']       = '0';
 						$query_params['modestbranding'] = '1';
 						$query_params['playsinline']    = '1';
+
+						// For loop to work, we need the playlist parameter.
+						$path          = $parsed_url['path'] ?? '';
+						$path_segments = explode( '/', $path );
+						$video_id      = end( $path_segments );
+						if ( $video_id ) {
+								$query_params['playlist'] = $video_id;
+						}
 					} elseif ( 'vimeo' === $provider ) {
 						$query_params['autoplay']    = '1';
 						$query_params['muted']       = '1';
@@ -126,8 +134,15 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	$object_position = isset( $attributes['focalPoint'] )
-		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
+	$cover_focal_point = $attributes['focalPoint'] ?? null;
+	$focal_point_x     = null;
+	$focal_point_y     = null;
+	if ( is_array( $cover_focal_point ) ) {
+		$focal_point_x = isset( $cover_focal_point['x'] ) && is_numeric( $cover_focal_point['x'] ) ? $cover_focal_point['x'] : null;
+		$focal_point_y = isset( $cover_focal_point['y'] ) && is_numeric( $cover_focal_point['y'] ) ? $cover_focal_point['y'] : null;
+	}
+	$object_position = null !== $focal_point_x && null !== $focal_point_y
+		? round( $focal_point_x * 100 ) . '% ' . round( $focal_point_y * 100 ) . '%'
 		: null;
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
@@ -146,7 +161,7 @@ function render_block_core_cover( $attributes, $content ) {
 		if ( in_the_loop() ) {
 			update_post_thumbnail_cache();
 		}
-		$current_featured_image = get_the_post_thumbnail_url( null, $attributes['sizeSlug'] ?? null );
+		$current_featured_image = get_the_post_thumbnail_url( null, $attributes['sizeSlug'] ?? 'full' );
 		if ( ! $current_featured_image ) {
 			return $content;
 		}

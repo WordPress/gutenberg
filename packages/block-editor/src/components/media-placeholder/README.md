@@ -38,7 +38,6 @@ This property is similar to the `allowedTypes` property. The difference is the f
 
 -   Type: `String`
 -   Required: No
--   Platform: Web
 
 ### addToGallery
 
@@ -48,7 +47,6 @@ If false the gallery media modal opens in the edit mode where the user can edit 
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
--   Platform: Web
 
 ### allowedTypes
 
@@ -60,16 +58,6 @@ This property is similar to the `accept` property. The difference is the format 
 
 -   Type: `Array`
 -   Required: No
--   Platform: Web | Mobile
-
-### autoOpenMediaUpload
-
-If true, the MediaUpload component auto-opens the picker of the respective platform.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-- Platform: Mobile
 
 ### className
 
@@ -77,7 +65,6 @@ Class name added to the placeholder.
 
 -   Type: `String`
 -   Required: No
--   Platform: Web
 
 ### disableDropZone
 
@@ -102,7 +89,6 @@ Icon to display left of the title. When passed as a `String`, the icon will be r
 
 -   Type: `String|Component`
 -   Required: No
--   Platform: Web | Mobile
 
 ### isAppender
 
@@ -112,7 +98,6 @@ If false the default placeholder style is used.
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
--   Platform: Web | Mobile
 
 ### disableMediaButtons
 
@@ -121,7 +106,6 @@ If true, only the Drop Zone will be rendered. No UI controls to upload the media
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
--   Platform: Web | Mobile
 
 ### labels
 
@@ -129,7 +113,6 @@ An object that can contain a `title` and `instructions` properties. These proper
 
 -   Type: `Object`
 -   Required: No
--   Platform: Web | Mobile
 
 ### multiple
 
@@ -138,7 +121,6 @@ Whether to allow multiple selection of files or not. This property will also acc
 -   Type: `Boolean|String`
 -   Required: No
 -   Default: `false`
--   Platform: Web
 
 ### mediaPreview
 
@@ -146,7 +128,6 @@ The component is rendered as a preview in the placeholder.
 
 -   Type: `Component`
 -   Required: No
--   Platform: Web
 
 ### onError
 
@@ -154,7 +135,6 @@ Callback called when an upload error happens.
 
 -   Type: `Function`
 -   Required: No
--   Platform: Web
 
 ### onFilesPreUpload
 
@@ -164,7 +144,6 @@ It receives an array with the files to upload before to the final process. It me
 -   Type: `Function`
 -   Required: No
 -   Default: `Function` noop
--   Platform: Web
 
 ### onSelect
 
@@ -173,12 +152,8 @@ The call back receives an array with the new files. Each element of the collecti
 
 -   Type: `Function`
 -   Required: Yes
--   Platform: Web | Mobile
 
-The argument of the callback is an object containing the following properties:
-
--   Web: `{ url, alt, id, link, caption, sizes, media_details }`
--   Mobile: `{ id, url }`
+The argument of the callback is an object containing the following properties: `{ url, alt, id, link, caption, sizes, media_details }`.
 
 ### value
 
@@ -186,7 +161,6 @@ An object or an array of objects that contain media ID (`id` property) to be sel
 
 -   Type: `Object|Array`
 -   Required: No
--   Platform: Web
 
 ### onSelectURL
 
@@ -194,7 +168,6 @@ Callback called when urls can be configured. No media insertion from url will be
 
 -   Type: `Function`
 -   Required: No
--   Platform: Web
 
 ### handleUpload
 
@@ -203,7 +176,6 @@ When the value is set to `false` or returned as `false`, the handling of the upl
 -   Type: `Boolean|Function`
 -   Required: No
 -   Default: `true`
--   Platform: Web
 
 ## Extend
 

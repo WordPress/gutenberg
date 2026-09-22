@@ -2,8 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Textarea } from '../index';
 
 const meta: Meta< typeof Textarea > = {
-	title: 'Design System/Components/Form/Primitives/Textarea',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Textarea',
+	id: 'design-system-components-form-primitives-textarea',
 	component: Textarea,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -12,6 +20,7 @@ type Story = StoryObj< typeof Textarea >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 

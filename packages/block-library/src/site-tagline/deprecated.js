@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
 
@@ -11,6 +8,7 @@ const v2 = {
 		},
 		level: {
 			type: 'number',
+			default: 0,
 		},
 		levelOptions: {
 			type: 'array',

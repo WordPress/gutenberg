@@ -67,6 +67,12 @@
 			"attribute": "src",
 			"role": "content"
 		},
+		"width": {
+			"type": "number"
+		},
+		"height": {
+			"type": "number"
+		},
 		"playsInline": {
 			"type": "boolean",
 			"source": "attribute",
@@ -95,7 +101,13 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		}
+	},
+	"selectors": {
+		"shadow": ".wp-block-video video"
 	},
 	"editorStyle": "wp-block-video-editor",
 	"style": "wp-block-video"

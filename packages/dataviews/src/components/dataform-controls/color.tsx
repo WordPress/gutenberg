@@ -1,38 +1,25 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ColorIndicator,
 	ColorPicker,
 	Dropdown,
-	privateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
+import { InputLayout, ValidatedInputControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedInputControl } = unlock( privateApis );
 
 const ColorPickerDropdown = ( {
 	color,
 	onColorChange,
+	disabled,
 }: {
 	color: string;
 	onColorChange: ( newColor: string ) => void;
+	disabled?: boolean;
 } ) => {
 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
 
@@ -45,6 +32,8 @@ const ColorPickerDropdown = ( {
 					onClick={ onToggle }
 					aria-label={ __( 'Open color picker' ) }
 					size="small"
+					disabled={ disabled }
+					accessibleWhenDisabled
 					icon={ () => <ColorIndicator colorValue={ validColor } /> }
 				/>
 			) }
@@ -70,6 +59,7 @@ export default function Color< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
@@ -94,17 +84,24 @@ export default function Color< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			value={ value }
-			help={ description }
-			onChange={ handleInputChange }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ handleInputChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
+			disabled={ disabled }
 			prefix={
-				<InputControlPrefixWrapper variant="control">
+				<InputLayout.Slot padding="minimal">
 					<ColorPickerDropdown
 						color={ value }
 						onColorChange={ handleColorChange }
+						disabled={ disabled }
 					/>
-				</InputControlPrefixWrapper>
+				</InputLayout.Slot>
 			}
 		/>
 	);
