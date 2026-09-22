@@ -103,7 +103,7 @@ function gutenberg_get_all_registered_field_modules() {
  *
  * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
  */
-function gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
+function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 	if ( ! $scripts instanceof WP_Scripts ) {
 		$scripts = wp_scripts();
 	}
@@ -149,4 +149,4 @@ function gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 	}
 }
-add_action( 'admin_init', 'gutenberg_add_field_modules_to_editor_script', 5 );
+add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
