@@ -23,7 +23,9 @@ function isNonValue( ancestors ) {
 		}
 		return (
 			node.type === 'ImportAttribute' ||
-			( node.type === 'TSModuleDeclaration' && key === 'id' ) ||
+			( ( node.type === 'TSModuleDeclaration' ||
+				node.type === 'TSEnumMember' ) &&
+				key === 'id' ) ||
 			node.type === 'TSExternalModuleReference' ||
 			node.type === 'ImportExpression' ||
 			( node.type === 'CallExpression' &&
@@ -48,7 +50,8 @@ export function transformDsTokenFallbacks( source, filename ) {
 	}
 
 	const isTypeScript = /\.[mc]?tsx?$/.test( filename );
-	const ast = parse( source, {
+	/** @type {import('@babel/parser').ParserOptions} */
+	const options = {
 		sourceType: 'unambiguous',
 		allowReturnOutsideFunction: true,
 		allowAwaitOutsideFunction: true,
@@ -68,7 +71,13 @@ export function transformDsTokenFallbacks( source, filename ) {
 			'sourcePhaseImports',
 			'deferredImportEvaluation',
 		],
-	} );
+	};
+	let ast = parse( source, options );
+	// With error recovery, unambiguous parsing can retain module-mode errors
+	// even after identifying a script. Reparse it under the correct rules.
+	if ( ast.program.sourceType === 'script' && ast.errors?.length ) {
+		ast = parse( source, { ...options, sourceType: 'script' } );
+	}
 	// Babel's standard decorators grammar reports parameter decorators even
 	// in TypeScript. Leave that one check to the compiler's tsconfig settings.
 	for ( const error of ast.errors ?? [] ) {

@@ -93,6 +93,18 @@ const element = <div>var(--wpds-not-a-token)</div>;
 		).toThrow( 'has already been declared' );
 	} );
 
+	it.each( [ '"use strict";', 'export {};' ] )(
+		'still rejects strict-mode violations after %s',
+		( prefix ) => {
+			expect( () =>
+				transformDsTokenFallbacks(
+					`${ prefix } function last(value, value) { return "var(--wpds-dimension-gap-sm)"; }`,
+					'fixture.js'
+				)
+			).toThrow( 'Argument name clash' );
+		}
+	);
+
 	it( 'preserves manual fallbacks and is idempotent', () => {
 		const source =
 			'const value = "var(--wpds-dimension-gap-sm,) var(--wpds-border-radius-sm, 99px)";';

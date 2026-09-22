@@ -81,7 +81,10 @@ const plugin = {
 								if ( context.depth !== 1 ) {
 									return null;
 								}
-								context.source = mapPath;
+								context.source = mapPath.replaceAll(
+									'\\',
+									'/'
+								);
 								return inputMap;
 							}
 						);

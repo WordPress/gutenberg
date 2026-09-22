@@ -154,6 +154,20 @@ export const manual = 'var(--wpds-dimension-gap-sm,)';
 			} );
 		} );
 
+		it( 'preserves TypeScript enum member names', async () => {
+			const filename = join( directory, 'fixture.ts' );
+			await writeFile(
+				filename,
+				'enum Tokens { "var(--wpds-not-a-token)" = "var(--wpds-dimension-gap-sm)" } export const gap = Tokens["var(--wpds-not-a-token)"];'
+			);
+			const result = await bundle( bundler, filename );
+			const module = { exports: {} };
+			runInNewContext( result.code, { module, exports: module.exports } );
+			expect( module.exports ).toMatchObject( {
+				gap: 'var(--wpds-dimension-gap-sm, 8px)',
+			} );
+		} );
+
 		it.each( [
 			[
 				'auto-accessors',
@@ -189,6 +203,21 @@ export const manual = 'var(--wpds-dimension-gap-sm,)';
 		} );
 	}
 );
+
+it( 'builds non-strict CommonJS syntax', async () => {
+	const filename = join( directory, 'fixture.cjs' );
+	await writeFile(
+		filename,
+		'function last(value, value) { return value; } const octal = 010; module.exports = { gap: last(octal, "var(--wpds-dimension-gap-sm)"), octal };'
+	);
+	const result = await bundle( 'esbuild', filename );
+	const module = { exports: {} };
+	runInNewContext( result.code, { module, exports: module.exports } );
+	expect( module.exports ).toEqual( {
+		gap: 'var(--wpds-dimension-gap-sm, 8px)',
+		octal: 8,
+	} );
+} );
 
 it.each( [
 	'import source wasm from "external.wasm"; export { wasm };',
