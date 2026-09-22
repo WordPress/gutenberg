@@ -34,7 +34,7 @@
 	"dependencies": {
 		"chalk": "^2.4.2",
 		"copy-dir": "^1.2.0",
-		"docker-compose": "^0.22.2",
+		"docker-compose": "0.24.0",
 		"extract-zip": "^1.6.7",
 		"inquirer": "^7.0.4",
 		"js-yaml": "^3.13.1",
