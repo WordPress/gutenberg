@@ -245,7 +245,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		: threads.findIndex(
 				( thread ) =>
 					thread.status === 'approved' && !! thread.blockClientId
-		  );
+			);
 
 	return (
 		<Stack
@@ -303,7 +303,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 												y: notePositions[ thread.id ],
 												registerThread,
 												unregisterThread,
-										  }
+											}
 										: undefined
 								}
 								onKeyDown={ ( event ) =>

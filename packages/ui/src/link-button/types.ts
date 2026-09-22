@@ -7,7 +7,8 @@ type LinkButtonVisualProps = Pick<
 >;
 
 export interface LinkButtonProps
-	extends Omit< LinkProps, keyof LinkButtonVisualProps >,
+	extends
+		Omit< LinkProps, keyof LinkButtonVisualProps >,
 		LinkButtonVisualProps {}
 
 export type { ButtonIconProps as LinkButtonIconProps };

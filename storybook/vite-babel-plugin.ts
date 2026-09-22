@@ -9,7 +9,10 @@ type BabelPluginOptions = Omit< TransformOptions, 'sourceMaps' > & {
 	sourceMap?: boolean;
 };
 
-const shouldTransformWithBabel = createFilter( /\.[jt]sx?$/, /node_modules/ );
+const shouldTransformWithBabel = createFilter(
+	/\.[cm]?[jt]sx?$/,
+	/node_modules/
+);
 
 export default async function babelPlugin(
 	rawOptions: BabelPluginOptions
@@ -32,7 +35,7 @@ export default async function babelPlugin(
 			if ( /\.[jt]sx$/.test( filePath ) ) {
 				parserPlugins.push( 'jsx' );
 			}
-			if ( /\.tsx?$/.test( filePath ) ) {
+			if ( /\.[cm]?tsx?$/.test( filePath ) ) {
 				parserPlugins.push( 'typescript' );
 			}
 

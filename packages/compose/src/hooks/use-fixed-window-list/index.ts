@@ -86,7 +86,7 @@ export default function useFixedWindowList(
 		// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 		const overscan = initRender
 			? visibleItems
-			: windowOverscan ?? visibleItems;
+			: ( windowOverscan ?? visibleItems );
 		const firstViewableIndex = Math.floor(
 			scrollContainer.scrollTop / itemHeight
 		);

@@ -2,7 +2,7 @@
 /**
  * Resolves the branches and the suite shards the performance workflow runs for a GitHub event.
  * Writes `branches` (`{ name, ref, artifact, sha?, reusable? }[]`), `shards` (`{ shard, suites }[]`),
- * `wp-version`, `plugin-files` (space separated globs from bin/plugin-files.txt) and `build-key`
+ * `wp-version`, `plugin-files` (space separated globs from plugin-files.mts) and `build-key`
  * to `$GITHUB_OUTPUT`.
  */
 import fs from 'node:fs';
@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
+import { PLUGIN_FILES } from './plugin-files.mts';
 
 /*
  * The commit trunk is compared against; must be updated on every WP major release, see
@@ -274,12 +275,7 @@ function main() {
 			.map( ( file ) => path.basename( file, '.spec.js' ) )
 	);
 
-	const pluginFiles = fs
-		.readFileSync( path.join( 'bin', 'plugin-files.txt' ), 'utf8' )
-		.split( '\n' )
-		.map( ( line ) => line.trim() )
-		.filter( ( line ) => line && ! line.startsWith( '#' ) )
-		.join( ' ' );
+	const pluginFiles = PLUGIN_FILES.join( ' ' );
 
 	const buildKey = computeBuildKey(
 		pluginFiles,

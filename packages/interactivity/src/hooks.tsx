@@ -329,7 +329,7 @@ const Directives = ( {
 					element,
 					originalProps,
 					previousScope: scope,
-			  } )
+				} )
 			: element;
 
 	const props = { ...originalProps, children };
