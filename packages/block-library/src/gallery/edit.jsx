@@ -65,6 +65,7 @@ import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
+import { getCurrentOrder, sortImageBlocks } from './order-images';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -313,6 +314,18 @@ export default function GalleryEdit( props ) {
 	const hasImages = !! images.length;
 	const isDynamic = !! attributes.dynamicContent;
 
+	// The order the static images are in, derived rather than stored so the
+	// "Order by" control reads honestly after images are dragged around.
+	const currentOrder = useMemo(
+		() => getCurrentOrder( innerBlockImages, imageData ),
+		[ innerBlockImages, imageData ]
+	);
+	// Sorting needs at least two placeable images and their attachment records;
+	// until the media resolves there's nothing to sort by.
+	const canSortImages =
+		images.filter( ( image ) => image.id !== undefined ).length > 1 &&
+		imageData.length > 0;
+
 	// Dynamic mode (resolving images from a source instead of inner blocks):
 	// source resolution, the editor-preview blocks, and the mode/ordering
 	// actions.
@@ -543,6 +556,20 @@ export default function GalleryEdit( props ) {
 		if ( newBlocks?.length > 0 ) {
 			selectBlock( newBlocks[ 0 ].clientId );
 		}
+	}
+
+	// Reorders the inner image blocks in place. Left persistent on purpose so
+	// the sort is a single undoable step.
+	function sortImages( { orderby, order } ) {
+		replaceInnerBlocks(
+			clientId,
+			sortImageBlocks(
+				getBlock( clientId ).innerBlocks,
+				imageData,
+				orderby,
+				order
+			)
+		);
 	}
 
 	function onUploadError( message ) {
@@ -864,6 +891,9 @@ export default function GalleryEdit( props ) {
 						dynamic={ dynamic }
 						dropdownMenuProps={ dropdownMenuProps }
 						hasImages={ hasImages }
+						currentOrder={ currentOrder }
+						canSortImages={ canSortImages }
+						onSortImages={ sortImages }
 					/>
 				) }
 				<ToolsPanel

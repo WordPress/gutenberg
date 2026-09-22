@@ -150,6 +150,12 @@
 	}
 }
 
+// In static mode the Source panel is a PanelBody with no grid gap, so space the
+// "Order by" control from the entry button above it when both render.
+.wp-block-gallery__source-settings + .wp-block-gallery__source-order {
+	margin-top: $grid-unit-20;
+}
+
 // The "showing the first N" notice is a plain (non-ToolsPanelItem) child of the
 // Source ToolsPanel, so span both grid columns rather than defaulting to one.
 .wp-block-gallery__source-notice {
