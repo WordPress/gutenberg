@@ -164,8 +164,10 @@ export default function PageListEdit( {
 		}
 
 		// Sort by menu order, then title, to match the order the front end
-		// renders (`get_pages()` sorted by `menu_order,post_title`).
-		const sortedPages = pages.sort( ( a, b ) => {
+		// renders (`get_pages()` sorted by `menu_order,post_title`). Sort a
+		// copy: `pages` is the array core-data caches for this query and hands
+		// to every other consumer of it, and `sort` reorders in place.
+		const sortedPages = [ ...pages ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
 			}
