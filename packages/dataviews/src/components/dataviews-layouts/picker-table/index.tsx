@@ -272,6 +272,7 @@ function ViewPickerTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
+	const { itemListLabel } = useContext( DataViewsContext );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -374,6 +375,10 @@ function ViewPickerTable< Item >( {
 				}
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
+				aria-label={ itemListLabel }
+				aria-multiselectable={
+					! isInfiniteScroll && isMultiselect ? true : undefined
+				}
 				role={ isInfiniteScroll ? 'feed' : 'listbox' }
 			>
 				<thead role="presentation">
