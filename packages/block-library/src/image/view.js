@@ -24,6 +24,9 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+// A new opening must not be cleared by the previous closing animation.
+let closeTimeout;
+
 const touchStartEvent = {
 	startX: 0,
 	startY: 0,
@@ -33,6 +36,8 @@ const touchStartEvent = {
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
+	'.lightbox-caption[tabindex="0"]',
+	'.lightbox-caption a[href]',
 ];
 
 /**
@@ -64,6 +69,7 @@ const { state, actions, callbacks } = store(
 		state: {
 			selectedImageId: null,
 			selectedGalleryId: null,
+			currentLiveText: '',
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get galleryImages() {
@@ -198,6 +204,7 @@ const { state, actions, callbacks } = store(
 				if ( ! state.metadata[ imageId ].imageRef?.complete ) {
 					return;
 				}
+				clearTimeout( closeTimeout );
 
 				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
@@ -209,20 +216,25 @@ const { state, actions, callbacks } = store(
 				const { galleryId } = getContext( 'core/gallery' ) || {};
 				state.selectedGalleryId = galleryId || null;
 				state.overlayEnabled = true;
+				state.currentLiveText = '';
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
+				document.querySelector(
+					'.wp-lightbox-overlay .lightbox-caption'
+				).scrollTop = 0;
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
+					state.currentLiveText = '';
 
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
 					// the `styles.scss` file, but in any case we should wait a few
 					// milliseconds longer than the duration, otherwise a user may scroll
 					// too soon and cause the animation to look sloppy.
-					setTimeout( function () {
+					closeTimeout = setTimeout( function () {
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
@@ -243,6 +255,7 @@ const { state, actions, callbacks } = store(
 					: state.galleryImages.length - 1;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
 				callbacks.setOverlayStyles();
+				state.currentLiveText = state.ariaLabel;
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
@@ -251,47 +264,57 @@ const { state, actions, callbacks } = store(
 					: 0;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
 				callbacks.setOverlayStyles();
+				state.currentLiveText = state.ariaLabel;
+			} ),
+			handleCaptionClick: withSyncEvent( ( event ) => {
+				// Keep text selection and links from closing the dialog.
+				event.stopPropagation();
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
-					} else if ( event.key === 'ArrowLeft' ) {
+					} else if (
+						event.key === 'ArrowLeft' &&
+						! event.target.closest( '.lightbox-caption' )
+					) {
 						actions.showPreviousImage( event );
-					} else if ( event.key === 'ArrowRight' ) {
+					} else if (
+						event.key === 'ArrowRight' &&
+						! event.target.closest( '.lightbox-caption' )
+					) {
 						actions.showNextImage( event );
 					} else if ( event.key === 'Tab' ) {
 						// Traps focus within the overlay.
 						const focusableElements = Array.from(
-							document.querySelectorAll( focusableSelectors )
+							event.currentTarget.querySelectorAll(
+								focusableSelectors
+							)
+						).filter(
+							( element ) =>
+								element.tabIndex >= 0 &&
+								element.getClientRects().length
 						);
-						const firstFocusableElement = focusableElements[ 0 ];
-						const lastFocusableElement =
-							focusableElements[ focusableElements.length - 1 ];
-						if (
-							event.shiftKey &&
-							event.target === firstFocusableElement
-						) {
-							event.preventDefault();
-							lastFocusableElement.focus();
-						} else if (
-							! event.shiftKey &&
-							event.target === lastFocusableElement
-						) {
-							event.preventDefault();
-							firstFocusableElement.focus();
-						}
+						const currentIndex = focusableElements.indexOf(
+							event.target
+						);
+						const nextIndex = event.shiftKey
+							? ( currentIndex > 0
+									? currentIndex
+									: focusableElements.length ) - 1
+							: ( currentIndex + 1 ) % focusableElements.length;
+						event.preventDefault();
+						focusableElements[ nextIndex ]?.focus();
 					}
 				}
 			} ),
 			handleTouchMove: withSyncEvent( ( event ) => {
-				// On mobile devices, prevents triggering the scroll event because
-				// otherwise the page jumps around when it resets the scroll position.
-				// This also means that closing the lightbox requires that a user
-				// perform a simple tap. This may be changed in the future if there is a
-				// better alternative to override or reset the scroll position during
-				// swipe actions.
-				if ( state.overlayEnabled ) {
+				// Captions scroll independently. Outside them, prevent page scrolling
+				// so the zoom animation keeps its original position.
+				if (
+					state.overlayEnabled &&
+					! event.target.closest( '.lightbox-caption' )
+				) {
 					event.preventDefault();
 				}
 			} ),
@@ -310,7 +333,11 @@ const { state, actions, callbacks } = store(
 					( event.touches && event.touches[ 0 ] );
 				const now = Date.now();
 
-				if ( touchEndEvent && state.overlayEnabled ) {
+				if (
+					touchEndEvent &&
+					state.overlayEnabled &&
+					! event.target.closest( '.lightbox-caption' )
+				) {
 					const deltaX =
 						touchEndEvent.clientX - touchStartEvent.startX;
 					const deltaY =
@@ -543,12 +570,47 @@ const { state, actions, callbacks } = store(
 					verticalPadding = 80;
 				}
 
+				const caption = document.querySelector(
+					'.wp-lightbox-overlay .lightbox-caption'
+				);
+				let captionSpace = 0;
+				if ( caption ) {
+					if ( caption.dataset.imageId !== state.selectedImageId ) {
+						// This HTML was sanitized with wp_kses_post on the server.
+						caption.innerHTML = state.selectedImage.caption || '';
+						caption.dataset.imageId = state.selectedImageId;
+						caption.scrollTop = 0;
+					}
+					caption.hidden = ! state.selectedImage.caption;
+					caption.style.width = `${ Math.max(
+						1,
+						window.innerWidth - Math.max( horizontalPadding, 48 )
+					) }px`;
+					if ( ! caption.hidden ) {
+						captionSpace = caption.offsetHeight + 16;
+						// Keep room for the image on short viewports, while leaving
+						// 56px above and below for the close and navigation buttons.
+						if ( window.innerHeight < 480 ) {
+							verticalPadding = Math.min( verticalPadding, 112 );
+						}
+					}
+					// Only add a tab stop when the caption needs keyboard scrolling.
+					if ( caption.scrollHeight > caption.clientHeight ) {
+						caption.tabIndex = 0;
+					} else {
+						caption.removeAttribute( 'tabindex' );
+					}
+				}
+
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
 					containerWidth
 				);
 				const targetMaxHeight = Math.min(
-					window.innerHeight - verticalPadding,
+					Math.max(
+						1,
+						window.innerHeight - verticalPadding - captionSpace
+					),
 					containerHeight
 				);
 				const targetContainerRatio = targetMaxWidth / targetMaxHeight;
@@ -576,6 +638,7 @@ const { state, actions, callbacks } = store(
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
+					--wp--lightbox-caption-space: ${ captionSpace }px;
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
@@ -618,14 +681,17 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				const figure = ref.parentElement;
-				const figureWidth = ref.parentElement.clientWidth;
+				const figure = ref.closest( '.wp-lightbox-container' );
+				if ( ! figure ) {
+					return;
+				}
+				const figureWidth = figure.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
 				// the figure to be taller than the image, which means it needs to
 				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
-				let figureHeight = ref.parentElement.clientHeight;
+				let figureHeight = figure.clientHeight;
 				const caption = figure.querySelector( 'figcaption' );
 				if ( caption ) {
 					const captionComputedStyle =
@@ -700,6 +766,15 @@ const { state, actions, callbacks } = store(
 							el.removeAttribute( 'inert' );
 						}
 					} );
+			},
+			initCaption() {
+				const { ref } = getElement();
+				// Reflow when fonts or caption images load after the dialog opens.
+				const observer = new window.ResizeObserver(
+					withScope( callbacks.setOverlayStyles )
+				);
+				observer.observe( ref );
+				return () => observer.disconnect();
 			},
 			initTriggerButton() {
 				const { imageId } = getContext();

@@ -298,7 +298,7 @@
 	.lightbox-image-container {
 		position: absolute;
 		overflow: hidden;
-		top: 50%;
+		top: calc(50% - var(--wp--lightbox-caption-space, 0px) / 2);
 		left: 50%;
 		transform-origin: top left;
 		transform: translate(-50%, -50%);
@@ -325,8 +325,29 @@
 			width: var(--wp--lightbox-image-width);
 			height: var(--wp--lightbox-image-height);
 		}
+	}
 
-		figcaption {
+	.lightbox-content {
+		margin: 0;
+	}
+
+	.lightbox-caption {
+		position: absolute;
+		top: calc(50% + (var(--wp--lightbox-container-height) - var(--wp--lightbox-caption-space, 0px)) / 2 + 16px);
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 2000001;
+		box-sizing: border-box;
+		max-width: 80ch;
+		max-height: 25vh;
+		overflow: auto;
+		overscroll-behavior: contain;
+		overflow-wrap: anywhere;
+		padding: 4px;
+		margin: 0;
+		cursor: auto;
+
+		&[hidden] {
 			display: none;
 		}
 	}
@@ -445,7 +466,7 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-caption-space, 0px) / 2 + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		transform: translate(-50%, -50%) scale(1, 1);
@@ -462,6 +483,6 @@
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-caption-space, 0px) / 2 + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }
