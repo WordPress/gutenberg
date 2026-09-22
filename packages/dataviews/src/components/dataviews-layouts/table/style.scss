@@ -242,6 +242,17 @@
 		min-width: var(--wpds-dimension-size-md);
 	}
 
+	.dataviews-view-table__hierarchy-pagination-content {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		min-height: var(--wpds-dimension-size-md);
+
+		[role="alert"] {
+			color: var(--wpds-color-foreground-content-error-weak);
+		}
+	}
 
 	// Density style overrides.
 	&.has-compact-density {
@@ -281,7 +292,7 @@
 		}
 	}
 
-	tbody .dataviews-view-table__hierarchy-content-column {
+	tbody tr td.dataviews-view-table__hierarchy-content-column {
 		padding-inline-start:
 			calc(var(--wp-dataviews-table-cell-padding-inline, var(--wpds-dimension-padding-md)) +
 			var(--wp-dataviews-table-hierarchy-level, 0) *
