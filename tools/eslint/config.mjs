@@ -963,9 +963,8 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: block-library — the waveform player initializes every
-	// `[data-waveform-player]` element on the page when it is imported, so it
-	// has a single import site that opts the document out first.
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
 	{
 		files: [ 'packages/block-library/**' ],
 		rules: {
@@ -977,14 +976,17 @@ export default dedupePlugins( [
 						{
 							name: '@arraypress/waveform-player',
 							message:
-								'Importing the waveform player initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `utils/waveform-player-library` instead.',
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
 						},
 					],
 					patterns: [
 						{
-							group: [ '@arraypress/waveform-player/*' ],
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
 							message:
-								'Importing the waveform player initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `utils/waveform-player-library` instead.',
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
 						},
 					],
 				},

@@ -3,7 +3,7 @@
  * Used by both the WaveformPlayer component (editor) and view.js (frontend).
  */
 import { colord } from 'colord';
-import WaveformPlayerLib from './waveform-player-library';
+import WaveformPlayerLib from '@arraypress/waveform-player/no-autoinit';
 
 /**
  * Configuration constants.

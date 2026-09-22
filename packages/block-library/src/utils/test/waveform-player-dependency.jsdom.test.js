@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const AUTO_INIT_ATTRIBUTE = 'data-waveform-autoinit';
-
 function createDeclarativePlayer() {
 	const element = document.createElement( 'div' );
 	element.setAttribute( 'data-waveform-player', '' );
@@ -51,9 +49,7 @@ describe( 'Waveform Player dependency', () => {
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
 		vi.useRealTimers();
 		vi.resetModules();
-		vi.doUnmock( '@arraypress/waveform-player' );
 		document.body.innerHTML = '';
-		document.documentElement.removeAttribute( AUTO_INIT_ATTRIBUTE );
 
 		if ( originalReadyState ) {
 			Object.defineProperty( document, 'readyState', originalReadyState );
@@ -63,10 +59,8 @@ describe( 'Waveform Player dependency', () => {
 	} );
 
 	/*
-	 * Must run first: the dependency scans the document while its own module is
-	 * evaluated, and `vi.resetModules()` does not re-evaluate dependencies, so
-	 * the real scan is only observable on the first import in this file. The
-	 * opt-out itself is covered order-independently below.
+	 * Must run first: a scan would happen when the dependency is evaluated, and
+	 * `vi.resetModules()` does not re-evaluate dependencies.
 	 */
 	it( 'leaves declarative markup it does not own uninitialized', async () => {
 		const element = createDeclarativePlayer();
@@ -75,9 +69,6 @@ describe( 'Waveform Player dependency', () => {
 
 		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
 		expect( element ).toBeEmptyDOMElement();
-		expect( document.documentElement ).not.toHaveAttribute(
-			AUTO_INIT_ATTRIBUTE
-		);
 	} );
 
 	it( 'initializes declarative markup that is requested explicitly', async () => {
@@ -93,30 +84,5 @@ describe( 'Waveform Player dependency', () => {
 		expect(
 			element.querySelector( '.waveform-player-inner' )
 		).not.toBeNull();
-	} );
-
-	it( 'applies the opt-out before the dependency is evaluated', async () => {
-		let attributeWhenEvaluated;
-
-		vi.doMock( '@arraypress/waveform-player', () => {
-			attributeWhenEvaluated =
-				document.documentElement.getAttribute( AUTO_INIT_ATTRIBUTE );
-			return { default: class WaveformPlayerStub {} };
-		} );
-
-		await loadWaveformUtils();
-
-		expect( attributeWhenEvaluated ).toBe( 'false' );
-	} );
-
-	it( "restores the document's own opt-out value", async () => {
-		document.documentElement.setAttribute( AUTO_INIT_ATTRIBUTE, 'true' );
-
-		await loadWaveformUtils();
-
-		expect( document.documentElement ).toHaveAttribute(
-			AUTO_INIT_ATTRIBUTE,
-			'true'
-		);
 	} );
 } );
