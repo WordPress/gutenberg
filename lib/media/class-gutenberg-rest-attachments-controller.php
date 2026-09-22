@@ -78,6 +78,25 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const META_KEY_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
 
 	/**
+	 * Image size token for a still frame the author picked from a Live photo's
+	 * motion (a converted HEIC/HEIF image sequence).
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_LIVE_PHOTO_STILL = 'live_photo_still';
+
+	/**
+	 * Metadata key listing the basenames of the picked Live photo still frames.
+	 *
+	 * A list rather than a single name: the frame is chosen per block, so
+	 * several blocks showing the same attachment can each rest on a different
+	 * one.
+	 *
+	 * @var string
+	 */
+	const META_KEY_LIVE_PHOTO_STILLS = 'live_photo_stills';
+
+	/**
 	 * Post meta key recording the file names produced by the sideload endpoint.
 	 *
 	 * Each successful sideload appends the file name(s) it created for an
@@ -915,6 +934,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Converted-video companions for an animated GIF (the MP4/WebM and its poster).
 			self::IMAGE_SIZE_ANIMATED_VIDEO,
 			self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER,
+			// Still frames picked from a converted image sequence's motion.
+			self::IMAGE_SIZE_LIVE_PHOTO_STILL,
 		);
 	}
 
@@ -969,6 +990,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// converted video. It is a real image (so it has positive dimensions)
 		// but is not a registered sub-size, so it has no dimension constraint.
 		if ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+			return true;
+		}
+
+		// 'live_photo_still' companion: a frame captured from the motion, so it
+		// has the video's dimensions rather than those of a registered size.
+		if ( self::IMAGE_SIZE_LIVE_PHOTO_STILL === $image_size ) {
 			return true;
 		}
 
@@ -1250,6 +1277,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// the filename to $metadata['animated_video_poster']; used as the
 			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_LIVE_PHOTO_STILL === $image_size ) {
+			// A still frame picked from a Live photo's motion. finalize_item()
+			// adds the filename to $metadata['live_photo_stills']; the block
+			// that picked it uses it as its poster, and it is deleted with the
+			// attachment.
+			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size || 'original' === $image_size ) {
 			// 'scaled' and 'original' both replace the attachment's main file
 			// with the supplied image and keep the file being replaced as
@@ -1469,6 +1502,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				}
 			}
 
+			if ( ! empty( $metadata[ self::META_KEY_LIVE_PHOTO_STILLS ] ) && is_array( $metadata[ self::META_KEY_LIVE_PHOTO_STILLS ] ) ) {
+				foreach ( $metadata[ self::META_KEY_LIVE_PHOTO_STILLS ] as $still ) {
+					$stored[] = $still;
+				}
+			}
+
 			foreach ( $stored as $name ) {
 				if ( is_string( $name ) && '' !== $name ) {
 					$allowed[] = $name;
@@ -1676,6 +1715,24 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				 * lib/media/animated-gif-to-video.php.
 				 */
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_LIVE_PHOTO_STILL === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * A still frame picked for one block. Appended rather than
+				 * replacing, since other blocks may rest on earlier picks.
+				 * Cleanup lives in lib/media/animated-gif-to-video.php.
+				 */
+				$stills = $metadata[ self::META_KEY_LIVE_PHOTO_STILLS ] ?? array();
+				if ( ! is_array( $stills ) ) {
+					$stills = array();
+				}
+				if ( ! in_array( $sub_size['file'], $stills, true ) ) {
+					$stills[] = $sub_size['file'];
+				}
+				$metadata[ self::META_KEY_LIVE_PHOTO_STILLS ] = $stills;
 			} else {
 				if ( empty( $sub_size['file'] ) ) {
 					continue;

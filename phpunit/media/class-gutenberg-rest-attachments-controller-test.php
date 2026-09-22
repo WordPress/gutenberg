@@ -2023,6 +2023,52 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that still frames picked for a Live photo accumulate in the
+	 * attachment metadata, since each block showing the attachment can rest
+	 * on its own frame.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::finalize_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_finalize_appends_live_photo_stills() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=live-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+
+		$files = array();
+		foreach ( array( 'live-photo-still-1.jpg', 'live-photo-still-2.jpg' ) as $name ) {
+			$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+			$request->set_header( 'Content-Type', 'image/jpeg' );
+			$request->set_header( 'Content-Disposition', "attachment; filename=$name" );
+			$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_LIVE_PHOTO_STILL );
+			$request->set_param( 'convert_format', false );
+			$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 200, $response->get_status() );
+			$still = $response->get_data();
+
+			$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+			$request->set_param( 'sub_sizes', array( $still ) );
+			$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+
+			$files[] = $still['file'];
+		}
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertSame( $files, $metadata['live_photo_stills'], 'Each picked still should be kept, in order.' );
+		$this->assertSame( 'live-photo.jpg', wp_basename( $metadata['file'] ), 'A picked still must not replace the main file.' );
+	}
+
+	/**
 	 * Verifies that finalize with empty sub_sizes still triggers the
 	 * wp_generate_attachment_metadata filter.
 	 *

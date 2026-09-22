@@ -171,6 +171,42 @@ class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Still frames picked for a Live photo are companions too, and are removed
+	 * with the attachment. Only their basenames are trusted.
+	 *
+	 * @covers ::gutenberg_get_live_photo_still_paths
+	 * @covers ::gutenberg_delete_animated_gif_video
+	 */
+	public function test_deletes_picked_live_photo_stills() {
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			DIR_TESTDATA . '/images/canola.jpg'
+		);
+		$dir           = dirname( get_attached_file( $attachment_id, true ) );
+
+		$stills = array( 'live-photo-still-1.jpg', 'live-photo-still-2.jpg' );
+		foreach ( $stills as $still ) {
+			file_put_contents( $dir . '/' . $still, 'still' );
+			$this->companion_files[] = $dir . '/' . $still;
+		}
+
+		$metadata                      = wp_get_attachment_metadata( $attachment_id, true );
+		$metadata                      = is_array( $metadata ) ? $metadata : array();
+		$metadata['animated_video']    = 'live-photo-test-video.mp4';
+		$metadata['live_photo_stills'] = array( $stills[0], '../../' . $stills[1] );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$this->assertSame(
+			array( $dir . '/' . $stills[0], $dir . '/' . $stills[1] ),
+			gutenberg_get_live_photo_still_paths( $attachment_id )
+		);
+
+		wp_delete_attachment( $attachment_id, true );
+
+		$this->assertFileDoesNotExist( $dir . '/' . $stills[0] );
+		$this->assertFileDoesNotExist( $dir . '/' . $stills[1] );
+	}
+
+	/**
 	 * Registering the sequence MIME types is what lets the original file be
 	 * stored alongside the still the editor uploads in its place.
 	 *
