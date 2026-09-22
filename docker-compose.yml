@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress
+    image: wordpress:5.1
     ports:
       - 8888:80
     environment:
@@ -18,7 +18,7 @@ services:
       - mysql
 
   cli:
-    image: wordpress:cli
+    image: wordpress:cli-php7.2
     user: xfs
     volumes:
       - wordpress:/var/www/html
@@ -44,12 +44,12 @@ services:
       - mysql
 
   composer:
-    image: composer
+    image: composer:1.7
     volumes:
       - .:/app
 
   wordpress_e2e_tests:
-    image: wordpress
+    image: wordpress:5.1
     ports:
       - 8889:80
     environment:
@@ -63,7 +63,7 @@ services:
       - ./test/e2e/test-mu-plugins:/var/www/html/wp-content/mu-plugins
 
   cli_e2e_tests:
-    image: wordpress:cli
+    image: wordpress:cli-php7.2
     volumes:
       - wordpress_e2e_tests:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
