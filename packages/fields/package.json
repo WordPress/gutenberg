@@ -40,6 +40,9 @@
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},
+	"wpScriptModuleExports": {
+		"./server-fields": "./build-module/server-fields.mjs"
+	},
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
