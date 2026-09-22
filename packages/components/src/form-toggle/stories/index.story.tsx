@@ -5,7 +5,8 @@ import FormToggle from '..';
 const meta: Meta< typeof FormToggle > = {
 	tags: [ 'manifest' ],
 	component: FormToggle,
-	title: 'Components/FormToggle',
+	id: 'components-formtoggle',
+	title: 'Components/@wordpress-components/FormToggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',

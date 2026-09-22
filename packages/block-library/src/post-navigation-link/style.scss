@@ -1,4 +1,6 @@
 .wp-block-post-navigation-link {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	.wp-block-post-navigation-link__arrow-previous {
 		display: inline-block;

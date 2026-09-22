@@ -8,6 +8,7 @@
 -   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 -   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
+-   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
 
 ### Bug Fixes
 
@@ -20,12 +21,9 @@
 -   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
 -   `useGlobalStylesOutput`: Let the styles engine derive block gap support from the config it renders, instead of a separate check that treated a theme without block gap support as supporting it and so dropped the fallback gap styles the front end renders ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 
-### Code Quality
-
--   Post template panel: Remove the dead template read capability check. ([#82861](https://github.com/WordPress/gutenberg/pull/82861))
-
 ### Internal
 
+-   Post template panel: Remove the dead template read capability check. ([#82861](https://github.com/WordPress/gutenberg/pull/82861))
 -   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
 
