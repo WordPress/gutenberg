@@ -701,6 +701,12 @@ button.wp-block-navigation-item__content {
 				background: transparent !important;
 			}
 
+			// Submenus unfold inline here, so drop the dropdown shadow.
+			// Has to be !important to override the inline instance style.
+			.wp-block-navigation-item .wp-block-navigation__submenu-container {
+				box-shadow: none !important;
+			}
+
 			// Override justification dropdown menu positioning rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				right: auto;
