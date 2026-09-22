@@ -238,7 +238,7 @@ final class Gutenberg_Fields_Registry {
 	 * @return array<string, string[]> The lists of module ids, keyed by
 	 *                                 `{$kind}/{$name}`.
 	 */
-	public function get_all_registered_script_modules() {
+	public function get_all_registered_field_modules() {
 		return array_map( 'array_keys', $this->field_modules );
 	}
 
