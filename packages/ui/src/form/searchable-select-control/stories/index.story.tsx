@@ -21,7 +21,8 @@ import {
 
 const meta: Meta< typeof SearchableSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableSelectControl',
+	id: 'design-system-components-form-searchableselectcontrol',
 	component: SearchableSelectControl,
 	subcomponents: {
 		'SearchableSelectControl.Group': SearchableSelectControl.Group,
