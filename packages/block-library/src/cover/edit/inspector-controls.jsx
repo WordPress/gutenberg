@@ -293,7 +293,7 @@ export default function CoverInspectorControls( {
 	 * The settings below stay behind their own condition, having nothing to
 	 * configure until there is media to configure.
 	 */
-	const mediaInspectorPanel = (
+	const mediaInspectorPanel = isSelected ? (
 		<InspectorControls group="content">
 			<ToolsPanel
 				label={ __( 'Media' ) }
@@ -325,11 +325,11 @@ export default function CoverInspectorControls( {
 				</ToolsPanelItem>
 			</ToolsPanel>
 		</InspectorControls>
-	);
+	) : null;
 
 	return (
 		<>
-			{ isSelected && mediaInspectorPanel }
+			{ mediaInspectorPanel }
 			{ ( !! url || useFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
