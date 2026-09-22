@@ -10,13 +10,9 @@ import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableChipSelect { ...args } />,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
