@@ -59,7 +59,8 @@ function nameToSlug( name: string ): string {
 
 const meta: Meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
@@ -101,7 +102,7 @@ const LibraryExample = ( {
 						)
 					);
 				} )
-		  )
+			)
 		: availableIcons;
 
 	const hasResults = Object.keys( filteredIcons ).length > 0;

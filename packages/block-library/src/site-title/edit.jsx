@@ -1,5 +1,5 @@
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -22,38 +22,31 @@ export default function SiteTitleEdit( props ) {
 	useDeprecatedTextAlign( props );
 
 	const { attributes, setAttributes } = props;
-
 	const { level, levelOptions, isLink, linkTarget } = attributes;
-	const { canUserEdit, title } = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEditedEntityRecord } =
-			select( coreStore );
-		const canEdit = canUser( 'update', {
-			kind: 'root',
-			name: 'site',
-		} );
-		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
-		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
-
-		return {
-			canUserEdit: canEdit,
-			title: canEdit ? settings?.title : readOnlySettings?.name,
-		};
-	}, [] );
-	const { editEntityRecord } = useDispatch( coreStore );
+	const canUserEdit = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'update', {
+				kind: 'root',
+				name: 'site',
+			} ),
+		[]
+	);
+	// Users who cannot edit the site settings cannot read them either, so the
+	// title comes from the base entity instead.
+	const [ title, setSiteTitle ] = useEntityProp(
+		'root',
+		canUserEdit ? 'site' : '__unstableBase',
+		canUserEdit ? 'title' : 'name',
+		undefined
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
-
-	function setTitle( newTitle ) {
-		editEntityRecord( 'root', 'site', undefined, {
-			title: newTitle.trim(),
-		} );
-	}
-
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
 		className:
 			! canUserEdit && ! title && 'wp-block-site-title__placeholder',
 	} );
+
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
 			<RichText
@@ -62,7 +55,7 @@ export default function SiteTitleEdit( props ) {
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
 				value={ title }
-				onChange={ setTitle }
+				onChange={ ( newTitle ) => setSiteTitle( newTitle.trim() ) }
 				allowedFormats={ [] }
 				disableLineBreaks
 			/>

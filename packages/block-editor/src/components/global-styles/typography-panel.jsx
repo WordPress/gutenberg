@@ -17,6 +17,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
+import { TextShadowPopover } from './text-shadow-panel';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
@@ -34,7 +35,7 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -79,6 +80,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 	const hasTextColor = useHasTextPanel( settings );
+	const hasTextShadow = useHasTextShadowControl( settings );
 
 	return (
 		hasFontFamily ||
@@ -92,7 +94,8 @@ export function useHasTypographyPanel( settings ) {
 		hasTextIndent ||
 		hasWritingMode ||
 		hasTextColumns ||
-		hasTextColor
+		hasTextColor ||
+		hasTextShadow
 	);
 }
 
@@ -158,6 +161,10 @@ function useHasTextIndentControl( settings ) {
 	return settings?.typography?.textIndent;
 }
 
+function useHasTextShadowControl( settings ) {
+	return settings?.typography?.textShadow;
+}
+
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
@@ -171,7 +178,7 @@ function getMergedFontSizes( settings ) {
 	return [
 		...( fontSizes?.custom ?? [] ),
 		...( fontSizes?.theme ?? [] ),
-		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+		...( defaultFontSizesEnabled ? ( fontSizes?.default ?? [] ) : [] ),
 	];
 }
 
@@ -214,6 +221,7 @@ const DEFAULT_CONTROLS = {
 	textIndent: true,
 	writingMode: true,
 	textColumns: true,
+	textShadow: true,
 };
 
 const EMPTY_VALUES = [ undefined, null, '' ];
@@ -248,7 +256,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
@@ -276,13 +284,7 @@ export default function TypographyPanel( {
 			newSlug
 		);
 		let changedObject = setImmutably( value, [ 'color', 'text' ], encoded );
-		// With the experiment off, keep the pre-inheritance comparison on
-		// `inheritedValue`.
-		const syncLinkColor = isGlobalStylesInheritanceEnabled()
-			? shouldSyncLinkColor( value, inheritedValue )
-			: inheritedValue?.color?.text ===
-			  inheritedValue?.elements?.link?.color?.text;
-		if ( syncLinkColor ) {
+		if ( shouldSyncLinkColor( value, inheritedValue ) ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
@@ -778,6 +780,25 @@ export default function TypographyPanel( {
 	const hasTextAlign = () => hasValue( value?.typography?.textAlign );
 	const resetTextAlign = () => setTextAlign( undefined );
 
+	// Text Shadow
+	const hasTextShadowControl = useHasTextShadowControl( settings );
+	const inheritedTextShadow = inheritedValue?.typography?.textShadow;
+	const textShadow = value?.typography?.textShadow ?? inheritedTextShadow;
+	const isTextShadowPlaceholder =
+		! hasValue( value?.typography?.textShadow ) &&
+		hasValue( inheritedTextShadow );
+	const setTextShadow = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textShadow' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextShadow = () => hasValue( value?.typography?.textShadow );
+	const resetTextShadow = () => setTextShadow( undefined );
+
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
 			if ( ! hasTextColorEnabled ) {
@@ -943,7 +964,7 @@ export default function TypographyPanel( {
 										getNumericPlaceholder(
 											inheritedLineHeight
 										),
-							  }
+								}
 							: {} ) }
 					/>
 				</InheritanceToolsPanelItem>
@@ -977,7 +998,7 @@ export default function TypographyPanel( {
 							isLetterSpacingPlaceholder
 								? getNumericPlaceholder(
 										inheritedLetterSpacing
-								  )
+									)
 								: undefined
 						}
 					/>
@@ -1110,6 +1131,24 @@ export default function TypographyPanel( {
 						onChange={ setTextTransformWithInheritedCommit }
 						showNone
 						isBlock
+					/>
+				</InheritanceToolsPanelItem>
+			) }
+			{ hasTextShadowControl && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isTextShadowPlaceholder,
+						hasTextShadow() && inheritedTextShadow !== undefined
+					) }
+					label={ __( 'Text shadow' ) }
+					hasValue={ hasTextShadow }
+					onDeselect={ resetTextShadow }
+					isShownByDefault={ defaultControls.textShadow }
+					panelId={ panelId }
+				>
+					<TextShadowPopover
+						textShadow={ textShadow }
+						onChange={ setTextShadow }
 					/>
 				</InheritanceToolsPanelItem>
 			) }

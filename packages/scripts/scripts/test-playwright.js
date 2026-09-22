@@ -39,9 +39,11 @@ try {
 }
 
 if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
-	const result = spawn( 'npx', [ 'playwright', 'install' ], {
-		stdio: 'inherit',
-	} );
+	const result = spawn(
+		'node',
+		[ require.resolve( '@playwright/test/cli' ), 'install' ],
+		{ stdio: 'inherit' }
+	);
 
 	if ( result.status > 0 ) {
 		process.exit( result.status );

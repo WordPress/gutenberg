@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { store as editorStore } from '../../store';
 import { useAuthorsQuery } from './hook';
 
@@ -14,7 +14,7 @@ export default function PostAuthorSelect() {
 	};
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			className="post-author-selector"
 			label={ __( 'Author' ) }
 			options={ authorOptions }

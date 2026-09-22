@@ -225,10 +225,10 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  *
  * @see gutenberg_render_block_style_variation_support_styles
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
  *
- * @return string                Filtered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {

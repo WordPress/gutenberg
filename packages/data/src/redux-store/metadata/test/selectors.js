@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;
@@ -455,10 +456,10 @@ describe( 'Selector arguments normalization', () => {
 	} );
 
 	it( 'should call normalization method on target selector if exists', () => {
-		const normalizationFunction = jest.fn( ( args ) => {
+		const normalizationFunction = vi.fn( ( args ) => {
 			return args.map( Number );
 		} );
-		getFooSelector.__unstableNormalizeArgs = normalizationFunction;
+		getFooSelector.normalizeArgs = normalizationFunction;
 
 		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [ 123 ] );
 		const { getIsResolving, hasStartedResolution, hasFinishedResolution } =
@@ -477,6 +478,6 @@ describe( 'Selector arguments normalization', () => {
 		expect( hasFinishedResolution( 'getFoo', [ '123' ] ) ).toBe( true );
 		expect( normalizationFunction ).toHaveBeenCalledWith( [ '123' ] );
 
-		getFooSelector.__unstableNormalizeArgs = undefined;
+		getFooSelector.normalizeArgs = undefined;
 	} );
 } );
