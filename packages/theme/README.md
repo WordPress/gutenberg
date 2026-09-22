@@ -280,6 +280,10 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 
 Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
+The JavaScript plugins treat token references in string values, JSX attribute values, and static template parts as CSS. This includes tagged templates such as `String.raw`. They leave comments, regular expressions, property names, module paths, JSX text, and TypeScript types unchanged. Token names assembled across template expressions are not resolved. As before, a token reference in a runtime message string is also treated as CSS.
+
+Both JavaScript plugins preserve source maps. The Vite plugin runs before JavaScript and TypeScript compilation and supports module IDs with query strings. It skips `?raw` and `?url` imports so their exported file contents and URLs stay unchanged.
+
 ### PostCSS
 
 ```js
