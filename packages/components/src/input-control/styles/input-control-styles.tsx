@@ -27,45 +27,10 @@ export const Suffix = styled.span`
 	display: flex;
 `;
 
-type BackdropProps = {
-	disabled?: boolean;
-	isBorderless?: boolean;
-};
-
-const backdropBorderColor = ( {
-	disabled,
-	isBorderless,
-}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
-	if ( isBorderless ) {
-		return 'transparent';
-	}
-
-	if ( disabled ) {
-		return COLORS.ui.borderDisabled;
-	}
-
-	return COLORS.ui.border;
-};
-
-const backdropDisabledStyles = ( {
-	disabled,
-	isBorderless,
-}: BackdropProps ) => {
-	if ( ! disabled || isBorderless ) {
-		return undefined;
-	}
-
-	return css`
-		@media ( forced-colors: active ) {
-			border-color: GrayText;
-		}
-	`;
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
+// Border color is in style.module.scss.
+export const BackdropUI = styled.div`
 	&&& {
 		box-sizing: border-box;
-		border-color: ${ backdropBorderColor };
 		border-radius: inherit;
 		border-style: solid;
 		border-width: 1px;
@@ -79,7 +44,6 @@ export const BackdropUI = styled.div< BackdropProps >`
 		top: 0;
 
 		${ rtl( { paddingLeft: 2 } ) }
-		${ backdropDisabledStyles }
 	}
 `;
 

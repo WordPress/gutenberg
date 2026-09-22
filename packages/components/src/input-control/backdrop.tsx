@@ -9,10 +9,10 @@ function Backdrop( { disabled = false, isBorderless = false } ) {
 			aria-hidden="true"
 			className={ clsx(
 				'components-input-control__backdrop',
-				! disabled && ! isBorderless && styles[ 'hover-border' ]
+				styles.border,
+				disabled && styles[ 'is-disabled' ],
+				isBorderless && styles[ 'is-borderless' ]
 			) }
-			disabled={ disabled }
-			isBorderless={ isBorderless }
 		/>
 	);
 }
