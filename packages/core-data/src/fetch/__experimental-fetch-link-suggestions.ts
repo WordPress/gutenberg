@@ -261,44 +261,18 @@ export default async function fetchLinkSuggestions(
 }
 
 /**
- * Whether a title answers the search: every word typed appears in it as a whole word.
+ * How well a title answers what was typed.
  *
- * Matching whole words rather than any substring is what separates a title that is about what was
- * typed from one that merely shares some letters with it. Searching `coffee`, both `Coffee Roasting
- * Guide` and `Our Coffee` are about coffee, wherever the word sits; `Coffeehouse Rules` is about
- * something else.
- *
- * @param title
- * @param search
- *
- * @return True when the title contains every word that was typed.
- */
-function isWholeMatch( title: string, search: string ): boolean {
-	const searchTokens = tokenize( search );
-
-	if ( ! searchTokens.length ) {
-		return false;
-	}
-
-	const titleTokens = tokenize( title || '' );
-
-	return searchTokens.every( ( searchToken ) =>
-		titleTokens.includes( searchToken )
-	);
-}
-
-/**
- * How directly a title answers what was typed.
- *
- * Only a whole-title or a start-of-title match counts. Anything less is left to the token score,
- * which cannot tell where in the title a match sits.
+ * The search string is compared as typed, not word by word: a title "contains" it when the whole
+ * string appears somewhere in the title, and it counts for more when the title begins with it.
+ * Beginning with what was typed is the clearest sign a title is the thing being looked for.
  *
  * @param title
  * @param search
  *
- * @return 2 for the whole title, 1 for the start of it, otherwise 0.
+ * @return 2 when the title begins with the search, 1 when it contains it, otherwise 0.
  */
-function getMatchTier( title: string, search: string ): number {
+function getMatchRank( title: string, search: string ): number {
 	const haystack = ( title ?? '' ).toLowerCase().trim();
 	const needle = ( search ?? '' ).toLowerCase().trim();
 
@@ -306,11 +280,11 @@ function getMatchTier( title: string, search: string ): number {
 		return 0;
 	}
 
-	if ( haystack === needle ) {
+	if ( haystack.startsWith( needle ) ) {
 		return 2;
 	}
 
-	return haystack.startsWith( needle ) ? 1 : 0;
+	return haystack.includes( needle ) ? 1 : 0;
 }
 
 /**
@@ -375,18 +349,13 @@ function getTypeRank( result: SearchResult, typeOrder: string[] ): number {
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * Above everything sits a title that is exactly what was typed. Nothing else lifts a result past
- * the rank of its type, so an attachment reaches the top only by being named exactly what was
- * searched for.
+ * How well a title answers the search is compared first: a title beginning with what was typed
+ * ranks above one that merely contains it, which ranks above one that does not contain it at all.
+ * How much of the title the match covers is not considered, so a long title is never marked down
+ * for being long.
  *
- * Below that, a title that answers the search — one containing every word that was typed — ranks
- * above every title that does not. Nothing that fails to match should displace something that
- * matches.
- *
- * The type then decides, in `typeOrder` or `DEFAULT_TYPE_ORDER`. Beginning with the search term
- * orders titles within a type, but never lifts one type above another: the score below cannot see
- * where a match sits, because it divides by the title's length, so a long title is marked down for
- * being long even when the search term is its first word.
+ * The type then decides between titles that answer the search equally well, in `typeOrder` or
+ * `DEFAULT_TYPE_ORDER`.
  *
  * The rest is sorted by scoring each result, where the score is the number of tokens in the title
  * that are also in the search query, divided by the total number of tokens in the title. This gives
@@ -409,11 +378,9 @@ export function sortResults(
 		`${ result.kind }:${ result.type }:${ result.id }`;
 
 	const scores = {};
-	const tiers = {};
 	const matches = {};
 	for ( const result of results ) {
-		tiers[ scoreKey( result ) ] = getMatchTier( result.title, search );
-		matches[ scoreKey( result ) ] = isWholeMatch( result.title, search );
+		matches[ scoreKey( result ) ] = getMatchRank( result.title, search );
 
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
@@ -445,24 +412,10 @@ export function sortResults(
 		}
 	}
 
-	// A title that is exactly what was typed leads, whatever its type. It is the one signal strong
-	// enough to be worth a type the caller would otherwise rank last.
-	const isExact = ( result: SearchResult ) =>
-		tiers[ scoreKey( result ) ] === 2 ? 1 : 0;
-
-	// Below that, a title that answers the search outranks one that does not, before any type is
-	// considered.
-	const isMatch = ( result: SearchResult ) =>
-		matches[ scoreKey( result ) ] ? 1 : 0;
-
 	return results.sort(
 		( a, b ) =>
-			isExact( b ) - isExact( a ) ||
-			isMatch( b ) - isMatch( a ) ||
+			matches[ scoreKey( b ) ] - matches[ scoreKey( a ) ] ||
 			getTypeRank( a, typeOrder ) - getTypeRank( b, typeOrder ) ||
-			// Beginning with the search term orders titles within a type, but never lifts one type
-			// above another.
-			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
 }

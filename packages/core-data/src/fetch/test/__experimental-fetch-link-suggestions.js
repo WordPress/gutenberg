@@ -381,8 +381,10 @@ describe( 'sortResults', () => {
 		const order = sortResults( results, 'travel tips' ).map(
 			( result ) => result.id
 		);
+		// Only 7 contains the string "travel tips"; the others merely contain
+		// one of the words, so they rank below it whatever their type.
 		expect( order ).toEqual( [
-			7, // exact match
+			7, // begins with "travel tips"
 			4, // contains: travel, tips
 			3, // contains: travel
 			// same order as input:
@@ -421,10 +423,11 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// "Contact" is exactly what was typed, so it leads whatever its type.
+		// The page ranks above the category, and the category above the post,
+		// before any of their titles are compared.
 		expect(
 			sortResults( results, 'contact' ).map( ( { title } ) => title )
-		).toEqual( [ 'Contact', 'Contact us today', 'Hello world!' ] );
+		).toEqual( [ 'Contact us today', 'Contact', 'Hello world!' ] );
 	} );
 
 	it( 'orders results to prefer direct matches over sub matches', () => {
@@ -604,7 +607,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Beach Day', 'Day' ] );
 	} );
 
-	it( 'ranks a preferred type that contains the whole search term above another type that begins with it', () => {
+	it( 'ranks a title that begins with the search above one that only contains it, whatever the type', () => {
 		const results = [
 			{
 				id: 1,
@@ -622,13 +625,13 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Both titles contain the whole word, so the type decides between them.
+		// Beginning with what was typed outranks a preferred type.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Our Coffee', 'Coffee Equipment' ] );
+		).toEqual( [ 'Coffee Equipment', 'Our Coffee' ] );
 	} );
 
-	it( 'ranks a title that contains only part of a word below one that contains all of it', () => {
+	it( 'matches the search as a string, not as whole words', () => {
 		const results = [
 			{
 				id: 1,
@@ -646,11 +649,11 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// "Coffeehouse" is a different word, so the page does not answer the
-		// search and being a page does not lift it.
+		// "Coffeehouse Rules" begins with the string that was typed, so it
+		// outranks a title that contains the same string further in.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Notes On Coffee', 'Coffeehouse Rules' ] );
+		).toEqual( [ 'Coffeehouse Rules', 'Notes On Coffee' ] );
 	} );
 
 	it( 'requires every word typed to appear in the title', () => {
@@ -677,7 +680,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
 	} );
 
-	it( 'ranks an exact title match first, whatever its type', () => {
+	it( 'lets a title that begins with the search outrank a better-ranked type', () => {
 		const results = [
 			{
 				id: 1,
@@ -695,13 +698,13 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// An exact title is the only thing that lifts a type above its rank.
+		// The attachment begins with what was typed; the page only contains it.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
 		).toEqual( [ 'Coffee', 'Our Coffee' ] );
 	} );
 
-	it( 'does not lift an attachment that merely begins with the search term', () => {
+	it( 'lifts an attachment that begins with the search above a page that does not', () => {
 		const results = [
 			{
 				id: 1,
@@ -719,10 +722,10 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Beginning with the term earns nothing across types, so the page wins.
+		// How well the title answers the search is compared before the type.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Our Coffee', 'Coffee Cup Photo' ] );
+		).toEqual( [ 'Coffee Cup Photo', 'Our Coffee' ] );
 	} );
 
 	it( 'orders types by pages, categories, posts, tags, attachments, then post formats', () => {

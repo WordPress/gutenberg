@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `__experimentalFetchLinkSuggestions`: rank results by type — pages, then categories, posts, tags, attachments and post formats — above all but a title that is exactly what was typed, so a media library no longer crowds out what a link search is looking for. A title containing every word typed ranks above one that does not. A caller passing `typeOrder` leads with the types it names ([#83293](https://github.com/WordPress/gutenberg/pull/83293)).
+-   `__experimentalFetchLinkSuggestions`: rank results by type — pages, then categories, posts, tags, attachments and post formats — so a media library no longer crowds out what a link search is looking for. A title beginning with what was typed ranks above one that merely contains it, and both rank above a title that does not contain it at all. A caller passing `typeOrder` leads with the types it names ([#83293](https://github.com/WordPress/gutenberg/pull/83293)).
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is what was typed, or begins with it, above the rest. The score divides by the title's length, so a long title was marked down for being long even when the search term was its first word ([#83287](https://github.com/WordPress/gutenberg/pull/83287)).
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
