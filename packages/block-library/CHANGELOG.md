@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Gallery: Add an "Order by" control to the Source panel of a static gallery, sorting its images in place by date or title with the same options the dynamic source offers. The control reflects the order the images are currently in and shows "Custom" once they are dragged into another.
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements

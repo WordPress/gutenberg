@@ -110,6 +110,53 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
+	describe( 'Source panel', () => {
+		const createGallery = ( attributes = {} ) =>
+			createBlock( 'core/gallery', attributes, [
+				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
+				createBlock( 'core/image', {
+					...IMAGE_ATTRIBUTES,
+					id: 2,
+				} ),
+			] );
+
+		test( 'offers an "Order by" control for a static gallery that reads as a custom order until the media resolves', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			// The attachment records never resolve in this environment, so
+			// there's nothing to sort by yet.
+			expect( orderBy ).toBeDisabled();
+			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'option', { name: 'Newest to oldest' } )
+			).toBeInTheDocument();
+		} );
+
+		test( 'does not offer a custom order for a dynamic gallery', async () => {
+			await setup(
+				createBlock( 'core/gallery', {
+					dynamicContent: { source: 'core/attached-media' },
+				} )
+			);
+			await selectBlock( 'Block: Dynamic Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			expect( orderBy ).toHaveDisplayValue( 'Newest to oldest' );
+			expect(
+				screen.queryByRole( 'option', { name: 'Custom' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'Layout', () => {
 		const createGallery = ( attributes = {} ) =>
 			createBlock( 'core/gallery', attributes, [
