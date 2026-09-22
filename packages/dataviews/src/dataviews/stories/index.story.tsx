@@ -16,7 +16,8 @@ import './style.css';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViews',
+	id: 'dataviews-dataviews',
+	title: 'Design System/DataViews/DataViews',
 	component: DataViews,
 	args: {
 		containerHeight: 'auto',

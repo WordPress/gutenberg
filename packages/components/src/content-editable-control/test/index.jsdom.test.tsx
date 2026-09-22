@@ -86,11 +86,7 @@ describe( 'ContentEditableControl', () => {
 
 	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
 		render(
-			<ContentEditableControl
-				label="Custom id"
-				// eslint-disable-next-line no-restricted-syntax
-				id="my-custom-id"
-			/>
+			<ContentEditableControl label="Custom id" id="my-custom-id" />
 		);
 
 		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(

@@ -3,7 +3,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Modal,
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -72,7 +72,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 						) }
 				</div>
 				{ requireConfirmation && (
-					<CheckboxControl
+					<WCCheckboxControl
 						label={ __( 'I understand the consequences' ) }
 						checked={ confirmed }
 						onChange={ setConfirmed }
