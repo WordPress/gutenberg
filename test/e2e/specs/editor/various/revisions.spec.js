@@ -1001,9 +1001,9 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 		).toBeVisible();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
+				name: 'Modified block: Paragraph',
 			} )
-		).toHaveText( 'Autosaved content' );
+		).toHaveText( 'SavedAutosaved content' );
 		await expect
 			.poll( () => new URL( page.url() ).searchParams.get( 'revision' ) )
 			.toBe( String( autosave.id ) );
