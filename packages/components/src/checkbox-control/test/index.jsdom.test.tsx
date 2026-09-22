@@ -65,16 +65,19 @@ describe( 'CheckboxControl', () => {
 		} );
 
 		it( 'should render the indeterminate icon when in the indeterminate state', () => {
-			const { asFragment, rerender } = render( <CheckboxControl /> );
-			screen
-				.getByRole( 'checkbox' )
-				.setAttribute( 'id', 'checkbox-control' );
+			const id = 'checkbox-control';
+			const { asFragment, rerender } = render(
+				<BaseCheckboxControl id={ id } onChange={ noop } />
+			);
 			const checkboxDefault = asFragment();
 
-			rerender( <CheckboxControl indeterminate /> );
-			screen
-				.getByRole( 'checkbox' )
-				.setAttribute( 'id', 'checkbox-control' );
+			rerender(
+				<BaseCheckboxControl
+					id={ id }
+					onChange={ noop }
+					indeterminate
+				/>
+			);
 			const checkboxIndeterminate = asFragment();
 
 			// Expect the diff snapshot to be mostly about the indeterminate icon
