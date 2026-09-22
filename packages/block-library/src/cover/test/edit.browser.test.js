@@ -217,7 +217,7 @@ describe( 'Cover block', () => {
 					} )
 				).not.toBeInTheDocument();
 			} );
-			test( 'does not display media settings panel when media settings are empty', async () => {
+			test( 'does not display settings panel in the settings tab when the block has no media', async () => {
 				await createAndSelectBlock();
 
 				await openSettingsTabIfAvailable();
