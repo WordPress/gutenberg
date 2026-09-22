@@ -312,27 +312,33 @@ function getMatchRank( title: string, search: string ): number {
 }
 
 /**
- * The order result types are ranked in, most wanted first.
+ * A position in a type order.
  *
- * An entry is either a search type, which covers everything of that type, or a search type with
- * one subtype, which covers only that subtype. Listing both lets a specific subtype outrank the
- * rest of its type while the plain entry catches everything else — so a page outranks a post, and
- * a custom post type nobody has heard of still ranks as content rather than falling off the end.
- *
- * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
- * destination and a post format is a way of styling a post, so both come last: on a site with a
- * large media library they otherwise crowd out what was being looked for. See
- * https://github.com/WordPress/gutenberg/issues/63683.
+ * Either a search type, which covers everything of that type, or a search type with one subtype,
+ * which covers only that subtype. Naming a subtype lets it outrank the rest of its type, while a
+ * plain search type catches every subtype at once — including custom post types and taxonomies,
+ * which no caller can be expected to list.
  */
 export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
 
+/**
+ * The order result types are ranked in, most wanted first.
+ *
+ * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
+ * destination, and a post format is a way of styling a post rather than somewhere to go, so those
+ * come last: on a site with a large media library they otherwise crowd out what was being looked
+ * for. See https://github.com/WordPress/gutenberg/issues/63683.
+ *
+ * Deliberately no finer than the search types themselves. Nothing general can be said about
+ * whether a page is a better answer than a post, and ranking by search type means every custom
+ * post type counts as content and every custom taxonomy counts as a taxonomy without being named.
+ * A caller that knows better says so with `preferTypes`, which does take subtypes.
+ */
 const TYPE_ORDER: TypeOrderEntry[] = [
-	{ type: 'post', subtype: 'page' },
 	'post',
-	{ type: 'term', subtype: 'category' },
 	'term',
-	'post-format',
 	'attachment',
+	'post-format',
 ];
 
 /**

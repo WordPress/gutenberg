@@ -255,6 +255,13 @@ describe( 'fetchLinkSuggestions', () => {
 					kind: 'taxonomy',
 				},
 				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
+				},
+				{
 					id: 'gallery',
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
@@ -267,13 +274,6 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
 					kind: 'taxonomy',
-				},
-				{
-					id: 54,
-					title: 'Some Test Media Title',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					type: 'attachment',
-					kind: 'media',
 				},
 			] )
 		);
@@ -810,7 +810,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Coffee Cup Photo', 'Our Coffee' ] );
 	} );
 
-	it( 'ranks pages, then other content, then categories, then other taxonomies', () => {
+	it( 'ranks content, then taxonomies, then attachments, then post formats', () => {
 		const results = [
 			{
 				id: 1,
@@ -856,15 +856,17 @@ describe( 'sortResults', () => {
 			},
 		];
 
+		// Ranked by search type, so a page and a post are worth the same, as are
+		// a category and a tag. Within a band the order they arrived in stands.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { type } ) => type )
 		).toEqual( [
-			'page',
 			'post',
-			'category',
+			'page',
 			'post_tag',
-			'post-format',
+			'category',
 			'attachment',
+			'post-format',
 		] );
 	} );
 
