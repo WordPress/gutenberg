@@ -47,6 +47,20 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
+			// Enter in an editable is handled here instead of on keydown:
+			// moving focus while the keydown is still being handled leaves
+			// the iOS keyboard's auto-capitalization stale.
+			if (
+				event.inputType === 'insertParagraph' &&
+				! event.defaultPrevented &&
+				! hasMultiSelection()
+			) {
+				onKeyDown( event );
+				if ( event.defaultPrevented ) {
+					return;
+				}
+			}
+
 			// If writing flow is editable, never allow the browser to alter
 			// the DOM outside of an editable element within a block. This
 			// will cause React errors (and the DOM should only be altered in
@@ -76,8 +90,17 @@ export default function useInput() {
 			}
 
 			if ( ! hasMultiSelection() ) {
-				if ( event.keyCode === ENTER ) {
-					if ( event.shiftKey ) {
+				if (
+					event.keyCode === ENTER ||
+					event.inputType === 'insertParagraph'
+				) {
+					if (
+						event.shiftKey ||
+						// Editables are handled on beforeinput.
+						( event.type === 'keydown' &&
+							event.target.ownerDocument.activeElement
+								.isContentEditable )
+					) {
 						return;
 					}
 

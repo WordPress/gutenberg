@@ -1,4 +1,7 @@
-import { Button, CheckboxControl } from '@wordpress/components';
+import {
+	Button,
+	CheckboxControl as WCCheckboxControl,
+} from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
@@ -42,7 +45,7 @@ function BulkSelectionCheckbox< Item >( {
 
 	if ( disableSelectAll ) {
 		return (
-			<CheckboxControl
+			<WCCheckboxControl
 				className="dataviews-view-table-selection-checkbox"
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
@@ -55,7 +58,7 @@ function BulkSelectionCheckbox< Item >( {
 	}
 
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }

@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+### Internal
+
+-   Palette preview: overlapping color dots no longer use `__experimentalZStack`, and the row uses `Stack` from `@wordpress/ui` instead of `Flex` / `HStack` / `VStack`. ([#83060](https://github.com/WordPress/gutenberg/pull/83060))
+-   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+## 1.22.0 (2026-09-10)
+
+### Enhancements
+
+-   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
+
 ### Bug Fixes
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))

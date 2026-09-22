@@ -52,7 +52,7 @@ jobs:
                           - '**'
                           # Documentation and schemas.
                           - '!**/*.md'
-                          - '!{backport-changelog,docs,phpunit,schemas,storybook,typings}/**'
+                          - '!{backport-changelog,docs,phpunit,schemas,storybook}/**'
                           # Other test suites, which cannot affect the measurements.
                           - '!test/{integration,php,storybook-playwright,unit}/**'
                           - '!test/e2e/{*,!(assets)/**}'
@@ -61,7 +61,7 @@ jobs:
                           - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
                           # The mu-plugins and plugins below it load at run time, so they still count.
                           - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
-                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!tools/{docs,eslint,monorepo,stylelint,validation}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
                           - '!{phpcs,phpunit}*'
                           # Repository metadata.
@@ -98,6 +98,7 @@ jobs:
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version-file: '.nvmrc'
+                  package-manager-cache: false
 
             - name: Resolve branches
               id: branches
@@ -200,7 +201,7 @@ jobs:
               if: steps.reused.outputs.ok != 'true'
               run: npm run build -- --skip-types || npm run build
 
-            # The list comes from bin/plugin-files.txt on the tested commit, so older refs
+            # The list comes from tools/release/plugin-files.mts on the tested commit, so older refs
             # are packaged the same way. They may lack some of the files.
             - name: Package plugin
               if: steps.reused.outputs.ok != 'true'
@@ -367,6 +368,7 @@ jobs:
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version-file: '.nvmrc'
+                  package-manager-cache: false
 
             - name: Download shard results
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1

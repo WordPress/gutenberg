@@ -5,6 +5,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useViewConfig } from '@wordpress/views';
+
+// The screen only renders a form, so it requests the `form` of the entity
+// view configuration alone.
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 const fields = [
 	{
@@ -53,14 +58,6 @@ const fields = [
 	},
 ];
 
-const form = {
-	layout: {
-		type: 'regular',
-		labelPosition: 'top',
-	},
-	fields: [ 'title', 'description', 'site_logo', 'site_icon' ],
-};
-
 export default function SidebarIdentity() {
 	const data = useSelect(
 		( select ) =>
@@ -68,10 +65,19 @@ export default function SidebarIdentity() {
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { form } = useViewConfig( {
+		kind: 'root',
+		name: 'site',
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 
 	const onChange = ( edits ) => {
 		editEntityRecord( 'root', 'site', undefined, edits );
 	};
+
+	if ( ! form ) {
+		return null;
+	}
 
 	return (
 		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>

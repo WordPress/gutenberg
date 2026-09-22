@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import normaliseBlocks from '../normalise-blocks';
 
 describe( 'normaliseBlocks', () => {

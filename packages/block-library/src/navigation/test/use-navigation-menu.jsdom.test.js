@@ -1,6 +1,9 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
+
+vi.mock( '@wordpress/api-fetch' );
 
 const BASE_ENTITY = {
 	kind: 'postType',
@@ -24,11 +27,11 @@ function createRegistryWithStores() {
 	return registry;
 }
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+	useSelect: vi.fn(),
+} ) );
 
 function resolveRecords( registry, menus ) {
 	const dispatch = registry.dispatch( coreStore );
@@ -64,11 +67,9 @@ function resolveReadPermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'read/postType/wp_navigation', allowed );
 	dispatch.startResolution( 'canUser', [
-		'read',
 		{ kind: 'postType', name: 'wp_navigation' },
 	] );
 	dispatch.finishResolution( 'canUser', [
-		'read',
 		{ kind: 'postType', name: 'wp_navigation' },
 	] );
 }
@@ -79,25 +80,17 @@ function resolveReadRecordPermission( registry, ref, allowed ) {
 		`read/postType/wp_navigation/${ ref }`,
 		allowed
 	);
-	dispatch.startResolution( 'canUser', [
-		'read',
-		{ ...BASE_ENTITY, id: ref },
-	] );
-	dispatch.finishResolution( 'canUser', [
-		'read',
-		{ ...BASE_ENTITY, id: ref },
-	] );
+	dispatch.startResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
+	dispatch.finishResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
 }
 
 function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'create/postType/wp_navigation', allowed );
 	dispatch.startResolution( 'canUser', [
-		'create',
 		{ kind: 'postType', name: 'wp_navigation' },
 	] );
 	dispatch.finishResolution( 'canUser', [
-		'create',
 		{ kind: 'postType', name: 'wp_navigation' },
 	] );
 }
@@ -108,14 +101,8 @@ function resolveUpdatePermission( registry, ref, allowed ) {
 		`update/postType/wp_navigation/${ ref }`,
 		allowed
 	);
-	dispatch.startResolution( 'canUser', [
-		'update',
-		{ ...BASE_ENTITY, id: ref },
-	] );
-	dispatch.finishResolution( 'canUser', [
-		'update',
-		{ ...BASE_ENTITY, id: ref },
-	] );
+	dispatch.startResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
+	dispatch.finishResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
 }
 
 function resolveDeletePermission( registry, ref, allowed ) {
@@ -124,14 +111,8 @@ function resolveDeletePermission( registry, ref, allowed ) {
 		`delete/postType/wp_navigation/${ ref }`,
 		allowed
 	);
-	dispatch.startResolution( 'canUser', [
-		'delete',
-		{ ...BASE_ENTITY, id: ref },
-	] );
-	dispatch.finishResolution( 'canUser', [
-		'delete',
-		{ ...BASE_ENTITY, id: ref },
-	] );
+	dispatch.startResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
+	dispatch.finishResolution( 'canUser', [ { ...BASE_ENTITY, id: ref } ] );
 }
 
 describe( 'useNavigationMenus', () => {

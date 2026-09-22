@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
 	createHooks,
 	addAction,
@@ -591,8 +592,8 @@ test( 'Verify doingFilter, didFilter and hasFilter.', () => {
 	} );
 
 	// Verify filter added and running.
-	const test = applyFilters( 'runtest.filter', 'someValue' );
-	expect( test ).toBe( 'someValue' );
+	const result = applyFilters( 'runtest.filter', 'someValue' );
+	expect( result ).toBe( 'someValue' );
 	expect( filterCalls ).toBe( 1 );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 	expect( hasFilter( 'runtest.filter' ) ).toBe( true );
@@ -729,7 +730,7 @@ const setupActionListener = ( hookName, callback ) =>
 	addAction( hookName, 'my_callback', callback );
 
 test( 'adding an action triggers a hookAdded action passing all callback details', () => {
-	const hookAddedSpy = jest.fn();
+	const hookAddedSpy = vi.fn();
 
 	setupActionListener( 'hookAdded', hookAddedSpy );
 
@@ -761,7 +762,7 @@ test( 'adding an action triggers a hookAdded action passing all callback details
 } );
 
 test( 'adding a filter triggers a hookAdded action passing all callback details', () => {
-	const hookAddedSpy = jest.fn();
+	const hookAddedSpy = vi.fn();
 
 	setupActionListener( 'hookAdded', hookAddedSpy );
 
@@ -793,7 +794,7 @@ test( 'adding a filter triggers a hookAdded action passing all callback details'
 } );
 
 test( 'removing an action triggers a hookRemoved action passing all callback details', () => {
-	const hookRemovedSpy = jest.fn();
+	const hookRemovedSpy = vi.fn();
 
 	setupActionListener( 'hookRemoved', hookRemovedSpy );
 
@@ -829,7 +830,7 @@ test( 'removing an action triggers a hookRemoved action passing all callback det
 } );
 
 test( 'removing a filter triggers a hookRemoved action passing all callback details', () => {
-	const hookRemovedSpy = jest.fn();
+	const hookRemovedSpy = vi.fn();
 
 	setupActionListener( 'hookRemoved', hookRemovedSpy );
 
@@ -960,14 +961,14 @@ describe( 'async filter', () => {
 	} );
 
 	test( 'aborts when handler throws an error', async () => {
-		const sqrt = jest.fn( async ( value ) => {
+		const sqrt = vi.fn( async ( value ) => {
 			if ( value < 0 ) {
 				throw new Error( 'cannot pass negative value to sqrt' );
 			}
 			return Math.sqrt( value );
 		} );
 
-		const plus1 = jest.fn( async ( value ) => {
+		const plus1 = vi.fn( async ( value ) => {
 			return value + 1;
 		} );
 

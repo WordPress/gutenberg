@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PlaylistEdit from '../edit';
@@ -8,7 +9,7 @@ let mediaReplaceFlowProps;
 // test can look at what ended up in the tracklist.
 let mockTracks = [];
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( '@wordpress/block-editor', () => ( {
 	store: {},
 	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
@@ -51,19 +52,19 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	} ),
 } ) );
 
-jest.mock( '@wordpress/blocks', () => ( {
-	createBlock: jest.fn( ( name, attributes ) => ( {
+vi.mock( '@wordpress/blocks', () => ( {
+	createBlock: vi.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
 		clientId: 'new-track',
 	} ) ),
 } ) );
 
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn( () => 'blob:track' ),
+vi.mock( '@wordpress/blob', () => ( {
+	createBlobURL: vi.fn( () => 'blob:track' ),
 } ) );
 
-jest.mock( '@wordpress/components', () => ( {
+vi.mock( '@wordpress/components', () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
 	SelectControl: () => <div />,
 	ToggleControl: () => <div />,
@@ -71,33 +72,33 @@ jest.mock( '@wordpress/components', () => ( {
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( '@wordpress/data', () => ( {
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/i18n', () => ( {
+vi.mock( '@wordpress/i18n', () => ( {
 	__: ( text ) => text,
 	_x: ( text ) => text,
 } ) );
 
-jest.mock( '@wordpress/icons', () => ( {
+vi.mock( '@wordpress/icons', () => ( {
 	playlist: 'playlist',
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( '@wordpress/notices', () => ( {
 	store: {},
 } ) );
 
-jest.mock( '../../utils/caption', () => ( {
+vi.mock( '../../utils/caption', () => ( {
 	Caption: () => <figcaption />,
 } ) );
 
-jest.mock( '../../utils/hooks', () => ( {
+vi.mock( '../../utils/hooks', () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
-jest.mock( '../../utils/waveform-player', () => ( {
+vi.mock( '../../utils/waveform-player', () => ( {
 	WaveformPlayer: () => <div />,
 } ) );
 
@@ -141,15 +142,15 @@ describe( 'PlaylistEdit', () => {
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
 		mediaReplaceFlowProps = undefined;
-		replaceInnerBlocks = jest.fn();
-		insertBlocks = jest.fn();
-		selectBlock = jest.fn();
+		replaceInnerBlocks = vi.fn();
+		insertBlocks = vi.fn();
+		selectBlock = vi.fn();
 		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
+			createErrorNotice: vi.fn(),
 			replaceInnerBlocks,
 			insertBlocks,
 			selectBlock,
-			__unstableMarkNextChangeAsNotPersistent: jest.fn(),
+			__unstableMarkNextChangeAsNotPersistent: vi.fn(),
 		} );
 		trackStore( [
 			{
@@ -170,9 +171,9 @@ describe( 'PlaylistEdit', () => {
 			<PlaylistEdit
 				attributes={ defaultAttributes }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 
@@ -184,9 +185,9 @@ describe( 'PlaylistEdit', () => {
 			<PlaylistEdit
 				attributes={ defaultAttributes }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 
@@ -201,9 +202,9 @@ describe( 'PlaylistEdit', () => {
 					showTracklist: false,
 				} }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 
@@ -233,9 +234,9 @@ describe( 'PlaylistEdit', () => {
 			<PlaylistEdit
 				attributes={ defaultAttributes }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 
@@ -253,9 +254,9 @@ describe( 'PlaylistEdit', () => {
 			<PlaylistEdit
 				attributes={ defaultAttributes }
 				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
+				insertBlocksAfter={ vi.fn() }
 				isSelected={ false }
-				setAttributes={ jest.fn() }
+				setAttributes={ vi.fn() }
 			/>
 		);
 

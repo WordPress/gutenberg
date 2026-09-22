@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { parseContent, serializeContent } from '../utils';
 
 describe( 'core/html', () => {

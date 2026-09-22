@@ -1653,11 +1653,42 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 
 ### `readOnly`
 
-Boolean indicating that the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts.
+Boolean indicating that the field doesn't have an Edit  be rendered as read-only in Edit contexts. Read-only fields use the `render` function instead of their `Edit` component to display their value (e.g., in DataForm). This is different from disabled fields (see `isDisabled`) that still render their Edit component but are situationally disabled.
 
 -   Type: `boolean`.
 -   Optional.
 -   Defaults to `false`.
+
+### `isDisabled`
+
+Whether the field should be disabled in Edit contexts (e.g., DataForm). Unlike read-only fields (see `readOnly`), disabled fields have an Edit component, but the control is situationally disabled.
+
+-   Type: `boolean` or `function`.
+-   Optional.
+-   Args
+    -   `item`: the data to be processed
+    -   `field`: the field definition
+-   Returns a `boolean` indicating if the field should be disabled (`true`) or not (`false`).
+
+This can be useful to disable fields based on the state of other fields. For example, a `password` field can be disabled depending on the value of the `status` field:
+
+```js
+{
+ id: 'status',
+ type: 'text',
+ label: 'Status',
+ elements: [
+  { value: 'public', label: 'Public' },
+  { value: 'private', label: 'Private' },
+ ],
+},
+{
+ id: 'password',
+ type: 'password',
+ label: 'Password',
+ isDisabled: ( { item } ) => item.status === 'private',
+},
+```
 
 ### `sort`
 
@@ -2200,6 +2231,7 @@ For example:
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
 -   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `showPlaceholderIfEmpty`: boolean. Optional. `false` by default. Whether the summary shows the field's `placeholder` instead of its `render` output when the field's value is `undefined`, `null`, or an empty string.
 -   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)

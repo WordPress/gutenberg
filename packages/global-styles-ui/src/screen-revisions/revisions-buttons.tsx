@@ -1,18 +1,12 @@
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, Composite } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { Badge } from '@wordpress/ui';
 import type { Revision } from './types';
-import { unlock } from '../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
@@ -79,13 +73,13 @@ function getRevisionLabel(
 				),
 				authorDisplayName,
 				formattedModifiedDate
-		  )
+			)
 		: sprintf(
 				// translators: 1: author display name. 2: revision creation date.
 				__( 'Changes saved by %1$s on %2$s' ),
 				authorDisplayName,
 				formattedModifiedDate
-		  );
+			);
 }
 
 interface RevisionButtonsProps {
@@ -157,7 +151,7 @@ function RevisionsButtons( {
 						: humanTimeDiff(
 								modifiedString ?? modifiedDate,
 								undefined
-						  );
+							);
 				const revisionLabel = getRevisionLabel(
 					id,
 					authorDisplayName,
@@ -229,12 +223,12 @@ function RevisionsButtons( {
 						</span>
 						{ isSelected &&
 							( areStylesEqual ? (
-								<WCBadge
+								<Badge
 									className="global-styles-ui-screen-revisions__active-badge"
-									intent="info"
+									intent="informational"
 								>
 									{ __( 'Active' ) }
-								</WCBadge>
+								</Badge>
 							) : (
 								<Button
 									size="compact"
