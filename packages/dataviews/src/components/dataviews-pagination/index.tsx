@@ -89,9 +89,7 @@ export function DataViewsPageSelect() {
 	);
 }
 
-// Given children, renders those in place of the page select and the
-// previous/next buttons.
-export function DataViewsPagination( { children }: { children?: ReactNode } ) {
+export function DataViewsPageNavigation() {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -102,40 +100,52 @@ export function DataViewsPagination( { children }: { children?: ReactNode } ) {
 	const { totalPages } = paginationInfo;
 	const currentPage = view.page ?? 1;
 
-	const controls = children ?? (
-		<>
-			<DataViewsPageSelect />
-			<Stack direction="row" gap="xs" align="center">
-				<Button
-					onClick={ () =>
-						onChangeView( {
-							...view,
-							page: currentPage - 1,
-						} )
-					}
-					disabled={ currentPage === 1 }
-					accessibleWhenDisabled
-					label={ __( 'Previous page' ) }
-					icon={ isRTL() ? next : previous }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-				<Button
-					onClick={ () =>
-						onChangeView( { ...view, page: currentPage + 1 } )
-					}
-					disabled={ currentPage >= totalPages }
-					accessibleWhenDisabled
-					label={ __( 'Next page' ) }
-					icon={ isRTL() ? previous : next }
-					showTooltip
-					size="compact"
-					tooltipPosition="top"
-				/>
-			</Stack>
-		</>
+	return (
+		<Stack
+			direction="row"
+			gap="xs"
+			align="center"
+			className="dataviews-pagination__page-navigation"
+		>
+			<Button
+				onClick={ () =>
+					onChangeView( {
+						...view,
+						page: currentPage - 1,
+					} )
+				}
+				disabled={ currentPage === 1 }
+				accessibleWhenDisabled
+				label={ __( 'Previous page' ) }
+				icon={ isRTL() ? next : previous }
+				showTooltip
+				size="compact"
+				tooltipPosition="top"
+			/>
+			<Button
+				onClick={ () =>
+					onChangeView( { ...view, page: currentPage + 1 } )
+				}
+				disabled={ currentPage >= totalPages }
+				accessibleWhenDisabled
+				label={ __( 'Next page' ) }
+				icon={ isRTL() ? previous : next }
+				showTooltip
+				size="compact"
+				tooltipPosition="top"
+			/>
+		</Stack>
 	);
+}
+
+// Given children, renders those in place of the page select and the
+// previous/next buttons.
+export function DataViewsPagination( { children }: { children?: ReactNode } ) {
+	const { view, paginationInfo } = useContext( DataViewsContext );
+
+	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+		return null;
+	}
 
 	return (
 		<Stack
@@ -145,7 +155,12 @@ export function DataViewsPagination( { children }: { children?: ReactNode } ) {
 			align="center"
 			gap="xl"
 		>
-			{ controls }
+			{ children ?? (
+				<>
+					<DataViewsPageSelect />
+					<DataViewsPageNavigation />
+				</>
+			) }
 		</Stack>
 	);
 }

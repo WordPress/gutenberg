@@ -561,8 +561,20 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
+-   `DataViews.PageSelect`
+-   `DataViews.PageNavigation`
 -   `DataViews.BulkActionToolbar`
 -   `DataViews.ViewConfig`
+
+`DataViews.Pagination` renders its children in place of its own page select and previous/next buttons, so a layout short on space can keep only the parts it has room for:
+
+```jsx
+<DataViews.Pagination>
+	<DataViews.PageSelect />
+</DataViews.Pagination>
+```
+
+Like the default contents it stands in for, a composed `DataViews.Pagination` renders nothing at all while the dataset fits on a single page.
 
 #### example
 
@@ -773,7 +785,7 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar`, `DataViewsPicker.Actions` and `DataViewsPicker.PageSelect`. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar` and `DataViewsPicker.Actions`. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
 
 ```jsx
 <DataViewsPicker.Footer>
