@@ -5,6 +5,10 @@
  * @package gutenberg
  *
  * @covers ::_gutenberg_add_field_modules_to_editor_script
+ * @covers ::_gutenberg_register_posttype_fields
+ * @covers ::_gutenberg_register_wp_template_fields
+ * @covers ::_gutenberg_register_wp_template_part_fields
+ * @covers ::_gutenberg_register_attachment_fields
  */
 class Tests_Fields_API extends WP_UnitTestCase {
 
@@ -196,5 +200,75 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		}
 
 		$this->assertArrayHasKey( 'plugin/color', $import_map['imports'] );
+	}
+
+	/**
+	 * Any post type supporting authors, including a custom one, gets the
+	 * default author field.
+	 */
+	public function test_a_custom_post_type_supporting_authors_gets_the_author_field() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'author' ),
+			)
+		);
+		$this->registered_field_entities[] = array( 'postType', 'gutenberg_book' );
+
+		try {
+			_gutenberg_register_posttype_fields();
+			$ids = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
+		} finally {
+			unregister_post_type( 'gutenberg_book' );
+		}
+
+		$this->assertContains( 'author', $ids );
+	}
+
+	/**
+	 * Templates and template parts support authors but have their own
+	 * client-side author field, so the default one is removed.
+	 *
+	 * @dataProvider data_template_post_types
+	 *
+	 * @param string   $post_type The post type.
+	 * @param callable $callback  The callback adjusting its fields.
+	 */
+	public function test_templates_do_not_get_the_default_author_field( $post_type, $callback ) {
+		$this->assertTrue( post_type_supports( $post_type, 'author' ), 'The post type supports authors.' );
+
+		_gutenberg_register_posttype_fields();
+		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The default author field is registered first.' );
+
+		$callback();
+		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ) );
+	}
+
+	/**
+	 * Attachments support authors and comments but the media editor has its
+	 * own fields, so the defaults derived from the supports are replaced.
+	 */
+	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
+		_gutenberg_register_posttype_fields();
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertContains( 'author', $ids, 'The default author field is registered first.' );
+		$this->assertContains( 'comment_status', $ids, 'The default comment status field is registered first.' );
+
+		_gutenberg_register_attachment_fields();
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertNotContains( 'author', $ids );
+		$this->assertNotContains( 'comment_status', $ids );
+		$this->assertContains( 'date', $ids );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function data_template_post_types() {
+		return array(
+			'template'      => array( 'wp_template', '_gutenberg_register_wp_template_fields' ),
+			'template part' => array( 'wp_template_part', '_gutenberg_register_wp_template_part_fields' ),
+		);
 	}
 }
