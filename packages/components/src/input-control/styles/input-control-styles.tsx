@@ -62,6 +62,18 @@ const backdropDisabledStyles = ( {
 	`;
 };
 
+const backdropHoverStyles = ( { disabled, isBorderless }: BackdropProps ) => {
+	if ( disabled || isBorderless ) {
+		return undefined;
+	}
+
+	return css`
+		.components-input-control__container:hover &&& {
+			border-color: ${ COLORS.ui.borderActive };
+		}
+	`;
+};
+
 export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
@@ -81,6 +93,8 @@ export const BackdropUI = styled.div< BackdropProps >`
 		${ rtl( { paddingLeft: 2 } ) }
 		${ backdropDisabledStyles }
 	}
+
+	${ backdropHoverStyles }
 `;
 
 export const Root = styled( Flex )`
