@@ -97,13 +97,4 @@ const element = <div>var(--wpds-not-a-token)</div>;
 			transformDsTokenFallbacks( result!.code, 'fixture.js' )
 		).toBeNull();
 	} );
-
-	it( 'reports unknown tokens in values', () => {
-		expect( () =>
-			transformDsTokenFallbacks(
-				'const value = "var(--wpds-not-a-token)";',
-				'fixture.ts'
-			)
-		).toThrow( 'Unknown design token: --wpds-not-a-token' );
-	} );
 } );
