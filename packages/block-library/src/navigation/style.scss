@@ -750,6 +750,43 @@ button.wp-block-navigation-item__content {
 						right: auto;
 						left: 0;
 					}
+
+					// The default overlay unfolds every submenu into the flow. A
+					// custom overlay keeps them collapsible, so they are still
+					// flyouts: absolutely positioned, and painted over whatever
+					// follows them. Lay them out in the flow instead, so an
+					// expanded submenu pushes the items after it down.
+					// See https://github.com/WordPress/gutenberg/issues/83319.
+					.wp-block-navigation-item.has-child:not(.open-always) {
+						// Keeps the label and its indicator on one line, with the
+						// submenu wrapping onto its own line below them.
+						flex-wrap: wrap;
+
+						> .wp-block-navigation__submenu-container {
+							// A collapsed flyout is out of the flow, so its zero
+							// sized box costs nothing. In the flow the border
+							// around that box still takes up space, so hide it
+							// with `display` instead.
+							display: none;
+							position: static;
+							flex-basis: 100%;
+							// The flyout minimum would push a nested submenu out
+							// of a narrow overlay.
+							min-width: 0;
+						}
+
+						// Mirrors the conditions that reveal a flyout, above.
+						@media (hover: hover) {
+							&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+								display: flex;
+							}
+						}
+
+						&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
+						> .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+							display: flex;
+						}
+					}
 				}
 			}
 		}
