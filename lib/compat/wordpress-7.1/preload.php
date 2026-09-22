@@ -15,8 +15,13 @@
  * @return array Filtered preload paths.
  */
 function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
-	// Complete list of fields expected by packages/core-data/src/entities.js.
-	// This must match exactly for preloading to work (same fields, same order).
+	// Base list of fields expected by packages/core-data/src/entities.js. The
+	// preloaded list must match entities.js exactly (same fields, same order)
+	// or the browser discards the preloaded response, so any field added to
+	// entities.js has to be reflected here too. Fields introduced for a later
+	// WordPress version are spliced in by that version's filter instead, which
+	// runs after this one: `generate_animated_image_subsizes` is added by
+	// lib/compat/wordpress-7.2/preload.php.
 	// @see packages/core-data/src/entities.js rootEntitiesConfig.__unstableBase
 	$root_fields = 'description,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
 

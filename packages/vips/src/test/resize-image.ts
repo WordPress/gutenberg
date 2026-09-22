@@ -16,9 +16,23 @@ const {
 	 * `undefined` means the field is absent, which is the common case: a JPEG
 	 * carries neither `heif-bitdepth` nor `palette`.
 	 */
-	const state: { bitdepth: number | undefined; hasPalette: boolean } = {
+	const state: {
+		bitdepth: number | undefined;
+		hasPalette: boolean;
+		width: number;
+		height: number;
+		pageHeight: number;
+	} = {
 		bitdepth: undefined,
 		hasPalette: false,
+		/*
+		 * `height` is the full "toilet roll" height of an image loaded with
+		 * `[n=-1]`, so `height / pageHeight` is the frame count, which drives
+		 * the animation memory estimate.
+		 */
+		width: 100,
+		height: 100,
+		pageHeight: 100,
 	};
 
 	// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
@@ -29,9 +43,9 @@ const {
 	} ) );
 
 	class ImageMock {
-		width = 100;
-		height = 100;
-		pageHeight = 100;
+		width = state.width;
+		height = state.height;
+		pageHeight = state.pageHeight;
 		crop = cropMock;
 		resize = resizeMock;
 		writeToBuffer = writeToBufferMock;
@@ -89,6 +103,9 @@ describe( 'resizeImage', () => {
 		vi.clearAllMocks();
 		mockState.bitdepth = undefined;
 		mockState.hasPalette = false;
+		mockState.width = 100;
+		mockState.height = 100;
+		mockState.pageHeight = 100;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -152,6 +169,208 @@ describe( 'resizeImage', () => {
 			size: 'down',
 		} );
 		expect( mockCrop ).not.toHaveBeenCalled();
+	} );
+
+	describe( 'preserveAnimation', () => {
+		it( 'loads all frames and tunes gifsave for uncropped animated resizes', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			// Three frames stacked into one 300px-tall image.
+			mockState.height = 300;
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+				option_string: '[n=-1]',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.objectContaining( {
+					effort: 2,
+					interframe_maxerror: 8,
+				} )
+			);
+			/*
+			 * `interpalette_maxerror` stays at the libvips default: raising it
+			 * makes frames reuse a palette that no longer fits when the colours
+			 * shift, which costs encode time and visible colour accuracy for a
+			 * negligible size saving.
+			 */
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interpalette_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'flattens cropped sizes to the first frame', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+					crop: true,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				crop: 'centre',
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'leaves gifsave at its defaults for a static GIF', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			/*
+			 * The mocked image reports a single frame (height === pageHeight).
+			 * The inter-frame and inter-palette tolerances are meaningless for
+			 * one frame, so a static GIF uploaded to an opted-in site must not
+			 * pay libvips' default `effort` in worse compression.
+			 */
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					effort: expect.anything(),
+				} )
+			);
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'falls back to the first frame when the animation exceeds the memory budget', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			/*
+			 * A 1200x900 GIF is only ~4 MB decoded as a single frame, but 150
+			 * frames of it need ~650 MB, which does not fit the 1 GiB WASM
+			 * heap. Such an animation must flatten rather than abort the
+			 * upload.
+			 */
+			mockState.width = 1200;
+			mockState.pageHeight = 900;
+			mockState.height = 900 * 150;
+
+			const warn = vi
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+			/*
+			 * The site opted in, so a silent flatten would look like the
+			 * filter had no effect. The warning names the frame count and the
+			 * budget it was measured against.
+			 */
+			expect( warn ).toHaveBeenCalledWith(
+				expect.stringContaining( '150 frames' )
+			);
+			warn.mockRestore();
+		} );
+
+		it( 'has no effect on still image formats', async () => {
+			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
+				lastModified: 1234567891,
+				type: 'image/jpeg',
+			} );
+			const buffer = await jpegFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/jpeg',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
 	} );
 
 	it( 'resizes with center crop', async () => {
