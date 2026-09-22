@@ -1,7 +1,9 @@
+import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
 import type { PostType } from '@wordpress/fields';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	viewPost,
 	viewPostRevisions,
@@ -139,6 +141,138 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
+/**
+ * A field as the server exposes it: the serializable subset of the Field
+ * API, see `Gutenberg_REST_Fields_Controller_7_2::get_field_schema()`.
+ */
+type ServerField< Item > = Pick< Field< Item >, 'id' > &
+	Partial< Omit< Field< Item >, 'id' > >;
+
+/**
+ * The response of the `wp/v2/fields` route.
+ */
+interface ServerFieldsResponse< Item > {
+	kind: string;
+	name: string;
+	fields: ServerField< Item >[];
+	script_modules: {
+		id: string;
+		fields: string[];
+	}[];
+}
+
+/**
+ * Loads the fields registered on the server for an entity.
+ *
+ * Fetches the definitions from the `wp/v2/fields` route and imports the
+ * script modules registered along with them.
+ *
+ * @param kind The entity kind (e.g. `postType`).
+ * @param name The entity name (e.g. `page`).
+ * @return The fields, in registration order, with their JavaScript parts.
+ */
+async function loadServerFields< Item >(
+	kind: string,
+	name: string
+): Promise< Field< Item >[] > {
+	let response: ServerFieldsResponse< Item >;
+	try {
+		response = await apiFetch< ServerFieldsResponse< Item > >( {
+			path: addQueryArgs( '/wp/v2/fields', { kind, name } ),
+		} );
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Could not load the fields of ${ kind }/${ name } from the server.`,
+			error
+		);
+		return [];
+	}
+
+	// The JavaScript parts of each field, by field id, in module order.
+	const scriptParts = new Map< string, Partial< Field< Item > > >();
+	await Promise.all(
+		( response.script_modules ?? [] ).map(
+			async ( { id: moduleId, fields: fieldIds } ) => {
+				let module;
+				try {
+					module = await import(
+						/* webpackIgnore: true */ /* @vite-ignore */ moduleId
+					);
+				} catch ( error ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`Could not load the script module ${ moduleId } of the fields of ${ kind }/${ name }.`,
+						error
+					);
+					return;
+				}
+
+				const parts = module?.default ?? {};
+				/*
+				 * Iterate over the registered field ids.
+				 * The parts augment the registered fields,
+				 * they don't contain a full field definition.
+				 *
+				 * If we don't check for the field id,
+				 * we may end up with a field that has been unregistered on the server,
+				 * but whose script module is still loaded.
+				 */
+				for ( const fieldId of fieldIds ?? [] ) {
+					if ( parts[ fieldId ] ) {
+						scriptParts.set( fieldId, {
+							...scriptParts.get( fieldId ),
+							...parts[ fieldId ],
+						} );
+					}
+				}
+			}
+		)
+	);
+
+	return ( response.fields ?? [] ).map(
+		( field ) =>
+			( {
+				...field,
+				...scriptParts.get( field.id ),
+			} ) as Field< Item >
+	);
+}
+
+/**
+ * Merges the fields registered on the server into the fields the editor
+ * derives itself.
+ *
+ * A server field with the id of a client field overrides its properties,
+ * keeping its position, so the data the server declares (label, type,
+ * elements, filter operators…) wins while the client keeps providing the
+ * JavaScript parts the server does not ship. A server field the client does
+ * not know about is appended, in registration order.
+ *
+ * @param clientFields The fields the editor derives.
+ * @param serverFields The fields registered on the server.
+ * @return The merged fields.
+ */
+function mergeServerFields< Item >(
+	clientFields: Field< Item >[],
+	serverFields: Field< Item >[]
+): Field< Item >[] {
+	const serverFieldsById = new Map(
+		serverFields.map( ( field ) => [ field.id, field ] )
+	);
+
+	const merged = clientFields.map( ( field ) => {
+		const serverField = serverFieldsById.get( field.id );
+		if ( ! serverField ) {
+			return field;
+		}
+		serverFieldsById.delete( field.id );
+		return { ...field, ...serverField };
+	} );
+
+	return [ ...merged, ...serverFieldsById.values() ];
+}
+
 /*
  * Media fields for the attachment post type.
  *
@@ -179,6 +313,10 @@ export const registerPostTypeSchema =
 			'postType',
 			postType
 		);
+
+		// Runs in parallel with the lookups below; awaited once the client
+		// fields are known.
+		const serverFieldsPromise = loadServerFields( 'postType', postType );
 
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
@@ -322,6 +460,11 @@ export const registerPostTypeSchema =
 				fields.push( _titleField );
 			}
 		}
+
+		fields = mergeServerFields(
+			fields as Field< any >[],
+			await serverFieldsPromise
+		);
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
