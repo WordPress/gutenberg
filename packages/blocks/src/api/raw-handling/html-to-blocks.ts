@@ -1,6 +1,7 @@
 import { createBlock, findTransform } from '../factory';
+import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
 import { getBlockAttributes } from '../parser/get-block-attributes';
-import { hasBlockSupport } from '../registration';
+import { getBlockType } from '../registration';
 import { getRawTransforms } from './get-raw-transforms';
 import type { Block, RawHandler } from '../../types';
 
@@ -52,19 +53,13 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 			);
 		}
 
-		// Neither `className` nor `anchor` has an attribute source, so
-		// `getBlockAttributes` cannot read them out of the markup.
-		if ( node.hasAttribute( 'class' ) ) {
-			block.attributes.className = node.getAttribute( 'class' );
-		}
-
-		if (
-			node.hasAttribute( 'id' ) &&
-			hasBlockSupport( block.name, 'anchor' )
-		) {
-			block.attributes.anchor = node.getAttribute( 'id' );
-		}
-
-		return block;
+		// A block support usually declares its attribute without a source, so
+		// `getBlockAttributes` cannot read it out of the markup. Recover
+		// those with the fixes the parser applies to an invalid block.
+		const { originalContent, ...fixedBlock } = applyBuiltInValidationFixes(
+			{ ...block, originalContent: node.outerHTML },
+			getBlockType( block.name )!
+		);
+		return fixedBlock;
 	} );
 }

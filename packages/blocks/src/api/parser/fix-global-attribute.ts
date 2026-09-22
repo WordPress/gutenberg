@@ -57,7 +57,7 @@ export function fixGlobalAttribute(
 	);
 	if ( attributeValue ) {
 		modifiedBlockAttributes[ supportKey ] = attributeValue;
-	} else if ( innerHTML ) {
+	} else if ( innerHTML.trim() ) {
 		// The markup is the source of truth, so an attribute absent from it has
 		// been removed. A block that saves no markup has nothing to compare
 		// against and keeps whatever the delimiter holds.

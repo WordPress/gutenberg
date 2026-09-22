@@ -1,19 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { fixGlobalAttribute } from '../fix-global-attribute';
-
-const ANCHOR_ATTR_SCHEMA = {
-	type: 'string',
-	source: 'attribute',
-	selector: '[data-anchor] > *',
-	attribute: 'id',
-};
-
-const ARIA_LABEL_ATTR_SCHEMA = {
-	type: 'string',
-	source: 'attribute',
-	selector: '[data-aria-label] > *',
-	attribute: 'aria-label',
-};
+import {
+	ANCHOR_ATTR_SCHEMA,
+	ARIA_LABEL_ATTR_SCHEMA,
+} from '../apply-built-in-validation-fixes';
 
 const blockSettings = {
 	category: 'text',
