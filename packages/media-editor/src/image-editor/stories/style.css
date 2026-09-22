@@ -40,13 +40,6 @@
 	display: none;
 }
 
-.image-editor-story__json {
-	width: 100%;
-	min-height: 80px;
-	font-family: monospace;
-	font-size: 12px;
-}
-
 .image-editor-story__state {
 	font-family: monospace;
 	font-size: 11px;
@@ -56,28 +49,6 @@
 	white-space: pre-wrap;
 	max-height: 200px;
 	overflow: auto;
-}
-
-.image-editor-story__vertex-count {
-	font-variant-numeric: tabular-nums;
-	min-width: 120px;
-}
-
-.image-editor-story__instructions {
-	background: #f9f9f9;
-	border: 1px solid #e0e0e0;
-	border-radius: 4px;
-	padding: 12px;
-	font-size: 13px;
-	line-height: 1.5;
-}
-
-.image-editor-story__instructions p {
-	margin: 0 0 4px;
-}
-
-.image-editor-story__instructions p:last-child {
-	margin-bottom: 0;
 }
 
 .image-editor-story__export-preview {

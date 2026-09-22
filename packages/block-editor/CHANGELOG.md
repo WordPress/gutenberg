@@ -2,13 +2,14 @@
 
 ## Unreleased
 
-### Internal
+### Breaking Changes
 
--   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
+-   `InspectorControls`: Remove the `__experimentalGroup` prop from the fill and the slot. It was deprecated in WordPress 6.2 in favour of `group`, with removal scheduled for 6.4 ([#83171](https://github.com/WordPress/gutenberg/pull/83171)).
 
 ### New Features
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Stabilize `getStyleForState` and `setStyleForState`, for reading and writing block style values for a given viewport or pseudo state, and stabilize the `getSelectedBlockStyleState` and `hasSelectedBlockStyleState`(renamed from `hasSelectedStyleState`) store selectors. ([#82741](https://github.com/WordPress/gutenberg/pull/82741)).
 
 ### Enhancements
 
@@ -16,6 +17,8 @@
 -   `BlockCard`: Migrate the block-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82503](https://github.com/WordPress/gutenberg/pull/82503)).
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) reflect the value a block inherits from Global Styles when nothing is set on the block. The `gutenberg-global-styles-inheritance-ui` experiment now gates only the indicators for that value: the dotted underline on an inherited label, and the dot that resets a local override ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
 -   `TypographyPanel`: Setting a text color starts an unset link color tracking it whenever no link color is set on the block or inherited from Global Styles. Previously the link color was left alone ([#82840](https://github.com/WordPress/gutenberg/pull/82840)).
+-   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
+-   `BlockQuickNavigation`: Highlight a block on the canvas while its item is hovered or focused, matching the List View. This affects the inspector Content tab, the pattern overrides panel, and the template and template part content panels ([#83049](https://github.com/WordPress/gutenberg/pull/83049)).
 
 ### Bug Fixes
 
@@ -27,6 +30,8 @@
 
 ### Internal
 
+-   Replace experimental `ZStack`, `HStack`, `Flex`, and `FlexItem` around the Duotone labeled swatch in the Filters panel ([#83061](https://github.com/WordPress/gutenberg/pull/83061)).
+-   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
 -   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 -   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).

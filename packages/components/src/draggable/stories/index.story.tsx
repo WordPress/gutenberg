@@ -8,7 +8,7 @@ import Draggable from '..';
 
 const meta: Meta< typeof Draggable > = {
 	component: Draggable,
-	title: 'Components/Utilities/Draggable',
+	title: 'Components/@wordpress-components/Utilities/Draggable',
 	id: 'components-draggable',
 	argTypes: {
 		elementId: { control: false },
