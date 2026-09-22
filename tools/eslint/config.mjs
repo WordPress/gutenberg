@@ -528,8 +528,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Story files are omitted here. storybook/stories is not in this list, and
-	// package stories are turned off in the Storybook override below.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -744,9 +742,6 @@ export default dedupePlugins( [
 	// load through package-styles/config.js. The production stylesheet
 	// import rule does not apply; Storybook loads package CSS through
 	// package-styles/config.js, not the enqueue path.
-	// The package stylesheet rule strips ?raw, ?inline, and ?url and reports
-	// those imports. Package stories live under packages/*/src, so they still
-	// match the block that enables that rule. Turn it off here.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
 		plugins: {
