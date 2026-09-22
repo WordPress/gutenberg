@@ -94,17 +94,19 @@ function findVideoEmbedProvider(
 /**
  * Modifies embed HTML to use background video parameters.
  *
- * @param {string} html The original embed HTML.
+ * @param {string}  html             The original embed HTML.
+ * @param {Object}  options          Options.
+ * @param {boolean} options.autoplay Whether the video should start playing on load.
  * @return {string|null} The modified embed HTML, or null if not possible.
  */
-export function getBackgroundEmbedHtml( html ) {
+export function getBackgroundEmbedHtml( html, { autoplay = true } = {} ) {
 	const srcMatch = html?.match( /src=["']([^"']+)["']/ );
 	if ( ! srcMatch ) {
 		return null;
 	}
 
 	const iframeSrc = srcMatch[ 1 ];
-	const backgroundSrc = getBackgroundVideoSrc( iframeSrc );
+	const backgroundSrc = getBackgroundVideoSrc( iframeSrc, { autoplay } );
 	return html.replace( iframeSrc, backgroundSrc );
 }
 
@@ -150,10 +152,12 @@ export function detectProviderFromSrc( src ) {
  * Modifies an iframe src URL to add background video parameters.
  * Automatically detects the provider from the URL.
  *
- * @param {string} src The iframe src URL.
+ * @param {string}  src              The iframe src URL.
+ * @param {Object}  options          Options.
+ * @param {boolean} options.autoplay Whether the video should start playing on load.
  * @return {string} The modified URL.
  */
-export function getBackgroundVideoSrc( src ) {
+export function getBackgroundVideoSrc( src, { autoplay = true } = {} ) {
 	if ( ! src ) {
 		return src;
 	}
@@ -164,11 +168,14 @@ export function getBackgroundVideoSrc( src ) {
 		// Detect provider from the iframe src URL
 		const provider = detectProviderFromSrc( src );
 
+		if ( autoplay ) {
+			url.searchParams.set( 'autoplay', '1' );
+		}
+
 		// Add provider-specific parameters for background video behavior
 		switch ( provider ) {
 			case 'youtube':
 				// YouTube parameters for background video
-				url.searchParams.set( 'autoplay', '1' );
 				url.searchParams.set( 'mute', '1' );
 				url.searchParams.set( 'loop', '1' );
 				url.searchParams.set( 'controls', '0' );
@@ -185,24 +192,25 @@ export function getBackgroundVideoSrc( src ) {
 
 			case 'vimeo':
 				// Vimeo parameters for background video
-				url.searchParams.set( 'autoplay', '1' );
 				url.searchParams.set( 'muted', '1' );
 				url.searchParams.set( 'loop', '1' );
-				url.searchParams.set( 'background', '1' );
+				// Vimeo's background mode always autoplays, so it can only be
+				// used when autoplay is allowed.
+				if ( autoplay ) {
+					url.searchParams.set( 'background', '1' );
+				}
 				url.searchParams.set( 'controls', '0' );
 				break;
 
 			case 'videopress':
 			case 'wordpress-tv':
 				// VideoPress parameters
-				url.searchParams.set( 'autoplay', '1' );
 				url.searchParams.set( 'loop', '1' );
 				url.searchParams.set( 'muted', '1' );
 				break;
 
 			default:
 				// Generic parameters that might work for other providers
-				url.searchParams.set( 'autoplay', '1' );
 				url.searchParams.set( 'muted', '1' );
 				url.searchParams.set( 'loop', '1' );
 				break;
