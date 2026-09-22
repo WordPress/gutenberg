@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises';
 import { fileURLToPath, pathToFileURL } from 'url';
 import remapping from '@jridgewell/remapping';
+import { AnyMap } from '@jridgewell/trace-mapping';
 import { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
 
 /** @type {Record<string, import('esbuild').Loader>} */
@@ -76,17 +77,14 @@ const plugin = {
 					// Like esbuild, do not fetch remote source-map URLs.
 					if ( inputMap !== undefined ) {
 						const map = remapping(
-							result.map.toString(),
-							( _source, context ) => {
-								if ( context.depth !== 1 ) {
-									return null;
-								}
-								context.source = mapPath.replaceAll(
-									'\\',
-									'/'
-								);
-								return inputMap;
-							}
+							[
+								result.map.toString(),
+								new AnyMap(
+									inputMap,
+									mapPath.replaceAll( '\\', '/' )
+								),
+							],
+							() => null
 						);
 						sourceMap = `data:application/json;base64,${ Buffer.from( map.toString() ).toString( 'base64' ) }`;
 					}

@@ -258,7 +258,7 @@ it( 'builds JSX in JavaScript files containing only manual fallbacks', async () 
 	} );
 } );
 
-it.each( [ 'base64', 'percent-encoded', 'external' ] )(
+it.each( [ 'base64', 'percent-encoded', 'external', 'indexed' ] )(
 	'preserves original sources through %s esbuild input maps',
 	async ( encoding ) => {
 		const source =
@@ -269,12 +269,20 @@ it.each( [ 'base64', 'percent-encoded', 'external' ] )(
 			sourcemap: 'external',
 		} );
 		let directive;
-		if ( encoding === 'external' ) {
+		const external = encoding === 'external' || encoding === 'indexed';
+		if ( external ) {
 			await mkdir( join( directory, 'maps' ) );
 			await mkdir( join( directory, 'src' ) );
 			await writeFile( join( directory, 'src/original.ts' ), source );
-			const map = JSON.parse( compiled.map );
+			let map = JSON.parse( compiled.map );
 			map.sourceRoot = '../src';
+			if ( encoding === 'indexed' ) {
+				map = {
+					version: 3,
+					sections: [ { offset: { line: 1, column: 0 }, map } ],
+				};
+				compiled.code = `// Concatenated input\n${ compiled.code }`;
+			}
 			await writeFile(
 				join( directory, 'maps/compiled.js.map' ),
 				JSON.stringify( map )
@@ -301,7 +309,7 @@ it.each( [ 'base64', 'percent-encoded', 'external' ] )(
 			positionOf( source, 'throw new Error' )
 		);
 		expect( original.source ).toMatch(
-			encoding === 'external' ? /src\/original\.ts$/ : /original\.ts$/
+			external ? /src\/original\.ts$/ : /original\.ts$/
 		);
 		expect( consumer.sourceContentFor( original.source! ) ).toBe( source );
 	}
