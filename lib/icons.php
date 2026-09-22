@@ -69,10 +69,6 @@ function gutenberg_register_default_icons() {
 			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
 
-		if ( isset( $icon_data['public'] ) ) {
-			$icon_args['public'] = $icon_data['public'];
-		}
-
 		wp_register_icon( 'core/' . $icon_name, $icon_args );
 	}
 }
