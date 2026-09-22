@@ -82,6 +82,50 @@ describe( 'core/embed fallback URLs', () => {
 			);
 		} );
 
+		it( 'leaves out a row that has no URL typed into it yet', () => {
+			const block = createBlock( name, {
+				...videoAttributes,
+				fallbacks: [ MIRROR_URL, '  ' ],
+			} );
+
+			expect( serialize( block ) ).toContain(
+				`data-fallbacks="${ MIRROR_URL }"`
+			);
+		} );
+
+		it( 'saves the markup unchanged when no row has a URL', () => {
+			const block = createBlock( name, {
+				...videoAttributes,
+				fallbacks: [ '' ],
+			} );
+
+			expect( serialize( block ) ).toContain(
+				'<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">'
+			);
+		} );
+
+		it( 'saves a URL listed twice once, as the panel shows it', () => {
+			const block = createBlock( name, {
+				...videoAttributes,
+				fallbacks: [ MIRROR_URL, SECOND_MIRROR_URL, MIRROR_URL ],
+			} );
+
+			expect( serialize( block ) ).toContain(
+				`data-fallbacks="${ MIRROR_URL } ${ SECOND_MIRROR_URL }"`
+			);
+		} );
+
+		it( 'saves no fallback a hand-edited post put in the wrong shape', () => {
+			// The attribute is defined as a list of URLs, but a post can be
+			// edited by hand or written by another tool.
+			const block = createBlock( name, {
+				...videoAttributes,
+				fallbacks: { 0: MIRROR_URL },
+			} );
+
+			expect( serialize( block ) ).not.toContain( 'data-fallbacks' );
+		} );
+
 		it( 'saves no markup at all when the block has no URL', () => {
 			const block = createBlock( name, {
 				fallbacks: [ MIRROR_URL ],

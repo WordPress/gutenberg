@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/variables" as *;
 
 .wp-block-embed {
 	// Remove the left and right margin the figure is born with.
@@ -23,6 +24,36 @@
 		word-break: normal;
 		overflow-wrap: break-word;
 	}
+}
+
+// A source URL is as long as any other URL and has nowhere to wrap, so
+// without a minimum of its own the list is as wide as the longest one and the
+// sidebar scrolls sideways. The rows show what fits; the flyout a row opens
+// holds the whole URL in a field.
+.wp-block-embed__sources {
+	min-width: 0;
+}
+
+.wp-block-embed__sources-description {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.wp-block-embed__source {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	// Ties the open flyout to the row it belongs to.
+	&[aria-expanded="true"] {
+		color: var(--wp-admin-theme-color);
+	}
+}
+
+// The flyout is a popover, which is only as wide as what it holds.
+.wp-block-embed__source-editor {
+	box-sizing: border-box;
+	width: 280px;
+	padding: $grid-unit-15;
 }
 
 .wp-block-embed__learn-more {

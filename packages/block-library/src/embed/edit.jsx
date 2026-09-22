@@ -265,6 +265,7 @@ const EmbedEdit = ( props ) => {
 				allowResponsive={ allowResponsive }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
+				url={ url }
 				fallbacks={ fallbacks }
 				setFallbacks={ ( value ) =>
 					setAttributes( { fallbacks: value } )

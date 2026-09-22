@@ -4,6 +4,7 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
+import { toSourceList } from './sources';
 
 export default function save( { attributes } ) {
 	const { url, caption, type, providerNameSlug, fallbacks } = attributes;
@@ -20,8 +21,9 @@ export default function save( { attributes } ) {
 
 	// Only emitted when fallbacks are set, so blocks without them save exactly
 	// as before and no deprecation is needed.
-	const fallbackProps = fallbacks?.length
-		? { 'data-fallbacks': fallbacks.join( ' ' ) }
+	const sources = toSourceList( fallbacks );
+	const fallbackProps = sources.length
+		? { 'data-fallbacks': sources.join( ' ' ) }
 		: {};
 
 	return (
