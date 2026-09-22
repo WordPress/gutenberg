@@ -13,6 +13,7 @@ import {
 	type MockInstance,
 } from 'vitest';
 import { createRegistry } from '@wordpress/data';
+import { revokeBlobURL } from '@wordpress/blob';
 import { store as uploadStore } from '..';
 import { vipsGetUltraHdrInfo } from '../utils';
 import {
@@ -744,6 +745,31 @@ describe( 'operation registry', () => {
 			expect( seen?.file ).toBe( jpegFile );
 			expect( seen ).not.toHaveProperty( 'operations' );
 			expect( seen ).not.toHaveProperty( 'abortController' );
+		} );
+
+		it( 'revokes a blob URL a handler created when the item leaves', async () => {
+			// A preview URL has to outlive the handler, since the editor
+			// shows it until the server's URL replaces it, so the queue owns
+			// its lifetime rather than the handler.
+			let url: string | undefined;
+			dispatch.registerOperation(
+				operation( 'my-plugin/preview', {
+					handler: ( item, _args, context ) => {
+						url = context.createBlobURL( item.file );
+						return { attachment: { url } };
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ 'my-plugin/preview' ],
+			} );
+			await flush();
+
+			expect( url ).toBe( 'blob:foo' );
+			expect( select.getAllItems() ).toHaveLength( 0 );
+			expect( revokeBlobURL ).toHaveBeenCalledWith( 'blob:foo' );
 		} );
 
 		it( 'lets a handler append steps to its item', async () => {

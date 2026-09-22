@@ -564,6 +564,15 @@ function createOperationContext(
 				operations: operations ?? [ OperationType.Upload ],
 			} );
 		},
+		createBlobURL: ( file ) => {
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id: item.id,
+				blobUrl,
+			} );
+			return blobUrl;
+		},
 	};
 
 	if ( isPrivileged ) {
