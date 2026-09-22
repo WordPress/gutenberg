@@ -1,10 +1,13 @@
 import {
 	type BatchId,
-	OperationType,
+	type ConcurrencyPoolDefinition,
+	type OperationDefinition,
+	type OperationName,
 	type QueueItem,
 	type QueueItemId,
 	type State,
 } from './types';
+import { getOperationName, resolveConcurrencyLimit } from './utils/operations';
 
 /**
  * Returns all items currently being uploaded.
@@ -87,109 +90,113 @@ export function getBlobUrls( state: State, id: QueueItemId ): string[] {
 }
 
 /**
- * Returns the number of items currently uploading.
+ * Returns all registered operations, in registration order.
  *
  * @param state Upload state.
  *
- * @return Number of items currently uploading.
+ * @return Operation definitions.
  */
-export function getActiveUploadCount( state: State ): number {
-	return state.queue.filter(
-		( item ) => item.currentOperation === OperationType.Upload
-	).length;
+export function getOperations( state: State ): OperationDefinition[] {
+	return Object.values( state.operations );
 }
 
 /**
- * Returns items that are waiting for upload (next operation is Upload but not yet started).
+ * Returns a registered operation by name.
+ *
+ * @param state Upload state.
+ * @param name  Operation name.
+ *
+ * @return Operation definition, or undefined if not registered.
+ */
+export function getOperation(
+	state: State,
+	name: OperationName
+): OperationDefinition | undefined {
+	return state.operations[ name ];
+}
+
+/**
+ * Returns a registered concurrency pool by name.
+ *
+ * @param state Upload state.
+ * @param name  Pool name.
+ *
+ * @return Pool definition, or undefined if not registered.
+ */
+export function getConcurrencyPool(
+	state: State,
+	name: string
+): ConcurrencyPoolDefinition | undefined {
+	return state.pools[ name ];
+}
+
+/**
+ * Returns all registered concurrency pools.
  *
  * @param state Upload state.
  *
- * @return Items pending upload.
+ * @return Pool definitions.
  */
-export function getPendingUploads( state: State ): QueueItem[] {
+export function getConcurrencyPools(
+	state: State
+): ConcurrencyPoolDefinition[] {
+	return Object.values( state.pools );
+}
+
+/**
+ * Returns the concurrency limit of a pool.
+ *
+ * An operation can only join a pool that is registered, so the lookup
+ * finds one for every pool an item is counted against; a name that is not
+ * registered is unlimited.
+ *
+ * @param state Upload state.
+ * @param pool  Pool name.
+ *
+ * @return Maximum number of items that may run operations of this pool at once.
+ */
+export function getConcurrencyPoolLimit( state: State, pool: string ): number {
+	const definition = state.pools[ pool ];
+	if ( ! definition ) {
+		return Infinity;
+	}
+	return resolveConcurrencyLimit( definition, state.settings );
+}
+
+/**
+ * Returns the number of items currently running an operation of a pool.
+ *
+ * @param state Upload state.
+ * @param pool  Pool name.
+ *
+ * @return Number of active items in the pool.
+ */
+export function getActiveCountByPool( state: State, pool: string ): number {
+	return state.queue.filter( ( item ) => item.currentPool === pool ).length;
+}
+
+/**
+ * Returns items whose next operation belongs to a pool but has not started,
+ * typically because the pool was at capacity when they were last processed.
+ *
+ * @param state Upload state.
+ * @param pool  Pool name.
+ *
+ * @return Items waiting on the pool.
+ */
+export function getPendingItemsByPool(
+	state: State,
+	pool: string
+): QueueItem[] {
 	return state.queue.filter( ( item ) => {
-		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 0 ]
-			: item.operations?.[ 0 ];
+		const nextOperation = item.operations?.[ 0 ];
+		if ( nextOperation === undefined ) {
+			return false;
+		}
+		const nextName = getOperationName( nextOperation );
 		return (
-			nextOperation === OperationType.Upload &&
-			item.currentOperation !== OperationType.Upload
-		);
-	} );
-}
-
-/**
- * Returns the number of items currently performing image processing operations.
- *
- * This counts items whose current operation is ResizeCrop or Rotate,
- * used to enforce the image processing concurrency limit.
- *
- * @param state Upload state.
- *
- * @return Number of items currently processing images.
- */
-export function getActiveImageProcessingCount( state: State ): number {
-	return state.queue.filter(
-		( item ) =>
-			item.currentOperation === OperationType.ResizeCrop ||
-			item.currentOperation === OperationType.Rotate
-	).length;
-}
-
-/**
- * Returns the number of items currently performing video processing operations.
- *
- * This counts items whose current operation is TranscodeGif,
- * used to enforce the video processing concurrency limit (1 at a time).
- *
- * @param state Upload state.
- *
- * @return Number of items currently processing video.
- */
-export function getActiveVideoProcessingCount( state: State ): number {
-	return state.queue.filter(
-		( item ) => item.currentOperation === OperationType.TranscodeGif
-	).length;
-}
-
-/**
- * Returns items waiting for image processing (next operation is ResizeCrop
- * or Rotate but not yet started).
- *
- * @param state Upload state.
- *
- * @return Items pending image processing.
- */
-export function getPendingImageProcessing( state: State ): QueueItem[] {
-	return state.queue.filter( ( item ) => {
-		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 0 ]
-			: item.operations?.[ 0 ];
-		return (
-			( nextOperation === OperationType.ResizeCrop ||
-				nextOperation === OperationType.Rotate ) &&
-			item.currentOperation !== OperationType.ResizeCrop &&
-			item.currentOperation !== OperationType.Rotate
-		);
-	} );
-}
-
-/**
- * Returns items waiting for video processing (next operation is TranscodeGif
- * but not yet started).
- *
- * @param state Upload state.
- *
- * @return Items pending video processing.
- */
-export function getPendingVideoProcessing( state: State ): QueueItem[] {
-	return state.queue.filter( ( item ) => {
-		const nextOperation = Array.isArray( item.operations?.[ 0 ] )
-			? item.operations[ 0 ][ 0 ]
-			: item.operations?.[ 0 ];
-		return (
-			nextOperation === OperationType.TranscodeGif &&
-			item.currentOperation !== OperationType.TranscodeGif
+			state.operations[ nextName ]?.concurrency === pool &&
+			item.currentOperation !== nextName
 		);
 	} );
 }

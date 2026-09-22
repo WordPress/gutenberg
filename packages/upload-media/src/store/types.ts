@@ -45,7 +45,16 @@ export interface QueueItem {
 	onSuccess?: OnSuccessHandler;
 	onError?: OnErrorHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
-	currentOperation?: OperationType;
+	currentOperation?: OperationName;
+	/**
+	 * Concurrency pool the operation in flight counts against.
+	 *
+	 * Recorded when the operation starts rather than looked up when it
+	 * ends: an operation can be unregistered, or replaced by a definition
+	 * declaring a different pool, while it runs, and the slot still has to
+	 * be released into the pool it was taken from.
+	 */
+	currentPool?: string;
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
@@ -64,6 +73,24 @@ export interface State {
 	queueStatus: QueueStatus;
 	blobUrls: Record< QueueItemId, string[] >;
 	settings: Settings;
+	/**
+	 * Registered operations keyed by name, in registration order.
+	 *
+	 * Core registers its own steps here at store creation; see
+	 * `store/operations.ts`. `processItem()` looks the next step of an
+	 * item up in this map, so an operation that is not registered cannot
+	 * run.
+	 */
+	operations: Record< OperationName, OperationDefinition >;
+	/**
+	 * Registered concurrency pools keyed by name.
+	 *
+	 * Core registers its own pools at store creation; see
+	 * `store/operations.ts`. An operation can only join a pool that is
+	 * already registered, so every pool an item is counted against has a
+	 * limit here.
+	 */
+	pools: Record< string, ConcurrencyPoolDefinition >;
 	/**
 	 * Running tally of top-level items cancelled because they failed.
 	 *
@@ -95,6 +122,9 @@ export enum Type {
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
+	RegisterOperation = 'REGISTER_OPERATION',
+	UnregisterOperation = 'UNREGISTER_OPERATION',
+	RegisterConcurrencyPool = 'REGISTER_CONCURRENCY_POOL',
 }
 
 type Action< T = Type, Payload = Record< string, unknown > > = {
@@ -111,7 +141,7 @@ export type AddAction = Action<
 >;
 export type OperationStartAction = Action<
 	Type.OperationStart,
-	{ id: QueueItemId; operation: OperationType }
+	{ id: QueueItemId; operation: OperationName }
 >;
 export type OperationFinishAction = Action<
 	Type.OperationFinish,
@@ -162,6 +192,18 @@ export type AccumulateSubSizeAction = Action<
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
 	{ settings: Partial< Settings > }
+>;
+export type RegisterOperationAction = Action<
+	Type.RegisterOperation,
+	{ operation: OperationDefinition }
+>;
+export type UnregisterOperationAction = Action<
+	Type.UnregisterOperation,
+	{ name: OperationName }
+>;
+export type RegisterConcurrencyPoolAction = Action<
+	Type.RegisterConcurrencyPool,
+	{ pool: ConcurrencyPoolDefinition }
 >;
 
 interface UploadMediaArgs {
@@ -222,7 +264,7 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
-	// Maximum number of concurrent image processing operations (resize, crop, rotate).
+	// Maximum number of concurrent image processing operations (resize, crop, rotate, transcode).
 	maxConcurrentImageProcessing: number;
 	// Big image size threshold in pixels.
 	// Images larger than this will be scaled down.
@@ -323,18 +365,31 @@ export enum ItemStatus {
 	Error = 'ERROR',
 }
 
+/**
+ * Names of the operations that ship with the package.
+ *
+ * Operation names are namespaced like block names. Every one of these is
+ * registered through the same registry a plugin would use, so they can be
+ * unregistered or replaced like any other operation.
+ */
 export enum OperationType {
-	Prepare = 'PREPARE',
-	Upload = 'UPLOAD',
-	ResizeCrop = 'RESIZE_CROP',
-	Rotate = 'ROTATE',
-	TranscodeImage = 'TRANSCODE_IMAGE',
-	TranscodeGif = 'TRANSCODE_GIF',
-	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
-	Finalize = 'FINALIZE',
+	Prepare = 'core/prepare',
+	Upload = 'core/upload',
+	ResizeCrop = 'core/resize-crop',
+	Rotate = 'core/rotate',
+	TranscodeImage = 'core/transcode-image',
+	TranscodeGif = 'core/transcode-gif',
+	ThumbnailGeneration = 'core/thumbnail-generation',
+	Finalize = 'core/finalize',
 	// UltraHDR operations
-	DetectUltraHdr = 'DETECT_ULTRAHDR',
+	DetectUltraHdr = 'core/detect-ultrahdr',
 }
+
+/**
+ * Name of a registered operation, e.g. `core/upload` or
+ * `my-plugin/generate-subtitles`.
+ */
+export type OperationName = string;
 
 /**
  * Defines the dimensions and cropping behavior for an image size.
@@ -407,7 +462,183 @@ export interface OperationArgs {
 type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
 	[ T, OperationArgs[ T ] ];
 
-export type Operation = OperationType | OperationWithArgs;
+/**
+ * A single step in an item's pipeline: either a bare operation name or a
+ * `[ name, args ]` tuple when the step takes arguments.
+ */
+export type Operation =
+	OperationName | OperationWithArgs | [ OperationName, unknown ];
+
+/**
+ * Fields of a queue item an operation handler may not set.
+ *
+ * These are the entry's own bookkeeping: what it is, what it still has to
+ * do, and how it is being tracked. A handler that resolves with something
+ * other than plain updates — the item it was handed, say — would otherwise
+ * put the step it just finished back on the pipeline, or point the entry
+ * at a different item.
+ *
+ * Everything else an item carries is data one step hands to the next, and
+ * a handler is free to update it. Listing what a handler may *not* touch
+ * rather than what it may is deliberate: a new field on the item is data
+ * far more often than it is bookkeeping, and forgetting to allow one would
+ * drop it silently.
+ */
+export const PROTECTED_ITEM_KEYS = [
+	'id',
+	'status',
+	'operations',
+	'currentOperation',
+	'currentPool',
+	'batchId',
+	'parentId',
+	'abortController',
+	'error',
+	'retryCount',
+	'nextRetryTimestamp',
+	'progress',
+	'subSizes',
+	'onChange',
+	'onSuccess',
+	'onError',
+	'onBatchSuccess',
+] as const satisfies readonly ( keyof QueueItem )[];
+
+export type ProtectedItemKey = ( typeof PROTECTED_ITEM_KEYS )[ number ];
+
+/**
+ * Updates an operation handler can apply to its item once it finishes.
+ *
+ * Merged into the item by the reducer; `attachment` and `additionalData`
+ * are merged shallowly with the existing values, everything else replaces.
+ */
+export type OperationResult = Partial< Omit< QueueItem, ProtectedItemKey > >;
+
+/**
+ * Arguments for spawning a child item from inside an operation handler.
+ *
+ * The child is parented to the handler's item and is uploaded through the
+ * sideload endpoint, so `parentId` and `post` cannot be set here.
+ */
+export interface OperationSideloadArgs {
+	file: File;
+	additionalData?: AdditionalData;
+	operations?: Operation[];
+	batchId?: BatchId;
+}
+
+/**
+ * What an operation handler is given besides the item and its arguments.
+ *
+ * This is deliberately narrow: handlers do not receive the store. Anything
+ * a handler needs to do to the queue goes through these methods.
+ */
+export interface OperationContext {
+	/** Aborted when the item is cancelled. */
+	signal?: AbortSignal;
+	/** Current store settings, read-only. */
+	settings: Settings;
+	/** Reports progress for the item, 0-100. */
+	updateProgress: ( progress: number ) => void;
+	/** Appends further steps to this item's pipeline. */
+	addOperations: ( operations: Operation[] ) => void;
+	/** Queues a companion file to be sideloaded to this item's attachment. */
+	addSideloadItem: ( args: OperationSideloadArgs ) => void;
+}
+
+/**
+ * Where an operation's `plan()` wants the step placed in an item's
+ * pipeline. Exactly one of `before`, `after` or `at` should be set.
+ *
+ * When the anchor named by `before` or `after` is not in the pipeline the
+ * step is skipped for this item, so "after the transcode" naturally means
+ * "only when a transcode happens".
+ */
+export interface OperationPlacement {
+	before?: OperationName;
+	after?: OperationName;
+	at?: 'start' | 'end';
+	/** Arguments passed to the handler for this item. */
+	args?: unknown;
+}
+
+/**
+ * Return value of an operation's `plan()`.
+ *
+ * - Nothing: leave the pipeline alone.
+ * - A placement: insert this operation relative to an existing step.
+ * - An array: replace the pipeline wholesale. This is the escape hatch for
+ *   removing or reordering steps for an item.
+ */
+export type OperationPlanResult =
+	OperationPlacement | Operation[] | false | undefined | void;
+
+export interface OperationPlanContext {
+	/** The pipeline as planned so far, starting with what core decided. */
+	operations: Operation[];
+	/** Current store settings, read-only. */
+	settings: Settings;
+}
+
+/**
+ * A named limit on how many items may run the operations assigned to it at
+ * the same time.
+ *
+ * A pool is declared once, with its limit, and operations join it by name.
+ * The limit may derive from the settings, in which case it is read afresh
+ * every time the pool is consulted.
+ *
+ * The limit is a finite positive number: a pool exists to throttle, so an
+ * operation that should run unthrottled joins no pool at all. A settings
+ * function returning anything else — a missing setting, a zero that would
+ * stall the pool for good — is read as 1 rather than taken literally.
+ */
+export interface ConcurrencyPoolDefinition {
+	/** Pool name, e.g. `upload`. */
+	name: string;
+	/** How many items may run operations of this pool at once. */
+	limit: number | ( ( settings: Settings ) => number );
+}
+
+/**
+ * A step in the upload pipeline, as held in the operation registry.
+ */
+export interface OperationDefinition< Args = unknown > {
+	/** Namespaced name, e.g. `core/upload` or `my-plugin/generate-subtitles`. */
+	name: OperationName;
+	/** Human-readable, translated description of the step while it runs. */
+	label: string;
+	/**
+	 * Decides whether and where this operation runs for a new top-level
+	 * item. Called once core has built the item's default pipeline, for
+	 * every registered operation, in `priority` order.
+	 */
+	plan?: (
+		item: QueueItem,
+		context: OperationPlanContext
+	) => OperationPlanResult | Promise< OperationPlanResult >;
+	/**
+	 * Order in which `plan()` runs relative to other operations. Lower
+	 * runs first; ties keep registration order. Defaults to 10.
+	 */
+	priority?: number;
+	/**
+	 * Performs the step. Resolves with updates for the item, or with
+	 * nothing when there are none. Throwing cancels the item; throw an
+	 * `UploadError` to control the message the user sees.
+	 */
+	handler: (
+		item: QueueItem,
+		args: Args,
+		context: OperationContext
+	) => OperationResult | void | Promise< OperationResult | void >;
+	/**
+	 * Name of the concurrency pool this step counts against, if any. The
+	 * pool must be registered before the operation is; a step without one
+	 * runs unthrottled.
+	 */
+	concurrency?: string;
+}
 
 export type AdditionalData = Record< string, unknown >;
 

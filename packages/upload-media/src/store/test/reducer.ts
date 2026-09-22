@@ -3,10 +3,12 @@ import reducer from '../reducer';
 import {
 	ItemStatus,
 	OperationType,
+	type OperationDefinition,
 	type QueueItem,
 	type State,
 	Type,
 } from '../types';
+import { CORE_OPERATIONS } from '../operations';
 
 describe( 'reducer', () => {
 	describe( `${ Type.Add }`, () => {
@@ -15,6 +17,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -39,6 +43,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -64,6 +70,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -90,6 +98,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 1,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -114,6 +124,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -145,6 +157,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 2,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -168,6 +182,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -193,6 +209,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -214,6 +232,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -237,6 +257,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -262,6 +284,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -290,6 +314,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -318,6 +344,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -344,6 +372,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
 					maxConcurrentUploads: 5,
@@ -369,6 +399,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -401,6 +433,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -428,6 +462,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -457,6 +493,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -486,6 +524,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -524,6 +564,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -552,6 +594,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -581,6 +625,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -617,6 +663,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -636,6 +684,8 @@ describe( 'reducer', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -655,6 +705,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: { '1': [ 'blob:foo' ] },
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -682,6 +734,8 @@ describe( 'reducer', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -701,6 +755,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -720,6 +776,8 @@ describe( 'reducer', () => {
 				queueStatus: 'paused',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -751,6 +809,8 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: {},
+				operations: {},
+				pools: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
@@ -771,6 +831,83 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.queue[ 0 ].progress ).toBe( 50 );
+		} );
+	} );
+
+	describe( 'default state', () => {
+		it( 'registers the core operations', () => {
+			const state = reducer( undefined, { type: Type.Unknown } );
+
+			expect( Object.keys( state.operations ) ).toEqual(
+				CORE_OPERATIONS.map( ( operation ) => operation.name )
+			);
+		} );
+	} );
+
+	describe( `${ Type.RegisterOperation }`, () => {
+		it( 'adds an operation keyed by name', () => {
+			const operation: OperationDefinition = {
+				name: 'my-plugin/ocr',
+				label: 'Reading text',
+				handler: () => {},
+			};
+			const initialState: State = {
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				operations: {},
+				pools: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.RegisterOperation,
+				operation,
+			} );
+
+			expect( state.operations ).toEqual( {
+				'my-plugin/ocr': operation,
+			} );
+		} );
+	} );
+
+	describe( `${ Type.UnregisterOperation }`, () => {
+		it( 'removes an operation by name', () => {
+			const keep: OperationDefinition = {
+				name: 'my-plugin/keep',
+				label: 'Keep',
+				handler: () => {},
+			};
+			const initialState: State = {
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				operations: {
+					'my-plugin/keep': keep,
+					'my-plugin/drop': {
+						name: 'my-plugin/drop',
+						label: 'Drop',
+						handler: () => {},
+					},
+				},
+				pools: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.UnregisterOperation,
+				name: 'my-plugin/drop',
+			} );
+
+			expect( state.operations ).toEqual( { 'my-plugin/keep': keep } );
 		} );
 	} );
 } );

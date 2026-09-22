@@ -234,6 +234,11 @@ describe( 'processItem re-entrancy', () => {
 				onError: () => {},
 			} );
 
+			// The failure reaches the item through the operation runner, a
+			// microtask after the dispatch settles, and the backoff timer
+			// it schedules is still a second out.
+			await vi.advanceTimersByTimeAsync( 0 );
+
 			const item = unlock(
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];

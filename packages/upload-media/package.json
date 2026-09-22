@@ -50,7 +50,6 @@
 	],
 	"dependencies": {
 		"@wordpress/blob": "file:../blob",
-		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",

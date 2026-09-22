@@ -19,6 +19,9 @@ import {
 	type State,
 	Type,
 	type UnknownAction,
+	type RegisterOperationAction,
+	type RegisterConcurrencyPoolAction,
+	type UnregisterOperationAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
@@ -27,6 +30,7 @@ import {
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	DEFAULT_RETRY_SETTINGS,
 } from './constants';
+import { CORE_OPERATIONS, CORE_POOLS } from './operations';
 
 const noop = () => {};
 
@@ -41,6 +45,12 @@ const DEFAULT_STATE: State = {
 		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
 	failureCount: 0,
+	operations: Object.fromEntries(
+		CORE_OPERATIONS.map( ( operation ) => [ operation.name, operation ] )
+	),
+	pools: Object.fromEntries(
+		CORE_POOLS.map( ( pool ) => [ pool.name, pool ] )
+	),
 };
 
 type Action =
@@ -61,6 +71,9 @@ type Action =
 	| RevokeBlobUrlsAction
 	| UpdateProgressAction
 	| UpdateSettingsAction
+	| RegisterOperationAction
+	| RegisterConcurrencyPoolAction
+	| UnregisterOperationAction
 	| UnknownAction;
 
 function reducer(
@@ -161,8 +174,15 @@ function reducer(
 								 * item is about to run again, so processItem
 								 * does not mistake it for an operation still
 								 * in flight and skip the retry.
+								 *
+								 * The slot it took goes with it: an item
+								 * still counted against its pool would be
+								 * competing with itself for the capacity it
+								 * needs to run, and a pool of one would
+								 * never let it through again.
 								 */
 								currentOperation: undefined,
+								currentPool: undefined,
 							}
 						: item
 				),
@@ -198,6 +218,9 @@ function reducer(
 						? {
 								...item,
 								currentOperation: action.operation,
+								currentPool:
+									state.operations[ action.operation ]
+										?.concurrency,
 							}
 						: item
 				),
@@ -246,6 +269,7 @@ function reducer(
 					return {
 						...item,
 						currentOperation: undefined,
+						currentPool: undefined,
 						operations,
 						...action.item,
 						attachment,
@@ -314,6 +338,35 @@ function reducer(
 					...state.settings,
 					...action.settings,
 				},
+			};
+		}
+
+		case Type.RegisterOperation: {
+			return {
+				...state,
+				operations: {
+					...state.operations,
+					[ action.operation.name ]: action.operation,
+				},
+			};
+		}
+
+		case Type.RegisterConcurrencyPool: {
+			return {
+				...state,
+				pools: {
+					...state.pools,
+					[ action.pool.name ]: action.pool,
+				},
+			};
+		}
+
+		case Type.UnregisterOperation: {
+			const operations = { ...state.operations };
+			delete operations[ action.name ];
+			return {
+				...state,
+				operations,
 			};
 		}
 	}

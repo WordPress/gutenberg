@@ -14,7 +14,7 @@ import type {
 	ScheduleRetryAction,
 	State,
 } from './types';
-import { ItemStatus, OperationType, Type } from './types';
+import { ItemStatus, Type } from './types';
 import {
 	calculateRetryDelay,
 	clearRetryTimer,
@@ -26,8 +26,9 @@ import type {
 	processItem,
 	removeItem,
 	revokeBlobUrls,
+	releaseConcurrencyPool,
 } from './private-actions';
-import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
+import { vipsCancelOperations } from './utils';
 import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
 import { ErrorCode, UploadError } from '../upload-error';
@@ -45,6 +46,7 @@ type ActionCreators = {
 	scheduleRetry: typeof scheduleRetry;
 	executeRetry: typeof executeRetry;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	releaseConcurrencyPool: typeof releaseConcurrencyPool;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -230,7 +232,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			);
 		}
 
-		const { currentOperation, parentId, batchId } = item;
+		const { currentPool, parentId, batchId } = item;
 
 		dispatch< CancelAction >( {
 			type: Type.Cancel,
@@ -242,35 +244,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// A concurrency slot just freed up. Kick any items that were
 		// waiting in the queue, mirroring finishOperation's behavior.
-		if (
-			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate
-		) {
-			for ( const pending of select.getPendingImageProcessing() ) {
-				dispatch.processItem( pending.id );
-			}
-		}
-		if ( currentOperation === OperationType.Upload ) {
-			for ( const pending of select.getPendingUploads() ) {
-				dispatch.processItem( pending.id );
-			}
-		}
-		if ( currentOperation === OperationType.TranscodeGif ) {
-			for ( const pending of select.getPendingVideoProcessing() ) {
-				dispatch.processItem( pending.id );
-			}
-		}
-
-		// Failed vips ops also leak WASM memory, so count them toward the
-		// recycle budget. Without this, a long burst of failures (e.g. a
-		// gallery of unsupported AVIFs) could grow memory unbounded.
-		if (
-			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate ||
-			currentOperation === OperationType.TranscodeImage
-		) {
-			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
-		}
+		dispatch.releaseConcurrencyPool( currentPool );
 
 		// If this was a child sideload item, handle the parent.
 		if ( parentId ) {

@@ -7,7 +7,6 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
-		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -19,9 +18,6 @@
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [
 		"**/benchmark",
-		"src/store/test/reducer.ts",
-		"src/store/test/actions.ts",
-		"src/store/test/selectors.ts",
 		"src/test/heic-parser.ts",
 		"src/store/test/vips.jsdom.test.ts"
 	]
