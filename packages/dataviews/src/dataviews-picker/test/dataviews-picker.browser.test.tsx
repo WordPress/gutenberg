@@ -899,6 +899,25 @@ describe( 'DataViews Picker', () => {
 			);
 		} );
 
+		it( 'reaches the row list before its own column header menus', async () => {
+			await render( <Picker layout={ LAYOUT_PICKER_TABLE } /> );
+
+			const listbox = screen.getByRole( 'listbox' );
+			const user = userEvent.setup();
+
+			// The `table` is the composite, and an element precedes its own
+			// descendants in tab order, so the row list takes the tab stop
+			// ahead of the column header menus and Tab moves into them rather
+			// than out of the table.
+			listbox.focus();
+			expect( listbox ).toHaveFocus();
+
+			await user.keyboard( '{Tab}' );
+			expect(
+				within( listbox ).getAllByRole( 'button' )[ 0 ]
+			).toHaveFocus();
+		} );
+
 		it( 'does not render a column for a field id without a field definition', async () => {
 			const { container } = await render(
 				<Picker
