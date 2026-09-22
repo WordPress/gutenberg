@@ -146,7 +146,7 @@ export default function ApplyGloballyModal( {
 			title={
 				isSiblingScope
 					? sprintf(
-							// translators: 1: Title of the block e.g. 'Tab'. 2: Title of the parent block e.g. 'Tabs'.
+							// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
 							__( 'Apply %1$s styles in this %2$s' ),
 							blockTitle,
 							scopeBlockTitle
@@ -164,7 +164,7 @@ export default function ApplyGloballyModal( {
 			<p>
 				{ isSiblingScope
 					? sprintf(
-							// translators: 1: Title of the block e.g. 'Tab'. 2: Title of the parent block e.g. 'Tabs'.
+							// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
 							__(
 								'Choose which styles to copy to every other %1$s block in this %2$s.'
 							),

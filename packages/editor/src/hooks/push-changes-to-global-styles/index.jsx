@@ -64,10 +64,11 @@ const sides = [ 'top', 'right', 'bottom', 'left' ];
  * Finds the nearest ancestor holding more than one block of this type, and the
  * other blocks of that type inside it.
  *
- * That ancestor is the scope the styles get applied to: for a Tab it's the
- * Tabs block, for an Accordion Heading it's the Accordion. Blocks of the same
- * type anywhere inside it count, not only immediate children, because the
- * blocks that should match are often a level or two down.
+ * That ancestor is the scope the styles get applied to: for a Button it's the
+ * Buttons block, for an Accordion Heading it's the Accordion. Blocks of the
+ * same type anywhere inside it count, not only immediate children, because the
+ * blocks that should match are often a level or two down, as an Accordion
+ * Heading is.
  *
  * @param {string} blockName The block's name.
  * @param {string} clientId  The block's clientId.
@@ -559,7 +560,7 @@ function PushChangesToGlobalStylesControl( {
 
 			createSuccessNotice(
 				sprintf(
-					// translators: 1: Title of the block e.g. 'Tab'. 2: Title of the parent block e.g. 'Tabs'.
+					// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
 					__( '%1$s styles applied in this %2$s.' ),
 					getBlockType( name ).title,
 					scopeBlockTitle
@@ -592,7 +593,7 @@ function PushChangesToGlobalStylesControl( {
 			help={
 				isSiblingScope
 					? sprintf(
-							// translators: 1: Title of the block e.g. 'Tab'. 2: Title of the parent block e.g. 'Tabs'.
+							// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
 							__(
 								'Review and copy this block’s typography, spacing, dimensions, and color styles to every other %1$s block in this %2$s.'
 							),
@@ -626,7 +627,7 @@ function PushChangesToGlobalStylesControl( {
 						},
 						{
 							label: sprintf(
-								// translators: 1: Title of the block e.g. 'Tab'. 2: Title of the parent block e.g. 'Tabs'.
+								// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
 								__( 'All %1$s blocks in this %2$s' ),
 								blockTitle,
 								scopeBlockTitle
