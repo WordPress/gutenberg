@@ -184,7 +184,7 @@ export default function PostExcerptEditor( props ) {
 	 * displayed, so that changing the length never blanks the block.
 	 */
 	const renderedExcerpt = needsGeneratedExcerpt
-		? generatedExcerpt ?? record?.excerpt?.rendered
+		? ( generatedExcerpt ?? record?.excerpt?.rendered )
 		: record?.excerpt?.rendered;
 	const isProtected = record?.excerpt?.protected;
 
