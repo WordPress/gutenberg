@@ -23,13 +23,6 @@ import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
- * Search types a Navigation cannot use. An attachment is a file rather than a
- * destination, and a post format is a way of styling a post rather than
- * something to navigate to. Neither is worth the room it takes in the results.
- */
-const UNUSED_SEARCH_TYPES = [ 'attachment', 'post-format' ];
-
-/**
  * Given the Link block's type attribute, return the search params describing
  * that one entity type.
  *
@@ -84,14 +77,10 @@ export function getSuggestionsQuery( type, kind ) {
 
 	return {
 		perPage,
-		// A Post Format Link searches post formats, so it cannot leave them
-		// out. No variation searches attachments.
-		exclude: UNUSED_SEARCH_TYPES.filter(
-			( unused ) => unused !== ownType.type
-		),
-		// The link's own type leads. Results are named by their post type or
-		// taxonomy slug, which is the `subtype` here for all but a post format.
-		priorityTypes: [ ownType.subtype ?? ownType.type ],
+		// The link's own type leads and everything else keeps its usual place.
+		// Results are named by their post type or taxonomy slug, which is the
+		// `subtype` here for all but a post format.
+		typeOrder: [ ownType.subtype ?? ownType.type ],
 		initialSuggestionsSearchOptions: { ...ownType, perPage },
 	};
 }

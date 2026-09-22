@@ -209,6 +209,14 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'category',
 					kind: 'taxonomy',
 				},
+				// Attachments rank above post formats by default.
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
+				},
 				{
 					id: 'gallery',
 					title: 'Gallery',
@@ -223,73 +231,9 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'post-format',
 					kind: 'taxonomy',
 				},
-				{
-					id: 54,
-					title: 'Some Test Media Title',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					type: 'attachment',
-					kind: 'media',
-				},
 			] )
 		);
 	} );
-	it( 'excludes a type from an unscoped search', () => {
-		return fetchLinkSuggestions( '', {
-			exclude: [ 'attachment' ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
-				'media'
-			);
-			// Everything else is still searched.
-			expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
-				'Contact Page',
-				'Cats',
-				'Uncategorized',
-				'Gallery',
-				'Quote',
-			] );
-		} );
-	} );
-
-	it( 'excludes several types at once', () => {
-		return fetchLinkSuggestions( '', {
-			exclude: [ 'attachment', 'post-format' ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions.map( ( { kind } ) => kind ) ).not.toContain(
-				'media'
-			);
-			expect( suggestions.map( ( { type } ) => type ) ).not.toContain(
-				'post-format'
-			);
-		} );
-	} );
-
-	it( 'leaves a narrowed search alone when the exclusion does not apply', () => {
-		return Promise.all( [
-			fetchLinkSuggestions( '', { type: 'term', perPage: 20 } ),
-			fetchLinkSuggestions( '', {
-				type: 'term',
-				exclude: [ 'attachment' ],
-				perPage: 20,
-			} ),
-		] ).then( ( [ without, excluded ] ) => {
-			expect( excluded ).toEqual( without );
-		} );
-	} );
-
-	it( 'excludes a type that was explicitly asked for', () => {
-		// Contradictory, but the exclusion is the more specific instruction.
-		return fetchLinkSuggestions( '', {
-			type: 'attachment',
-			exclude: [ 'attachment' ],
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions ).toEqual( [] );
-		} );
-	} );
-
 	describe( 'Initial search suggestions', () => {
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {
@@ -437,12 +381,9 @@ describe( 'sortResults', () => {
 		const order = sortResults( results, 'travel tips' ).map(
 			( result ) => result.id
 		);
-		// Both 4 and 7 contain every word typed, so the type decides between
-		// them and the page leads. Everything below contains at most one of
-		// the two words, so it does not answer the search.
 		expect( order ).toEqual( [
-			4, // page, contains: travel, tips
-			7, // category, contains: travel, tips
+			7, // exact match
+			4, // contains: travel, tips
 			3, // contains: travel
 			// same order as input:
 			1,
@@ -480,11 +421,10 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// The page ranks above the category, and the category above the post,
-		// before any of their titles are compared.
+		// "Contact" is exactly what was typed, so it leads whatever its type.
 		expect(
 			sortResults( results, 'contact' ).map( ( { title } ) => title )
-		).toEqual( [ 'Contact us today', 'Contact', 'Hello world!' ] );
+		).toEqual( [ 'Contact', 'Contact us today', 'Hello world!' ] );
 	} );
 
 	it( 'orders results to prefer direct matches over sub matches', () => {
@@ -664,166 +604,6 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Beach Day', 'Day' ] );
 	} );
 
-	it( 'leads with the type the caller names', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee Guide',
-				url: 'http://wordpress.local/coffee-guide/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Coffee',
-				url: 'http://wordpress.local/category/coffee/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-		];
-
-		// Pages lead by default.
-		expect(
-			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Guide', 'Coffee' ] );
-
-		// A caller editing a category link asks for categories instead.
-		expect(
-			sortResults( results, 'coffee', [ 'category' ] ).map(
-				( { title } ) => title
-			)
-		).toEqual( [ 'Coffee', 'Coffee Guide' ] );
-	} );
-
-	it( 'keeps the default order below the type the caller names', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee Beans',
-				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
-				type: 'attachment',
-				kind: 'media',
-			},
-			{
-				id: 2,
-				title: 'Coffee Talk',
-				url: 'http://wordpress.local/coffee-talk/',
-				type: 'post',
-				kind: 'post-type',
-			},
-			{
-				id: 3,
-				title: 'Coffee Shop',
-				url: 'http://wordpress.local/coffee-shop/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 4,
-				title: 'Coffee Gear',
-				url: 'http://wordpress.local/tag/coffee-gear/',
-				type: 'post_tag',
-				kind: 'taxonomy',
-			},
-		];
-
-		expect(
-			sortResults( results, 'coffee', [ 'post_tag' ] ).map(
-				( { title } ) => title
-			)
-		).toEqual( [
-			'Coffee Gear', // the named type
-			'Coffee Shop', // then pages
-			'Coffee Talk', // then posts
-			'Coffee Beans', // attachments last
-		] );
-	} );
-
-	it( 'leads with several types in the order they are named', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee Shop',
-				url: 'http://wordpress.local/coffee-shop/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Coffee Gear',
-				url: 'http://wordpress.local/tag/coffee-gear/',
-				type: 'post_tag',
-				kind: 'taxonomy',
-			},
-			{
-				id: 3,
-				title: 'Coffee',
-				url: 'http://wordpress.local/category/coffee/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-			{
-				id: 4,
-				title: 'Coffee Talk',
-				url: 'http://wordpress.local/coffee-talk/',
-				type: 'post',
-				kind: 'post-type',
-			},
-		];
-
-		expect(
-			sortResults( results, 'coffee', [ 'post_tag', 'category' ] ).map(
-				( { title } ) => title
-			)
-		).toEqual( [
-			'Coffee Gear', // named first
-			'Coffee', // named second
-			'Coffee Shop', // then the default order: pages,
-			'Coffee Talk', // then posts
-		] );
-	} );
-
-	it( 'orders types that are not named by the default preference', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee Beans',
-				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
-				type: 'attachment',
-				kind: 'media',
-			},
-			{
-				id: 2,
-				title: 'Coffee Talk',
-				url: 'http://wordpress.local/coffee-talk/',
-				type: 'post',
-				kind: 'post-type',
-			},
-			{
-				id: 3,
-				title: 'Coffee Shop',
-				url: 'http://wordpress.local/coffee-shop/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 4,
-				title: 'Coffee',
-				url: 'http://wordpress.local/category/coffee/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-		];
-
-		// Naming only the post type leaves pages, categories and attachments
-		// in the order they are given by default.
-		expect(
-			sortResults( results, 'coffee', [ 'post' ] ).map(
-				( { title } ) => title
-			)
-		).toEqual( [ 'Coffee Talk', 'Coffee Shop', 'Coffee', 'Coffee Beans' ] );
-	} );
-
 	it( 'ranks a preferred type that contains the whole search term above another type that begins with it', () => {
 		const results = [
 			{
@@ -895,6 +675,195 @@ describe( 'sortResults', () => {
 		expect(
 			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
 		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
+	} );
+
+	it( 'ranks an exact title match first, whatever its type', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/1/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee',
+				url: 'http://wordpress.local/2/',
+				type: 'attachment',
+				kind: 'media',
+			},
+		];
+
+		// An exact title is the only thing that lifts a type above its rank.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Coffee', 'Our Coffee' ] );
+	} );
+
+	it( 'does not lift an attachment that merely begins with the search term', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Cup Photo',
+				url: 'http://wordpress.local/1/',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/2/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// Beginning with the term earns nothing across types, so the page wins.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Our Coffee', 'Coffee Cup Photo' ] );
+	} );
+
+	it( 'orders types by pages, categories, posts, tags, attachments, then post formats', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Format',
+				url: 'http://wordpress.local/1/',
+				type: 'post-format',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/2/',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 3,
+				title: 'Coffee Tag',
+				url: 'http://wordpress.local/3/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+			{
+				id: 4,
+				title: 'Coffee Post',
+				url: 'http://wordpress.local/4/',
+				type: 'post',
+				kind: 'post-type',
+			},
+			{
+				id: 5,
+				title: 'Coffee Category',
+				url: 'http://wordpress.local/5/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 6,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/6/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee' ).map( ( { type } ) => type )
+		).toEqual( [
+			'page',
+			'category',
+			'post',
+			'post_tag',
+			'attachment',
+			'post-format',
+		] );
+	} );
+
+	it( 'takes a caller’s own order in place of the default', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/1/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Tag',
+				url: 'http://wordpress.local/2/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+			{
+				id: 3,
+				title: 'Coffee Category',
+				url: 'http://wordpress.local/3/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		expect(
+			sortResults( results, 'coffee', [
+				'category',
+				'post_tag',
+				'page',
+			] ).map( ( { type } ) => type )
+		).toEqual( [ 'category', 'post_tag', 'page' ] );
+	} );
+
+	it( 'still prefers a title that begins with the search term within one type', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/1/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Roasting Guide For Beginners',
+				url: 'http://wordpress.local/2/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// The score alone would favour the shorter title.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Coffee Roasting Guide For Beginners', 'Our Coffee' ] );
+	} );
+
+	it( 'ranks a type the order does not name with the closest one it does', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Genre',
+				url: 'http://wordpress.local/genre/coffee-genre/',
+				type: 'genre',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'Coffee Event',
+				url: 'http://wordpress.local/event/coffee-event/',
+				type: 'event',
+				kind: 'post-type',
+			},
+		];
+
+		// A custom taxonomy ranks with tags, a custom post type with posts, so
+		// the post type leads.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { type } ) => type )
+		).toEqual( [ 'event', 'genre' ] );
 	} );
 } );
 

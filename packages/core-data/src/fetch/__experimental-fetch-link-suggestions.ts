@@ -26,23 +26,16 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
-	 * Types to leave out. Only meaningful for a search that is not already
-	 * narrowed by `type`, to drop results the caller cannot use:
+	 * The order to rank result types in, most wanted first. Each is named as the
+	 * results spell it: a post type or taxonomy slug, such as `page`, `category`
+	 * or `post_tag`.
 	 *
-	 *     exclude: [ 'attachment' ]
+	 * Defaults to `DEFAULT_TYPE_ORDER`. A caller that edits one kind of link
+	 * leads with that kind:
+	 *
+	 *     typeOrder: [ 'category', 'page', 'post', 'post_tag', 'attachment', 'post-format' ]
 	 */
-	exclude?: SearchType[];
-	/**
-	 * Result types to rank above every other type, most wanted first. Each is
-	 * named as the results spell it: a post type or taxonomy slug, such as
-	 * `page`, `category` or `post_tag`.
-	 *
-	 * Types left out keep the default order below them, which leads with pages
-	 * and ends with attachments and post formats:
-	 *
-	 *     priorityTypes: [ 'category', 'post_tag' ]
-	 */
-	priorityTypes?: string[];
+	typeOrder?: string[];
 	/**
 	 * Which page of results to return.
 	 */
@@ -139,23 +132,16 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
-		exclude,
-		priorityTypes,
+		typeOrder,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
 
 	const { disablePostFormats = false } = editorSettings;
 
-	// An unscoped search covers every type. `exclude` drops the ones the caller
-	// cannot use, so that they neither reach the caller nor take up room in the
-	// results, which are merged and cut to `perPage` before being returned.
-	const isSearched = ( searchType: SearchType ) =>
-		( ! type || type === searchType ) && ! exclude?.includes( searchType );
-
 	const queries: Promise< SearchResult[] >[] = [];
 
-	if ( isSearched( 'post' ) ) {
+	if ( ! type || type === 'post' ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -183,7 +169,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( isSearched( 'term' ) ) {
+	if ( ! type || type === 'term' ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -211,7 +197,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( ! disablePostFormats && isSearched( 'post-format' ) ) {
+	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
 		queries.push(
 			apiFetch< SearchAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -239,7 +225,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	if ( isSearched( 'attachment' ) ) {
+	if ( ! type || type === 'attachment' ) {
 		queries.push(
 			apiFetch< MediaAPIResult[] >( {
 				path: addQueryArgs( '/wp/v2/media', {
@@ -269,7 +255,7 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	results = sortResults( results, search, priorityTypes );
+	results = sortResults( results, search, typeOrder );
 	results = results.slice( 0, perPage );
 	return results;
 }
@@ -328,44 +314,58 @@ function getMatchTier( title: string, search: string ): number {
 }
 
 /**
- * How likely a result's type is to be what a link search wants.
+ * The order result types are ranked in when the caller names none.
  *
- * A link is usually to a page, then to a category, then to a post or a tag. Attachments and post
- * formats come last: a link search is rarely looking for one, and on a site with a large media
- * library they crowd out everything else. Custom post types and custom taxonomies sit with posts
- * and tags, because nothing general can be said about them.
+ * A link is most often to a page, then to a category, then to a post, then to a tag. An attachment
+ * is a file rather than a destination and a post format is a way of styling a post, so both come
+ * last: a link search is rarely looking for either, and on a site with a large media library they
+ * crowd out everything else.
+ */
+export const DEFAULT_TYPE_ORDER = [
+	'page',
+	'category',
+	'post',
+	'post_tag',
+	'attachment',
+	'post-format',
+];
+
+/**
+ * Where a result's type sits in the order the caller wants.
+ *
+ * A caller may name every type, or only the ones it wants to lead with. Types it leaves out keep
+ * their `DEFAULT_TYPE_ORDER` positions, below the ones it named, so naming `[ 'category' ]` leads
+ * with categories and orders the rest as usual.
+ *
+ * A custom post type or taxonomy is ranked with the built-in type closest to it, since nothing
+ * general can be said about it.
  *
  * @param result
- * @param priorityTypes
+ * @param typeOrder
  *
- * @return A negative rank for a type the caller named, otherwise 0 for the most likely type
- *         through to 3 for the least.
+ * @return 0 for the most wanted type, rising for each type after it.
  */
-function getTypeRank(
-	result: SearchResult,
-	priorityTypes: string[] = []
-): number {
-	// The caller's own types lead, in the order it named them. A Category Link
-	// searches from a category, so categories are what it most likely wants.
-	// Ranking them below zero keeps them above every unnamed type.
-	const priority = priorityTypes.indexOf( result.type );
+function getTypeRank( result: SearchResult, typeOrder: string[] ): number {
+	const named = typeOrder.indexOf( result.type );
 
-	if ( priority !== -1 ) {
-		return priority - priorityTypes.length;
+	if ( named !== -1 ) {
+		return named;
 	}
 
-	if ( result.kind === 'media' || result.type === 'post-format' ) {
-		return 3;
+	const closest = DEFAULT_TYPE_ORDER.includes( result.type )
+		? result.type
+		: ( {
+				media: 'attachment',
+				taxonomy: 'post_tag',
+			}[ result.kind as string ] ?? 'post' );
+
+	const namedClosest = typeOrder.indexOf( closest );
+
+	if ( namedClosest !== -1 ) {
+		return namedClosest;
 	}
 
-	switch ( result.type ) {
-		case 'page':
-			return 0;
-		case 'category':
-			return 1;
-		default:
-			return 2;
-	}
+	return typeOrder.length + DEFAULT_TYPE_ORDER.indexOf( closest );
 }
 
 /**
@@ -375,19 +375,18 @@ function getTypeRank(
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * A title that answers the search — one containing every word that was typed — ranks above every
- * title that does not, whatever its type. Nothing that fails to match should displace something
- * that matches.
+ * Above everything sits a title that is exactly what was typed. Nothing else lifts a result past
+ * the rank of its type, so an attachment reaches the top only by being named exactly what was
+ * searched for.
  *
- * Among titles that answer the search equally, the type decides, because the type a link points at
- * matters more than the difference between a whole-title and a start-of-title match: a page is
- * what a link usually wants, and an attachment almost never is. A caller that knows better names
- * its own types as `priorityTypes`, and those lead instead, in the order it named them.
+ * Below that, a title that answers the search — one containing every word that was typed — ranks
+ * above every title that does not. Nothing that fails to match should displace something that
+ * matches.
  *
- * Within a type, a title that is what was typed, or that begins with it, ranks above the rest.
- * Where the match sits in the title is a stronger signal than how much of the title it covers, and
- * the score below cannot see it: it divides by the title's length, so a long title is marked down
- * for being long even when the search term is its first word.
+ * The type then decides, in `typeOrder` or `DEFAULT_TYPE_ORDER`. Beginning with the search term
+ * orders titles within a type, but never lifts one type above another: the score below cannot see
+ * where a match sits, because it divides by the title's length, so a long title is marked down for
+ * being long even when the search term is its first word.
  *
  * The rest is sorted by scoring each result, where the score is the number of tokens in the title
  * that are also in the search query, divided by the total number of tokens in the title. This gives
@@ -395,12 +394,12 @@ function getTypeRank(
  *
  * @param results
  * @param search
- * @param priorityTypes
+ * @param typeOrder
  */
 export function sortResults(
 	results: SearchResult[],
 	search: string,
-	priorityTypes?: string[]
+	typeOrder: string[] = DEFAULT_TYPE_ORDER
 ) {
 	const searchTokens = tokenize( search );
 
@@ -446,14 +445,23 @@ export function sortResults(
 		}
 	}
 
-	// A title that answers the search outranks one that does not, before any type is considered.
+	// A title that is exactly what was typed leads, whatever its type. It is the one signal strong
+	// enough to be worth a type the caller would otherwise rank last.
+	const isExact = ( result: SearchResult ) =>
+		tiers[ scoreKey( result ) ] === 2 ? 1 : 0;
+
+	// Below that, a title that answers the search outranks one that does not, before any type is
+	// considered.
 	const isMatch = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] ? 1 : 0;
 
 	return results.sort(
 		( a, b ) =>
+			isExact( b ) - isExact( a ) ||
 			isMatch( b ) - isMatch( a ) ||
-			getTypeRank( a, priorityTypes ) - getTypeRank( b, priorityTypes ) ||
+			getTypeRank( a, typeOrder ) - getTypeRank( b, typeOrder ) ||
+			// Beginning with the search term orders titles within a type, but never lifts one type
+			// above another.
 			tiers[ scoreKey( b ) ] - tiers[ scoreKey( a ) ] ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
