@@ -514,7 +514,7 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: React src + storybook — stylesheet and component rules.
+	// Override: React src + storybook — component rules.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -528,6 +528,7 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: React src — non-module stylesheet imports.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -738,8 +739,7 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
-	// Flag side-effect imports of package build-style stylesheets so they
-	// load through package-styles/config.js. The production stylesheet
+	// Reject non-module stylesheet imports. The production stylesheet
 	// import rule does not apply; Storybook loads package CSS through
 	// package-styles/config.js, not the enqueue path.
 	{
