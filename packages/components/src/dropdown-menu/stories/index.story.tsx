@@ -13,7 +13,7 @@ import MenuItem from '../../menu-item';
 import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/Actions/DropdownMenu',
+	title: 'Components/@wordpress-components/Actions/DropdownMenu',
 	component: DropdownMenu,
 	id: 'components-dropdownmenu',
 	parameters: {

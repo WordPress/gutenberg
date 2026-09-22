@@ -6,6 +6,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 import babel from './vite-babel-plugin.js';
+import { statusIndexer } from './status-indexer.js';
 
 /**
  * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
@@ -21,14 +22,14 @@ const { NODE_ENV = 'development' } = process.env;
 const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
 	'./stories/**/*.mdx',
-	'./stories/design-system/**/*.story.@(ts|tsx)',
+	'./stories/design-system/**/*.story.@(ts|tsx|mts|cts)',
 	'../packages/block-editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(tsx|mdx)',
-	'./stories/icons/**/*.story.@(ts|tsx)',
+	'./stories/icons/**/*.story.@(ts|tsx|mts|cts)',
 	'../packages/dataviews/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(tsx|mdx)',
@@ -36,14 +37,14 @@ const stories = [
 	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
-	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/grid/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
-	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/widget-dashboard/src/**/stories/*.mdx',
-	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 	'../packages/ui/src/**/stories/*.mdx',
-	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/ui/src/**/stories/*.story.@(ts|tsx|mts|cts)',
+	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx|mts|cts)',
 ];
 
 const config: StorybookConfig = {
@@ -51,6 +52,8 @@ const config: StorybookConfig = {
 		disableTelemetry: true,
 	},
 	stories,
+	// Tags stories with their `componentStatus` so the sidebar can show it.
+	experimental_indexers: ( existing = [] ) => [ statusIndexer, ...existing ],
 	staticDirs: [ './static' ],
 	addons: [
 		{
