@@ -51,7 +51,10 @@ export function parseCSSVariableReferences( value ) {
 	// Scan once to locate their complete source spelling.
 	for ( const identifier of value.matchAll( identifiers ) ) {
 		const end = identifier.index + identifier[ 0 ].length;
+		const prefix = value[ identifier.index - 1 ];
 		if (
+			prefix !== '#' &&
+			prefix !== '@' &&
 			value[ end ] === '(' &&
 			decodeIdentifier( identifier[ 0 ] ) === 'var'
 		) {

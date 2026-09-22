@@ -22,4 +22,5 @@
 	content: "var(--wpds-not-a-token, red)";
 	background-image: url("var(--wpds-not-a-token, red)");
 	color: inherit; /* var(--wpds-not-a-token, red) */
+	--example: #v\61r(--wpds-not-a-token, red) @v\61r(--wpds-not-a-token, red);
 }

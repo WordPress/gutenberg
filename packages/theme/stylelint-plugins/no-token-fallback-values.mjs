@@ -26,11 +26,27 @@ const ruleFunction = ( primary ) => {
 		}
 
 		root.walkDecls( ( ruleNode ) => {
-			// Include the property and raw comments so parser offsets match the
-			// declaration's source positions, even when token text is repeated.
-			const references = parseCSSVariableReferences(
-				ruleNode.toString()
-			).references;
+			const declaration = ruleNode.toString();
+			const references =
+				parseCSSVariableReferences( declaration ).references;
+			let { line, column } = ruleNode.rangeBy( { index: 0 } ).start;
+			let offset = 0;
+
+			// SCSS serialization adds closing delimiters to line comments. Those
+			// change offsets, but not line/column positions on subsequent lines.
+			// References are visited in source order, so advance one shared cursor.
+			/** @param {number} index Offset in the serialized declaration. */
+			const getPosition = ( index ) => {
+				while ( offset < index ) {
+					if ( declaration[ offset++ ] === '\n' ) {
+						line++;
+						column = 1;
+					} else {
+						column++;
+					}
+				}
+				return { line, column };
+			};
 
 			for ( const reference of references ) {
 				if (
@@ -43,10 +59,11 @@ const ruleFunction = ( primary ) => {
 				report( {
 					message: messages.rejected( reference.name ),
 					node: ruleNode,
-					index: reference.sourceIndex,
-					endIndex:
+					start: getPosition( reference.sourceIndex ),
+					end: getPosition(
 						reference.fallbackSeparator.sourceEndIndex -
-						reference.fallbackSeparator.after.length,
+							reference.fallbackSeparator.after.length
+					),
 					result,
 					ruleName,
 				} );

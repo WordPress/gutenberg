@@ -109,6 +109,7 @@
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"lightningcss": "^1.33.0",
+		"postcss-scss": "^4.0.9",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"source-map": "^0.6.1",
 		"storybook": "^10.5.3",
