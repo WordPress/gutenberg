@@ -23,7 +23,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 
 const meta: Meta< typeof Popover > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Overlays/Popover',
+	title: 'Components/@wordpress-components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
 	subcomponents: {
@@ -242,6 +242,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 	],
 	args: {
 		...Default.args,
+		animate: false,
 		children: (
 			<div
 				style={ {

@@ -21,6 +21,7 @@ export const MediaWrapper = styled.div`
 	display: flex;
 	text-align: center;
 	width: 100%;
+	contain: layout;
 `;
 
 export const MediaContainer = styled.div`
@@ -80,7 +81,7 @@ const extraHelpTextMargin = ( {
 	return hasHelpText
 		? css`
 				padding-bottom: 1em;
-		  `
+			`
 		: undefined;
 };
 

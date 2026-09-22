@@ -437,10 +437,7 @@ export class Metrics {
 	 */
 	async initWebVitals( reload = true ) {
 		await this.page.addInitScript( {
-			path: join(
-				__dirname,
-				'../../../../node_modules/web-vitals/dist/web-vitals.umd.cjs'
-			),
+			path: require.resolve( 'web-vitals' ),
 		} );
 
 		await this.page.exposeFunction(

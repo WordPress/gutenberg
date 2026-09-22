@@ -4,6 +4,43 @@
 
 ### New Features
 
+-   `HostLink`: an anchor that mounts the host router's link for a target
+    `links.match` recognizes, and a plain anchor otherwise, including for a
+    `download` or a `_blank` target. Composes through the `render` prop of a
+    UI link ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+-   `WidgetModuleRecord.attributes`: a record carries the attribute schema
+    `widget.json` declares, as `WidgetAttributeRecord[]`; `useWidgetTypes`
+    merges it by `id` over the module's entries, the record winning a shared
+    key and `isValid` merging rule by rule
+    ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+### Documentation
+
+-   Add a `WithHostLink` story: the same action declarations routed through
+    `HostLink` against a demo router, with a toggle that removes the `links`
+    capability ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+
+## 0.7.0 (2026-09-10)
+
+### Documentation
+
+-   `WidgetHostLinks.match`: the in-app route it returns carries the
+    route's query when the href has one; docblock, README, Storybook page
+    and seam diagram say so
+    ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+-   `WidgetAction.download`: any value but `false` downloads; `true` or `''`
+    keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
+-   `WidgetHostProvider` / `useWidgetHost`: the seam through which a host
+    provides capabilities to the widgets it renders, merged over the
+    inherited value. First capability: `links`, in-app route recognition
+    (`match`) plus the host router's link primitive
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 -   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
     for persistent but compact visibility
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
@@ -17,6 +54,12 @@
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Documentation
+
+-   Add a Widget host doc page: the capability seam and the `links`
+    contract, with the consumption rules link actions follow
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Internal
 

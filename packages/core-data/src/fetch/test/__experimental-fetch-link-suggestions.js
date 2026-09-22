@@ -1,11 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
-jest.mock( '@wordpress/api-fetch', () =>
-	jest.fn( ( { path } ) => {
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
@@ -93,8 +94,8 @@ jest.mock( '@wordpress/api-fetch', () =>
 					},
 				] );
 		}
-	} )
-);
+	} ),
+} ) );
 
 describe( 'fetchLinkSuggestions', () => {
 	it( 'filters suggestions by post-type', () => {
@@ -389,6 +390,39 @@ describe( 'sortResults', () => {
 			5,
 			6,
 		] );
+	} );
+
+	it( 'scores results that share an id separately', () => {
+		// Posts, terms and media are separate tables, so ids repeat across
+		// them. On a fresh site the post "Hello world!" and the category
+		// "Uncategorized" are both id 1.
+		const results = [
+			{
+				id: 1,
+				title: 'Hello world!',
+				type: 'post',
+				kind: 'post-type',
+				url: 'http://wordpress.local/hello-world/',
+			},
+			{
+				id: 1,
+				title: 'Contact',
+				type: 'category',
+				kind: 'taxonomy',
+				url: 'http://wordpress.local/category/contact/',
+			},
+			{
+				id: 2,
+				title: 'Contact us today',
+				type: 'page',
+				kind: 'post-type',
+				url: 'http://wordpress.local/contact-us-today/',
+			},
+		];
+
+		expect(
+			sortResults( results, 'contact' ).map( ( { title } ) => title )
+		).toEqual( [ 'Contact', 'Contact us today', 'Hello world!' ] );
 	} );
 
 	it( 'orders results to prefer direct matches over sub matches', () => {

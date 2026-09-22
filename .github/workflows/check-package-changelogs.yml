@@ -1,4 +1,4 @@
-name: OPTIONAL - Verify package CHANGELOG updates
+name: Verify package CHANGELOG updates
 
 on:
     pull_request:
@@ -22,6 +22,9 @@ on:
             - 'packages/widget-dashboard/**'
             - 'packages/widget-primitives/**'
             - 'packages/wp-build/**'
+            - 'packages/*/CHANGELOG.md'
+            - 'tools/validation/validate-changelogs.ts'
+            - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
 
@@ -30,8 +33,10 @@ on:
 permissions: {}
 
 jobs:
-    check:
-        name: Check CHANGELOG diff (${{ matrix.package }})
+    # Presence: The allowlisted packages listed in the matrix have stricter
+    # expectations around changes having an accompanying changelog note.
+    presence:
+        name: Check CHANGELOG presence (${{ matrix.package }})
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -83,15 +88,28 @@ jobs:
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?(stories|test)/" || true)
+                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
 
                   if [ -z "$relevant_changes" ]; then
-                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG check."
+                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
                       echo "has_changes=false" >> "$GITHUB_OUTPUT"
                   else
                       echo "has_changes=true" >> "$GITHUB_OUTPUT"
                   fi
-            - name: Check CHANGELOG status
+            # This intentionally doesn't use `.github/setup-node`, because we
+            # don't currently need to `npm ci` install any dependencies.
+            - name: Use desired version of Node.js
+              if: steps.filter.outputs.has_changes == 'true'
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  package-manager-cache: false
+            - name: Set up npm
+              if: steps.filter.outputs.has_changes == 'true'
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+            - name: Check CHANGELOG cites this PR
               if: steps.filter.outputs.has_changes == 'true'
               env:
                   PR_NUMBER: ${{ github.event.number }}
@@ -103,30 +121,60 @@ jobs:
 
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
-                    echo "Please add a CHANGELOG entry to $changelog_path"
-                    echo
-                    echo "${optional_check_notice}"
-                    exit 1
-                  fi
-
-                  pr_link_pattern="\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)"
-                  pr_link_grep_pattern="\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER})"
-
-                  unreleased_section=$(sed -n '/^## Unreleased$/,/^## /p' "${changelog_path}")
-
-                  # Confirm that the CHANGELOG has an entry for the current PR
-                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
-                      echo "Please add a CHANGELOG entry to $changelog_path, and make sure your CHANGELOG entry has a link to the current PR."
+                      echo "Please add a CHANGELOG entry to $changelog_path"
                       echo
                       echo "${optional_check_notice}"
                       exit 1
                   fi
 
-                  # Confirm that there is an 'Unreleased' section and that the relevant entry is in that section
-                  if ! grep -nq -e '^## Unreleased' "${changelog_path}" || \
-                    ! [[ $unreleased_section = *${pr_link_pattern}* ]]; then
-                      echo "Please make sure your CHANGELOG entry is in the \`## Unreleased\` section"
-                      echo
-                      echo "${optional_check_notice}"
-                      exit 1
+                  # Confirm that the CHANGELOG has a valid entry for the current PR
+                  npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+
+    # Structure: For any revisions to CHANGELOGs (regardless of package),
+    # validate that the contents follow the expected format.
+    structure:
+        name: Validate CHANGELOG structure
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        steps:
+            - name: 'Get PR commit count'
+              env:
+                  PR_COUNT: ${{ github.event.pull_request.commits }}
+              run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
+            # This intentionally doesn't use `.github/setup-node`, because we
+            # don't currently need to `npm ci` install any dependencies.
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  package-manager-cache: false
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+            - name: Validate touched CHANGELOG files
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PR_NUMBER: ${{ github.event.number }}
+              run: |
+                  changelogs=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
+
+                  if [ -z "$changelogs" ]; then
+                      echo "No package CHANGELOG.md files changed; skipping structure check."
+                      exit 0
                   fi
+
+                  echo "Validating:"
+                  echo "$changelogs"
+                  echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
