@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 import {
 	Button,
 	CheckboxControl as WCCheckboxControl,
@@ -211,7 +212,7 @@ function PickerBulkSelectionInfo() {
 	);
 }
 
-export function PickerActions() {
+export function PickerActions( { className }: { className?: string } ) {
 	const {
 		data,
 		selection,
@@ -230,7 +231,9 @@ export function PickerActions() {
 	}
 
 	return (
-		<div className="dataviews-picker-footer__actions">
+		<div
+			className={ clsx( 'dataviews-picker-footer__actions', className ) }
+		>
 			<ActionButtons
 				actions={ actions }
 				items={ selectedItems }
@@ -242,9 +245,13 @@ export function PickerActions() {
 
 // The bulk-selection info and action buttons without pagination — the picker
 // counterpart to `DataViews.BulkActionToolbar`, for free composition.
-export function DataViewsPickerBulkActionToolbar() {
+export function DataViewsPickerBulkActionToolbar( {
+	className,
+}: {
+	className?: string;
+} ) {
 	return (
-		<Stack direction="row" gap="md" align="center">
+		<Stack direction="row" gap="md" align="center" className={ className }>
 			<PickerBulkSelectionInfo />
 			<PickerActions />
 		</Stack>
@@ -256,8 +263,10 @@ export function DataViewsPickerBulkActionToolbar() {
 // in their place instead.
 export function DataViewsPickerFooter( {
 	children,
+	className,
 }: {
 	children?: ReactNode;
+	className?: string;
 } ) {
 	const {
 		actions = EMPTY_ARRAY,
@@ -284,7 +293,11 @@ export function DataViewsPickerFooter( {
 			direction="row"
 			justify="space-between"
 			align="center"
-			className="dataviews-footer dataviews-picker-footer"
+			className={ clsx(
+				'dataviews-footer',
+				'dataviews-picker-footer',
+				className
+			) }
 			gap="sm"
 		>
 			{ children ?? (

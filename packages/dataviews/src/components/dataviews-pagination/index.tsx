@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 import {
 	Button,
 	SelectControl as WCSelectControl,
@@ -21,7 +22,7 @@ export function hasPaginationControls(
 	);
 }
 
-export function DataViewsPageSelect() {
+export function DataViewsPageSelect( { className }: { className?: string } ) {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -56,7 +57,7 @@ export function DataViewsPageSelect() {
 			justify="flex-start"
 			align="center"
 			gap="xs"
-			className="dataviews-pagination__page-select"
+			className={ clsx( 'dataviews-pagination__page-select', className ) }
 		>
 			{ createInterpolateElement(
 				sprintf(
@@ -89,7 +90,11 @@ export function DataViewsPageSelect() {
 	);
 }
 
-export function DataViewsPageNavigation() {
+export function DataViewsPageNavigation( {
+	className,
+}: {
+	className?: string;
+} ) {
 	const { view, onChangeView, paginationInfo } =
 		useContext( DataViewsContext );
 
@@ -105,7 +110,10 @@ export function DataViewsPageNavigation() {
 			direction="row"
 			gap="xs"
 			align="center"
-			className="dataviews-pagination__page-navigation"
+			className={ clsx(
+				'dataviews-pagination__page-navigation',
+				className
+			) }
 		>
 			<Button
 				onClick={ () =>
@@ -140,7 +148,13 @@ export function DataViewsPageNavigation() {
 
 // Given children, renders those in place of the page select and the
 // previous/next buttons.
-export function DataViewsPagination( { children }: { children?: ReactNode } ) {
+export function DataViewsPagination( {
+	children,
+	className,
+}: {
+	children?: ReactNode;
+	className?: string;
+} ) {
 	const { view, paginationInfo } = useContext( DataViewsContext );
 
 	if ( ! hasPaginationControls( view, paginationInfo ) ) {
@@ -150,7 +164,7 @@ export function DataViewsPagination( { children }: { children?: ReactNode } ) {
 	return (
 		<Stack
 			direction="row"
-			className="dataviews-pagination"
+			className={ clsx( 'dataviews-pagination', className ) }
 			justify="end"
 			align="center"
 			gap="xl"

@@ -574,7 +574,7 @@ The following components are available directly under `DataViews`:
 </DataViews.Pagination>
 ```
 
-Like the default contents it stands in for, a composed `DataViews.Pagination` renders nothing at all while the dataset fits on a single page.
+Like the default contents it stands in for, a composed `DataViews.Pagination` renders nothing at all while the dataset fits on a single page. `DataViews.Pagination`, `DataViews.PageSelect` and `DataViews.PageNavigation` each take a `className`, as `DataViews.Layout` does.
 
 #### example
 
@@ -795,6 +795,8 @@ Optional. Custom UI to render instead of the default picker layout. When provide
 	<DataViewsPicker.Actions />
 </DataViewsPicker.Footer>
 ```
+
+Placing a composed footer is the consumer's business: `DataViewsPicker.Footer`, `DataViewsPicker.Actions` and `DataViewsPicker.BulkActionToolbar` each take a `className` too, so a footer can be laid out from the consumer's own stylesheet without wrapping its parts in extra elements.
 
 **Unsupported properties:**
 

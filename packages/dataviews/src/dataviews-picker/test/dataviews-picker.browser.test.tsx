@@ -794,6 +794,40 @@ describe( 'DataViews Picker', () => {
 			);
 			expect( footer ).toBeNull();
 		} );
+
+		it( "keeps a composed part's own className next to the built-in one", async () => {
+			// Placing a composed footer is the consumer's business, so each
+			// part takes a className rather than leaving them to wrap it or to
+			// lean on a rule over whichever part renders on its own.
+			const { container } = await render(
+				<Picker actions={ singleSelectActions } view={ { perPage: 2 } }>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer className="my-footer">
+						<DataViewsPicker.Pagination className="my-pagination">
+							<DataViewsPicker.PageSelect className="my-page-select" />
+							<DataViewsPicker.PageNavigation className="my-page-navigation" />
+						</DataViewsPicker.Pagination>
+						<DataViewsPicker.Actions className="my-actions" />
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			for ( const [ ownClass, builtInClass ] of [
+				[ 'my-footer', 'dataviews-picker-footer' ],
+				[ 'my-pagination', 'dataviews-pagination' ],
+				[ 'my-page-select', 'dataviews-pagination__page-select' ],
+				[
+					'my-page-navigation',
+					'dataviews-pagination__page-navigation',
+				],
+				[ 'my-actions', 'dataviews-picker-footer__actions' ],
+			] ) {
+				// eslint-disable-next-line testing-library/no-node-access
+				const element = container.querySelector( `.${ ownClass }` );
+				expect( element ).not.toBeNull();
+				expect( element ).toHaveClass( builtInClass );
+			}
+		} );
 	} );
 
 	describe( 'Table layout', () => {
