@@ -333,6 +333,8 @@ $navigation-icon-size: 24px;
 			border: none;
 			background-color: transparent;
 			color: inherit;
+			// Has to be !important to override the inline instance style.
+			box-shadow: none !important;
 		}
 	}
 }
