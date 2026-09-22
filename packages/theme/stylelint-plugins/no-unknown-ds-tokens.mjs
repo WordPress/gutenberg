@@ -32,7 +32,10 @@ const ruleFunction = ( primary ) => {
 
 		root.walkDecls( ( ruleNode ) => {
 			const { value } = ruleNode;
-			if ( value.includes( `--${ DS_TOKEN_PREFIX }` ) ) {
+			if (
+				value.includes( `--${ DS_TOKEN_PREFIX }` ) ||
+				value.includes( '\\' )
+			) {
 				const usedTokens = new Set(
 					parseCSSVariableReferences( value )
 						.references.map( ( reference ) => reference.name )

@@ -71,7 +71,7 @@ const plugin = {
 				name: variable.name.from
 					? variable.name
 					: { ident: variable.name.ident },
-				fallback,
+				fallback: structuredClone( fallback ),
 			},
 		};
 	},

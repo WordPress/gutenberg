@@ -3,4 +3,7 @@
 	color: var(--wpds-color-foreground-content-neutral);
 	content: "var(--wpds-border-radius-sm)";
 	background-image: url("var(--wpds-not-a-token)");
+	gap: var(--wpds-dimension-gap-\73m);
+	padding: var(--wpds-dimension-padding-\73 m);
+	margin: var(\2d-wpds-dimension-gap-sm);
 }

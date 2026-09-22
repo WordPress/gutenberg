@@ -2,7 +2,7 @@
 .with-fallback {
 	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
 	background-color: var(--wpds-color-background-surface-neutral-weak, #f0f0f0);
-	border-radius: var(--wpds-border-radius-sm, 2px);
+	border-radius: var(--wpds-border-radius-\73 m, 2px);
 }
 
 /* Invalid: Fallbacks in complex values */

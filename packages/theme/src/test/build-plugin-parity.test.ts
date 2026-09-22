@@ -8,7 +8,10 @@ import type {
 	PluginBuild,
 } from 'esbuild';
 import { build as esbuildBuild } from 'esbuild';
-import { transform as lightningcssTransform } from 'lightningcss';
+import {
+	composeVisitors,
+	transform as lightningcssTransform,
+} from 'lightningcss';
 import postcss from 'postcss';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
 import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
@@ -153,6 +156,30 @@ describe( 'design token fallback build plugin parity', () => {
 			'gap: var(--wpds-dimension-gap-sm, 8px)'
 		);
 		expect( result.references ).toEqual( {} );
+	} );
+
+	it( 'isolates injected fallbacks from changes by composed Lightning CSS visitors', () => {
+		const source = '.fixture { gap: var(--wpds-dimension-gap-sm); }';
+		const result = lightningcssTransform( {
+			filename: 'styles.css',
+			code: Buffer.from( source ),
+			visitor: composeVisitors( [
+				lightningcssPlugin,
+				{
+					Variable( variable ) {
+						const fallback = variable.fallback?.[ 0 ];
+						if ( fallback?.type === 'length' ) {
+							fallback.value.value = 999;
+						}
+					},
+				},
+			] ),
+		} );
+
+		expect( result.code.toString() ).toContain( '999px' );
+		expect( transformWithLightningcss( source, 'styles.css' ) ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
 	} );
 
 	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {

@@ -4,6 +4,5 @@
 }
 
 .another {
-	background: var(--wpds-made-up-color);
+	background: var(\2d-wpds-made-up-color);
 }
-

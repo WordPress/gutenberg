@@ -4,6 +4,8 @@
 	color: var(--wpds-color-foreground-content-neutral);
 	border-radius: var(--wpds-border-radius-sm);
 	padding: var(--wpds-dimension-padding-2xl);
+	gap: var(--wpds-dimension-gap-\73m);
+	margin: var(--wpds-dimension-gap-\73 m);
 }
 
 /* Valid: Using tokens with fallbacks */

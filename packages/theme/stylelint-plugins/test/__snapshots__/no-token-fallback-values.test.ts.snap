@@ -22,7 +22,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) > snapshot matches war
   },
   {
     "column": 17,
-    "endColumn": 45,
+    "endColumn": 48,
     "endLine": 5,
     "line": 5,
     "rule": "plugin-wpds/no-token-fallback-values",

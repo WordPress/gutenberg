@@ -16,6 +16,9 @@ exports[`design token fallback build plugin parity > transforms supported CSS in
 	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
 	content: "var(--wpds-border-radius-sm)";
 	background-image: url("var(--wpds-not-a-token)");
+	gap: var(--wpds-dimension-gap-\\73m, 8px);
+	padding: var(--wpds-dimension-padding-\\73 m, 8px);
+	margin: var(\\2d-wpds-dimension-gap-sm, 8px);
 }
 "
 `;
@@ -31,6 +34,9 @@ exports[`design token fallback build plugin parity > transforms supported CSS wi
 ".fixture {
   color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
   content: "var(--wpds-border-radius-sm)";
+  gap: var(--wpds-dimension-gap-sm, 8px);
+  padding: var(--wpds-dimension-padding-sm, 8px);
+  margin: var(--wpds-dimension-gap-sm, 8px);
   background-image: url("var(--wpds-not-a-token)");
 }
 "
