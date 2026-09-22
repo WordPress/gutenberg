@@ -58,8 +58,7 @@ function getRows< Item >(
 	getItemId: ( item: Item ) => string,
 	getItemLevel: ( ( item: Item ) => number ) | undefined,
 	getItemParentId:
-		| ( ( item: Item ) => string | number | null | undefined )
-		| undefined,
+		( ( item: Item ) => string | number | null | undefined ) | undefined,
 	showLevels: boolean | undefined
 ): HierarchicalRow< Item >[] {
 	if ( showLevels && getItemParentId ) {
@@ -310,7 +309,7 @@ function ViewTable< Item >( {
 				getItemLevel,
 				getItemParentId,
 				view.showLevels
-		  );
+			);
 	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
@@ -537,15 +536,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? view.layout?.enableMoving ??
-												  true
+												? ( view.layout?.enableMoving ??
+													true )
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: view.layout?.enableMoving ??
-												  true
+												: ( view.layout?.enableMoving ??
+													true )
 										}
 									/>
 								) }
@@ -601,8 +600,7 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
+										'dataviews-view-table__actions-column--sticky': true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -637,7 +635,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {
