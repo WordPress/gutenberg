@@ -49,9 +49,9 @@ function gutenberg_register_default_icons() {
 		return;
 	}
 
-	$manifest = include $manifest_path;
+	$collection = include $manifest_path;
 
-	if ( empty( $manifest ) ) {
+	if ( empty( $collection ) ) {
 		wp_trigger_error(
 			__FUNCTION__,
 			__( 'Core icon collection manifest is empty or invalid.', 'gutenberg' )
@@ -59,7 +59,7 @@ function gutenberg_register_default_icons() {
 		return;
 	}
 
-	foreach ( $manifest as $icon_name => $icon_data ) {
+	foreach ( $collection as $icon_name => $icon_data ) {
 		if (
 			empty( $icon_data['filePath'] )
 			|| ! is_string( $icon_data['filePath'] )
