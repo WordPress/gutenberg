@@ -22,6 +22,16 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	user-select: none;
 	touch-action: none;
 	cursor: ew-resize;
+	// The ruler is a number line, not prose: `__ticks` pins the strip so
+	// negatives stay on the left in every locale, so the numerals have to
+	// read the same way. Inherited `rtl` would hand each SVG tick label to
+	// the bidi algorithm, where the `-` of `-45°` is an ES that only joins
+	// a number when it sits between two, so it falls to the paragraph
+	// direction and lands on the far side: `45°-`, its sign pointing away
+	// from the half of the line it labels. Nothing in here is prose — the
+	// only sentence is the input's `aria-label`, which is read, not drawn.
+	/*rtl:ignore*/
+	direction: ltr;
 	// Always declare the container so the inline-size query below can
 	// match. Cheap; only affects layout if a child uses cqw/cqh.
 	container-type: inline-size;
