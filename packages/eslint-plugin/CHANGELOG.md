@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Update `use-recommended-components` deprecation message for `__experimentalScrollable` to point to writing CSS ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
 -   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to `Separator` subcomponents and design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
 -   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `recommended`: Apply the TypeScript rules and parser to `.mts` and `.cts` files ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
