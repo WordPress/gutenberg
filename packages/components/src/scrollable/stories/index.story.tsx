@@ -5,7 +5,7 @@ import Scrollable from '../deprecated';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components/Deprecated/Scrollable',
+	title: 'Components/@wordpress-components/Deprecated/Scrollable',
 	id: 'components-scrollable',
 	argTypes: {
 		as: {
