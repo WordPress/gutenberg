@@ -22,7 +22,8 @@ export function recordUsage( name ) {
 }
 
 /**
- * Runs a single command loader and reports what it resolved to `onResolved`.
+ * Runs a single command loader and reports the commands it resolved to
+ * `onResolved`.
  *
  * Commands returned by a loader hook never pass through `registerCommand`, so
  * the loader's own category stands in whenever the hook sets none.
@@ -31,15 +32,13 @@ export function recordUsage( name ) {
  * @param {Function} props.hook       The loader hook.
  * @param {string}   props.name       The loader's name.
  * @param {string}   props.category   The loader's category.
- * @param {boolean}  props.contextual Whether the loader is contextual.
  * @param {string}   props.search     The search term.
- * @param {Function} props.onResolved Called with the loader's name and result.
+ * @param {Function} props.onResolved Called with the loader's name and commands.
  */
 export function useLoaderCollector( {
 	hook,
 	name,
 	category,
-	contextual,
 	search,
 	onResolved,
 } ) {
@@ -52,18 +51,18 @@ export function useLoaderCollector( {
 	}, [ setLoaderLoading, name, isLoading ] );
 
 	useEffect( () => {
-		onResolved( name, {
-			contextual,
-			commands: commands.map( ( command ) =>
+		onResolved(
+			name,
+			commands.map( ( command ) =>
 				command.category ? command : { ...command, category }
-			),
-		} );
-	}, [ onResolved, name, contextual, category, commands ] );
+			)
+		);
+	}, [ onResolved, name, category, commands ] );
 
 	// Clear this loader's entries when it unmounts.
 	useEffect( () => {
-		return () => onResolved( name, { contextual, commands: EMPTY_ARRAY } );
-	}, [ onResolved, name, contextual ] );
+		return () => onResolved( name, EMPTY_ARRAY );
+	}, [ onResolved, name ] );
 }
 
 /**
@@ -71,7 +70,8 @@ export function useLoaderCollector( {
  * keeping them in recency order and dropping the ones the pool cannot resolve.
  *
  * @param {string[]} recentlyUsedNames Command names, most recently used first.
- * @param {Object[]} commandPool       The commands to resolve the names against.
+ * @param {Object[]} commandPool       The commands to resolve the names against,
+ *                                     de-duplicated by name.
  *
  * @return {Object[]} The recently used commands.
  */
@@ -80,11 +80,8 @@ export function getRecentCommands( recentlyUsedNames, commandPool ) {
 	if ( ! names.length ) {
 		return EMPTY_ARRAY;
 	}
-	const pool = new Map();
-	for ( const command of commandPool ) {
-		if ( ! pool.has( command.name ) ) {
-			pool.set( command.name, command );
-		}
-	}
+	const pool = new Map(
+		commandPool.map( ( command ) => [ command.name, command ] )
+	);
 	return names.map( ( name ) => pool.get( name ) ).filter( Boolean );
 }

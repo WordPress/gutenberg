@@ -71,16 +71,15 @@ export function isValidIcon( icon ) {
 }
 
 /**
- * Compares the parts of two commands that decide what the palette renders.
- * Functions are left out on purpose: loader hooks rebuild them on every render,
- * so comparing them by identity would never report a match.
+ * Compares the parts of two commands the palette renders and ranks by, leaving
+ * out functions that loader hooks rebuild on every render.
  *
  * @param {Object} a First command.
  * @param {Object} b Second command.
  *
- * @return {boolean} Whether both commands render the same way.
+ * @return {boolean} Whether one command can stand in for the other.
  */
-function rendersTheSame( a, b ) {
+function isEquivalentCommand( a, b ) {
 	const aKeywords = a.keywords ?? EMPTY_ARRAY;
 	const bKeywords = b.keywords ?? EMPTY_ARRAY;
 	return (
@@ -123,7 +122,7 @@ function dedupeCommands( commands ) {
  */
 function rankCommands( commands, search ) {
 	const scored = [];
-	for ( const command of dedupeCommands( commands ) ) {
+	for ( const command of commands ) {
 		const score = commandScore(
 			command.searchLabel ?? command.label,
 			search,
@@ -167,7 +166,6 @@ function LoaderRunner( { loader, search, onResolved } ) {
 		hook: loader.hook,
 		name: loader.name,
 		category: loader.category,
-		contextual: loader.contextual,
 		search,
 		onResolved,
 	} );
@@ -175,33 +173,17 @@ function LoaderRunner( { loader, search, onResolved } ) {
 	return null;
 }
 
-// The "hook" prop is actually a custom React hook, so to avoid breaking the
-// rules of hooks the `LoaderRunner` needs to be remounted whenever the hook
-// identity changes.
-function LoaderRunnerWrapper( { loader, ...props } ) {
-	const [ tracked, setTracked ] = useState( () => ( {
-		hook: loader.hook,
-		key: 0,
-	} ) );
-
-	if ( tracked.hook !== loader.hook ) {
-		// Derive new state during render and skip this pass so the next render
-		// mounts a fresh `LoaderRunner` for the new hook.
-		setTracked( ( prev ) => ( { hook: loader.hook, key: prev.key + 1 } ) );
-		return null;
-	}
-
-	return <LoaderRunner key={ tracked.key } loader={ loader } { ...props } />;
-}
-
 /**
- * @ignore
+ * The palette itself, mounted only while it is open. Everything it derives is
+ * scoped to one session: the search term, the loaders and what they resolved to
+ * all start clean on the next open.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onClose Closes the palette.
  */
-export function CommandMenu() {
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+function CommandPalette( { onClose } ) {
 	const [ search, setSearch ] = useState( '' );
 	const {
-		isOpen: paletteIsOpen,
 		loadersLoading,
 		staticCommands,
 		contextualCommands,
@@ -209,10 +191,8 @@ export function CommandMenu() {
 		contextualLoaders,
 		recentlyUsedNames,
 	} = useSelect( ( select ) => {
-		const { getCommands, getCommandLoaders, isOpen } =
-			select( commandsStore );
+		const { getCommands, getCommandLoaders } = select( commandsStore );
 		return {
-			isOpen: isOpen(),
 			loadersLoading: unlock( select( commandsStore ) ).isLoading(),
 			staticCommands: getCommands( false ),
 			contextualCommands: getCommands( true ),
@@ -225,101 +205,80 @@ export function CommandMenu() {
 				) ?? EMPTY_ARRAY,
 		};
 	}, [] );
-	const { open, close } = useDispatch( commandsStore );
 	const hasRecentCommands = recentlyUsedNames.length > 0;
 
-	// Each loader runs in its own `LoaderRunner` and reports back here. State is
-	// only replaced when `rendersTheSame` sees a difference, so a loader that
-	// rebuilds equivalent commands on every render does not churn the list. The
-	// ref still tracks the newest objects, whose callbacks the comparison
-	// cannot see.
 	const latestLoaderCommands = useRef( new Map() );
 	const [ resolvedMap, setResolvedMap ] = useState( () => new Map() );
-	const onResolved = useCallback( ( loaderName, entry ) => {
-		latestLoaderCommands.current.set( loaderName, entry.commands );
+
+	const onResolved = useCallback( ( loaderName, commands ) => {
+		if ( commands.length ) {
+			latestLoaderCommands.current.set( loaderName, commands );
+		} else {
+			latestLoaderCommands.current.delete( loaderName );
+		}
 		setResolvedMap( ( prev ) => {
-			const previous = prev.get( loaderName );
+			const previous = prev.get( loaderName ) ?? EMPTY_ARRAY;
 			if (
-				previous &&
-				previous.contextual === entry.contextual &&
-				previous.commands.length === entry.commands.length &&
-				previous.commands.every( ( command, i ) =>
-					rendersTheSame( command, entry.commands[ i ] )
+				previous.length === commands.length &&
+				previous.every( ( command, i ) =>
+					isEquivalentCommand( command, commands[ i ] )
 				)
 			) {
 				return prev;
 			}
-			return new Map( prev ).set( loaderName, entry );
+			const next = new Map( prev );
+			if ( commands.length ) {
+				next.set( loaderName, commands );
+			} else {
+				next.delete( loaderName );
+			}
+			return next;
 		} );
 	}, [] );
 
-	// The rendered object can predate the loader's latest report.
 	const runCommand = useCallback( ( command, closeMenu ) => {
 		recordUsage( command.name );
-		let latest;
-		for ( const cmds of latestLoaderCommands.current.values() ) {
-			latest = cmds.find( ( c ) => c.name === command.name );
-			if ( latest ) {
-				break;
-			}
-		}
+		const latest = [ ...latestLoaderCommands.current.values() ]
+			.flat()
+			.find( ( { name } ) => name === command.name );
 		( latest ?? command ).callback( { close: closeMenu } );
 	}, [] );
 
-	const loaders = useMemo(
-		() => [
-			...contextualLoaders.map( ( loader ) => ( {
-				...loader,
-				contextual: true,
-			} ) ),
-			...staticLoaders.map( ( loader ) => ( {
-				...loader,
-				contextual: false,
-			} ) ),
-		],
-		[ contextualLoaders, staticLoaders ]
-	);
-	// Without a search term the non-contextual loaders only serve the Recent
-	// group, and running them anyway makes those that ignore `search` fetch on
-	// every open.
-	const activeLoaders = useMemo(
-		() =>
-			search || hasRecentCommands
-				? loaders
-				: loaders.filter( ( loader ) => loader.contextual ),
-		[ search, hasRecentCommands, loaders ]
+	const activeLoaders =
+		search || hasRecentCommands
+			? [ ...contextualLoaders, ...staticLoaders ]
+			: contextualLoaders;
+
+	const contextualLoaderNames = useMemo(
+		() => new Set( contextualLoaders.map( ( { name } ) => name ) ),
+		[ contextualLoaders ]
 	);
 
 	const { allLoaderCommands, contextualLoaderCommands } = useMemo( () => {
 		const all = [];
 		const contextual = [];
-		for ( const entry of resolvedMap.values() ) {
-			all.push( ...entry.commands );
-			if ( entry.contextual ) {
-				contextual.push( ...entry.commands );
+		for ( const [ name, commands ] of resolvedMap ) {
+			all.push( ...commands );
+			if ( contextualLoaderNames.has( name ) ) {
+				contextual.push( ...commands );
 			}
 		}
 		return {
 			allLoaderCommands: all,
 			contextualLoaderCommands: contextual,
 		};
-	}, [ resolvedMap ] );
+	}, [ resolvedMap, contextualLoaderNames ] );
 
 	const allCommands = useMemo(
-		() => [
-			...contextualCommands,
-			...staticCommands,
-			...allLoaderCommands,
-		],
+		() =>
+			dedupeCommands( [
+				...contextualCommands,
+				...staticCommands,
+				...allLoaderCommands,
+			] ),
 		[ contextualCommands, staticCommands, allLoaderCommands ]
 	);
 
-	const recentCommands = useMemo(
-		() => getRecentCommands( recentlyUsedNames, allCommands ),
-		[ recentlyUsedNames, allCommands ]
-	);
-
-	// Recent and Suggestions show without a search term, Results with one.
 	const groups = useMemo( () => {
 		if ( search ) {
 			const results = rankCommands( allCommands, search );
@@ -328,7 +287,6 @@ export function CommandMenu() {
 						{
 							key: 'results',
 							label: __( 'Results' ),
-							search,
 							items: results,
 						},
 					]
@@ -337,17 +295,18 @@ export function CommandMenu() {
 
 		const result = [];
 
-		// Recent.
+		const recentCommands = getRecentCommands(
+			recentlyUsedNames,
+			allCommands
+		);
 		if ( recentCommands.length ) {
 			result.push( {
 				key: 'recent',
 				label: __( 'Recent' ),
-				search: '',
 				items: recentCommands,
 			} );
 		}
 
-		// Suggestions (contextual commands and loaders only).
 		const suggestions = dedupeCommands( [
 			...contextualCommands,
 			...contextualLoaderCommands,
@@ -356,7 +315,6 @@ export function CommandMenu() {
 			result.push( {
 				key: 'suggestions',
 				label: __( 'Suggestions' ),
-				search: '',
 				items: suggestions,
 			} );
 		}
@@ -365,7 +323,7 @@ export function CommandMenu() {
 	}, [
 		search,
 		allCommands,
-		recentCommands,
+		recentlyUsedNames,
 		contextualCommands,
 		contextualLoaderCommands,
 	] );
@@ -373,52 +331,8 @@ export function CommandMenu() {
 	const inputRef = useRef();
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
-		if ( paletteIsOpen ) {
-			inputRef.current?.focus();
-		}
-	}, [ paletteIsOpen ] );
-
-	useEffect( () => {
-		registerShortcut( {
-			name: 'core/commands',
-			category: 'global',
-			description: __( 'Open the command palette.' ),
-			keyCombination: {
-				modifier: 'primary',
-				character: 'k',
-			},
-		} );
-	}, [ registerShortcut ] );
-
-	useShortcut(
-		'core/commands',
-		/** @type {React.KeyboardEventHandler} */
-		withIgnoreIMEEvents( ( event ) => {
-			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			event.preventDefault();
-			if ( paletteIsOpen ) {
-				close();
-			} else {
-				open();
-			}
-		} ),
-		{
-			bindGlobal: true,
-		}
-	);
-
-	const closeAndReset = () => {
-		setSearch( '' );
-		close();
-	};
-
-	if ( ! paletteIsOpen ) {
-		return false;
-	}
+		inputRef.current?.focus();
+	}, [] );
 
 	const showEmpty = !! search && ! loadersLoading && ! groups.length;
 
@@ -426,7 +340,7 @@ export function CommandMenu() {
 		<Modal
 			className="commands-command-menu"
 			overlayClassName="commands-command-menu__overlay"
-			onRequestClose={ closeAndReset }
+			onRequestClose={ onClose }
 			__experimentalHideHeader
 			size="medium"
 			contentLabel={ __( 'Command palette' ) }
@@ -442,7 +356,7 @@ export function CommandMenu() {
 					autoHighlight
 				>
 					{ activeLoaders.map( ( loader ) => (
-						<LoaderRunnerWrapper
+						<LoaderRunner
 							key={ loader.name }
 							loader={ loader }
 							search={ search }
@@ -496,7 +410,7 @@ export function CommandMenu() {
 												<CommandItem
 													key={ command.name }
 													command={ command }
-													search={ group.search }
+													search={ search }
 													onRun={ runCommand }
 												/>
 											) }
@@ -510,4 +424,51 @@ export function CommandMenu() {
 			</div>
 		</Modal>
 	);
+}
+
+/**
+ * @ignore
+ */
+export function CommandMenu() {
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	const isOpen = useSelect(
+		( select ) => select( commandsStore ).isOpen(),
+		[]
+	);
+	const { open, close } = useDispatch( commandsStore );
+
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/commands',
+			category: 'global',
+			description: __( 'Open the command palette.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'k',
+			},
+		} );
+	}, [ registerShortcut ] );
+
+	useShortcut(
+		'core/commands',
+		/** @type {React.KeyboardEventHandler} */
+		withIgnoreIMEEvents( ( event ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
+			if ( isOpen ) {
+				close();
+			} else {
+				open();
+			}
+		} ),
+		{
+			bindGlobal: true,
+		}
+	);
+
+	return isOpen ? <CommandPalette onClose={ close } /> : null;
 }
