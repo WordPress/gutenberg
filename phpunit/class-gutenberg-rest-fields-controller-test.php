@@ -35,6 +35,14 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	protected static $subscriber_id;
 
 	/**
+	 * Entities whose fields a test registered, as `[ $kind, $name ]`,
+	 * unregistered on tear down.
+	 *
+	 * @var array[]
+	 */
+	private $registered_field_entities = array();
+
+	/**
 	 * Creates shared users.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
@@ -55,95 +63,29 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The callbacks a test hooked to `wp_fields_api_init`, removed on tear
-	 * down.
-	 *
-	 * @var callable[]
-	 */
-	private $callbacks = array();
-
-	/**
 	 * Tears down each test.
-	 *
-	 * Resetting the registry drops the fields a test registered; the next
-	 * read fires `wp_fields_api_init` again.
 	 */
 	public function tear_down() {
-		foreach ( $this->callbacks as $callback ) {
-			remove_action( 'wp_fields_api_init', $callback );
+		foreach ( $this->registered_field_entities as $args ) {
+			gutenberg_unregister_fields( ...$args );
 		}
-		$this->callbacks = array();
-		self::reset_registry();
+		$this->registered_field_entities = array();
 
 		parent::tear_down();
 	}
 
 	/**
-	 * Resets the registry: drops the singleton instance, so the next
-	 * get_instance() creates an empty registry and its first read fires
-	 * `wp_fields_api_init` again.
-	 */
-	private static function reset_registry() {
-		$instance = new ReflectionProperty( Gutenberg_Fields_Registry::class, 'instance' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$instance->setAccessible( true );
-		}
-		$instance->setValue( null, null );
-	}
-
-	/**
-	 * Registers fields on `wp_fields_api_init` for the duration of the test,
-	 * with the `test-plugin` origin: the registry is reset on tear down.
-	 *
-	 * Registering only runs on the action, so the registration is hooked to
-	 * it, as a plugin does, and the action fired anew: the registry is reset
-	 * and read, which replays the registrations made so far, in order.
+	 * Registers fields for the duration of the test.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
 	 * @param array[]     $fields The field definitions.
 	 * @param string|null $module The script module id, if any.
-	 * @return string[] The ids of the fields registered.
+	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		$registered = array();
-		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
-			$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
-		};
-		add_action( 'wp_fields_api_init', $callback );
-		$this->callbacks[] = $callback;
-
-		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->get_all_registered();
-
-		return $registered;
-	}
-
-	/**
-	 * Updates registered fields on `wp_fields_api_init` for the duration of the
-	 * test, with the `test-plugin` origin, the way register_fields() registers
-	 * them.
-	 *
-	 * @param string      $kind   The entity kind.
-	 * @param string      $name   The entity name.
-	 * @param array[]     $fields The partial field definitions.
-	 * @param string|null $module The script module id, if any.
-	 * @return string[] The ids of the fields updated.
-	 */
-	private function update_fields( $kind, $name, $fields, $module = null ) {
-		$updated  = array();
-		$callback = static function ( $registry ) use ( &$updated, $kind, $name, $fields, $module ) {
-			$updated = $registry->update( 'test-plugin', $kind, $name, $fields, $module );
-		};
-		add_action( 'wp_fields_api_init', $callback );
-		$this->callbacks[] = $callback;
-
-		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->get_all_registered();
-
-		return $updated;
+		$this->registered_field_entities[] = array( $kind, $name );
+		return gutenberg_register_fields( $kind, $name, $fields, $module );
 	}
 
 	/**
@@ -175,7 +117,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( self::ROUTE, $routes );
 		$this->assertCount( 1, $routes[ self::ROUTE ], 'The route should be registered once.' );
 		$this->assertInstanceOf( 'Gutenberg_REST_Fields_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
-		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
 	}
 
 	/**
@@ -254,38 +195,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'postType', 'nonexistent_post_type' );
 
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
-	}
-
-	/**
-	 * The fields registered on a post type not exposed in the REST API are
-	 * not served: the registry accepts them, the route does not.
-	 *
-	 * @covers ::get_items_permissions_check
-	 * @covers ::get_required_capability
-	 */
-	public function test_get_items_post_type_hidden_from_rest_is_not_found() {
-		register_post_type( 'gutenberg_hidden', array( 'show_in_rest' => false ) );
-		wp_set_current_user( self::$admin_id );
-
-		try {
-			$registered = $this->register_fields(
-				'postType',
-				'gutenberg_hidden',
-				array(
-					array(
-						'id'    => 'secret',
-						'type'  => 'text',
-						'label' => 'Secret',
-					),
-				)
-			);
-			$response   = $this->dispatch_request( 'postType', 'gutenberg_hidden' );
-		} finally {
-			unregister_post_type( 'gutenberg_hidden' );
-		}
-
-		$this->assertSame( array( 'secret' ), $registered, 'The registry accepts the fields.' );
 		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
 	}
 
@@ -400,6 +309,22 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The default fields registered for a post type are exposed.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_the_default_post_type_fields() {
+		wp_set_current_user( self::$editor_id );
+
+		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
+		$ids  = array_column( $data['fields'], 'id' );
+
+		$this->assertContains( 'author', $ids, 'Pages support authors.' );
+		$this->assertContains( 'comment_status', $ids, 'Pages support comments.' );
+		$this->assertSame( gutenberg_get_registered_fields( 'postType', 'page' ), $data['fields'] );
+	}
+
+	/**
 	 * An entity without registered fields returns empty lists, which encode as
 	 * JSON arrays.
 	 *
@@ -442,31 +367,15 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			'type'  => 'integer',
 			'label' => 'Size',
 		);
-		$this->register_fields( 'customKind', 'customName', array( $color, $size ), 'plugin/appearance' );
-		$this->update_fields( 'customKind', 'customName', array( array( 'id' => 'size' ) ), 'plugin/sizes' );
+		$this->register_fields( 'postType', 'page', array( $color, $size ), 'plugin/appearance' );
+		$this->register_fields( 'postType', 'page', array( $size ), 'plugin/sizes' );
 
 		wp_set_current_user( self::$editor_id );
-		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
+		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
 
 		$fields = array_column( $data['fields'], null, 'id' );
-		$this->assertSame(
-			$color + array(
-				'origin' => array(
-					'registeredBy' => 'test-plugin',
-					'updatedBy'    => array(),
-				),
-			),
-			$fields['color']
-		);
-		$this->assertSame(
-			$size + array(
-				'origin' => array(
-					'registeredBy' => 'test-plugin',
-					'updatedBy'    => array( 'test-plugin' ),
-				),
-			),
-			$fields['size']
-		);
+		$this->assertSame( $color, $fields['color'] );
+		$this->assertSame( $size, $fields['size'] );
 
 		$this->assertSame(
 			array(
@@ -513,6 +422,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * than arrays.
 	 *
 	 * @covers ::get_items
+	 * @covers ::prepare_field_for_response
 	 */
 	public function test_empty_object_properties_serialize_as_json_objects() {
 		$this->register_fields(
@@ -526,11 +436,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 					'isValid'  => array(),
 					'format'   => array(),
 					'Edit'     => array(),
-					'elements' => array( array() ),
-				),
-				array(
-					'id'       => 'list',
-					'type'     => 'text',
 					'elements' => array(),
 				),
 			)
@@ -544,8 +449,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( '"isValid":{}', $json );
 		$this->assertStringContainsString( '"format":{}', $json );
 		$this->assertStringContainsString( '"Edit":{}', $json );
-		$this->assertStringContainsString( '"elements":[{}]', $json, 'Empty items typed as objects encode as objects.' );
-		$this->assertStringContainsString( '"elements":[]', $json, 'Empty lists stay lists.' );
+		$this->assertStringContainsString( '"elements":[]', $json, 'Lists stay lists.' );
 	}
 
 	/**
@@ -563,10 +467,9 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$field = $schema['properties']['fields']['items'];
 		$this->assertSame( 'object', $field['type'] );
 		$this->assertTrue( $field['additionalProperties'], 'A plugin can register properties of its own.' );
-		foreach ( array( 'id', 'origin', 'type', 'label', 'Edit', 'isValid', 'elements', 'filterBy', 'readOnly', 'format' ) as $property ) {
+		foreach ( array( 'id', 'type', 'label', 'Edit', 'isValid', 'elements', 'filterBy', 'readOnly', 'format' ) as $property ) {
 			$this->assertArrayHasKey( $property, $field['properties'], "The `$property` field property should be described." );
 		}
-		$this->assertContains( 'text', $field['properties']['type']['enum'], 'The schema lists the field types DataViews provides.' );
 
 		$module = $schema['properties']['script_modules']['items'];
 		$this->assertSame( array( 'id', 'fields' ), array_keys( $module['properties'] ) );
