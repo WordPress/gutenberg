@@ -360,6 +360,34 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 						) )
 					) }
 				</div>
+				<details>
+					<summary>Color values</summary>
+					<p>
+						The surface3 squares show fgSurface1 through fgSurface4
+						in order. The bgFill1, bgFillInverted1, and bgFillDark
+						squares show fgFill, fgFillInverted, and fgFillDark,
+						respectively.
+					</p>
+					{ ramps.map( ( { name, ramp } ) => (
+						<table key={ name }>
+							<caption>{ name } ramp</caption>
+							<thead>
+								<tr>
+									<th scope="col">Step</th>
+									<th scope="col">Color</th>
+								</tr>
+							</thead>
+							<tbody>
+								{ RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
+									<tr key={ tokenName }>
+										<th scope="row">{ tokenName }</th>
+										<td>{ ramp[ tokenName ] }</td>
+									</tr>
+								) ) }
+							</tbody>
+						</table>
+					) ) }
+				</details>
 			</div>
 		);
 	}

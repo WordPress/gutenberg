@@ -140,8 +140,9 @@ function ColorScaleCombination( {
 			</header>
 			<p>
 				Squares show foreground colors on their corresponding
-				backgrounds. Hover over a square for its step and color value.
-				Color pairs may not meet text contrast requirements.
+				backgrounds. Hover over a square for its step and color value,
+				or expand Color values below the ramps. Color pairs may not meet
+				text contrast requirements.
 			</p>
 			<RampTable label={ label } ramps={ ramps } warnings={ warnings } />
 			<ColorWarningDetails label={ label } warnings={ warnings } />
