@@ -259,6 +259,7 @@ class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
 			'properties' => array(
 				'value'       => array(
 					'description' => __( 'The value of the option.', 'gutenberg' ),
+					'type'        => array( 'string', 'integer', 'number', 'boolean', 'null' ),
 				),
 				'label'       => array(
 					'description' => __( 'The label of the option.', 'gutenberg' ),
