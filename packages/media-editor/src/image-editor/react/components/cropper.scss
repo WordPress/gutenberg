@@ -6,6 +6,17 @@
 // reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
+// Every offset below is geometry, not text direction: the crop canvas is a
+// coordinate space the camera and the resize maths address in physical
+// pixels. `nw` names the top-left corner in every locale, and
+// `stencil-math.ts` keys on that name to decide which edges a drag moves —
+// mirrored, the handle at the top right would resize the left edge. The
+// image layer is over-constrained the same way: JS sets `left` inline while
+// the sheet supplies the fallback, so a mirrored `right` wins in an RTL
+// containing block and pins the image to the stage edge instead of centring
+// it. `@wordpress/components`' ResizableBox ignores its own handle offsets
+// for the same reason.
+/*!rtl:begin:ignore*/
 .wp-media-editor-image-editor {
 	position: relative;
 	overflow: hidden;
@@ -251,3 +262,4 @@ $handle-touch-target-size: 44px;
 	}
 
 }
+/*!rtl:end:ignore*/
