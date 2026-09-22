@@ -1,43 +1,10 @@
 import stylelint from 'stylelint';
 import tokenList from '../prebuilt/js/design-tokens.mjs';
+import { parseCSSVariableReferences } from '../postcss-plugins/parse-css-variables.mjs';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
-/**
- * Extracts all unique CSS custom properties (variables) from a given CSS value string,
- * including those in fallback positions, optionally filtering by a specific prefix.
- *
- * @param {string} value       - The CSS value string to search for variables.
- * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
- * @return {Set<string>} A Set of unique matched CSS variable names (e.g., Set { '--wpds-token' }).
- *
- * @example
- * extractCSSVariables(
- *   'border: 1px solid var(--wpds-border-radius-sm, var(--wpds-border-radius-md)); ' +
- *   'color: var(--wpds-color-foreground-content-neutral, black); ' +
- *   'background: var(--unrelated-bg);',
- *   'wpds'
- * );
- * // → Set { '--wpds-border-radius-sm', '--wpds-border-radius-md', '--wpds-color-foreground-content-neutral' }
- */
-function extractCSSVariables( value, prefix = '' ) {
-	const regex = /--[\w-]+/g;
-	/** @type {Set<string>} */
-	const variables = new Set();
-
-	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		const variableName = match[ 0 ];
-		if ( variableName.startsWith( `--${ prefix }` ) ) {
-			variables.add( variableName );
-		}
-	}
-
-	return variables;
-}
-
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
 
 const {
 	createPlugin,
@@ -65,11 +32,13 @@ const ruleFunction = ( primary ) => {
 
 		root.walkDecls( ( ruleNode ) => {
 			const { value } = ruleNode;
-			// Early match for WPDS tokens to avoid unnecessary processing.
-			if ( wpdsTokensRegex.test( value ) ) {
-				const usedTokens = extractCSSVariables(
-					value,
-					DS_TOKEN_PREFIX
+			if ( value.includes( `--${ DS_TOKEN_PREFIX }` ) ) {
+				const usedTokens = new Set(
+					parseCSSVariableReferences( value )
+						.references.map( ( reference ) => reference.name )
+						.filter( ( name ) =>
+							name.startsWith( `--${ DS_TOKEN_PREFIX }` )
+						)
 				);
 				const unknownTokens = new Set(
 					[ ...usedTokens ].filter(

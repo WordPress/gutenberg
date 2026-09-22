@@ -1,4 +1,5 @@
 import stylelint from 'stylelint';
+import { parseCSSVariableReferences } from '../postcss-plugins/parse-css-variables.mjs';
 
 const {
 	createPlugin,
@@ -6,12 +7,6 @@ const {
 } = stylelint;
 
 const ruleName = 'plugin-wpds/no-token-fallback-values';
-
-/**
- * Matches `var(--wpds-<name>,` — the comma signals a fallback value.
- * Captures the token name (e.g. `--wpds-color-foreground-content-neutral`).
- */
-const varWithFallbackRegex = /var\(\s*(--wpds-[\w-]+)\s*,/g;
 
 const messages = ruleMessages( ruleName, {
 	rejected: ( tokenName ) =>
@@ -32,14 +27,24 @@ const ruleFunction = ( primary ) => {
 
 		root.walkDecls( ( ruleNode ) => {
 			const { value } = ruleNode;
+			const references = parseCSSVariableReferences( value ).references;
 
-			let match;
-			varWithFallbackRegex.lastIndex = 0;
-			while ( ( match = varWithFallbackRegex.exec( value ) ) !== null ) {
+			for ( const reference of references ) {
+				if (
+					! reference.name.startsWith( '--wpds-' ) ||
+					! reference.fallbackSeparator
+				) {
+					continue;
+				}
+
 				report( {
-					message: messages.rejected( match[ 1 ] ),
+					message: messages.rejected( reference.name ),
 					node: ruleNode,
-					word: match[ 0 ],
+					word: value.slice(
+						reference.node.sourceIndex,
+						reference.fallbackSeparator.sourceEndIndex -
+							reference.fallbackSeparator.after.length
+					),
 					result,
 					ruleName,
 				} );

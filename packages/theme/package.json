@@ -92,7 +92,8 @@
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.7.1",
 		"magic-string": "^0.30.21",
-		"memize": "^2.1.1"
+		"memize": "^2.1.1",
+		"postcss-value-parser": "^4.2.0"
 	},
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.5.3",

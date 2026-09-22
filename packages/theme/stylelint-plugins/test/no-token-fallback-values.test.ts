@@ -54,3 +54,14 @@ describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
 		);
 	} );
 } );
+
+describe( 'token-like text in CSS strings, URLs, and comments', () => {
+	it( 'flags no warnings', async () => {
+		const data = await getStylelintResult(
+			'./fixtures/token-like-text.css',
+			CONFIG
+		);
+
+		expect( data.results[ 0 ].warnings ).toHaveLength( 0 );
+	} );
+} );

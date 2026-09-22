@@ -96,6 +96,18 @@ describe( 'design token fallback build plugin parity', () => {
 		}
 	);
 
+	it( 'leaves token-like text in CSS strings and URLs unchanged in PostCSS', async () => {
+		const source = `.fixture {
+	content: "var(--wpds-border-radius-sm)";
+	background-image: url("var(--wpds-not-a-token)");
+}`;
+		const result = await postcss( [ postcssPlugin ] ).process( source, {
+			from: undefined,
+		} );
+
+		expect( result.css ).toBe( source );
+	} );
+
 	it( 'keeps PostCSS and Lightning CSS var() fallbacks aligned', async () => {
 		const filename = join( fixturesDirectory, 'styles.module.css' );
 		const source = await readFile( filename, 'utf8' );
@@ -137,6 +149,22 @@ describe( 'design token fallback build plugin parity', () => {
 
 		expect( postcssResult.css ).toContain( expected );
 		expect( lightningcssResult ).toContain( expected );
+	} );
+
+	it( 'preserves from global when adding a fallback with Lightning CSS', () => {
+		const result = lightningcssTransform( {
+			filename: 'styles.module.css',
+			code: Buffer.from(
+				'.fixture { gap: var(--wpds-dimension-gap-sm from global); }'
+			),
+			cssModules: { dashedIdents: true },
+			visitor: lightningcssPlugin,
+		} );
+
+		expect( result.code.toString() ).toContain(
+			'gap: var(--wpds-dimension-gap-sm, 8px)'
+		);
+		expect( result.references ).toEqual( {} );
 	} );
 
 	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {

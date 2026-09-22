@@ -1,5 +1,9 @@
 import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
-import { addFallbackToVar as _addFallbackToVar } from './add-fallback-to-var.mjs';
+import {
+	addFallbackToVar as _addFallbackToVar,
+	addFallbackToVarInCSS as _addFallbackToVarInCSS,
+	getTokenFallback as _getTokenFallback,
+} from './add-fallback-to-var.mjs';
 
 /**
  * Replace bare `var(--wpds-*)` references in a CSS value string with
@@ -26,4 +30,24 @@ import { addFallbackToVar as _addFallbackToVar } from './add-fallback-to-var.mjs
  */
 export function addFallbackToVar( cssValue, options ) {
 	return _addFallbackToVar( cssValue, tokenFallbacks, options );
+}
+
+/**
+ * Replace bare design token references in a parsed CSS declaration value.
+ *
+ * @param {string} cssValue A CSS declaration value.
+ * @return {string} The value with fallbacks injected.
+ */
+export function addFallbackToVarInCSS( cssValue ) {
+	return _addFallbackToVarInCSS( cssValue, tokenFallbacks );
+}
+
+/**
+ * Get the generated fallback for a design token.
+ *
+ * @param {string} tokenName CSS variable name.
+ * @return {string} The token fallback.
+ */
+export function getTokenFallback( tokenName ) {
+	return _getTokenFallback( tokenName, tokenFallbacks );
 }
