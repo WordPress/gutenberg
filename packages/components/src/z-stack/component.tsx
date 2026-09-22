@@ -8,7 +8,7 @@ import styles from './style.module.scss';
 import type { ZStackProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
-function UnconnectedZStack(
+export function UnconnectedZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {

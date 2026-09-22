@@ -2,12 +2,12 @@ import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
-import { ZStack } from '..';
+import ZStack from '../deprecated';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
 	id: 'components-zstack',
-	title: 'Components/@wordpress-components/ZStack',
+	title: 'Components/@wordpress-components/Deprecated/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: { control: false },
@@ -21,7 +21,7 @@ const meta: Meta< typeof ZStack > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. Write your own CSS instead.',
+			notes: 'Deprecated. Write your own CSS instead.',
 		},
 	},
 };

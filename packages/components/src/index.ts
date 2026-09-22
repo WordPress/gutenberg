@@ -219,7 +219,7 @@ export type {
 	DistributiveOmit,
 } from './slot-fill/types';
 export { default as __experimentalStyleProvider } from './style-provider';
-export { ZStack as __experimentalZStack } from './z-stack';
+export { default as __experimentalZStack } from './z-stack/deprecated';
 
 // Higher-Order Components.
 export {
