@@ -4,7 +4,7 @@ import type {
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
 import colorTokenAliases from '../../prebuilt/ts/color-tokens';
-import { getColorString } from '../lib/color-utils';
+import { getColorString, getContrast } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -34,6 +34,7 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 ];
 
 type RampTableProps = {
+	label: string;
 	ramps: {
 		name: ThemeProviderColorRampName;
 		seed: {
@@ -114,8 +115,33 @@ function isSeedAdjusted( seed: string, generatedAnchor: string ) {
 	return getColorString( seed ) !== getColorString( generatedAnchor );
 }
 
+function ColorSample( {
+	foreground,
+	background,
+	ramp,
+}: {
+	foreground: keyof Ramp;
+	background: keyof Ramp;
+	ramp: Record< keyof Ramp, string >;
+} ) {
+	const label = `${ foreground }: ${ ramp[ foreground ] } on ${ background }: ${ ramp[ background ] }`;
+	return (
+		<span
+			role="img"
+			aria-label={ label }
+			title={ label }
+			style={ {
+				backgroundColor: ramp[ foreground ],
+				display: 'inline-block',
+				width: 12,
+				height: 12,
+			} }
+		/>
+	);
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { ramps, warnings = [] }, forwardedRef ) {
+	function RampTable( { label, ramps, warnings = [] }, forwardedRef ) {
 		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
 			isSeedAdjusted( seed.value, ramp[ seed.name ] )
 		);
@@ -123,7 +149,10 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 
 		return (
 			<div
-				style={ { width: '100%', overflowX: 'scroll' } }
+				role="region"
+				aria-label={ `${ label } color ramps` }
+				tabIndex={ 0 }
+				style={ { width: '100%', overflowX: 'auto' } }
 				ref={ forwardedRef }
 			>
 				{ hasAdjustedSeed || hasAnyColorWarning ? (
@@ -151,7 +180,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								fontSize: 11,
 								fontWeight:
 									'var(--wpds-typography-font-weight-emphasis)',
-								color: ramps[ 0 ].ramp.fgSurface4,
+								color: 'inherit',
 							} }
 						>
 							{ abbr }
@@ -247,9 +276,12 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												: '',
 											outlineOffset: '-3px',
 											color:
-												tokenName === 'surface2'
-													? ramp.fgSurface4
-													: ramp.fgFill,
+												getContrast(
+													seed.value,
+													'#000'
+												) >= 4.5
+													? '#000'
+													: '#fff',
 										} }
 									>
 										{ isSeedAdjusted(
@@ -279,62 +311,48 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									>
 										{ tokenName === 'surface3' ? (
 											<>
-												<span
-													style={ {
-														color: ramp.fgSurface1,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface2,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface3,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface4,
-													} }
-												>
-													Aa
-												</span>
+												<ColorSample
+													foreground="fgSurface1"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface2"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface3"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface4"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
 											</>
 										) : null }
 										{ tokenName === 'bgFill1' ? (
-											<span
-												style={ {
-													color: ramp.fgFill,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFill"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillInverted1' ? (
-											<span
-												style={ {
-													color: ramp.fgFillInverted,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillInverted"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillDark' ? (
-											<span
-												style={ {
-													color: ramp.fgFillDark,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillDark"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 									</span>
 								) : null }
