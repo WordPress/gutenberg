@@ -83,8 +83,12 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
+				// The drag may start on an image, which is draggable by
+				// default: it is the block's drag as long as no nested
+				// draggable, such as an inner block, is closer to the source.
+				// The data and the drag image set below replace the image's.
 				if (
-					node !== event.target ||
+					event.target.closest( '[draggable="true"]' ) !== node ||
 					node.isContentEditable ||
 					node.ownerDocument.activeElement !== node ||
 					hasMultiSelection()
