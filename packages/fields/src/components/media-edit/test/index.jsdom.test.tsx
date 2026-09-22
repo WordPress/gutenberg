@@ -11,7 +11,7 @@ import {
 } from '@wordpress/data';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import MediaEdit from '../index';
+import MediaEdit, { MediaEditWithFilteredPicker } from '../index';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
@@ -55,26 +55,8 @@ describe( 'MediaEdit', () => {
 		removeFilter( 'editor.MediaUpload', 'test/media-upload-marker' );
 	} );
 
-	it( 'resolves the media picker through the editor.MediaUpload filter', async () => {
+	it( 'resolves the media picker through the editor.MediaUpload filter only in the filtered variant', async () => {
 		const received: Record< string, unknown >[] = [];
-		render(
-			<RegistryProvider value={ createTestRegistry() }>
-				<MediaEdit
-					data={ { featured_media: 0 } }
-					field={ field }
-					onChange={ () => {} }
-					mediaUploadProps={ {
-						unstableFeaturedImageFlow: true,
-						mode: 'browse',
-					} }
-				/>
-			</RegistryProvider>
-		);
-		expect(
-			screen.getByRole( 'button', { name: 'Set featured image' } )
-		).toBeInTheDocument();
-		expect( screen.queryByText( 'Filter marker' ) ).not.toBeInTheDocument();
-
 		addFilter(
 			'editor.MediaUpload',
 			'test/media-upload-marker',
@@ -88,6 +70,35 @@ describe( 'MediaEdit', () => {
 						</>
 					);
 				}
+		);
+		const mediaUploadProps = {
+			unstableFeaturedImageFlow: true,
+			mode: 'browse',
+		};
+		const { rerender } = render(
+			<RegistryProvider value={ createTestRegistry() }>
+				<MediaEdit
+					data={ { featured_media: 0 } }
+					field={ field }
+					onChange={ () => {} }
+					mediaUploadProps={ mediaUploadProps }
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Set featured image' } )
+		).toBeInTheDocument();
+		expect( screen.queryByText( 'Filter marker' ) ).not.toBeInTheDocument();
+
+		rerender(
+			<RegistryProvider value={ createTestRegistry() }>
+				<MediaEditWithFilteredPicker
+					data={ { featured_media: 0 } }
+					field={ field }
+					onChange={ () => {} }
+					mediaUploadProps={ mediaUploadProps }
+				/>
+			</RegistryProvider>
 		);
 		expect(
 			await screen.findByText( 'Filter marker' )
