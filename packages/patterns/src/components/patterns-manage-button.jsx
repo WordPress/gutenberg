@@ -63,10 +63,10 @@ function PatternsManageButton( { clientId, onClose } ) {
 				} )
 					? addQueryArgs( 'site-editor.php', {
 							p: '/pattern',
-					  } )
+						} )
 					: addQueryArgs( 'edit.php', {
 							post_type: 'wp_block',
-					  } ),
+						} ),
 			};
 		},
 		[ clientId ]
@@ -119,10 +119,10 @@ function PatternsManageButton( { clientId, onClose } ) {
 						{ isSyncedPattern
 							? __(
 									'The blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
-							  )
+								)
 							: __(
 									'Blocks will no longer be associated with this pattern and will be fully editable.'
-							  ) }
+								) }
 					</ConfirmDialog>
 				</>
 			) }

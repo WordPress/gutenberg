@@ -27,6 +27,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
@@ -38,6 +42,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Context
 

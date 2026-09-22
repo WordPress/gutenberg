@@ -1,6 +1,6 @@
 import {
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
@@ -42,7 +42,9 @@ export default function QueryInspectorControls( props ) {
 		orderBy,
 		author: authorIds,
 		pages,
-		postType,
+		// Match `build_query_vars_from_query_block()`, which queries posts when
+		// `query` has no post type.
+		postType = 'post',
 		perPage,
 		offset,
 		sticky,
@@ -172,7 +174,7 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'excludeCurrent' );
 	const postTypeSingularName = useSelect(
 		( select ) =>
-			select( coreStore ).getPostType( postType )?.labels.singular_name,
+			select( coreStore ).getPostType( postType )?.labels?.singular_name,
 		[ postType ]
 	);
 
@@ -235,10 +237,10 @@ export default function QueryInspectorControls( props ) {
 										inherit
 											? __(
 													'Display a list of posts or custom post types based on the current template.'
-											  )
+												)
 											: __(
 													'Display a list of posts or custom post types based on specific criteria.'
-											  )
+												)
 									}
 									value={ !! inherit ? 'default' : 'custom' }
 								>
@@ -273,7 +275,7 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							{ postTypesSelectOptions.length > 2 ? (
-								<SelectControl
+								<WCSelectControl
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }
@@ -432,14 +434,17 @@ export default function QueryInspectorControls( props ) {
 					{ showSearchControl && (
 						<ToolsPanelItem
 							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
+							label={ __( 'Search terms' ) }
 							onDeselect={ () => {
 								setQuery( { search: '' } );
 								setQuerySearch( '' );
 							} }
 						>
 							<TextControl
-								label={ __( 'Keyword' ) }
+								label={ __( 'Search terms' ) }
+								help={ __(
+									'Filter the query by keywords that appear in the content, title, or excerpt.'
+								) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
 									debouncedQuerySearch( newQuerySearch );

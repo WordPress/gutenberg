@@ -160,7 +160,7 @@ export function Root( { rootRef, ...props }: RootProps ) {
 					__( '%1$s, %2$s' ),
 					defaultAriaLabel,
 					labels.labelGrid( currentMonth.date )
-			  )
+				)
 			: defaultAriaLabel;
 	}
 

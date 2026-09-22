@@ -11,9 +11,12 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin, styleBook, page } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
@@ -101,8 +104,14 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await expect(
 			page.locator( 'role=button[name="Blocks"]' )
@@ -155,7 +164,10 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )

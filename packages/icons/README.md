@@ -50,7 +50,8 @@ To add a new icon to the library, follow these steps:
    - `slug`: The icon identifier (should match the SVG filename without the `.svg` extension)
    - `label`: The human-readable label for the icon. Use Title Case (for example, `My New Icon`).
    - `filePath`: The relative path to the SVG file (e.g., `library/my-new-icon.svg`)
-   - `public` (optional): Set to `true` if you want to expose this icon as a core icon through the SVG Icons API. **Important**: Once an icon is made public, removing it is difficult, so carefully consider whether to make it public before setting this field to `true`.
+   - `public` (optional): Set to `true` to ship the icon to WordPress Core and register it in the `core` collection. Omit it to keep the icon in the JS library only. **Important**: Once an icon ships to WordPress Core, removing it is difficult, so carefully consider this field before setting it.
+
 4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
 After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.

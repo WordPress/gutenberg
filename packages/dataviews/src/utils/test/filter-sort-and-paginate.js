@@ -193,6 +193,26 @@ describe( 'filters', () => {
 		expect( result[ 1 ].name.title ).toBe( 'Uranus' );
 	} );
 
+	it( 'should search using IS ANY filter for NUMBER values', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				filters: [
+					{
+						field: 'satellites',
+						operator: 'isAny',
+						value: [ 16, 2 ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 3 );
+		expect( result[ 0 ].name.title ).toBe( 'Neptune' );
+		expect( result[ 1 ].name.title ).toBe( 'Mars' );
+		expect( result[ 2 ].name.title ).toBe( 'Haumea' );
+	} );
+
 	it( 'should search using IS NONE filter for STRING values', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
@@ -221,6 +241,30 @@ describe( 'filters', () => {
 		expect( result[ 10 ].name.title ).toBe(
 			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
+	} );
+
+	it( 'should search using IS NONE filter for NUMBER values', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				filters: [
+					{
+						field: 'satellites',
+						operator: 'isNone',
+						value: [ 0, 16, 2 ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 7 );
+		expect( result[ 0 ].name.title ).toBe( 'Earth' );
+		expect( result[ 1 ].name.title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].name.title ).toBe( 'Saturn' );
+		expect( result[ 3 ].name.title ).toBe( 'Uranus' );
+		expect( result[ 4 ].name.title ).toBe( 'Makemake' );
+		expect( result[ 5 ].name.title ).toBe( 'Sun' );
+		expect( result[ 6 ].name.title ).toBe( 'Pluto' );
 	} );
 
 	it( 'should search using IS ANY filter for ARRAY values', () => {
@@ -300,6 +344,30 @@ describe( 'filters', () => {
 		expect( result[ 6 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
+
+	it.each( [
+		[ 'number', 'satellites', 2 ],
+		[ 'string', 'author', 'lunarian_observer' ],
+	] )(
+		'should exclude a %s value from the IS ALL filter instead of throwing',
+		( _type, fieldId, value ) => {
+			// Fields with no type accept every operator, so an item's scalar
+			// value can reach the IS ALL filter.
+			const untypedFields = fields.map( ( field ) =>
+				field.id === fieldId ? { id: fieldId } : field
+			);
+			const { data: result } = filterSortAndPaginate(
+				data,
+				{
+					filters: [
+						{ field: fieldId, operator: 'isAll', value: [ value ] },
+					],
+				},
+				untypedFields
+			);
+			expect( result ).toHaveLength( 0 );
+		}
+	);
 
 	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(

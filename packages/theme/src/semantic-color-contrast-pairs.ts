@@ -8,6 +8,26 @@ export const MINIMUM_TEXT_CONTRAST = 4.5;
 
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	{
+		background: 'background.interactive.neutral',
+		foreground: 'foreground.interactive.neutral',
+	},
+	{
+		background: 'background.interactive.neutral',
+		foreground: 'foreground.interactive.neutral-weak',
+	},
+	{
+		background: 'background.interactive.neutral-active',
+		foreground: 'foreground.interactive.neutral',
+	},
+	{
+		background: 'background.interactive.neutral-active',
+		foreground: 'foreground.interactive.neutral-weak',
+	},
+	{
+		background: 'background.interactive.neutral-weak-active',
+		foreground: 'foreground.interactive.neutral-active',
+	},
+	{
 		background: 'background.surface.neutral',
 		foreground: 'foreground.content.neutral',
 	},

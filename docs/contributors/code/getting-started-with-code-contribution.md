@@ -42,6 +42,12 @@ npm run dev
 
 > Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
 
+### Set up each worktree
+
+Install dependencies in each fresh Git worktree before you build, test, lint, or commit. Do not reuse `node_modules` or generated package files from a worktree whose `package-lock.json` is at a different revision. Results from that setup might not match the current checkout.
+
+If you install dependencies with `--ignore-scripts`, run `npm run prepare` before committing so Husky installs the repository Git hooks. If a focused command needs generated package files, build the affected package in the current worktree before you interpret its result.
+
 There are two ways to build your code. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `npm run build` to create optimized production build.
 
 Once built, Gutenberg is ready to be used as a WordPress plugin!
@@ -192,7 +198,7 @@ To build: open a terminal (or if on Windows, a command prompt) and navigate to t
 
 After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
 
-Another way to upload after building is to run `npm run build:plugin-zip` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
+Another way to upload after building is to run `npm run build:plugin-zip`, which creates a `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
 
 ## Storybook
 

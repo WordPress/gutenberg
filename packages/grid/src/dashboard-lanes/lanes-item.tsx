@@ -187,7 +187,7 @@ export function LanesItem( {
 		resizeDelta && initialContentSize
 			? {
 					width: initialContentSize.width + resizeDelta.width,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (

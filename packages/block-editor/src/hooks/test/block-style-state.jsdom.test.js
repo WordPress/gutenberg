@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	getStyleForState,
 	scopeResetAllFilterToState,
@@ -153,7 +154,7 @@ describe( 'setStyleForState', () => {
 
 describe( 'scopeResetAllFilterToState', () => {
 	it( 'passes only the selected state style to the reset filter', () => {
-		const innerReset = jest.fn( ( attributes ) => ( {
+		const innerReset = vi.fn( ( attributes ) => ( {
 			...attributes,
 			style: {
 				...attributes.style,
@@ -213,7 +214,7 @@ describe( 'scopeResetAllFilterToState', () => {
 	} );
 
 	it( 'calls the reset filter with an empty style when no state styles exist', () => {
-		const innerReset = jest.fn( ( attributes ) => attributes );
+		const innerReset = vi.fn( ( attributes ) => attributes );
 		const attributes = {
 			style: { color: { text: '#000000' } },
 		};
@@ -227,7 +228,7 @@ describe( 'scopeResetAllFilterToState', () => {
 	} );
 
 	it( 'passes only the selected viewport pseudo state style to the reset filter', () => {
-		const innerReset = jest.fn( () => ( { style: undefined } ) );
+		const innerReset = vi.fn( () => ( { style: undefined } ) );
 		const attributes = {
 			style: {
 				color: { text: '#000000' },
