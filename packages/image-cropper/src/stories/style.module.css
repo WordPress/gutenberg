@@ -13,7 +13,3 @@
 	height: 100%;
 	width: 100%;
 }
-
-.container-wrapper :global(.image-cropper__crop-area) {
-	box-shadow: unset !important;
-}
