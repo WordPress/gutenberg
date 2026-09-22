@@ -213,9 +213,9 @@
 				// What the editor shows until the server's URL replaces it;
 				// the queue revokes it when the item leaves.
 				attachment: { url: context.createBlobURL( result.file ) },
-				additionalData: {
-					smallest_encoding: JSON.stringify( result.record ),
-				},
+				// Sent as nested form fields, which the server reads back
+				// as an object and checks against the field's schema.
+				additionalData: { smallest_encoding: result.record },
 			};
 		},
 	} );

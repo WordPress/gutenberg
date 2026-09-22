@@ -59,11 +59,26 @@ test.describe( 'Upload operations: smallest encoding plugin', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
+		// Watch the create request so a refusal reads as a status and a
+		// body rather than as a block without an attachment.
+		const created = page.waitForResponse(
+			( response ) =>
+				response.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( response.url() ),
+			{ timeout: 60_000 }
+		);
+
 		await imageBlock
 			.locator( 'data-testid=form-file-upload-input' )
 			.setInputFiles(
 				path.join( ASSETS_DIR, '1024x768_e2e_test_image.png' )
 			);
+
+		const response = await created;
+		expect(
+			response.status(),
+			`The create request was refused: ${ await response.text() }`
+		).toBe( 201 );
 
 		await page.waitForFunction(
 			() =>
@@ -108,9 +123,9 @@ test.describe( 'Upload operations: smallest encoding plugin', () => {
 		);
 		expect( media.mime_type ).toBe( record.type );
 
-		const response = await fetch( media.source_url );
-		expect( response.ok ).toBe( true );
-		const bytes = await response.arrayBuffer();
+		const served = await fetch( media.source_url );
+		expect( served.ok ).toBe( true );
+		const bytes = await served.arrayBuffer();
 		expect( bytes.byteLength ).toBe( record.size );
 	} );
 } );

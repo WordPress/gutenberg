@@ -31,21 +31,44 @@ function gutenberg_test_upload_operation_smallest_encoding_register_field() {
 				$decoded = json_decode( $record, true );
 				return is_array( $decoded ) ? $decoded : null;
 			},
+			// The value arrives validated and coerced against the schema
+			// below, so sizes are integers by the time they get here.
 			'update_callback' => static function ( $value, $attachment ) {
-				if ( ! is_string( $value ) || ! is_array( json_decode( $value, true ) ) ) {
+				if ( ! is_array( $value ) ) {
 					return new WP_Error(
 						'rest_invalid_smallest_encoding',
-						'The encoding record must be a JSON object.',
+						'The encoding record must be an object.',
 						array( 'status' => 400 )
 					);
 				}
-				update_post_meta( $attachment->ID, 'smallest_encoding', wp_slash( $value ) );
+				update_post_meta( $attachment->ID, 'smallest_encoding', wp_slash( wp_json_encode( $value ) ) );
 				return true;
 			},
 			'schema'          => array(
-				'description' => 'Which encodings the browser compared before uploading, and which one it picked.',
-				'type'        => array( 'object', 'null' ),
-				'context'     => array( 'view', 'edit' ),
+				'description'          => 'Which encodings the browser compared before uploading, and which one it picked.',
+				'type'                 => array( 'object', 'null' ),
+				'context'              => array( 'view', 'edit' ),
+				'properties'           => array(
+					'type'       => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'size'       => array(
+						'type'     => 'integer',
+						'required' => true,
+					),
+					'requested'  => array(
+						'type' => 'string',
+					),
+					'candidates' => array(
+						'type'                 => 'object',
+						'required'             => true,
+						'additionalProperties' => array(
+							'type' => 'integer',
+						),
+					),
+				),
+				'additionalProperties' => false,
 			),
 		)
 	);
