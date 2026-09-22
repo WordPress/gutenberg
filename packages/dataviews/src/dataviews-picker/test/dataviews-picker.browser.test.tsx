@@ -829,6 +829,95 @@ describe( 'DataViews Picker', () => {
 	} );
 
 	describe( 'Table layout', () => {
+		it( 'renders the table as a `listbox` that holds `aria-activedescendant`, with rows as `option` roles', async () => {
+			await render( <Picker layout={ LAYOUT_PICKER_TABLE } /> );
+
+			const listbox = screen.getByRole( 'listbox' );
+			const options = screen.getAllByRole( 'option' );
+			expect( options ).toHaveLength( data.length );
+
+			// Screen readers only announce the active row when the element
+			// that holds `aria-activedescendant` is the one with the
+			// `listbox` role, so the two have to be on the same element.
+			expect( listbox ).toHaveAttribute( 'tabindex', '0' );
+			expect( listbox.tagName ).toBe( 'TABLE' );
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( listbox.querySelector( '[aria-activedescendant]' ) ).toBe(
+				null
+			);
+
+			const user = userEvent.setup();
+			listbox.focus();
+			expect( listbox ).toHaveAttribute(
+				'aria-activedescendant',
+				options[ 0 ].id
+			);
+
+			await user.keyboard( '{ArrowDown}' );
+			expect( listbox ).toHaveAttribute(
+				'aria-activedescendant',
+				options[ 1 ].id
+			);
+		} );
+
+		it( 'supports specifying a `label` which is rendered as an aria-label', async () => {
+			const testLabel = 'Select an item from the table';
+			await render(
+				<Picker layout={ LAYOUT_PICKER_TABLE } label={ testLabel } />
+			);
+
+			expect(
+				screen.getByRole( 'listbox', { name: testLabel } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'adds the `aria-multiselectable` attribute to the listbox', async () => {
+			await render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					actions={ multiSelectActions }
+				/>
+			);
+
+			expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
+				'aria-multiselectable',
+				'true'
+			);
+		} );
+
+		it( 'keeps the rows of every group in a single listbox that arrow keys traverse', async () => {
+			await render(
+				<Picker
+					layout={ LAYOUT_PICKER_TABLE }
+					fields={ groupingFields }
+					view={ {
+						groupBy: { field: 'parity', direction: 'asc' },
+					} }
+				/>
+			);
+
+			// One listbox for the whole table, with a labelled `group` per
+			// group rather than a listbox of its own.
+			const listbox = screen.getByRole( 'listbox' );
+			const groups = within( listbox ).getAllByRole( 'group' );
+			expect( groups ).toHaveLength( 2 );
+			expect( groups[ 0 ] ).toHaveAccessibleName( 'Parity: odd' );
+			expect( groups[ 1 ] ).toHaveAccessibleName( 'Parity: even' );
+
+			const options = within( listbox ).getAllByRole( 'option' );
+			expect( options ).toHaveLength( data.length );
+
+			// The last row of the first group and the first row of the
+			// second one are neighbours for arrow key navigation.
+			const user = userEvent.setup();
+			listbox.focus();
+			await user.keyboard( '{ArrowDown}{ArrowDown}' );
+			expect( listbox ).toHaveAttribute(
+				'aria-activedescendant',
+				options[ 2 ].id
+			);
+		} );
+
 		it( 'does not render a column for a field id without a field definition', async () => {
 			const { container } = await render(
 				<Picker
