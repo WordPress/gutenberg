@@ -507,6 +507,32 @@ export const PROTECTED_ITEM_KEYS = [
 export type ProtectedItemKey = ( typeof PROTECTED_ITEM_KEYS )[ number ];
 
 /**
+ * The bookkeeping fields an operation is still told about.
+ *
+ * A handler needs to know which item it is running for and where that
+ * item sits, even though it may not change any of that.
+ */
+export const ITEM_IDENTITY_KEYS = [
+	'id',
+	'parentId',
+	'batchId',
+] as const satisfies readonly ProtectedItemKey[];
+
+/**
+ * What an operation is told about its item.
+ *
+ * A snapshot rather than the queue's own record: the same `File` objects,
+ * but none of the entry's bookkeeping beyond its identity, and nothing a
+ * handler could change to alter what the queue does. Whatever a handler
+ * may set through its result it can read here, so a step can see what an
+ * earlier step handed on.
+ */
+export type OperationItem = Readonly<
+	Pick< QueueItem, ( typeof ITEM_IDENTITY_KEYS )[ number ] > &
+		Omit< QueueItem, ProtectedItemKey >
+>;
+
+/**
  * Updates an operation handler can apply to its item once it finishes.
  *
  * Merged into the item by the reducer; `attachment` and `additionalData`
@@ -614,7 +640,7 @@ export interface OperationDefinition< Args = unknown > {
 	 * every registered operation, in `priority` order.
 	 */
 	plan?: (
-		item: QueueItem,
+		item: OperationItem,
 		context: OperationPlanContext
 	) => OperationPlanResult | Promise< OperationPlanResult >;
 	/**
@@ -628,7 +654,7 @@ export interface OperationDefinition< Args = unknown > {
 	 * `UploadError` to control the message the user sees.
 	 */
 	handler: (
-		item: QueueItem,
+		item: OperationItem,
 		args: Args,
 		context: OperationContext
 	) => OperationResult | void | Promise< OperationResult | void >;

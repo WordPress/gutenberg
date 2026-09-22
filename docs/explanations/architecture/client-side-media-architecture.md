@@ -109,6 +109,10 @@ The finalize step uses a gate: if any child sideloads are still pending, the ope
 
 If the finalize request fails, the error is logged but the upload is still considered successful — finalization is best-effort so that a plugin failure doesn't block the user's upload.
 
+## Extending the pipeline
+
+The steps above are operations in a registry held by the `core/upload-media` store, and core registers them through the same functions a plugin uses: `registerUploadOperation()` adds a step, its `plan()` decides where the step sits in a new item's pipeline, and `unregisterUploadOperation()` followed by `registerUploadOperation()` under the same name replaces a step, core's included. Concurrency pools are registered once with their limit and joined by name. Handlers get a frozen snapshot of their item and a small context — abort signal, settings, progress, appending steps, sideloading a companion file — rather than the store; core's own steps reach the store through a privileged context that is handed only to the definitions the package ships, not to anything named `core/…`. See the [`@wordpress/upload-media` README](https://github.com/WordPress/gutenberg/blob/HEAD/packages/upload-media/README.md#upload-operations) for the API.
+
 ## Image quality resolution
 
 Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for JPEG output, the still-supported [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/).

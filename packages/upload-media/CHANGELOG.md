@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `registerUploadOperation()`, `unregisterUploadOperation()`, `getUploadOperation()`, `getUploadOperations()` and `registerUploadConcurrencyPool()`, so a plugin can add a step to the upload pipeline, place it with a `plan()`, replace or remove a core step, and throttle its steps through a concurrency pool. Handlers receive a frozen snapshot of their item rather than the queue's own record, so a step can read what earlier steps set aside and cannot reach the item's callbacks, abort controller or pipeline ([#82035](https://github.com/WordPress/gutenberg/issues/82035)).
+
 ### Breaking Changes
 
 -   Remove the `useSubRegistry` prop of `MediaUploadProvider`. The upload store is now always the one in the default registry, so a page has a single upload queue and the operations registered on it are visible to every editor on the page. The only consumer already passed `false` ([#82474](https://github.com/WordPress/gutenberg/pull/82474)).

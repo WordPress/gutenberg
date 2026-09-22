@@ -20,6 +20,7 @@ import {
 	OperationType,
 	type OperationContext,
 	type OperationDefinition,
+	type OperationItem,
 	type QueueItem,
 } from '../types';
 import type { ActionCreators, Selectors } from '../private-actions';
@@ -316,7 +317,7 @@ describe( 'operation registry', () => {
 
 	describe( 'runOperation', () => {
 		it( 'merges the updates a handler resolves with into the item', async () => {
-			const received: QueueItem[] = [];
+			const received: OperationItem[] = [];
 			dispatch.registerOperation(
 				operation( 'my-plugin/first', {
 					handler: () => ( { additionalData: { ocr: 'text' } } ),
@@ -479,7 +480,7 @@ describe( 'operation registry', () => {
 			// A handler that resolves with the item it was handed would
 			// otherwise put the step it just finished back on the pipeline
 			// and run forever, and could point the entry at another item.
-			const first = vi.fn( ( item: QueueItem ) => ( {
+			const first = vi.fn( ( item: OperationItem ) => ( {
 				...item,
 				id: 'hijacked',
 			} ) );
@@ -512,7 +513,7 @@ describe( 'operation registry', () => {
 			const heicFile = new File( [ 'foo' ], 'example.heic', {
 				type: 'image/heic',
 			} );
-			let seen: QueueItem | undefined;
+			let seen: OperationItem | undefined;
 
 			dispatch.registerOperation(
 				operation( 'my-plugin/convert', {
@@ -568,7 +569,7 @@ describe( 'operation registry', () => {
 			dispatch.registerOperation(
 				operation( 'my-plugin/inspect', {
 					handler: ( item ) => {
-						seen = item;
+						seen = select.getItem( item.id );
 					},
 				} )
 			);
@@ -674,6 +675,75 @@ describe( 'operation registry', () => {
 			expect( context ).toBeDefined();
 			expect( context ).not.toHaveProperty( 'dispatch' );
 			expect( context ).not.toHaveProperty( 'select' );
+		} );
+
+		it( 'hands the handler a snapshot of its item', async () => {
+			// The same File objects the queue holds, and the item's
+			// identity, but none of the bookkeeping: a handler cannot reach
+			// the callbacks, abort the item or read its pipeline, and
+			// writing to what it was handed changes nothing in the store.
+			let seen: OperationItem | undefined;
+			const onSuccess = vi.fn();
+			dispatch.registerOperation(
+				operation( 'my-plugin/inspect', {
+					handler: ( item ) => {
+						seen = item;
+						expect( () => {
+							( item as { file: File } ).file = mp4File;
+						} ).toThrow();
+						item.additionalData.forged = true;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				additionalData: { post: 7 },
+				operations: [ 'my-plugin/inspect', 'my-plugin/after' ],
+				onSuccess,
+			} );
+			let after: QueueItem | undefined;
+			dispatch.registerOperation(
+				operation( 'my-plugin/after', {
+					handler: ( item ) => {
+						after = select.getItem( item.id );
+					},
+				} )
+			);
+			await flush();
+
+			expect( seen?.file ).toBe( jpegFile );
+			expect( seen?.sourceFile ).toBe( after?.sourceFile );
+			expect( seen?.id ).toBe( after?.id );
+			expect( seen ).not.toHaveProperty( 'status' );
+			expect( seen ).not.toHaveProperty( 'operations' );
+			expect( seen ).not.toHaveProperty( 'abortController' );
+			expect( seen ).not.toHaveProperty( 'onSuccess' );
+			expect( seen?.additionalData ).toHaveProperty( 'forged', true );
+			expect( after?.additionalData ).not.toHaveProperty( 'forged' );
+			expect( after?.additionalData ).toHaveProperty( 'post', 7 );
+			expect( after?.file ).toBe( jpegFile );
+		} );
+
+		it( 'hands a plan the same snapshot', async () => {
+			let seen: OperationItem | undefined;
+			dispatch.registerOperation(
+				operation( 'my-plugin/watch', {
+					plan: ( item ) => {
+						seen = item;
+					},
+				} )
+			);
+
+			dispatch.addItem( {
+				file: jpegFile,
+				operations: [ OperationType.Prepare ],
+			} );
+			await flush();
+
+			expect( seen?.file ).toBe( jpegFile );
+			expect( seen ).not.toHaveProperty( 'operations' );
+			expect( seen ).not.toHaveProperty( 'abortController' );
 		} );
 
 		it( 'lets a handler append steps to its item', async () => {
@@ -830,7 +900,7 @@ describe( 'operation registry', () => {
 		it( 'plans against the item as prepare leaves it', async () => {
 			// prepare decides `generate_sub_sizes` while it builds the
 			// pipeline. A plan plotting around that decision has to see it.
-			let planned: QueueItem | undefined;
+			let planned: OperationItem | undefined;
 			dispatch.registerOperation(
 				operation( 'my-plugin/inspector', {
 					plan: ( item ) => {
