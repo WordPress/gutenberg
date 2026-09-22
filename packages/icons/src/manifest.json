@@ -1790,6 +1790,32 @@
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg"
+		"filePath": "library/wordpress.svg",
+		"public": false
+	},
+	{
+		"slug": "fullscreen-exit",
+		"label": "Fullscreen Exit",
+		"filePath": "library/fullscreen-exit.svg"
+	},
+	{
+		"slug": "justify-space-evenly",
+		"label": "Justify Space Evenly",
+		"filePath": "library/justify-space-evenly.svg"
+	},
+	{
+		"slug": "paintbrush",
+		"label": "Paintbrush",
+		"filePath": "library/paintbrush.svg"
+	},
+	{
+		"slug": "reaction",
+		"label": "Reaction",
+		"filePath": "library/reaction.svg"
+	},
+	{
+		"slug": "multimedia",
+		"label": "Multimedia",
+		"filePath": "library/multimedia.svg"
 	}
 ]
