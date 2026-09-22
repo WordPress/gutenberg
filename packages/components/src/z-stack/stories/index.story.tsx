@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
-import ZStack from '../deprecated';
+import { ZStack } from '..';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
