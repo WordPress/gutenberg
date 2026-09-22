@@ -7,6 +7,7 @@ import {
 	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
 import { PanelBody, Button, Spinner } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -15,6 +16,7 @@ import {
 	isClientSideMediaSupported,
 } from '@wordpress/upload-media';
 import { __ } from '@wordpress/i18n';
+import OptimizeMediaDialog from '../components/optimize-media-dialog';
 
 declare global {
 	interface Window {
@@ -82,6 +84,8 @@ function OptimizeControl( {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
+
 	const { media, isOptimizing } = useSelect(
 		( select ) => ( {
 			media: attachmentId
@@ -103,10 +107,12 @@ function OptimizeControl( {
 		return null;
 	}
 
-	const optimize = () => {
+	const optimize = ( outputQuality: number ) => {
+		setIsDialogOpen( false );
 		optimizeExistingItem( {
 			id: attachmentId,
 			url: sourceUrl,
+			outputQuality,
 			onSuccess: ( [ newMedia ]: OptimizedMedia[] ) => {
 				if ( newMedia ) {
 					onComplete( newMedia );
@@ -135,7 +141,7 @@ function OptimizeControl( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					onClick={ optimize }
+					onClick={ () => setIsDialogOpen( true ) }
 					disabled={ isOptimizing }
 					accessibleWhenDisabled
 					icon={ isOptimizing ? <Spinner /> : undefined }
@@ -144,6 +150,13 @@ function OptimizeControl( {
 						? __( 'Optimizing…' )
 						: __( 'Optimize image' ) }
 				</Button>
+				{ isDialogOpen && (
+					<OptimizeMediaDialog
+						url={ sourceUrl }
+						onConfirm={ optimize }
+						onClose={ () => setIsDialogOpen( false ) }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);
