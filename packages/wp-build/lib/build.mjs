@@ -1982,9 +1982,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @param {string[]} [widgetDirNames] Restrict collection to these widget
- *                                    directories. Defaults to every widget
- *                                    discovered under `widgets/`.
+ * @param {string[]} [widgetDirNames] Widget directories to collect. Defaults to all.
  * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets( widgetDirNames ) {
@@ -2504,8 +2502,7 @@ async function buildAll( baseUrlExpression ) {
 /**
  * Watch mode for development.
  *
- * @param {string?} baseUrlExpression PHP expression used as the base URL in
- *                                    generated files.
+ * @param {string?} baseUrlExpression PHP expression for the base URL.
  */
 async function watchMode( baseUrlExpression ) {
 	let isRebuilding = false;
