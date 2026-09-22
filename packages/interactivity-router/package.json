@@ -50,6 +50,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
+		"preact": "^10.29.1",
 		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
