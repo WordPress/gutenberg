@@ -77,11 +77,39 @@ export function transformDsTokenFallbacks( source, filename ) {
 			'deferredImportEvaluation',
 		],
 	};
-	let ast = parse( source, options );
+	let parserSource = source;
+	/** @type {ReturnType<typeof parse>} */
+	let ast;
+	for (;;) {
+		try {
+			ast = parse( parserSource, options );
+			break;
+		} catch ( error ) {
+			const parseError =
+				/** @type {import('@babel/parser').ParseError} */ ( error );
+			if (
+				! isTypeScript ||
+				! [ 'UnexpectedLeadingDecorator', 'UnexpectedToken' ].includes(
+					parseError.reasonCode
+				) ||
+				! Number.isInteger( parseError.pos ) ||
+				parserSource[ parseError.pos ] !== '!'
+			) {
+				throw error;
+			}
+			// Babel's decorator grammar rejects TypeScript non-null assertions.
+			// Mask only the rejected token for parsing, preserving source offsets.
+			// The downstream compiler still receives the original assertion.
+			parserSource =
+				parserSource.slice( 0, parseError.pos ) +
+				' ' +
+				parserSource.slice( parseError.pos + 1 );
+		}
+	}
 	// With error recovery, unambiguous parsing can retain module-mode errors
 	// even after identifying a script. Reparse it under the correct rules.
 	if ( ast.program.sourceType === 'script' && ast.errors?.length ) {
-		ast = parse( source, { ...options, sourceType: 'script' } );
+		ast = parse( parserSource, { ...options, sourceType: 'script' } );
 	}
 	// Babel's standard decorators grammar reports parameter decorators even
 	// in TypeScript. Leave that one check to the compiler's tsconfig settings.

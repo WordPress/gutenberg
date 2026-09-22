@@ -200,6 +200,10 @@ export const manual = 'var(--wpds-dimension-gap-sm,)';
 				'import assertions',
 				'import config from "./config.json" assert { type: "json" }; export const gap = config.prefix + "var(--wpds-dimension-gap-sm)";',
 			],
+			[
+				'decorator non-null assertions',
+				'function inject(...args: unknown[]) {} function factory<T>() { return inject; } @factory!<string>() class Legacy {} export @inject! class Modern {} class Styles { @inject! gap = "var(--wpds-dimension-gap-sm)"; } export const gap = new Styles().gap;',
+			],
 		] )( 'builds supported %s syntax', async ( _syntax, source ) => {
 			await writeFile(
 				join( directory, 'tsconfig.json' ),
