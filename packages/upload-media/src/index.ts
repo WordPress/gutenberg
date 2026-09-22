@@ -31,6 +31,7 @@ export type {
 } from './upload-operations';
 export type {
 	OperationDefinition as UploadOperation,
+	OperationArgs as UploadOperationArgs,
 	OperationName as UploadOperationName,
 	Operation as UploadOperationStep,
 	OperationItem as UploadOperationItem,

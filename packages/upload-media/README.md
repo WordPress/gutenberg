@@ -89,6 +89,7 @@ Once every plan has run, the pipeline is checked against the registry: an item w
 - `context.updateProgress( progress )`: reports the step's progress, 0–100.
 - `context.addOperations( operations )`: appends steps to this item's pipeline.
 - `context.addSideloadItem( { file, additionalData, operations } )`: queues a companion file to be sideloaded to this item's attachment once it exists. The child is parented to the item and its `post` is filled in by the queue.
+- `context.createBlobURL( file )`: creates a blob URL the queue revokes when the item leaves it. Use it for anything the editor shows while the upload is still in flight, such as a preview returned as `attachment.url`: the URL has to outlive the handler, so the handler cannot revoke it itself.
 
 It resolves with updates to apply to the item — typically `file`, `attachment` or `additionalData`, which reaches the server as request fields — or with nothing. Throwing cancels the item; throw an `UploadError` to control the message the user sees, and set `silent: true` on it to cancel without one.
 
@@ -107,6 +108,8 @@ A step without a pool runs unthrottled.
 ### Core operations
 
 Core registers `core/prepare`, `core/detect-ultra-hdr`, `core/upload`, `core/resize-crop`, `core/rotate`, `core/transcode-image`, `core/transcode-gif`, `core/thumbnail-generation` and `core/finalize`. `UploadOperationType` holds these names as constants. Replacing one of them with `unregisterUploadOperation()` and `registerUploadOperation()` is supported; the replacement runs with the same context a plugin's operation gets, not with core's internal access to the store.
+
+A replacement runs wherever core placed the step, and receives the arguments core placed it with: `core/resize-crop`, `core/rotate`, `core/transcode-image` and `core/transcode-gif` take arguments, and `UploadOperationArgs` describes them. Core places `core/transcode-image` only when the site's `image_editor_output_format` asks for a conversion, so a replacement that should run on every image plans itself in as well, skipping items whose pipeline already carries the step.
 
 ## API Reference
 
@@ -343,6 +346,10 @@ _Type_
 - `UploadError`
 
 ### UploadOperation
+
+Undocumented declaration.
+
+### UploadOperationArgs
 
 Undocumented declaration.
 

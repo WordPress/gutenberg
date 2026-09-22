@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `registerUploadOperation()`, `unregisterUploadOperation()`, `getUploadOperation()`, `getUploadOperations()` and `registerUploadConcurrencyPool()`, so a plugin can add a step to the upload pipeline, place it with a `plan()`, replace or remove a core step, and throttle its steps through a concurrency pool. Handlers receive a frozen snapshot of their item rather than the queue's own record, so a step can read what earlier steps set aside and cannot reach the item's callbacks, abort controller or pipeline ([#82035](https://github.com/WordPress/gutenberg/issues/82035)).
+-   Add `registerUploadOperation()`, `unregisterUploadOperation()`, `getUploadOperation()`, `getUploadOperations()` and `registerUploadConcurrencyPool()`, so a plugin can add a step to the upload pipeline, place it with a `plan()`, replace or remove a core step, and throttle its steps through a concurrency pool. Handlers receive a frozen snapshot of their item rather than the queue's own record, so a step can read what earlier steps set aside and cannot reach the item's callbacks, abort controller or pipeline, and `context.createBlobURL()` gives them a preview URL the queue revokes with the item ([#82035](https://github.com/WordPress/gutenberg/issues/82035)).
 
 ### Breaking Changes
 

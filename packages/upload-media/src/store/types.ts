@@ -570,6 +570,14 @@ export interface OperationContext {
 	addOperations: ( operations: Operation[] ) => void;
 	/** Queues a companion file to be sideloaded to this item's attachment. */
 	addSideloadItem: ( args: OperationSideloadArgs ) => void;
+	/**
+	 * Creates a blob URL the queue revokes when the item leaves it.
+	 *
+	 * A URL for a preview has to outlive the handler, since the editor
+	 * shows it until the server's URL replaces it, so a handler cannot
+	 * revoke it itself; a URL created here is tied to the item instead.
+	 */
+	createBlobURL: ( file: File ) => string;
 }
 
 /**
