@@ -3,11 +3,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
+import { BlockRefs } from '../provider/block-refs-provider';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
+	const { refsMap } = useContext( BlockRefs );
 	const isInBetweenInserterDisabled = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return (
@@ -19,6 +21,7 @@ export function useInBetweenInserter() {
 	const {
 		getBlockListSettings,
 		getBlockIndex,
+		getBlockOrder,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getSettings,
@@ -94,53 +97,45 @@ export function useInBetweenInserter() {
 				const offsetTop = event.clientY;
 				const offsetLeft = event.clientX;
 
-				const children = Array.from( event.target.children );
-				let element = children.find( ( blockEl ) => {
-					if ( ! blockEl.classList.contains( 'wp-block' ) ) {
-						return false;
+				// Not the container's children: a block may put its block
+				// props on an inner element, as Social Icons does.
+				const clientId = getBlockOrder( rootClientId ).find(
+					( childClientId ) => {
+						const blockEl = refsMap.get( childClientId );
+
+						if ( ! blockEl ) {
+							return false;
+						}
+
+						const blockElRect = blockEl.getBoundingClientRect();
+
+						if ( orientation === 'vertical' ) {
+							return blockElRect.top > offsetTop;
+						}
+
+						// A horizontal list can wrap, so only blocks on the
+						// pointer's line are candidates.
+						if (
+							offsetTop < blockElRect.top ||
+							offsetTop > blockElRect.bottom
+						) {
+							return false;
+						}
+
+						return isRTL()
+							? blockElRect.right < offsetLeft
+							: blockElRect.left > offsetLeft;
 					}
+				);
 
-					const blockElRect = blockEl.getBoundingClientRect();
-
-					if ( orientation === 'vertical' ) {
-						return blockElRect.top > offsetTop;
-					}
-
-					// A horizontal list can wrap, so only blocks on the
-					// pointer's line are candidates.
-					if (
-						offsetTop < blockElRect.top ||
-						offsetTop > blockElRect.bottom
-					) {
-						return false;
-					}
-
-					return isRTL()
-						? blockElRect.right < offsetLeft
-						: blockElRect.left > offsetLeft;
-				} );
-
-				if ( ! element ) {
+				if ( ! clientId ) {
 					hideInsertionPoint();
 					return;
 				}
 
-				// The block may be in an alignment wrapper, so check the first direct
-				// child if the element has no ID.
-				if ( ! element.id ) {
-					element = element.firstElementChild;
-
-					if ( ! element ) {
-						hideInsertionPoint();
-						return;
-					}
-				}
-
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const clientId = element.id.slice( 'block-'.length );
 				if (
-					! clientId ||
 					__unstableIsWithinBlockOverlay( clientId ) ||
 					!! getParentSectionBlock( clientId )
 				) {
@@ -161,6 +156,8 @@ export function useInBetweenInserter() {
 				) {
 					return;
 				}
+
+				const element = refsMap.get( clientId );
 
 				// Don't show the insertion point when the pointer sits beside
 				// the block rather than before it.
@@ -198,8 +195,10 @@ export function useInBetweenInserter() {
 		},
 		[
 			openRef,
+			refsMap,
 			getBlockListSettings,
 			getBlockIndex,
+			getBlockOrder,
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,
