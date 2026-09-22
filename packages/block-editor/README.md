@@ -618,6 +618,26 @@ _Returns_
 
 - `string | undefined`: CSS var string for given spacing preset value.
 
+### getStyleForState
+
+Returns the style object for the selected block style state.
+
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+```
+
+_Parameters_
+
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+- `Object`: The style object for the selected state, if found.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support attributes.
@@ -883,6 +903,33 @@ Undocumented declaration.
 ### RichTextToolbarButton
 
 Undocumented declaration.
+
+### setStyleForState
+
+Returns a style object with the selected block style state updated.
+
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+setAttributes( {
+	style: setStyleForState( attributes.style, state, {
+		...stateStyle,
+		dimensions: { ...stateStyle.dimensions, minHeight: '50vh' },
+	} ),
+} );
+```
+
+_Parameters_
+
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
+- _newStyle_ `Object`: New style for the selected state.
+
+_Returns_
+
+- `Object`: The updated style object.
 
 ### SETTINGS_DEFAULTS
 
