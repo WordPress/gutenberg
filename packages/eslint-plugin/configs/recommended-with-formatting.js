@@ -37,6 +37,7 @@ module.exports = [
 				'error',
 				{
 					peerDependencies: true,
+					includeTypes: true,
 				},
 			],
 			'import/no-unresolved': 'error',

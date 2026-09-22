@@ -27,17 +27,21 @@ const statusDescriptions = {
 };
 
 const statusBadges = Object.fromEntries(
-	Object.entries( statuses ).map( ( [ key, { label, icon, tag } ] ) => [
-		tag,
-		{
-			icon,
-			title: `${ icon } ${ label }`,
-			tooltip: {
-				title: `Component status: ${ label }`,
-				desc: statusDescriptions[ key ],
+	Object.entries( statuses ).map( ( [ key, { label, icon, tag } ] ) => {
+		const showIcon = key !== 'recommended';
+
+		return [
+			tag,
+			{
+				...( showIcon && { icon } ),
+				title: showIcon ? `${ icon } ${ label }` : label,
+				tooltip: {
+					title: `Component status: ${ label }`,
+					desc: statusDescriptions[ key ],
+				},
 			},
-		},
-	] )
+		];
+	} )
 );
 
 /**
