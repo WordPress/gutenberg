@@ -81,8 +81,9 @@
 		"prebuilt/css/design-tokens.css"
 	],
 	"dependencies": {
-		"@babel/parser": "^7.29.7",
+		"@babel/parser": "^7.28.6",
 		"@babel/types": "^7.29.7",
+		"@jridgewell/remapping": "^2.3.5",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",

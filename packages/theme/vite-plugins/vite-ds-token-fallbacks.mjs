@@ -25,7 +25,8 @@ const plugin = () => ( {
 		if ( id.includes( 'node_modules' ) ) {
 			return null;
 		}
-		return transformDsTokenFallbacks( code, filename );
+		const result = transformDsTokenFallbacks( code, filename );
+		return result ? { code: result.code, map: result.map } : null;
 	},
 } );
 

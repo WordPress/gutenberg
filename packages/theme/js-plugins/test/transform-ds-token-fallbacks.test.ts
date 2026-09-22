@@ -74,14 +74,23 @@ const element = <div>var(--wpds-not-a-token)</div>;
 		expect( transformDsTokenFallbacks( source, 'fixture.tsx' ) ).toBeNull();
 	} );
 
-	it( 'encodes JSX attribute fallbacks as JavaScript expressions', () => {
+	it( 'preserves JSX attribute literals for downstream whitespace normalization', () => {
 		const result = transformDsTokenFallbacks(
-			'<div title="var(--wpds-typography-font-family-mono) &amp; test" />',
+			'<div title="before\n    var(--wpds-typography-font-family-mono) &amp; test\n    after" />',
 			'fixture.jsx'
 		);
 		expect( result?.code ).toBe(
-			`<div title={${ JSON.stringify( `${ font } & test` ) }} />`
+			`<div title="before\n    ${ font.replaceAll( '"', '&quot;' ) } &amp; test\n    after" />`
 		);
+	} );
+
+	it( 'does not suppress other recoverable parser errors', () => {
+		expect( () =>
+			transformDsTokenFallbacks(
+				'let gap = "var(--wpds-dimension-gap-sm)"; let gap = "duplicate";',
+				'fixture.ts'
+			)
+		).toThrow( 'has already been declared' );
 	} );
 
 	it( 'preserves manual fallbacks and is idempotent', () => {

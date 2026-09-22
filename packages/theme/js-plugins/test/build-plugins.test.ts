@@ -1,8 +1,8 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runInNewContext } from 'node:vm';
-import { build as esbuild } from 'esbuild';
+import { build as esbuild, transform as esbuildTransform } from 'esbuild';
 import { build as vite, createServer } from 'vite';
 import { SourceMapConsumer } from 'source-map';
 import MagicString from 'magic-string';
@@ -28,6 +28,7 @@ async function bundle( bundler: 'esbuild' | 'Vite', filename: string ) {
 			bundle: true,
 			write: false,
 			format: 'cjs',
+			target: 'es2022',
 			sourcemap: true,
 			plugins: [ esbuildPlugin ],
 		} );
@@ -69,6 +70,7 @@ async function bundle( bundler: 'esbuild' | 'Vite', filename: string ) {
 		],
 		oxc: { jsx: { runtime: 'classic', pragma: 'h' } },
 		build: {
+			target: 'es2022',
 			write: false,
 			minify: false,
 			sourcemap: true,
@@ -151,6 +153,153 @@ export const manual = 'var(--wpds-dimension-gap-sm,)';
 				gap: 'var(--wpds-dimension-gap-sm, 8px)',
 			} );
 		} );
+
+		it.each( [
+			[
+				'auto-accessors',
+				'export class Styles { accessor gap = "var(--wpds-dimension-gap-sm)"; } export const gap = new Styles().gap;',
+			],
+			[
+				'parameter decorators',
+				'function inject(...args: unknown[]) {} export @inject class Styles { constructor(@inject value: string) {} } export const gap = "var(--wpds-dimension-gap-sm)";',
+			],
+			[
+				'import assertions',
+				'import config from "./config.json" assert { type: "json" }; export const gap = config.prefix + "var(--wpds-dimension-gap-sm)";',
+			],
+		] )( 'builds supported %s syntax', async ( _syntax, source ) => {
+			await writeFile(
+				join( directory, 'tsconfig.json' ),
+				JSON.stringify( {
+					compilerOptions: { experimentalDecorators: true },
+				} )
+			);
+			await writeFile(
+				join( directory, 'config.json' ),
+				'{"prefix":""}'
+			);
+			const filename = join( directory, 'fixture.ts' );
+			await writeFile( filename, source );
+			const result = await bundle( bundler, filename );
+			const module = { exports: {} };
+			runInNewContext( result.code, { module, exports: module.exports } );
+			expect( module.exports ).toMatchObject( {
+				gap: 'var(--wpds-dimension-gap-sm, 8px)',
+			} );
+		} );
+	}
+);
+
+it.each( [
+	'import source wasm from "external.wasm"; export { wasm };',
+	'export const wasm = import.source("external.wasm");',
+	'import defer * as mod from "external"; export { mod };',
+	'export const mod = import.defer("external");',
+] )( 'builds supported import phases: %s', async ( statement ) => {
+	const filename = join( directory, 'fixture.js' );
+	await writeFile(
+		filename,
+		`${ statement } export const gap = "var(--wpds-dimension-gap-sm)";`
+	);
+	const result = await esbuild( {
+		entryPoints: [ filename ],
+		bundle: true,
+		format: 'esm',
+		target: 'esnext',
+		write: false,
+		external: [ 'external', 'external.wasm' ],
+		plugins: [ esbuildPlugin ],
+	} );
+	expect( result.outputFiles![ 0 ].text ).toContain(
+		'var(--wpds-dimension-gap-sm, 8px)'
+	);
+} );
+
+it( 'builds JSX in JavaScript files containing only manual fallbacks', async () => {
+	const filename = join( directory, 'fixture.js' );
+	await writeFile(
+		filename,
+		'const React = { createElement: (_tag, props) => props.style.gap }; export const gap = <div style={{ gap: "var(--wpds-dimension-gap-sm, 8px)" }} />;'
+	);
+	const result = await bundle( 'esbuild', filename );
+	const module = { exports: {} };
+	runInNewContext( result.code, { module, exports: module.exports } );
+	expect( module.exports ).toMatchObject( {
+		gap: 'var(--wpds-dimension-gap-sm, 8px)',
+	} );
+} );
+
+it.each( [ 'base64', 'percent-encoded', 'external' ] )(
+	'preserves original sources through %s esbuild input maps',
+	async ( encoding ) => {
+		const source =
+			'export function fail(): never { const css: string = "var(--wpds-typography-font-family-mono)"; throw new Error(css); }\n';
+		const compiled = await esbuildTransform( source, {
+			loader: 'ts',
+			sourcefile: 'original.ts',
+			sourcemap: 'external',
+		} );
+		let directive;
+		if ( encoding === 'external' ) {
+			await mkdir( join( directory, 'maps' ) );
+			await mkdir( join( directory, 'src' ) );
+			await writeFile( join( directory, 'src/original.ts' ), source );
+			const map = JSON.parse( compiled.map );
+			map.sourceRoot = '../src';
+			await writeFile(
+				join( directory, 'maps/compiled.js.map' ),
+				JSON.stringify( map )
+			);
+			directive = 'maps/compiled.js.map';
+		} else {
+			directive =
+				encoding === 'base64'
+					? `data:application/json;base64,${ Buffer.from( compiled.map ).toString( 'base64' ) }`
+					: `data:application/json,${ encodeURIComponent( compiled.map ) }`;
+		}
+		const filename = join( directory, 'compiled.js' );
+		// A later directive-shaped template must not replace the real comment.
+		await writeFile(
+			filename,
+			`${ compiled.code }\n//# sourceMappingURL=${ directive }\nexport const text = \`\n//# sourceMappingURL=missing.map\n\`;`
+		);
+		const result = await bundle( 'esbuild', filename );
+		const consumer = new SourceMapConsumer( JSON.parse( result.map ) );
+		const original = consumer.originalPositionFor(
+			positionOf( result.code, 'throw new Error' )
+		);
+		expect( original ).toMatchObject(
+			positionOf( source, 'throw new Error' )
+		);
+		expect( original.source ).toMatch(
+			encoding === 'external' ? /src\/original\.ts$/ : /original\.ts$/
+		);
+		expect( consumer.sourceContentFor( original.source! ) ).toBe( source );
+	}
+);
+
+it.each( [
+	[ 'missing.map', 0 ],
+	[ 'data:application/json,invalid', 1 ],
+] )(
+	'continues building when the input source map is %s',
+	async ( directive, warningCount ) => {
+		const filename = join( directory, 'fixture.js' );
+		await writeFile(
+			filename,
+			`export const gap = "var(--wpds-dimension-gap-sm)";\n//# sourceMappingURL=${ directive }`
+		);
+		const result = await esbuild( {
+			entryPoints: [ filename ],
+			write: false,
+			sourcemap: 'inline',
+			logLevel: 'silent',
+			plugins: [ esbuildPlugin ],
+		} );
+		expect( result.outputFiles![ 0 ].text ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+		expect( result.warnings ).toHaveLength( warningCount );
 	}
 );
 

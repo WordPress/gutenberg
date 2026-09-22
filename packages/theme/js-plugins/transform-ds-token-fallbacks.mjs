@@ -40,7 +40,7 @@ function isNonValue( ancestors ) {
  *
  * @param {string} source   JavaScript or TypeScript source.
  * @param {string} filename Source filename, without a query string.
- * @return {{ code: string, map: import('magic-string').SourceMap } | null} Transformation, or null when unchanged.
+ * @return {{ code: string, map: import('magic-string').SourceMap, sourceMappingURL: string | undefined } | null} Transformation, or null when unchanged.
  */
 export function transformDsTokenFallbacks( source, filename ) {
 	if ( ! source.includes( '--wpds-' ) ) {
@@ -54,6 +54,7 @@ export function transformDsTokenFallbacks( source, filename ) {
 		allowAwaitOutsideFunction: true,
 		allowUndeclaredExports: true,
 		attachComment: false,
+		errorRecovery: true,
 		plugins: [
 			...( isTypeScript
 				? [ /** @type {const} */ ( 'typescript' ) ]
@@ -62,8 +63,22 @@ export function transformDsTokenFallbacks( source, filename ) {
 				? []
 				: [ /** @type {const} */ ( 'jsx' ) ] ),
 			'decorators',
+			'decoratorAutoAccessors',
+			'deprecatedImportAssert',
+			'sourcePhaseImports',
+			'deferredImportEvaluation',
 		],
 	} );
+	// Babel's standard decorators grammar reports parameter decorators even
+	// in TypeScript. Leave that one check to the compiler's tsconfig settings.
+	for ( const error of ast.errors ?? [] ) {
+		if (
+			! isTypeScript ||
+			error.reasonCode !== 'UnsupportedParameterDecorator'
+		) {
+			throw error;
+		}
+	}
 	const output = new MagicString( source );
 
 	traverse( ast, ( node, ancestors ) => {
@@ -82,14 +97,16 @@ export function transformDsTokenFallbacks( source, filename ) {
 			if ( value === node.value ) {
 				return;
 			}
-			// JSX attribute strings use HTML entities, not JavaScript escapes.
-			const replacement = JSON.stringify( value );
+			// Keep JSX literals as literals: JSX compilers can normalize their
+			// whitespace differently from JavaScript expression values.
+			const isAttribute =
+				ancestors.at( -1 )?.node.type === 'JSXAttribute';
 			output.overwrite(
 				node.start,
 				node.end,
-				ancestors.at( -1 )?.node.type === 'JSXAttribute'
-					? `{${ replacement }}`
-					: replacement
+				isAttribute
+					? `"${ value.replaceAll( '&', '&amp;' ).replaceAll( '"', '&quot;' ) }"`
+					: JSON.stringify( value )
 			);
 			return;
 		}
@@ -121,8 +138,19 @@ export function transformDsTokenFallbacks( source, filename ) {
 	if ( ! output.hasChanged() ) {
 		return null;
 	}
+	// Read actual comments, not directive-shaped text inside strings/templates.
+	let sourceMappingURL;
+	for ( const comment of ast.comments ?? [] ) {
+		const match = /^[#@]\s*sourceMappingURL=(\S+)\s*$/.exec(
+			comment.value
+		);
+		if ( match ) {
+			sourceMappingURL = match[ 1 ];
+		}
+	}
 	return {
 		code: output.toString(),
+		sourceMappingURL,
 		map: output.generateMap( {
 			source: filename,
 			includeContent: true,

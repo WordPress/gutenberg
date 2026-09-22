@@ -164,7 +164,9 @@ describe( 'design token fallback build plugin parity', () => {
 			path: emptyFallbackJsFixture,
 		} as OnLoadArgs );
 
-		expect( result ).toBeUndefined();
+		expect( result?.contents ).toContain(
+			'gap: var(--wpds-dimension-gap-sm,);'
+		);
 	} );
 
 	it( 'leaves an empty var() fallback untouched in Vite', async () => {
