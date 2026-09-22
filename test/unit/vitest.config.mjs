@@ -88,6 +88,23 @@ export default defineConfig( {
 				),
 			},
 			{
+				// Generated during a full build and gitignored, so it cannot be
+				// resolved here. Both @wordpress/vips and
+				// @wordpress/video-conversion import it by this exact specifier.
+				find: /^\.\/worker-code\.ts$/,
+				replacement: path.join(
+					ROOT_DIR,
+					'test/unit/config/worker-code-stub.vitest.ts'
+				),
+			},
+			{
+				find: '@wordpress/vips/jxl-wasm',
+				replacement: path.join(
+					ROOT_DIR,
+					'test/unit/config/vips-jxl-wasm-stub.vitest.js'
+				),
+			},
+			{
 				find: '@wordpress/video-conversion/worker',
 				replacement: path.join(
 					ROOT_DIR,

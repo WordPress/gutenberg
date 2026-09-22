@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add JPEG XL (JXL) as a client-side supported MIME type and output format. The vips-jxl.wasm module is loaded lazily on first use via `vipsEnsureJxlSupport()`, keeping it out of the default bundle ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
+-   Convert uploaded JPEG XL (JXL) images to JPEG client-side via vips, since JXL is not yet broadly web-compatible (most browsers cannot display it and the server cannot read it). The original `.jxl` is preserved as a companion file alongside the JPEG derivative, mirroring how HEIC uploads are handled ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
+
 ### Bug Fixes
 
 -   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
