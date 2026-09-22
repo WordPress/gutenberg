@@ -241,17 +241,19 @@ export function Notes( {
 		}
 	};
 
-	// In the "All notes" view, find where the resolved notes begin so a
-	// "Resolved" divider can be rendered above them. Resolved notes (status
-	// 'approved' with a still-present block) always sort after the active
-	// ones, so the first match marks the boundary. The floating view only
-	// lists unresolved notes, so it needs no divider.
-	const firstResolvedIndex = isFloating
-		? -1
-		: threads.findIndex(
-				( thread ) =>
-					thread.status === 'approved' && !! thread.blockClientId
-			);
+	// In the unfiltered "All notes" view, find where the resolved notes begin
+	// so a "Resolved" divider can be rendered above them. Resolved notes
+	// (status 'approved' with a still-present block) always sort after the
+	// active ones, so the first match marks the boundary. The floating view
+	// only lists unresolved notes, and a filtered list is already all one
+	// status, so neither needs a divider.
+	const firstResolvedIndex =
+		isFloating || isFiltered
+			? -1
+			: threads.findIndex(
+					( thread ) =>
+						thread.status === 'approved' && !! thread.blockClientId
+				);
 
 	return (
 		<Stack
