@@ -34,10 +34,6 @@
 	margin-bottom: 1.5em;
 }
 
-.wp-block-file__embed {
-	margin-bottom: 1em;
-}
-
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;
