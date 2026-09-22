@@ -41,11 +41,15 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 		let block: Block;
 
 		if ( transform ) {
-			// A raw transform may return several blocks, in which case it is
-			// unclear which of them the node's attributes belong on, so only
-			// the single-block case is handled. No core raw transform returns
-			// an array today; one that did would already have thrown here.
-			block = transform( node, handler ) as Block;
+			const transformed = transform( node, handler );
+
+			// A transform may return several blocks, and which of them the
+			// node's attributes belong on is ambiguous, so leave those alone.
+			if ( Array.isArray( transformed ) ) {
+				return transformed;
+			}
+
+			block = transformed;
 		} else {
 			block = createBlock(
 				blockName,
