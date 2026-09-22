@@ -20,6 +20,8 @@ Read the cross-package guide and the package-specific source guidance that
 matches the change:
 
 - [`docs/contributors/design/design-system-packages.md`](../../../docs/contributors/design/design-system-packages.md)
+- [`storybook/stories/design-system/contributing.md`](../../../storybook/stories/design-system/contributing.md)
+  for when to report instead of fix, and what a report contains
 - [`packages/components/CONTRIBUTING.md`](../../../packages/components/CONTRIBUTING.md)
 - [`packages/ui/CONTRIBUTING.md`](../../../packages/ui/CONTRIBUTING.md)
 - [`packages/theme/README.md`](../../../packages/theme/README.md)
