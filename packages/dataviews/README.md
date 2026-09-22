@@ -117,7 +117,7 @@ Example:
 
 #### `getItemLevel`: `function`
 
-A function that receives an item and returns its hierarchical level. It's optional, but this property must be passed for DataViews to display the hierarchical levels of the data if `view.showLevels` is true.
+A function that receives an item and returns its hierarchical level. It's optional. DataViews uses it to indent table rows when `view.showLevels` is true and either `getItemParentId` is not provided or `view.groupBy` is set.
 
 Example:
 
@@ -125,6 +125,18 @@ Example:
 // Example implementation
 {
 	getItemLevel={ ( item ) => item.level }
+}
+```
+
+#### `getItemParentId`: `function`
+
+A function that receives an item and returns its parent's unique id, or `null`/`undefined` for a root item. When `view.showLevels` is true and `view.groupBy` is not set, the table orders loaded items by these relationships and calculates their indentation. Items with an unloaded parent are treated as roots. DataViews does not fetch missing items.
+
+Example:
+
+```js
+{
+	getItemParentId={ ( item ) => item.parentId }
 }
 ```
 
@@ -237,7 +249,7 @@ Properties:
 -   `showTitle`: Whether the title should be shown in the UI. `true` by default.
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
--   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
+-   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See the related `getItemParentId` and `getItemLevel` DataViews props.
 -   `groupBy`:
 
     -   `field`: the field used for grouping the dataset.
@@ -783,6 +795,7 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `renderItemLink`
 -   `onClickItem`
 -   `getItemLevel`
+-   `getItemParentId`
 -   `header`
 
 ## `DataForm`
