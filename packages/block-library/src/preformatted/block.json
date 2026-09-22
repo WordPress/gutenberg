@@ -17,6 +17,11 @@
 	},
 	"supports": {
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -24,6 +29,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"padding": true,
 			"margin": true

@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentPropsWithoutRef, ComponentType } from 'react';
-// Form controls read these stylesheets, normally enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import {
@@ -155,7 +150,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {

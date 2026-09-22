@@ -10,7 +10,8 @@ import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta = {
-	title: 'Design System/Components/Button/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Button/Usage Guidelines',
+	id: 'design-system-components-button-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},

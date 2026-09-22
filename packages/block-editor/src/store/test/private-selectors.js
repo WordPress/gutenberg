@@ -33,8 +33,6 @@ import {
 	isSectionBlock,
 	isSyncedBlock,
 	getParentSectionBlock,
-	getSelectedBlockStyleState,
-	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
 	getStyleOverrides,
@@ -225,114 +223,6 @@ describe( 'private selectors', () => {
 			expect( shouldRenderBlockListView( state, 'client-1' ) ).toBe(
 				true
 			);
-		} );
-	} );
-
-	describe( 'getSelectedBlockStyleState', () => {
-		it( 'returns default when the block has no selected state', () => {
-			const state = {};
-
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'default',
-				pseudo: 'default',
-			} );
-		} );
-
-		it( 'returns the per-block pseudo with the global viewport', () => {
-			const state = {
-				styleStateViewport: '@mobile',
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-					value: { pseudo: ':hover' },
-				},
-			};
-
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: '@mobile',
-				pseudo: ':hover',
-			} );
-		} );
-
-		it( 'returns default pseudo when the selected state has no value', () => {
-			const state = {
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-				},
-			};
-
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: 'default',
-				pseudo: 'default',
-			} );
-		} );
-
-		it( 'returns the global viewport even when another block holds the per-block state', () => {
-			const state = {
-				styleStateViewport: '@mobile',
-				selectedBlockStyleState: {
-					clientId: 'client-2',
-					value: { pseudo: ':hover' },
-				},
-			};
-
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
-				viewport: '@mobile',
-				pseudo: 'default',
-			} );
-		} );
-	} );
-
-	describe( 'hasSelectedStyleState', () => {
-		it( 'returns false when the block has no selected state', () => {
-			const state = {};
-
-			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
-		} );
-
-		it( 'returns false when another block has the selected state', () => {
-			const state = {
-				selectedBlockStyleState: {
-					clientId: 'client-2',
-					value: { viewport: 'default', pseudo: ':hover' },
-				},
-			};
-
-			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
-		} );
-
-		it( 'returns true when a global viewport state is selected', () => {
-			const state = {
-				styleStateViewport: '@mobile',
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-					value: { pseudo: 'default' },
-				},
-			};
-
-			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
-		} );
-
-		it( 'returns true when a pseudo state is selected', () => {
-			const state = {
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-					value: { viewport: 'default', pseudo: ':hover' },
-				},
-			};
-
-			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
-		} );
-
-		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
-			const state = {
-				styleStateViewport: '@mobile',
-				selectedBlockStyleState: {
-					clientId: 'client-1',
-					value: { pseudo: ':hover' },
-				},
-			};
-
-			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
 		} );
 	} );
 

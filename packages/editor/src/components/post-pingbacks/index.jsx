@@ -1,5 +1,8 @@
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl, ExternalLink } from '@wordpress/components';
+import {
+	CheckboxControl as WCCheckboxControl,
+	ExternalLink,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
@@ -17,7 +20,7 @@ function PostPingbacks() {
 		} );
 
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			label={ __( 'Enable pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
