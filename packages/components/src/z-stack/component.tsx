@@ -16,6 +16,7 @@ function UnconnectedZStack(
 	deprecated( 'wp.components.__experimentalZStack', {
 		since: '7.2',
 		version: '7.4',
+		alternative: 'your own CSS',
 	} );
 
 	const {
