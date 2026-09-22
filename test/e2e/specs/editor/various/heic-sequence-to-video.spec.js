@@ -323,6 +323,11 @@ test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 				'data-wp-on--pointerenter',
 				'actions.playLivePhoto'
 			);
+			// A touch screen has no hover, so a tap plays it instead.
+			await expect( video ).toHaveAttribute(
+				'data-wp-on--click',
+				'actions.toggleLivePhoto'
+			);
 			// Reachable without a pointer.
 			await expect( video ).toHaveAttribute( 'tabindex', '0' );
 			// It rests on the still: autoplay would make it an animation.
@@ -395,6 +400,72 @@ test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 			expect( blocks[ 0 ].name ).toBe( 'core/image' );
 			// The flag is what keeps it from converting straight back.
 			expect( blocks[ 0 ].attributes.preserveStillImage ).toBe( true );
+		} );
+
+		test( 'offers a still frame picker in place of the poster control', async ( {
+			editor,
+			page,
+			sequenceUtils,
+		} ) => {
+			await uploadAndConvert( { editor, sequenceUtils } );
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'button', { name: 'Still frame' } )
+			).toBeVisible();
+			// The poster of a Live photo is a frame of its own motion.
+			await expect(
+				settings.getByRole( 'button', {
+					name: 'Edit or replace the poster image.',
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'keeps a picked still frame when switching between still and live', async ( {
+			editor,
+			page,
+			sequenceUtils,
+		} ) => {
+			await uploadAndConvert( { editor, sequenceUtils } );
+
+			// Stand in for a frame picked in the Still frame panel, which
+			// needs a playable companion the fixtures do not provide.
+			const pickedFrame = await page.evaluate( () => {
+				const { getBlocks } =
+					window.wp.data.select( 'core/block-editor' );
+				const [ block ] = getBlocks();
+				const frame = block.attributes.poster.replace(
+					/\.(\w+)$/,
+					'-still.$1'
+				);
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( block.clientId, { poster: frame } );
+				return frame;
+			} );
+
+			await page
+				.getByRole( 'button', { name: 'Display as still image' } )
+				.click();
+			await sequenceUtils.waitForBlockNames( [ 'core/image' ] );
+
+			let blocks = await sequenceUtils.getBlocks();
+			expect( blocks[ 0 ].attributes.url ).toBe( pickedFrame );
+
+			await editor.openDocumentSettingsSidebar();
+			// Not uncheck(): clearing it replaces the block, so the checkbox
+			// is gone before its state could be verified.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'checkbox', { name: 'Display as still image' } )
+				.click();
+			await sequenceUtils.waitForBlockNames( [ 'core/video' ] );
+
+			blocks = await sequenceUtils.getBlocks();
+			expect( blocks[ 0 ].attributes.poster ).toBe( pickedFrame );
 		} );
 
 		test( 'leaves gallery images alone, since a gallery only holds images', async ( {
