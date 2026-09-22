@@ -4,15 +4,14 @@ import {
 	Modal,
 	__experimentalGrid as Grid,
 	__experimentalText as WCText,
-	__experimentalVStack as VStack,
 	Flex,
 	Icon as WCIcon,
 } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useViewportMatch } from '@wordpress/compose';
 import {
 	archive,
 	blockMeta,
@@ -83,56 +82,48 @@ const TEMPLATE_ICONS: Record< string, any > = {
 
 interface TemplateListItemProps {
 	title: string;
-	direction: 'row' | 'column';
 	className: string;
 	description?: string;
 	icon: any;
 	onClick: () => void;
-	children?: React.ReactNode;
 }
 
 function TemplateListItem( {
 	title,
-	direction,
 	className,
 	description,
 	icon,
 	onClick,
-	children,
 }: TemplateListItemProps ) {
 	return (
 		<Button
 			__next40pxDefaultSize
 			className={ className }
 			onClick={ onClick }
-			label={ description }
-			showTooltip={ !! description }
 		>
-			<Flex
-				as="span"
-				align="center"
-				justify="center"
-				style={ { width: '100%' } }
-				direction={ direction }
-			>
-				<div className="template-list-add-new-template__template-icon">
-					<WCIcon icon={ icon } />
-				</div>
-				<VStack
-					className="template-list-add-new-template__template-name"
-					alignment="center"
-					spacing={ 0 }
+			<Stack render={ <span /> } direction="column" gap="sm">
+				<Stack
+					render={ <span /> }
+					direction="row"
+					align="center"
+					gap="sm"
 				>
-					<WCText
-						align="center"
-						weight="var(--wpds-typography-font-weight-emphasis)"
-						lineHeight={ 1.53846153846 } // 20px
-					>
-						{ title }
-					</WCText>
-					{ children }
-				</VStack>
-			</Flex>
+					<div className="template-list-add-new-template__template-icon">
+						<WCIcon icon={ icon } />
+					</div>
+					<span className="template-list-add-new-template__template-name">
+						<WCText
+							weight="var(--wpds-typography-font-weight-emphasis)"
+							lineHeight={ 1.53846153846 } // 20px
+						>
+							{ title }
+						</WCText>
+					</span>
+				</Stack>
+				{ description && (
+					<Text variant="body-sm">{ description }</Text>
+				) }
+			</Stack>
 		</Button>
 	);
 }
@@ -170,24 +161,6 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const containerRef = useRef< HTMLDivElement >( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const homeUrl = useSelect( ( select ) => {
-		// Site index.
-		return select( coreStore ).getEntityRecord< { home?: string } >(
-			'root',
-			'__unstableBase'
-		)?.home;
-	}, [] );
-
-	const TEMPLATE_SHORT_DESCRIPTIONS: Record< string, string > = {
-		'front-page': homeUrl ?? '',
-		date: sprintf(
-			// translators: %s: The homepage url.
-			__( 'E.g. %s' ),
-			homeUrl + '/' + new Date().getFullYear()
-		),
-	};
 
 	useEffect( () => {
 		// Focus the first focusable element when component mounts or UI changes
@@ -300,7 +273,7 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
-					columns={ isMobile ? 2 : 3 }
+					templateColumns="repeat(auto-fill, minmax(240px, 1fr))"
 					gap={ 4 }
 					align="flex-start"
 					justify="center"
@@ -312,16 +285,13 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 						) }
 					</Flex>
 					{ missingTemplates.map( ( template ) => {
-						const { title, slug, onClick } = template;
+						const { title, description, slug, onClick } = template;
 						return (
 							<TemplateListItem
 								key={ slug }
 								title={ title }
-								direction="column"
 								className="template-list-add-new-template__template-button"
-								description={
-									TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
-								}
+								description={ description }
 								icon={ TEMPLATE_ICONS[ slug ] || layout }
 								onClick={ () =>
 									onClick
@@ -333,23 +303,17 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					} ) }
 					<TemplateListItem
 						title={ __( 'Custom template' ) }
-						direction="row"
 						className="template-list-add-new-template__custom-template-button"
+						description={ __(
+							'A custom template can be manually applied to any post or page.'
+						) }
 						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate
 							)
 						}
-					>
-						<WCText
-							lineHeight={ 1.53846153846 } // 20px
-						>
-							{ __(
-								'A custom template can be manually applied to any post or page.'
-							) }
-						</WCText>
-					</TemplateListItem>
+					/>
 				</Grid>
 			) }
 			{ modalContent === modalContentMap.customTemplate &&
