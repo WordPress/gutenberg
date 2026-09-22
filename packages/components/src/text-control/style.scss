@@ -34,6 +34,22 @@
 	&::placeholder {
 		color: $components-color-dark-gray-placeholder;
 	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		background: $components-color-background;
+
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+			color: GrayText;
+		}
+
+		&::placeholder {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+	}
 }
 
 .components-text-control__input[type="email"],
