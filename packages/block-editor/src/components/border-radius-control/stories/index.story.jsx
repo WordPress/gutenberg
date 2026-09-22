@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import BorderRadiusControl from '../';
 
 const meta = {
-	title: 'BlockEditor/BorderRadiusControl',
+	id: 'blockeditor-borderradiuscontrol',
+	title: 'Editor/Block Editor/BorderRadiusControl',
 	component: BorderRadiusControl,
 	parameters: {
 		docs: {

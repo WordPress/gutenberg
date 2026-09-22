@@ -17,6 +17,11 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergStorybookPlugin = {
+	rules: {
+		'no-build-style-imports': require( '../../storybook/eslint/no-build-style-imports.js' ),
+	},
+};
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( rootDir )
 );
@@ -202,6 +207,11 @@ const UI_RESTRICTED_IMPORTS = {
 	patterns: [ lockUnlockRestrictedPattern ],
 };
 
+const noStringLiteralIds = {
+	selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+	message: 'Do not use string literals for IDs; use useId hook instead.',
+};
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -214,10 +224,7 @@ const restrictedSyntax = [
 			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 		message: 'Prefer page.waitForSelector instead.',
 	},
-	{
-		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message: 'Do not use string literals for IDs; use useId hook instead.',
-	},
+	noStringLiteralIds,
 	{
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
@@ -378,6 +385,7 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
@@ -720,11 +728,20 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
+	// Flag side-effect imports of package build-style stylesheets so they
+	// load through package-styles/config.js. The production stylesheet
+	// import rule does not apply; Storybook loads package CSS through
+	// package-styles/config.js, not the enqueue path.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
+		plugins: {
+			'gutenberg-storybook': gutenbergStorybookPlugin,
+		},
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
+			'gutenberg-storybook/no-build-style-imports': 'error',
+			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
 
@@ -759,6 +776,25 @@ export default dedupePlugins( [
 					message:
 						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 				},
+			],
+		},
+	},
+
+	// Override: Tests and Storybook — allow literal `id` attributes.
+	// Later than the components re-spread of `restrictedSyntax`. Ignore
+	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.
+	{
+		files: [
+			`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+			`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [ 'test/e2e/**', 'test/performance/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax.filter(
+					( rule ) => rule !== noStringLiteralIds
+				),
 			],
 		},
 	},

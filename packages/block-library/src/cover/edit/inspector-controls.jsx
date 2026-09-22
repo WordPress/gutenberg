@@ -42,12 +42,9 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import PosterImage from '../../utils/poster-image';
 import { MediaControl } from '../../utils/media-control';
 
-const {
-	cleanEmptyObject,
-	isDefaultBlockStyleState,
-	ResolutionTool,
-	HTMLElementControl,
-} = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
 
 function CoverHeightInput( {
 	onChange,
@@ -136,15 +133,18 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { imageSizes, selectedStyleState } = useSelect(
+	const { imageSizes, selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
-			const { getSettings, getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getSettings,
+				getSelectedBlockStyleState,
+				hasSelectedBlockStyleState,
+			} = select( blockEditorStore );
 
 			return {
 				imageSizes: getSettings()?.imageSizes,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId ]
