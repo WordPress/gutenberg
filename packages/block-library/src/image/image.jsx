@@ -46,7 +46,12 @@ import {
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
+import { isBlobURL } from '@wordpress/blob';
+import {
+	createBlock,
+	getBlockBindingsSource,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -56,6 +61,12 @@ import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { LIVE_PHOTO_ATTRIBUTES } from '../video/live-photo';
+import {
+	getCarriedMotionConversionAttributes,
+	getMotionCompanion,
+	isConvertedImageSequence,
+} from '../utils/motion-companion';
 import {
 	getActiveDimensionValue,
 	getDimensionResetAttributes,
@@ -94,6 +105,14 @@ const scaleOptions = [
 const WRITEMODE_POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
+
+/*
+ * Blocks already converted to a Live photo video, so undoing that conversion
+ * does not immediately trigger it again. Undo restores the Image block with
+ * its original client ID, and the companion is still there, so without this
+ * the author could never get back to the still image.
+ */
+const convertedSequenceClientIds = new Set();
 
 // If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles.
 const ImageWrapper = ( { href, children } ) => {
@@ -298,6 +317,7 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
+		preserveStillImage,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -364,10 +384,15 @@ export default function Image( {
 		imageSizes,
 		maxWidth,
 		editMediaEntity,
+		isInGallery,
 	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType, getSettings } =
-				select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				canInsertBlockType,
+				getSettings,
+				getBlockName,
+			} = select( blockEditorStore );
 
 			const rootClientId = getBlockRootClientId( clientId );
 			const settings = getSettings();
@@ -381,6 +406,7 @@ export default function Image( {
 					'core/cover',
 					rootClientId
 				),
+				isInGallery: getBlockName( rootClientId ) === 'core/gallery',
 			};
 		},
 		[ clientId ]
@@ -464,6 +490,85 @@ export default function Image( {
 		setAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	/*
+	 * A HEIC/HEIF image sequence — an Apple Live Photo or Android burst —
+	 * uploads as a still frame with the motion re-encoded to a companion
+	 * video. What the author dropped in was something that moves, so once that
+	 * companion is available the block becomes a Live photo Video block, which
+	 * rests on this still and plays on hover. "Display as
+	 * still image" in the toolbar undoes it.
+	 *
+	 * An animated GIF is deliberately not converted here: it already animates
+	 * as an image, so its Video block is offered through the block switcher
+	 * instead (see transforms.js).
+	 */
+	useEffect( () => {
+		if (
+			preserveStillImage ||
+			! isConvertedImageSequence( image ) ||
+			// A gallery only accepts image blocks.
+			isInGallery ||
+			convertedSequenceClientIds.has( clientId )
+		) {
+			return;
+		}
+
+		const companion = getMotionCompanion( image );
+		if ( ! companion ) {
+			return;
+		}
+
+		/*
+		 * Remember the block so undo does not land back here and immediately
+		 * re-convert, which would make the image block unreachable.
+		 */
+		convertedSequenceClientIds.add( clientId );
+
+		replaceBlocks(
+			clientId,
+			createBlock( 'core/video', {
+				...getCarriedMotionConversionAttributes( attributes ),
+				id,
+				src: companion.src,
+				/*
+				 * Rest on the frame this block shows, which may be one the
+				 * author picked from the motion earlier. A sub-size of the
+				 * original still is the same frame, and smaller.
+				 */
+				poster: url && ! isBlobURL( url ) ? url : companion.poster,
+				caption: attributes.caption,
+				...LIVE_PHOTO_ATTRIBUTES,
+				/*
+				 * Carry the still's intrinsic dimensions so the <video> holds
+				 * its aspect ratio from the first paint, rather than
+				 * collapsing to the browser default and jumping once the
+				 * poster loads.
+				 */
+				width: companion.width,
+				height: companion.height,
+			} )
+		);
+	}, [
+		image,
+		preserveStillImage,
+		isInGallery,
+		clientId,
+		id,
+		url,
+		attributes,
+		replaceBlocks,
+	] );
+
+	/*
+	 * Clearing "Display as still image" has to also forget the earlier
+	 * conversion, or the guard above would keep the effect from running and
+	 * the checkbox would appear to do nothing.
+	 */
+	const playAsLivePhoto = useCallback( () => {
+		convertedSequenceClientIds.delete( clientId );
+		setAttributes( { preserveStillImage: undefined } );
+	}, [ clientId, setAttributes ] );
 
 	/*
 	 * Externally hosted images can be uploaded to the media library. The
@@ -1051,6 +1156,30 @@ export default function Image( {
 									onChange={ updateIsDecorative }
 									help={ __(
 										'Hidden from assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ isConvertedImageSequence( image ) && (
+							<ToolsPanelItem
+								label={ __( 'Display as still image' ) }
+								isShownByDefault
+								hasValue={ () => !! preserveStillImage }
+								onDeselect={ () => playAsLivePhoto() }
+							>
+								<WCCheckboxControl
+									label={ __( 'Display as still image' ) }
+									checked={ !! preserveStillImage }
+									onChange={ ( value ) =>
+										value
+											? setAttributes( {
+													preserveStillImage: true,
+												} )
+											: playAsLivePhoto()
+									}
+									help={ __(
+										'Keep the photo still instead of playing its motion on hover.'
 									) }
 								/>
 							</ToolsPanelItem>

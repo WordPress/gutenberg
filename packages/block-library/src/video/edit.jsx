@@ -3,6 +3,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
 	Placeholder,
+	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import {
@@ -11,15 +12,18 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { video as icon } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { image as imageIcon, video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 import { prependHTTPS } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
@@ -31,6 +35,9 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
+import { getCarriedMotionConversionAttributes } from '../utils/motion-companion';
+import { isLivePhoto as isLivePhotoAttributes } from './live-photo';
+import LivePhotoStillFrame from './live-photo-still-frame';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -38,6 +45,7 @@ function VideoEdit( {
 	isSelected: isSingleSelected,
 	attributes,
 	className,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -56,6 +64,7 @@ function VideoEdit( {
 		muted,
 		playsInline,
 	} = attributes;
+	const isLivePhoto = isLivePhotoAttributes( attributes );
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -87,6 +96,51 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
+
+	/*
+	 * A Live photo rests on its still frame and plays only while the pointer
+	 * is over it, while it has keyboard focus, or, on a touch screen, from one
+	 * tap to the next. These mirror the front-end module (view.js).
+	 */
+	function playLivePhoto( event ) {
+		if ( event.pointerType === 'touch' ) {
+			return;
+		}
+		// A tap focuses the video too; only keyboard focus plays it.
+		if (
+			event.type === 'focus' &&
+			! event.currentTarget.matches( ':focus-visible' )
+		) {
+			return;
+		}
+		// Browsers allow muted videos to be played programmatically.
+		event.currentTarget.play().catch( () => {} );
+	}
+
+	// Reloading, rather than rewinding, brings back the poster, which may be
+	// a frame picked from the middle of the motion.
+	function restLivePhoto( player ) {
+		player.pause();
+		player.load();
+	}
+
+	function pauseLivePhoto( event ) {
+		if ( event.pointerType !== 'touch' ) {
+			restLivePhoto( event.currentTarget );
+		}
+	}
+
+	function toggleLivePhoto( event ) {
+		if ( event.nativeEvent.pointerType !== 'touch' ) {
+			return;
+		}
+		if ( event.currentTarget.paused ) {
+			event.currentTarget.play().catch( () => {} );
+		} else {
+			restLivePhoto( event.currentTarget );
+		}
+	}
+
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -148,6 +202,48 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	/*
+	 * A Live photo plays a companion video of an image attachment, so this
+	 * block can be turned back into the still image it was converted from.
+	 * That needs the attachment record, which only resolves asynchronously —
+	 * hence a dedicated control rather than a block-switcher transform, which
+	 * has to decide synchronously whether it applies.
+	 */
+	const stillImage = useSelect(
+		( select ) =>
+			isLivePhoto && id && isSingleSelected
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+					)
+				: null,
+		[ isLivePhoto, id, isSingleSelected ]
+	);
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	function convertToStillImage() {
+		replaceBlocks(
+			clientId,
+			createBlock( 'core/image', {
+				...getCarriedMotionConversionAttributes( attributes ),
+				id,
+				// Show the frame the Live photo rests on, which the author may
+				// have picked from the motion.
+				url: poster || stillImage.source_url,
+				alt: stillImage.alt_text,
+				caption: attributes.caption,
+				/*
+				 * Without this the Image block would convert straight back to
+				 * a Live photo, since its companion video is still there.
+				 */
+				preserveStillImage: true,
+			} )
+		);
+	}
+
 	// Much of this description is duplicated from MediaPlaceholder.
 	const placeholder = ( content ) => {
 		return (
@@ -203,6 +299,13 @@ function VideoEdit( {
 						/>
 					</BlockControls>
 					<BlockControls group="other">
+						{ isLivePhoto && !! stillImage && (
+							<ToolbarButton
+								icon={ imageIcon }
+								label={ __( 'Display as still image' ) }
+								onClick={ convertToStillImage }
+							/>
+						) }
 						<MediaReplaceFlow
 							mediaId={ id }
 							mediaURL={ src }
@@ -237,15 +340,28 @@ function VideoEdit( {
 						setAttributes={ setAttributes }
 						attributes={ attributes }
 					/>
-					<PosterImage
+					{ ! isLivePhoto && (
+						<PosterImage
+							poster={ poster }
+							onChange={ ( posterImage ) =>
+								setAttributes( {
+									poster: posterImage?.url,
+								} )
+							}
+						/>
+					) }
+				</ToolsPanel>
+				{ /* A Live photo's poster is a frame of its own motion. */ }
+				{ isLivePhoto && !! stillImage?.source_url && (
+					<LivePhotoStillFrame
+						src={ src }
 						poster={ poster }
-						onChange={ ( posterImage ) =>
-							setAttributes( {
-								poster: posterImage?.url,
-							} )
+						stillImage={ stillImage }
+						onChange={ ( newPoster ) =>
+							setAttributes( { poster: newPoster } )
 						}
 					/>
-				</ToolsPanel>
+				) }
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
@@ -258,6 +374,11 @@ function VideoEdit( {
 					loop={ loop }
 					muted={ muted }
 					playsInline={ playsInline }
+					onPointerEnter={ isLivePhoto ? playLivePhoto : undefined }
+					onPointerLeave={ isLivePhoto ? pauseLivePhoto : undefined }
+					onFocus={ isLivePhoto ? playLivePhoto : undefined }
+					onBlur={ isLivePhoto ? pauseLivePhoto : undefined }
+					onClick={ isLivePhoto ? toggleLivePhoto : undefined }
 					width={ width }
 					height={ height }
 					style={

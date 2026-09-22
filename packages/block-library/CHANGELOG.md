@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Video: Play uploaded HEIC/HEIF image sequences (Apple Live Photos, Android bursts) as Live photos. It shows the sequence's still frame and plays its motion on hover, keyboard focus, or a tap on touch screens, in the editor and on the front end. The author can pick which frame it rests on. An uploaded sequence becomes one automatically once its companion video is ready, and "Display as still image" turns it back into an Image block ([#79642](https://github.com/WordPress/gutenberg/issues/79642), [#79647](https://github.com/WordPress/gutenberg/pull/79647)).
+
 ### Enhancements
 
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
