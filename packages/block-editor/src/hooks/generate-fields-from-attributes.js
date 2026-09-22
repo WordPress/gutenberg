@@ -51,9 +51,17 @@ function createFieldFromAttribute( name, def ) {
 		type: type === 'string' ? 'text' : type,
 	};
 
-	// Add elements for enums (DataForm shows select UI when elements are present)
+	// Add elements for enums (DataForm idiom)
 	if ( def.enum && Array.isArray( def.enum ) ) {
 		field.elements = def.enum.map( ( value ) => ( {
+			value,
+			label: String( value ),
+		} ) );
+	}
+
+	// Add elements for arrays of enums (DataForm idiom)
+	if ( type === 'array' && Array.isArray( def.items?.enum ) ) {
+		field.elements = def.items.enum.map( ( value ) => ( {
 			value,
 			label: String( value ),
 		} ) );
