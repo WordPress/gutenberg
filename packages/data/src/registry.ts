@@ -25,7 +25,7 @@ function getStoreName( storeNameOrDescriptor: StoreNameOrDescriptor ): string {
  */
 interface PendingListener {
 	listener: () => void;
-	unsubscribe: () => void;
+	unsubscribe?: () => void;
 }
 
 /**
@@ -67,10 +67,7 @@ export function createRegistry(
 		storeName: string,
 		listener: () => void
 	): () => void {
-		const pending: PendingListener = {
-			listener,
-			unsubscribe: () => {},
-		};
+		const pending: PendingListener = { listener };
 
 		let listeners = pendingListeners.get( storeName );
 		if ( ! listeners ) {
@@ -80,7 +77,7 @@ export function createRegistry(
 		listeners.add( pending );
 
 		return () => {
-			pending.unsubscribe();
+			pending.unsubscribe?.();
 			// Remove the listener from the pending set.
 			const stillPending = pendingListeners.get( storeName );
 			if ( stillPending ) {
