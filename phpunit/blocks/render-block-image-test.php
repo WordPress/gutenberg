@@ -168,4 +168,45 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		remove_all_filters( 'render_block_core/image' );
 	}
+
+	/**
+	 * @covers ::block_core_image_render_lightbox
+	 * @dataProvider data_lightbox_captions
+	 *
+	 * @param string $caption_markup Rendered caption markup.
+	 * @param string $expected       Expected sanitized caption.
+	 */
+	public function test_should_preserve_rendered_lightbox_caption( $caption_markup, $expected ) {
+		$content = '<figure class="wp-block-image"><picture><img src="canola.jpg" alt="" /></picture>' . $caption_markup . '</figure>';
+		$parsed  = parse_blocks( '<!-- wp:image -->' . $content . '<!-- /wp:image -->' )[0];
+		$result  = gutenberg_block_core_image_render_lightbox( $content, $parsed, new WP_Block( $parsed ) );
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$processor->next_tag( 'figure' );
+		$context  = json_decode( $processor->get_attribute( 'data-wp-context' ), true );
+		$metadata = wp_interactivity_state( 'core/image' )['metadata'][ $context['imageId'] ];
+
+		$this->assertSame( $expected, $metadata['caption'] );
+		$this->assertSame( '', $metadata['alt'], 'A caption must not overwrite an intentionally empty alt attribute.' );
+	}
+
+	/**
+	 * @return array[] Caption cases.
+	 */
+	public static function data_lightbox_captions() {
+		return array(
+			'no caption'       => array( '', '' ),
+			'empty caption'    => array( '<figcaption> </figcaption>', '' ),
+			'quoted delimiter' => array( '<figcaption title="A > B">Caption</figcaption>', 'Caption' ),
+			'rich caption'     => array(
+				'<figcaption class="wp-element-caption">A <strong>rich &amp; safe</strong> <a href="https://example.org/credit">credit</a> &lt;caption&gt;</figcaption>',
+				'A <strong>rich &amp; safe</strong> <a href="https://example.org/credit">credit</a> &lt;caption&gt;',
+			),
+			'multiline markup' => array( "<FIGCAPTION>First line\n<em>second line</em></FIGCAPTION>", "First line\n<em>second line</em>" ),
+			'unsafe markup'    => array(
+				'<figcaption><a href="javascript:alert(1)" onclick="alert(1)">Credit</a><img src="credit.jpg" onerror="alert(1)"><script>alert(1)</script></figcaption>',
+				'<a href="alert(1)">Credit</a><img src="credit.jpg">alert(1)',
+			),
+		);
+	}
 }

@@ -200,6 +200,19 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img_height       = 'none';
 	$img_srcset       = false;
 
+	$caption           = '';
+	$caption_processor = WP_HTML_Processor::create_fragment( $block_content );
+	if ( $caption_processor->next_tag( 'FIGCAPTION' ) ) {
+		while ( $caption_processor->next_token() ) {
+			if ( 'FIGCAPTION' === $caption_processor->get_tag() && $caption_processor->is_tag_closer() ) {
+				break;
+			}
+			$caption .= $caption_processor->serialize_token();
+		}
+	}
+	// Preserve rendered links and formatting, but do not copy executable markup.
+	$caption = trim( wp_kses_post( $caption ) );
+
 	wp_interactivity_config(
 		'core/image',
 		array(
@@ -247,6 +260,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 					'targetHeight'           => $img_height,
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
+					'caption'                => $caption,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
@@ -383,28 +397,31 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 				</button>
-				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
-						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
-					</figure>
-				</div>
-				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
-						<img
-							data-wp-bind--alt="state.selectedImage.alt"
-							data-wp-bind--class="state.selectedImage.imgClassNames"
-							data-wp-bind--style="state.imgStyles"
-							data-wp-bind--src="state.enlargedSrc"
-							data-wp-bind--srcset="state.enlargedSrcset"
-							sizes="100vw"
-						>
-					</figure>
-				</div>
+				<figure class="lightbox-content">
+					<div class="lightbox-image-container" aria-hidden="true">
+						<div data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
+							<img alt="" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
+						</div>
+					</div>
+					<div class="lightbox-image-container">
+						<div data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
+							<img
+								data-wp-bind--alt="state.selectedImage.alt"
+								data-wp-bind--class="state.selectedImage.imgClassNames"
+								data-wp-bind--style="state.imgStyles"
+								data-wp-bind--src="state.enlargedSrc"
+								data-wp-bind--srcset="state.enlargedSrcset"
+								sizes="100vw"
+							>
+						</div>
+					</div>
+					<figcaption class="lightbox-caption wp-element-caption" style="color: {$close_button_color}; background-color: {$background_color}" hidden data-wp-init="callbacks.initCaption" data-wp-on--click="actions.handleCaptionClick"></figcaption>
+				</figure>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 				</button>
-				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
+				<div data-wp-text="state.currentLiveText" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
 				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
 		</div>
 HTML;
