@@ -17,3 +17,9 @@
 	background: var(--some-other-var);
 }
 
+/* Valid: Token-like text in strings, URLs, and comments */
+.fixture::before {
+	content: "var(--wpds-not-a-token, red)";
+	background-image: url("var(--wpds-not-a-token, red)");
+	color: inherit; /* var(--wpds-not-a-token, red) */
+}

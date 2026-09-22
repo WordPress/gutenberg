@@ -96,18 +96,6 @@ describe( 'design token fallback build plugin parity', () => {
 		}
 	);
 
-	it( 'leaves token-like text in CSS strings and URLs unchanged in PostCSS', async () => {
-		const source = `.fixture {
-	content: "var(--wpds-border-radius-sm)";
-	background-image: url("var(--wpds-not-a-token)");
-}`;
-		const result = await postcss( [ postcssPlugin ] ).process( source, {
-			from: undefined,
-		} );
-
-		expect( result.css ).toBe( source );
-	} );
-
 	it( 'keeps PostCSS and Lightning CSS var() fallbacks aligned', async () => {
 		const filename = join( fixturesDirectory, 'styles.module.css' );
 		const source = await readFile( filename, 'utf8' );

@@ -15,6 +15,7 @@ exports[`design token fallback build plugin parity > transforms supported CSS in
 .fixture {
 	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
 	content: "var(--wpds-border-radius-sm)";
+	background-image: url("var(--wpds-not-a-token)");
 }
 "
 `;
@@ -30,6 +31,7 @@ exports[`design token fallback build plugin parity > transforms supported CSS wi
 ".fixture {
   color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
   content: "var(--wpds-border-radius-sm)";
+  background-image: url("var(--wpds-not-a-token)");
 }
 "
 `;

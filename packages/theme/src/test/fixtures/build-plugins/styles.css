@@ -2,4 +2,5 @@
 .fixture {
 	color: var(--wpds-color-foreground-content-neutral);
 	content: "var(--wpds-border-radius-sm)";
+	background-image: url("var(--wpds-not-a-token)");
 }

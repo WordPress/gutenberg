@@ -16,3 +16,10 @@
 .nested-no-fallback {
 	color: var(--my-custom-color, var(--wpds-color-foreground-content-neutral));
 }
+
+/* Valid: Token-like text in strings, URLs, and comments */
+.fixture::before {
+	content: "var(--wpds-not-a-token, red)";
+	background-image: url("var(--wpds-not-a-token, red)");
+	color: inherit; /* var(--wpds-not-a-token, red) */
+}
