@@ -141,8 +141,8 @@ async function resetRepository(): Promise< void > {
 
 /**
  * Deletes the icons WordPress Core does not ship. An icon ships when its
- * manifest entry carries a `public` property, whether that property is `true`
- * or `false`.
+ * manifest entry sets `public` or `admin` to `true`, matching the entries
+ * `generateManifestPHP()` writes to `manifest.php`.
  *
  * This runs after the build so that icon collection validation still sees the
  * full library.
@@ -150,14 +150,16 @@ async function resetRepository(): Promise< void > {
 function prunePrivateIcons(): void {
 	status( 'Pruning non-public icons for WordPress Core... ✂️' );
 
-	const manifest: { filePath: string; public?: boolean }[] = JSON.parse(
+	const manifest: {
+		filePath: string;
+		public?: boolean;
+		admin?: boolean;
+	}[] = JSON.parse(
 		fs.readFileSync( path.join( ICONS_DIR, 'manifest.json' ), 'utf8' )
 	);
 	const shipped = new Set(
 		manifest
-			.filter(
-				( icon ) => icon.public !== undefined && icon.public !== null
-			)
+			.filter( ( icon ) => icon.public === true || icon.admin === true )
 			.map( ( icon ) => icon.filePath )
 	);
 
