@@ -14,6 +14,7 @@ function isStrokeBasedSvg( svgContent ) {
  *
  * - Each manifest entry has a matching SVG in library/, and vice versa.
  * - Each manifest entry's `public` property, if present, is a boolean.
+ * - Each manifest entry's `keywords` property, if present, is an array of strings.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
@@ -70,6 +71,25 @@ async function validateCollection() {
 					icon.slug
 				}': expected 'public' to be true or false, saw ${ JSON.stringify(
 					icon.public
+				) }`
+			);
+		}
+
+		/*
+		 * Verify that `keywords`, if present, is an array of strings.
+		 */
+		if (
+			'keywords' in icon &&
+			( ! Array.isArray( icon.keywords ) ||
+				icon.keywords.some(
+					( keyword ) => typeof keyword !== 'string'
+				) )
+		) {
+			problems.push(
+				`- Invalid icon definition for icon '${
+					icon.slug
+				}': expected 'keywords' to be an array of strings, saw ${ JSON.stringify(
+					icon.keywords
 				) }`
 			);
 		}
