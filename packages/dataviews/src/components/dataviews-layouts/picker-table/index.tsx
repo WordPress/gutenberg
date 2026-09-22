@@ -334,6 +334,16 @@ function ViewPickerTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = getTableColumns( view, fields );
+	const tableClassName = clsx(
+		'dataviews-view-table',
+		'dataviews-view-picker-table',
+		className,
+		{
+			[ `has-${ view.layout?.density }-density` ]:
+				view.layout?.density &&
+				[ 'compact', 'comfortable' ].includes( view.layout.density ),
+		}
+	);
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -357,22 +367,7 @@ function ViewPickerTable< Item >( {
 			<Composite
 				virtualFocus
 				orientation="vertical"
-				render={
-					<table
-						className={ clsx(
-							'dataviews-view-table',
-							'dataviews-view-picker-table',
-							className,
-							{
-								[ `has-${ view.layout?.density }-density` ]:
-									view.layout?.density &&
-									[ 'compact', 'comfortable' ].includes(
-										view.layout.density
-									),
-							}
-						) }
-					/>
-				}
+				render={ <table className={ tableClassName } /> }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				aria-label={ itemListLabel }
