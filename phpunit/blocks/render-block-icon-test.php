@@ -28,12 +28,20 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 			'attrs'     => array(),
 		);
 
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
+		/*
+		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
+		 * icons that `init` only registers once. Replay the registration so order-dependent
+		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
+		 * collection at once, so drop whatever survived rather than topping up.
+		 */
+		$collections_registry = WP_Icon_Collections_Registry::get_instance();
+		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
+			if ( $collections_registry->is_registered( $collection_slug ) ) {
+				$collections_registry->unregister( $collection_slug );
+			}
 		}
-		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
-			gutenberg_register_default_icons();
-		}
+		gutenberg_register_default_icon_collections();
+		gutenberg_register_default_icons();
 	}
 
 	public function tear_down() {
