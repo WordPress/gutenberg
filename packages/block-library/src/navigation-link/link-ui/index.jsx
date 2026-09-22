@@ -23,44 +23,66 @@ import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
+ * Given the Link block's type attribute, return the search params describing
+ * that one entity type.
  *
  * @param {string} type Link block's type attribute.
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
+ * @return {{ type: string, subtype?: string }} Entity search params.
+ */
+function getOwnTypeSearchOptions( type, kind ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
+			// A custom link is bound to no entity, so it has no type of its
+			// own to suggest. Pages are the most likely thing to be linked.
+			return { type: 'post', subtype: 'page' };
+	}
+}
+
+/**
+ * Given the Link block's type attribute, return the query params to give to
+ * /wp/v2/search.
+ *
+ * A typed search is deliberately unscoped, so that every entity type is
+ * reachable from one search box. Adding anything but a page to a Navigation
+ * otherwise means leaving the search box, picking a block type, and typing
+ * again.
+ *
+ * The block's own type still decides the suggestions shown before anything is
+ * typed, which is what makes a Page Link open on a list of pages.
+ *
+ * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
+ * @return {Object} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
 	// How many results to show initially and per search.
 	const perPage = 20;
 
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type, perPage };
-		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
-		case 'post_format':
-			return { type: 'post-format', perPage };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
-			}
-			return {
-				// for custom link which has no type
-				// always show pages as initial suggestions
-				initialSuggestionsSearchOptions: {
-					type: 'post',
-					subtype: 'page',
-					perPage,
-				},
-			};
-	}
+	const ownType = getOwnTypeSearchOptions( type, kind );
+
+	return {
+		perPage,
+		// The link's own type leads, and everything else keeps its usual place
+		// behind it, so a Category Link lists categories first.
+		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
+		initialSuggestionsSearchOptions: { ...ownType, perPage },
+	};
 }
 
 function UnforwardedLinkUI( props, ref ) {

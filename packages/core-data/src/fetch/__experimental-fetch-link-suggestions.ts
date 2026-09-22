@@ -26,6 +26,17 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
+	 * Result types to rank above the usual order, most wanted first. Everything
+	 * left out keeps its usual place below them.
+	 *
+	 * An entry is a search type, covering everything of that type, or a search
+	 * type with one subtype, covering only that subtype. A caller that edits one
+	 * kind of link leads with that kind:
+	 *
+	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
+	 */
+	preferTypes?: TypeOrderEntry[];
+	/**
 	 * Which page of results to return.
 	 */
 	page?: number;
@@ -121,6 +132,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		preferTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -263,7 +275,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	results = sortResults( results, search );
+	results = sortResults( results, search, preferTypes );
 
 	if ( type ) {
 		results = results.slice( 0, perPage );
@@ -300,6 +312,16 @@ function getMatchRank( title: string, search: string ): number {
 }
 
 /**
+ * A position in a type order.
+ *
+ * Either a search type, which covers everything of that type, or a search type with one subtype,
+ * which covers only that subtype. Naming a subtype lets it outrank the rest of its type, while a
+ * plain search type catches every subtype at once — including custom post types and taxonomies,
+ * which no caller can be expected to list.
+ */
+export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
+
+/**
  * The order result types are ranked in, most wanted first.
  *
  * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
@@ -310,8 +332,9 @@ function getMatchRank( title: string, search: string ): number {
  * Deliberately no finer than the search types themselves. Nothing general can be said about
  * whether a page is a better answer than a post, and ranking by search type means every custom
  * post type counts as content and every custom taxonomy counts as a taxonomy without being named.
+ * A caller that knows better says so with `preferTypes`, which does take subtypes.
  */
-const TYPE_ORDER: SearchType[] = [
+const TYPE_ORDER: TypeOrderEntry[] = [
 	'post',
 	'term',
 	'attachment',
@@ -341,17 +364,48 @@ function getSearchType( result: SearchResult ): SearchType {
 }
 
 /**
+ * Whether an entry in a type order describes a result.
+ *
+ * @param entry
+ * @param result
+ *
+ * @return True when the entry covers that result.
+ */
+function coversResult( entry: TypeOrderEntry, result: SearchResult ): boolean {
+	const searchType = getSearchType( result );
+
+	return typeof entry === 'string'
+		? entry === searchType
+		: entry.type === searchType && entry.subtype === result.type;
+}
+
+/**
  * How much a result's type counts towards its rank.
  *
- * Earlier entries in `TYPE_ORDER` are worth more. A weight rather than a band, so a title that
- * plainly answers the search can still outrank a better-placed type that barely does.
+ * Earlier entries are worth more, and anything a caller prefers outranks the usual order entirely.
+ * A weight rather than a band, so a title that plainly answers the search can still outrank a
+ * better-placed type that barely does.
  *
  * @param result
+ * @param preferTypes
  *
  * @return The weight to add to the result's score.
  */
-function getTypeWeight( result: SearchResult ): number {
-	const rank = TYPE_ORDER.indexOf( getSearchType( result ) );
+function getTypeWeight(
+	result: SearchResult,
+	preferTypes: TypeOrderEntry[] = []
+): number {
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		coversResult( entry, result )
+	);
+
+	if ( preferred !== -1 ) {
+		return TYPE_ORDER.length + ( preferTypes.length - preferred );
+	}
+
+	const rank = TYPE_ORDER.findIndex( ( entry ) =>
+		coversResult( entry, result )
+	);
 
 	return rank === -1 ? 0 : TYPE_ORDER.length - rank;
 }
@@ -380,8 +434,13 @@ function getTypeWeight( result: SearchResult ): number {
  *
  * @param results
  * @param search
+ * @param preferTypes
  */
-export function sortResults( results: SearchResult[], search: string ) {
+export function sortResults(
+	results: SearchResult[],
+	search: string,
+	preferTypes?: TypeOrderEntry[]
+) {
 	const searchTokens = tokenize( search );
 
 	// Give each result a unique key to avoid duplicate ids from different tables
@@ -416,9 +475,9 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 			scores[ scoreKey( result ) ] =
 				( wholeWords * 10 + partialWords ) / searchTokens.length +
-				getTypeWeight( result );
+				getTypeWeight( result, preferTypes );
 		} else {
-			scores[ scoreKey( result ) ] = getTypeWeight( result );
+			scores[ scoreKey( result ) ] = getTypeWeight( result, preferTypes );
 		}
 	}
 
