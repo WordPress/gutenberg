@@ -22,6 +22,7 @@ function gutenberg_register_default_icon_collections() {
 		array(
 			'label'       => __( 'WordPress Admin', 'gutenberg' ),
 			'description' => __( 'Icon collection used by the WordPress admin interface.', 'gutenberg' ),
+			'public'      => false,
 		)
 	);
 }
@@ -76,14 +77,11 @@ function gutenberg_register_default_icons() {
 			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
 
-		if ( isset( $icon_data['public'] ) ) {
-			$icon_args['public'] = $icon_data['public'];
+		if ( ! empty( $icon_data['public'] ) ) {
+			wp_register_icon( 'core/' . $icon_name, $icon_args );
 		}
 
-		wp_register_icon( 'core/' . $icon_name, $icon_args );
-
 		if ( ! empty( $icon_data['admin'] ) ) {
-			$icon_args['public'] = false;
 			wp_register_icon( 'core-admin/' . $icon_name, $icon_args );
 		}
 	}

@@ -3,7 +3,7 @@ import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
-	title: 'Components/Layout/ResponsiveWrapper',
+	title: 'Components/@wordpress-components/Layout/ResponsiveWrapper',
 	id: 'components-responsivewrapper',
 	argTypes: {
 		children: { control: false },

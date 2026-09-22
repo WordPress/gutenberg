@@ -182,7 +182,6 @@
 		"slug": "brush",
 		"label": "Brush",
 		"filePath": "library/brush.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -496,7 +495,6 @@
 		"slug": "dashboard",
 		"label": "Dashboard",
 		"filePath": "library/dashboard.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -931,7 +929,6 @@
 		"slug": "link",
 		"label": "Link",
 		"filePath": "library/link.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -994,7 +991,6 @@
 		"slug": "media",
 		"label": "Media",
 		"filePath": "library/media.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1082,7 +1078,6 @@
 		"slug": "page",
 		"label": "Page",
 		"filePath": "library/page.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1140,7 +1135,6 @@
 		"slug": "pin",
 		"label": "Pin",
 		"filePath": "library/pin.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1152,7 +1146,6 @@
 		"slug": "plugins",
 		"label": "Plugins",
 		"filePath": "library/plugins.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1531,7 +1524,6 @@
 		"slug": "sites",
 		"label": "Sites",
 		"filePath": "library/sites.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1739,7 +1731,6 @@
 		"slug": "tool",
 		"label": "Tool",
 		"filePath": "library/tool.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1786,7 +1777,6 @@
 		"slug": "update",
 		"label": "Update",
 		"filePath": "library/update.svg",
-		"public": false,
 		"admin": true
 	},
 	{
@@ -1820,7 +1810,6 @@
 		"slug": "wordpress",
 		"label": "WordPress",
 		"filePath": "library/wordpress.svg",
-		"public": false,
 		"admin": true
 	}
 ]

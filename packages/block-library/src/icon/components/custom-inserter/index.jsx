@@ -8,38 +8,20 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import IconGrid from './icon-grid';
 import { normalizeSearchInput } from '../../../utils/search-patterns';
 
-const ALL_ICONS_QUERY = {};
-
 export default function CustomInserterModal( { onClose, value, onChange } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
 	const [ currentCollection, setCurrentCollection ] = useState( null );
 
 	const debouncedSetSearchInput = useDebounce( setSearchInput, 300 );
 
-	const { allCollections, icons, hasResolvedIcons } = useSelect(
-		( select ) => {
-			const { getEntityRecords, hasFinishedResolution } =
-				select( coreDataStore );
-			return {
-				allCollections: getEntityRecords( 'root', 'iconCollection' ),
-				icons: getEntityRecords( 'root', 'icon', ALL_ICONS_QUERY ),
-				hasResolvedIcons: hasFinishedResolution( 'getEntityRecords', [
-					'root',
-					'icon',
-					ALL_ICONS_QUERY,
-				] ),
-			};
-		},
+	const collections = useSelect(
+		( select ) =>
+			select( coreDataStore ).getEntityRecords(
+				'root',
+				'iconCollection'
+			),
 		[]
 	);
-
-	const collections = useMemo( () => {
-		if ( ! allCollections || ! icons ) {
-			return null;
-		}
-		const populated = new Set( icons.map( ( icon ) => icon.collection ) );
-		return allCollections.filter( ( { slug } ) => populated.has( slug ) );
-	}, [ allCollections, icons ] );
 
 	// Default to the collection the selected icon belongs to, otherwise the
 	// first collection.
@@ -51,18 +33,34 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 			: collections?.[ 0 ]?.slug ) ??
 		null;
 
+	const { icons, hasResolvedIcons } = useSelect(
+		( select ) => {
+			if ( collectionSlug === null ) {
+				return { icons: null, hasResolvedIcons: false };
+			}
+			const query =
+				collectionSlug === '' ? {} : { collection: collectionSlug };
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreDataStore );
+			return {
+				icons: getEntityRecords( 'root', 'icon', query ),
+				hasResolvedIcons: hasFinishedResolution( 'getEntityRecords', [
+					'root',
+					'icon',
+					query,
+				] ),
+			};
+		},
+		[ collectionSlug ]
+	);
+
 	const filteredIcons = useMemo( () => {
 		if ( ! icons ) {
 			return [];
 		}
-
-		const scopedIcons = collectionSlug
-			? icons.filter( ( icon ) => icon.collection === collectionSlug )
-			: icons;
-
 		if ( searchInput ) {
 			const input = normalizeSearchInput( searchInput );
-			return scopedIcons.filter( ( icon ) => {
+			return icons.filter( ( icon ) => {
 				const iconName = normalizeSearchInput( icon.name );
 				const iconLabel = normalizeSearchInput( icon.label );
 
@@ -72,8 +70,8 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 			} );
 		}
 
-		return scopedIcons;
-	}, [ searchInput, icons, collectionSlug ] );
+		return icons;
+	}, [ searchInput, icons ] );
 
 	return (
 		<Modal
