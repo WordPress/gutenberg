@@ -22,7 +22,7 @@
 
 ### Deprecations
 
--   `ZStack`: Deprecate the component, planned for removal in WordPress 7.4.
+-   `ZStack`: Deprecate the component, planned for removal in WordPress 7.4 ([#83344](https://github.com/WordPress/gutenberg/pull/83344)).
 -   `Scrollable`: Deprecate the component, planned for removal in WordPress 7.4 ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
 -   `Elevation`: Deprecate the component, planned for removal in WordPress 7.4 ([#83269](https://github.com/WordPress/gutenberg/pull/83269)).
 -   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
