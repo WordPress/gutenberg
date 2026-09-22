@@ -262,6 +262,38 @@ describe( 'ThemeProvider', () => {
 			);
 		} );
 
+		it( 'restores a previous document-root property value and priority on unmount', async () => {
+			const root = document.documentElement;
+			root.style.setProperty( BRAND_BG, '#123456', 'important' );
+			let unmount: undefined | ( () => void );
+
+			try {
+				( { unmount } = await render(
+					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+						<div>x</div>
+					</ThemeProvider>
+				) );
+
+				expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
+					PRIMARY
+				);
+				expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe( '' );
+
+				await unmount();
+				unmount = undefined;
+
+				expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
+					'#123456'
+				);
+				expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe(
+					'important'
+				);
+			} finally {
+				await unmount?.();
+				root.style.removeProperty( BRAND_BG );
+			}
+		} );
+
 		it( "forwards tokens to the wrapper's own document, not the top document", async () => {
 			const iframe = document.createElement( 'iframe' );
 			document.body.appendChild( iframe );

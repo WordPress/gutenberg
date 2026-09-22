@@ -23,6 +23,12 @@ const REJECTED_SEEDS = [
 	'lab(50% 40 59)',
 	'hwb(230 10% 20%)',
 	'color(display-p3 1 0 0)',
+	'rgb(NaN 0 0)',
+	'rgb(infinity 0 0)',
+	'rgb(none 0 0)',
+	'rgb(0 none 0)',
+	'rgb(0 0 none)',
+	'rgb(0 0 0 / none)',
 	'',
 	'not-a-color',
 ];
@@ -34,7 +40,7 @@ function testSeedColorContract( build: ( seed: string ) => unknown ) {
 		expect( () => build( seed ) ).not.toThrow();
 	} );
 
-	it.each( REJECTED_SEEDS )( 'rejects non-sRGB seed %p', ( seed ) => {
+	it.each( REJECTED_SEEDS )( 'rejects unsupported seed %p', ( seed ) => {
 		expect( () => build( seed ) ).toThrow();
 	} );
 

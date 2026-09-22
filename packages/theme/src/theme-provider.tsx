@@ -74,7 +74,10 @@ export const ThemeProvider = ( {
 			rootProviderCountByDocument.set( doc, active + 1 );
 		}
 
-		const previous = new Map< string, string >();
+		const previous = new Map<
+			string,
+			{ value: string; priority: string }
+		>();
 		const applied: string[] = [];
 		const previousRootProvider = root.getAttribute(
 			'data-wpds-root-provider'
@@ -96,7 +99,10 @@ export const ThemeProvider = ( {
 			) {
 				continue;
 			}
-			previous.set( rawKey, root.style.getPropertyValue( rawKey ) );
+			previous.set( rawKey, {
+				value: root.style.getPropertyValue( rawKey ),
+				priority: root.style.getPropertyPriority( rawKey ),
+			} );
 			root.style.setProperty( rawKey, String( rawValue ) );
 			applied.push( rawKey );
 		}
@@ -112,9 +118,13 @@ export const ThemeProvider = ( {
 			}
 
 			for ( const key of applied ) {
-				const prev = previous.get( key );
-				if ( prev ) {
-					root.style.setProperty( key, prev );
+				const previousProperty = previous.get( key );
+				if ( previousProperty?.value ) {
+					root.style.setProperty(
+						key,
+						previousProperty.value,
+						previousProperty.priority
+					);
 				} else {
 					root.style.removeProperty( key );
 				}
