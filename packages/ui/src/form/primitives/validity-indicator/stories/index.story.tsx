@@ -3,13 +3,9 @@ import { ValidityIndicator } from '../index';
 
 const meta: Meta< typeof ValidityIndicator > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/ValidityIndicator',
+	title: 'Components/@wordpress-ui/Form/Primitives/ValidityIndicator',
+	id: 'design-system-components-form-primitives-validityindicator',
 	component: ValidityIndicator,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <ValidityIndicator { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',

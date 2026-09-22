@@ -14,7 +14,7 @@ describe( 'post-meta bindings', () => {
 					? {
 							movie_field: 'Test Movie Value',
 							_protected_field: 'Protected field value',
-					  }
+						}
 					: {},
 		} );
 

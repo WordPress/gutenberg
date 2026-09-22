@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	RangeControl,
 	MenuGroup,
@@ -65,7 +65,6 @@ import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
-import { unlock } from '../lock-unlock';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -156,7 +155,7 @@ export default function GalleryEdit( props ) {
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
 				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-		  )
+			)
 		: LINK_OPTIONS;
 
 	const {
@@ -238,7 +237,7 @@ export default function GalleryEdit( props ) {
 				getSettings: _getSettings,
 				getBlock: _getBlock,
 				getSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
@@ -264,7 +263,7 @@ export default function GalleryEdit( props ) {
 		? getViewportGalleryStyle(
 				attributes.style,
 				selectedStyleState.viewport
-		  )
+			)
 		: {};
 	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
 	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
@@ -469,7 +468,7 @@ export default function GalleryEdit( props ) {
 					}
 
 					return file;
-			  } )
+				} )
 			: selectedImages;
 
 		if ( ! imageArray.every( isValidFileType ) ) {
@@ -498,8 +497,9 @@ export default function GalleryEdit( props ) {
 		// once the new image blocks are merged in with existing.
 		const newOrderMap = processedImages.reduce(
 			( result, image, index ) => (
-				( result[ image.id ] = index ), result
-			),
+				( result[ image.id ] = index ),
+				result
+			 ),
 			{}
 		);
 
@@ -508,7 +508,7 @@ export default function GalleryEdit( props ) {
 					processedImages.find(
 						( img ) => img.id === block.attributes.id
 					)
-			  )
+				)
 			: innerBlockImages;
 
 		const newImageList = processedImages.filter(
@@ -723,12 +723,12 @@ export default function GalleryEdit( props ) {
 					),
 					selectedStyleState.viewport.replace( '@', '' ),
 					aspectRatioText?.label || noticeValue
-			  )
+				)
 			: sprintf(
 					/* translators: %s: aspect ratio setting */
 					__( 'All gallery images updated to aspect ratio: %s' ),
 					aspectRatioText?.label || noticeValue
-			  );
+				);
 
 		createSuccessNotice( noticeText, {
 			id: 'gallery-attributes-aspectRatio',
@@ -907,7 +907,7 @@ export default function GalleryEdit( props ) {
 								isViewportStyleState
 									? hasViewportColumns
 									: !! activeColumns &&
-									  activeColumns !== displayedImageCount
+										activeColumns !== displayedImageCount
 							}
 							onDeselect={ () => setColumnsNumber( undefined ) }
 						>
@@ -918,7 +918,7 @@ export default function GalleryEdit( props ) {
 										? activeColumns
 										: defaultColumnsNumber(
 												displayedImageCount
-										  )
+											)
 								}
 								onChange={ setColumnsNumber }
 								min={ 1 }
@@ -942,7 +942,7 @@ export default function GalleryEdit( props ) {
 									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
 								}
 							>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -1026,7 +1026,7 @@ export default function GalleryEdit( props ) {
 							}
 							isShownByDefault
 						>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Aspect ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'

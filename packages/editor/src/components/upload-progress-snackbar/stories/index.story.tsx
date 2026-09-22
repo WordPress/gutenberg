@@ -11,7 +11,8 @@ import { UPLOAD_DONE, UPLOAD_SPINNER } from '../index';
  * visually without running an actual upload.
  */
 const meta: Meta< typeof Snackbar > = {
-	title: 'Editor/UploadProgressSnackbar',
+	id: 'editor-uploadprogresssnackbar',
+	title: 'Editor/Upload Progress Snackbar',
 	component: Snackbar,
 	parameters: {
 		docs: { canvas: { sourceState: 'shown' } },

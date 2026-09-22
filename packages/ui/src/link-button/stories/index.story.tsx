@@ -4,7 +4,8 @@ import { wordpress } from '@wordpress/icons';
 import { LinkButton } from '../index';
 
 const meta: Meta< typeof LinkButton > = {
-	title: 'Design System/Components/LinkButton',
+	title: 'Components/@wordpress-ui/LinkButton',
+	id: 'design-system-components-linkbutton',
 	component: LinkButton,
 	subcomponents: {
 		'LinkButton.Icon': LinkButton.Icon,
