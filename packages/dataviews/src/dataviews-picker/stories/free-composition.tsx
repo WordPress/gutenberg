@@ -31,8 +31,8 @@ const STYLES = `
  * The footer is the part worth composing: its full row holds the selection
  * count, the pagination and the actions, which is more than 300px can carry.
  * `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render children in
- * place of their default contents, so this one keeps the page select and the
- * action and drops the rest:
+ * place of their default contents, so this one keeps one pagination part and
+ * the action and drops the rest:
  *
  * ```jsx
  * <DataViewsPicker.Footer>
@@ -43,10 +43,21 @@ const STYLES = `
  * </DataViewsPicker.Footer>
  * ```
  *
+ * Which part earns the room is the consumer's call: `pagination` swaps the page
+ * select for `DataViewsPicker.PageNavigation`, the previous/next buttons, which
+ * suit a list short enough to walk through a page at a time.
+ *
  * Each part takes a `className`, so where they sit is decided by the stylesheet
  * of whoever composed them rather than by the picker.
  */
-export const FreeCompositionComponent = () => {
+export const FreeCompositionComponent = ( {
+	pagination = 'page-select',
+}: {
+	/**
+	 * Which pagination part the composed footer keeps.
+	 */
+	pagination?: 'page-select' | 'page-navigation';
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_ACTIVITY,
 		fields: [],
@@ -107,7 +118,11 @@ export const FreeCompositionComponent = () => {
 					<DataViewsPicker.Layout />
 					<DataViewsPicker.Footer>
 						<DataViewsPicker.Pagination>
-							<DataViewsPicker.PageSelect />
+							{ pagination === 'page-select' ? (
+								<DataViewsPicker.PageSelect />
+							) : (
+								<DataViewsPicker.PageNavigation />
+							) }
 						</DataViewsPicker.Pagination>
 						<DataViewsPicker.Actions className="dataviews-picker-free-composition__actions" />
 					</DataViewsPicker.Footer>

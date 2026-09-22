@@ -252,6 +252,16 @@ export const FreeComposition = {
 	},
 };
 
+export const FreeCompositionWithPageNavigation = {
+	render: FreeCompositionComponent,
+	args: { pagination: 'page-navigation' as const },
+	parameters: {
+		// FIXME: Picker UI nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+};
+
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	isMultiselectable,
