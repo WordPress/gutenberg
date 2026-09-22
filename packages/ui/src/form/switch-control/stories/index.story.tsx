@@ -6,7 +6,8 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof SwitchControl > = {
-	title: 'Design System/Components/Form/SwitchControl',
+	title: 'Components/@wordpress-ui/Form/SwitchControl',
+	id: 'design-system-components-form-switchcontrol',
 	component: SwitchControl,
 	argTypes: {
 		checked: { control: false },
