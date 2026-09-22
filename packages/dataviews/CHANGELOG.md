@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   DataViews: Add controlled expand/collapse controls to hierarchical tables ([#83311](https://github.com/WordPress/gutenberg/pull/83311)).
 -   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83241](https://github.com/WordPress/gutenberg/pull/83241)).
 
 ### Bug Fixes
