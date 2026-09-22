@@ -7,24 +7,27 @@ describe( 'isLivePhoto', () => {
 	} );
 
 	it( 'does not match when controls are shown', () => {
-		expect( isLivePhoto( { ...LIVE_PHOTO_ATTRIBUTES, controls: true } ) ).toBe(
-			false
-		);
+		expect(
+			isLivePhoto( { ...LIVE_PHOTO_ATTRIBUTES, controls: true } )
+		).toBe( false );
 	} );
 
 	it.each( [ 'loop', 'muted', 'playsInline' ] )(
 		'does not match when %s is missing',
 		( attribute ) => {
 			expect(
-				isLivePhoto( { ...LIVE_PHOTO_ATTRIBUTES, [ attribute ]: false } )
+				isLivePhoto( {
+					...LIVE_PHOTO_ATTRIBUTES,
+					[ attribute ]: false,
+				} )
 			).toBe( false );
 		}
 	);
 
 	it( 'does not match an autoplaying loop, which plays like a GIF', () => {
-		expect( isLivePhoto( { ...LIVE_PHOTO_ATTRIBUTES, autoplay: true } ) ).toBe(
-			false
-		);
+		expect(
+			isLivePhoto( { ...LIVE_PHOTO_ATTRIBUTES, autoplay: true } )
+		).toBe( false );
 	} );
 
 	it( 'does not match a default video block', () => {

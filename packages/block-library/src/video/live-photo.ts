@@ -33,12 +33,7 @@ export const LIVE_PHOTO_ATTRIBUTES = {
  * @param attributes Video block attributes.
  * @return Whether the attributes describe a Live photo.
  */
-export function isLivePhoto( {
-	controls,
-	loop,
-	autoplay,
-	muted,
-	playsInline,
-}: PlaybackAttributes = {} ): boolean {
+export function isLivePhoto( attributes: PlaybackAttributes = {} ): boolean {
+	const { controls, loop, autoplay, muted, playsInline } = attributes;
 	return ! controls && !! loop && ! autoplay && !! muted && !! playsInline;
 }
