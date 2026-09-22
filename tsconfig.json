@@ -38,6 +38,7 @@
 		{ "path": "packages/interface" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
+		{ "path": "packages/latex-to-mathml" },
 		{ "path": "packages/media-editor" },
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },

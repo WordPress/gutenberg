@@ -29,7 +29,7 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../interactivity/tsconfig.build.json" },
 		{ "path": "../interactivity-router/tsconfig.main.json" },
-		{ "path": "../latex-to-mathml" },
+		{ "path": "../latex-to-mathml/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },

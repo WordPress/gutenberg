@@ -52,7 +52,7 @@
 		{ "path": "packages/kebab-case" },
 		{ "path": "packages/keycodes/tsconfig.build.json" },
 		{ "path": "packages/keyboard-shortcuts" },
-		{ "path": "packages/latex-to-mathml" },
+		{ "path": "packages/latex-to-mathml/tsconfig.build.json" },
 		{ "path": "packages/lazy-editor" },
 		{ "path": "packages/lazy-import" },
 		{ "path": "packages/list-reusable-blocks" },
