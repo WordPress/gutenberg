@@ -77,7 +77,6 @@ const UI = {
 	backgroundDisabled: THEME.gray[ 100 ],
 	border: THEME.gray[ 600 ],
 	borderHover: THEME.gray[ 700 ],
-	borderActive: `var(--wpds-color-stroke-interactive-neutral-active, #6e6e6e)`,
 	borderFocus: THEME.accent,
 	// The gray ramp above has no disabled step to map these through.
 	borderDisabled: `var(--wpds-color-stroke-interactive-neutral-disabled, #dbdbdb)`,

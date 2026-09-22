@@ -1,0 +1,7 @@
+// The resting border comes from Emotion `&&&`. Repeat the class so this
+// hover color wins regardless of stylesheet order.
+:global(.components-input-control__container):hover {
+	.hover-border.hover-border {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+}
