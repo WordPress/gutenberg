@@ -3,13 +3,13 @@
 
 	@layer components {
 		.root {
-			--_radio-input-size: var(--wp-ui-radio-input-size, var(--wpds-dimension-size-2xs));
+			--wp-ui-radio-input-size: 16px;
 
 			position: relative;
 			display: inline-block;
 			flex-shrink: 0;
-			width: var(--_radio-input-size);
-			aspect-ratio: 1;
+			width: var(--wp-ui-radio-input-size);
+			height: var(--wp-ui-radio-input-size);
 			border-radius: 50%;
 			border:
 				var(--wpds-border-width-xs) solid
@@ -49,7 +49,7 @@
 				top: 50%;
 				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical centering technique used with transform: translate(-50%, -50%) */
 				left: 50%;
-				width: max(var(--_radio-input-size), var(--wpds-dimension-size-sm));
+				width: max(var(--wp-ui-radio-input-size), var(--wpds-dimension-size-sm));
 				aspect-ratio: 1;
 				transform: translate(-50%, -50%);
 			}
@@ -60,8 +60,8 @@
 			position: absolute;
 			inset: 0;
 			margin: auto;
-			width: calc(var(--_radio-input-size) / 2);
-			aspect-ratio: 1;
+			width: calc(var(--wp-ui-radio-input-size) / 2);
+			height: calc(var(--wp-ui-radio-input-size) / 2);
 			border-radius: 50%;
 			background-color: currentColor;
 
