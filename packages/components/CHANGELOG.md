@@ -11,7 +11,7 @@
 
 ### Enhancements
 
--   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin.
+-   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 -   `SelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
