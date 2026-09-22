@@ -50,6 +50,7 @@
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {

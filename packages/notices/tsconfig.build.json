@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
-		{ "path": "../data" }
+		{ "path": "../data" },
+		{ "path": "../element/tsconfig.build.json" }
 	]
 }

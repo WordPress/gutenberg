@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InlineNotices`: Render nothing when passed several children that all render nothing. The check looked at the array itself rather than through it, so `[ false, false ]` counted as content and left an empty wrapper in the DOM.
+
 ## 5.55.0 (2026-09-10)
 
 ## 5.54.0 (2026-08-26)

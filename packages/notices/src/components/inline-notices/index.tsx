@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { NoticeList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Children } from '@wordpress/element';
 import { store as noticesStore } from '../../store';
 
 type InlineNoticesProps = {
@@ -13,12 +14,11 @@ type InlineNoticesProps = {
 };
 
 function hasRenderableChildren( children: ReactNode ): boolean {
-	return (
-		children !== null &&
-		children !== undefined &&
-		children !== false &&
-		children !== ''
-	);
+	// `Children.toArray` flattens the array that more than one child arrives
+	// as, and drops the nothings along the way — `null`, `undefined` and the
+	// booleans a `&&` leaves behind — so only the empty string is left to
+	// check for.
+	return Children.toArray( children ).some( ( child ) => child !== '' );
 }
 
 export default function InlineNotices( {
