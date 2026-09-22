@@ -28,6 +28,9 @@ type DataViewsContextType< Item > = {
 	getItemId: ( item: Item ) => string;
 	getItemLevel?: ( item: Item ) => number;
 	getItemParentId?: ( item: Item ) => string | number | null | undefined;
+	getItemHasChildren?: ( item: Item ) => boolean | undefined;
+	expandedItemIds?: string[];
+	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
 		props: {

@@ -179,6 +179,10 @@
 	tbody {
 		td {
 			vertical-align: top;
+
+			&.dataviews-view-table__hierarchy-column {
+				padding-right: var(--wpds-dimension-padding-xs);
+			}
 		}
 		.dataviews-view-table__cell-content-wrapper {
 			min-height: var(--wpds-dimension-size-md);
@@ -194,6 +198,20 @@
 			&.dataviews-view-table__cell-align-center {
 				justify-content: center;
 			}
+		}
+
+		.dataviews-view-table__hierarchy-cell {
+			min-width: auto;
+			max-width: none;
+		}
+
+		.dataviews-view-table__hierarchy-cell,
+		.dataviews-view-table__checkbox-column > .dataviews-view-table__cell-content-wrapper,
+		.dataviews-view-table__primary-column {
+			position: relative;
+			inset-inline-start:
+				calc(var(--wp-dataviews-table-hierarchy-level, 0) *
+				var(--wpds-dimension-size-md));
 		}
 
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
@@ -226,6 +244,10 @@
 	.dataviews-view-table__actions-column {
 		width: auto;
 		white-space: nowrap;
+	}
+
+	.dataviews-view-table__hierarchy-toggle.components-button.has-icon {
+		min-width: var(--wpds-dimension-size-md);
 	}
 
 

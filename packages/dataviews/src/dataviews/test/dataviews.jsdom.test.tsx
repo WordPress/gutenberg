@@ -198,6 +198,122 @@ describe( 'DataViews component', () => {
 		expect( rows[ 1 ] ).toHaveTextContent( '— Child' );
 	} );
 
+	it( 'hides loaded descendants of collapsed items', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 2, title: 'Child' },
+					{ id: 1, title: 'Parent' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				getItemHasChildren={ ( item ) => item.id === 1 }
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ vi.fn() }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect( screen.getByText( 'Parent' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Child' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'emits controlled expanded item ids from a row disclosure', async () => {
+		const user = userEvent.setup();
+		const onChangeExpandedItemIds = vi.fn();
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 2, title: 'Child' },
+					{ id: 1, title: 'Parent' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				getItemHasChildren={ ( item ) => item.id === 1 }
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ onChangeExpandedItemIds }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Expand Parent' } )
+		);
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [ '1' ] );
+	} );
+
+	it( 'keeps unknown items expandable and hides disclosure for known leaves', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Unknown' },
+					{ id: 2, title: 'Leaf' },
+				] }
+				getItemParentId={ () => undefined }
+				getItemHasChildren={ ( item ) =>
+					item.id === 1 ? undefined : false
+				}
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ vi.fn() }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Expand Unknown' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Expand Leaf' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'expands all loaded parents from the header disclosure', async () => {
+		const user = userEvent.setup();
+		const onChangeExpandedItemIds = vi.fn();
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 2, title: 'Child' },
+					{ id: 1, title: 'Parent' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				getItemHasChildren={ ( item ) => item.id === 1 }
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ onChangeExpandedItemIds }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Expand all' } )
+		);
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [ '1' ] );
+	} );
+
 	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
 		render(
 			<DataViewWrapper
