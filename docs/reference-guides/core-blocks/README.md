@@ -74,7 +74,7 @@ Embed a simple audio player.
 
 -	**Name:** [core/audio](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-audio/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding)
+-	**Supports:** align, anchor, color (link, ~~background~~, ~~text~~), interactivity (clientNavigation), spacing (margin, padding)
 -	**Attributes:** autoplay, blob, caption, id, loop, preload, src
 
 ## Avatar
