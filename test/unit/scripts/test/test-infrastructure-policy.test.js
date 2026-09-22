@@ -112,7 +112,7 @@ describe( 'test infrastructure policy', () => {
 		];
 		const sources = {
 			'.github/workflows/test.yml':
-				'"run": npm run test:unit:debug -- --runInBand\n',
+				'"run": npm run test:unit:jest -- --runInBand\n',
 			'packages/example/jest.config.js': 'module.exports = {};\n',
 			'packages/example/package.json': JSON.stringify( {
 				jest: {},
@@ -120,13 +120,16 @@ describe( 'test infrastructure policy', () => {
 					'@jest/globals': '^30.0.0',
 					'@testing-library/jest-dom': '^6.9.1',
 					'@types/jest': '^30.0.0',
+					'eslint-plugin-jest-dom': '^5.10.1',
 					'legacy-test': 'npm:@types/jest@^30.0.0',
 					'test-runner': 'npm:jest@^30.0.0',
 				},
 				scripts: {
-					test: 'wp-scripts test-unit-js --config jest.config.js',
+					test: 'wp-scripts test-unit-jest --config jest.config.js',
 					vitest: 'npm run test:unit:vitest',
-					watch: 'npm run test:unit:watch',
+					watch: 'npm run test:unit:jest -- --watch',
+					unit: 'npm run test:unit',
+					public: 'wp-scripts test-unit-js',
 				},
 			} ),
 		};
@@ -137,13 +140,14 @@ describe( 'test infrastructure policy', () => {
 				( file ) => sources[ file ] ?? null
 			)
 		).toEqual( [
-			'command:.github/workflows/test.yml=npm run test:unit:debug -- --runInBand',
-			'command:packages/example/package.json:scripts.test=wp-scripts test-unit-js --config jest.config.js',
-			'command:packages/example/package.json:scripts.watch=npm run test:unit:watch',
+			'command:.github/workflows/test.yml=npm run test:unit:jest -- --runInBand',
+			'command:packages/example/package.json:scripts.test=wp-scripts test-unit-jest --config jest.config.js',
+			'command:packages/example/package.json:scripts.watch=npm run test:unit:jest -- --watch',
 			'config:packages/example/jest.config.js',
 			'config:packages/example/package.json:jest',
 			'dependency:packages/example/package.json:devDependencies.@jest/globals',
 			'dependency:packages/example/package.json:devDependencies.@types/jest',
+			'dependency:packages/example/package.json:devDependencies.eslint-plugin-jest-dom',
 			'dependency:packages/example/package.json:devDependencies.legacy-test',
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );

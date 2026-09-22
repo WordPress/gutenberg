@@ -30,7 +30,7 @@ exports.interfaceVersion = 2;
 function getResolvedExportPath( exportEntry ) {
 	return typeof exportEntry === 'string'
 		? exportEntry
-		: exportEntry?.import ?? exportEntry?.default;
+		: ( exportEntry?.import ?? exportEntry?.default );
 }
 
 /**
@@ -74,6 +74,8 @@ exports.resolve = function ( source, file, config ) {
 			extensions: [
 				'.tsx',
 				'.ts',
+				'.mts',
+				'.cts',
 				'.mjs',
 				'.js',
 				'.jsx',

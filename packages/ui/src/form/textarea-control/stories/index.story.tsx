@@ -7,13 +7,9 @@ import {
 
 const meta: Meta< typeof TextareaControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/TextareaControl',
+	title: 'Components/@wordpress-ui/Form/TextareaControl',
+	id: 'design-system-components-form-textareacontrol',
 	component: TextareaControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <TextareaControl { ...args } />,
 	argTypes: {
 		defaultValue: { control: false },
 		onValueChange: { action: 'onValueChange' },

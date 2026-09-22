@@ -21,7 +21,8 @@ import {
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Autocomplete',
+	title: 'Components/@wordpress-ui/Form/Primitives/Autocomplete',
+	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
 		'Autocomplete.Portal': Autocomplete.Portal,
@@ -591,12 +592,6 @@ function chunkItems< T >( items: T[], size: number ): T[][] {
  * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
  */
 export const Grid: Story = {
-	parameters: {
-		// `role="grid"` disallows the `role="group"` children that Base UI
-		// renders (aria-required-children, aria-required-parent).
-		// TODO: Remove after updating to Base UI >= 1.8.0
-		a11y: { test: 'todo' },
-	},
 	args: {
 		items: EMOJI_GROUPS,
 		inline: true,

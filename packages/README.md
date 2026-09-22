@@ -60,8 +60,7 @@ When creating a new package, you need to provide at least the following. Package
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
     	"engines": {
-    		"node": ">=18.12.0",
-    		"npm": ">=8.19.2"
+    		"node": ">=18.12.0"
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
@@ -268,11 +267,15 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
+Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
 
-For each pull request, you should always include relevant changes under an "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
+Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
 
-_Example:_
+### Changelog Entry Format
+
+Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period.
+
+Example:
 
 ```md
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
@@ -281,16 +284,16 @@ _Example:_
 
 ### Bug Fixes
 
--   Fixed an off-by-one error with the `sum` function.
+-   Fixed an off-by-one error with the `sum` function ([#12347](https://github.com/WordPress/gutenberg/pull/12347)).
 ```
+
+You can verify the structure locally by running `npm run lint:changelogs`.
 
 ### Promoting a Pre-Release Package to Stable (1.0.0)
 
 The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
 
-When a package's API is considered stable and ready for production use, it should be promoted to version 1.0.0. This is done by adding a "Stable Release" section to the `CHANGELOG.md` file:
-
-_Example:_
+A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** section.
 
 ```md
 ## Unreleased
@@ -301,7 +304,7 @@ This package is now considered stable and production-ready. The API will follow 
 
 ### Breaking Changes
 
--   Final API adjustments before 1.0.0 release.
+-   Final API adjustments before 1.0.0 release ([#12345](https://github.com/WordPress/gutenberg/pull/12345)).
 ```
 
 The presence of the "Stable Release" heading will cause the automated release process to bump a pre-1.0 package to 1.0.0. The "Stable Release" heading should only be used for pre-1.0 packages, and from that point forward breaking changes will result in major version bumps as expected.
@@ -310,17 +313,16 @@ The presence of the "Stable Release" heading will cause the automated release pr
 
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
+Use the following standardized section headings and ordering based on the type of change you are making:
+
+-   "Stable Release" - Marks a pre-1.0 package as stable and production-ready. This should only be used for packages currently published as a 0.x pre-release, to intentionally communicate that a package's API is now stable and ready for production use.
 -   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump for stable packages).
 -   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
 -   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
 -   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
 -   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
--   "Stable Release" - Marks a pre-1.0 package as stable and production-ready. This should only be used for packages currently published as a 0.x pre-release, to intentionally communicate that a package's API is now stable and ready for production use.
-
-While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
-
-When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
+-   "Documentation" - Changes affecting consumer documentation.
 
 If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
@@ -365,7 +367,7 @@ Both extend shared base configurations (comments are not necessary):
 ```jsonc
 // tsconfig.json
 {
-	// Extends the shared dev project configuration (noEmit, jest types,
+	// Extends the shared dev project configuration (noEmit, Vitest matcher types,
 	// test and story includes).
 	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 
@@ -374,16 +376,16 @@ Both extend shared base configurations (comments are not necessary):
 }
 ```
 
-Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` and widgets under `widgets/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. An entry with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
 
-Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without test types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 
 Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
 
--   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
--   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `gutenberg-vitest-test-env` or `vitest/globals` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `gutenberg-vitest-test-env`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
 
-A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
 
 The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 
@@ -400,9 +402,9 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
-## Supported Node.js and npm versions
+## Supported Node.js versions
 
-WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required versions of Node.js and npm are specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
+WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required version of Node.js is specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
 ## Optimizing for bundlers
 

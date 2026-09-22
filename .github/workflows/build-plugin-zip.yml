@@ -5,8 +5,10 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
     workflow_dispatch:
         inputs:
             version:
@@ -264,7 +266,7 @@ jobs:
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
             - name: Build Gutenberg plugin ZIP file
-              run: ./bin/build-plugin-zip.sh
+              run: npm run build:plugin-zip
               env:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}

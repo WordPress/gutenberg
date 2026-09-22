@@ -197,7 +197,9 @@ function mediaUpload(
 		},
 		onBatchSuccess,
 		onError: ( error ) =>
-			onError( typeof error === 'string' ? error : error?.message ?? '' ),
+			onError(
+				typeof error === 'string' ? error : ( error?.message ?? '' )
+			),
 		additionalData,
 		allowedTypes,
 	} );
@@ -259,7 +261,7 @@ function heicMediaUpload(
 				if ( pathsRemaining <= 0 ) {
 					onBatchSuccess?.();
 				}
-		  }
+			}
 		: onBatchSuccess;
 
 	// Route HEIC files through the upload-media pipeline.
@@ -274,7 +276,7 @@ function heicMediaUpload(
 			onBatchSuccess: coordinatedBatchSuccess,
 			onError: ( error ) =>
 				onError(
-					typeof error === 'string' ? error : error?.message ?? ''
+					typeof error === 'string' ? error : ( error?.message ?? '' )
 				),
 			additionalData,
 			allowedTypes,
