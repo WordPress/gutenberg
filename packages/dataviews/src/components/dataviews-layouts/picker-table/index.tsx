@@ -48,6 +48,7 @@ interface TableRowProps< Item > {
 	onChangeSelection: SetSelection;
 	selectionProps: SelectionProps;
 	posinset?: number;
+	isInfiniteScroll: boolean;
 }
 
 function TableColumnField< Item >( {
@@ -87,6 +88,7 @@ function TableRow< Item >( {
 	onChangeSelection,
 	selectionProps,
 	posinset,
+	isInfiniteScroll,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 
@@ -96,12 +98,7 @@ function TableRow< Item >( {
 	const elementRef = useRef< HTMLButtonElement >( null );
 
 	useIntersectionObserver( elementRef, posinset );
-	const {
-		showTitle = true,
-		showMedia = true,
-		showDescription = true,
-		infiniteScrollEnabled,
-	} = view;
+	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const handleMouseEnter = () => {
 		setIsHovered( true );
 	};
@@ -134,7 +131,7 @@ function TableRow< Item >( {
 			aria-selected={ isSelected }
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
-			role={ infiniteScrollEnabled ? 'article' : 'option' }
+			role={ isInfiniteScroll ? 'article' : 'option' }
 			onClickCapture={ selectionProps.onClickCapture }
 			onClick={ selectionProps.onClick }
 			onMouseDown={ ( event ) => {
@@ -296,7 +293,8 @@ function ViewPickerTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
@@ -497,6 +495,9 @@ function ViewPickerTable< Item >( {
 											selectionProps={ getSelectionProps(
 												id
 											) }
+											isInfiniteScroll={
+												isInfiniteScroll
+											}
 										/>
 									);
 								} ) }
@@ -529,6 +530,7 @@ function ViewPickerTable< Item >( {
 											id
 										) }
 										posinset={ posinset }
+										isInfiniteScroll={ isInfiniteScroll }
 									/>
 								);
 							} ) }
