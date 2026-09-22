@@ -26,6 +26,17 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
+	 * Result types to rank above the usual order, most wanted first. Everything
+	 * left out keeps its usual place below them.
+	 *
+	 * An entry is a search type, covering everything of that type, or a search
+	 * type with one subtype, covering only that subtype. A caller that edits one
+	 * kind of link leads with that kind:
+	 *
+	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
+	 */
+	preferTypes?: TypeOrderEntry[];
+	/**
 	 * Which page of results to return.
 	 */
 	page?: number;
@@ -121,6 +132,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		preferTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -263,7 +275,7 @@ export default async function fetchLinkSuggestions(
 		);
 	}
 
-	results = sortResults( results, search );
+	results = sortResults( results, search, preferTypes );
 
 	if ( type ) {
 		results = results.slice( 0, perPage );
@@ -300,32 +312,96 @@ function getMatchRank( title: string, search: string ): number {
 }
 
 /**
- * How much a result's type counts towards its rank.
+ * The order result types are ranked in, most wanted first.
  *
- * A link is usually to content — a page, a post, or anything else a site has made a post type of.
- * A category or a tag is a plausible destination but a less common one. An attachment is a file
- * rather than a destination, and a post format is a way of styling a post, so neither earns
- * anything: on a site with a large media library they otherwise crowd out what was being looked
- * for. See https://github.com/WordPress/gutenberg/issues/63683.
+ * An entry is either a search type, which covers everything of that type, or a search type with
+ * one subtype, which covers only that subtype. Listing both lets a specific subtype outrank the
+ * rest of its type while the plain entry catches everything else — so a page outranks a post, and
+ * a custom post type nobody has heard of still ranks as content rather than falling off the end.
  *
- * Weighing the `kind` rather than the type means a custom post type counts as content and a custom
- * taxonomy counts as a taxonomy, without either having to be named anywhere.
+ * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
+ * destination and a post format is a way of styling a post, so both come last: on a site with a
+ * large media library they otherwise crowd out what was being looked for. See
+ * https://github.com/WordPress/gutenberg/issues/63683.
+ */
+export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
+
+const TYPE_ORDER: TypeOrderEntry[] = [
+	{ type: 'post', subtype: 'page' },
+	'post',
+	{ type: 'term', subtype: 'category' },
+	'term',
+	'post-format',
+	'attachment',
+];
+
+/**
+ * Which search type a result belongs to.
+ *
+ * Results name themselves by post type or taxonomy slug, so the search type they came back from
+ * has to be recovered from the kind.
  *
  * @param result
  *
+ * @return The search type.
+ */
+function getSearchType( result: SearchResult ): SearchType {
+	if ( result.kind === 'media' ) {
+		return 'attachment';
+	}
+
+	if ( result.type === 'post-format' ) {
+		return 'post-format';
+	}
+
+	return result.kind === 'taxonomy' ? 'term' : 'post';
+}
+
+/**
+ * Whether an entry in a type order describes a result.
+ *
+ * @param entry
+ * @param result
+ *
+ * @return True when the entry covers that result.
+ */
+function coversResult( entry: TypeOrderEntry, result: SearchResult ): boolean {
+	const searchType = getSearchType( result );
+
+	return typeof entry === 'string'
+		? entry === searchType
+		: entry.type === searchType && entry.subtype === result.type;
+}
+
+/**
+ * How much a result's type counts towards its rank.
+ *
+ * Earlier entries are worth more, and anything a caller prefers outranks the usual order entirely.
+ * A weight rather than a band, so a title that plainly answers the search can still outrank a
+ * better-placed type that barely does.
+ *
+ * @param result
+ * @param preferTypes
+ *
  * @return The weight to add to the result's score.
  */
-function getTypeWeight( result: SearchResult ): number {
-	if ( result.kind === 'post-type' ) {
-		return 5;
+function getTypeWeight(
+	result: SearchResult,
+	preferTypes: TypeOrderEntry[] = []
+): number {
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		coversResult( entry, result )
+	);
+
+	if ( preferred !== -1 ) {
+		return TYPE_ORDER.length + ( preferTypes.length - preferred );
 	}
 
-	// A post format is a taxonomy, but not one a link points at.
-	if ( result.kind === 'taxonomy' && result.type !== 'post-format' ) {
-		return 3;
-	}
+	const rank = TYPE_ORDER.findIndex( ( entry ) =>
+		coversResult( entry, result )
+	);
 
-	return 0;
+	return rank === -1 ? 0 : TYPE_ORDER.length - rank;
 }
 
 /**
@@ -352,8 +428,13 @@ function getTypeWeight( result: SearchResult ): number {
  *
  * @param results
  * @param search
+ * @param preferTypes
  */
-export function sortResults( results: SearchResult[], search: string ) {
+export function sortResults(
+	results: SearchResult[],
+	search: string,
+	preferTypes?: TypeOrderEntry[]
+) {
 	const searchTokens = tokenize( search );
 
 	// Give each result a unique key to avoid duplicate ids from different tables
@@ -388,9 +469,9 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 			scores[ scoreKey( result ) ] =
 				( wholeWords * 10 + partialWords ) / searchTokens.length +
-				getTypeWeight( result );
+				getTypeWeight( result, preferTypes );
 		} else {
-			scores[ scoreKey( result ) ] = getTypeWeight( result );
+			scores[ scoreKey( result ) ] = getTypeWeight( result, preferTypes );
 		}
 	}
 

@@ -637,9 +637,7 @@ describe( 'sortResults', () => {
 		];
 
 		expect(
-			sortResults( results, 'beach', [ 'page', 'attachment' ] ).map(
-				( { title } ) => title
-			)
+			sortResults( results, 'beach' ).map( ( { title } ) => title )
 		).toEqual( [ 'A Day At The Beach', 'Sunny Beach' ] );
 	} );
 
@@ -812,7 +810,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Coffee Cup Photo', 'Our Coffee' ] );
 	} );
 
-	it( 'ranks content above taxonomies, and both above attachments and post formats', () => {
+	it( 'ranks pages, then other content, then categories, then other taxonomies', () => {
 		const results = [
 			{
 				id: 1,
@@ -858,15 +856,13 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Weighted by kind, so a page and a post are worth the same, as are a
-		// category and a tag. Within a band the order they arrived in stands.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { type } ) => type )
 		).toEqual( [
-			'post',
 			'page',
-			'post_tag',
+			'post',
 			'category',
+			'post_tag',
 			'post-format',
 			'attachment',
 		] );
@@ -967,6 +963,96 @@ describe( 'sortResults', () => {
 		expect(
 			sortResults( results, 'coffee bean' ).map( ( { id } ) => id )
 		).toEqual( [ 2, 1 ] );
+	} );
+
+	it( 'leads with a type the caller prefers', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Uncategorized Notes',
+				url: 'http://wordpress.local/uncategorized-notes/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Uncategorized',
+				url: 'http://wordpress.local/category/uncategorized/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// Pages lead by default.
+		expect(
+			sortResults( results, 'uncategorized' ).map( ( { type } ) => type )
+		).toEqual( [ 'page', 'category' ] );
+
+		// A caller editing a category link asks for categories instead.
+		expect(
+			sortResults( results, 'uncategorized', [
+				{ type: 'term', subtype: 'category' },
+			] ).map( ( { type } ) => type )
+		).toEqual( [ 'category', 'page' ] );
+	} );
+
+	it( 'keeps the usual order below the types a caller prefers', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/coffee-photo.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/coffee-page/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee Tag',
+				url: 'http://wordpress.local/tag/coffee-tag/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+		];
+
+		// Tags lead; the rest keep their usual places behind them.
+		expect(
+			sortResults( results, 'coffee', [
+				{ type: 'term', subtype: 'post_tag' },
+			] ).map( ( { type } ) => type )
+		).toEqual( [ 'post_tag', 'page', 'attachment' ] );
+	} );
+
+	it( 'prefers a whole search type when no subtype is named', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/coffee-page/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Genre',
+				url: 'http://wordpress.local/genre/coffee-genre/',
+				type: 'genre',
+				kind: 'taxonomy',
+			},
+		];
+
+		// A custom taxonomy is covered by the bare entry, without being named.
+		expect(
+			sortResults( results, 'coffee', [ 'term' ] ).map(
+				( { type } ) => type
+			)
+		).toEqual( [ 'genre', 'page' ] );
 	} );
 } );
 
