@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Button, Spinner, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import {
 	useContext,
 	useEffect,
@@ -267,6 +268,15 @@ function TableRow< Item >( {
 			{ isTreeHierarchy && (
 				<td className="dataviews-view-table__hierarchy-column">
 					<div className="dataviews-view-table__cell-content-wrapper dataviews-view-table__hierarchy-cell">
+						{ hierarchyLevel > 0 && (
+							<VisuallyHidden render={ <span /> }>
+								{ sprintf(
+									// translators: %d: The hierarchy level number.
+									__( 'Hierarchy level %d' ),
+									hierarchyLevel + 1
+								) }
+							</VisuallyHidden>
+						) }
 						{ hasChildren && (
 							<Button
 								className="dataviews-view-table__hierarchy-toggle"
@@ -310,7 +320,7 @@ function TableRow< Item >( {
 				<td
 					className={
 						isTreeHierarchy
-							? 'dataviews-view-table__primary-column'
+							? 'dataviews-view-table__hierarchy-content-column'
 							: undefined
 					}
 				>
@@ -329,7 +339,7 @@ function TableRow< Item >( {
 					/>
 				</td>
 			) }
-			{ columns.map( ( column: string ) => {
+			{ columns.map( ( column: string, index: number ) => {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
@@ -339,6 +349,11 @@ function TableRow< Item >( {
 				return (
 					<td
 						key={ column }
+						className={
+							isTreeHierarchy && ! hasPrimaryColumn && index === 0
+								? 'dataviews-view-table__hierarchy-content-column'
+								: undefined
+						}
 						style={ {
 							width,
 							maxWidth,
@@ -430,6 +445,7 @@ function ViewTable< Item >( {
 		treeRows?.allRows
 			.filter( ( row ) => row.hasChildren )
 			.map( ( row ) => row.id ) ?? [];
+	const expandableItemIdSet = new Set( expandableItemIds );
 	const allItemsExpanded =
 		expandableItemIds.length > 0 &&
 		expandableItemIds.every( ( id ) => expandedItemIdSet.has( id ) );
@@ -657,11 +673,18 @@ function ViewTable< Item >( {
 												? __( 'Collapse all' )
 												: __( 'Expand all' )
 										}
-										aria-expanded={ allItemsExpanded }
 										onClick={ () =>
 											onChangeExpandedItemIds?.(
 												allItemsExpanded
-													? []
+													? (
+															expandedItemIds ??
+															[]
+														).filter(
+															( id ) =>
+																! expandableItemIdSet.has(
+																	id
+																)
+														)
 													: [
 															...new Set( [
 																...( expandedItemIds ??

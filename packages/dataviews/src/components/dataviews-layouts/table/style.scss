@@ -205,12 +205,10 @@
 			max-width: none;
 		}
 
-		.dataviews-view-table__hierarchy-cell,
-		.dataviews-view-table__checkbox-column > .dataviews-view-table__cell-content-wrapper,
-		.dataviews-view-table__primary-column {
-			position: relative;
-			inset-inline-start:
-				calc(var(--wp-dataviews-table-hierarchy-level, 0) *
+		.dataviews-view-table__hierarchy-content-column {
+			padding-inline-start:
+				calc(var(--wpds-dimension-padding-md) +
+				var(--wp-dataviews-table-hierarchy-level, 0) *
 				var(--wpds-dimension-size-md));
 		}
 

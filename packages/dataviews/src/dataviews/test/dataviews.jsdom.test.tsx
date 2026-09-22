@@ -284,34 +284,58 @@ describe( 'DataViews component', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'expands all loaded parents from the header disclosure', async () => {
+	it( 'toggles all loaded parents without changing unloaded items', async () => {
 		const user = userEvent.setup();
 		const onChangeExpandedItemIds = vi.fn();
-		render(
+		const hierarchyProps = {
+			data: [
+				{ id: 2, title: 'Child' },
+				{ id: 1, title: 'Parent' },
+			],
+			getItemParentId: ( item: Data ) =>
+				item.id === 2 ? 1 : undefined,
+			getItemHasChildren: ( item: Data ) => item.id === 1,
+			onChangeExpandedItemIds,
+			view: {
+				...DEFAULT_VIEW,
+				fields: [],
+				showLevels: true,
+				titleField: 'title',
+			},
+		};
+		const { rerender } = render(
 			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child' },
-					{ id: 1, title: 'Parent' },
-				] }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				getItemHasChildren={ ( item ) => item.id === 1 }
-				expandedItemIds={ [] }
-				onChangeExpandedItemIds={ onChangeExpandedItemIds }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				{ ...hierarchyProps }
+				expandedItemIds={ [ 'unloaded' ] }
 			/>
 		);
 
-		await user.click(
-			screen.getByRole( 'button', { name: 'Expand all' } )
+		const expandAll = screen.getByRole( 'button', {
+			name: 'Expand all',
+		} );
+		expect( expandAll ).not.toHaveAttribute( 'aria-expanded' );
+		await user.click( expandAll );
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [
+			'unloaded',
+			'1',
+		] );
+
+		onChangeExpandedItemIds.mockClear();
+		rerender(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				expandedItemIds={ [ 'unloaded', '1' ] }
+			/>
 		);
-		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [ '1' ] );
+		expect( screen.getByText( 'Hierarchy level 2' ) ).toBeInTheDocument();
+		const collapseAll = screen.getByRole( 'button', {
+			name: 'Collapse all',
+		} );
+		expect( collapseAll ).not.toHaveAttribute( 'aria-expanded' );
+		await user.click( collapseAll );
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [
+			'unloaded',
+		] );
 	} );
 
 	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
