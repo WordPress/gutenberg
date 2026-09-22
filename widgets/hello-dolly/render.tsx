@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.css';
 
 // These are the lyrics to Hello Dolly

@@ -62,7 +62,7 @@ const webpackConfig = {
 
 ### Behavior with scripts
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
 For example:
 
@@ -129,7 +129,7 @@ const webpackConfig = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
 For example:
 

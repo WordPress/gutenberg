@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isTemplatePart } from '@wordpress/blocks';
 
 const EMPTY_ARRAY = [];

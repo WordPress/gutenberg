@@ -8,7 +8,6 @@ import {
 	SelectControl,
 	Tooltip,
 } from '@wordpress/ui';
-
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [

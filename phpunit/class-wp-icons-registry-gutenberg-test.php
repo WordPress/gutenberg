@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_Icons_Registry_Gutenberg::register functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
@@ -98,18 +98,22 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Provides valid namespaced icon names.
+	 * Provides valid namespaced icon names, including names that contain,
+	 * start or end with digits, as well as underscores and hyphens.
 	 *
 	 * @return array<string, array{0: string}>
 	 */
 	public function data_valid_icon_names() {
 		return array(
-			'simple name'            => array( 'test-collection/myicon' ),
-			'digit at the start'     => array( 'test-collection/1-icon' ),
-			'digit in the name'      => array( 'test-collection/my-1-icon' ),
-			'digit at the end'       => array( 'test-collection/icon1' ),
-			'underscore in the name' => array( 'test-collection/my_icon' ),
-			'hyphen in the name'     => array( 'test-collection/my-icon' ),
+			'single character'                => array( 'test-collection/a' ),
+			'simple name'                     => array( 'test-collection/icon' ),
+			'digit at the start'              => array( 'test-collection/1icon' ),
+			'digit in the name'               => array( 'test-collection/my1icon' ),
+			'digit at the end'                => array( 'test-collection/icon1' ),
+			'underscore in the name'          => array( 'test-collection/my_icon' ),
+			'hyphen in the name'              => array( 'test-collection/my-icon' ),
+			'digit adjacent to a hyphen'      => array( 'test-collection/my-1-icon' ),
+			'digit adjacent to an underscore' => array( 'test-collection/my_1_icon' ),
 		);
 	}
 
@@ -376,6 +380,92 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$registered_icons = $this->registry->get_registered_icons( $name );
 		$this->assertCount( 1, $registered_icons );
 		$this->assertStringContainsString( '<svg', $registered_icons[0]['content'] );
+	}
+
+	/**
+	 * Should register an icon with its `content` sanitized.
+	 */
+	public function test_register_icon_sanitizes_content() {
+		$name     = 'test-collection/unsafe-content';
+		$settings = array(
+			'label'   => 'Icon',
+			'content' => '<svg viewbox="0 0 24 24" onload="alert(1)"><path d="M0 0" /></svg>',
+		);
+
+		$result = $this->register( $name, $settings );
+		$this->assertTrue( $result );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertSame( '<svg viewbox="0 0 24 24"><path d="M0 0" /></svg>', $icon['content'] );
+	}
+
+	/**
+	 * Provides the supported icon content sources.
+	 *
+	 * @return array<string, array{0: bool}>
+	 */
+	public function data_icon_content_sources(): array {
+		return array(
+			'inline content' => array( false ),
+			'file path'      => array( true ),
+		);
+	}
+
+	/**
+	 * Should preserve stroke attributes when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_stroke_attributes_survive_sanitization( bool $use_file_path ) {
+		$content  = '<svg fill="currentColor" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M0 0" vector-effect="non-scaling-stroke"/><polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"/></svg>';
+		$name     = 'test-collection/stroke-icon';
+		$settings = array(
+			'label' => 'Stroke Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( 'fill="currentColor"', $icon['content'] );
+		$this->assertStringContainsString( 'style="fill: none"', $icon['content'] );
+		$this->assertStringContainsString( 'stroke="currentColor"', $icon['content'] );
+		$this->assertStringContainsString( 'stroke-width="1.5"', $icon['content'] );
+		$this->assertStringContainsString( 'vector-effect="non-scaling-stroke"', $icon['content'] );
+		$this->assertStringContainsString( '<polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"', $icon['content'] );
+	}
+
+	/**
+	 * Should preserve clip rules when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_clip_rule_survives_sanitization( bool $use_file_path ) {
+		$content  = '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" /></svg>';
+		$name     = 'test-collection/clip-rule-icon';
+		$settings = array(
+			'label' => 'Clip Rule Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( 'clip-rule="evenodd"', $icon['content'] );
 	}
 
 	/**

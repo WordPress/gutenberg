@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as commandsStore } from '../store';
 
 /**

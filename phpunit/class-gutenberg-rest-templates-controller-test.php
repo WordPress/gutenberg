@@ -157,6 +157,25 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * A file-backed template has no modification date, which should be exposed as
+	 * `null` rather than the `false` returned by `mysql_to_rfc3339()`.
+	 *
+	 * @ticket 65728
+	 * @covers WP_REST_Templates_Controller::prepare_item_for_response
+	 */
+	public function test_get_item_modified_is_null_for_file_backed_template() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//page-home' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status(), 'Fetching a file-backed template should return 200.' );
+		$this->assertNull( $data['modified'], 'The modified date should be null for a file-backed template.' );
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_create_item() {
@@ -182,6 +201,22 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 */
 	public function test_prepare_item() {
 		// Not testing item preparation.
+	}
+
+	/**
+	 * A `null` template must produce an error response, not a fatal error from
+	 * reading properties on `null`.
+	 *
+	 * @covers Gutenberg_REST_Templates_Controller_7_2::prepare_item_for_response
+	 */
+	public function test_prepare_item_for_response_with_null_template() {
+		$controller = new Gutenberg_REST_Templates_Controller_7_2( 'wp_template' );
+		$request    = new WP_REST_Request( 'PUT', '/wp/v2/templates/default//does-not-exist' );
+
+		$response = $controller->prepare_item_for_response( null, $request );
+
+		$this->assertWPError( $response, 'A null template should produce a WP_Error, not a fatal error.' );
+		$this->assertSame( 'rest_template_not_found', $response->get_error_code() );
 	}
 
 	/**

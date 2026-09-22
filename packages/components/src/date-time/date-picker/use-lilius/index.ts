@@ -28,10 +28,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/**
- * External dependencies
- */
 import {
 	addMonths,
 	addYears,
@@ -52,10 +48,6 @@ import {
 	subMonths,
 	subYears,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
 
 export enum Month {

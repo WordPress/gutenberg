@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,

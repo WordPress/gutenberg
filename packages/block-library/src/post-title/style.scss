@@ -1,4 +1,5 @@
 .wp-block-post-title {
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;

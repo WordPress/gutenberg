@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Autosave', () => {
@@ -19,7 +16,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -57,7 +54,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -104,7 +101,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -140,7 +137,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -175,7 +172,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -248,7 +245,7 @@ test.describe( 'Autosave', () => {
 			.filter( { hasText: 'Draft saved' } );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -284,7 +281,7 @@ test.describe( 'Autosave', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();
@@ -341,7 +338,7 @@ test.describe( 'Autosave', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();

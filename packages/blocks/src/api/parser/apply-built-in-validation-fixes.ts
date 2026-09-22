@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { fixCustomClassname } from './fix-custom-classname';
 import { fixGlobalAttribute } from './fix-global-attribute';
 import type { Block, BlockAttribute, BlockType } from '../../types';

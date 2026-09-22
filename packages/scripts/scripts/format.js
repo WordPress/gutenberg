@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 const { exit, stdout } = require( 'process' );
-
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
 const { sync: dirGlob } = require( 'dir-glob' );
 const { sync: readPkgUp } = require( 'read-pkg-up' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	fromProjectRoot,

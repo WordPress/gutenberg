@@ -1,6 +1,6 @@
 /**
  * Given an element type, returns an HTMLElement with an emulated layout,
- * since JSDOM does have its own internal layout engine.
+ * since JSDOM does not have its own internal layout engine.
  *
  * @param {string} type Element type.
  *
@@ -14,9 +14,8 @@ export default function createElement( type ) {
 			let isHidden = false;
 			let node = this;
 			do {
-				isHidden =
-					node.style.display === 'none' ||
-					node.style.visibility === 'hidden';
+				// CSS visibility does not remove an element's layout box.
+				isHidden = node.style.display === 'none';
 
 				node = node.parentNode;
 			} while (

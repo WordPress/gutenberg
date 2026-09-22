@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -18,10 +15,6 @@ import {
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import BlockPreviewPanel from './block-preview-panel';
 import { Subtitle } from './subtitle';
@@ -29,7 +22,7 @@ import {
 	useBlockVariations,
 	VariationsPanel,
 } from './variations/variations-panel';
-import { useStyle, useSetting } from './hooks';
+import { useStyle, useSetting, useStyleWithResolvedBackground } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates, getValidViewportStates } from './utils';
@@ -99,6 +92,7 @@ interface ScreenBlockProps {
 	variation?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function ScreenBlock( {
@@ -106,6 +100,7 @@ function ScreenBlock( {
 	variation,
 	selectedViewport: controlledSelectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -161,6 +156,8 @@ function ScreenBlock( {
 		false,
 		hasSelectedState ? stateParam : undefined
 	);
+	const inheritedStyleWithResolvedBackground =
+		useStyleWithResolvedBackground( inheritedStyle );
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -367,7 +364,7 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
-				pseudoStates={ validPseudoStates }
+				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={
@@ -404,15 +401,17 @@ function ScreenBlock( {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
-					inheritedValue={ inheritedStyle }
+					inheritedValue={ inheritedStyleWithResolvedBackground }
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -422,6 +421,7 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -431,6 +431,7 @@ function ScreenBlock( {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -439,6 +440,7 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -447,6 +449,7 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

@@ -1,13 +1,15 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "./tsconfig.src.json",
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"composite": true,
-		"rootDir": ".",
+		"allowImportingTsExtensions": true,
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"noEmit": true,
-		"allowImportingTsExtensions": true
+		"emitDeclarationOnly": false,
+		"rootDir": ".",
+		"types": [ "node" ]
 	},
 	"include": [ "bin", "terrazzo.config.ts" ],
-	"exclude": [],
-	"references": [ { "path": "./tsconfig.src.json" } ]
+	"references": [ { "path": "./tsconfig.build.json" } ]
 }

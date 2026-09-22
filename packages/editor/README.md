@@ -373,18 +373,7 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Renders the component for managing saved states of entities.
-
-_Parameters_
-
--   _props_ `Object`: The component props.
--   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean=`: Whether to render the component with modal dialog behavior.
--   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+Undocumented declaration.
 
 ### ErrorBoundary
 
@@ -417,18 +406,6 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 ### getFontSizeClass
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getFontSizeClass` instead.
-
-### getTemplatePartIcon
-
-Helper function to retrieve the corresponding icon by area name.
-
-_Parameters_
-
--   _areaOrIconName_ `string`: The area name (e.g., 'header', 'navigation-overlay').
-
-_Returns_
-
--   `Object`: The corresponding icon.
 
 ### InnerBlocks
 
@@ -732,7 +709,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
 
 _Returns_
 
@@ -884,7 +861,7 @@ _Parameters_
 -   _props.href_ `[string]`: When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying MenuItem component.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
 
 _Returns_
 
@@ -1722,11 +1699,7 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
-
-_Returns_
-
--   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
+Undocumented declaration.
 
 ### usePostScheduleLabel
 

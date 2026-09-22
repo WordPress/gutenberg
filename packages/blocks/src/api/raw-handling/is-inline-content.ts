@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isTextContent } from '@wordpress/dom';
 
 /**

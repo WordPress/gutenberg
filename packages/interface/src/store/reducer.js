@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers } from '@wordpress/data';
 
 export function complementaryAreas( state = {}, action ) {

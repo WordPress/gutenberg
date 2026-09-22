@@ -1,10 +1,8 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
-	"references": [],
-	"include": [ "src/**/*" ],
-	"exclude": [ "src/test/**" ]
+	"references": [ { "path": "./tsconfig.build.json" } ]
 }

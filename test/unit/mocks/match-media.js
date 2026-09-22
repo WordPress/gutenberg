@@ -2,8 +2,7 @@
 // since js-dom does not fully support CSS animations.
 // Example: https://github.com/jsdom/jsdom/issues/3239
 //
-// Skip entirely when there is no `window` (tests opting into
-// `@jest-environment node` for SSR-style assertions).
+// Skip entirely when there is no `window`.
 if ( typeof window !== 'undefined' ) {
 	const originalMatchMedia = window.matchMedia;
 	const mockedMatchMedia = jest.fn( ( query ) => {

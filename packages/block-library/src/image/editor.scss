@@ -22,12 +22,16 @@ figure.wp-block-image:not(.wp-block) {
 	// width (e.g. a small animated GIF being transcoded to a video) otherwise
 	// leaves the spinner off to one side. Wide and full alignments keep their
 	// own width.
-	&.is-transient:not(.alignwide):not(.alignfull) {
+	// The media editor swap state marks the img rather than the figure (its
+	// state lives alongside the img's load handlers), hence the :has() variant.
+	&.is-transient:not(.alignwide):not(.alignfull),
+	&:has(img.is-swapping-media):not(.alignwide):not(.alignfull) {
 		width: fit-content;
 	}
 
 	.is-applying img,
-	&.is-transient img {
+	&.is-transient img,
+	img.is-swapping-media {
 		opacity: 0.3;
 	}
 

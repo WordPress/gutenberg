@@ -288,7 +288,7 @@ WordPress calls this endpoint automatically as part of the client-side upload pi
 
 ## Cross-origin isolation considerations
 
-Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/nicolo-ribaudo/tc39-proposal-structs/blob/main/test262-filtering/isolation-explainer.md) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
+Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/WICG/document-isolation-policy) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
 
 ### Impact on plugins
 

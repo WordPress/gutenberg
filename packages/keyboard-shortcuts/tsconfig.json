@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../data" },
-		{ "path": "../element" },
-		{ "path": "../keycodes" }
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" }
 	]
 }

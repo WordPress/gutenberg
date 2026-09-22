@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -10,10 +7,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useNavigateToEntityRecord from './use-navigate-to-entity-record';
@@ -38,7 +31,9 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings() {
+export function useSpecificEditorSettings( {
+	defaultRenderingMode = 'post-only',
+} = {} ) {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
@@ -98,16 +93,17 @@ export function useSpecificEditorSettings() {
 			__experimentalFeatures: globalSettings,
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvas !== 'view',
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			isPreviewMode: canvas === 'view',
+			defaultRenderingMode,
 		};
 	}, [
 		settings,
 		globalStyles,
 		globalSettings,
 		canvas,
+		defaultRenderingMode,
 		currentPostIsTrashed,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,

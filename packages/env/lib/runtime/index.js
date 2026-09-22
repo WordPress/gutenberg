@@ -1,8 +1,4 @@
 'use strict';
-
-/**
- * Internal dependencies
- */
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
 const {

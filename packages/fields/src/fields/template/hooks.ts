@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle } from '../../actions/utils';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerFieldType } from '@wordpress/widget-primitives';
 import type { FieldTypeDefinition } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { LocationControl } from './location-control';
 
 /*

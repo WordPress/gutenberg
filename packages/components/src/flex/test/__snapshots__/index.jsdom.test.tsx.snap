@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`props should render correctly 1`] = `
+<div
+  class="style-flex style-items-row style-expanded-row components-flex"
+  data-testid="base-flex"
+  data-wp-c16t="true"
+  data-wp-component="Flex"
+  style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-wrap: nowrap; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
+>
+  <div
+    class="style-item components-flex-item"
+    data-wp-c16t="true"
+    data-wp-component="FlexItem"
+    style="--wp-components-flex-item-display: block;"
+  >
+    Item
+  </div>
+  <div
+    class="style-item style-block components-flex-item components-flex-block"
+    data-wp-c16t="true"
+    data-wp-component="FlexBlock"
+    style="--wp-components-flex-item-display: block;"
+  >
+    Item
+  </div>
+</div>
+`;

@@ -14,6 +14,7 @@
 .editor-post-url__link,
 .editor-post-url__front-page-link {
 	direction: ltr;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 /* rtl:end:ignore */
@@ -49,6 +50,7 @@
 
 .editor-post-url__panel-toggle,
 .editor-post-parent__panel-toggle {
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 

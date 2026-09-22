@@ -4,7 +4,7 @@ import { forwardRef } from '@wordpress/element';
 import { check, reset } from '@wordpress/icons';
 import { Icon } from '../../../icon';
 import resetStyles from '../../../utils/css/resets.module.css';
-import focusStyles from '../../../utils/css/focus.module.css';
+import focusStyles from '../../../utils/css/focus.module.scss';
 import styles from './style.module.css';
 import type { CheckboxProps } from './types';
 

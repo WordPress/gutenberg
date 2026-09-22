@@ -61,6 +61,32 @@ Similar to the `codeEditingEnabled` setting, `richEditingEnabled` allows you to 
 
 The setting defaults to the returned value of the [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/) function. It checks whether the user can access the visual editor and whether the user's browser supports it.
 
+### Restrict responsive editing
+
+The `responsiveEditingEnabled` setting, which defaults to `true`, controls whether the "Responsive styles" option is available in the Editor's View menu. When it is `false`, the option is not rendered, and the viewport state control in Global Styles is hidden as well, so users cannot target style changes at a single viewport. Pseudo states such as hover remain available. Responsive styles already defined in the theme or in Global Styles are unaffected.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
+
+function example_disable_responsive_editing( $settings ) {
+	$settings['responsiveEditingEnabled'] = false;
+	return $settings;
+}
+```
+
+### Restrict block states editing
+
+The `blockStatesEditingEnabled` setting, which defaults to `true`, controls whether state controls for blocks are available in the block inspector and Global Styles. When it is `false`, those controls are not rendered, so users cannot apply block styles to states from those UIs. Viewport state controls are unaffected and remain controlled by `responsiveEditingEnabled`. State styles already saved in `theme.json`, in Global Styles, or in a block's `style` attribute are unaffected.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
+
+function example_disable_block_states_editing( $settings ) {
+	$settings['blockStatesEditingEnabled'] = false;
+	return $settings;
+}
+```
+
 ### Set a default image size
 
 Images are set to the `large` image size by default in the Editor. You can modify this using the `imageDefaultSize` setting, which is especially useful if you have configured your own custom image sizes. The following example changes the default image size to `medium`.
@@ -286,7 +312,7 @@ Opaque animated GIFs are converted client-side to a companion MP4/WebM video, an
 
 A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.
 
-The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) and gives you access to the error object.
+The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) and gives you access to the error object, along with React's error info object, whose `componentStack` property describes where in the component tree the error was thrown.
 
 You can use this action to get hold of the error object handled by the boundaries. For example, you may want to send them to an external error-tracking tool. Here's an example:
 
@@ -296,10 +322,10 @@ import { addAction } from '@wordpress/hooks';
 addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
-	( error ) => {
-		// Error is the exception's error object. 
+	( error, errorInfo ) => {
+		// Error is the exception's error object.
 		// You can console.log it or send it to an external error-tracking tool.
-		console.log ( error );
+		console.log ( error, errorInfo?.componentStack );
 	}
 );
 ```
