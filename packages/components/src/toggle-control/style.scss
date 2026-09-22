@@ -1,8 +1,10 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../form-toggle/style" as form-toggle;
+@use "../utils/theme-variables" as *;
 
 .components-toggle-control__label {
 	line-height: form-toggle.$toggle-height;
+	color: $components-color-foreground;
 
 	&:not(.is-disabled) {
 		cursor: var(--wpds-cursor-control);
