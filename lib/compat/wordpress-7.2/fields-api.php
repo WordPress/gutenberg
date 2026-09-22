@@ -70,3 +70,83 @@ function gutenberg_get_registered_fields( $kind, $name ) {
 function gutenberg_get_registered_field_modules( $kind, $name ) {
 	return Gutenberg_Fields_Registry::get_instance()->get_registered_field_modules( $kind, $name );
 }
+
+/**
+ * Returns the ids of all script modules registered for any entity.
+ *
+ * @return string[] The module ids, unique and in registration order.
+ */
+function gutenberg_get_all_registered_field_modules() {
+	return Gutenberg_Fields_Registry::get_instance()->get_all_registered_field_modules();
+}
+
+/**
+ * Declares the script modules of the entity fields as dependencies of the
+ * editor script.
+ *
+ * The editor imports the script modules of an entity on demand, with a dynamic
+ * `import()` the browser resolves through the import map of the page. Listing
+ * the modules as dynamic `module_dependencies` of the `wp-editor` script adds
+ * them to the import map of every page that loads the editor script: the post
+ * editor, the site editor, and the pages booted by `@wordpress/boot`, whose
+ * prerequisites depend on it. A dynamic dependency is only listed in the
+ * import map; the module is fetched when it is imported.
+ *
+ * It runs early on `admin_init`: after `init`, so the fields and their script
+ * modules are registered, and before the pages rendered outside the admin
+ * template, which render and exit on `admin_init` at the default priority.
+ * A field registered later is not covered.
+ *
+ * When called by the `admin_init` action, which passes no arguments,
+ * `$scripts` is an empty string and the global registry is used.
+ * In other scenarios (tests), the scripts are given directly.
+ *
+ * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
+ */
+function gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
+	if ( ! $scripts instanceof WP_Scripts ) {
+		$scripts = wp_scripts();
+	}
+
+	// TODO:
+	// Field registration as well as actions live in packages/editor/src/dataviews/store/private-actions.ts
+	// which means any screen that wants to use this mechanism needs to load the editor script.
+	// This is fine for our current use cases (site editor, post editor), but regular wp-admin screens
+	// that want to use the fields API will need to load the editor script as well, which is not ideal.
+	if ( ! $scripts->query( 'wp-editor', 'registered' ) ) {
+		return;
+	}
+
+	$entities = gutenberg_get_all_registered_field_modules();
+	if ( empty( $entities ) ) {
+		return;
+	}
+
+	$dependencies = $scripts->get_data( 'wp-editor', 'module_dependencies' );
+	$dependencies = is_array( $dependencies ) ? $dependencies : array();
+
+	$declared = array();
+	foreach ( $dependencies as $dependency ) {
+		$declared[] = is_array( $dependency ) ? $dependency['id'] : $dependency;
+	}
+
+	$added = false;
+	foreach ( $entities as $modules ) {
+		foreach ( $modules as $module ) {
+			if ( ! in_array( $module, $declared, true ) ) {
+				$dependencies[] = array(
+					'id'      => $module,
+					'dynamic' => true,
+				);
+				$declared[]     = $module;
+				$added          = true;
+			}
+		}
+	}
+
+	if ( $added ) {
+		// `add_data()` replaces the value, hence the merge above.
+		$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
+	}
+}
+add_action( 'admin_init', 'gutenberg_add_field_modules_to_editor_script', 5 );
