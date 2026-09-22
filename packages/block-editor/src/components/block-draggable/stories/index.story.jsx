@@ -1,8 +1,8 @@
 import BlockDraggableChip from '../draggable-chip';
 
 export default {
-	title: 'BlockEditor/BlockDraggable',
 	id: 'blockeditor-blockdraggable',
+	title: 'Editor/Block Editor/BlockDraggable',
 };
 
 export const _default = () => {

@@ -16,7 +16,7 @@ import {
 
 const meta: Meta< typeof InputControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/InputControl',
+	title: 'Components/@wordpress-ui/Form/InputControl',
 	id: 'design-system-components-form-inputcontrol',
 	component: InputControl,
 	argTypes: {

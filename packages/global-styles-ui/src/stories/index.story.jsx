@@ -2,8 +2,8 @@ import { useState } from '@wordpress/element';
 import { GlobalStylesUI as GlobalStylesUIComponent } from '../global-styles-ui';
 
 export default {
-	title: 'GlobalStylesUI/GlobalStylesUI',
 	id: 'globalstylesui-globalstylesui',
+	title: 'Editor/Global Styles/Global Styles UI',
 };
 
 const BASE_SETTINGS = {

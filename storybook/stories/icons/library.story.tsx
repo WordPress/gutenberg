@@ -59,9 +59,8 @@ function nameToSlug( name: string ): string {
 
 const meta: Meta = {
 	component: Icon,
-	// Keep in sync with `packages/icons/src/icon/stories/index.story.tsx`.
-	title: 'Icons/Icon',
 	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },

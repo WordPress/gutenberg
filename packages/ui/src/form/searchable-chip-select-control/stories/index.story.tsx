@@ -21,7 +21,7 @@ import {
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableChipSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableChipSelectControl',
 	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
 	subcomponents: {

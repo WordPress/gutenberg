@@ -3,7 +3,7 @@ import { Spinner } from '../index';
 
 const meta: Meta< typeof Spinner > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Spinner',
+	title: 'Components/@wordpress-ui/Spinner',
 	id: 'design-system-components-spinner',
 	component: Spinner,
 	parameters: {

@@ -3,7 +3,7 @@ import { Skeleton } from '../index';
 
 const meta: Meta< typeof Skeleton > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Skeleton',
+	title: 'Components/@wordpress-ui/Skeleton',
 	id: 'design-system-components-skeleton',
 	component: Skeleton,
 	parameters: {

@@ -12,7 +12,7 @@ import {
 
 const meta: Meta< typeof Calendar > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Calendar/Calendar',
+	title: 'Components/@wordpress-ui/Calendar/Calendar',
 	id: 'design-system-components-calendar-calendar',
 	component: Calendar,
 	parameters: {

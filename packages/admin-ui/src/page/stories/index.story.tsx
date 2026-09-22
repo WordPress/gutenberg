@@ -10,8 +10,8 @@ import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
-	title: 'Admin UI/Page',
 	id: 'admin-ui-page',
+	title: 'Design System/Admin UI/Page',
 	parameters: {
 		layout: 'fullscreen',
 	},
