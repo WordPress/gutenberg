@@ -170,16 +170,6 @@ describe( 'DataViews Picker', () => {
 			expect( options ).toHaveLength( data.length );
 		} );
 
-		it( 'supports specifying a `label` which is rendered as an aria-label', async () => {
-			const testLabel = 'Select an item from the grid';
-			await render( <Picker label={ testLabel } /> );
-
-			// Grid should have the specified aria-label
-			expect(
-				screen.getByRole( 'listbox', { name: testLabel } )
-			).toBeInTheDocument();
-		} );
-
 		it( 'implements single tab-stop composite pattern with aria-activedescendant', async () => {
 			await render( <Picker /> );
 
@@ -339,16 +329,6 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		describe( 'Multi selection', () => {
-			it( 'adds the `aria-multiselectable` attribute to the listbox', async () => {
-				await render( <Picker actions={ multiSelectActions } /> );
-
-				const listbox = screen.getByRole( 'listbox' );
-				expect( listbox ).toHaveAttribute(
-					'aria-multiselectable',
-					'true'
-				);
-			} );
-
 			it( 'supports multiple selected items and calls the `onChangeSelection` callback when the selection changes', async () => {
 				// Test multi-selection by clicking multiple items
 				await render( <Picker actions={ multiSelectActions } /> );
@@ -828,6 +808,32 @@ describe( 'DataViews Picker', () => {
 		} );
 	} );
 
+	describe.each( [
+		[ 'picker grid', LAYOUT_PICKER_GRID ],
+		[ 'picker table', LAYOUT_PICKER_TABLE ],
+		[ 'picker activity', LAYOUT_PICKER_ACTIVITY ],
+	] as const )( 'Listbox semantics (%s)', ( _layoutName, layout ) => {
+		it( 'labels the listbox with the `itemListLabel` prop', async () => {
+			const testLabel = 'Select an item';
+			await render( <Picker label={ testLabel } layout={ layout } /> );
+
+			expect(
+				screen.getByRole( 'listbox', { name: testLabel } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'marks the listbox as multiselectable for a multi-select picker', async () => {
+			await render(
+				<Picker actions={ multiSelectActions } layout={ layout } />
+			);
+
+			expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
+				'aria-multiselectable',
+				'true'
+			);
+		} );
+	} );
+
 	describe( 'Table layout', () => {
 		it( 'renders the table as a `listbox` that holds `aria-activedescendant`, with rows as `option` roles', async () => {
 			await render( <Picker layout={ LAYOUT_PICKER_TABLE } /> );
@@ -857,31 +863,6 @@ describe( 'DataViews Picker', () => {
 			expect( listbox ).toHaveAttribute(
 				'aria-activedescendant',
 				options[ 1 ].id
-			);
-		} );
-
-		it( 'supports specifying a `label` which is rendered as an aria-label', async () => {
-			const testLabel = 'Select an item from the table';
-			await render(
-				<Picker layout={ LAYOUT_PICKER_TABLE } label={ testLabel } />
-			);
-
-			expect(
-				screen.getByRole( 'listbox', { name: testLabel } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'adds the `aria-multiselectable` attribute to the listbox', async () => {
-			await render(
-				<Picker
-					layout={ LAYOUT_PICKER_TABLE }
-					actions={ multiSelectActions }
-				/>
-			);
-
-			expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
-				'aria-multiselectable',
-				'true'
 			);
 		} );
 
