@@ -123,6 +123,7 @@ jobs:
               uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
               with:
                   node-version: 14
+                  package-manager-cache: false
 
             - name: Cache NPM packages
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
