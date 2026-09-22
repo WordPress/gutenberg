@@ -1,18 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
-import { DropdownMenu } from '..';
-import MenuItem from '../../menu-item';
-import MenuGroup from '../../menu-group';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import {
 	menu,
 	arrowUp,
@@ -21,14 +8,25 @@ import {
 	more,
 	trash,
 } from '@wordpress/icons';
+import { DropdownMenu } from '..';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/DropdownMenu',
+	title: 'Components/@wordpress-components/Actions/DropdownMenu',
 	component: DropdownMenu,
+	id: 'components-dropdownmenu',
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use `Menu` instead. Otherwise, continue using for now.',
+		},
+	},
+	args: {
+		onToggle: fn(),
 	},
 	argTypes: {
 		icon: {
@@ -36,9 +34,9 @@ const meta: Meta< typeof DropdownMenu > = {
 			mapping: { menu, chevronDown, more },
 			control: { type: 'select' },
 		},
-		open: { control: { type: null } },
-		defaultOpen: { control: { type: null } },
-		onToggle: { control: { type: null } },
+		open: { control: false },
+		defaultOpen: { control: false },
+		onToggle: { control: false },
 	},
 };
 export default meta;
@@ -96,6 +94,9 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 		icon: more,
 		children: ( { onClose } ) => (
 			<>
+				<MenuItem icon={ arrowUp } onClick={ onClose }>
+					Standalone Item
+				</MenuItem>
 				<MenuGroup>
 					<MenuItem icon={ arrowUp } onClick={ onClose }>
 						Move Up

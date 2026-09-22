@@ -1,36 +1,37 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { BlockRefs } from '../provider/block-refs-provider';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
+import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
-	const isInBetweenInserterDisabled = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree ||
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
+	const { refsMap } = useContext( BlockRefs );
+	const isInBetweenInserterDisabled = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return (
+			settings.isDistractionFree ||
+			settings.isPreviewMode ||
+			unlock( select( blockEditorStore ) ).isZoomOut()
+		);
+	}, [] );
 	const {
 		getBlockListSettings,
 		getBlockIndex,
+		getBlockOrder,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
+		getSettings,
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
 		getBlockEditingMode,
 		getBlockName,
 		getBlockAttributes,
-	} = useSelect( blockEditorStore );
+		getParentSectionBlock,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -88,70 +89,88 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				const blockListSettings = getBlockListSettings( rootClientId );
 				const orientation =
-					getBlockListSettings( rootClientId )?.orientation ||
-					'vertical';
+					blockListSettings?.orientation || 'vertical';
+				const captureToolbars =
+					!! blockListSettings?.__experimentalCaptureToolbars;
 				const offsetTop = event.clientY;
 				const offsetLeft = event.clientX;
 
-				const children = Array.from( event.target.children );
-				let element = children.find( ( blockEl ) => {
-					const blockElRect = blockEl.getBoundingClientRect();
-					return (
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'vertical' &&
-							blockElRect.top > offsetTop ) ||
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'horizontal' &&
-							( isRTL()
-								? blockElRect.right < offsetLeft
-								: blockElRect.left > offsetLeft ) )
-					);
-				} );
+				// Use block refs, not the container's DOM children: a block
+				// can render its block props on an inner element.
+				const clientId = getBlockOrder( rootClientId ).find(
+					( childClientId ) => {
+						const blockEl = refsMap.get( childClientId );
 
-				if ( ! element ) {
+						if ( ! blockEl ) {
+							return false;
+						}
+
+						const blockElRect = blockEl.getBoundingClientRect();
+
+						if ( orientation === 'vertical' ) {
+							return blockElRect.top > offsetTop;
+						}
+
+						// A horizontal list can wrap, so only blocks on the
+						// pointer's line are candidates.
+						if (
+							offsetTop < blockElRect.top ||
+							offsetTop > blockElRect.bottom
+						) {
+							return false;
+						}
+
+						return isRTL()
+							? blockElRect.right < offsetLeft
+							: blockElRect.left > offsetLeft;
+					}
+				);
+
+				if ( ! clientId ) {
 					hideInsertionPoint();
 					return;
-				}
-
-				// The block may be in an alignment wrapper, so check the first direct
-				// child if the element has no ID.
-				if ( ! element.id ) {
-					element = element.firstElementChild;
-
-					if ( ! element ) {
-						hideInsertionPoint();
-						return;
-					}
 				}
 
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const clientId = element.id.slice( 'block-'.length );
 				if (
-					! clientId ||
-					__unstableIsWithinBlockOverlay( clientId )
+					__unstableIsWithinBlockOverlay( clientId ) ||
+					!! getParentSectionBlock( clientId )
 				) {
 					return;
 				}
 
-				// Don't show the inserter when hovering above (conflicts with
-				// block toolbar) or inside selected block(s).
-				if ( getSelectedBlockClientIds().includes( clientId ) ) {
+				// Don't show the inserter if the following conditions are met,
+				// as it conflicts with the block toolbar:
+				// 1. when hovering above or inside selected block(s)
+				// 2. when the orientation is vertical
+				// 3. when the __experimentalCaptureToolbars is not enabled
+				// 4. when the Top Toolbar is not disabled
+				if (
+					getSelectedBlockClientIds().includes( clientId ) &&
+					orientation === 'vertical' &&
+					! captureToolbars &&
+					! getSettings().hasFixedToolbar
+				) {
 					return;
 				}
-				const elementRect = element.getBoundingClientRect();
 
-				if (
-					( orientation === 'horizontal' &&
-						( event.clientY > elementRect.bottom ||
-							event.clientY < elementRect.top ) ) ||
-					( orientation === 'vertical' &&
-						( event.clientX > elementRect.right ||
-							event.clientX < elementRect.left ) )
-				) {
-					hideInsertionPoint();
-					return;
+				const element = refsMap.get( clientId );
+
+				// Don't show the insertion point when the pointer sits beside
+				// the block rather than before it.
+				if ( orientation === 'vertical' ) {
+					const elementRect = element.getBoundingClientRect();
+
+					if (
+						event.clientX > elementRect.right ||
+						event.clientX < elementRect.left
+					) {
+						hideInsertionPoint();
+						return;
+					}
 				}
 
 				const index = getBlockIndex( clientId );
@@ -176,8 +195,10 @@ export function useInBetweenInserter() {
 		},
 		[
 			openRef,
+			refsMap,
 			getBlockListSettings,
 			getBlockIndex,
+			getBlockOrder,
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,

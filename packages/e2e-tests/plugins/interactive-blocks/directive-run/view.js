@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	useInit,
@@ -21,12 +18,12 @@ directive(
 		element,
 		evaluate,
 	} ) => {
-		const entry = showChildren.find(
-			( { suffix } ) => suffix === 'default'
-		);
-		return evaluate( entry )
-			? element
-			: cloneElement( element, { children: null } );
+		const entry = showChildren.find( ( { suffix } ) => suffix === null );
+		let result = evaluate( entry );
+		if ( typeof result === 'function' ) {
+			result = result();
+		}
+		return result ? element : cloneElement( element, { children: null } );
 	},
 	{ priority: 9 }
 );
@@ -65,9 +62,8 @@ const { state } = store( 'directive-run', {
 			state.clickCount = state.clickCount + 1;
 		},
 		*navigate() {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			return actions.navigate( window.location, {
 				force: true,
 				html,

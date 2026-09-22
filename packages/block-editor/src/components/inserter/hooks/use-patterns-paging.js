@@ -1,19 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useAsyncList, usePrevious } from '@wordpress/compose';
+import { usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
 
 const PAGE_SIZE = 20;
-const INITIAL_INSERTER_RESULTS = 5;
 
 /**
  * Supplies values needed to page the patterns list client side.
  *
  * @param {Array}  currentCategoryPatterns An array of the current patterns to display.
  * @param {string} currentCategory         The currently selected category.
- * @param {Object} scrollContainerRef      Ref of container to to find scroll container for when moving between pages.
+ * @param {Object} scrollContainerRef      Ref of container to find scroll container for when moving between pages.
  * @param {string} currentFilter           The currently search filter.
  *
  * @return {Object} Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
@@ -42,9 +38,6 @@ export default function usePatternsPaging(
 			pageIndex * PAGE_SIZE + PAGE_SIZE
 		);
 	}, [ pageIndex, currentCategoryPatterns ] );
-	const categoryPatternsAsyncList = useAsyncList( categoryPatterns, {
-		step: INITIAL_INSERTER_RESULTS,
-	} );
 	const numPages = Math.ceil( currentCategoryPatterns.length / PAGE_SIZE );
 	const changePage = ( page ) => {
 		const scrollContainer = getScrollContainer(
@@ -68,7 +61,6 @@ export default function usePatternsPaging(
 	return {
 		totalItems,
 		categoryPatterns,
-		categoryPatternsAsyncList,
 		numPages,
 		changePage,
 		currentPage,

@@ -1,15 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/pattern-overrides',
-	getValues( { registry, clientId, context, bindings } ) {
+	getValues( { select, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
-		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const { getBlockAttributes } = select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 
 		const overridesValues = {};
@@ -19,11 +19,11 @@ export default {
 					currentBlockAttributes?.metadata?.name
 				]?.[ attributeName ];
 
-			// If it has not been overriden, return the original value.
+			// If it has not been overridden, return the original value.
 			// Check undefined because empty string is a valid value.
 			if ( overridableValue === undefined ) {
 				overridesValues[ attributeName ] =
-					currentBlockAttributes[ attributeName ];
+					currentBlockAttributes?.[ attributeName ];
 				continue;
 			} else {
 				overridesValues[ attributeName ] =
@@ -32,9 +32,9 @@ export default {
 		}
 		return overridesValues;
 	},
-	setValues( { registry, clientId, bindings } ) {
+	setValues( { select, dispatch, clientId, bindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
-			registry.select( blockEditorStore );
+			select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
 		if ( ! blockName ) {
@@ -61,12 +61,10 @@ export default {
 			const syncBlocksWithSameName = ( blocks ) => {
 				for ( const block of blocks ) {
 					if ( block.attributes?.metadata?.name === blockName ) {
-						registry
-							.dispatch( blockEditorStore )
-							.updateBlockAttributes(
-								block.clientId,
-								attributes
-							);
+						dispatch( blockEditorStore ).updateBlockAttributes(
+							block.clientId,
+							attributes
+						);
 					}
 					syncBlocksWithSameName( block.innerBlocks );
 				}
@@ -77,27 +75,26 @@ export default {
 		}
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
-		registry
-			.dispatch( blockEditorStore )
-			.updateBlockAttributes( patternClientId, {
-				[ CONTENT ]: {
-					...currentBindingValue,
-					[ blockName ]: {
-						...currentBindingValue?.[ blockName ],
-						...Object.entries( attributes ).reduce(
-							( acc, [ key, value ] ) => {
-								// TODO: We need a way to represent `undefined` in the serialized overrides.
-								// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-								// We use an empty string to represent undefined for now until
-								// we support a richer format for overrides and the block bindings API.
-								acc[ key ] = value === undefined ? '' : value;
-								return acc;
-							},
-							{}
-						),
-					},
+
+		dispatch( blockEditorStore ).updateBlockAttributes( patternClientId, {
+			[ CONTENT ]: {
+				...currentBindingValue,
+				[ blockName ]: {
+					...currentBindingValue?.[ blockName ],
+					...Object.entries( attributes ).reduce(
+						( acc, [ key, value ] ) => {
+							// TODO: We need a way to represent `undefined` in the serialized overrides.
+							// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
+							// We use an empty string to represent undefined for now until
+							// we support a richer format for overrides and the block bindings API.
+							acc[ key ] = value === undefined ? '' : value;
+							return acc;
+						},
+						{}
+					),
 				},
-			} );
+			},
+		} );
 	},
 	canUserEditValue: () => true,
 };

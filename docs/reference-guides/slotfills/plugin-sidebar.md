@@ -2,6 +2,7 @@
 
 This slot allows adding items to the tool bar of either the Post or Site editor screens.
 Using this slot will add an icon to the toolbar that, when clicked, opens a panel with containing the items wrapped in the `<PluginSidebar />` component.
+Additionally, it will also create a `<PluginSidebarMoreMenuItem />` that will allow opening the panel from Options panel when clicked.
 
 ## Example
 
@@ -63,6 +64,4 @@ registerPlugin( 'plugin-sidebar-example', { render: PluginSidebarExample } );
 
 ## Location
 
-### Open State
-
-![Open State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-open-state.png?raw=true)
+![PluginSidebar example expanded](https://developer.wordpress.org/files/2024/08/plugin-sidebar-example.png)

@@ -1,29 +1,28 @@
-/**
- * WordPress dependencies
- */
-
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import type { TabProps } from './types';
 import warning from '@wordpress/warning';
+import { chevronRight } from '@wordpress/icons';
+import type { TabProps } from './types';
 import { useTabsContext } from './context';
-import { Tab as StyledTab } from './styles';
+import {
+	Tab as StyledTab,
+	TabChildren as StyledTabChildren,
+	TabChevron as StyledTabChevron,
+} from './styles';
 import type { WordPressComponentProps } from '../context';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
 	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
 >( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
-	const context = useTabsContext();
-	if ( ! context ) {
+	const { store, instanceId } = useTabsContext() ?? {};
+
+	if ( ! store ) {
 		warning( '`Tabs.Tab` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
-	const { store, instanceId } = context;
+
 	const instancedTabId = `${ instanceId }-${ tabId }`;
+
 	return (
 		<StyledTab
 			ref={ ref }
@@ -33,7 +32,8 @@ export const Tab = forwardRef<
 			render={ render }
 			{ ...otherProps }
 		>
-			{ children }
+			<StyledTabChildren>{ children }</StyledTabChildren>
+			<StyledTabChevron icon={ chevronRight } />
 		</StyledTab>
 	);
 } );

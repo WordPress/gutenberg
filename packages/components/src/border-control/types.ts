@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ColorPaletteProps } from '../color-palette/types';
 import type { PopoverProps } from '../popover/types';
 import type { ToggleGroupControlProps } from '../toggle-group-control/types';
@@ -18,12 +11,19 @@ export type Border = {
 
 export type ColorProps = Pick<
 	ColorPaletteProps,
-	'colors' | 'enableAlpha' | '__experimentalIsRenderedInSidebar'
+	'colors' | '__experimentalIsRenderedInSidebar'
 > & {
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
 	disableCustomColors?: boolean;
+	/**
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
 };
 
 export type LabelProps = {
@@ -78,15 +78,15 @@ export type BorderControlProps = ColorProps &
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
-		 * Whether or not to show the header for the border color and style
-		 * picker dropdown. The header includes a label for the color picker
-		 * and a close button.
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 		/**
 		 * Size of the control.
 		 *
-		 * @default 'default'
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		size?: 'default' | '__unstable-large';
 		/**
@@ -107,13 +107,14 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * Start opting into the larger default height that will become the default size in a future version.
 		 *
-		 * @default false
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
 		 */
 		__next40pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &
-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+	Pick< BorderControlProps, 'enableStyle' > & {
 		/**
 		 * An object representing a border or `undefined`. This component will
 		 * extract the border color and style selections from this object to use as
@@ -139,9 +140,8 @@ export type DropdownProps = ColorProps &
 		 */
 		previousStyleSelection?: string;
 		/**
-		 * Whether or not to render a header for the border color and style picker
-		 * dropdown. The header includes a label for the color picker and a
-		 * close button.
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 	};

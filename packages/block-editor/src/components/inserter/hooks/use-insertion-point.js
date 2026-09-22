@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -71,7 +64,11 @@ function useInsertionPoint( {
 	selectBlockOnInsert = true,
 } ) {
 	const registry = useRegistry();
-	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const {
+		getSelectedBlock,
+		getClosestAllowedInsertionPoint,
+		getBlockInsertionPoint,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {
@@ -79,15 +76,24 @@ function useInsertionPoint( {
 				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-			} = select( blockEditorStore );
+				getInsertionPoint,
+			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
-
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
+			const insertionPoint = getInsertionPoint();
 
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
+			} else if (
+				insertionPoint &&
+				insertionPoint.hasOwnProperty( 'index' )
+			) {
+				_destinationRootClientId = insertionPoint?.rootClientId
+					? insertionPoint.rootClientId
+					: rootClientId;
+				_destinationIndex = insertionPoint.index;
 			} else if ( clientId ) {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
@@ -138,7 +144,7 @@ function useInsertionPoint( {
 			if (
 				! isAppender &&
 				selectedBlock &&
-				isUnmodifiedDefaultBlock( selectedBlock )
+				isUnmodifiedDefaultBlock( selectedBlock, 'content' )
 			) {
 				replaceBlocks(
 					selectedBlock.clientId,
@@ -157,7 +163,7 @@ function useInsertionPoint( {
 								destinationIndex,
 								rootClientId: _rootClientId,
 								registry,
-						  } ),
+							} ),
 					isAppender || _rootClientId === undefined
 						? destinationRootClientId
 						: _rootClientId,
@@ -188,30 +194,47 @@ function useInsertionPoint( {
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
+			setLastFocus,
+			registry,
 		]
 	);
 
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
-			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
-				showInsertionPoint(
-					item.rootClientId,
-					getIndex( {
-						destinationRootClientId,
-						destinationIndex,
-						rootClientId: item.rootClientId,
-						registry,
-					} )
-				);
-			} else {
+			if ( item ) {
+				const allowedDestinationRootClientId =
+					getClosestAllowedInsertionPoint(
+						item.name,
+						destinationRootClientId
+					);
+				if ( allowedDestinationRootClientId !== null ) {
+					showInsertionPoint(
+						allowedDestinationRootClientId,
+						getIndex( {
+							destinationRootClientId,
+							destinationIndex,
+							rootClientId: allowedDestinationRootClientId,
+							registry,
+						} )
+					);
+				}
+			} else if ( ! getBlockInsertionPoint()?.__unstableWithInserter ) {
+				// The insertion cue is shared state. The in-between inserter
+				// marks its own cue with `__unstableWithInserter` and mounts an
+				// inserter inside that cue's popover, so hiding that cue here
+				// would unmount a UI this inserter does not own.
+				// See https://github.com/WordPress/gutenberg/issues/72297.
 				hideInsertionPoint();
 			}
 		},
 		[
+			getClosestAllowedInsertionPoint,
+			getBlockInsertionPoint,
 			showInsertionPoint,
 			hideInsertionPoint,
 			destinationRootClientId,
 			destinationIndex,
+			registry,
 		]
 	);
 

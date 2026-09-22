@@ -2,6 +2,153 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
+
+### Enhancements
+
+-   Enable `custom-property-pattern` to disallow `--_gcd-*` and `--_wp-*` custom properties. Stylelint does not merge this rule, so projects that already set `custom-property-pattern` will not gain the ban and need to include `(?!_(?:gcd|wp)-)` in their own pattern if they want it. ([#83025](https://github.com/WordPress/gutenberg/pull/83025), [#83075](https://github.com/WordPress/gutenberg/pull/83075))
+
+## 25.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   Upgrade the supported Stylelint versions to `stylelint ^17.14.1` and `stylelint-scss ^7.2.0`, with `@stylistic/stylelint-plugin ^5.2.1`, `stylelint-config-recommended ^18.0.0`, and `stylelint-config-recommended-scss ^17.0.1`. This changes the inherited rules, including enabling `media-type-no-deprecated` and `no-invalid-position-declaration` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+### Bug Fixes
+
+-   Fix invalid RegEx for the `@stylistic/max-line-length` rule in the `stylistic` config ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+## 24.3.0 (2026-08-26)
+
+## 24.2.0 (2026-08-12)
+
+## 24.1.0 (2026-07-29)
+
+## 24.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to 20.19.0 || 22.13.0, i.e. versions supporting require(esm) ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
+
+### Enhancements
+
+-   `length-zero-no-unit` rule now ignores custom properties and `var` functions, for better compatibility with usage inside `calc` functions. `calc` functions are already [exempt from the rule by default](https://stylelint.io/user-guide/rules/length-zero-no-unit/), and this change extends the same exemption to variables that may be used within `calc` functions, as [unitless zeros are not valid in CSS math functions](https://www.w3.org/TR/css-values-4/#calc-type-checking) ([#79786](https://github.com/WordPress/gutenberg/pull/79786)).
+-   Include `plugin-wpds/no-token-fallback-values` from `@wordpress/theme` to catch manual design token fallbacks in the shared Stylelint config ([#79768](https://github.com/WordPress/gutenberg/pull/79768)).
+-   Update `@stylistic/stylelint-plugin` to `^3.1.3` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Convert configuration to ESM ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
+
+## 23.42.0 (2026-07-01)
+
+## 23.41.0 (2026-06-24)
+
+## 23.40.1 (2026-06-16)
+
+## 23.40.0 (2026-06-10)
+
+## 23.39.0 (2026-05-27)
+
+## 23.38.0 (2026-05-14)
+
+## 23.37.0 (2026-04-29)
+
+## 23.36.0 (2026-04-15)
+
+## 23.35.0 (2026-04-01)
+
+## 23.34.0 (2026-03-18)
+
+## 23.33.0 (2026-03-04)
+
+## 23.32.0 (2026-02-18)
+
+## 23.31.0 (2026-01-29)
+
+## 23.30.0 (2026-01-16)
+
+### New Features
+
+-   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
+
+## 23.28.0 (2025-11-26)
+
+## 23.27.0 (2025-11-12)
+
+## 23.26.0 (2025-10-29)
+
+## 23.25.0 (2025-10-17)
+
+## 23.24.0 (2025-10-01)
+
+## 23.23.0 (2025-09-17)
+
+## 23.22.0 (2025-09-03)
+
+## 23.21.0 (2025-08-20)
+
+## 23.20.0 (2025-08-07)
+
+## 23.19.0 (2025-07-23)
+
+## 23.18.0 (2025-06-25)
+
+## 23.17.0 (2025-06-04)
+
+## 23.16.0 (2025-05-22)
+
+## 23.15.0 (2025-05-07)
+
+## 23.14.0 (2025-04-11)
+
+## 23.13.0 (2025-03-27)
+
+## 23.12.0 (2025-03-13)
+
+## 23.11.0 (2025-02-28)
+
+## 23.10.0 (2025-02-12)
+
+## 23.9.0 (2025-01-29)
+
+## 23.8.0 (2025-01-15)
+
+## 23.7.0 (2025-01-02)
+
+## 23.6.0 (2024-12-11)
+
+## 23.5.0 (2024-11-27)
+
+## 23.4.0 (2024-11-16)
+
+## 23.3.0 (2024-10-30)
+
+## 23.2.0 (2024-10-16)
+
+## 23.1.0 (2024-10-03)
+
+## 23.0.0 (2024-09-19)
+
+### Breaking Changes
+
+-   Updated `stylelint` peer dependency requirement to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended` to `^14.0.1` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended-scss` to `^14.1.0` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Added `@stylistic/stylelint-plugin` dependency at `^3.0.1` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Migrated stylelint's deprecated rules from v15 to use `@stylistic/stylelint-plugin` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). For more information, see the [stylelint migration guide](https://stylelint.io/migration-guide/to-15). To migrate your rule overrides, you just need to add `@stylistic/` in front of the rule names.
+-   Created new `stylistic` and `scss-stylistic` configs ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). If you want to continue using the exact same rule set as before, you should use these, however if you currently use something like `stylelint-config-prettier` to disable formatting rules, you will want to use the non-stylistic configs (using the same names as before).
+-   `scss/at-import-partial-extension` has been renamed ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). You must convert this rule to `scss/load-partial-extension` instead (name only change).
+
+### Bug Fixes
+
+-   Fixes `declaration-block-no-duplicate-properties` in the `scss` config to use the same value as the base config ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+
+## 22.7.0 (2024-09-05)
+
+## 22.6.0 (2024-08-21)
+
+## 22.5.0 (2024-08-07)
+
 ## 22.4.0 (2024-07-24)
 
 ## 22.3.0 (2024-07-10)
@@ -277,7 +424,7 @@
 -   Added: `no-extra-semicolons` rule.
 -   Added: `selector-attribute-operator-space-after` rule.
 -   Added: `selector-attribute-operator-space-before` rule.
--   Added: `selector-max-empty-liness` rule.
+-   Added: `selector-max-empty-lines` rule.
 
 ## 5.0.0 (2016-04-24)
 

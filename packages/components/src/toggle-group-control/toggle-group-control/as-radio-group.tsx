@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { forwardRef, useEffect, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
@@ -28,9 +18,10 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		isAdaptiveWidth,
 		label,
 		onChange: onChangeProp,
-		size,
 		value: valueProp,
 		id: idProp,
+		setSelectedElement,
+		disabled,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -57,28 +48,48 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	const wrappedOnChangeProp = onChangeProp
 		? ( v: string | number | null ) => {
 				onChangeProp( v ?? undefined );
-		  }
+			}
 		: undefined;
 
 	const radio = Ariakit.useRadioStore( {
 		defaultValue,
 		value,
 		setValue: wrappedOnChangeProp,
+		rtl: isRTL(),
 	} );
 
-	const selectedValue = radio.useState( 'value' );
+	const selectedValue = Ariakit.useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
 
+	// Ensures that the active id is also reset after the value is "reset" by the consumer.
+	useEffect( () => {
+		if ( selectedValue === '' ) {
+			radio.setActiveId( undefined );
+		}
+	}, [ radio, selectedValue ] );
+
 	const groupContextValue = useMemo(
-		() =>
-			( {
-				baseId,
-				isBlock: ! isAdaptiveWidth,
-				size,
-				value: selectedValue,
-				setValue,
-			} ) as ToggleGroupControlContextProps,
-		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
+		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
+			baseId,
+			isBlock: ! isAdaptiveWidth,
+			// @ts-expect-error - This is wrong and we should fix it.
+			value: selectedValue,
+			// @ts-expect-error - This is wrong and we should fix it.
+			setValue,
+			setSelectedElement,
+			disabled: Boolean( disabled ),
+		} ),
+		[
+			baseId,
+			isAdaptiveWidth,
+			radio,
+			selectedValue,
+			setSelectedElement,
+			setValue,
+			disabled,
+		]
 	);
 
 	return (
@@ -90,6 +101,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
+				disabled={ disabled || undefined }
 			>
 				{ children }
 			</Ariakit.RadioGroup>
@@ -100,3 +112,4 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 export const ToggleGroupControlAsRadioGroup = forwardRef(
 	UnforwardedToggleGroupControlAsRadioGroup
 );
+ToggleGroupControlAsRadioGroup.displayName = 'ToggleGroupControlAsRadioGroup';

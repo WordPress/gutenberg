@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import defaultProcessor from './default-processor';
 
 /**
@@ -48,7 +45,7 @@ export default function createBatch( processor = defaultProcessor ) {
 		 * rejected when the input is processed by `batch.run()`.
 		 *
 		 * You may also pass a thunk which allows inputs to be added
-		 * asychronously.
+		 * asynchronously.
 		 *
 		 * ```
 		 * // Both are allowed:

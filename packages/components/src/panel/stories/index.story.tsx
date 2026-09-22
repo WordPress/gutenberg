@@ -1,32 +1,26 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { wordpress } from '@wordpress/icons';
 import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
 import InputControl from '../../input-control';
 
-/**
- * WordPress dependencies
- */
-import { wordpress } from '@wordpress/icons';
-
 const meta: Meta< typeof Panel > = {
-	title: 'Components/Panel',
+	title: 'Components/@wordpress-components/Containers/Panel',
+	id: 'components-panel',
 	component: Panel,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { PanelRow, PanelBody },
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+			notes: 'Intended for the block inspector sidebar. For collapsible sections elsewhere, use [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

@@ -1,26 +1,9 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Backdrop from './backdrop';
 import Label from './label';
-import {
-	Container,
-	Root,
-	Prefix,
-	Suffix,
-	getSizeConfig,
-} from './styles/input-control-styles';
+import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
 import {
@@ -28,7 +11,6 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../context';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -69,7 +51,6 @@ function InputBase(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
-		__next40pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -83,23 +64,17 @@ function InputBase(
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		useContextSystem( props, 'InputBase' )
-	);
+	} = useContextSystem( props, 'InputBase' );
 
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
-	const { paddingLeft, paddingRight } = getSizeConfig( {
-		inputSize: size,
-		__next40pxDefaultSize,
-	} );
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefixWrapper: { paddingLeft },
-			InputControlSuffixWrapper: { paddingRight },
+			InputControlPrefixWrapper: { size },
+			InputControlSuffixWrapper: { size },
 		};
-	}, [ paddingLeft, paddingRight ] );
+	}, [ size ] );
 
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.

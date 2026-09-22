@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -37,36 +34,40 @@ export function useCanEditEntity( kind, name, recordId ) {
  * @param {Function} args.onError      Function called when an error happens.
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
-	const latestArgs = useRef( args );
-	const hasUploadStarted = useRef( false );
+	const latestArgsRef = useRef( args );
+	const hasUploadStartedRef = useRef( false );
 	const { getSettings } = useSelect( blockEditorStore );
 
 	useLayoutEffect( () => {
-		latestArgs.current = args;
+		latestArgsRef.current = args;
 	} );
 
 	useEffect( () => {
 		// Uploading is a special effect that can't be canceled via the cleanup method.
 		// The extra check avoids duplicate uploads in development mode (React.StrictMode).
-		if ( hasUploadStarted.current ) {
+		if ( hasUploadStartedRef.current ) {
 			return;
 		}
 		if (
-			! latestArgs.current.url ||
-			! isBlobURL( latestArgs.current.url )
+			! latestArgsRef.current.url ||
+			! isBlobURL( latestArgsRef.current.url )
 		) {
 			return;
 		}
 
-		const file = getBlobByURL( latestArgs.current.url );
+		const file = getBlobByURL( latestArgsRef.current.url );
 		if ( ! file ) {
 			return;
 		}
 
-		const { url, allowedTypes, onChange, onError } = latestArgs.current;
+		const { url, allowedTypes, onChange, onError } = latestArgsRef.current;
 		const { mediaUpload } = getSettings();
 
-		hasUploadStarted.current = true;
+		if ( ! mediaUpload ) {
+			return;
+		}
+
+		hasUploadStartedRef.current = true;
 
 		mediaUpload( {
 			filesList: [ file ],
@@ -78,15 +79,24 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 
 				revokeBlobURL( url );
 				onChange( media );
-				hasUploadStarted.current = false;
+				hasUploadStartedRef.current = false;
 			},
 			onError: ( message ) => {
 				revokeBlobURL( url );
 				onError( message );
-				hasUploadStarted.current = false;
+				hasUploadStartedRef.current = false;
 			},
 		} );
 	}, [ getSettings ] );
+}
+
+export function useDefaultAvatar() {
+	const avatarURL = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.avatarURL ?? '';
+	}, [] );
+	return avatarURL;
 }
 
 export function useToolsPanelDropdownMenuProps() {
@@ -98,6 +108,6 @@ export function useToolsPanelDropdownMenuProps() {
 					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 					offset: 259,
 				},
-		  }
+			}
 		: {};
 }

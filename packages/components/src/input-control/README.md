@@ -1,8 +1,6 @@
 # InputControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
 
@@ -107,3 +105,4 @@ The current value of the input.
 
 -   Type: `String`
 -   Required: No
+

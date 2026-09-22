@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-import type { MinutesInput } from './time/styles';
+import type { MinutesInput } from './time-picker/styles';
 
 export type TimePickerProps = {
 	/**
@@ -29,6 +26,13 @@ export type TimePickerProps = {
 	 * time as an argument.
 	 */
 	onChange?: ( time: string ) => void;
+
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
 };
 
 export type TimeInputValue = {
@@ -130,7 +134,10 @@ export type DatePickerProps = {
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
-	Omit< TimePickerProps, 'currentTime' | 'onChange' > & {
+	Omit<
+		TimePickerProps,
+		'currentTime' | 'onChange' | 'hideLabelFromVision'
+	> & {
 		/**
 		 * The function called when a new date or time has been selected. It is
 		 * passed the date and time as an argument.

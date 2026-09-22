@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Context,
 	PostStatus,
@@ -8,7 +5,6 @@ import type {
 	OmitNevers,
 	ContextualField,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -57,6 +53,11 @@ declare module './base-entity-records' {
 				'view' | 'edit',
 				C
 			>;
+			blocks: ContextualField<
+				Array< Record< string, any > > | undefined,
+				'edit',
+				C
+			>;
 			/**
 			 * Title of template.
 			 */
@@ -74,6 +75,10 @@ declare module './base-entity-records' {
 			 */
 			wp_id: number;
 			/**
+			 * Plugin that registered the template.
+			 */
+			plugin?: string;
+			/**
 			 * Theme file exists.
 			 */
 			has_theme_file: Record< string, string >;
@@ -81,6 +86,10 @@ declare module './base-entity-records' {
 			 * The ID for the author of the template.
 			 */
 			author: number;
+			/**
+			 * The display name for the author of the template.
+			 */
+			author_text: string;
 			/**
 			 * Whether a template is a custom template.
 			 */

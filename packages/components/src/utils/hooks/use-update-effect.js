@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -8,27 +5,25 @@ import { useRef, useEffect } from '@wordpress/element';
  * Source:
  * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
  *
- * @param {import('react').EffectCallback} effect
- * @param {import('react').DependencyList} deps
+ * @param {React.EffectCallback} effect
+ * @param {React.DependencyList} deps
  */
 function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
+	const mountedRef = useRef( false );
 	useEffect( () => {
-		if ( mounted.current ) {
+		if ( mountedRef.current ) {
 			return effect();
 		}
-		mounted.current = true;
+		mountedRef.current = true;
 		return undefined;
-		// Disable reasons:
 		// 1. This hook needs to pass a dep list that isn't an array literal
 		// 2. `effect` is missing from the array, and will need to be added carefully to avoid additional warnings
 		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, deps );
 
 	useEffect(
 		() => () => {
-			mounted.current = false;
+			mountedRef.current = false;
 		},
 		[]
 	);

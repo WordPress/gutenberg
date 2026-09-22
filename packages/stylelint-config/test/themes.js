@@ -1,26 +1,11 @@
-/**
- * External dependencies
- */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
-/**
- * Internal dependencies
- */
-const config = require( '../' ),
-	validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/themes-valid.css',
-		'utf-8'
-	);
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validCss,
-			config,
-		} );
+		result = getStylelintResult( './themes-valid.css' );
 	} );
 
 	it( 'did not error', () => {

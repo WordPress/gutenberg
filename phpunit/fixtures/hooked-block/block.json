@@ -1,5 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"title": "Hooked Block",
 	"name": "tests/hooked-block",
 	"blockHooks": {

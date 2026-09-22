@@ -1,30 +1,11 @@
-/**
- * External dependencies
- */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
-/**
- * Internal dependencies
- */
-const config = require( '../scss' ),
-	validScss = fs.readFileSync(
-		'./packages/stylelint-config/test/selectors-valid.scss',
-		'utf-8'
-	),
-	invalidScss = fs.readFileSync(
-		'./packages/stylelint-config/test/selectors-invalid.scss',
-		'utf-8'
-	);
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid selectors scss', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validScss,
-			config,
-		} );
+		result = getStylelintResult( './selectors-valid.scss' );
 	} );
 
 	it( 'did not error', () => {
@@ -42,10 +23,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: invalidScss,
-			config,
-		} );
+		result = getStylelintResult( './selectors-invalid.scss' );
 	} );
 
 	it( 'did error', () => {

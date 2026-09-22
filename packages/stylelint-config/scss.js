@@ -1,8 +1,9 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
-module.exports = {
-	extends: [ './', 'stylelint-config-recommended-scss' ].map(
-		require.resolve
+/** @type {import('stylelint').Config} */
+export default {
+	extends: [ './', 'stylelint-config-recommended-scss' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
 	),
 
 	plugins: [ 'stylelint-scss' ],
@@ -18,19 +19,18 @@ module.exports = {
 			},
 		],
 
-		'block-opening-brace-space-before': 'always',
-		'block-closing-brace-newline-after': [
-			'always',
-			{
-				ignoreAtRules: [ 'if', 'else' ],
-			},
-		],
-		'at-rule-name-space-after': 'always',
 		'scss/at-else-closing-brace-newline-after': 'always-last-in-chain',
 		'scss/at-else-closing-brace-space-after': 'always-intermediate',
 		'scss/at-else-empty-line-before': 'never',
 		'scss/at-if-closing-brace-newline-after': 'always-last-in-chain',
 		'scss/at-if-closing-brace-space-after': 'always-intermediate',
 		'scss/selector-no-redundant-nesting-selector': true,
+		/* This value gets overwritten by stylelint-config-recommended-scss so we need to set it again. */
+		'declaration-block-no-duplicate-properties': [
+			true,
+			{
+				ignore: [ 'consecutive-duplicates' ],
+			},
+		],
 	},
 };

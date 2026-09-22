@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type {
 	CSSProperties,
 	ReactNode,
@@ -8,10 +5,6 @@ import type {
 	HTMLInputTypeAttribute,
 } from 'react';
 import type { useDrag } from '@use-gesture/react';
-
-/**
- * Internal dependencies
- */
 import type { StateReducer } from './reducer/state';
 import type { WordPressComponentProps } from '../context';
 import type { FlexProps } from '../flex/types';
@@ -23,22 +16,9 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
-export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
+export type Size = 'default' | 'small' | 'compact';
 
 interface BaseProps {
-	/**
-	 * Deprecated. Use `__next40pxDefaultSize` instead.
-	 *
-	 * @default false
-	 * @deprecated
-	 */
-	__next36pxDefaultSize?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If true, the label will only be visible to screen readers.
@@ -65,8 +45,7 @@ export type InputChangeCallback< P = {} > = (
 	extra: { event: SyntheticEvent } & P
 ) => void;
 
-export interface InputFieldProps
-	extends Omit< BaseProps, '__next36pxDefaultSize' > {
+export interface InputFieldProps extends BaseProps {
 	/**
 	 * Determines the drag axis.
 	 *
@@ -128,7 +107,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
 	 * the provided `<InputControlPrefixWrapper>` component.
 	 *
-	 * @example
+	 * ```jsx
 	 * import {
 	 *   __experimentalInputControl as InputControl,
 	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
@@ -137,6 +116,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * <InputControl
 	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
 	 * />
+	 * ```
 	 */
 	prefix?: ReactNode;
 	/**
@@ -146,7 +126,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
 	 * the provided `<InputControlSuffixWrapper>` component.
 	 *
-	 * @example
+	 * ```jsx
 	 * import {
 	 *   __experimentalInputControl as InputControl,
 	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -155,6 +135,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * <InputControl
 	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
 	 * />
+	 * ```
 	 */
 	suffix?: ReactNode;
 	/**
@@ -176,10 +157,8 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 }
 
 export interface InputControlProps
-	extends Omit<
-			InputBaseProps,
-			'children' | 'isBorderless' | keyof FlexProps
-		>,
+	extends
+		Omit< InputBaseProps, 'children' | 'isBorderless' | keyof FlexProps >,
 		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
@@ -198,6 +177,19 @@ export interface InputControlProps
 			| 'paddingInlineStart'
 			| 'paddingInlineEnd'
 		> {
+	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 * @ignore
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }
 
@@ -208,16 +200,25 @@ export interface InputControlLabelProps {
 	size?: BaseProps[ 'size' ];
 }
 
-export type InputControlPrefixWrapperProps = {
+export type PrefixSuffixWrapperProps = {
 	/**
-	 * The prefix to be inserted.
+	 * The content to be inserted.
 	 */
 	children: ReactNode;
-};
-
-export type InputControlSuffixWrapperProps = {
 	/**
-	 * The suffix to be inserted.
+	 * Internal prop used to control the padding size of the wrapper.
+	 *
+	 * @ignore
 	 */
-	children: ReactNode;
+	size?: BaseProps[ 'size' ];
+	/**
+	 * Adjust the wrapper based on the prefix or suffix content.
+	 *
+	 * - `'default'`: Standard padding for text content.
+	 * - `'icon'`: For icons.
+	 * - `'control'`: For controls, like buttons or selects.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'icon' | 'control';
 };

@@ -3,8 +3,7 @@
  * Unit test class for Gutenberg Coding Standard.
  *
  * @package gutenberg-coding-standards/gbc
- * @link    https://github.com/WordPress/gutenberg
- * @license https://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/WordPress/gutenberg/tree/trunk/test/php/gutenberg-coding-standards
  */
 
 namespace GutenbergCS\Gutenberg\Tests\NamingConventions;
@@ -69,7 +68,6 @@ final class ValidBlockLibraryFunctionNameUnitTest extends AbstractSniffUnitTest 
 	 * Get a list of all test files to check.
 	 *
 	 * @param string $testFileBase The base path that the unit tests files will have.
-	 *
 	 * @return string[]
 	 */
 	protected function getTestFiles( $testFileBase ) {

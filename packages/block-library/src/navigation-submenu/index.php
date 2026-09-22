@@ -5,52 +5,61 @@
  * @package WordPress
  */
 
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+
 /**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
+ * Renders the submenu icon SVG for the Navigation Submenu block.
  *
  * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_render_submenu_icon() instead.
  *
- * @param  array $context Navigation block context.
- * @return array Font size CSS classes and inline styles.
+ * @return string SVG markup for the submenu icon.
  */
-function block_core_navigation_submenu_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf(
-			'font-size: %s;',
-			wp_get_typography_font_size_value(
-				array(
-					'size' => $context['style']['typography']['fontSize'],
-				)
-			)
-		);
-	}
-
-	return $font_sizes;
+function block_core_navigation_submenu_render_submenu_icon() {
+	_deprecated_function( __FUNCTION__, '7.0.0', 'block_core_shared_navigation_render_submenu_icon()' );
+	return block_core_shared_navigation_render_submenu_icon();
 }
 
 /**
- * Returns the top-level submenu SVG chevron icon.
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
  *
- * @since 5.9.0
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
  *
- * @return string
+ * Backward compatibility handling:
+ * - Legacy blocks (saved before migration, never opened in editor):
+ *   Have openSubmenusOnClick in database. Parent Navigation block passes it via context.
+ *   We prioritize openSubmenusOnClick to preserve the original behavior.
+ *
+ * - Migrated blocks (opened in editor after migration):
+ *   JavaScript deprecation removes openSubmenusOnClick and sets submenuVisibility.
+ *   We use submenuVisibility since openSubmenusOnClick is null.
+ *
+ * - New blocks (created after migration):
+ *   Only have submenuVisibility, openSubmenusOnClick is null.
+ *   We use submenuVisibility.
+ *
+ * @since 6.9.0
+ *
+ * @param array $context Block context from parent Navigation block.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
-function block_core_navigation_submenu_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+function block_core_navigation_submenu_get_submenu_visibility( $context ) {
+	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
+
+	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
+	// the deprecated attribute will be replaced by submenuVisibility.
+	if ( null !== $deprecated_open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
+	}
+
+	$submenu_visibility = $context['submenuVisibility'] ?? null;
+
+	// Use submenuVisibility for migrated/new blocks.
+	return $submenu_visibility ?? 'hover';
 }
 
 /**
@@ -65,12 +74,13 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
-	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
-	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
-	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
-
-	// Don't render the block's subtree if it is a draft.
-	if ( $is_post_type && $navigation_link_has_id && 'publish' !== get_post_status( $attributes['id'] ) ) {
+	// Check if this navigation item should render based on post status.
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$should_render = gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block );
+	} else {
+		$should_render = block_core_shared_navigation_item_should_render( $attributes, $block );
+	}
+	if ( ! $should_render ) {
 		return '';
 	}
 
@@ -79,15 +89,17 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
-	$style_attribute = $font_sizes['inline_styles'];
+	// Render inner blocks first to check if any menu items will actually display.
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
+	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
-	$css_classes = trim( implode( ' ', $font_sizes['css_classes'] ) );
-	$has_submenu = count( $block->inner_blocks ) > 0;
-	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
+	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
-	if ( is_post_type_archive() ) {
+	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
 		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
 		if ( $attributes['url'] === $queried_archive_link ) {
 			$is_active = true;
@@ -95,16 +107,34 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
-	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
-		$show_submenu_indicators;
+	$computed_visibility     = block_core_navigation_submenu_get_submenu_visibility( $block->context );
+	$open_on_click           = 'click' === $computed_visibility;
+	$open_on_hover           = 'hover' === $computed_visibility;
+	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
+
+	$classes = array(
+		'wp-block-navigation-item',
+	);
+
+	if ( $has_submenu ) {
+		$classes[] = 'has-child';
+	}
+	if ( $open_on_click ) {
+		$classes[] = 'open-on-click';
+	}
+	if ( $open_on_hover_and_click ) {
+		$classes[] = 'open-on-hover-click';
+	}
+	if ( 'always' === $computed_visibility ) {
+		$classes[] = 'open-always';
+	}
+	if ( $is_active ) {
+		$classes[] = 'current-menu-item';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-			( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
-			( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
+			'class' => implode( ' ', $classes ),
 		)
 	);
 
@@ -122,10 +152,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$html = '<li ' . $wrapper_attributes . '>';
 
-	// If Submenus open on hover, we render an anchor tag with attributes.
+	// If Submenus open on hover or are always open, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
 	if ( ! $open_on_click ) {
-		$item_url = isset( $attributes['url'] ) ? $attributes['url'] : '';
+		$item_url = $attributes['url'] ?? '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content"';
 
@@ -159,18 +189,32 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '>';
 		// End appending HTML attributes to anchor tag.
 
+		$html .= '<span class="wp-block-navigation-item__label">';
 		$html .= $label;
+		$html .= '</span>';
+
+		// Add description if available.
+		if ( ! empty( $attributes['description'] ) ) {
+			$html .= '<span class="wp-block-navigation-item__description">';
+			$html .= wp_kses_post( $attributes['description'] );
+			$html .= '</span>';
+		}
 
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( $show_submenu_indicators ) {
+		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</button>';
 		}
 	} else {
-		// If menus open on click, we render the parent as a button.
 		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
@@ -180,10 +224,24 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= '</span>';
 
+		// Add description if available.
+		if ( ! empty( $attributes['description'] ) ) {
+			$html .= '<span class="wp-block-navigation-item__description">';
+			$html .= wp_kses_post( $attributes['description'] );
+			$html .= '</span>';
+		}
+
 		$html .= '</button>';
 
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
-
+		if ( $has_submenu ) {
+			$html .= '<span class="wp-block-navigation__submenu-icon">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</span>';
+		}
 	}
 
 	if ( $has_submenu ) {
@@ -215,14 +273,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$style_attribute = $colors_supports['style'];
 		}
 
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
-		}
-
 		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
 			$tag_processor = new WP_HTML_Tag_Processor( $html );
-			while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-navigation-item__content' ) ) ) {
+			while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-navigation-item' ) ) ) {
 				$tag_processor->add_class( 'current-menu-ancestor' );
 			}
 			$html = $tag_processor->get_updated_html();

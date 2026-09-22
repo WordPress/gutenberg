@@ -2,6 +2,267 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Switch `test-unit-js` to consumer-installed Vitest 5 and Vite 7/8 at the 36.0.0 boundary. Run once by default, discover consumer Vitest/Vite config, and use Vitest lint defaults for test/spec files. Keep `test-unit-jest` as a maintenance-only adapter for consumer-installed Jest, with no scheduled removal. Remove the bundled Jest dependencies, preset config, Babel transformer, and GitHub Actions reporter. Retire the Jest preset and console package source; published versions remain available. Jest projects must install their own dependencies and configure the published preset if needed. See the [migration guide](docs/vitest-migration.md). ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
+
+-   Require Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` and update the bundled `markdownlint-cli` from `^0.31.1` to `^0.49.1`, which moves `markdownlint` from 0.25 to 0.41. `lint-md-docs` now runs the rules added since then (MD051 through MD060) by default, so projects may see new reports. The `header` rule aliases (for example `header-increment`) no longer work in configuration files; use the `heading` names ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+
+### Enhancements
+
+-   `check-engines`: Check only the tools listed in `engines`, instead of always passing `--node` and `--npm`. Without an `engines` field in the project, it now checks only the Node.js version ([#83326](https://github.com/WordPress/gutenberg/pull/83326)).
+-   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+-   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+-   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The default ESLint config now lints `.jsx`, `.ts`, `.tsx`, `.mts` and `.cts` files, which ESLint's own file discovery skips ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `build` and `start`: Discover `.cjs`, `.cts` and `.mts` entry points, resolve them from extensionless imports, and transpile `.cjs` and `.cts` modules ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+
+### Bug Fixes
+
+-   Update the bundled webpack to `^5.111.0`, which fixes a code-generation regression in webpack 5.110.3 that can make production bundles fail at startup ([#82698](https://github.com/WordPress/gutenberg/pull/82698)).
+
+## 35.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+### Bug Fixes
+
+-   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Enhancements
+
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Internal
+
+-   Update bundled Jest packages to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 34.2.0 (2026-08-26)
+
+## 34.1.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Set Sass's `charset` option to `false` so production builds no longer emit a UTF-8 BOM in the middle of the extracted CSS ([#81383](https://github.com/WordPress/gutenberg/pull/81383)).
+
+## 34.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Upgrade the bundled Jest packages from v29 to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
+### Enhancements
+
+-   `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+
+## 33.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   The `test-e2e` command now runs the Playwright-based end-to-end test runner instead of Puppeteer (`test-playwright` remains available as an alias). Removed the Puppeteer test environment and configuration (`jest-environment-puppeteer`, `jest-e2e.config.js`, `puppeteer.config.js`) along with the `puppeteer-core` and `expect-puppeteer` dependencies. Puppeteer-specific options (e.g. `--puppeteer-interactive`, `--puppeteer-devtools`) are no longer supported ([#60357](https://github.com/WordPress/gutenberg/issues/60357)).
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Widen the `@playwright/test` peer dependency to `>=1` and mark it optional, so consumers aren't forced to bump Playwright or satisfy it under strict peer deps ([#78632](https://github.com/WordPress/gutenberg/pull/78632)).
+-   Update `webpack-dev-server` to `^5.2.1`, resolving several Dependabot security alerts and migrating the internal dev-server proxy config to the v5 array format ([#80347](https://github.com/WordPress/gutenberg/pull/80347)).
+
+## 32.6.0 (2026-07-01)
+
+## 32.5.0 (2026-06-24)
+
+### Enhancements
+
+-   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
+
+## 32.4.1 (2026-06-16)
+
+## 32.4.0 (2026-06-10)
+
+## 32.3.0 (2026-05-27)
+
+## 32.2.0 (2026-05-14)
+
+## 32.1.0 (2026-04-29)
+
+## 32.0.0 (2026-04-15)
+
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been upgraded from v8 to v10 ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The `lint-js` script now uses flat config (`eslint.config.*`) by default. Legacy `.eslintrc.*` files are still detected as a fallback, but this support is deprecated and will be removed in a future version ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The default config shipped with `wp-scripts` has changed from `config/.eslintrc.js` to `config/eslint.config.cjs` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+## 31.8.0 (2026-04-01)
+
+## 31.7.0 (2026-03-18)
+
+## 31.6.0 (2026-03-04)
+
+## 31.5.0 (2026-02-18)
+
+## 31.4.0 (2026-01-29)
+
+## 31.3.0 (2026-01-16)
+
+### Internal
+
+-   The bundled `eslint` dependency has been updated from `^8.3.0` to `^8.57.1` ([#74316](https://github.com/WordPress/gutenberg/pull/74316)).
+
+## 31.1.0 (2025-11-26)
+
+## 31.0.0 (2025-11-12)
+
+### Breaking Changes
+
+-   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
+
+## 30.27.0 (2025-10-29)
+
+## 30.26.0 (2025-10-17)
+
+## 30.25.0 (2025-10-01)
+
+## 30.24.0 (2025-09-17)
+
+## 30.23.0 (2025-09-03)
+
+### Internal
+
+-   Remove deprecated `clean-webpack-plugin` dependency in favor of webpack's native cleaning functionality ([#71080](https://github.com/WordPress/gutenberg/pull/71080))
+
+## 30.22.0 (2025-08-20)
+
+## 30.21.0 (2025-08-07)
+
+## 30.20.0 (2025-07-23)
+
+## 30.19.0 (2025-06-25)
+
+## 30.18.0 (2025-06-04)
+
+## 30.17.0 (2025-05-22)
+
+## 30.16.0 (2025-05-07)
+
+## 30.15.0 (2025-04-11)
+
+## 30.14.1 (2025-04-01)
+
+### Bug Fixes
+
+-   Fix: `--blocks-manifest` CLI flag doesn't work when the directory name has space ([#69766](https://github.com/WordPress/gutenberg/pull/69766)).
+
+## 30.14.0 (2025-03-27)
+
+### New Features
+
+-   Add `--blocks-manifest` CLI flag to generate a PHP file containing block metadata from all `block.json` files in the project ([#69578](https://github.com/WordPress/gutenberg/pull/69578)).
+
+## 30.13.0 (2025-03-13)
+
+## 30.12.0 (2025-02-28)
+
+## 30.11.0 (2025-02-12)
+
+## 30.10.0 (2025-01-29)
+
+## 30.9.0 (2025-01-15)
+
+## 30.8.0 (2025-01-02)
+
+### Enhancements
+
+-   Recommend listing JavaScript entry points as paths passed to the `start` and `build` commands ([#68251](https://github.com/WordPress/gutenberg/pull/68251)).
+-   Introduce a new option `--source-path` to customize the source directory used with the `start` and `build` commands ([#68251](https://github.com/WordPress/gutenberg/pull/68251)).
+
+### Internal
+
+-   The bundled `rtlcss-webpack-plugin` dependency has been replaced with a modified fork of the plugin to fix issues with the original package ([#68201](https://github.com/WordPress/gutenberg/pull/68201)).
+-   The bundled `sass` dependency has been updated from `^1.50.0` to `^1.54.0` ([#68380](https://github.com/WordPress/gutenberg/pull/68380)).
+
+## 30.7.0 (2024-12-11)
+
+### Internal
+
+-   The bundled `sass` dependency has been updated from `^1.35.2` to `^1.50.1` ([#67572](https://github.com/WordPress/gutenberg/pull/67572)).
+-   The bundled `sass-loader` dependency has been updated from `^12.1.0` to `^16.0.3` ([#67572](https://github.com/WordPress/gutenberg/pull/67572)).
+-   The bundled `mini-css-extract-plugin` dependency has been updated from `^2.5.1` to `^2.9.2` ([#67572](https://github.com/WordPress/gutenberg/pull/67572)).
+-   The bundled `webpack` dependency has been updated from `^5.95.0` to `^5.97.0` ([#67572](https://github.com/WordPress/gutenberg/pull/67572)).
+-   The bundled `cross-spawn` dependency has been updated from `^5.1.0` to `^7.0.6` ([#67708](https://github.com/WordPress/gutenberg/pull/67708)).
+-   The bundled `jest-dev-server` dependency has been updated from `^9.0.1` to `^10.1.4` ([#67708](https://github.com/WordPress/gutenberg/pull/67708)).
+-   The bundled `puppeteer-core` dependency has been updated from `^23.1.0` to `^23.10.1` ([#67708](https://github.com/WordPress/gutenberg/pull/67708)).
+
+### Bug Fix
+
+-   Make React Fast Refresh in the `start` command work with multiple blocks ([64924](https://github.com/WordPress/gutenberg/pull/64924)).
+
+## 30.6.0 (2024-11-27)
+
+## 30.5.1 (2024-11-18)
+
+### Bug Fix
+
+-   Revert changes from [#61121](https://github.com/WordPress/gutenberg/pull/61121) that inlined CSS files imported from other CSS files before optimization in the `build` command.
+
+## 30.5.0 (2024-11-16)
+
+### Bug Fix
+
+-   Make `start` script more resilient for developer errors ([#66752](https://github.com/WordPress/gutenberg/pull/66752)).
+
+## 30.4.0 (2024-10-30)
+
+### Enhancements
+
+-   Add BlueOak-1.0.0 the GPLv2-compatible licenses recognized by check-licenses ([#66139](https://github.com/WordPress/gutenberg/pull/66139)).
+-   Add an optional `--root-folder` argument to the `plugin-zip` command ([#61375](https://github.com/WordPress/gutenberg/pull/61375)). By default, the command will use the plugin's name as the root folder of the zip. If the change in the behavior impacted your workflow, you could pass `--no-root-folder` to remove the root folder.
+
+### Internal
+
+-   Refactor to extract license related logic to a reusable module ([#66179](https://github.com/WordPress/gutenberg/pull/66179)).
+
+## 30.3.0 (2024-10-17)
+
+### New Features
+
+-   Add new `build-blocks-manifest` command to generate a PHP file containing block metadata from all `block.json` files in a project ([#65866](https://github.com/WordPress/gutenberg/pull/65866)).
+
+## 30.2.0 (2024-10-16)
+
+## 30.1.0 (2024-10-03)
+
+## 30.0.0 (2024-09-19)
+
+### Breaking Changes
+
+-   Updated `stylelint` dependency to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Switched default config from `@wordpress/stylelint-config/scss` to use `@wordpress/stylelint-config/scss-stylistic` to keep stylistic rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+
+## 29.0.0 (2024-09-05)
+
+### Breaking Changes
+
+-   Fixed the issue with having 5 high severity vulnerabilities by upgrading the `puppeteer-core` package to the latest major version `^23.1.0` ([#64597](https://github.com/WordPress/gutenberg/pull/64597)).
+
+### Enhancements
+
+-   Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
+
+### Bug Fixes
+
+-   Added chunk filename in webpack config to avoid reading stale files ([#58176](https://github.com/WordPress/gutenberg/pull/58176)).
+
+## 28.6.0 (2024-08-21)
+
+## 28.5.0 (2024-08-07)
+
 ## 28.4.0 (2024-07-24)
 
 ### New Features
@@ -267,7 +528,7 @@
 
 ### Breaking Changes
 
--   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
+-   Remove `lint-md-js` script that was broken for some time and it's extremely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
 -   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
 
 ### New Features

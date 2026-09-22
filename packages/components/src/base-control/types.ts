@@ -1,13 +1,11 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 
 export type BaseControlProps = {
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
@@ -42,5 +40,8 @@ export type BaseControlProps = {
 };
 
 export type BaseControlVisualLabelProps = {
+	/**
+	 * The content to be displayed within the `BaseControl.VisualLabel`.
+	 */
 	children: ReactNode;
 };

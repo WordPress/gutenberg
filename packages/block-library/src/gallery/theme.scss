@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .blocks-gallery-caption {
 	@include caption-style-theme();
 }

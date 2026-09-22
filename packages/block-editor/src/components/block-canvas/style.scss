@@ -1,8 +1,18 @@
+@use "sass:math";
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 iframe[name="editor-canvas"] {
 	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
 	display: block;
-	background-color: transparent;
-	@include editor-canvas-resize-animation;
+	// Handles transitions between device previews
+	@media not ( prefers-reduced-motion ) {
+		transition: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
+	}
+	background-color: var(--wp-editor-canvas-background);
 }

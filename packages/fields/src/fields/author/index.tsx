@@ -1,0 +1,46 @@
+import type { Field } from '@wordpress/dataviews';
+import { __ } from '@wordpress/i18n';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+import type { BasePostWithEmbeddedAuthor } from '../../types';
+import { hasActionLink } from '../utils';
+import AuthorView from './author-view';
+
+interface Author {
+	id: number;
+	name: string;
+}
+
+const authorField: Field< BasePostWithEmbeddedAuthor > = {
+	label: __( 'Author' ),
+	id: 'author',
+	type: 'integer',
+	getElements: async () => {
+		const authors: Author[] =
+			( await resolveSelect( coreDataStore ).getEntityRecords< Author >(
+				'root',
+				'user',
+				{
+					per_page: -1,
+					who: 'authors',
+					_fields: 'id,name',
+					context: 'view',
+				}
+			) ) ?? [];
+		return authors.map( ( { id, name } ) => ( {
+			value: id,
+			label: name,
+		} ) );
+	},
+	setValue: ( { value } ) => ( { author: Number( value ) } ),
+	render: AuthorView,
+	isVisible: ( item ) => hasActionLink( item, 'wp:action-assign-author' ),
+	filterBy: {
+		operators: [ 'isAny', 'isNone' ],
+	},
+};
+
+/**
+ * Author field for BasePost.
+ */
+export default authorField;

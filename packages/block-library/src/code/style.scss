@@ -8,6 +8,11 @@
 		display: block;
 		font-family: inherit;
 		overflow-wrap: break-word;
-		white-space: pre-wrap;
+		white-space: break-spaces;
+		// Set direction and avoid inheriting alignment from a parent element.
+		/*!rtl:begin:ignore*/
+		direction: ltr;
+		text-align: initial;
+		/*!rtl:end:ignore*/
 	}
 }

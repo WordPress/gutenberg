@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -47,7 +44,7 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 
 					await editor.openDocumentSettingsSidebar();
 					await page
-						.getByRole( 'button', { name: 'Change post status:' } )
+						.getByRole( 'button', { name: 'Change status:' } )
 						.click();
 					await page.getByRole( 'radio', { name: 'Draft' } ).click();
 

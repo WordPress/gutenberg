@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.4.0",
+	"version": "1.55.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,16 +19,27 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
@@ -41,9 +52,12 @@
 		"@wordpress/router": "file:../router",
 		"@wordpress/url": "file:../url"
 	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
+	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,29 +1,17 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import { fontSizeStyles } from '../input-control/styles/input-control-styles';
+import { DROPDOWN_MOTION_CSS } from '../utils/style-mixins';
 import type { CustomSelectButtonSize } from './types';
 
-// TODO: extract to common utils and apply to relevant components
-const ANIMATION_PARAMS = {
-	SLIDE_AMOUNT: '2px',
-	DURATION: '400ms',
-	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
-};
-
 const INLINE_PADDING = {
-	compact: 8, // space(2)
-	small: 8, // space(2)
-	default: 16, // space(4)
+	compact: CONFIG.controlPaddingXSmall,
+	small: CONFIG.controlPaddingXSmall,
+	default: CONFIG.controlPaddingX,
 };
 
 const getSelectSize = (
@@ -105,12 +93,14 @@ export const Select = styled( Ariakit.Select, {
 	`
 );
 
-const slideDownAndFade = keyframes( {
-	'0%': {
-		opacity: 0,
-		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
-	},
-	'100%': { opacity: 1, transform: 'translateY(0)' },
+const slideDown = keyframes( {
+	'0%': { transform: `translateY(-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE })` },
+	'100%': { transform: 'translateY(0)' },
+} );
+
+const fadeIn = keyframes( {
+	'0%': { opacity: 0 },
+	'100%': { opacity: 1 },
 } );
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
@@ -118,8 +108,9 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	flex-direction: column;
 
 	background-color: ${ COLORS.theme.background };
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	border: 1px solid ${ COLORS.theme.foreground };
+	box-shadow: ${ CONFIG.elevationMedium };
 
 	/* z-index(".components-popover") */
 	z-index: 1000000;
@@ -134,9 +125,13 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	/* Animation */
 	&[data-open] {
 		@media not ( prefers-reduced-motion ) {
-			animation-duration: ${ ANIMATION_PARAMS.DURATION };
-			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-			animation-name: ${ slideDownAndFade };
+			animation-name: ${ slideDown }, ${ fadeIn };
+			animation-duration:
+				${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+			animation-timing-function:
+				${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+				${ DROPDOWN_MOTION_CSS.FADE_EASING };
 			will-change: transform, opacity;
 		}
 	}
@@ -212,6 +207,7 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
 	align-items: center;
 	margin-inline-start: ${ space( 2 ) };
+	fill: currentColor;
 
 	// Keep the checkmark vertically aligned at the top. Since the item text has a
 	// 28px line height and the checkmark is 24px tall, a (28-24)/2 = 2px margin

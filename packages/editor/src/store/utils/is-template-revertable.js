@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { TEMPLATE_ORIGINS } from '../constants';
 
 // Copy of the function from packages/edit-site/src/utils/is-template-revertable.js
@@ -18,6 +15,7 @@ export default function isTemplateRevertable( templateOrTemplatePart ) {
 
 	return (
 		templateOrTemplatePart.source === TEMPLATE_ORIGINS.custom &&
-		templateOrTemplatePart.has_theme_file
+		( Boolean( templateOrTemplatePart?.plugin ) ||
+			templateOrTemplatePart?.has_theme_file )
 	);
 }

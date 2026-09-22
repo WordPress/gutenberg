@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"backgroundColor": "accent",
-			"opacity": "css"
+			"opacity": "css",
+			"tagName": "hr"
 		},
 		"innerBlocks": []
 	}

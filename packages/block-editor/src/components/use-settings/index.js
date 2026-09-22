@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -32,7 +25,6 @@ export function useSettings( ...paths ) {
 				clientId,
 				...paths
 			),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, ...paths ]
 	);
 }

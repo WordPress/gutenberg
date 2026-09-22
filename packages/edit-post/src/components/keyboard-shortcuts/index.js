@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
@@ -8,21 +5,17 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { toggleFeature } = useDispatch( editPostStore );
+	const { toggleFullscreenMode } = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-fullscreen',
 			category: 'global',
-			description: __( 'Toggle fullscreen mode.' ),
+			description: __( 'Enable or disable fullscreen mode.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'f',
@@ -31,7 +24,7 @@ function KeyboardShortcuts() {
 	}, [] );
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
-		toggleFeature( 'fullscreenMode' );
+		toggleFullscreenMode();
 	} );
 
 	return null;

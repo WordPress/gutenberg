@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { orderBy } from '../sorting';
 
 describe( 'orderBy', () => {
@@ -37,7 +35,7 @@ describe( 'orderBy', () => {
 		expect( orderBy( input, 'x' ) ).toEqual( expected );
 	} );
 
-	it( 'should maintain original order of equal items in descencing order', () => {
+	it( 'should maintain original order of equal items in descending order', () => {
 		const a = { x: 1, a: 1 };
 		const b = { x: 1, b: 2 };
 		const c = { x: 0 };

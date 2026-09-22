@@ -2,7 +2,7 @@
 /**
  * Tests the typography block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	/**
@@ -284,6 +284,39 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a classname is generated for a text shadow preset.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_classname_for_text_shadow() {
+		$this->test_block_name = 'test/text-shadow-with-class';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'textShadow' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array( 'textShadow' => 'light' );
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array( 'class' => 'has-light-text-shadow' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
 	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
 	 *
 	 * @covers ::wp_get_typography_font_size_value
@@ -292,7 +325,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_font_size_preset_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size       {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -351,7 +384,11 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'font_size'       => array(
 					'size' => null,
 				),
-				'settings'        => null,
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
 				'expected_output' => null,
 			),
 
@@ -425,8 +462,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns already clamped value'              => array(
 				'font_size'       => array(
-					'size'  => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
-					'fluid' => false,
+					'size' => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 				),
 				'settings'        => array(
 					'typography' => array(
@@ -438,8 +474,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns value with unsupported unit'        => array(
 				'font_size'       => array(
-					'size'  => '1000%',
-					'fluid' => false,
+					'size' => '1000%',
 				),
 				'settings'        => array(
 					'typography' => array(
@@ -769,6 +804,33 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => 'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
 			),
+
+			// Individual preset settings override global settings.
+			'should convert individual preset size to fluid if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => true,
+				),
+				'settings'        => array(
+					'typography' => array(),
+				),
+				'expected_output' => 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.234), 17px)',
+			),
+			'should use individual preset settings if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => array(
+						'min' => '16px',
+						'max' => '26px',
+					),
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => false,
+					),
+				),
+				'expected_output' => 'clamp(16px, 1rem + ((1vw - 3.2px) * 0.781), 26px)',
+			),
 		);
 	}
 
@@ -781,7 +843,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_font_size_preset_should_use_fluid_typography_deprecated_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size                   {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -789,7 +851,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *     @type string $size CSS font-size value, including units where applicable.
 	 * }
 	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
-	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
+	 * @param string $expected_output             Expected output of gutenberg_get_typography_font_size_value().
 	 */
 	public function test_gutenberg_get_typography_font_size_value_should_use_fluid_typography_deprecated( $font_size, $should_use_fluid_typography, $expected_output ) {
 		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
@@ -829,7 +891,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_should_override_theme_settings_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size       {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -930,7 +992,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param string $theme_slug      A theme slug corresponding to an available test theme.
 	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
-	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
+	public function test_should_convert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
 		switch_theme( $theme_slug );
 
 		$this->test_block_name = 'test/font-size-fluid-value';
@@ -967,7 +1029,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_should_covert_font_sizes_to_fluid_values.
+	 * Data provider for test_should_convert_font_sizes_to_fluid_values.
 	 *
 	 * @return array
 	 */
@@ -1212,7 +1274,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_computed_fluid_typography_value
 	 *
-	 * @param array  $args {
+	 * @param array  $args            {
 	 *      Optional. An associative array of values to calculate a fluid formula for font size. Default is empty array.
 	 *
 	 *     @type string $maximum_viewport_width Maximum size up to which type will have fluidity.
@@ -1221,7 +1283,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *     @type string $minimum_font_size      Minimum font size for any clamp() calculation.
 	 *     @type int    $scale_factor           A scale factor to determine how fast a font scales within boundaries.
 	 * }
-	 * @param string $expected_output             Expected value of style property from gutenberg_apply_typography_support().
+	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
 	public function test_get_computed_fluid_typography_value( $args, $expected_output ) {
 		$actual = gutenberg_get_computed_fluid_typography_value( $args );

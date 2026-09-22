@@ -1,7 +1,3 @@
-.show-icon-labels {
-	.block-editor-block-inspector__tabs [role="tablist"] {
-		.components-button {
-			justify-content: center;
-		}
-	}
+.block-editor-block-inspector__tabs [role="tablist"] {
+	width: 100%;
 }

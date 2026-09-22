@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { PanelBodyProps, PanelBodyTitleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Button from '../button';
@@ -57,7 +46,7 @@ export function UnforwardedPanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef< boolean | undefined >();
+	const scrollAfterOpenRef = useRef< boolean >( undefined );
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
@@ -116,6 +105,7 @@ const PanelBodyTitle = forwardRef(
 		return (
 			<h2 className="components-panel__body-title">
 				<Button
+					__next40pxDefaultSize
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }
@@ -146,5 +136,6 @@ const PanelBodyTitle = forwardRef(
 );
 
 export const PanelBody = forwardRef( UnforwardedPanelBody );
+PanelBody.displayName = 'PanelBody';
 
 export default PanelBody;

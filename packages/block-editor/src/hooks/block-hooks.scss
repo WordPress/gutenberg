@@ -1,13 +1,7 @@
-.block-editor-hooks__block-hooks {
-	/**
-	 * Since we're displaying the block icon alongside the block name,
-	 * we need to right-align the toggle.
-	 */
-	.components-toggle-control .components-h-stack {
-		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
-		flex-direction: row-reverse;
-	}
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 
+.block-editor-hooks__block-hooks {
 	/**
 	 * Un-reverse the flex direction for the toggle's label.
 	 */

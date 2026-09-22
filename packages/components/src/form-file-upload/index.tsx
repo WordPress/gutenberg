@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import type { WordPressComponentProps } from '../context';
 import type { FormFileUploadProps } from './types';
 
 /**
- * FormFileUpload is a component that allows users to select files from their local device.
+ * FormFileUpload allows users to select files from their local device.
  *
  * ```jsx
  * import { FormFileUpload } from '@wordpress/components';
@@ -33,6 +26,7 @@ export function FormFileUpload( {
 	onChange,
 	onClick,
 	render,
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	...props
 }: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
 	const ref = useRef< HTMLInputElement >( null );
@@ -43,10 +37,16 @@ export function FormFileUpload( {
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
-		<Button onClick={ openFileDialog } { ...props }>
+		<Button onClick={ openFileDialog } __next40pxDefaultSize { ...props }>
 			{ children }
 		</Button>
 	);
+
+	// iOS browsers may not reliably handle 'audio/*' in the accept attribute.
+	// Adding explicit audio MIME types improves compatibility across all devices.
+	const compatAccept = accept?.includes( 'audio/*' )
+		? `${ accept }, audio/mp3, audio/x-m4a, audio/x-m4b, audio/x-m4p, audio/x-wav, audio/webm`
+		: accept;
 
 	return (
 		<div className="components-form-file-upload">
@@ -56,7 +56,7 @@ export function FormFileUpload( {
 				ref={ ref }
 				multiple={ multiple }
 				style={ { display: 'none' } }
-				accept={ accept }
+				accept={ compatAccept }
 				onChange={ onChange }
 				onClick={ onClick }
 				data-testid="form-file-upload-input"

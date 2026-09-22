@@ -9,12 +9,6 @@
 	display: inline;
 }
 
-.editor-latest-posts-image-alignment-control {
-	.components-toolbar {
-		border-radius: $radius-block-ui;
-	}
-}
-
 :root :where(.wp-block-latest-posts) {
 	padding-left: 2.5em;
 }

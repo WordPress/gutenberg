@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { menu } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
@@ -164,11 +153,14 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
+									size="compact"
 									key={ [
 										indexOfSet,
 										indexOfControl,
 									].join() }
-									onClick={ ( event ) => {
+									onClick={ (
+										event: React.MouseEvent< HTMLButtonElement >
+									) => {
 										event.stopPropagation();
 										props.onClose();
 										if ( control.onClick ) {

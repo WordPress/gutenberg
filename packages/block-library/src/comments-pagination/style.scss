@@ -4,14 +4,7 @@ $pagination-margin: 0.5em;
 	> .wp-block-comments-pagination-next,
 	> .wp-block-comments-pagination-previous,
 	> .wp-block-comments-pagination-numbers {
-		/*rtl:ignore*/
-		margin-right: $pagination-margin;
-		margin-bottom: $pagination-margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
+		font-size: inherit;
 	}
 	.wp-block-comments-pagination-previous-arrow {
 		margin-right: 1ch;

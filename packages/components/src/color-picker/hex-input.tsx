@@ -1,27 +1,15 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { InputControl } from '../input-control';
 import { Text } from '../text';
-import { Spacer } from '../spacer';
-import { space } from '../utils/space';
 import { COLORS } from '../utils/colors-values';
 import type { StateReducer } from '../input-control/reducer/state';
 import type { HexInputProps } from './types';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
-		if ( ! nextValue ) {
+		if ( nextValue === undefined ) {
 			return;
 		}
 		const hexValue = nextValue.startsWith( '#' )
@@ -48,21 +36,17 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	return (
 		<InputControl
 			prefix={
-				<Spacer
-					as={ Text }
-					marginLeft={ space( 4 ) }
-					color={ COLORS.theme.accent }
-					lineHeight={ 1 }
-				>
-					#
-				</Spacer>
+				<InputControlPrefixWrapper>
+					<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+						#
+					</Text>
+				</InputControlPrefixWrapper>
 			}
 			value={ color.toHex().slice( 1 ).toUpperCase() }
 			onChange={ handleChange }
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
-			size="__unstable-large"
 			__unstableStateReducer={ stateReducer }
 			__unstableInputWidth="9em"
 		/>

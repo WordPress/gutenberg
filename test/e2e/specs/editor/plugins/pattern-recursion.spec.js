@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preventing Pattern Recursion (client)', () => {
 	test.beforeEach( async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
@@ -59,9 +56,9 @@ test.describe( 'Preventing Pattern Recursion (server)', () => {
 		page,
 		editor,
 	} ) => {
-		// Click the Toggle block inserter button
+		// Click the Block Inserter button
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		// Click the Patterns tab
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();

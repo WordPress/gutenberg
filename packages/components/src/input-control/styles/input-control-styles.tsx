@@ -1,20 +1,12 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
-import type { LabelPosition, Size } from '../types';
-import { space } from '../../utils/space';
+import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -55,6 +47,21 @@ const backdropBorderColor = ( {
 	return COLORS.ui.border;
 };
 
+const backdropDisabledStyles = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ) => {
+	if ( ! disabled || isBorderless ) {
+		return undefined;
+	}
+
+	return css`
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+		}
+	`;
+};
+
 export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
@@ -72,33 +79,29 @@ export const BackdropUI = styled.div< BackdropProps >`
 		top: 0;
 
 		${ rtl( { paddingLeft: 2 } ) }
+		${ backdropDisabledStyles }
 	}
 `;
 
 export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-
-	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
-	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		${ BackdropUI } {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
-	const backgroundColor = disabled
-		? COLORS.ui.backgroundDisabled
-		: COLORS.ui.background;
+	if ( ! disabled ) {
+		return undefined;
+	}
 
-	return css( { backgroundColor } );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 const containerWidthStyles = ( {
@@ -129,13 +132,13 @@ export const Container = styled.div< ContainerProps >`
 	display: flex;
 	flex: 1;
 	position: relative;
+	background-color: ${ COLORS.ui.background };
 
 	${ containerDisabledStyles }
 	${ containerWidthStyles }
 `;
 
 type InputProps = {
-	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -149,9 +152,17 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
+	`;
 };
 
 export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
@@ -159,7 +170,6 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 		default: '13px',
 		small: '11px',
 		compact: '13px',
-		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -178,45 +188,31 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	`;
 };
 
-export const getSizeConfig = ( {
-	inputSize: size,
-	__next40pxDefaultSize,
-}: InputProps ) => {
+export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
 		},
 		compact: {
 			height: 32,
 			lineHeight: 1,
 			minHeight: 32,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		},
-		'__unstable-large': {
-			height: 40,
-			lineHeight: 1,
-			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
 		},
 	};
-
-	if ( ! __next40pxDefaultSize ) {
-		sizes.default = sizes.compact;
-	}
 
 	return sizes[ size as Size ] || sizes.default;
 };
@@ -286,7 +282,51 @@ export const Input = styled.input< InputProps >`
 		${ customPaddings }
 
 		&::-webkit-input-placeholder {
-			line-height: normal;
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&::-moz-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&:-ms-input-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+
+		/* Hide Safari's value-like placeholder (e.g. \`12:30\`) in empty
+		   date/time inputs. While the input is focused, the browser's
+		   segment editor must stay visible for typing. */
+		@supports ( -webkit-hyphens: none ) and
+			( not ( -moz-appearance: none ) ) {
+			/* Safari only */
+			&[type='date'][data-empty-value]:not( :focus ),
+			&[type='time'][data-empty-value]:not( :focus ),
+			&[type='datetime-local'][data-empty-value]:not( :focus ) {
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
+			}
+		}
+
+		&[type='email'],
+		&[type='url'] {
+			/* rtl:ignore */
+			direction: ltr;
 		}
 	}
 `;
@@ -301,10 +341,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		padding-bottom: 0;
 		max-width: 100%;
 		z-index: 1;
-
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 `;
 
@@ -318,4 +354,34 @@ export const Label = (
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
+`;
+
+const prefixSuffixWrapperStyles = ( {
+	variant = 'default',
+	size,
+	isPrefix,
+}: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
+	const { paddingLeft: padding } = getSizeConfig( {
+		inputSize: size,
+	} );
+
+	const paddingProperty = isPrefix
+		? 'paddingInlineStart'
+		: 'paddingInlineEnd';
+
+	if ( variant === 'default' ) {
+		return css( {
+			[ paddingProperty ]: padding,
+		} );
+	}
+
+	// If variant is 'icon' or 'control'
+	return css( {
+		display: 'flex',
+		[ paddingProperty ]: padding - 4,
+	} );
+};
+
+export const PrefixSuffixWrapper = styled.div`
+	${ prefixSuffixWrapperStyles }
 `;

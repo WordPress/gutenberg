@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import createLocks from './engine';
 
 export default function createLocksActions() {

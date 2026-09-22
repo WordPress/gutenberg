@@ -1,18 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import { defaultColumnsNumber } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -22,10 +16,19 @@ const parseShortcodeIds = ( ids ) => {
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
 
+const cloneInnerBlocks = ( innerBlocks ) =>
+	innerBlocks.map( ( innerBlock ) =>
+		createBlock(
+			innerBlock.name,
+			innerBlock.attributes,
+			cloneInnerBlocks( innerBlock.innerBlocks || [] )
+		)
+	);
+
 /**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
- * 3rdPartyBlock -> GalleryBlock transform so this tranform filter
+ * 3rdPartyBlock -> GalleryBlock transform so this transform filter
  * will handle this. Once the innerBlocks version is the default
  * in a core release, this could be deprecated and removed after
  * plugin authors have been given time to update transforms.
@@ -155,7 +158,7 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-			transform( { named: { ids, columns = 3, link, orderby } } ) {
+			transform( { named: { ids, columns = 3, link, orderby, size } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -173,9 +176,13 @@ const transforms = {
 						columns: parseInt( columns, 10 ),
 						linkTo,
 						randomOrder: orderby === 'rand',
+						...( size && { sizeSlug: size } ),
 					},
 					imageIds.map( ( imageId ) =>
-						createBlock( 'core/image', { id: imageId } )
+						createBlock( 'core/image', {
+							id: imageId,
+							...( size && { sizeSlug: size } ),
+						} )
 					)
 				);
 
@@ -189,7 +196,7 @@ const transforms = {
 			// When created by drag and dropping multiple files on an insertion point. Because multiple
 			// files must not be transformed to a gallery when dropped within a gallery there is another transform
 			// within the image block to handle that case. Therefore this transform has to have priority 1
-			// set so that it overrrides the image block transformation when mulitple images are dropped outside
+			// set so that it overrides the image block transformation when multiple images are dropped outside
 			// of a gallery block.
 			type: 'files',
 			priority: 1,
@@ -216,6 +223,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
+			// A dynamic gallery has no inner blocks — its images are resolved
+			// from a source at render time — so this transform would produce a
+			// single empty image and drop the source.
+			isMatch: ( { dynamicContent } ) => ! dynamicContent,
 			transform: ( { align }, innerBlocks ) => {
 				if ( innerBlocks.length > 0 ) {
 					return innerBlocks.map(
@@ -255,6 +266,47 @@ const transforms = {
 					);
 				}
 				return createBlock( 'core/image', { align } );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			variationName: 'group-grid',
+			// As above: with no inner blocks to clone, a dynamic gallery would
+			// transform into an empty grid.
+			isMatch: ( { dynamicContent } ) => ! dynamicContent,
+			transform: ( attributes, innerBlocks ) => {
+				const {
+					allowResize,
+					aspectRatio,
+					caption,
+					columns,
+					dynamicContent,
+					fixedHeight,
+					ids,
+					imageCrop,
+					images,
+					linkTarget,
+					linkTo,
+					navigationButtonType,
+					randomOrder,
+					shortCodeTransforms,
+					sizeSlug,
+					...rest
+				} = attributes;
+				return createBlock(
+					'core/group',
+					{
+						...rest,
+						layout: {
+							type: 'grid',
+							columnCount:
+								columns ??
+								defaultColumnsNumber( innerBlocks.length ),
+						},
+					},
+					cloneInnerBlocks( innerBlocks )
+				);
 			},
 		},
 	],

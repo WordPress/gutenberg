@@ -59,6 +59,22 @@ Use this to customize the label of the _Finish_ button shown at the end of the g
 -   Required: No
 -	Default: `'Finish'`
 
+### nextButtonText
+
+Use this to customize the label of the _Next_ button shown on each page of the guide.
+
+-   Type: `string`
+-   Required: No
+-   Default: `'Next'`
+
+### previousButtonText
+
+Use this to customize the label of the _Previous_ button shown on each page of the guide except the first.
+
+-   Type: `string`
+-   Required: No
+-   Default: `'Previous'`
+
 ### onFinish
 
 A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.

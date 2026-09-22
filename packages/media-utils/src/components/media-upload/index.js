@@ -1,8 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { select, dispatch } from '@wordpress/data';
+import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
 const DEFAULT_EMPTY_GALLERY = [];
 
@@ -64,6 +63,46 @@ const getFeaturedImageMediaFrame = () => {
 				new wp.media.controller.FeaturedImage(),
 				new wp.media.controller.EditImage( {
 					model: this.options.editImage,
+				} ),
+			] );
+		},
+	} );
+};
+
+/**
+ * Prepares the default frame for selecting a single media item.
+ *
+ * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
+ */
+const getSingleMediaFrame = () => {
+	const { wp } = window;
+
+	// Extend the default Select frame, and use the same `createStates` method as in core,
+	// but with the addition of `filterable: 'uploaded'` to the Library state, so that
+	// the user can filter the media library by uploaded media.
+	return wp.media.view.MediaFrame.Select.extend( {
+		/**
+		 * Create the default states on the frame.
+		 */
+		createStates() {
+			const options = this.options;
+
+			if ( this.options.states ) {
+				return;
+			}
+
+			// Add the default states.
+			this.states.add( [
+				// Main states.
+				new wp.media.controller.Library( {
+					library: wp.media.query( options.library ),
+					multiple: options.multiple,
+					title: options.title,
+					priority: 20,
+					filterable: 'uploaded', // Allow filtering by uploaded images.
+				} ),
+				new wp.media.controller.EditImage( {
+					model: options.editImage,
 				} ),
 			] );
 		},
@@ -231,6 +270,27 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
+		this.stopUndoRedoPropagation =
+			this.stopUndoRedoPropagation.bind( this );
+	}
+
+	stopUndoRedoPropagation( event ) {
+		if ( ! event.metaKey && ! event.ctrlKey ) {
+			return;
+		}
+
+		// Undo is primary+z, redo is primary+shift+z with a primary+y alias on
+		// non-Apple platforms. Matching both characters covers every variant
+		// without needing to know the platform here.
+		const character = event.key?.toLowerCase();
+		if ( character !== 'z' && character !== 'y' ) {
+			return;
+		}
+
+		// Only stop the editor from acting on the keystroke. The event still
+		// reaches the focused field, so native text undo keeps working inside
+		// the modal's inputs.
+		event.stopPropagation();
 	}
 
 	initializeListeners() {
@@ -254,7 +314,7 @@ class MediaUpload extends Component {
 			value = DEFAULT_EMPTY_GALLERY,
 		} = this.props;
 
-		// If the value did not changed there is no need to rebuild the frame,
+		// If the value did not change there is no need to rebuild the frame,
 		// we can continue to use the existing one.
 		if ( value === this.lastGalleryValue ) {
 			return;
@@ -287,7 +347,7 @@ class MediaUpload extends Component {
 			state: currentState,
 			multiple,
 			selection,
-			editing: value && value.length ? true : false,
+			editing: !! value?.length,
 		} );
 		wp.media.frame = this.frame;
 		this.initializeListeners();
@@ -324,8 +384,62 @@ class MediaUpload extends Component {
 		};
 	}
 
+	/**
+	 * Initializes the Media Library requirements for the single image flow.
+	 *
+	 * @return {void}
+	 */
+	buildAndSetSingleMediaFrame() {
+		const { wp } = window;
+		const {
+			allowedTypes,
+			multiple = false,
+			title = __( 'Select or Upload Media' ),
+			value,
+		} = this.props;
+
+		const frameConfig = {
+			title,
+			multiple,
+		};
+		if ( !! allowedTypes ) {
+			frameConfig.library = { type: allowedTypes };
+		}
+
+		// If a frame already exists, remove it.
+		if ( this.frame ) {
+			this.frame.remove();
+		}
+
+		const singleImageFrame = getSingleMediaFrame();
+		const attachments = getAttachmentsCollection( value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+		} );
+		this.frame = new singleImageFrame( {
+			mimeType: allowedTypes,
+			multiple,
+			selection,
+			...frameConfig,
+		} );
+		wp.media.frame = this.frame;
+	}
+
 	componentWillUnmount() {
+		this.detachUndoRedoGuard();
+		this.frame?.close();
+		this.frame?.modal?.remove();
 		this.frame?.remove();
+	}
+
+	detachUndoRedoGuard() {
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.removeEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 	}
 
 	onUpdate( selections ) {
@@ -359,6 +473,14 @@ class MediaUpload extends Component {
 		const { wp } = window;
 		const { value } = this.props;
 		this.updateCollection();
+
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.addEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 
 		//Handle active tab in media model on model open.
 		if ( this.props.mode ) {
@@ -396,10 +518,28 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
+		this.detachUndoRedoGuard();
 
 		if ( onClose ) {
 			onClose();
 		}
+
+		// Uploads performed inside the legacy wp.media modal attach media to the
+		// current post but never reach @wordpress/core-data, so views listing
+		// attached media (e.g. the Gallery block's dynamic mode) would stay stale
+		// until the editor reloads. Invalidate the cached attachment queries on
+		// close so they refetch — mirroring the core-data-native media modal,
+		// which does the same on upload completion.
+		//
+		// This targets the default registry via the module-level `select` and
+		// `dispatch` rather than the contextual one. As a class component
+		// extended by plugins through the `editor.MediaUpload` filter, it can't
+		// read the contextual registry without `withRegistry`/`useRegistry`,
+		// which would break that subclassing contract (see
+		// https://github.com/WordPress/gutenberg/pull/70648). The editor runs on
+		// the default registry in practice, so the only case this misses is a
+		// custom registry, where the invalidation is effectively a no-op.
+		invalidateAttachmentResolutions( { select, dispatch } );
 
 		this.frame.detach();
 	}
@@ -424,27 +564,15 @@ class MediaUpload extends Component {
 
 	openModal() {
 		const {
-			allowedTypes,
 			gallery = false,
 			unstableFeaturedImageFlow = false,
 			modalClass,
-			multiple = false,
-			title = __( 'Select or Upload Media' ),
 		} = this.props;
-		const { wp } = window;
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
 		} else {
-			const frameConfig = {
-				title,
-				multiple,
-			};
-			if ( !! allowedTypes ) {
-				frameConfig.library = { type: allowedTypes };
-			}
-
-			this.frame = wp.media( frameConfig );
+			this.buildAndSetSingleMediaFrame();
 		}
 
 		if ( modalClass ) {

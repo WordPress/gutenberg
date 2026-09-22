@@ -30,14 +30,14 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
 		// translators: %s: human-readable time difference.
-		$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_comment_date( 'U', $comment ) ) );
+		$formatted_date = sprintf( __( '%s ago' ), human_time_diff( get_comment_date( 'U', $comment ) ) );
 	} else {
 		$formatted_date = get_comment_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $comment );
 	}
 	$link = get_comment_link( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		$formatted_date = sprintf( '<a href="%1$s">%2$s</a>', esc_url( $link ), $formatted_date );
 	}
 
 	return sprintf(

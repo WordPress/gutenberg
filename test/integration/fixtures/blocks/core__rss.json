@@ -10,7 +10,8 @@
 			"displayExcerpt": true,
 			"displayAuthor": true,
 			"displayDate": true,
-			"excerptLength": 20
+			"excerptLength": 20,
+			"openInNewTab": false
 		},
 		"innerBlocks": []
 	}
