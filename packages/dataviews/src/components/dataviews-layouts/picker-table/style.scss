@@ -12,7 +12,8 @@
 		width: 48px;
 	}
 
-	tbody:focus-visible {
+	// The table itself is the composite widget that takes focus.
+	&:focus-visible {
 		// Only show one focus outline at a time. When focus is on a child element,
 		// hide the table's own focus outline.
 		&[aria-activedescendant] {

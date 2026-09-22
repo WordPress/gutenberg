@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import {
@@ -140,14 +141,14 @@ function TableRow< Item >( {
 				if ( event.button !== 0 ) {
 					return;
 				}
-				// Pre-focus the Composite container (parent `tbody`) so that
+				// Pre-focus the Composite container (the `table`) so that
 				// when the row is focused on click, Ariakit sees the focus
 				// coming from within the Composite and uses `focusSilently`
 				// (which passes `preventScroll: true`). Without this, the
 				// first focus into the Composite scrolls the active row
 				// under the sticky table header, which also causes the click
 				// to land on a different element than the original target.
-				event.currentTarget.parentElement?.focus( {
+				event.currentTarget.closest( 'table' )?.focus( {
 					preventScroll: true,
 				} );
 				selectionProps.onMouseDown( event );
@@ -214,6 +215,39 @@ function TableRow< Item >( {
 				);
 			} ) }
 		</Composite.Item>
+	);
+}
+
+function TableGroup( {
+	label,
+	colSpan,
+	children,
+}: {
+	label: string;
+	colSpan: number;
+	children: ReactNode;
+} ) {
+	const headerId = useId();
+	return (
+		// The rows of every group belong to the same listbox, so the group is
+		// a `group` within it rather than a listbox of its own.
+		<tbody role="group" aria-labelledby={ headerId }>
+			<tr
+				className="dataviews-view-table__group-header-row"
+				role="presentation"
+			>
+				<td
+					id={ headerId }
+					colSpan={ colSpan }
+					className="dataviews-view-table__group-header-cell"
+					// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+					role="presentation"
+				>
+					{ label }
+				</td>
+			</tr>
+			{ children }
+		</tbody>
 	);
 }
 
@@ -313,19 +347,31 @@ function ViewPickerTable< Item >( {
 
 	return (
 		<>
-			<table
-				className={ clsx(
-					'dataviews-view-table',
-					'dataviews-view-picker-table',
-					className,
-					{
-						[ `has-${ view.layout?.density }-density` ]:
-							view.layout?.density &&
-							[ 'compact', 'comfortable' ].includes(
-								view.layout.density
-							),
-					}
-				) }
+			{ /*
+			 * The `table` is the Composite element so that the role that
+			 * describes the rows sits on the same element that holds
+			 * `aria-activedescendant`. Assistive technologies only announce
+			 * the active row when those two are together.
+			 */ }
+			<Composite
+				virtualFocus
+				orientation="vertical"
+				render={
+					<table
+						className={ clsx(
+							'dataviews-view-table',
+							'dataviews-view-picker-table',
+							className,
+							{
+								[ `has-${ view.layout?.density }-density` ]:
+									view.layout?.density &&
+									[ 'compact', 'comfortable' ].includes(
+										view.layout.density
+									),
+							}
+						) }
+					/>
+				}
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : 'listbox' }
@@ -408,36 +454,24 @@ function ViewPickerTable< Item >( {
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<Composite
+							<TableGroup
 								key={ `group-${ groupName }` }
-								virtualFocus
-								orientation="vertical"
-								render={ <tbody role="group" /> }
+								colSpan={
+									columns.length +
+									( hasPrimaryColumn ? 1 : 0 ) +
+									1
+								}
+								label={
+									view.groupBy?.showLabel === false
+										? groupName
+										: sprintf(
+												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+												__( '%1$s: %2$s' ),
+												groupField.label,
+												groupName
+											)
+								}
 							>
-								<tr
-									className="dataviews-view-table__group-header-row"
-									role="presentation"
-								>
-									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											1
-										}
-										className="dataviews-view-table__group-header-cell"
-										// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
-										role="presentation"
-									>
-										{ view.groupBy?.showLabel === false
-											? groupName
-											: sprintf(
-													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-													__( '%1$s: %2$s' ),
-													groupField.label,
-													groupName
-												) }
-									</td>
-								</tr>
 								{ groupItems.map( ( item, index ) => {
 									const id =
 										getItemId( item ) || index.toString();
@@ -464,15 +498,11 @@ function ViewPickerTable< Item >( {
 										/>
 									);
 								} ) }
-							</Composite>
+							</TableGroup>
 						)
 					)
 				) : (
-					<Composite
-						render={ <tbody role="presentation" /> }
-						virtualFocus
-						orientation="vertical"
-					>
+					<tbody role="presentation">
 						{ hasData &&
 							data.map( ( item, index ) => {
 								const itemId = getItemId( item );
@@ -500,9 +530,9 @@ function ViewPickerTable< Item >( {
 									/>
 								);
 							} ) }
-					</Composite>
+					</tbody>
 				) }
-			</table>
+			</Composite>
 			<div
 				className={ clsx( {
 					'dataviews-loading': isLoading,
