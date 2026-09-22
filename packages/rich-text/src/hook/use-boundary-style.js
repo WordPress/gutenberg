@@ -32,9 +32,10 @@ export function useBoundaryStyle( { record } ) {
 		const newColor = colord( computedStyle.color )
 			.alpha( 0.2 )
 			.toRgbString();
-		// The field has focus, or the editing host it is part of has: only
-		// the field with the selection renders a boundary.
-		const selector = `.rich-text:focus ${ boundarySelector }, [contenteditable="true"]:focus ${ boundarySelector }`;
+		// Only while the editing host has focus, be it the element or the
+		// canvas root around it. Only the element with the selection renders
+		// a boundary.
+		const selector = `[contenteditable="true"]:focus ${ boundarySelector }`;
 		const rule = `background-color: ${ newColor }`;
 		const style = `${ selector } {${ rule }}`;
 		const globalStyleId = 'rich-text-boundary-style';

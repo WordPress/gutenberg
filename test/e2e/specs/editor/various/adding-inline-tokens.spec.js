@@ -74,7 +74,7 @@ test.describe( 'adding inline tokens', () => {
 		] );
 	} );
 
-	test( 'should select an inline image by clicking it @webkit', async ( {
+	test( 'should select an inline image by clicking it @webkit @firefox', async ( {
 		page,
 		editor,
 		requestUtils,
