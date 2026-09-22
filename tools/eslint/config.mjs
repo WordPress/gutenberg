@@ -17,6 +17,11 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergStorybookPlugin = {
+	rules: {
+		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
+	},
+};
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( rootDir )
 );
@@ -380,6 +385,7 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
@@ -508,7 +514,7 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: React src + storybook — stylesheet and component rules.
+	// Override: React src + storybook — component rules.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -517,9 +523,20 @@ export default dedupePlugins( [
 			`storybook/stories/**/*.${ SCRIPT_EXT }`,
 		],
 		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
+		},
+	},
+
+	// Override: React src — non-module stylesheet imports.
+	{
+		files: [
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+		],
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
 	},
 
@@ -722,11 +739,19 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
+	// Reject non-module stylesheet imports. The production stylesheet
+	// import rule does not apply; Storybook loads package CSS through
+	// package-styles/config.js, not the enqueue path.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
+		plugins: {
+			'gutenberg-storybook': gutenbergStorybookPlugin,
+		},
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
+			'gutenberg-storybook/no-non-module-stylesheet-imports': 'error',
+			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
 

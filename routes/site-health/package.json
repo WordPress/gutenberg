@@ -17,5 +17,8 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }

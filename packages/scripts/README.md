@@ -167,11 +167,11 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-- `npm run check-engines` - checks installed version of `node` and `npm`.
+- `npm run check-engines` - checks installed versions of the tools listed in the `engines` field of your project's `package.json`, falling back to the `node` version required by this package.
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. When your project has no `engines` field, it checks the Node.js version required by this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 

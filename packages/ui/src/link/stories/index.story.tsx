@@ -4,7 +4,8 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 
 const meta: Meta< typeof Link > = {
-	title: 'Design System/Components/Link',
+	title: 'Components/@wordpress-ui/Link',
+	id: 'design-system-components-link',
 	component: Link,
 	tags: [ 'manifest' ],
 	parameters: {
