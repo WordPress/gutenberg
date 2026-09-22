@@ -196,8 +196,7 @@
 	{
 		"slug": "brush",
 		"label": "Brush",
-		"filePath": "library/brush.svg",
-		"public": false
+		"filePath": "library/brush.svg"
 	},
 	{
 		"slug": "bug",
@@ -529,8 +528,7 @@
 	{
 		"slug": "dashboard",
 		"label": "Dashboard",
-		"filePath": "library/dashboard.svg",
-		"public": false
+		"filePath": "library/dashboard.svg"
 	},
 	{
 		"slug": "desktop",
@@ -980,8 +978,7 @@
 	{
 		"slug": "link",
 		"label": "Link",
-		"filePath": "library/link.svg",
-		"public": false
+		"filePath": "library/link.svg"
 	},
 	{
 		"slug": "link-off",
@@ -1043,8 +1040,7 @@
 	{
 		"slug": "media",
 		"label": "Media",
-		"filePath": "library/media.svg",
-		"public": false
+		"filePath": "library/media.svg"
 	},
 	{
 		"slug": "media-and-text",
@@ -1134,8 +1130,7 @@
 	{
 		"slug": "page",
 		"label": "Page",
-		"filePath": "library/page.svg",
-		"public": false
+		"filePath": "library/page.svg"
 	},
 	{
 		"slug": "page-break",
@@ -1193,8 +1188,7 @@
 	{
 		"slug": "pin",
 		"label": "Pin",
-		"filePath": "library/pin.svg",
-		"public": false
+		"filePath": "library/pin.svg"
 	},
 	{
 		"slug": "pin-small",
@@ -1204,8 +1198,7 @@
 	{
 		"slug": "plugins",
 		"label": "Plugins",
-		"filePath": "library/plugins.svg",
-		"public": false
+		"filePath": "library/plugins.svg"
 	},
 	{
 		"slug": "play",
@@ -1594,8 +1587,7 @@
 	{
 		"slug": "sites",
 		"label": "Sites",
-		"filePath": "library/sites.svg",
-		"public": false
+		"filePath": "library/sites.svg"
 	},
 	{
 		"slug": "square",
@@ -1815,8 +1807,7 @@
 	{
 		"slug": "tool",
 		"label": "Tool",
-		"filePath": "library/tool.svg",
-		"public": false
+		"filePath": "library/tool.svg"
 	},
 	{
 		"slug": "trash",
@@ -1863,8 +1854,7 @@
 	{
 		"slug": "update",
 		"label": "Update",
-		"filePath": "library/update.svg",
-		"public": false
+		"filePath": "library/update.svg"
 	},
 	{
 		"slug": "upload",
@@ -1898,7 +1888,6 @@
 	{
 		"slug": "wordpress",
 		"label": "WordPress",
-		"filePath": "library/wordpress.svg",
-		"public": false
+		"filePath": "library/wordpress.svg"
 	}
 ]

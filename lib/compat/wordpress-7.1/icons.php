@@ -15,6 +15,10 @@ if ( ! function_exists( 'wp_register_icon_collection' ) ) {
 	 *
 	 *     @type string $label       Required. A human-readable label for the icon collection.
 	 *     @type string $description Optional. A human-readable description for the icon collection.
+	 *     @type bool   $public      Optional. Whether the collection and its icons are exposed through
+	 *                               the REST API and selectable in the editor's Icon block. Icons in
+	 *                               non-public collections remain available via {@see wp_get_icon()}.
+	 *                               Default true.
 	 * }
 	 * @return bool True if the icon collection was registered successfully, else false.
 	 */
@@ -47,17 +51,13 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 * @param array  $args      {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label      Required. A human-readable label for the icon.
-	 *     @type string $content    Optional. SVG markup for the icon.
-	 *                              If not provided, the content will be retrieved from the `file_path` if set.
-	 *                              If both `content` and `file_path` are not set, the icon will not be registered.
-	 *     @type string $file_path  Optional. The full path to the file containing the icon content.
-	 *     @type bool   $public     Optional. Whether the icon is exposed through the REST API, and
-	 *                              therefore selectable in the editor's Icon block. Non-public icons
-	 *                              stay available to server-side code via {@see wp_get_icon()}.
-	 *                              Default true.
+	 *     @type string $label     Required. A human-readable label for the icon.
+	 *     @type string $content   Optional. SVG markup for the icon.
+	 *                             If not provided, the content will be retrieved from the `file_path` if set.
+	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string $file_path Optional. The full path to the file containing the icon content.
 	 *     @type string[] $keywords Optional. Additional search terms for the icon, matched by
-	 *                              `get_registered_icons()` alongside the name and label.
+	 *                             `get_registered_icons()` alongside the name and label.
 	 * }
 	 * @return bool True if the icon was registered successfully, else false.
 	 */
