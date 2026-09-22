@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   Visual Revisions: Fix autosave diff comparison when viewing an autosave with no older revisions so unchanged base blocks are not highlighted as additions ([#80455](https://github.com/WordPress/gutenberg/issues/80455)).
+-   Visual Revisions: Fix autosave diff comparison when viewing an autosave with no older revisions so unchanged base blocks are not highlighted as additions ([#83342](https://github.com/WordPress/gutenberg/pull/83342)).
 -   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
 -   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
