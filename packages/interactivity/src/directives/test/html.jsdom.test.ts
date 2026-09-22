@@ -120,4 +120,88 @@ describe( 'data-wp-html', () => {
 		expect( uniqueId.innerHTML ).toBe( '<p>b</p>' );
 		expect( console ).toHaveWarned();
 	} );
+
+	it( 'warns and preserves existing content when the browser rejects the HTML value', async () => {
+		const namespace = uniqueNamespace();
+		store( namespace, {
+			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
+		} );
+
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>fallback</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+
+		// Simulate a Trusted Types rejection: the site enforces Trusted Types
+		// with no default policy, so the native setter throws for a plain
+		// string. Hydration reuses this exact node, so overriding its
+		// `innerHTML` accessor here intercepts the directive's own write.
+		Object.defineProperty( target, 'innerHTML', {
+			configurable: true,
+			get: () => '<p>fallback</p>',
+			set: () => {
+				throw new TypeError(
+					"Failed to set the 'innerHTML' property: This document requires 'TrustedHTML' assignment."
+				);
+			},
+		} );
+
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+
+		expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+		expect( console ).toHaveWarned();
+	} );
+
+	it( 'does not retry a value the browser already rejected once', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
+		} );
+
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>fallback</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+
+		let attempts = 0;
+		Object.defineProperty( target, 'innerHTML', {
+			configurable: true,
+			get: () => '<p>fallback</p>',
+			set: () => {
+				attempts++;
+				throw new TypeError( 'rejected' );
+			},
+		} );
+
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		expect( attempts ).toBe( 1 );
+		expect( console ).toHaveWarned();
+
+		// Forcing an unrelated re-render must not retry the same value.
+		await act( () => {
+			state.html = asDangerousHTML( '<strong>Hi</strong>' );
+		} );
+		expect( attempts ).toBe( 1 );
+	} );
+
+	it( 'marks interactive islands inside the fallback content as already hydrated', () => {
+		const namespace = uniqueNamespace();
+		const nestedNamespace = `${ namespace }/nested`;
+		const region = createRegion(
+			namespace,
+			`<div data-wp-html="state.html">` +
+				`<div data-wp-interactive="${ nestedNamespace }"><p>Nested</p></div>` +
+				`</div>`
+		);
+
+		toVdom( region );
+
+		const nestedIsland = region.querySelector(
+			'[data-wp-interactive]'
+		) as HTMLElement;
+		expect( nestedIsland ).not.toBeNull();
+		expect( hydratedIslands.has( nestedIsland ) ).toBe( true );
+	} );
 } );

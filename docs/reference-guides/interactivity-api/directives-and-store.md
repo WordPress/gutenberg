@@ -375,9 +375,14 @@ store( 'myPlugin', {
 } );
 ```
 
-`asDangerousHTML()` does not sanitize or otherwise process the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Never pass raw, unescaped user input to it. Adding the value it returns to `data-wp-context`, or serializing it as JSON, does not carry the "trusted" marker along with it; only a `wp-html` reference that resolves directly to a value from `asDangerousHTML()` is rendered.
+#### Security contract
 
-The server leaves `wp-html` unprocessed, so the element's server-rendered content serves as a fallback until hydration runs (and stays visible if JavaScript never loads, or on a version of the Interactivity API that doesn't support this directive yet). Directives inside the HTML `wp-html` inserts are not processed, including after later updates — the content behaves as regular, non-interactive markup.
+-   **`asDangerousHTML()` does not sanitize.** It performs no processing at all on the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Treating untrusted input as trusted here is an XSS risk. Never pass it raw user-supplied content or a `context` value directly: `context` is meant for selecting *which* trusted markup to show (e.g. an ID or a flag), while the actual HTML should come from `state`, computed by your plugin's own code from a source it trusts (its own bundled markup, or a response from an endpoint it controls).
+-   **The returned value is opaque and identity-based, not content-based.** It carries no inspectable trace of the HTML it wraps. Adding it to `data-wp-context`, spreading it into a new object, or serializing it as JSON does not carry the "trusted" marker along with it — only a `wp-html` reference that resolves directly to the exact value `asDangerousHTML()` returned is ever rendered.
+-   **This package creates no Trusted Types policy.** On a site that enforces Trusted Types with no default policy, passing a plain string causes the browser to reject the write, and the element's existing content (the server-rendered fallback, or the last HTML that did render successfully) is left in place. The supported way to render on such a site is to pass a `TrustedHTML` value from the site's own policy: `asDangerousHTML( myPolicy.createHTML( markup ) )`. This package deliberately doesn't create a policy of its own — that's a decision for the site to make.
+-   **"Inert" means inert to the Interactivity API only.** Directives inside the HTML `wp-html` inserts are never processed, and interactive islands nested inside it are not hydrated (nested [client-side navigation](./core-concepts/client-side-navigation.md) regions aren't excluded from processing yet). But the inserted content is still live browser HTML: a `<script>` tag inside it won't execute, but that's an artifact of how `innerHTML` works, not a security boundary you should rely on. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
+
+The server leaves `wp-html` unprocessed, so the element's server-rendered content serves as a fallback until hydration runs (and stays visible if JavaScript never loads, or on a version of the Interactivity API that doesn't support this directive yet).
 
 ### `wp-on`
 
