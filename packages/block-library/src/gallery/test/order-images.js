@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getCurrentOrder, sortImageBlocks } from '../order-images';
+import {
+	getCurrentOrder,
+	hasSortableImages,
+	sortImageBlocks,
+} from '../order-images';
 
 function block( id, clientId = `block-${ id }` ) {
 	return { clientId, attributes: { id } };
@@ -105,6 +109,29 @@ describe( 'sortImageBlocks', () => {
 	} );
 } );
 
+describe( 'hasSortableImages', () => {
+	it( 'is true with two or more images that have an attachment record', () => {
+		expect( hasSortableImages( [ block( 1 ), block( 2 ) ], MEDIA ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'is false while the attachment records have not resolved', () => {
+		expect( hasSortableImages( [ block( 1 ), block( 2 ) ], [] ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'does not count images without an id or attachment record', () => {
+		expect(
+			hasSortableImages(
+				[ block( 1 ), block( undefined ), block( 99 ) ],
+				MEDIA
+			)
+		).toBe( false );
+	} );
+} );
+
 describe( 'getCurrentOrder', () => {
 	it( 'detects newest to oldest', () => {
 		expect(
@@ -179,17 +206,37 @@ describe( 'getCurrentOrder', () => {
 		).toEqual( { orderby: 'date', order: 'desc' } );
 	} );
 
-	it( 'reports the first matching option when a sequence satisfies several', () => {
+	describe( 'when a sequence satisfies several orders', () => {
+		// Oldest to newest and A → Z both match.
 		const media = [
 			record( 1, 'a', '2024-01-01T00:00:00' ),
 			record( 2, 'b', '2024-01-02T00:00:00' ),
 		];
-		// Oldest to newest and A → Z both match; date options are listed first.
-		expect( getCurrentOrder( [ block( 1 ), block( 2 ) ], media ) ).toEqual(
-			{
+		const blocks = [ block( 1 ), block( 2 ) ];
+
+		it( 'reports the first matching option by default', () => {
+			expect( getCurrentOrder( blocks, media ) ).toEqual( {
 				orderby: 'date',
 				order: 'asc',
-			}
-		);
+			} );
+		} );
+
+		it( 'reports the preferred order when it holds', () => {
+			expect(
+				getCurrentOrder( blocks, media, {
+					orderby: 'title',
+					order: 'asc',
+				} )
+			).toEqual( { orderby: 'title', order: 'asc' } );
+		} );
+
+		it( 'ignores the preferred order when it no longer holds', () => {
+			expect(
+				getCurrentOrder( blocks, media, {
+					orderby: 'title',
+					order: 'desc',
+				} )
+			).toEqual( { orderby: 'date', order: 'asc' } );
+		} );
 	} );
 } );

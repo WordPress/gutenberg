@@ -1,4 +1,4 @@
-import { ORDER_OPTIONS } from './dynamic-source';
+import { ORDER_OPTIONS } from './order-options';
 
 /**
  * Returns the value an image block is ordered by, or `undefined` when it has no
@@ -19,9 +19,45 @@ function getSortKey( block, media, orderby ) {
 		return undefined;
 	}
 	if ( orderby === 'title' ) {
+		// The media is fetched in the default (view) context, so `rendered`
+		// is the usual source; `raw` is only present with the edit context.
 		return record.title?.raw ?? record.title?.rendered ?? '';
 	}
 	return record.date ?? '';
+}
+
+/**
+ * Whether there's anything to sort: at least two image blocks with a resolved
+ * attachment record. With fewer, every order trivially holds and sorting is a
+ * no-op, so the control is disabled and reports a custom order.
+ *
+ * @param {Array} blocks The gallery's `core/image` inner blocks.
+ * @param {Array} media  Attachment records for the gallery's images.
+ * @return {boolean} Whether the images can be sorted.
+ */
+export function hasSortableImages( blocks, media ) {
+	return (
+		blocks.filter(
+			( block ) =>
+				block.attributes.id !== undefined &&
+				media.some( ( item ) => item.id === block.attributes.id )
+		).length > 1
+	);
+}
+
+/**
+ * Whether sorting `blocks` by the given order would leave them as they are.
+ *
+ * @param {Array}  blocks  The gallery's `core/image` inner blocks.
+ * @param {Array}  media   Attachment records for the gallery's images.
+ * @param {string} orderby `date` or `title`.
+ * @param {string} order   `asc` or `desc`.
+ * @return {boolean} Whether the blocks are already in that order.
+ */
+function isInOrder( blocks, media, orderby, order ) {
+	return sortImageBlocks( blocks, media, orderby, order ).every(
+		( block, index ) => block === blocks[ index ]
+	);
 }
 
 /**
@@ -90,29 +126,34 @@ export function sortImageBlocks( blocks, media, orderby, order ) {
  * attribute.
  *
  * Returns `null` ("custom order") when the sequence matches none of the
- * options, and also when there are fewer than two blocks with a resolved
- * attachment record, since every order trivially matches then. Options are
- * checked in `ORDER_OPTIONS` order, so a sequence that satisfies several (e.g.
- * images uploaded in title order) reports the first.
+ * options, or when there's nothing sortable (see `hasSortableImages`).
  *
- * @param {Array} blocks The gallery's `core/image` inner blocks.
- * @param {Array} media  Attachment records for the gallery's images.
+ * A sequence can satisfy several orders at once — files named in sequence and
+ * uploaded in one go are in both title and date order — so the order the user
+ * last applied, if given, is checked first and wins while it still holds. That
+ * way the control keeps showing what was chosen rather than the first option
+ * that happens to fit. Otherwise options are checked in `ORDER_OPTIONS` order.
+ *
+ * @param {Array}   blocks         The gallery's `core/image` inner blocks.
+ * @param {Array}   media          Attachment records for the gallery's images.
+ * @param {?Object} preferredOrder The `{ orderby, order }` to check first, if any.
  * @return {?{orderby: string, order: string}} The detected order, or `null`.
  */
-export function getCurrentOrder( blocks, media ) {
-	const resolvedCount = blocks.filter(
-		( block ) =>
-			block.attributes.id !== undefined &&
-			media.some( ( item ) => item.id === block.attributes.id )
-	).length;
-	if ( resolvedCount < 2 ) {
+export function getCurrentOrder( blocks, media, preferredOrder = null ) {
+	if ( ! hasSortableImages( blocks, media ) ) {
 		return null;
+	}
+
+	if (
+		preferredOrder &&
+		isInOrder( blocks, media, preferredOrder.orderby, preferredOrder.order )
+	) {
+		return preferredOrder;
 	}
 
 	for ( const { value } of ORDER_OPTIONS ) {
 		const [ orderby, order ] = value.split( '/' );
-		const sorted = sortImageBlocks( blocks, media, orderby, order );
-		if ( sorted.every( ( block, index ) => block === blocks[ index ] ) ) {
+		if ( isInOrder( blocks, media, orderby, order ) ) {
 			return { orderby, order };
 		}
 	}

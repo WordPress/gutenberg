@@ -26,6 +26,15 @@ const IMAGE_ATTRIBUTES = {
 
 const VIEWPORT_STATE_INITIALIZER = 'test/viewport-state-initializer';
 
+const createGallery = ( attributes = {} ) =>
+	createBlock( 'core/gallery', attributes, [
+		createBlock( 'core/image', IMAGE_ATTRIBUTES ),
+		createBlock( 'core/image', {
+			...IMAGE_ATTRIBUTES,
+			id: 2,
+		} ),
+	] );
+
 // The Gallery only offers its aspect ratio control when the theme or the
 // defaults provide ratios to choose from.
 const ASPECT_RATIO_SETTINGS = {
@@ -110,17 +119,8 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
-	describe( 'Source panel', () => {
-		const createGallery = ( attributes = {} ) =>
-			createBlock( 'core/gallery', attributes, [
-				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
-				createBlock( 'core/image', {
-					...IMAGE_ATTRIBUTES,
-					id: 2,
-				} ),
-			] );
-
-		test( 'offers an "Order by" control for a static gallery that reads as a custom order until the media resolves', async () => {
+	describe( 'Order by', () => {
+		test( 'offers a sort control in Settings for a static gallery that reads as a custom order until the media resolves', async () => {
 			await setup( createGallery() );
 			await selectBlock( 'Block: Gallery' );
 
@@ -158,15 +158,6 @@ describe( 'Gallery block', () => {
 	} );
 
 	describe( 'Layout', () => {
-		const createGallery = ( attributes = {} ) =>
-			createBlock( 'core/gallery', attributes, [
-				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
-				createBlock( 'core/image', {
-					...IMAGE_ATTRIBUTES,
-					id: 2,
-				} ),
-			] );
-
 		test( 'keeps the custom Gallery controls for the default Flex layout', async () => {
 			await setup( createGallery() );
 			await selectBlock( 'Block: Gallery' );

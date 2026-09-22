@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
--   Gallery: Add an "Order by" control to the Source panel of a static gallery, sorting its images in place by date or title with the same options the dynamic source offers. The control reflects the order the images are currently in and shows "Custom" once they are dragged into another.
+-   Gallery: Add an "Order by" control to the Settings panel of a static gallery, below "Randomize order", sorting its images in place by date or title with the same options the dynamic source offers. The control reflects the order the images are currently in and shows "Custom" once they are dragged into another.
 
 ### Bug Fixes
 
