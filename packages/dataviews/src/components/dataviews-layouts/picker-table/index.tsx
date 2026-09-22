@@ -218,12 +218,16 @@ function TableRow< Item >( {
 	);
 }
 
-function TableGroup( {
-	label,
+function TableGroup< Item >( {
+	groupName,
+	groupField,
+	showLabel = true,
 	colSpan,
 	children,
 }: {
-	label: string;
+	groupName: string;
+	groupField: NormalizedField< Item >;
+	showLabel?: boolean;
 	colSpan: number;
 	children: ReactNode;
 } ) {
@@ -243,7 +247,14 @@ function TableGroup( {
 					// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
 					role="presentation"
 				>
-					{ label }
+					{ showLabel
+						? sprintf(
+								// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+								__( '%1$s: %2$s' ),
+								groupField.label,
+								groupName
+							)
+						: groupName }
 				</td>
 			</tr>
 			{ children }
@@ -344,6 +355,8 @@ function ViewPickerTable< Item >( {
 				[ 'compact', 'comfortable' ].includes( view.layout.density ),
 		}
 	);
+	const groupHeaderColSpan =
+		columns.length + ( hasPrimaryColumn ? 1 : 0 ) + 1;
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -456,21 +469,10 @@ function ViewPickerTable< Item >( {
 						( [ groupName, groupItems ] ) => (
 							<TableGroup
 								key={ `group-${ groupName }` }
-								colSpan={
-									columns.length +
-									( hasPrimaryColumn ? 1 : 0 ) +
-									1
-								}
-								label={
-									view.groupBy?.showLabel === false
-										? groupName
-										: sprintf(
-												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-												__( '%1$s: %2$s' ),
-												groupField.label,
-												groupName
-											)
-								}
+								groupName={ groupName }
+								groupField={ groupField }
+								showLabel={ view.groupBy?.showLabel }
+								colSpan={ groupHeaderColSpan }
 							>
 								{ groupItems.map( ( item, index ) => {
 									const id =
