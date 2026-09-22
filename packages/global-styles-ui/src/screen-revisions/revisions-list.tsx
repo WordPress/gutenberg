@@ -306,7 +306,7 @@ function RevisionsList( {
 					<DataViewsPicker.Pagination>
 						<DataViewsPicker.PageSelect />
 					</DataViewsPicker.Pagination>
-					<DataViewsPicker.Actions />
+					<DataViewsPicker.Actions className="global-styles-ui-screen-revisions__actions" />
 				</DataViewsPicker.Footer>
 			</DataViewsPicker>
 		</div>

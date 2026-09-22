@@ -10,6 +10,13 @@
 	min-height: 0;
 }
 
+.global-styles-ui-screen-revisions__actions {
+	// The picker footer spreads its parts, so on a single page of revisions —
+	// where the page select renders nothing — the action would sit at the
+	// start of the row. Keep it at the end whichever parts survive.
+	margin-inline-start: auto;
+}
+
 .global-styles-ui-screen-revisions__date {
 	text-transform: uppercase;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
