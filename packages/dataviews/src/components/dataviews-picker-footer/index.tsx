@@ -293,11 +293,7 @@ export function DataViewsPickerFooter( {
 			direction="row"
 			justify="space-between"
 			align="center"
-			className={ clsx(
-				'dataviews-footer',
-				'dataviews-picker-footer',
-				className
-			) }
+			className={ clsx( 'dataviews-footer', className ) }
 			gap="sm"
 		>
 			{ children ?? (

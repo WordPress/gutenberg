@@ -789,9 +789,7 @@ describe( 'DataViews Picker', () => {
 			// and padding. A row that is not there has nothing for a role or a
 			// text query to find.
 			// eslint-disable-next-line testing-library/no-node-access
-			const footer = container.querySelector(
-				'.dataviews-picker-footer'
-			);
+			const footer = container.querySelector( '.dataviews-footer' );
 			expect( footer ).toBeNull();
 		} );
 
@@ -813,7 +811,7 @@ describe( 'DataViews Picker', () => {
 			);
 
 			for ( const [ ownClass, builtInClass ] of [
-				[ 'my-footer', 'dataviews-picker-footer' ],
+				[ 'my-footer', 'dataviews-footer' ],
 				[ 'my-pagination', 'dataviews-pagination' ],
 				[ 'my-page-select', 'dataviews-pagination__page-select' ],
 				[
