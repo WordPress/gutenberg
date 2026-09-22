@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0",
-		"npm": ">=10.2.3"
+		"node": "^20.19.0 || >=22.13.0"
 	},
 	"files": [
 		"src",
@@ -67,7 +66,6 @@
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
-		"@types/jest": "^30.0.0",
 		"@types/node": "^24.13.3",
 		"@wordpress/base-styles": "file:../base-styles",
 		"fast-glob": "^3.2.7",

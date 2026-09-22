@@ -13,6 +13,11 @@
 		"align": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true
@@ -46,7 +51,8 @@
 			"color": true,
 			"width": true,
 			"style": true
-		}
+		},
+		"shadow": true
 	},
 	"style": "wp-block-query-no-results"
 }
