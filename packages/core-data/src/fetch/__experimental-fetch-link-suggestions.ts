@@ -275,6 +275,33 @@ export default async function fetchLinkSuggestions(
 }
 
 /**
+ * Whether a title answers the search: every word typed appears in it as a whole word.
+ *
+ * Matching whole words rather than any substring is what separates a title that is about what was
+ * typed from one that merely shares some letters with it. Searching `coffee`, both `Coffee Roasting
+ * Guide` and `Our Coffee` are about coffee, wherever the word sits; `Coffeehouse Rules` is about
+ * something else.
+ *
+ * @param title
+ * @param search
+ *
+ * @return True when the title contains every word that was typed.
+ */
+function isWholeMatch( title: string, search: string ): boolean {
+	const searchTokens = tokenize( search );
+
+	if ( ! searchTokens.length ) {
+		return false;
+	}
+
+	const titleTokens = tokenize( title || '' );
+
+	return searchTokens.every( ( searchToken ) =>
+		titleTokens.includes( searchToken )
+	);
+}
+
+/**
  * How directly a title answers what was typed.
  *
  * Only a whole-title or a start-of-title match counts. Anything less is left to the token score,
@@ -348,9 +375,9 @@ function getTypeRank(
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * A title that answers the search — one that is what was typed, or that begins with it — ranks
- * above every title that does not, whatever its type. Nothing that fails to match should displace
- * something that matches.
+ * A title that answers the search — one containing every word that was typed — ranks above every
+ * title that does not, whatever its type. Nothing that fails to match should displace something
+ * that matches.
  *
  * Among titles that answer the search equally, the type decides, because the type a link points at
  * matters more than the difference between a whole-title and a start-of-title match: a page is
@@ -384,8 +411,10 @@ export function sortResults(
 
 	const scores = {};
 	const tiers = {};
+	const matches = {};
 	for ( const result of results ) {
 		tiers[ scoreKey( result ) ] = getMatchTier( result.title, search );
+		matches[ scoreKey( result ) ] = isWholeMatch( result.title, search );
 
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
@@ -419,7 +448,7 @@ export function sortResults(
 
 	// A title that answers the search outranks one that does not, before any type is considered.
 	const isMatch = ( result: SearchResult ) =>
-		tiers[ scoreKey( result ) ] > 0 ? 1 : 0;
+		matches[ scoreKey( result ) ] ? 1 : 0;
 
 	return results.sort(
 		( a, b ) =>

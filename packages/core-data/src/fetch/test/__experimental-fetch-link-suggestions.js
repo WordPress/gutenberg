@@ -437,9 +437,12 @@ describe( 'sortResults', () => {
 		const order = sortResults( results, 'travel tips' ).map(
 			( result ) => result.id
 		);
+		// Both 4 and 7 contain every word typed, so the type decides between
+		// them and the page leads. Everything below contains at most one of
+		// the two words, so it does not answer the search.
 		expect( order ).toEqual( [
-			7, // exact match
-			4, // contains: travel, tips
+			4, // page, contains: travel, tips
+			7, // category, contains: travel, tips
 			3, // contains: travel
 			// same order as input:
 			1,
@@ -819,6 +822,79 @@ describe( 'sortResults', () => {
 				( { title } ) => title
 			)
 		).toEqual( [ 'Coffee Talk', 'Coffee Shop', 'Coffee', 'Coffee Beans' ] );
+	} );
+
+	it( 'ranks a preferred type that contains the whole search term above another type that begins with it', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Equipment',
+				url: 'http://wordpress.local/category/coffee-equipment/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/our-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// Both titles contain the whole word, so the type decides between them.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Our Coffee', 'Coffee Equipment' ] );
+	} );
+
+	it( 'ranks a title that contains only part of a word below one that contains all of it', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffeehouse Rules',
+				url: 'http://wordpress.local/coffeehouse-rules/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Notes On Coffee',
+				url: 'http://wordpress.local/category/notes-on-coffee/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// "Coffeehouse" is a different word, so the page does not answer the
+		// search and being a page does not lift it.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Notes On Coffee', 'Coffeehouse Rules' ] );
+	} );
+
+	it( 'requires every word typed to appear in the title', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee',
+				url: 'http://wordpress.local/coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Our Coffee Guide',
+				url: 'http://wordpress.local/category/our-coffee-guide/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// The page has only one of the two words typed.
+		expect(
+			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
+		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
 	} );
 } );
 
