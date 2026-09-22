@@ -22,6 +22,7 @@
 
 ### Deprecations
 
+-   `ResponsiveWrapper`: Deprecate the component, planned for removal in WordPress 7.4. Use the CSS `aspect-ratio` property instead.
 -   `Scrollable`: Deprecate the component, planned for removal in WordPress 7.4 ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
 -   `Elevation`: Deprecate the component, planned for removal in WordPress 7.4 ([#83269](https://github.com/WordPress/gutenberg/pull/83269)).
 -   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
