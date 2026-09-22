@@ -235,8 +235,14 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 			.getByRole( 'button', { name: 'Next', exact: true } )
 			.click();
 		const caption = dialog.locator( 'figcaption' );
-		await caption.dispatchEvent( 'touchstart', {
-			touches: [ { identifier: 1, clientX: 200, clientY: 100 } ],
+		// Desktop Firefox has no Touch constructor. Supply the event properties
+		// consumed by the handlers; real touch scrolling needs device testing.
+		await caption.evaluate( ( element ) => {
+			element.dispatchEvent(
+				Object.assign( new Event( 'touchstart', { bubbles: true } ), {
+					touches: [ { clientX: 200, clientY: 100 } ],
+				} )
+			);
 		} );
 		const prevented = await caption.evaluate( ( element ) => {
 			const event = new Event( 'touchmove', {
@@ -247,8 +253,16 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 			return event.defaultPrevented;
 		} );
 		expect( prevented ).toBe( false );
-		await caption.dispatchEvent( 'touchend', {
-			changedTouches: [ { identifier: 1, clientX: 20, clientY: 100 } ],
+		await caption.evaluate( ( element ) => {
+			element.dispatchEvent(
+				Object.assign(
+					new Event( 'touchend', {
+						bubbles: true,
+						cancelable: true,
+					} ),
+					{ changedTouches: [ { clientX: 20, clientY: 100 } ] }
+				)
+			);
 		} );
 		await expect( caption ).toContainText( 'Long caption' );
 	} );
