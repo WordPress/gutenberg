@@ -2528,23 +2528,15 @@ async function watchMode( baseUrlExpression ) {
 	const allRoutes = getAllRoutes( ROOT_DIR );
 	const allWidgetDirs = getAllWidgets( ROOT_DIR );
 
-	// Reused by every widget rebuild; the inputs do not change while
-	// watching.
 	const phpReplacements = await getPhpReplacements(
 		ROOT_DIR,
 		baseUrlExpression
 	);
 
-	/**
-	 * Regenerate the widget PHP that `buildAll()` writes.
-	 *
-	 * `build/widgets/registry.php` is the only place PHP reads widget
-	 * metadata from, and `buildWidget()` does not touch it, so a
-	 * `widget.json` edit would otherwise never reach PHP. Collection is
-	 * restricted to the widgets this watcher knows about so the registry
-	 * never lists a widget whose modules have not been built.
-	 */
 	async function regenerateWidgetPhp() {
+		// Calling it with no argument rescans widgets/,
+		// so a directory created during watch would show up
+		// in the registry before this watcher has compiled it.
 		const widgets = collectWidgets( allWidgetDirs );
 
 		await Promise.all( [
