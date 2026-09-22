@@ -26,7 +26,7 @@
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   Layout: Treat a missing `spacing.blockGap` setting as no block gap support, as the server does. A theme that does not opt into block gap has the setting stored as `null`, which the block settings resolve to `undefined`, so per-block layout styles applied block gap values the front end never renders. An editor that never provides the setting must set it to `true` to keep rendering block gap values ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 -   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
--   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Social Icons and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
+-   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Gallery and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
 
 ### Internal
 
