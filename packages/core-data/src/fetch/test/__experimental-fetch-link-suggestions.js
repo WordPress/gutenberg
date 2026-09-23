@@ -621,14 +621,14 @@ describe( 'sortResults', () => {
 		] );
 	} );
 
-	it( 'ranks a title that begins with the search above one that only contains it, whatever the type', () => {
+	it( 'ranks a page above an attachment named after a file that begins with the search', () => {
 		const results = [
 			{
 				id: 1,
-				title: 'Coffee Equipment',
-				url: 'http://wordpress.local/category/coffee-equipment/',
-				type: 'category',
-				kind: 'taxonomy',
+				title: 'coffee-beans',
+				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
+				type: 'attachment',
+				kind: 'media',
 			},
 			{
 				id: 2,
@@ -639,10 +639,12 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Beginning with what was typed outranks a preferred type.
+		// An attachment is named after its file, so it very often begins with
+		// what was typed. That must not lift it above a page, or a media
+		// library fills the list again.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Equipment', 'Our Coffee' ] );
+		).toEqual( [ 'Our Coffee', 'coffee-beans' ] );
 	} );
 
 	it( 'matches the search as a string, not as whole words', () => {
@@ -820,8 +822,9 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Only the second contains "coffee bean" as a string; the first covers
-		// one of the two words typed.
+		// Both begin with the string typed, so the score decides: the second
+		// has both words whole, the first only has "coffee" whole and finds
+		// "bean" inside "beans".
 		expect(
 			sortResults( results, 'coffee bean' ).map( ( { id } ) => id )
 		).toEqual( [ 2, 1 ] );
