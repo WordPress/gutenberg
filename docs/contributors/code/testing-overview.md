@@ -19,7 +19,7 @@ When writing tests consider the following:
 
 ## JavaScript testing
 
-JavaScript unit and integration tests use [Vitest](https://vitest.dev/). Import `describe`, `test`, `expect`, hooks, and `vi` explicitly from `vitest`. Globals are disabled. Gutenberg's shared setup is internal; external projects should follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/scripts/docs/vitest-migration.md).
+JavaScript unit and integration tests use [Vitest](https://vitest.dev/). Import `describe`, `test`, `expect`, hooks, and `vi` explicitly from `vitest`. Globals are disabled. Gutenberg's shared setup is internal; external projects should follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
 
 ### Setup and commands
 
@@ -56,7 +56,7 @@ npm run test:unit:debug -- packages/escape-html/src/test/index.ts
 
 Paths filter discovered files; `-t` filters test names. Use `--project=node`, `--project=jsdom`, or `--project=browser` to select an environment. These filters do not change the environment selected by the filename. For example, `npm run test:unit -- --project=browser` runs the Browser suite.
 
-`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. Gutenberg-owned tests run only through Vitest. External projects that keep Jest can use the public `wp-scripts test-unit-jest` adapter and follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite).
+`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. Gutenberg-owned tests run only through Vitest. External projects that keep Jest can use the public `wp-scripts test-unit-jest` adapter and follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite).
 
 Run `npm run lint` independently for code style checks. [ESLint](https://eslint.org/) enforces JavaScript rules; `npm run typecheck` checks TypeScript and checked JavaScript, including tests and stories. `npm run build` emits declarations but does not typecheck. Run `npm run test:unit:routing` and `npm run test:unit:conventions` to check discovery, imports, and environment conventions. Configure an [editor linting integration](/docs/contributors/code/getting-started-with-code-contribution.md) for feedback while editing.
 
