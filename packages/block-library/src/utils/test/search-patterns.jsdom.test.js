@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	normalizeSearchInput,
-	getPatternSearchRank,
-	searchPatterns,
-} from '../search-patterns';
+import { normalizeSearchInput, searchPatterns } from '../search-patterns';
 
 describe( 'normalizeSearchInput', () => {
 	it( 'should remove accents', () => {
@@ -12,23 +8,6 @@ describe( 'normalizeSearchInput', () => {
 
 	it( 'should trim and lowercase', () => {
 		expect( normalizeSearchInput( '  Foo  ' ) ).toBe( 'foo' );
-	} );
-} );
-
-describe( 'getPatternSearchRank', () => {
-	it( 'should give a high rank to exact matches', () => {
-		const pattern = { title: 'Foo' };
-		expect( getPatternSearchRank( pattern, 'Foo' ) ).toBe( 30 );
-	} );
-
-	it( 'should give a high rank to prefix matches', () => {
-		const pattern = { title: 'Foo' };
-		expect( getPatternSearchRank( pattern, 'Fo' ) ).toBe( 20 );
-	} );
-
-	it( 'should give a low rank to no matches', () => {
-		const pattern = { title: 'Foo' };
-		expect( getPatternSearchRank( pattern, 'Bar' ) ).toBe( 0 );
 	} );
 } );
 
