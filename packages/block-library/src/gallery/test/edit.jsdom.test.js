@@ -127,19 +127,40 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			// The attachment records never resolve in this environment, so
-			// there's nothing to sort by yet.
-			expect( orderBy ).toBeDisabled();
 			expect( orderBy ).toHaveDisplayValue( 'Custom' );
-			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeDisabled();
+			// The attachment records never resolve in this environment, so
+			// there's nothing to sort by yet; Custom and Random don't need them.
 			expect(
 				screen.getByRole( 'option', { name: 'Newest to oldest' } )
-			).toBeInTheDocument();
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeEnabled();
+			expect(
+				screen.getByRole( 'option', { name: 'Random' } )
+			).toBeEnabled();
+			expect(
+				screen.queryByLabelText( 'Randomize order' )
+			).not.toBeInTheDocument();
 		} );
 
-		test( 'does not offer a custom order for a dynamic gallery', async () => {
+		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			// The select is controlled from the `randomOrder` attribute, so
+			// its display value reflects the stored state after each change.
+			await userEvent.selectOptions( orderBy, 'random' );
+			expect( orderBy ).toHaveDisplayValue( 'Random' );
+
+			await userEvent.selectOptions( orderBy, 'custom' );
+			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+		} );
+
+		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
 			await setup(
 				createBlock( 'core/gallery', {
 					dynamicContent: { source: 'core/attached-media' },
@@ -154,6 +175,23 @@ describe( 'Gallery block', () => {
 			expect(
 				screen.queryByRole( 'option', { name: 'Custom' } )
 			).not.toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Randomize order' )
+			).not.toBeInTheDocument();
+			// The order lives in Settings; the Source panel is a plain
+			// PanelBody with no resettable items, hence no options menu.
+			expect(
+				screen.getByRole( 'button', { name: 'Settings options' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Source options' } )
+			).not.toBeInTheDocument();
+
+			await userEvent.selectOptions( orderBy, 'random' );
+			expect( orderBy ).toHaveDisplayValue( 'Random' );
+
+			await userEvent.selectOptions( orderBy, 'title/asc' );
+			expect( orderBy ).toHaveDisplayValue( 'A → Z' );
 		} );
 	} );
 
@@ -187,7 +225,7 @@ describe( 'Gallery block', () => {
 				screen.getByLabelText( 'Crop images to fit' )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByLabelText( 'Randomize order' )
+				screen.queryByRole( 'combobox', { name: 'Order by' } )
 			).not.toBeInTheDocument();
 		} );
 
