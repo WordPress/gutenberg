@@ -323,10 +323,10 @@ function getTitleMatch(
 /**
  * The order result types are ranked in, most wanted first.
  *
- * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
- * destination, and a post format is a way of styling a post rather than somewhere to go, so those
- * come last: on a site with a large media library they otherwise crowd out what was being looked
- * for. See https://github.com/WordPress/gutenberg/issues/63683.
+ * A link is usually to content, then to a taxonomy. A post format is a way of styling a post
+ * rather than somewhere to go, and an attachment is a file rather than a destination, so those
+ * come last in the order they already had: on a site with a large media library they otherwise
+ * crowd out what was being looked for. See https://github.com/WordPress/gutenberg/issues/63683.
  *
  * Deliberately no finer than the search types themselves. Nothing general can be said about
  * whether a page is a better answer than a post, and ranking by search type means every custom
@@ -335,8 +335,8 @@ function getTitleMatch(
 const TYPE_ORDER: SearchType[] = [
 	'post',
 	'term',
-	'attachment',
 	'post-format',
+	'attachment',
 ];
 
 /**

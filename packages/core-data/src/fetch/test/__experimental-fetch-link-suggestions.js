@@ -269,13 +269,6 @@ describe( 'fetchLinkSuggestions', () => {
 					kind: 'taxonomy',
 				},
 				{
-					id: 54,
-					title: 'Some Test Media Title',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					type: 'attachment',
-					kind: 'media',
-				},
-				{
 					id: 'gallery',
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
@@ -288,6 +281,13 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
 					kind: 'taxonomy',
+				},
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
 				},
 			] )
 		);
@@ -696,7 +696,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
 	} );
 
-	it( 'ranks content, then taxonomies, then attachments, then post formats', () => {
+	it( 'ranks content, then taxonomies, then post formats, then attachments', () => {
 		const results = [
 			{
 				id: 1,
@@ -751,8 +751,8 @@ describe( 'sortResults', () => {
 			'page',
 			'post_tag',
 			'category',
-			'attachment',
 			'post-format',
+			'attachment',
 		] );
 	} );
 
