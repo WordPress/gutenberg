@@ -28,6 +28,7 @@ export default function BlockParentSelector() {
 				getEnabledBlockParents,
 				getBlockName,
 				getNextBlockClientId,
+				hasInserterItems,
 			} = unlock( select( blockEditorStore ) );
 			// Not getSelectedBlockClientId: a text selection crossing into a
 			// nested block resolves to the ancestor alone, but its selection
@@ -60,12 +61,16 @@ export default function BlockParentSelector() {
 					selectedBlockClientId
 				),
 				// No button when the parent shown is not the direct parent, nor
-				// within a section, where the structure is locked.
+				// within a section, where the structure is locked. Also no
+				// button when the parent takes no inserts (e.g. templateLock:
+				// 'all'), where the Inserter would render nothing and leave an
+				// empty toolbar group behind.
 				showInserter:
 					!! _parentClientId &&
 					_parentClientId === immediateParentClientId &&
 					! parentSection &&
-					! isTextFlowWrapper,
+					! isTextFlowWrapper &&
+					hasInserterItems( _parentClientId ),
 			};
 		},
 		[]
