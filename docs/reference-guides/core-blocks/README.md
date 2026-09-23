@@ -138,7 +138,7 @@ Display a list of all terms of a given taxonomy.
 
 -	**Name:** [core/categories](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textColumns), ~~html~~
 -	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
@@ -673,7 +673,7 @@ Displays the contents of a post or page.
 
 -	**Name:** [core/post-content](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-content/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** tagName
 
 ## Date
@@ -1010,7 +1010,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Name:** [core/tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, text), interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, heading, link, text), interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tag Cloud
@@ -1037,7 +1037,7 @@ Displays the post count of a taxonomy term.
 
 -	**Name:** [core/term-count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-count/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** bracketType
 
 ## Term Description
