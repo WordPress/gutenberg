@@ -9,7 +9,6 @@
 			"dimRatio": 100,
 			"overlayColor": "primary",
 			"backgroundType": "image",
-			"minHeightUnit": "%",
 			"isDark": true,
 			"tagName": "div"
 		},

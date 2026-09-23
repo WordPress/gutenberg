@@ -9,6 +9,13 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 const defaultSettings = {
 	__experimentalFeatures: {
+		blocks: {
+			'core/cover': {
+				dimensions: {
+					minHeight: true,
+				},
+			},
+		},
 		color: {
 			defaultPalette: true,
 			defaultGradients: true,
@@ -154,6 +161,32 @@ describe( 'Cover block', () => {
 					).minHeight
 				).toBe( `${ window.innerHeight }px` )
 			);
+		} );
+
+		test( 'full height toggle is hidden when the theme opts out of minimum height', async () => {
+			const settings = {
+				...defaultSettings,
+				__experimentalFeatures: {
+					...defaultSettings.__experimentalFeatures,
+					blocks: {
+						'core/cover': {
+							dimensions: {
+								minHeight: false,
+							},
+						},
+					},
+				},
+			};
+			await setup( { overlayColor: 'black' }, settings, [
+				createBlock( 'core/paragraph' ),
+			] );
+			const cover = screen.getByLabelText( 'Block: Cover' );
+			await act( async () => cover.focus() );
+			await waitFor( () => expect( cover ).toHaveClass( 'is-selected' ) );
+
+			expect(
+				screen.queryByLabelText( 'Full height' )
+			).not.toBeInTheDocument();
 		} );
 
 		test( 'content position button sets content position', async () => {
@@ -385,13 +418,11 @@ describe( 'Cover block', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await createAndSelectBlock();
 				await openStylesTabIfAvailable();
-				await userEvent.clear(
-					screen.getByLabelText( 'Minimum height' )
-				);
-				await userEvent.type(
-					screen.getByLabelText( 'Minimum height' ),
-					'300'
-				);
+				const input = screen.getByRole( 'spinbutton', {
+					name: 'Minimum height',
+				} );
+				await userEvent.clear( input );
+				await userEvent.type( input, '300' );
 
 				expect(
 					window.getComputedStyle(

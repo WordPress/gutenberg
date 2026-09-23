@@ -32,8 +32,6 @@ export default function save( { attributes } ) {
 		url,
 		alt,
 		id,
-		minHeight: minHeightProp,
-		minHeightUnit,
 		tagName: Tag,
 		sizeSlug,
 		poster,
@@ -43,10 +41,6 @@ export default function save( { attributes } ) {
 		overlayColor
 	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
-	const minHeight =
-		minHeightProp && minHeightUnit
-			? `${ minHeightProp }${ minHeightUnit }`
-			: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -54,10 +48,6 @@ export default function save( { attributes } ) {
 		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
-
-	const style = {
-		minHeight: minHeight || undefined,
-	};
 
 	const bgStyle = {
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
@@ -98,7 +88,7 @@ export default function save( { attributes } ) {
 	const gradientValue = gradient || customGradient;
 
 	return (
-		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
+		<Tag { ...useBlockProps.save( { className: classes } ) }>
 			{ ! useFeaturedImage &&
 				isImageBackground &&
 				url &&

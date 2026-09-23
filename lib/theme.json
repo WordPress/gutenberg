@@ -358,6 +358,11 @@
 					]
 				}
 			},
+			"core/cover": {
+				"dimensions": {
+					"minHeight": true
+				}
+			},
 			"core/image": {
 				"lightbox": {
 					"allowEditing": true
