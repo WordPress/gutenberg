@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { MenuGroup } from '@wordpress/components';
+import { MenuGroup, MenuItem } from '@wordpress/components';
 import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 import LinkControlSearchCreate from './search-create-button';
@@ -35,6 +35,18 @@ function LinkControlSearchResults( {
 		! isInitialSuggestions;
 	// If the query has a specified type, then we can skip showing them in the result. See #24839.
 	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
+	const hasEntitySuggestions = suggestions.some(
+		( suggestion ) =>
+			suggestion.type !== CREATE_TYPE &&
+			! LINK_ENTRY_TYPES.includes( suggestion.type )
+	);
+	const shouldShowNoResults =
+		withCreateSuggestion &&
+		suggestions.some( ( suggestion ) => suggestion.type === CREATE_TYPE ) &&
+		! isInitialSuggestions &&
+		! isLoading &&
+		currentInputValue?.trim() &&
+		! hasEntitySuggestions;
 
 	const labelText = isInitialSuggestions
 		? __( 'Suggestions' )
@@ -52,6 +64,11 @@ function LinkControlSearchResults( {
 				aria-label={ labelText }
 			>
 				<MenuGroup>
+					{ shouldShowNoResults && (
+						<MenuItem disabled role="option" aria-selected="false">
+							{ __( 'No results found.' ) }
+						</MenuItem>
+					) }
 					{ suggestions.map( ( suggestion, index ) => {
 						if (
 							shouldShowCreateSuggestion &&
