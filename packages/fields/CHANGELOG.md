@@ -17,6 +17,7 @@
 
 ### Internal
 
+-   Featured image field: pass the stabilized `featuredImageFlow` prop to `MediaEdit` alongside the deprecated `unstableFeaturedImageFlow`, so plugins reading either name still recognize the featured image. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
 - 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
 
 ## 0.47.0 (2026-09-10)
