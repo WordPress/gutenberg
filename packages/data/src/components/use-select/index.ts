@@ -62,14 +62,11 @@ interface DeferredListener {
 	callback: VoidFunction;
 }
 
-interface DeferredBucket {
-	listeners: Set< DeferredListener >;
-	unsubscribe: VoidFunction;
-}
+type AddToBucket = ( listener: DeferredListener ) => VoidFunction;
 
 const deferredBuckets = new WeakMap<
 	DataRegistry,
-	Map< string, DeferredBucket >
+	Map< string, AddToBucket >
 >();
 
 /**
@@ -97,34 +94,34 @@ function subscribeDeferred(
 		deferredBuckets.set( registry, buckets );
 	}
 
-	let bucket = buckets.get( storeName );
-	if ( ! bucket ) {
+	let addToBucket = buckets.get( storeName );
+	if ( ! addToBucket ) {
 		const listeners = new Set< DeferredListener >();
 		const flush = () => {
 			for ( const { context, callback } of listeners ) {
 				renderQueue.add( context, callback );
 			}
 		};
-		bucket = {
-			listeners,
-			unsubscribe: registry.subscribe(
-				() => renderQueue.add( listeners, flush ),
-				storeName
-			),
+		const unsubscribe = registry.subscribe(
+			() => renderQueue.add( listeners, flush ),
+			storeName
+		);
+
+		addToBucket = ( newListener ) => {
+			listeners.add( newListener );
+
+			return () => {
+				if ( listeners.delete( newListener ) && listeners.size === 0 ) {
+					buckets.delete( storeName );
+					renderQueue.cancel( listeners );
+					unsubscribe();
+				}
+			};
 		};
-		buckets.set( storeName, bucket );
+		buckets.set( storeName, addToBucket );
 	}
 
-	const { listeners, unsubscribe } = bucket;
-	listeners.add( listener );
-
-	return () => {
-		if ( listeners.delete( listener ) && listeners.size === 0 ) {
-			buckets.delete( storeName );
-			renderQueue.cancel( listeners );
-			unsubscribe();
-		}
-	};
+	return addToBucket( listener );
 }
 
 function Store( registry: DataRegistry, suspense: boolean ) {
@@ -183,21 +180,15 @@ function Store( registry: DataRegistry, suspense: boolean ) {
 				listener();
 			};
 
-			const deferredListener: DeferredListener = {
-				context: queueContext,
-				callback: onStoreChange,
-			};
-
 			// Listen to one store on the tier that matches the current mode:
 			// async listeners share one deferred subscription per store, sync
 			// ones listen to the store directly.
 			function listenToStore( storeName: string ) {
 				if ( lastIsAsync ) {
-					return subscribeDeferred(
-						registry,
-						storeName,
-						deferredListener
-					);
+					return subscribeDeferred( registry, storeName, {
+						context: queueContext,
+						callback: onStoreChange,
+					} );
 				}
 
 				return registry.subscribe( onStoreChange, storeName );
