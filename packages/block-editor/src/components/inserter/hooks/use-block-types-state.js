@@ -5,9 +5,13 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
 import { isFiltered } from '../../../store/utils';
+
+// Shared so the selector cache survives the inserter closing and reopening.
+const FILTERED_OPTIONS = { [ isFiltered ]: true };
+const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
 
 /**
  * Retrieves the block types inserter state.
@@ -18,10 +22,7 @@ import { isFiltered } from '../../../store/utils';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
-	const options = useMemo(
-		() => ( { [ isFiltered ]: !! isQuick } ),
-		[ isQuick ]
-	);
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
 	// Not wrapped in a tuple, so `useSelect` can return the previous array when the items match.
 	const items = useSelect(
 		( select ) =>
