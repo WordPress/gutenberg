@@ -90,14 +90,14 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	if ( isBlockCurrentlyHidden ) {
 		// Block is currently hidden - check if hidden everywhere or at specific viewport
 		if ( currentBlockVisibility === false ) {
-			label = __( 'Block is hidden' );
+			label = __( 'Hidden' );
 		} else {
 			const viewportLabel =
 				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 				currentViewport;
 			label = sprintf(
 				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
+				__( 'Hidden on %s' ),
 				viewportLabel
 			);
 		}
@@ -105,14 +105,14 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 
 	// Parent is hidden - check if hidden everywhere or at specific viewport
 	if ( hasParentHiddenEverywhere ) {
-		label = __( 'Parent block is hidden' );
+		label = __( 'Parent hidden' );
 	} else if ( isBlockParentHiddenAtViewport ) {
 		const viewportLabel =
 			BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 			currentViewport;
 		label = sprintf(
 			/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-			__( 'Parent block is hidden on %s' ),
+			__( 'Parent hidden on %s' ),
 			viewportLabel
 		);
 	}
