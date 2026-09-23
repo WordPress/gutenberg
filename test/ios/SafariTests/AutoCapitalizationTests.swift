@@ -142,6 +142,12 @@ final class AutoCapitalizationTests: XCTestCase {
 		)
 		waitForFocus( on: "Add title", "The title is not focused" )
 		waitForKeyboard()
+
+		// The first synthesized touch of a run can lose its lift inside the
+		// simulator: backboardd registers the virtual digitizer after its
+		// first event arrives. Spend that touch on the focused empty title,
+		// where a landed or a lost tap changes nothing.
+		web.textViews[ "Add title" ].tap()
 		assertCapitalized( "An empty title should start capitalized" )
 
 		type( "title" )
