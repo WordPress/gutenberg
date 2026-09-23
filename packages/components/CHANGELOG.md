@@ -30,6 +30,7 @@
 
 ### Bug Fixes
 
+-   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
 -   `FocalPointPicker`: Keep a surrounding scroll container from gaining a horizontal scrollbar when the focal point sits on an edge, without clipping the handle ([#68915](https://github.com/WordPress/gutenberg/pull/68915)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
