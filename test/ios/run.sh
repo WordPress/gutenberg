@@ -83,11 +83,29 @@ fi
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
-rm -rf test/ios/build/results.xcresult
+rm -rf test/ios/build/results.xcresult test/ios/build/simulator.log
+TEST_START=$( date -u +%Y-%m-%dT%H:%M:%SZ )
+echo "Test start (UTC): $TEST_START"
+STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
 	-scheme SafariTests \
 	-destination "id=${UDID}" \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
-	"$@"
+	"$@" || STATUS=$?
+
+# Diagnostic only: the page log cannot tell a tap the keyboard dropped from
+# one WebKit received and discarded, so keep what the simulator's keyboard
+# and WebKit logged while the test ran.
+step "Collecting the simulator log"
+xcrun simctl spawn "$UDID" log show --info --debug --style compact \
+	--start "$( date -u -j -f %Y-%m-%dT%H:%M:%SZ "$TEST_START" +'%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u +'%Y-%m-%d %H:%M:%S' )" \
+	--predicate 'process IN {"MobileSafari", "com.apple.WebKit.WebContent", "kbd", "SpringBoard", "backboardd"} AND (subsystem CONTAINS[c] "WebKit" OR subsystem CONTAINS[c] "UIKit" OR subsystem CONTAINS[c] "TextInput" OR subsystem CONTAINS[c] "Keyboard" OR category CONTAINS[c] "Keyboard" OR category CONTAINS[c] "TextInput")' \
+	> test/ios/build/simulator.log 2>&1 || true
+echo "Simulator log: $( wc -l < test/ios/build/simulator.log ) lines"
+echo "Lines per process:"
+awk '{ print $3 }' test/ios/build/simulator.log | sed 's/\[.*//' | sort | uniq -c | sort -rn | head -10
+echo "Text input entries:"
+grep -iE "insertText|handleKeyWebEvent|keyboardInput|UIKeyboardImpl|TIKeyboard|_didHandleKeyEvent|didFinishTextInput|updateTextInput|selectionDidChange|inputDelegate" test/ios/build/simulator.log | cut -c1-240 | head -150
+exit "$STATUS"
