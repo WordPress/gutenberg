@@ -64,8 +64,13 @@ import useGetMedia from './use-get-media';
 import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
-import { SortImagesControl } from './order-controls';
-import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
+import { SortImagesControl, SourceOrderControl } from './order-controls';
+import {
+	getDynamicSource,
+	ATTACHED_MEDIA,
+	DEFAULT_ORDERBY,
+	DEFAULT_ORDER,
+} from './dynamic-source';
 import {
 	getCurrentOrder,
 	hasSortableImages,
@@ -562,6 +567,10 @@ export default function GalleryEdit( props ) {
 		}
 	}
 
+	function setRandomOrder( nextRandomOrder ) {
+		setAttributes( { randomOrder: nextRandomOrder } );
+	}
+
 	// Reorders the inner image blocks in place. Left persistent on purpose so
 	// the sort is a single undoable step.
 	function sortImages( { orderby, order } ) {
@@ -645,10 +654,6 @@ export default function GalleryEdit( props ) {
 
 	function toggleImageCrop() {
 		setGallerySettings( { imageCrop: ! activeImageCrop } );
-	}
-
-	function toggleRandomOrder() {
-		setAttributes( { randomOrder: ! randomOrder } );
 	}
 
 	function toggleOpenInNewTab( openInNewTab ) {
@@ -894,7 +899,6 @@ export default function GalleryEdit( props ) {
 				{ ! isViewportStyleState && (
 					<GallerySourcePanel
 						dynamic={ dynamic }
-						dropdownMenuProps={ dropdownMenuProps }
 						hasImages={ hasImages }
 					/>
 				) }
@@ -920,6 +924,10 @@ export default function GalleryEdit( props ) {
 						} );
 
 						setAspectRatio( 'auto' );
+
+						if ( isDynamic ) {
+							dynamic.setSourceOrder( undefined, undefined );
+						}
 
 						if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
 							updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
@@ -962,6 +970,52 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
+					{ ! isViewportStyleState && (
+						// "Random" is stored in both modes. Beyond that, a
+						// dynamic gallery's order is a stored query setting,
+						// while a static gallery's orders are one-off actions.
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Order by' ) }
+							hasValue={ () =>
+								!! randomOrder ||
+								( isDynamic &&
+									( dynamic.sourceOrderby !==
+										DEFAULT_ORDERBY ||
+										dynamic.sourceOrder !==
+											DEFAULT_ORDER ) )
+							}
+							onDeselect={ () => {
+								setRandomOrder( false );
+								if ( isDynamic ) {
+									dynamic.setSourceOrder(
+										undefined,
+										undefined
+									);
+								}
+							} }
+						>
+							{ isDynamic ? (
+								<SourceOrderControl
+									orderby={ dynamic.sourceOrderby }
+									order={ dynamic.sourceOrder }
+									isRandom={ !! randomOrder }
+									onChange={ ( { orderby, order } ) =>
+										dynamic.setSourceOrder( orderby, order )
+									}
+									onRandomChange={ setRandomOrder }
+								/>
+							) : (
+								<SortImagesControl
+									currentOrder={ currentOrder }
+									isRandom={ !! randomOrder }
+									canSort={ canSortImages }
+									onSort={ sortImages }
+									onRandomChange={ setRandomOrder }
+								/>
+							) }
+						</ToolsPanelItem>
+					) }
 					{ ! isViewportStyleState &&
 						imageSizeOptions?.length > 0 && (
 							<ToolsPanelItem
@@ -986,57 +1040,6 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
-					{ isFlexLayout && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Crop images to fit' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportImageCrop
-									: ! activeImageCrop
-							}
-							onDeselect={ () =>
-								setGallerySettings( {
-									imageCrop: isViewportStyleState
-										? undefined
-										: true,
-								} )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Crop images to fit' ) }
-								checked={ activeImageCrop }
-								onChange={ toggleImageCrop }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Randomize order' ) }
-							hasValue={ () => !! randomOrder }
-							onDeselect={ () =>
-								setAttributes( { randomOrder: false } )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Randomize order' ) }
-								checked={ !! randomOrder }
-								onChange={ toggleRandomOrder }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState && ! isDynamic && (
-						// A one-off action rather than a value, so it's a plain
-						// child of the panel (like the Source controls) instead
-						// of a resettable ToolsPanelItem. A dynamic gallery
-						// orders its images from the Source panel instead.
-						<SortImagesControl
-							currentOrder={ currentOrder }
-							disabled={ ! canSortImages }
-							onSort={ sortImages }
-						/>
-					) }
 					{ ! isViewportStyleState && hasLinkTo && (
 						<ToolsPanelItem
 							isShownByDefault
@@ -1077,6 +1080,30 @@ export default function GalleryEdit( props ) {
 								value={ activeAspectRatio }
 								options={ aspectRatioOptions }
 								onChange={ setAspectRatio }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ isFlexLayout && (
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Crop images to fit' ) }
+							hasValue={ () =>
+								isViewportStyleState
+									? hasViewportImageCrop
+									: ! activeImageCrop
+							}
+							onDeselect={ () =>
+								setGallerySettings( {
+									imageCrop: isViewportStyleState
+										? undefined
+										: true,
+								} )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Crop images to fit' ) }
+								checked={ activeImageCrop }
+								onChange={ toggleImageCrop }
 							/>
 						</ToolsPanelItem>
 					) }
