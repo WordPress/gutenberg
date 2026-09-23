@@ -1311,6 +1311,8 @@ Subscribes to changes in any signal accessed inside the callback, re-running the
 
 Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
 
+The callback runs without a directive scope, even when you call `watch()` from inside an action or a callback that has one. `getContext()` and `getElement()` are therefore not available inside it, and calling them throws, exactly as it does in a `setTimeout()` callback. Use `watch()` for work that only reads the store, and `data-wp-watch` when the callback needs the element or its context.
+
 ```js
 import { store, watch } from '@wordpress/interactivity';
 

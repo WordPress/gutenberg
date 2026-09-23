@@ -34,10 +34,22 @@ export interface SyncAwareFunction extends Function {
 /**
  * Executes a callback function after the next frame is rendered.
  *
+ * Both arms below — the `requestAnimationFrame` call and the 100 ms
+ * `setTimeout` fallback — funnel through the same inner `setTimeout`, so the
+ * callback always runs *one macrotask after* whichever arm wins, not inside
+ * that arm's own turn. That deferral, not registration order, is the
+ * property this function is relied on for: it is what makes a callback
+ * registered inside a `requestAnimationFrame` callback wait for the next
+ * task instead of running in the same one, and it is why consumers that
+ * need a settled frame (rather than a settled microtask) schedule through
+ * this function. This is *not* a FIFO guarantee — when two registrations'
+ * arms race, the funnel does not preserve the order they were registered
+ * in; it reproduces whatever order the races themselves produce.
+ *
  * @param callback The callback function to be executed.
  * @return A promise that resolves after the callback function is executed.
  */
-const afterNextFrame = ( callback: () => void ) => {
+export const afterNextFrame = ( callback: () => void ) => {
 	return new Promise< void >( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
@@ -86,6 +98,34 @@ export const onDOMReady = ( callback: () => void ) => {
 		document.addEventListener( 'DOMContentLoaded', callback );
 	}
 };
+
+/**
+ * Subscribes to changes in any signal accessed inside the callback, re-running
+ * the callback whenever those signals change. The callback runs without an
+ * ambient directive scope and the previous scope is restored afterwards.
+ *
+ * @example
+ * ```js
+ * const unwatch = watch( () => {
+ *   console.log( state.counter );
+ * } );
+ *
+ * // Later, to stop watching:
+ * unwatch();
+ * ```
+ *
+ * @param callback The callback to execute when a dependency changes.
+ * @return A cleanup function to stop watching.
+ */
+export const watch: typeof effect = ( callback ) =>
+	effect( () => {
+		setScope();
+		try {
+			return callback();
+		} finally {
+			resetScope();
+		}
+	} );
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.

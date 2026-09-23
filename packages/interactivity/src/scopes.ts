@@ -16,11 +16,33 @@ export interface Scope {
 // to interact with them.
 const scopeStack: Scope[] = [];
 
+/**
+ * Retrieves the scope at the top of the scope stack.
+ *
+ * An empty stack entry represents a deliberate scope-less execution frame and
+ * is returned as `undefined`.
+ *
+ * @return The current scope, or `undefined` when no scope is installed.
+ */
 export const getScope = () => scopeStack.slice( -1 )[ 0 ];
 
-export const setScope = ( scope: Scope ) => {
-	scopeStack.push( scope );
+/**
+ * Installs a scope at the top of the scope stack.
+ *
+ * Omitting the scope installs an empty execution frame for code that must not
+ * inherit a caller's directive scope.
+ *
+ * @param scope Scope to install, or `undefined` for an empty execution frame.
+ */
+export const setScope = ( scope?: Scope ) => {
+	// The stack intentionally stores an undefined entry for an empty frame while
+	// retaining the existing non-null scope type expected by internal consumers.
+	scopeStack.push( scope as Scope );
 };
+
+/**
+ * Removes the current scope from the scope stack.
+ */
 export const resetScope = () => {
 	scopeStack.pop();
 };

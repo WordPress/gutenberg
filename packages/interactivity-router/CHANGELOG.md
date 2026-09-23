@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Bug Fixes
+
+-   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
 ## 2.55.0 (2026-09-10)
 
 ## 2.54.0 (2026-08-26)

@@ -70,10 +70,39 @@ function parseDirectiveName( directiveName: string ): {
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
+/**
+ * Parses the namespace and value from a directive attribute value.
+ *
+ * JSON is retained only when it produces a plain object. All other values use
+ * the raw value after any namespace prefix has been removed.
+ *
+ * @param rawValue The raw directive attribute value.
+ * @return An object with the optional `namespace` and interpreted `value`.
+ */
+export function parseDirectiveValue( rawValue: string ): {
+	namespace: string | null;
+	value: string | Record< string, unknown >;
+} {
+	const regexResult = nsPathRegExp.exec( rawValue );
+	const namespace = regexResult?.[ 1 ] ?? null;
+	const rawDirectiveValue = regexResult?.[ 2 ] ?? rawValue;
+	let value: string | Record< string, unknown > = rawDirectiveValue;
+
+	try {
+		const parsedValue: unknown = JSON.parse( rawDirectiveValue );
+		if ( isObject( parsedValue ) ) {
+			value = parsedValue;
+		}
+	} catch {}
+
+	return { namespace, value };
+}
+
 export const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
+ * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -130,13 +159,8 @@ export function toVdom( root: Node ): ComponentChild {
 				if ( attributeName === 'data-wp-ignore' ) {
 					ignore = true;
 				} else {
-					const regexResult = nsPathRegExp.exec( attributeValue );
-					const namespace = regexResult?.[ 1 ] ?? null;
-					let value: any = regexResult?.[ 2 ] ?? attributeValue;
-					try {
-						const parsedValue = JSON.parse( value );
-						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch {}
+					const { namespace, value } =
+						parseDirectiveValue( attributeValue );
 					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
 						const islandNamespace =
