@@ -174,13 +174,15 @@ function getElementLayers( blockName, headingLevel ) {
  * argument: these panels always render inside `BlockEditContextProvider`, so
  * the caller does not have to thread it through.
  *
- * @param {?string} blockName Block name (e.g. `core/heading`).
- * @param {?string} className Space-separated class string from block attributes.
+ * @param {?string} blockName          Block name (e.g. `core/heading`).
+ * @param {?string} className          Space-separated class string from block attributes.
+ * @param {?string} [clientIdOverride] Block to read instead of the one in the block edit context.
  * @return {{ variationName: ?string, headingLevel: ?number }} Variation slug
  * (without the `is-style-` prefix) and the block's heading level, if any.
  */
-function useVariationAndElements( blockName, className ) {
-	const { clientId } = useBlockEditContext();
+function useVariationAndElements( blockName, className, clientIdOverride ) {
+	const blockEditContext = useBlockEditContext();
+	const clientId = clientIdOverride ?? blockEditContext.clientId;
 	const contextHeadingLevel = useContextHeadingLevel( blockName );
 	return useSelect(
 		( select ) => {
@@ -253,4 +255,53 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 		globalStyles,
 		selectedState,
 	] );
+}
+
+/**
+ * Same as `useResolvedStyle`, for a block named by `clientId` rather than the
+ * block edit context, so tools outside the block's tree (the style inspector)
+ * can ask what Global Styles declare for it. Also returns the element layers
+ * and variation it resolved against, to name those layers.
+ *
+ * Heading levels handed down through block context are not visible from
+ * outside the block's tree, so those blocks fall back to their default level.
+ *
+ * @param {?string} clientId Block client ID.
+ * @return {{ value: Object, sources: Object, elements: string[], variationName: ?string }}
+ * Merged payload, source map, and the layers it was resolved against.
+ */
+export function useResolvedStyleForBlock( clientId ) {
+	const { blockName, className } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			return {
+				blockName: clientId ? getBlockName( clientId ) : null,
+				className: clientId
+					? getBlockAttributes( clientId )?.className
+					: undefined,
+			};
+		},
+		[ clientId ]
+	);
+	const { variationName, headingLevel } = useVariationAndElements(
+		blockName,
+		className,
+		clientId
+	);
+	const globalStyles = useRawGlobalStyles();
+
+	return useMemo( () => {
+		const elements = blockName
+			? getElementLayers( blockName, headingLevel )
+			: [];
+		const resolved = blockName
+			? resolveStyle( globalStyles, {
+					blockName,
+					variationName,
+					elements,
+				} )
+			: { value: {}, sources: {} };
+		return { ...resolved, elements, variationName, globalStyles };
+	}, [ blockName, variationName, headingLevel, globalStyles ] );
 }

@@ -38,6 +38,7 @@ import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/regist
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import StyleInspectorMenuItem from '../style-inspector-menu-item';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 
@@ -451,6 +452,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
+									<StyleInspectorMenuItem />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }

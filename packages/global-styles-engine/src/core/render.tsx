@@ -2163,15 +2163,18 @@ export function generateGlobalStyles(
 		{
 			css: customProperties,
 			isGlobalStyles: true,
+			origin: 'global-presets',
 		},
 		{
 			css: globalStyles,
 			isGlobalStyles: true,
+			origin: 'global-styles',
 		},
 		// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
 		{
 			css: updatedConfig?.styles?.css ?? '',
 			isGlobalStyles: true,
+			origin: 'global-custom-css',
 		},
 		{
 			assets: svgs,
@@ -2205,6 +2208,7 @@ export function generateGlobalStyles(
 			styles.push( {
 				css: processCSSNesting( blockStyles.css, selector ),
 				isGlobalStyles: true,
+				origin: 'global-custom-css',
 			} );
 		}
 	} );

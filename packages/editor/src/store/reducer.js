@@ -342,6 +342,21 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
+ * Reducer for whether the style inspector pane is open under List View.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function styleInspectorPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_STYLE_INSPECTOR_OPENED':
+			return action.isOpen;
+	}
+	return state;
+}
+
+/**
  * This reducer does nothing aside initializing a ref to the list view toggle.
  * We will have a unique ref per "editor" instance.
  *
@@ -497,6 +512,7 @@ export default combineReducers( {
 	inserterSidebarToggleRef,
 	listViewPanel,
 	listViewToggleRef,
+	styleInspectorPanel,
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,

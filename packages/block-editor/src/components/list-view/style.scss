@@ -626,3 +626,10 @@ svg {
 .list-view-appender__description {
 	display: none;
 }
+
+// A row of its own under a block's row, for tools that explain that block
+// (the style inspector). It sits flush with the tree, framed so it reads as
+// belonging to the row above it.
+.block-editor-list-view-block-details > td {
+	padding: 0 0 $grid-unit-10 $grid-unit-30;
+}
