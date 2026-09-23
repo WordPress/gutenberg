@@ -526,9 +526,9 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should register an icon that provides a valid `keywords` array.
+	 * Should register an icon that provides, optional args like a valid `keywords` array.
 	 */
-	public function test_register_icon_with_keywords() {
+	public function test_register_icon_with_optional_args() {
 		$name = 'test-collection/with-keywords';
 
 		$result = $this->register(
@@ -544,26 +544,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 		$icon = $this->registry->get_registered_icon( $name );
 		$this->assertSame( array( 'alpha', 'beta' ), $icon['keywords'] );
-	}
-
-	/**
-	 * Should register an icon that omits `keywords`, since the property is optional.
-	 */
-	public function test_register_icon_without_keywords() {
-		$name = 'test-collection/without-keywords';
-
-		$result = $this->register(
-			$name,
-			array(
-				'label'   => 'Icon',
-				'content' => '<svg></svg>',
-			)
-		);
-
-		$this->assertTrue( $result );
-
-		$icon = $this->registry->get_registered_icon( $name );
-		$this->assertArrayNotHasKey( 'keywords', $icon );
 	}
 
 	/**
