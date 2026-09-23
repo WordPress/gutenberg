@@ -4,7 +4,10 @@
 
 ### Enhancements
 
+-   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
 -   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
+-   Featured image field: support the `editor.MediaUpload` filter in the post summary and open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
+-   `MediaEdit`: Add a `mediaUploadProps` prop forwarded to the media upload component. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
 
 ### Bug Fixes
 

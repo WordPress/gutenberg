@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",

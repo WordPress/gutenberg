@@ -1,0 +1,30 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--_wp-ui-radio-group-control-radio-height: 16px;
+			--_wp-ui-radio-group-control-label-line-height: max(var(--_wp-ui-radio-group-control-radio-height), var(--wpds-typography-line-height-xs));
+		}
+
+		.radio-wrapper {
+			display: flex;
+			align-items: center;
+			height: 1lh;
+			line-height: var(--_wp-ui-radio-group-control-label-line-height);
+			overflow: visible;
+		}
+
+		.radio {
+			--wp-ui-radio-input-size: var(--_wp-ui-radio-group-control-radio-height);
+		}
+
+		.label {
+			--wp-ui-field-label-line-height: var(--_wp-ui-radio-group-control-label-line-height);
+		}
+
+		.item:not(:has(.radio[data-disabled])) .label {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}
