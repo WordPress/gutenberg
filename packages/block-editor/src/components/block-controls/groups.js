@@ -6,6 +6,7 @@ const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
 const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 const BlockControlsParent = createSlotFill( 'BlockControlsParent' );
 const BlockControlsStyleState = createSlotFill( 'BlockControlsStyleState' );
+const BlockControlsViewport = createSlotFill( 'BlockControlsViewport' );
 
 const groups = {
 	default: BlockControlsDefault,
@@ -14,6 +15,7 @@ const groups = {
 	other: BlockControlsOther,
 	parent: BlockControlsParent,
 	'style-state': BlockControlsStyleState,
+	viewport: BlockControlsViewport,
 };
 
 export default groups;

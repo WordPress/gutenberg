@@ -29,7 +29,7 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
-import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import { DEFAULT_BLOCK_STYLE_STATE } from '../../hooks/block-style-state';
 
 /**
  * Renders the block toolbar.
@@ -69,6 +69,7 @@ export function PrivateBlockToolbar( {
 		showSwitchSectionStyleButton,
 		areSelectedBlocksHiddenOnViewport,
 		showStyleStateSlot,
+		showViewportSlot,
 		canEdit,
 	} = useSelect( ( select ) => {
 		const { canEditBlock } = select( blockEditorStore );
@@ -87,6 +88,7 @@ export function PrivateBlockToolbar( {
 			isSectionBlock,
 			isBlockHiddenAtViewport,
 			getSelectedBlockStyleState,
+			hasSelectedBlockStyleState,
 			isResponsiveEditing,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -132,11 +134,20 @@ export function PrivateBlockToolbar( {
 			selectedBlockClientIds.every( ( id ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
+		const _selectedBlockStyleState = getSelectedBlockStyleState(
+			selectedBlockClientId
+		);
 		const _isEditingResponsiveStyleState =
 			isResponsiveEditing() &&
-			hasViewportBlockStyleState(
-				getSelectedBlockStyleState( selectedBlockClientId )
-			);
+			hasSelectedBlockStyleState( selectedBlockClientId ) &&
+			_selectedBlockStyleState.viewport !==
+				DEFAULT_BLOCK_STYLE_STATE.viewport;
+		// The viewport group is only shown for a pure viewport state, not
+		// when a pseudo state (e.g. hover) is also selected.
+		const _isEditingViewportStyleState =
+			_isEditingResponsiveStyleState &&
+			_selectedBlockStyleState.pseudo ===
+				DEFAULT_BLOCK_STYLE_STATE.pseudo;
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -162,6 +173,7 @@ export function PrivateBlockToolbar( {
 			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
 			showStyleStateSlot: ! _isZoomOut && _isEditingResponsiveStyleState,
+			showViewportSlot: ! _isZoomOut && _isEditingViewportStyleState,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
@@ -288,6 +300,12 @@ export function PrivateBlockToolbar( {
 									{ showStyleStateSlot && (
 										<BlockControls.Slot
 											group="style-state"
+											className="block-editor-block-toolbar__slot"
+										/>
+									) }
+									{ showViewportSlot && (
+										<BlockControls.Slot
+											group="viewport"
 											className="block-editor-block-toolbar__slot"
 										/>
 									) }

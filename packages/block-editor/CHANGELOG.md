@@ -20,6 +20,7 @@
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 -   Stabilize `getStyleForState` and `setStyleForState`, for reading and writing block style values for a given viewport or pseudo state, and stabilize the `getSelectedBlockStyleState` and `hasSelectedBlockStyleState`(renamed from `hasSelectedStyleState`) store selectors. ([#82741](https://github.com/WordPress/gutenberg/pull/82741)).
+-   `BlockControls`: Add a `viewport` group, shown in the block toolbar while editing a viewport style state, for custom block controls that only apply to that state.
 
 ### Enhancements
 
