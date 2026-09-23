@@ -4,7 +4,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -19,6 +19,7 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { copyBlocksToClipboard } from '../writing-flow/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -33,33 +34,56 @@ function CopyMenuItem( {
 	eventType = 'copy',
 	__experimentalUpdateSelection: updateSelection = false,
 } ) {
+	const registry = useRegistry();
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+
+	// Write the same `text/plain` and `text/html` clipboard data as the
+	// keyboard shortcuts do, so that pasting behaves consistently no matter
+	// how the blocks were copied.
+	function onClick( event ) {
+		const hasCopied = copyBlocksToClipboard(
+			event.currentTarget.ownerDocument,
+			getBlocksByClientId( clientIds ),
+			registry
+		);
+
+		if ( ! hasCopied ) {
+			return;
+		}
+
+		notifyCopy( eventType, clientIds );
+
+		if ( eventType === 'cut' ) {
+			removeBlocks( clientIds, updateSelection );
+		} else {
+			onCopy();
+		}
+	}
+
+	return (
+		<MenuItem onClick={ onClick } shortcut={ shortcut }>
+			{ label ? label : __( 'Copy' ) }
+		</MenuItem>
+	);
+}
+
+function CopyStylesMenuItem( { clientIds, onCopy, label } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const notifyCopy = useNotifyCopy();
+
+	// Write the serialized blocks as plain text so that `usePasteStyles` can
+	// read them back from the clipboard with `navigator.clipboard.readText()`.
 	const ref = useCopyToClipboard(
 		() => serialize( getBlocksByClientId( clientIds ) ),
 		() => {
-			switch ( eventType ) {
-				case 'copy':
-				case 'copyStyles':
-					onCopy();
-					notifyCopy( eventType, clientIds );
-					break;
-				case 'cut':
-					notifyCopy( eventType, clientIds );
-					removeBlocks( clientIds, updateSelection );
-					break;
-				default:
-					break;
-			}
+			onCopy();
+			notifyCopy( 'copyStyles', clientIds );
 		}
 	);
-	const copyMenuItemLabel = label ? label : __( 'Copy' );
-	return (
-		<MenuItem ref={ ref } shortcut={ shortcut }>
-			{ copyMenuItemLabel }
-		</MenuItem>
-	);
+
+	return <MenuItem ref={ ref }>{ label }</MenuItem>;
 }
 
 export function BlockSettingsDropdown( {
@@ -352,11 +376,10 @@ export function BlockSettingsDropdown( {
 								</MenuGroup>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>
-										<CopyMenuItem
+										<CopyStylesMenuItem
 											clientIds={ clientIds }
 											onCopy={ onCopy }
 											label={ __( 'Copy styles' ) }
-											eventType="copyStyles"
 										/>
 										{ canEdit && (
 											<MenuItem onClick={ onPasteStyles }>
