@@ -10,18 +10,21 @@ const PAGES = [
 		content: '',
 		menu_order: 1,
 		comment_status: 'closed',
+		subtitle: '',
 	},
 	{
 		title: 'Short Page',
 		content: words( 300 ),
 		menu_order: 2,
 		comment_status: 'open',
+		subtitle: 'A short read',
 	},
 	{
 		title: 'Long Page',
 		content: words( 2200 ),
 		menu_order: 3,
 		comment_status: 'closed',
+		subtitle: 'A long read',
 	},
 ];
 
@@ -207,6 +210,59 @@ test.describe( 'Fields API', () => {
 		await expect(
 			page.getByRole( 'spinbutton', { name: 'Written by' } )
 		).toHaveValue( String( authorId ) );
+	} );
+
+	test( 'reads and writes a field backed by data the plugin adds to the REST endpoint', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
+		// The column is shown after the edit: a popover opened before the
+		// Quick Edit modal leaves its container hidden from assistive
+		// technology, and the form control would not be found by role.
+		await showFieldsInTable( page, [] );
+		const table = page.getByRole( 'table' );
+
+		// The field is not read-only: the Quick Edit form saves the edit
+		// with the record, and the REST field the plugin registers writes
+		// it.
+		const shortPage = table.getByRole( 'row', { name: /Short Page/ } );
+		await shortPage.getByRole( 'button', { name: 'Quick Edit' } ).click();
+		const quickEditModal = page.locator(
+			'.dataviews-action-modal__quick-edit'
+		);
+		await expect( quickEditModal ).toBeVisible();
+		await quickEditModal
+			.getByRole( 'button', { name: 'Edit Subtitle' } )
+			.click();
+		const subtitleInput = page.getByRole( 'textbox', { name: 'Subtitle' } );
+		await expect( subtitleInput ).toHaveValue( 'A short read' );
+		await subtitleInput.fill( 'An even shorter read' );
+		await quickEditModal.getByRole( 'button', { name: 'Done' } ).click();
+		await expect( quickEditModal ).toBeHidden();
+
+		// The value reached the server.
+		const [ saved ] = await requestUtils.rest( {
+			path: '/wp/v2/pages',
+			params: { search: 'Short Page' },
+		} );
+		expect( saved.subtitle ).toBe( 'An even shorter read' );
+
+		// The REST field carries the value in the record, where the
+		// declarative field reads it.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Subtitle', exact: true } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			await getCell( table, shortPage, 'Subtitle' )
+		).toHaveText( 'An even shorter read' );
+		const emptyPage = table.getByRole( 'row', { name: /Empty Page/ } );
+		await expect(
+			await getCell( table, emptyPage, 'Subtitle' )
+		).toHaveText( '' );
 	} );
 
 	test( 'loads the fields in the extensible site editor embedded in wp-admin', async ( {

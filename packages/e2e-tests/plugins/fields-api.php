@@ -14,6 +14,9 @@
  *    its definition.
  * 4. A substitute for a default field (`author`): unregistered and registered
  *    again as a plain integer with a new label.
+ * 5. A field whose value is data the plugin adds to the Pages REST endpoint
+ *    (`subtitle`): a REST field backed by post meta, readable in the list and
+ *    writable from the Quick Edit form, which the plugin adds the field to.
  *
  * @package gutenberg-test-fields-api
  */
@@ -116,6 +119,83 @@ function gutenberg_test_fields_api_alter_default_fields() {
 	);
 }
 add_action( 'init', 'gutenberg_test_fields_api_alter_default_fields', 200 );
+
+/**
+ * Adds the `subtitle` property to the Pages REST endpoint.
+ *
+ * Case 5, first half: the value comes from post meta the plugin owns, which
+ * the endpoint does not expose otherwise. The REST field reads and writes
+ * it, so the record of every page carries `subtitle` and a request updating
+ * a page can set it.
+ */
+function gutenberg_test_fields_api_register_rest_field() {
+	register_rest_field(
+		'page',
+		'subtitle',
+		array(
+			'schema'          => array(
+				'description' => 'A secondary title shown under the title.',
+				'type'        => 'string',
+				'context'     => array( 'view', 'edit' ),
+			),
+			'get_callback'    => function ( $item ) {
+				return (string) get_post_meta( $item['id'], '_gutenberg_test_subtitle', true );
+			},
+			'update_callback' => function ( $value, $post ) {
+				update_post_meta( $post->ID, '_gutenberg_test_subtitle', sanitize_text_field( $value ) );
+				return true;
+			},
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_test_fields_api_register_rest_field' );
+
+/**
+ * Registers the field reading the `subtitle` property.
+ *
+ * Case 5, second part: a declarative field like case 1. The field API reads
+ * the value from the record and, as the field is not read-only, the Quick
+ * Edit form saves the edits with the record, through the REST field above.
+ */
+function gutenberg_test_fields_api_register_rest_backed_field() {
+	gutenberg_register_fields(
+		'postType',
+		'page',
+		array(
+			array(
+				'id'            => 'subtitle',
+				'type'          => 'text',
+				'label'         => 'Subtitle',
+				'description'   => 'A secondary title shown under the title.',
+				'enableSorting' => false,
+				'filterBy'      => false,
+			),
+		)
+	);
+}
+add_action( 'init', 'gutenberg_test_fields_api_register_rest_backed_field' );
+
+/**
+ * Adds the `subtitle` field to the Quick Edit form of Pages.
+ *
+ * Case 5, last part: the form lists its fields explicitly in the view
+ * configuration of the entity, so a new field is not offered for editing
+ * until it is added there. Merging appends the field to the end of the form.
+ *
+ * @param Gutenberg_View_Config_Data $data The Pages view configuration.
+ * @return Gutenberg_View_Config_Data The updated view configuration.
+ */
+function gutenberg_test_fields_api_add_field_to_form( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array( 'subtitle' ),
+			),
+		),
+		1
+	);
+}
+add_filter( 'get_entity_view_config_posttype_page', 'gutenberg_test_fields_api_add_field_to_form' );
 
 /**
  * Enqueues the stylesheet of the fields.
