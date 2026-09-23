@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `checkbox-control`: Use the design system tokens for the default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
 -   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 
 ## 13.1.0 (2026-09-10)

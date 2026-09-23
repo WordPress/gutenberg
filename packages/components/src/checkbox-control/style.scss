@@ -90,7 +90,7 @@ svg.components-checkbox-control__indeterminate {
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
-		color: $components-color-gray-400;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 }
 

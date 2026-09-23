@@ -3,6 +3,18 @@ import { parseHeic, type HeicImageData } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
+ * How long an `ImageDecoder` decode may run before it is abandoned.
+ *
+ * `ImageDecoder.isTypeSupported()` can report HEIC support from the container
+ * format alone. When the platform codec behind it is missing, `decode()` never
+ * settles rather than rejecting, and nothing downstream would ever run. The
+ * ceiling is generous because it applies to every decode, not only a stalled
+ * one: a large photo on slow hardware has to finish well inside it, or a file
+ * the browser was decoding fine is abandoned and reported as undecodable.
+ */
+export const IMAGE_DECODER_TIMEOUT = 15000;
+
+/**
  * Raised when no decoding strategy could be used at all.
  *
  * Separates "nothing here can decode HEIC" from a file that is damaged: only
@@ -79,8 +91,47 @@ export async function canvasConvertToJpeg(
 				type: file.type,
 				data: file.stream(),
 			} );
+			let videoFrame: VideoFrame | undefined;
+			let timeoutId: ReturnType< typeof setTimeout > | undefined;
+			let timedOut = false;
 			try {
-				const { image: videoFrame } = await decoder.decode();
+				/*
+				 * Closing the decoder rejects its pending decode, so a decode
+				 * that never settles becomes a rejection. Which rejection
+				 * wins the race is not defined, so the flag decides below.
+				 */
+				const decoded = await Promise.race( [
+					decoder.decode(),
+					new Promise< never >( ( _resolve, reject ) => {
+						timeoutId = setTimeout( () => {
+							timedOut = true;
+							decoder.close();
+							reject(
+								new Error( 'ImageDecoder decode timed out' )
+							);
+						}, IMAGE_DECODER_TIMEOUT );
+					} ),
+				] );
+				videoFrame = decoded.image;
+			} catch ( error ) {
+				/*
+				 * A decode that rejects on its own has read the file and found
+				 * it damaged, which the caller reports as such. Only a decode
+				 * that never answered falls through: the browser claimed the
+				 * type and could not deliver, which is what a missing platform
+				 * codec looks like, and strategy 3 decides for itself.
+				 */
+				if ( ! timedOut ) {
+					throw error;
+				}
+			} finally {
+				clearTimeout( timeoutId );
+				if ( ! timedOut ) {
+					decoder.close();
+				}
+			}
+
+			if ( videoFrame ) {
 				try {
 					const canvas = new OffscreenCanvas(
 						videoFrame.displayWidth,
@@ -105,8 +156,6 @@ export async function canvasConvertToJpeg(
 				} finally {
 					videoFrame.close();
 				}
-			} finally {
-				decoder.close();
 			}
 		}
 	}
