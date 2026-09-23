@@ -93,11 +93,21 @@
 		{ "path": "storybook" },
 		{ "path": "tools/monorepo" },
 		{ "path": "tools/pr-meta" },
+		{ "path": "tools/release" },
+		{ "path": "tools/validation" },
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },
 		{ "path": "test/storybook-playwright" },
 		{ "path": "test/unit" },
-		{ "path": "widgets" }
+		{ "path": "widgets/activity" },
+		{ "path": "widgets/events" },
+		{ "path": "widgets/hello-dolly" },
+		{ "path": "widgets/hello-world" },
+		{ "path": "widgets/news" },
+		{ "path": "widgets/quick-draft" },
+		{ "path": "widgets/site-health" },
+		{ "path": "widgets/site-preview" },
+		{ "path": "widgets/welcome" }
 	],
 	"files": []
 }
