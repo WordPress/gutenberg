@@ -25,6 +25,7 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+# Emptied out by #83033; the entry stays so anything reappearing there gets reviewed.
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
@@ -72,3 +73,4 @@
 # so these stay at the end. Removing them brings back the review requests.
 /tools/eslint/suppressions.json
 /tools/stylelint/stylelint-suppressions.json
+/tools/validation/check-private-apis.config.json

@@ -25,6 +25,7 @@ export const SearchableChipSelect = forwardRef<
 		children,
 		disabled,
 		emptyContent = __( 'No results found.' ),
+		statusContent,
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
@@ -82,7 +83,7 @@ export const SearchableChipSelect = forwardRef<
 														>
 															{ item.label }
 														</Combobox.ChipWithRemove>
-												  ) ) }
+													) ) }
 										</Stack>
 										{ showClearButton && (
 											<Combobox.Clear
@@ -115,7 +116,10 @@ export const SearchableChipSelect = forwardRef<
 			</Combobox.InputGroup>
 
 			<Combobox.Popup width={ popupWidth }>
-				<SearchableResults emptyContent={ emptyContent }>
+				<SearchableResults
+					emptyContent={ emptyContent }
+					statusContent={ statusContent }
+				>
 					{ children }
 				</SearchableResults>
 			</Combobox.Popup>

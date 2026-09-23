@@ -21,8 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"index.js"
@@ -38,7 +37,7 @@
 		"rimraf": "^5.0.10",
 		"terser-webpack-plugin": "^5.3.10",
 		"vitest": "^5.0.0",
-		"webpack": "^5.108.1"
+		"webpack": "^5.111.0"
 	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"

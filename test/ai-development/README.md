@@ -99,14 +99,16 @@ its own lockfile and install step.
 Promptfoo is pinned to `0.122.1` because `0.122.2` adds a dependency affected
 by [GHSA-jmr9-qjv8-65gv](https://github.com/advisories/GHSA-jmr9-qjv8-65gv).
 The package overrides also update two optional local-transformer dependencies to
-releases that fix [GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85)
+releases that fix [GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85),
+[GHSA-vwc7-r8mq-g2x9](https://github.com/advisories/GHSA-vwc7-r8mq-g2x9),
+[GHSA-7q85-xj36-vmfc](https://github.com/advisories/GHSA-7q85-xj36-vmfc)
 and [GHSA-f88m-g3jw-g9cj](https://github.com/advisories/GHSA-f88m-g3jw-g9cj).
 The CI job fails if a high-severity advisory returns.
 
-It also needs a newer Node than the repository — see `.nvmrc`.
+Use the repository's Node version, then install this package separately:
 
 ```bash
-nvm use "$(cat test/ai-development/.nvmrc)"
+nvm use
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci --prefix test/ai-development
 ```
 
@@ -119,9 +121,6 @@ Model calls consume the associated quota or paid usage.
 Run from the repository root:
 
 ```bash
-# The repository default is Node 20; the eval package requires Node 22.22+.
-nvm use "$(cat test/ai-development/.nvmrc)"
-
 # Validate configuration without model calls.
 npm --prefix test/ai-development run validate
 

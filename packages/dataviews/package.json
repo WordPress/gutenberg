@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",
@@ -51,8 +50,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.37",
-		"@base-ui/react": "^1.7.0",
+		"@ariakit/react": "^0.4.39",
+		"@base-ui/react": "^1.8.0",
 		"@date-fns/tz": "^1.5.0",
 		"@daypicker/react": "^10.0.1",
 		"@emotion/cache": "^11.14.0",
@@ -79,7 +78,7 @@
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.3",
+		"colord": "^2.9.4",
 		"colorjs.io": "^0.7.1",
 		"date-fns": "^4.4.0",
 		"deepmerge": "^4.3.1",
@@ -96,14 +95,15 @@
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
-		"@testing-library/dom": "^10.4.1",
+		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^24.13.3",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.5.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -30,7 +30,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import {
 	InheritanceResetButton,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
@@ -160,7 +160,7 @@ function InspectorImagePreviewItem( {
 									/* translators: %s: file name */
 									__( 'Background image: %s' ),
 									filename || label
-							  )
+								)
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexBlock>
@@ -687,7 +687,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
