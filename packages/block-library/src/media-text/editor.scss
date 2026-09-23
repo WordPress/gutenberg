@@ -39,6 +39,17 @@
 	max-width: unset;
 }
 
+.wp-block-media-text__content {
+	// The UA stylesheet sets `overflow-wrap: break-word` on editable
+	// elements, which would otherwise win over the inherited `anywhere`
+	// from style.scss and inflate the content column's min-content size.
+	// Exclude Search's button: it opts out of wrapping and must keep
+	// `overflow-wrap: normal` (see search/style.scss).
+	[contenteditable="true"]:not(.wp-block-search__button) {
+		overflow-wrap: inherit;
+	}
+}
+
 /* Make the featured image placeholder the same height as the media selection area. */
 .wp-block-media-text--placeholder-image {
 	min-height: 205px;
