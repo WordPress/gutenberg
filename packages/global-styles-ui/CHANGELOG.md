@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Enhancements
 
--   Blocks screen: restore the hover, focus, focus-visible and active state controls for the Navigation Link block, which the block already declared support for in PHP and in the style engine.
+-   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector.
 
 ## 1.23.0 (2026-09-23)
 
