@@ -127,8 +127,8 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
  * `ConditionalMediaUpload` resolved through `editor.MediaUpload`: the hook
  * through which the editor supplies its media library to blocks and plugins
  * extend it (extra sources, validation). Those callbacks assume an editor
- * context, so `MediaEdit` does not use it; `MediaEditWithFilteredPicker` does,
- * for fields that render inside the editor.
+ * context, so `MediaEdit` does not use it; `MediaEditControl` does when
+ * `isPickerFiltered` is set, for fields that render inside the editor.
  */
 const FilteredMediaUpload = withFilters( 'editor.MediaUpload' )(
 	ConditionalMediaUpload
@@ -576,7 +576,6 @@ function CompactMediaEditAttachments( {
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
- * @param {Object}               [props.mediaUploadProps]    - Extra props forwarded to the media upload component (e.g. `gallery`, `modalClass`). The props the control sets itself, such as `onSelect`, `value` and `render`, take precedence.
  *
  * @return {React.JSX.Element} The media edit control component.
  *
@@ -599,39 +598,14 @@ function CompactMediaEditAttachments( {
  * ```
  */
 export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
-	return (
-		<MediaEditControl
-			{ ...props }
-			MediaUploadComponent={ ConditionalMediaUpload }
-		/>
-	);
-}
-
-/**
- * `MediaEdit` with its picker resolved through the `editor.MediaUpload`
- * filter, so the plugin extensions registered on it apply. Package-internal:
- * the featured image field renders it in the post editor, where its item is
- * the post in context; elsewhere, such as Quick Edit, the field renders
- * `MediaEdit`.
- *
- * @param props The `MediaEdit` props.
- */
-export function MediaEditWithFilteredPicker< Item >(
-	props: MediaEditProps< Item >
-) {
-	return (
-		<MediaEditControl
-			{ ...props }
-			MediaUploadComponent={ FilteredMediaUpload }
-		/>
-	);
+	return <MediaEditControl { ...props } />;
 }
 
 /*
- * Shared body of `MediaEdit` and `MediaEditWithFilteredPicker`;
- * `MediaUploadComponent` is the picker they differ in.
+ * Body of `MediaEdit`. Package-internal: the featured image field renders it
+ * for the props the public control doesn't offer.
  */
-function MediaEditControl< Item >( {
+export function MediaEditControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -640,11 +614,28 @@ function MediaEditControl< Item >( {
 	multiple,
 	isExpanded,
 	validity,
-	mediaUploadProps,
-	MediaUploadComponent,
+	isPickerFiltered,
+	featuredImageFlow,
+	pickerTitle,
 }: MediaEditProps< Item > & {
-	MediaUploadComponent: React.ComponentType< Record< string, unknown > >;
+	/**
+	 * Whether the picker resolves through the `editor.MediaUpload` filter, so
+	 * the plugin extensions registered on it apply.
+	 */
+	isPickerFiltered?: boolean;
+	/**
+	 * Opens the featured-image media frame, as the classic panel does; plugins
+	 * extending `editor.MediaUpload` recognize the featured image by it.
+	 */
+	featuredImageFlow?: boolean;
+	/**
+	 * Title of the picker, in place of the field label.
+	 */
+	pickerTitle?: string;
 } ) {
+	const MediaUploadComponent = isPickerFiltered
+		? FilteredMediaUpload
+		: ConditionalMediaUpload;
 	const value = field.getValue( { item: data } );
 	// While the permission is unresolved, show the picker, as the editor does.
 	const canUpload = useSelect(
@@ -930,7 +921,14 @@ function MediaEditControl< Item >( {
 		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
 				<MediaUploadComponent
-					{ ...mediaUploadProps }
+					title={ pickerTitle ?? field.label }
+					featuredImageFlow={ featuredImageFlow }
+					// The deprecated name is passed too, because the callbacks on
+					// `editor.MediaUpload` read it from the props and would
+					// otherwise stop recognizing the featured image. It will be
+					// removed in the near future, and passing both raises no
+					// warning.
+					unstableFeaturedImageFlow={ featuredImageFlow }
 					onSelect={ ( selectedMedia: any ) => {
 						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
@@ -983,7 +981,6 @@ function MediaEditControl< Item >( {
 					multiple={
 						multiple && targetItemId === undefined ? 'add' : false
 					}
-					title={ field.label }
 					render={ ( { open }: any ) => {
 						// Keep a ref to the latest `open` so the deferred effect can call it.
 						openModalRef.current = open;
