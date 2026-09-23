@@ -6,31 +6,28 @@ import {
 	type Type,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import MediaEdit, {
-	MediaEditWithFilteredPicker,
-} from '../../components/media-edit';
+import { MediaEditControl } from '../../components/media-edit';
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 type Item = BasePostWithEmbeddedFeaturedMedia;
 
-// Opens the featured-image media frame, as the classic panel does; plugins
-// extending `editor.MediaUpload` recognize the featured image by it.
-const mediaUploadProps = {
-	featuredImageFlow: true,
-	// The deprecated name is passed too, because those callbacks read it from
-	// the props and would otherwise stop recognizing the featured image. It
-	// will be removed in the near future, and passing both raises no warning.
-	unstableFeaturedImageFlow: true,
-};
-
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
-	function PostFeaturedImage( props: DataFormControlProps< Item > ) {
+	function PostFeaturedImage(
+		props: DataFormControlProps< Item > & {
+			postType: Type< 'edit' > | undefined;
+		}
+	) {
 		return (
-			<MediaEditWithFilteredPicker
+			<MediaEditControl
 				{ ...props }
 				isExpanded
-				mediaUploadProps={ mediaUploadProps }
+				isPickerFiltered
+				featuredImageFlow
+				pickerTitle={
+					props.postType?.labels?.featured_image || props.field.label
+				}
 			/>
 		);
 	}
@@ -105,6 +102,19 @@ export default function FeaturedImageEdit(
 	props: DataFormControlProps< Item >
 ) {
 	const { data } = props;
+	const labels = useSelect(
+		( select ) => select( coreStore ).getPostType( data.type )?.labels,
+		[ data.type ]
+	);
+	const setFeaturedImageLabel = labels?.set_featured_image;
+	// The post type's labels, as the classic panel's button and frame use.
+	const field = useMemo(
+		() =>
+			setFeaturedImageLabel
+				? { ...props.field, placeholder: setFeaturedImageLabel }
+				: props.field,
+		[ props.field, setFeaturedImageLabel ]
+	);
 	// The post and site editor load different APIs. Callbacks written for the
 	// classic panel and its picker may rely on `core/editor` selectors, actions
 	// (e.g. `editPost`), `useEntityProp` without an id, or on plugins only
@@ -119,12 +129,14 @@ export default function FeaturedImageEdit(
 		String( contextId ) !== String( data.id )
 	) {
 		return (
-			<MediaEdit
+			<MediaEditControl
 				{ ...props }
+				field={ field }
 				isExpanded
-				mediaUploadProps={ mediaUploadProps }
+				featuredImageFlow
+				pickerTitle={ labels?.featured_image || field.label }
 			/>
 		);
 	}
-	return <FilteredFeaturedImageEdit { ...props } />;
+	return <FilteredFeaturedImageEdit { ...props } field={ field } />;
 }
