@@ -82,10 +82,10 @@ function DetachConfirmation( { postTypeLabel, onCancel, onConfirm } ) {
 								'Detach this image from the current %s? The image will remain in the Media Library.'
 							),
 							postTypeLabel
-					  )
+						)
 					: __(
 							'Detach this image from the current post? The image will remain in the Media Library.'
-					  ) }
+						) }
 			</p>
 			<div className="block-editor-inserter__media-panel-detach-actions">
 				<Button
@@ -218,7 +218,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 								),
 								attachedCount,
 								category.postTypeLabel
-						  )
+							)
 						: sprintf(
 								/* translators: %d: Number of images attached to the post. */
 								_n(
@@ -227,7 +227,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 									attachedCount
 								),
 								attachedCount
-						  ),
+							),
 					{ type: 'snackbar', id: 'inserter-notice' }
 				);
 			} catch {
@@ -258,7 +258,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 								/* translators: %s: Name of the post type e.g: "Page". */
 								__( 'Image detached from %s.' ),
 								category.postTypeLabel
-						  )
+							)
 						: __( 'Image detached from post.' ),
 					{ type: 'snackbar', id: 'inserter-notice' }
 				);
@@ -300,7 +300,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 							/* translators: %s: Name of the post type e.g: "Page". */
 							__( 'Detach from %s' ),
 							category.postTypeLabel
-					  )
+						)
 					: __( 'Detach from post' ),
 				icon: linkOff,
 				modalHeader: __( 'Detach image' ),
@@ -325,9 +325,9 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 	const emptyMessage =
 		category.emptyMessage && ! search
 			? // For a source with a custom empty message (e.g. Attachments)
-			  // and no active search, an empty result means nothing is
-			  // attached yet — clearer than the generic "no results found".
-			  category.emptyMessage
+				// and no active search, an empty result means nothing is
+				// attached yet — clearer than the generic "no results found".
+				category.emptyMessage
 			: __( 'No results found.' );
 
 	return (
