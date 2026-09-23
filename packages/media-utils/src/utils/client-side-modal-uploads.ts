@@ -489,15 +489,16 @@ function getErrorText( error: unknown ): string {
 }
 
 /**
- * Translates a REST attachment into the attributes a `wp.media` attachment
- * model expects.
+ * Translates the pipeline's attachment into the attributes a `wp.media`
+ * attachment model expects.
  *
- * The two shapes disagree on nearly every field a tile renders: `source_url`
- * against `url`, `media_details.sizes` against `sizes`, and a raw/rendered
- * object against a plain string title. Only used as a fallback, so it fills in
- * what the grid reads and leaves the rest to the next refetch.
+ * The pipeline returns the attachment after `transformAttachment()`, which
+ * already maps `source_url`, `alt_text` and the title, but keeps the REST
+ * `media_details.sizes` that the model reads as `sizes`. The raw REST fields
+ * are still read as a fallback. Only used when the refetch fails, so it fills
+ * in what the grid reads and leaves the rest to the next refetch.
  *
- * @param attachment The finalized REST attachment.
+ * @param attachment The finalized attachment.
  * @return Attributes for a `wp.media` attachment model.
  */
 function toModelAttributes( attachment: any ): Record< string, unknown > {
@@ -507,11 +508,14 @@ function toModelAttributes( attachment: any ): Record< string, unknown > {
 
 	return {
 		id: attachment.id,
-		title: attachment.title?.raw ?? attachment.title?.rendered ?? '',
+		title:
+			typeof attachment.title === 'string'
+				? attachment.title
+				: ( attachment.title?.raw ?? attachment.title?.rendered ?? '' ),
 		filename: details?.file?.split( '/' ).pop() ?? '',
-		url: attachment.source_url,
+		url: attachment.url ?? attachment.source_url,
 		link: attachment.link,
-		alt: attachment.alt_text,
+		alt: attachment.alt ?? attachment.alt_text,
 		mime: attachment.mime_type,
 		type,
 		subtype,
@@ -539,7 +543,7 @@ function toModelAttributes( attachment: any ): Record< string, unknown > {
 /**
  * Handles a finished upload by syncing the modal's tile with the server data.
  *
- * The pipeline returns a REST attachment, while the modal's tile is a
+ * The pipeline returns a block editor attachment, while the modal's tile is a
  * `wp.media` attachment, so the model is refetched by ID rather than filled in
  * from the response.
  *

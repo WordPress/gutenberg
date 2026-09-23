@@ -327,6 +327,59 @@ describe( 'installClientSideModalUploads', () => {
 		expect( model.set ).toHaveBeenCalledWith( { id: 99 } );
 	} );
 
+	it( 'fills the tile from the pipeline attachment when the refetch fails', async () => {
+		const { Uploader, created } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, wpUploader, bindings } = createUploader( Uploader );
+
+		bindings[ 0 ].handler( up, [ createPluploadFile() ] );
+
+		const model = created[ 0 ];
+		( model.fetch as ReturnType< typeof vi.fn > ).mockImplementation(
+			() => {
+				const deferred = {
+					done: () => deferred,
+					fail: ( fn: () => void ) => {
+						fn();
+						return deferred;
+					},
+					always: ( fn: () => void ) => {
+						fn();
+						return deferred;
+					},
+				};
+				return deferred;
+			}
+		);
+
+		// The pipeline hands back the attachment after `transformAttachment()`,
+		// so it carries `url`, `alt` and a string title, not the REST fields.
+		addItems.mock.calls[ 0 ][ 0 ].onSuccess( [
+			{
+				id: 99,
+				url: 'https://example.com/test.jpeg',
+				alt: 'Alt text',
+				title: 'test',
+				mime_type: 'image/jpeg',
+				media_details: { file: '2026/09/test.jpeg' },
+			},
+		] );
+
+		expect( model.attributes ).toMatchObject( {
+			id: 99,
+			url: 'https://example.com/test.jpeg',
+			alt: 'Alt text',
+			title: 'test',
+			filename: 'test.jpeg',
+			type: 'image',
+			subtype: 'jpeg',
+			uploading: false,
+		} );
+		expect( wpUploader.success ).toHaveBeenCalledWith( model );
+	} );
+
 	it( 'reports the outcome of an upload only once', async () => {
 		const { Uploader, created } = setUpGlobals();
 		const { installClientSideModalUploads } = await loadModule();
