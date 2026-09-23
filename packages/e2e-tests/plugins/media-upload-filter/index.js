@@ -18,7 +18,7 @@
 						{
 							className: 'e2e-media-upload-filter',
 							'data-featured-image-flow': String(
-								!! props.unstableFeaturedImageFlow
+								!! props.featuredImageFlow
 							),
 						},
 						'Media upload filter'
