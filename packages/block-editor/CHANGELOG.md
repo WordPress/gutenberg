@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `URLInput`: Add an opt-in `closeSuggestionsOnNavigateOutside` prop that closes the suggestions list when focus moves outside the field, dismisses it on Escape without also closing an enclosing popover, and only opens the list while the field has focus ([#80879](https://github.com/WordPress/gutenberg/pull/80879)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes
@@ -12,7 +16,6 @@
 
 -   Add a text shadow block support and its control in the typography panel ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 -   Stabilize `getStyleForState` and `setStyleForState`, for reading and writing block style values for a given viewport or pseudo state, and stabilize the `getSelectedBlockStyleState` and `hasSelectedBlockStyleState`(renamed from `hasSelectedStyleState`) store selectors. ([#82741](https://github.com/WordPress/gutenberg/pull/82741)).
--   `URLInput`: Add an opt-in `closeSuggestionsOnNavigateOutside` prop that closes the suggestions list when focus moves outside the field, dismisses it on Escape without also closing an enclosing popover, and only opens the list while the field has focus ([#80879](https://github.com/WordPress/gutenberg/pull/80879)).
 
 ### Enhancements
 
