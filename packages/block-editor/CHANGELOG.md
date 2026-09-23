@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `FontAppearanceControl`: Resolve a `@font-face` `font-style` range, such as the `oblique -10deg 0deg` a variable font with a `slnt` axis declares, to the slant nearest upright. The raw range was offered as an appearance value, which `font-style` discards, so selecting it left the text unchanged ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   `FontAppearanceControl`: Resolve a `@font-face` `font-style` range, such as the `oblique -10deg 0deg` a variable font with a `slnt` axis declares, to the slant nearest upright. The raw range was offered as an appearance value, which `font-style` discards, so selecting it left the text unchanged ([#83456](https://github.com/WordPress/gutenberg/pull/83456)).
 
 ## 18.0.0 (2026-09-23)
 
