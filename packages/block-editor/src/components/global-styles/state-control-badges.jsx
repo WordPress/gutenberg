@@ -92,7 +92,6 @@ export default function StateControlBadges( {
 			{ activeStates.map( ( state ) => (
 				<Badge
 					key={ state.key }
-					className="block-editor-global-styles-state-control__badge"
 					intent="informational"
 				>
 					{ state.label }
