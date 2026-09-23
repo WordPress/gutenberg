@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   `InspectorControls`: Remove the `__experimentalGroup` prop from the fill and the slot. It was deprecated in WordPress 6.2 in favour of `group`, with removal scheduled for 6.4 ([#83171](https://github.com/WordPress/gutenberg/pull/83171)).
