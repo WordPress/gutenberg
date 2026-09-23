@@ -61,10 +61,9 @@ export default function BlockParentSelector() {
 					selectedBlockClientId
 				),
 				// No button when the parent shown is not the direct parent, nor
-				// within a section, where the structure is locked. Also no
-				// button when the parent takes no inserts (e.g. templateLock:
-				// 'all'), where the Inserter would render nothing and leave an
-				// empty toolbar group behind.
+				// within a section, nor when the parent is locked against
+				// adding blocks (e.g. templateLock: 'all') — the Inserter would
+				// render nothing and leave an empty toolbar group behind.
 				showInserter:
 					!! _parentClientId &&
 					_parentClientId === immediateParentClientId &&
