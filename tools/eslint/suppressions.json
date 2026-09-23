@@ -808,9 +808,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7424,11 +7421,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/pagination/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}

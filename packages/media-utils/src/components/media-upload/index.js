@@ -1,5 +1,6 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
@@ -565,9 +566,24 @@ class MediaUpload extends Component {
 	openModal() {
 		const {
 			gallery = false,
-			unstableFeaturedImageFlow = false,
+			featuredImageFlow,
+			unstableFeaturedImageFlow,
 			modalClass,
 		} = this.props;
+
+		if (
+			unstableFeaturedImageFlow !== undefined &&
+			featuredImageFlow === undefined
+		) {
+			deprecated(
+				'wp.mediaUtils.MediaUpload unstableFeaturedImageFlow prop',
+				{
+					since: '7.2',
+					alternative: 'featuredImageFlow',
+					version: '7.4',
+				}
+			);
+		}
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
@@ -579,7 +595,7 @@ class MediaUpload extends Component {
 			this.frame.$el.addClass( modalClass );
 		}
 
-		if ( unstableFeaturedImageFlow ) {
+		if ( featuredImageFlow ?? unstableFeaturedImageFlow ) {
 			this.buildAndSetFeatureImageFrame();
 		}
 		this.initializeListeners();
