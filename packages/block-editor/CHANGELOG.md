@@ -12,6 +12,7 @@
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 -   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
+-   Block Settings Menu: The `Copy` and `Cut` items now write the same `text/plain` and `text/html` clipboard data as the keyboard shortcuts, so blocks copied from the menu paste as formatted content in rich text targets instead of raw block markup ([#80603](https://github.com/WordPress/gutenberg/pull/80603)).
 
 ## 18.0.0 (2026-09-23)
 
@@ -49,7 +50,6 @@
 -   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Gallery and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
 -   In-between inserter: Resolve the hovered block through the block refs rather than the container's DOM children, so the inserter also appears in lists whose blocks apply their block props to an inner element, such as Social Icons ([#83327](https://github.com/WordPress/gutenberg/pull/83327)).
 -   In HEIC-only upload mode, route files to the HEIC conversion by what they contain rather than by the MIME type the browser infers from their name, so a HEIC photo saved as `.jpg` or `.png` is no longer handed to a server-side path that cannot convert it either ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
--   Block Settings Menu: The `Copy` and `Cut` items now write the same `text/plain` and `text/html` clipboard data as the keyboard shortcuts, so blocks copied from the menu paste as formatted content in rich text targets instead of raw block markup ([#80603](https://github.com/WordPress/gutenberg/pull/80603)).
 
 ### Internal
 
