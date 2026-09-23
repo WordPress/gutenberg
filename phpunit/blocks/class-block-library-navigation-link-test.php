@@ -294,4 +294,82 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	/**
+	 * Renders a Navigation Link block and returns the class attribute of the
+	 * first tag of the given name.
+	 *
+	 * @param string $block_markup Serialized block markup.
+	 * @param string $tag_name     Uppercase tag name, e.g. 'A'.
+	 * @return string The tag's class attribute, or an empty string if it has none.
+	 */
+	private function render_and_get_class( $block_markup, $tag_name ) {
+		$parsed_blocks = parse_blocks( $block_markup );
+		$block         = new WP_Block( $parsed_blocks[0], array() );
+		$html          = gutenberg_render_block_core_navigation_link( $block->attributes, array(), $block );
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( array( 'tag_name' => $tag_name ) );
+
+		return (string) $processor->get_attribute( 'class' );
+	}
+
+	/**
+	 * Renders a Navigation Link block and returns the style attribute of the
+	 * first tag of the given name.
+	 *
+	 * @param string $block_markup Serialized block markup.
+	 * @param string $tag_name     Uppercase tag name, e.g. 'A'.
+	 * @return string The tag's style attribute, or an empty string if it has none.
+	 */
+	private function render_and_get_style( $block_markup, $tag_name ) {
+		$parsed_blocks = parse_blocks( $block_markup );
+		$block         = new WP_Block( $parsed_blocks[0], array() );
+		$html          = gutenberg_render_block_core_navigation_link( $block->attributes, array(), $block );
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( array( 'tag_name' => $tag_name ) );
+
+		return (string) $processor->get_attribute( 'style' );
+	}
+
+	/**
+	 * A preset colour belongs on the anchor, which is the element a visitor
+	 * sees and clicks. Putting it on the list item would paint the wrong box,
+	 * and on an item with a submenu it would paint behind the dropdown too.
+	 */
+	public function test_preset_text_color_is_rendered_on_the_anchor() {
+		$markup = '<!-- wp:navigation-link {"label":"Sample Page","url":"https://example.com","textColor":"vivid-red"} /-->';
+
+		$anchor_class = $this->render_and_get_class( $markup, 'A' );
+
+		$this->assertStringContainsString( 'has-text-color', $anchor_class );
+		$this->assertStringContainsString( 'has-vivid-red-color', $anchor_class );
+	}
+
+	public function test_preset_text_color_is_not_rendered_on_the_list_item() {
+		$markup = '<!-- wp:navigation-link {"label":"Sample Page","url":"https://example.com","textColor":"vivid-red"} /-->';
+
+		$list_item_class = $this->render_and_get_class( $markup, 'LI' );
+
+		$this->assertStringNotContainsString( 'has-vivid-red-color', $list_item_class );
+	}
+
+	public function test_preset_background_color_is_rendered_on_the_anchor() {
+		$markup = '<!-- wp:navigation-link {"label":"Sample Page","url":"https://example.com","backgroundColor":"pale-cyan-blue"} /-->';
+
+		$anchor_class = $this->render_and_get_class( $markup, 'A' );
+
+		$this->assertStringContainsString( 'has-background', $anchor_class );
+		$this->assertStringContainsString( 'has-pale-cyan-blue-background-color', $anchor_class );
+	}
+
+	public function test_custom_colors_are_rendered_as_inline_styles_on_the_anchor() {
+		$markup = '<!-- wp:navigation-link {"label":"Sample Page","url":"https://example.com","style":{"color":{"text":"#ff0000","background":"#00ff00"}}} /-->';
+
+		$anchor_style = $this->render_and_get_style( $markup, 'A' );
+
+		$this->assertStringContainsString( 'color:#ff0000', str_replace( ' ', '', $anchor_style ) );
+		$this->assertStringContainsString( 'background-color:#00ff00', str_replace( ' ', '', $anchor_style ) );
+	}
 }

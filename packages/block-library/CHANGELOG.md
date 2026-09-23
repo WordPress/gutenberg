@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown.
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements

@@ -12,6 +12,7 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -348,9 +349,18 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': needsValidLink,
-	} );
+	// Color serialization is skipped so the block's own colors land on the
+	// anchor rather than the list item, which also wraps the submenu. Colors
+	// inherited from the parent Navigation block stay on the list item.
+	const contentColorProps = getColorClassesAndStyles( attributes );
+
+	const classes = clsx(
+		'wp-block-navigation-item__content',
+		contentColorProps.className,
+		{
+			'wp-block-navigation-link__placeholder': needsValidLink,
+		}
+	);
 
 	const missingText = getMissingText( type );
 	const invalidLinkHelpText = getInvalidLinkHelpText();
@@ -392,7 +402,7 @@ export default function NavigationLinkEdit( {
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<a className={ classes }>
+				<a className={ classes } style={ contentColorProps.style }>
 					{ /* eslint-enable */ }
 					{ ! url && ! metadata?.bindings?.url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
