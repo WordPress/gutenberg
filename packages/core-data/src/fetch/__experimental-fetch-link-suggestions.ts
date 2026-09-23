@@ -258,9 +258,8 @@ export default async function fetchLinkSuggestions(
 	// the ranking below prefers them together, but a title is still an answer with them apart.
 	// See https://github.com/WordPress/gutenberg/issues/83372.
 	//
-	// A narrowed search is left alone: it is paginated, and its `X-WP-Total` count comes from
-	// WordPress, so dropping results here would leave the caller's page sizes and totals
-	// disagreeing with each other.
+	// A narrowed search keeps everything WordPress sent, so that the caller's page sizes still
+	// add up to the `X-WP-Total` it reports.
 	if ( ! type ) {
 		const searchTokens = tokenize( search );
 
@@ -435,13 +434,13 @@ export function sortResults( results: SearchResult[], search: string ) {
 		}
 	}
 
-	// Containing what was typed is decided before anything else: a title that does not contain it
-	// is not an answer to the search, whatever its type.
+	// A title that does not contain what was typed is not an answer to the search, whatever its
+	// type, so this is compared first.
 	const contains = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] > 0 ? 1 : 0;
 
-	// Then the type, before anything about where the match sits: an attachment is named after its
-	// file, so it very often begins with what was typed, and that must not lift it above a page.
+	// Compared after the type: an attachment is named after its file, so it very often begins
+	// with what was typed, and that must not lift it above a page.
 	const begins = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] === 2 ? 1 : 0;
 
