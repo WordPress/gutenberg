@@ -18,6 +18,7 @@
 ### Bug Fixes
 
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
+-   `DataViewsPicker` `pickerTable` layout: make the whole `table` the composite, so `aria-activedescendant` sits on the `listbox` itself and screen readers announce the row the arrow keys move to. The layout also honors `itemListLabel` and marks the listbox as `aria-multiselectable` now, and grouped data is one tab stop holding a labelled `group` per group instead of one composite per group ([#83354](https://github.com/WordPress/gutenberg/pull/83354)).
 
 ## 21.0.0 (2026-10-20)
 
@@ -91,7 +92,6 @@
 
 ### Bug Fixes
 
--   `DataViewsPicker` `pickerTable` layout: make the whole `table` the composite, so `aria-activedescendant` sits on the `listbox` itself and screen readers announce the row the arrow keys move to. The layout also honors `itemListLabel` and marks the listbox as `aria-multiselectable` now, and grouped data is one tab stop holding a labelled `group` per group instead of one composite per group ([#83354](https://github.com/WordPress/gutenberg/pull/83354)).
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
 -   DataForm: Hide the edit button of disabled fields in the panel layout, as it already is for read-only fields ([#82957](https://github.com/WordPress/gutenberg/pull/82957)).
 
