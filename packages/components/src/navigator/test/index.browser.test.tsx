@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import type { ComponentPropsWithoutRef } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import Button from '../../button';
 import { Navigator, useNavigator } from '..';
 import { NavigatorToParentButton } from '../legacy';
@@ -50,6 +51,25 @@ const BUTTON_TEXT = {
 	backUsingGoTo: 'Go back using goTo',
 	goToWithSkipFocus: 'Go to with skipFocus',
 };
+
+const DEPRECATION_MESSAGES = {
+	NavigatorToParentButton:
+		'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.Navigator.BackButton instead.',
+	goToParent:
+		'wp.components.useNavigator().goToParent is deprecated since version 6.7. Please use wp.components.useNavigator().goBack instead.',
+};
+
+beforeEach( () => {
+	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
+		logged[ message ] = true;
+	}
+} );
+
+afterEach( () => {
+	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
+		delete logged[ message ];
+	}
+} );
 
 type CustomTestOnClickHandler = (
 	args:
@@ -856,6 +876,7 @@ describe( 'Navigator', () => {
 
 	describe( 'deprecated APIs', () => {
 		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+			delete logged[ DEPRECATION_MESSAGES.NavigatorToParentButton ];
 			const user = userEvent.setup();
 
 			await render(
@@ -877,11 +898,12 @@ describe( 'Navigator', () => {
 
 			// Rendering `NavigatorToParentButton` logs a deprecation notice
 			expect( console ).toHaveWarnedWith(
-				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.Navigator.BackButton instead.'
+				DEPRECATION_MESSAGES.NavigatorToParentButton
 			);
 		} );
 
 		it( 'should log a deprecation notice when using the useNavigator().goToParent() function', async () => {
+			delete logged[ DEPRECATION_MESSAGES.goToParent ];
 			const user = userEvent.setup();
 
 			await render(
@@ -902,7 +924,7 @@ describe( 'Navigator', () => {
 			).toHaveFocus();
 
 			expect( console ).toHaveWarnedWith(
-				'wp.components.useNavigator().goToParent is deprecated since version 6.7. Please use wp.components.useNavigator().goBack instead.'
+				DEPRECATION_MESSAGES.goToParent
 			);
 		} );
 	} );
