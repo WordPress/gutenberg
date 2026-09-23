@@ -9,6 +9,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
+	withFilters,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -85,11 +86,12 @@ function normalizeValue( value: number | number[] | undefined ): number[] {
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
- * otherwise falls back to media-utils MediaUpload.
+ * otherwise falls back to media-utils MediaUpload. Also what `FilteredMediaUpload`
+ * falls back to when nothing is registered on `editor.MediaUpload`, as in tests.
  *
  * @param root0          Component props.
  * @param root0.render   Render prop function that receives { open } object.
- * @param root0.multiple Whether to allow multiple media selections.
+ * @param root0.multiple Whether to allow multiple media selections; `'add'` keeps the current selection in the legacy media frame.
  * @return The component.
  */
 function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
@@ -101,7 +103,8 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 				{ isModalOpen && (
 					<MediaUploadModal
 						{ ...props }
-						multiple={ multiple }
+						// The modal takes a boolean.
+						multiple={ !! multiple }
 						isOpen={ isModalOpen }
 						onClose={ () => {
 							setIsModalOpen( false );
@@ -117,14 +120,19 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 		);
 	}
 	// Fallback to media-utils MediaUpload when experiment is disabled.
-	return (
-		<MediaUpload
-			{ ...props }
-			render={ render }
-			multiple={ multiple ? 'add' : undefined }
-		/>
-	);
+	return <MediaUpload { ...props } render={ render } multiple={ multiple } />;
 }
+
+/*
+ * `ConditionalMediaUpload` resolved through `editor.MediaUpload`: the hook
+ * through which the editor supplies its media library to blocks and plugins
+ * extend it (extra sources, validation). Those callbacks assume an editor
+ * context, so `MediaEdit` does not use it; `MediaEditWithFilteredPicker` does,
+ * for fields that render inside the editor.
+ */
+const FilteredMediaUpload = withFilters( 'editor.MediaUpload' )(
+	ConditionalMediaUpload
+) as React.ComponentType< Record< string, unknown > >;
 
 function MediaPickerButton( {
 	open,
@@ -568,6 +576,7 @@ function CompactMediaEditAttachments( {
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
+ * @param {Object}               [props.mediaUploadProps]    - Extra props forwarded to the media upload component (e.g. `gallery`, `modalClass`). The props the control sets itself, such as `onSelect`, `value` and `render`, take precedence.
  *
  * @return {React.JSX.Element} The media edit control component.
  *
@@ -589,7 +598,40 @@ function CompactMediaEditAttachments( {
  * };
  * ```
  */
-export default function MediaEdit< Item >( {
+export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
+	return (
+		<MediaEditControl
+			{ ...props }
+			MediaUploadComponent={ ConditionalMediaUpload }
+		/>
+	);
+}
+
+/**
+ * `MediaEdit` with its picker resolved through the `editor.MediaUpload`
+ * filter, so the plugin extensions registered on it apply. Package-internal:
+ * the featured image field renders it in the post editor, where its item is
+ * the post in context; elsewhere, such as Quick Edit, the field renders
+ * `MediaEdit`.
+ *
+ * @param props The `MediaEdit` props.
+ */
+export function MediaEditWithFilteredPicker< Item >(
+	props: MediaEditProps< Item >
+) {
+	return (
+		<MediaEditControl
+			{ ...props }
+			MediaUploadComponent={ FilteredMediaUpload }
+		/>
+	);
+}
+
+/*
+ * Shared body of `MediaEdit` and `MediaEditWithFilteredPicker`;
+ * `MediaUploadComponent` is the picker they differ in.
+ */
+function MediaEditControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -598,7 +640,11 @@ export default function MediaEdit< Item >( {
 	multiple,
 	isExpanded,
 	validity,
-}: MediaEditProps< Item > ) {
+	mediaUploadProps,
+	MediaUploadComponent,
+}: MediaEditProps< Item > & {
+	MediaUploadComponent: React.ComponentType< Record< string, unknown > >;
+} ) {
 	const value = field.getValue( { item: data } );
 	// While the permission is unresolved, show the picker, as the editor does.
 	const canUpload = useSelect(
@@ -883,7 +929,8 @@ export default function MediaEdit< Item >( {
 	return (
 		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
-				<ConditionalMediaUpload
+				<MediaUploadComponent
+					{ ...mediaUploadProps }
 					onSelect={ ( selectedMedia: any ) => {
 						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
@@ -930,7 +977,12 @@ export default function MediaEdit< Item >( {
 					// and open in single-select mode so the user picks exactly
 					// one replacement, even if `multiple` is true.
 					value={ targetItemId !== undefined ? targetItemId : value }
-					multiple={ multiple && targetItemId === undefined }
+					// Pickers on `editor.MediaUpload` take the block-editor
+					// `MediaUpload` value, `'add'` to keep the current selection
+					// or `false`, so the control speaks that API.
+					multiple={
+						multiple && targetItemId === undefined ? 'add' : false
+					}
 					title={ field.label }
 					render={ ( { open }: any ) => {
 						// Keep a ref to the latest `open` so the deferred effect can call it.

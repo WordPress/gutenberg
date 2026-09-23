@@ -20,5 +20,8 @@
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/media-editor": "file:../../packages/media-editor",
 		"@wordpress/route": "file:../../packages/route"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }
