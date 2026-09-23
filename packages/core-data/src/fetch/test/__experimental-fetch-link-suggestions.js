@@ -862,8 +862,8 @@ describe( 'sortResults', () => {
 		const results = [
 			{
 				id: 1,
-				title: 'Jerry S Best Coffee',
-				url: 'http://wordpress.local/jerry-s-best-coffee/',
+				title: 'Barista S Best Coffee',
+				url: 'http://wordpress.local/barista-s-best-coffee/',
 				type: 'page',
 				kind: 'post-type',
 			},
@@ -871,8 +871,8 @@ describe( 'sortResults', () => {
 				// `get_the_title()` runs `wptexturize`, so a title written with
 				// straight quotes comes back with curly ones.
 				id: 2,
-				title: 'Jerry\u2019s \u201cBest\u201d Coffee',
-				url: 'http://wordpress.local/jerrys-best-coffee/',
+				title: 'Barista\u2019s \u201cBest\u201d Coffee',
+				url: 'http://wordpress.local/baristas-best-coffee/',
 				type: 'page',
 				kind: 'post-type',
 			},
@@ -880,7 +880,7 @@ describe( 'sortResults', () => {
 
 		// Typed with the straight quotes that are the only ones on a keyboard.
 		expect(
-			sortResults( results, 'jerry\'s "best" coffee' ).map(
+			sortResults( results, 'barista\'s "best" coffee' ).map(
 				( { id } ) => id
 			)
 		).toEqual( [ 2, 1 ] );
