@@ -7,7 +7,7 @@ import { Button, Dropdown } from '@wordpress/components';
  */
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
-import { SVG, Path } from '@wordpress/primitives';
+import { reaction as reactionIcon } from '@wordpress/icons';
 import {
 	Component,
 	Suspense,
@@ -30,23 +30,6 @@ import {
 } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import { invalidateReactionNames } from './reaction-display';
-
-// Inlined while reactions remain experimental in scope. If/when this
-// icon is needed elsewhere it can be promoted to `@wordpress/icons`.
-const smileyIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path
-			fill="currentColor"
-			d="M14.438 14.15a.75.75 0 0 1 1.124.993A4.742 4.742 0 0 1 12 16.75a4.742 4.742 0 0 1-3.563-1.608.75.75 0 0 1 1.126-.993A3.24 3.24 0 0 0 12 15.251c.97 0 1.84-.425 2.438-1.1ZM9.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM14.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"
-		/>
-		<Path
-			fill="currentColor"
-			fillRule="evenodd"
-			d="M12 4a8 8 0 1 1 .001 16.001A8 8 0 0 1 12 4Zm0 1.5a6.5 6.5 0 1 0-.001 13.001A6.5 6.5 0 0 0 12 5.5Z"
-			clipRule="evenodd"
-		/>
-	</SVG>
-);
 
 // Shared by the lazy component and the prefetch, so both hit one request.
 function loadEmojiPicker() {
@@ -212,7 +195,7 @@ export function AddReactionButton( {
 					variant="minimal"
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
-					icon={ smileyIcon }
+					icon={ reactionIcon }
 					label={ __( 'Add reaction' ) }
 					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
