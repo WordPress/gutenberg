@@ -21,9 +21,11 @@
 -   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
 -   `BlockQuickNavigation`: Highlight a block on the canvas while its item is hovered or focused, matching the List View. This affects the inspector Content tab, the pattern overrides panel, and the template and template part content panels ([#83049](https://github.com/WordPress/gutenberg/pull/83049)).
 -   Inserter and pattern search: rank title matches above keyword and description matches, and rank a word in the title that starts with the search term above a substring match ([#83312](https://github.com/WordPress/gutenberg/pull/83312)).
+-   `ViewportVisibilityInfo`: Migrate the block visibility badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Notice` component ([#82670](https://github.com/WordPress/gutenberg/pull/82670)).
 
 ### Bug Fixes
 
+-   `BlockAlignmentControl`: Hide the control again when none of a block's alignments are available. Paragraph, Heading, List and other blocks that support only wide and full were showing a menu of unavailable options that could not change anything ([#83265](https://github.com/WordPress/gutenberg/pull/83265)).
 -   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
@@ -43,7 +45,7 @@
 -   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Layout hooks: Use `normalizeLegacyLayout` in `useLayoutClasses`, `useLayoutStyles`, the block layout styles wrapper and `isAxialBlockGapAllowed`, replacing four inline copies of the legacy `inherit` / size check ([#82710](https://github.com/WordPress/gutenberg/pull/82710)).
 -   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
--   Inserter: Minor performance optimization when sorting items by frecency.
+-   Inserter: Minor performance optimization when sorting items by frecency ([#83443](https://github.com/WordPress/gutenberg/pull/83443)).
 
 ## 17.1.0 (2026-09-10)
 
