@@ -258,6 +258,13 @@ export default function TypographyPanel( {
 	isGlobalStyles = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
+	/*
+	 * The family this text is drawn in when neither `value` nor `inheritedValue`
+	 * names one, used to look up which styles and weights exist. It only feeds
+	 * that lookup: it is not shown as the font, does not become a value, and
+	 * does not mark anything as inherited.
+	 */
+	capabilityFontFamily,
 } ) {
 	const { colors, allColors, areCustomSolidsEnabled, decodeValue } =
 		useColorGradientSettings( settings );
@@ -310,9 +317,17 @@ export default function TypographyPanel( {
 	const isFontFamilyPlaceholder =
 		! hasValue( value?.typography?.fontFamily ) &&
 		hasValue( inheritedFontFamily );
+	/*
+	 * Which faces exist follows the family the text is drawn in, which is the
+	 * one further up the cascade when nothing here names a family.
+	 */
+	const familyForFaces = fontFamily ?? decodeValue( capabilityFontFamily );
 	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
-		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
-	}, [ settings, fontFamily ] );
+		return getMergedFontFamiliesAndFontFamilyFaces(
+			settings,
+			familyForFaces
+		);
+	}, [ settings, familyForFaces ] );
 
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(

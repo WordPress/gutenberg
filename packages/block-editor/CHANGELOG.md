@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `TypographyPanel`: Add an optional `capabilityFontFamily`, the family the text is drawn in when neither the panel's value nor the value it inherits names one. It decides which styles and weights Appearance offers and nothing else, so a block that draws its text in the root font is no longer offered the built-in weight list ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes

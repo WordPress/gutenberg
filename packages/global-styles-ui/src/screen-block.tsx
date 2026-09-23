@@ -156,6 +156,19 @@ function ScreenBlock( {
 		false,
 		hasSelectedState ? stateParam : undefined
 	);
+	/*
+	 * A block-scoped read stops at `styles.blocks.<name>`, so a block that draws
+	 * its text in the root font resolves no family of its own. Read the root
+	 * font family separately, for the typography panel to look up which faces
+	 * exist. It is only that lookup: nothing here becomes a value or is
+	 * presented as inherited.
+	 */
+	const [ rootFontFamily ] = useStyle< string | undefined >(
+		'typography.fontFamily',
+		undefined,
+		'merged',
+		false
+	);
 	const inheritedStyleWithResolvedBackground =
 		useStyleWithResolvedBackground( inheritedStyle );
 
@@ -402,6 +415,7 @@ function ScreenBlock( {
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
 					showInheritanceLabelIndicators={ false }
+					capabilityFontFamily={ rootFontFamily }
 				/>
 			) }
 			{ hasBackgroundPanel && (
