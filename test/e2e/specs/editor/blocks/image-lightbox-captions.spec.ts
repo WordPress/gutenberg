@@ -136,7 +136,7 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		await expect( dialog.locator( '[aria-live]' ) ).toBeEmpty();
 	} );
 
-	test( 'resets a returning caption after restoring its scrolling box', async ( {
+	test( 'resets the dialog scroll position on navigation and reopening', async ( {
 		page,
 	} ) => {
 		const dialog = page.getByRole( 'dialog' );
@@ -147,46 +147,35 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		} );
 		await next.click();
 		await expect( caption ).toContainText( 'Long caption' );
-		await caption.evaluate( ( element ) => {
+		await dialog.evaluate( ( element ) => {
 			element.scrollTop = element.scrollHeight;
 		} );
 		await expect
-			.poll( () => caption.evaluate( ( element ) => element.scrollTop ) )
+			.poll( () => dialog.evaluate( ( element ) => element.scrollTop ) )
 			.toBeGreaterThan( 0 );
 		await next.click();
 		await expect( caption ).toBeHidden();
-
-		// A hidden caption has no scrolling box, so its scrollTop setter can
-		// silently ignore a reset even though its getter reports zero.
-		await caption.evaluate( ( element ) => {
-			const descriptor = Object.getOwnPropertyDescriptor(
-				Element.prototype,
-				'scrollTop'
-			)!;
-			Object.defineProperty( element, 'scrollTop', {
-				configurable: true,
-				get() {
-					return descriptor.get!.call( this );
-				},
-				set( value ) {
-					this.setAttribute(
-						'data-reset-with-scrolling-box',
-						String( this.getClientRects().length > 0 )
-					);
-					descriptor.set!.call( this, value );
-				},
-			} );
-		} );
+		await expect
+			.poll( () => dialog.evaluate( ( element ) => element.scrollTop ) )
+			.toBe( 0 );
 		await dialog
 			.getByRole( 'button', { name: 'Previous', exact: true } )
 			.click();
 		await expect( caption ).toBeVisible();
-		await expect( caption ).toHaveAttribute(
-			'data-reset-with-scrolling-box',
-			'true'
-		);
 		await expect
-			.poll( () => caption.evaluate( ( element ) => element.scrollTop ) )
+			.poll( () => dialog.evaluate( ( element ) => element.scrollTop ) )
+			.toBe( 0 );
+		await dialog.evaluate( ( element ) => {
+			element.scrollTop = element.scrollHeight;
+		} );
+		await page.keyboard.press( 'Escape' );
+		await expect( dialog ).toBeHidden();
+		await page
+			.getByRole( 'button', { name: 'Enlarge 2 of 3', exact: true } )
+			.click();
+		await expect( caption ).toContainText( 'Long caption' );
+		await expect
+			.poll( () => dialog.evaluate( ( element ) => element.scrollTop ) )
 			.toBe( 0 );
 	} );
 
@@ -229,14 +218,17 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		test( `keeps a long caption readable at ${ viewport.width }x${ viewport.height }`, async ( {
 			page,
 		} ) => {
+			await page.emulateMedia( { reducedMotion: 'reduce' } );
 			await page.setViewportSize( viewport );
 			const dialog = page.getByRole( 'dialog' );
 			await dialog
 				.getByRole( 'button', { name: 'Next', exact: true } )
 				.click();
 			const caption = dialog.locator( 'figcaption' );
-			await expect( caption ).toBeInViewport( { ratio: 1 } );
-			await expect( caption ).toHaveAttribute( 'tabindex', '0' );
+			await expect( caption ).toBeInViewport();
+			await expect( caption ).not.toHaveAttribute( 'tabindex' );
+			await expect( caption ).toHaveCSS( 'overflow-y', 'visible' );
+			await expect( caption ).toHaveCSS( 'transform', 'none' );
 			await expect(
 				dialog.getByRole( 'button', { name: 'Close', exact: true } )
 			).toBeInViewport( { ratio: 1 } );
@@ -249,17 +241,46 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 			expect( captionBounds!.y ).toBeGreaterThanOrEqual(
 				imageBounds!.y + imageBounds!.height
 			);
+			const pageScroll = await page.evaluate( () => window.scrollY );
 			await dialog
-				.getByRole( 'button', { name: 'Previous', exact: true } )
+				.getByRole( 'button', { name: 'Next', exact: true } )
 				.focus();
 			await page.keyboard.press( 'Tab' );
-			await expect( caption ).toBeFocused();
+			await expect( dialog ).toBeFocused();
 			await page.keyboard.press( 'End' );
 			await expect
 				.poll( () =>
-					caption.evaluate( ( element ) => element.scrollTop )
+					dialog.evaluate( ( element ) => element.scrollTop )
 				)
 				.toBeGreaterThan( 0 );
+			for ( const name of [ 'Close', 'Previous', 'Next' ] ) {
+				const button = dialog.getByRole( 'button', {
+					name,
+					exact: true,
+				} );
+				await expect( button ).toBeInViewport( { ratio: 1 } );
+				const buttonBounds = await button.boundingBox();
+				expect(
+					buttonBounds!.x + buttonBounds!.width <= captionBounds!.x ||
+						buttonBounds!.x >=
+							captionBounds!.x + captionBounds!.width
+				).toBe( true );
+			}
+			expect(
+				await caption.evaluate( ( element ) => element.scrollTop )
+			).toBe( 0 );
+			expect( await page.evaluate( () => window.scrollY ) ).toBe(
+				pageScroll
+			);
+			await page.keyboard.press( 'Home' );
+			await expect
+				.poll( () =>
+					dialog.evaluate( ( element ) => element.scrollTop )
+				)
+				.toBe( 0 );
+			await dialog
+				.getByRole( 'button', { name: 'Previous', exact: true } )
+				.focus();
 			await page.keyboard.press( 'Tab' );
 			await expect(
 				caption.getByRole( 'link', { name: 'Last credit' } )
@@ -275,7 +296,7 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 				.click();
 			await expect
 				.poll( () =>
-					caption.evaluate( ( element ) => element.scrollTop )
+					dialog.evaluate( ( element ) => element.scrollTop )
 				)
 				.toBe( 0 );
 		} );
@@ -318,6 +339,34 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 				)
 			);
 		} );
+		await expect( caption ).toContainText( 'Long caption' );
+		const image = dialog
+			.locator( '.lightbox-image-container' )
+			.last()
+			.locator( 'img' );
+		const imageScrollPrevented = await image.evaluate( ( element ) => {
+			element.dispatchEvent(
+				Object.assign( new Event( 'touchstart', { bubbles: true } ), {
+					touches: [ { clientX: 200, clientY: 300 } ],
+				} )
+			);
+			const move = new Event( 'touchmove', {
+				bubbles: true,
+				cancelable: true,
+			} );
+			element.dispatchEvent( move );
+			element.dispatchEvent(
+				Object.assign(
+					new Event( 'touchend', {
+						bubbles: true,
+						cancelable: true,
+					} ),
+					{ changedTouches: [ { clientX: 190, clientY: 100 } ] }
+				)
+			);
+			return move.defaultPrevented;
+		} );
+		expect( imageScrollPrevented ).toBe( false );
 		await expect( caption ).toContainText( 'Long caption' );
 	} );
 } );

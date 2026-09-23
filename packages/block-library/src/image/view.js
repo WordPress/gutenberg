@@ -36,7 +36,6 @@ const touchStartEvent = {
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
-	'.lightbox-caption[tabindex="0"]',
 	'.lightbox-caption a[href]',
 ];
 
@@ -220,12 +219,13 @@ const { state, actions, callbacks } = store(
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
-				document.querySelector(
-					'.wp-lightbox-overlay .lightbox-caption'
-				).scrollTop = 0;
+				document.querySelector( '.wp-lightbox-overlay' ).scrollTop = 0;
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
+					// Restore the image's starting position for the closing animation.
+					document.querySelector( '.wp-lightbox-overlay' ).scrollTop =
+						0;
 					state.overlayEnabled = false;
 					state.currentLiveText = '';
 
@@ -295,6 +295,19 @@ const { state, actions, callbacks } = store(
 								element.tabIndex >= 0 &&
 								element.getClientRects().length
 						);
+						// Keep the dialog's scrolling surface reachable by keyboard,
+						// without making the semantic caption a focusable container.
+						// Ignore temporary overflow from the image's zoom animation.
+						const content =
+							event.currentTarget.querySelector(
+								'.lightbox-content'
+							);
+						if (
+							content.offsetTop + content.offsetHeight >
+							event.currentTarget.clientHeight + 1
+						) {
+							focusableElements.unshift( event.currentTarget );
+						}
 						const currentIndex = focusableElements.indexOf(
 							event.target
 						);
@@ -309,11 +322,11 @@ const { state, actions, callbacks } = store(
 				}
 			} ),
 			handleTouchMove: withSyncEvent( ( event ) => {
-				// Captions scroll independently. Outside them, prevent page scrolling
-				// so the zoom animation keeps its original position.
+				// Let the image and caption scroll together inside the dialog.
+				// Outside that content, keep the underlying page in place.
 				if (
 					state.overlayEnabled &&
-					! event.target.closest( '.lightbox-caption' )
+					! event.target.closest( '.lightbox-content' )
 				) {
 					event.preventDefault();
 				}
@@ -570,41 +583,50 @@ const { state, actions, callbacks } = store(
 					verticalPadding = 80;
 				}
 
-				const caption = document.querySelector(
-					'.wp-lightbox-overlay .lightbox-caption'
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
 				);
+				const caption = overlay.querySelector( '.lightbox-caption' );
+				const controlWidth = Math.max(
+					...Array.from(
+						overlay.querySelectorAll(
+							'.wp-lightbox-close-button, .wp-lightbox-navigation-button'
+						),
+						( button ) => button.offsetWidth
+					)
+				);
+				const hasCaptionChanged =
+					caption?.dataset.imageId !== state.selectedImageId;
 				let captionSpace = 0;
 				if ( caption ) {
-					const hasCaptionChanged =
-						caption.dataset.imageId !== state.selectedImageId;
 					if ( hasCaptionChanged ) {
 						// This HTML was sanitized with wp_kses_post on the server.
 						caption.innerHTML = state.selectedImage.caption || '';
 						caption.dataset.imageId = state.selectedImageId;
 					}
 					caption.hidden = ! state.selectedImage.caption;
+					// Leave room beside the text for the fixed dialog controls.
 					caption.style.width = `${ Math.max(
 						1,
-						window.innerWidth - Math.max( horizontalPadding, 48 )
+						overlay.clientWidth -
+							Math.max(
+								horizontalPadding,
+								( controlWidth + 32 ) * 2
+							)
 					) }px`;
 					if ( ! caption.hidden ) {
-						captionSpace = caption.offsetHeight + 16;
+						// Reserve an initial caption preview, but let the full text
+						// flow below the image in the dialog's single scroll area.
+						captionSpace =
+							Math.min(
+								caption.offsetHeight,
+								window.innerHeight / 4
+							) + 16;
 						// Keep room for the image on short viewports, while leaving
 						// 56px above and below for the close and navigation buttons.
 						if ( window.innerHeight < 480 ) {
 							verticalPadding = Math.min( verticalPadding, 112 );
 						}
-					}
-					// Only add a tab stop when the caption needs keyboard scrolling.
-					if ( caption.scrollHeight > caption.clientHeight ) {
-						caption.tabIndex = 0;
-					} else {
-						caption.removeAttribute( 'tabindex' );
-					}
-					if ( hasCaptionChanged && ! caption.hidden ) {
-						// Restore the scrolling box first. A reset while hidden can
-						// be ignored when returning from an uncaptioned image.
-						caption.scrollTop = 0;
 					}
 				}
 
@@ -645,6 +667,7 @@ const { state, actions, callbacks } = store(
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
 					--wp--lightbox-caption-space: ${ captionSpace }px;
+					--wp--lightbox-content-padding: ${ verticalPadding / 2 }px;
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
@@ -656,6 +679,9 @@ const { state, actions, callbacks } = store(
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
 				`;
+				if ( hasCaptionChanged ) {
+					overlay.scrollTop = 0;
+				}
 			},
 			setButtonStyles() {
 				const { ref } = getElement();
@@ -776,11 +802,18 @@ const { state, actions, callbacks } = store(
 			initCaption() {
 				const { ref } = getElement();
 				// Reflow when fonts or caption images load after the dialog opens.
-				const observer = new window.ResizeObserver(
-					withScope( callbacks.setOverlayStyles )
-				);
+				// Schedule layout writes outside the observer's delivery cycle.
+				const updateStyles = withScope( callbacks.setOverlayStyles );
+				let frame;
+				const observer = new window.ResizeObserver( () => {
+					window.cancelAnimationFrame( frame );
+					frame = window.requestAnimationFrame( updateStyles );
+				} );
 				observer.observe( ref );
-				return () => observer.disconnect();
+				return () => {
+					observer.disconnect();
+					window.cancelAnimationFrame( frame );
+				};
 			},
 			initTriggerButton() {
 				const { imageId } = getContext();
