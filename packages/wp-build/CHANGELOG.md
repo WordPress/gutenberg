@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.24.0 (2026-09-23)
+
 ### Enhancements
 
 -   Carry a widget's `attributes` from `widget.json` into `build/widgets/registry.php` ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).

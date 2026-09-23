@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.56.0 (2026-09-23)
+
 ### Enhancements
 
 -   Optimized store listener registration and execution ([#82842](https://github.com/WordPress/gutenberg/pull/82842)).
