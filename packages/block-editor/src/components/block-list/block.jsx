@@ -27,7 +27,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
-import { getPerBlockAttributeUpdates } from '../../utils/object';
+import { getMultiSelectionAttributeUpdates } from '../../utils/multi-selection-attributes';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -257,7 +257,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( nextAttributes ) {
-			const { getMultiSelectedBlockClientIds, getBlocksByClientId } =
+			const { getMultiSelectedBlockClientIds, getBlockAttributes } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
@@ -267,23 +267,33 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					? nextAttributes( attributes )
 					: nextAttributes;
 
-			if ( multiSelectedBlockClientIds.length > 0 ) {
-				const updates = getPerBlockAttributeUpdates(
-					attributes,
-					newAttributes,
-					getBlocksByClientId( multiSelectedBlockClientIds )
-				);
-				if ( updates ) {
-					updateBlockAttributes(
-						multiSelectedBlockClientIds,
-						updates,
-						{
-							uniqueByBlock: true,
-						}
-					);
-				}
-			} else {
+			if ( ! multiSelectedBlockClientIds.length ) {
 				updateBlockAttributes( clientId, newAttributes );
+				return;
+			}
+
+			// Only the first block of a multi-selection renders its inspector
+			// and toolbar, so this update describes that block's attributes.
+			// Spread it across the selection as the change it made, so the
+			// other blocks keep the attributes they do not share.
+			const attributesByClientId = Object.fromEntries(
+				multiSelectedBlockClientIds.map( ( selectedClientId ) => [
+					selectedClientId,
+					getBlockAttributes( selectedClientId ) ?? {},
+				] )
+			);
+			const updatesByClientId = getMultiSelectionAttributeUpdates(
+				attributes ?? {},
+				newAttributes ?? {},
+				attributesByClientId
+			);
+
+			if ( updatesByClientId ) {
+				updateBlockAttributes(
+					multiSelectedBlockClientIds,
+					updatesByClientId,
+					{ uniqueByBlock: true }
+				);
 			}
 		},
 		onInsertBlocks( blocks, index ) {
