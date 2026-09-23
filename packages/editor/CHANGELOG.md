@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+
 ## 15.1.0 (2026-09-23)
 
 ### Enhancements
