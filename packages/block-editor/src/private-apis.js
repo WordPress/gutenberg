@@ -6,11 +6,10 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	searchItems,
-} from './components/inserter/search-items';
+} from './utils/search-ranking';
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
@@ -95,8 +94,7 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getRichTextValues,
 	PrivateQuickInserter,
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
