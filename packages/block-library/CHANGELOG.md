@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. The server no longer renders the autoplay parameters into the iframe source, and a new view module adds them back when motion is allowed ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
 -   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
 -   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
