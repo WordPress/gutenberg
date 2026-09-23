@@ -246,17 +246,11 @@ export default async function fetchLinkSuggestions(
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
 
-	// A search narrowed to one type comes from a single request, so `perPage` already bounds it
-	// and `page` pages through it. An unscoped search merges four requests, which cannot be
-	// paginated coherently — a result's place is not known until every request has been ranked —
-	// so cutting it would discard results that nothing could ever ask for again.
-	//
-	// Returning all of them instead means dropping the ones that do not answer the search at all.
 	// WordPress matches a post's body and excerpt as well as its title, so an unscoped search
-	// returns titles with no sign of what was typed in them, and unbounded they would fill the
-	// list. A title is kept when it has every word that was typed, wherever they sit in it —
-	// the ranking below prefers them together, but a title is still an answer with them apart.
-	// See https://github.com/WordPress/gutenberg/issues/83372.
+	// returns titles with no sign of what was typed in them. Since it is returned whole below,
+	// those would fill the list. A title is kept when it has every word that was typed, wherever
+	// they sit in it: the ranking prefers them together, but a title is still an answer with them
+	// apart. See https://github.com/WordPress/gutenberg/issues/83372.
 	//
 	// A narrowed search keeps everything WordPress sent, so that the caller's page sizes still
 	// add up to the `X-WP-Total` it reports.
@@ -274,8 +268,13 @@ export default async function fetchLinkSuggestions(
 
 	results = sortResults( results, search );
 
-	// Only an unscoped search is unbounded. With nothing typed there is no search to be an answer
-	// to, so those results are a preview and there is nothing in them to lose by cutting.
+	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
+	// through it. An unscoped search merges four, which cannot be paginated coherently — a
+	// result's place is not known until every request has been ranked, and `page` applies to each
+	// request separately — so cutting it would discard results nothing could ask for again.
+	//
+	// With nothing typed there is no search to answer, so those results are a preview and there is
+	// nothing in them to lose by cutting.
 	if ( type || ! search ) {
 		results = results.slice( 0, perPage );
 	}
@@ -286,16 +285,19 @@ export default async function fetchLinkSuggestions(
 /**
  * How well a title answers what was typed.
  *
- * The search string is compared as typed, not word by word: a title "contains" it when the whole
- * string appears somewhere in the title, and it counts for more when the title begins with it.
- * Beginning with what was typed is the clearest sign a title is the thing being looked for.
+ * The search is compared as the string it was typed as, not word by word: a title contains it when
+ * the whole string appears somewhere in the title, and beginning with it is the clearest sign the
+ * title is the thing being looked for.
  *
  * @param title
  * @param search
  *
- * @return 2 when the title begins with the search, 1 when it contains it, otherwise 0.
+ * @return Whether the title contains the search, and whether it begins with it.
  */
-function getMatchRank( title: string, search: string ): number {
+function getTitleMatch(
+	title: string,
+	search: string
+): { contains: boolean; begins: boolean } {
 	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
 	// written with straight ones. Compare them as the same character.
 	const plain = ( text: string ) =>
@@ -309,14 +311,13 @@ function getMatchRank( title: string, search: string ): number {
 	const needle = plain( search );
 
 	if ( ! haystack || ! needle ) {
-		return 0;
+		return { contains: false, begins: false };
 	}
 
-	if ( haystack.startsWith( needle ) ) {
-		return 2;
-	}
-
-	return haystack.includes( needle ) ? 1 : 0;
+	return {
+		contains: haystack.includes( needle ),
+		begins: haystack.startsWith( needle ),
+	};
 }
 
 /**
@@ -394,63 +395,65 @@ function getTypeWeight( result: SearchResult ): number {
  * @param results
  * @param search
  */
+/**
+ * How much of the search a title covers.
+ *
+ * Counts how much of the search the title covers, not how much of the title the search covers: a
+ * title is not a worse answer for having more words in it, and saying the same word twice does not
+ * make it a better one.
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return 10 when every word typed is in the title whole, less as fewer are.
+ */
+function getCoverage( title: string, searchTokens: string[] ): number {
+	if ( ! title || ! searchTokens.length ) {
+		return 0;
+	}
+
+	const titleTokens = tokenize( title );
+
+	const wholeWords = searchTokens.filter( ( searchToken ) =>
+		titleTokens.includes( searchToken )
+	).length;
+
+	// A word typed that only appears inside a longer one, as "coffee" does in "coffeehouse", is
+	// worth much less than the word itself.
+	const partialWords = searchTokens.filter(
+		( searchToken ) =>
+			! titleTokens.includes( searchToken ) &&
+			titleTokens.some( ( titleToken ) =>
+				titleToken.includes( searchToken )
+			)
+	).length;
+
+	return ( wholeWords * 10 + partialWords ) / searchTokens.length;
+}
+
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
-	// Give each result a unique key to avoid duplicate ids from different tables
-	// overwriting another's score.
-	const scoreKey = ( result: SearchResult ) =>
-		`${ result.kind }:${ result.type }:${ result.id }`;
+	const ranked = results.map( ( result ) => ( {
+		result,
+		...getTitleMatch( result.title, search ),
+		type: getTypeWeight( result ),
+		score: getCoverage( result.title, searchTokens ),
+	} ) );
 
-	const scores = {};
-	const matches = {};
-	for ( const result of results ) {
-		matches[ scoreKey( result ) ] = getMatchRank( result.title, search );
-
-		if ( result.title && searchTokens.length ) {
-			const titleTokens = tokenize( result.title );
-
-			// Count how much of the search the title covers, not how much of the title the search
-			// covers. A title is not a worse answer for having more words in it, and saying the same
-			// word twice does not make it a better one.
-			const wholeWords = searchTokens.filter( ( searchToken ) =>
-				titleTokens.includes( searchToken )
-			).length;
-
-			// A word typed that only appears inside a longer one, as "coffee" does in
-			// "coffeehouse", is worth much less than the word itself.
-			const partialWords = searchTokens.filter(
-				( searchToken ) =>
-					! titleTokens.includes( searchToken ) &&
-					titleTokens.some( ( titleToken ) =>
-						titleToken.includes( searchToken )
-					)
-			).length;
-
-			scores[ scoreKey( result ) ] =
-				( wholeWords * 10 + partialWords ) / searchTokens.length;
-		} else {
-			scores[ scoreKey( result ) ] = 0;
-		}
-	}
-
-	// A title that does not contain what was typed is not an answer to the search, whatever its
-	// type, so this is compared first.
-	const contains = ( result: SearchResult ) =>
-		matches[ scoreKey( result ) ] > 0 ? 1 : 0;
-
-	// Compared after the type: an attachment is named after its file, so it very often begins
-	// with what was typed, and that must not lift it above a page.
-	const begins = ( result: SearchResult ) =>
-		matches[ scoreKey( result ) ] === 2 ? 1 : 0;
-
-	return results.sort(
+	ranked.sort(
 		( a, b ) =>
-			contains( b ) - contains( a ) ||
-			getTypeWeight( b ) - getTypeWeight( a ) ||
-			begins( b ) - begins( a ) ||
-			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+			// A title that does not contain what was typed is not an answer to the search, whatever
+			// its type.
+			Number( b.contains ) - Number( a.contains ) ||
+			b.type - a.type ||
+			// After the type: an attachment is named after its file, so it very often begins with
+			// what was typed, and that must not lift it above a page.
+			Number( b.begins ) - Number( a.begins ) ||
+			b.score - a.score
 	);
+
+	return ranked.map( ( { result } ) => result );
 }
 
 /**
