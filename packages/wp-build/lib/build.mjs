@@ -1857,10 +1857,12 @@ async function buildRoutes(
 /**
  * Build a single widget's files.
  *
- * @param {string} widgetName Widget name.
+ * @param {string}  widgetName          Widget name.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildWidget( widgetName ) {
+async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 	const startTime = Date.now();
 	const widgetDir = path.join( ROOT_DIR, 'widgets', widgetName );
 	const outputDir = path.join( BUILD_DIR, 'widgets', widgetName );
@@ -1878,8 +1880,8 @@ async function buildWidget( widgetName ) {
 		} );
 
 		if ( renderEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			// Build minified and (unless skipped) non-minified versions in parallel
+			const renderBuilds = [
 				esbuild.build( {
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
@@ -1898,25 +1900,32 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
-					entryPoints: renderEntryPoints,
-					outfile: path.join( outputDir, 'render.js' ),
-					bundle: true,
-					format: 'esm',
-					target: getEsbuildTarget(),
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						...createStyleBundlingPlugins( widgetDir ),
-						wordpressExternalsPlugin(
-							'render.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! noScriptDebug ) {
+				renderBuilds.push(
+					esbuild.build( {
+						entryPoints: renderEntryPoints,
+						outfile: path.join( outputDir, 'render.js' ),
+						bundle: true,
+						format: 'esm',
+						target: getEsbuildTarget(),
+						minify: false,
+						define: getDefine( true ),
+						plugins: [
+							...createStyleBundlingPlugins( widgetDir ),
+							wordpressExternalsPlugin(
+								'render.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( renderBuilds );
 		}
 	}
 
@@ -1928,8 +1937,8 @@ async function buildWidget( widgetName ) {
 		} );
 
 		if ( widgetEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			// Build minified and (unless skipped) non-minified versions in parallel
+			const widgetBuilds = [
 				esbuild.build( {
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
@@ -1948,25 +1957,32 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
-					entryPoints: widgetEntryPoints,
-					outfile: path.join( outputDir, 'widget.js' ),
-					bundle: true,
-					format: 'esm',
-					target: getEsbuildTarget(),
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						styleRuntimeAliasPlugin(),
-						wordpressExternalsPlugin(
-							'widget.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! noScriptDebug ) {
+				widgetBuilds.push(
+					esbuild.build( {
+						entryPoints: widgetEntryPoints,
+						outfile: path.join( outputDir, 'widget.js' ),
+						bundle: true,
+						format: 'esm',
+						target: getEsbuildTarget(),
+						minify: false,
+						define: getDefine( true ),
+						plugins: [
+							styleRuntimeAliasPlugin(),
+							wordpressExternalsPlugin(
+								'widget.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( widgetBuilds );
 		}
 	}
 
@@ -1976,9 +1992,11 @@ async function buildWidget( widgetName ) {
 /**
  * Build all discovered widgets.
  *
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<void>}
  */
-async function buildAllWidgets() {
+async function buildAllWidgets( { noScriptDebug = false } = {} ) {
 	console.log( '\n🧩 Phase 4: Building widgets...\n' );
 
 	const widgets = getAllWidgets( ROOT_DIR );
@@ -1994,7 +2012,9 @@ async function buildAllWidgets() {
 
 	await Promise.all(
 		widgets.map( async ( widgetName ) => {
-			const buildTime = await buildWidget( widgetName );
+			const buildTime = await buildWidget( widgetName, {
+				noScriptDebug,
+			} );
 			console.log(
 				`   ✔ Built widget ${ widgetName } (${ buildTime }ms)`
 			);
@@ -2429,7 +2449,7 @@ async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 	await buildRoutes( experimentalPageIds, { noScriptDebug } );
 
 	// Build widgets
-	await buildAllWidgets();
+	await buildAllWidgets( { noScriptDebug } );
 
 	// Collect widget data for PHP generation
 	const widgets = collectWidgets();

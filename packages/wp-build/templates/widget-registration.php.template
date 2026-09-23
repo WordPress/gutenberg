@@ -24,7 +24,10 @@ function {{PREFIX}}_register_widget_modules() {
 	}
 
 	$build_constants = require __DIR__ . '/constants.php';
-	$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+	$extension       = '.min.js';
+	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+		$extension = '.js';
+	}
 
 	foreach ( $widgets as $widget ) {
 		$widget_name = $widget['dir_name'];
