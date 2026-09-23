@@ -243,14 +243,19 @@
 			record( document, topTitle, 'TOP load' )
 		);
 		document.addEventListener( 'readystatechange', () =>
-			record( document, topTitle, 'TOP readyState=' + document.readyState )
+			record(
+				document,
+				topTitle,
+				'TOP readyState=' + document.readyState
+			)
 		);
 		if ( window.visualViewport ) {
 			window.visualViewport.addEventListener( 'resize', () =>
 				record(
 					document,
 					topTitle,
-					'TOP viewport h=' + Math.round( window.visualViewport.height )
+					'TOP viewport h=' +
+						Math.round( window.visualViewport.height )
 				)
 			);
 		}
@@ -332,22 +337,22 @@
 						.map( ( m ) =>
 							m.type === 'childList'
 								? 'in ' +
-								  describeNode( m.target ) +
-								  ' +[' +
-								  Array.from( m.addedNodes )
+									describeNode( m.target ) +
+									' +[' +
+									Array.from( m.addedNodes )
 										.map( describeNode )
 										.join( ' ' ) +
-								  '] -[' +
-								  Array.from( m.removedNodes )
+									'] -[' +
+									Array.from( m.removedNodes )
 										.map( describeNode )
 										.join( ' ' ) +
-								  ']'
+									']'
 								: 'data ' +
-								  describeNode( m.target ) +
-								  ' was ' +
-								  JSON.stringify(
+									describeNode( m.target ) +
+									' was ' +
+									JSON.stringify(
 										( m.oldValue || '' ).slice( 0, 4 )
-								  )
+									)
 						)
 						.join( ', ' )
 			)
