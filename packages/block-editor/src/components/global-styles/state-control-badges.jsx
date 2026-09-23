@@ -90,12 +90,7 @@ export default function StateControlBadges( {
 			wrap="wrap"
 		>
 			{ activeStates.map( ( state ) => (
-				<Badge
-					key={ state.key }
-					intent="informational"
-				>
-					{ state.label }
-				</Badge>
+				<Badge key={ state.key }>{ state.label }</Badge>
 			) ) }
 			<Popover.Root>
 				<Popover.Trigger
