@@ -40,6 +40,14 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 			}
 		}
 		gutenberg_register_default_icon_collections();
+
+		/*
+		 * Replaying registration has to go through the Gutenberg registry, since only
+		 * it accepts the `keywords` property; the base registry rejects it and would
+		 * register no icon at all. On a normal request the `init` priority 1 override
+		 * has already done this, but the singleton is reset between suites.
+		 */
+		WP_Icons_Registry_Gutenberg::get_instance();
 		gutenberg_register_default_icons();
 
 		$collections = array(
