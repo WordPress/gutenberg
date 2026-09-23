@@ -584,8 +584,8 @@ function findNoteThread( noteId, container, additionalSelector ) {
 	// A thread without a noteId is a new note thread.
 	const threadSelector =
 		noteId && noteId !== 'new'
-			? `[role=treeitem][id="note-thread-${ noteId }"]`
-			: '[role=treeitem]:not([id])';
+			? `[role=listitem][id="note-thread-${ noteId }"]`
+			: '[role=listitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
 		: threadSelector;

@@ -210,9 +210,13 @@ export function NoteThread( {
 				}
 			} }
 			tabIndex={ 0 }
-			role="treeitem"
+			role="listitem"
 			aria-label={ ariaLabel }
-			aria-expanded={ isSelected }
+			/*
+			 * `aria-current` rather than `aria-expanded`: a list item supports
+			 * the former, and the selected thread is the current one in the set.
+			 */
+			aria-current={ isSelected }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-to-note"
@@ -289,7 +293,7 @@ export function NoteThread( {
 				/>
 			) }
 			{ isSelected && (
-				<NoteCard role="treeitem">
+				<NoteCard>
 					<NoteForm
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {

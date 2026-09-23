@@ -203,11 +203,7 @@ export function Note( {
 	) : null;
 
 	return (
-		<NoteCard
-			note={ note }
-			actions={ actions }
-			role={ note.parent !== 0 ? 'treeitem' : undefined }
-		>
+		<NoteCard note={ note } actions={ actions }>
 			{ body }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
