@@ -23,6 +23,8 @@
 
 ### Bug Fixes
 
+-   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
+-   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
@@ -30,6 +32,7 @@
 -   Block Toolbar: Show the parent block selector for blocks inside patterns and `contentOnly` locked blocks. It selects the nearest parent shown in List View and the breadcrumb ([#82912](https://github.com/WordPress/gutenberg/pull/82912)).
 -   In-between inserter: Show the inserter between blocks on a wrapped line of a horizontal container, such as the Buttons, Row, Gallery and Navigation blocks ([#83276](https://github.com/WordPress/gutenberg/pull/83276)).
 -   In-between inserter: Resolve the hovered block through the block refs rather than the container's DOM children, so the inserter also appears in lists whose blocks apply their block props to an inner element, such as Social Icons ([#83327](https://github.com/WordPress/gutenberg/pull/83327)).
+-   In HEIC-only upload mode, route files to the HEIC conversion by what they contain rather than by the MIME type the browser infers from their name, so a HEIC photo saved as `.jpg` or `.png` is no longer handed to a server-side path that cannot convert it either ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
 
 ### Internal
 
