@@ -14,6 +14,13 @@
 		"allow-plugins": {
 			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"policy": {
+			"advisories": {
+				"ignore-id": {
+					"PKSA-mh9b-91zm-m1gy": "CVE-2026-45293 only affects the WordPress.WP.EnqueuedResourceParameters sniff included in the WordPress and WordPress-Extra rulesets, all of which are not used."
+				}
+			}
 		}
 	},
 	"require-dev": {
