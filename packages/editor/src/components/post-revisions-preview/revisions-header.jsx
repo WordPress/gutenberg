@@ -2,6 +2,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 import { __, _x, isRTL } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { drawerLeft, drawerRight, seen } from '@wordpress/icons';
 import HeaderSkeleton from '../header/header-skeleton';
 import MoreMenu from '../more-menu';
@@ -88,7 +89,10 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 						__next40pxDefaultSize
 						variant="secondary"
 						size="compact"
-						onClick={ () => setCurrentRevisionId( null ) }
+						onClick={ () => {
+							setCurrentRevisionId( null );
+							speak( __( 'Revisions exited.' ), 'assertive' );
+						} }
 					>
 						{ __( 'Exit' ) }
 					</Button>
