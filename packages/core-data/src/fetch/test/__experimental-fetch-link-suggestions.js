@@ -141,6 +141,36 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					} ) )
 				);
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post':
+				return Promise.resolve( [
+					...Array.from( { length: 5 }, ( _, index ) => ( {
+						id: 900 + index,
+						title: `Tea Leaves ${ index }`,
+						url: `http://wordpress.local/tea-leaves-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+					// Holds neither word; WordPress matched a body.
+					...Array.from( { length: 10 }, ( _, index ) => ( {
+						id: 950 + index,
+						title: `Unrelated ${ index }`,
+						url: `http://wordpress.local/unrelated-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+				] );
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=term':
+				return Promise.resolve(
+					// Holds "leaves" but not "tea".
+					Array.from( { length: 20 }, ( _, index ) => ( {
+						id: 1000 + index,
+						title: `Leaves ${ index }`,
+						url: `http://wordpress.local/leaves-${ index }/`,
+						type: 'category',
+					} ) )
+				);
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post-format':
+			case '/wp/v2/media?search=tea%20leaves&per_page=20':
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
 			case '/wp/v2/media?search=few%20notes&per_page=20':
 			case '/wp/v2/search?search=many&per_page=20&type=post-format':
@@ -323,7 +353,7 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'unscoped searches are not limited by the per page limit and return all results', () => {
+	it( 'returns every title holding the search, past the default limit', () => {
 		// No number named, so the default of 20 is what a page holds rather
 		// than what was asked for: all 25 titles holding the word come back.
 		return fetchLinkSuggestions( 'many', {} ).then( ( suggestions ) =>
@@ -359,6 +389,25 @@ describe( 'fetchLinkSuggestions', () => {
 				expect( startsWith( titles.slice( 10 ), 'Unrelated' ) ).toBe(
 					true
 				);
+			}
+		);
+	} );
+
+	it( 'keeps every title matching a word typed, past the per page limit', () => {
+		// 5 titles hold both words typed and 20 hold one of them, so 25 match
+		// and none of them can be cut, though the limit is 20. The 10 holding
+		// neither word are what the cut takes.
+		const countStartingWith = ( titles, prefix ) =>
+			titles.filter( ( title ) => title.startsWith( prefix ) ).length;
+
+		return fetchLinkSuggestions( 'tea leaves', {} ).then(
+			( suggestions ) => {
+				const titles = suggestions.map( ( { title } ) => title );
+
+				expect( titles ).toHaveLength( 25 );
+				expect( countStartingWith( titles, 'Tea Leaves' ) ).toBe( 5 );
+				expect( countStartingWith( titles, 'Leaves' ) ).toBe( 20 );
+				expect( countStartingWith( titles, 'Unrelated' ) ).toBe( 0 );
 			}
 		);
 	} );
