@@ -117,6 +117,20 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 			case '/wp/v2/search?search=few&per_page=20&type=post-format':
 			case '/wp/v2/media?search=few&per_page=20':
 				return Promise.resolve( [] );
+			case '/wp/v2/search?search=&per_page=3&type=post':
+			case '/wp/v2/search?search=&per_page=3&type=term':
+			case '/wp/v2/search?search=&per_page=3&type=post-format':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 500 + index,
+						title: `Initial ${ index }`,
+						url: `http://wordpress.local/initial-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) )
+				);
+			case '/wp/v2/media?search=&per_page=3':
+				return Promise.resolve( [] );
 			case '/wp/v2/media?search=&per_page=20':
 				return Promise.resolve( [
 					{
@@ -315,6 +329,18 @@ describe( 'fetchLinkSuggestions', () => {
 	} );
 
 	describe( 'Initial search suggestions', () => {
+		it( 'limits unscoped initial suggestions to the per page count', () => {
+			// Nothing has been typed, so these are a preview rather than an
+			// answer to a search, and there is nothing to lose by bounding
+			// them. Without this an unscoped preview would show one page of
+			// each type at once.
+			return fetchLinkSuggestions( '', {
+				isInitialSuggestions: true,
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toHaveLength( 3 )
+			);
+		} );
+
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {
 				type: 'post',

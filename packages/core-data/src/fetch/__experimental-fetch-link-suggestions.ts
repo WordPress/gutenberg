@@ -265,7 +265,9 @@ export default async function fetchLinkSuggestions(
 
 	results = sortResults( results, search );
 
-	if ( type ) {
+	// Initial suggestions are bounded too. Nothing has been typed, so they are a preview rather
+	// than an answer to a search, and there is nothing in them to lose.
+	if ( type || searchOptions.isInitialSuggestions ) {
 		results = results.slice( 0, perPage );
 	}
 
@@ -351,9 +353,7 @@ function getSearchType( result: SearchResult ): SearchType {
  * @return The weight to add to the result's score.
  */
 function getTypeWeight( result: SearchResult ): number {
-	const rank = TYPE_ORDER.indexOf( getSearchType( result ) );
-
-	return rank === -1 ? 0 : TYPE_ORDER.length - rank;
+	return TYPE_ORDER.length - TYPE_ORDER.indexOf( getSearchType( result ) );
 }
 
 /**
@@ -373,10 +373,6 @@ function getTypeWeight( result: SearchResult ): number {
  * than a word found inside a longer one, plus a weight for the result's type. How much of the
  * *title* the search covers is deliberately not considered, so a long title is never marked down
  * for being long, and repeating a word never makes a title a better answer.
- *
- * The rest is sorted by scoring each result, where the score is the number of tokens in the title
- * that are also in the search query, divided by the total number of tokens in the title. This gives
- * us a score between 0 and 1, where 1 is a perfect match.
  *
  * @param results
  * @param search
@@ -427,8 +423,8 @@ export function sortResults( results: SearchResult[], search: string ) {
 	const contains = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] > 0 ? 1 : 0;
 
-	// Where the match sits is decided after the type, so naming an order drops the advantage a
-	// title would otherwise get from beginning with the search.
+	// Then whether it begins with what was typed, which outranks the score below and so cannot be
+	// outweighed by a better-placed type.
 	const begins = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] === 2 ? 1 : 0;
 
