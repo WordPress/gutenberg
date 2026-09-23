@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `URLInput`: Add an opt-in `closeSuggestionsOnNavigateOutside` prop that closes the suggestions list when focus moves outside the field, dismisses it on Escape without also closing an enclosing popover, and only opens the list while the field has focus ([#80879](https://github.com/WordPress/gutenberg/pull/80879)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes
