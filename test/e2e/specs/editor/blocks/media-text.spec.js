@@ -51,7 +51,7 @@ test.describe( 'Media & Text', () => {
 						borderTopWidth,
 						borderBottomWidth,
 						lineHeight,
-					} = getComputedStyle( el );
+					} = window.getComputedStyle( el );
 					const verticalChrome =
 						parseFloat( paddingTop ) +
 						parseFloat( paddingBottom ) +
