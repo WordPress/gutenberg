@@ -41,8 +41,12 @@
 
 -   `trashPost`, `permanentlyDeletePost`: Offer "Permanently delete" instead of "Trash" for posts without the `wp:action-trash` REST link. Requires WordPress 7.2 or the Gutenberg plugin ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
+
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 -   `MediaEdit`: Show a checkerboard background behind image previews, so images with transparent backgrounds stay visible, as in the classic featured image panel. ([#83846](https://github.com/WordPress/gutenberg/pull/83846))
+-   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
 ## 0.48.0 (2026-09-23)
 
@@ -58,9 +62,6 @@
 -   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
 -   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
 -   Featured image field: label the button that sets the image with the post type's `set_featured_image` label and title the DataViews media modal with its `featured_image` label, as the classic panel does. ([#83445](https://github.com/WordPress/gutenberg/pull/83445))
--   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
--   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
--   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
 
 ### Internal
 
