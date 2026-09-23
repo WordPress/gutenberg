@@ -353,13 +353,6 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'returns every title holding the search, past the default limit', () => {
-		// No number named, so the default of 20 is what a page holds rather
-		// than what was asked for: all 25 titles holding the word come back.
-		return fetchLinkSuggestions( 'many', {} ).then( ( suggestions ) =>
-			expect( suggestions ).toHaveLength( 25 )
-		);
-	} );
 
 	it( 'returns no more than the caller asked for', () => {
 		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
@@ -367,7 +360,7 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'fills the page with the titles that answer the search least well, last', () => {
+	it( 'returns at least 20 results even if not all have a word match in the title, ordered by best matches first', () => {
 		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
 		// neither. The 5 answers come first and are never cut, then the 5
 		// partial matches, then 10 of the rest fill the room left by a limit
@@ -393,7 +386,7 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'keeps every title matching a word typed, past the per page limit', () => {
+	it( 'keeps every title matching a word typed, past the per page limit on default searches', () => {
 		// 5 titles hold both words typed and 20 hold one of them, so 25 match
 		// and none of them can be cut, though the limit is 20. The 10 holding
 		// neither word are what the cut takes.
