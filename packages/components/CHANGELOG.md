@@ -19,6 +19,7 @@
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 -   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
+-   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
@@ -62,7 +63,6 @@
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `Draggable`: Render `__experimentalDragComponent` only while a drag is in progress, so long lists of draggables such as the block inserter no longer render a hidden drag preview per item ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
 -   `Flex`, `Grid`: Stop watching the viewport for props that are given a single value rather than an array of breakpoint values. Each instance previously called `window.matchMedia()` and subscribed a `resize` listener that could never change its result ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
--   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
