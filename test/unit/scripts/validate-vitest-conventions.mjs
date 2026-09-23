@@ -34,12 +34,6 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const require = createRequire( import.meta.url );
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
 const policyExceptions = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
@@ -47,8 +41,7 @@ const policyExceptions = JSON.parse(
 	)
 );
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	migration
+	discoverTestFiles( ROOT_DIR )
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const vitestTestSet = new Set( vitestTests );
@@ -56,11 +49,14 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
-		cwd: ROOT_DIR,
-		nodir: true,
-	} ),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...globSync(
+		'test/unit/config/**/*.vitest*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
+		{
+			cwd: ROOT_DIR,
+			nodir: true,
+		}
+	),
+	...globSync( 'test/unit/scripts/*.{mjs,mts}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
@@ -222,14 +218,14 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
 }
 
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
-		( file ) => /\.tsx?$/.test( file )
+		( file ) => /\.[cm]?tsx?$/.test( file )
 	);
 	if ( ! projectTypescriptTests.length ) {
 		continue;

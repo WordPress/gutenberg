@@ -8,7 +8,9 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Design System/Components/Form/SelectControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/SelectControl',
+	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,
@@ -19,6 +21,12 @@ const meta: Meta< typeof SelectControl > = {
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
