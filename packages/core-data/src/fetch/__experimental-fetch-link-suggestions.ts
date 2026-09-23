@@ -27,21 +27,28 @@ export type SearchOptions = {
 	subtype?: string;
 	/**
 	 * Result types to rank above the usual order, most wanted first. Everything
-	 * left out keeps its usual place below them.
+	 * left out keeps its usual place behind them.
 	 *
 	 * An entry is a search type, covering everything of that type, or a search
-	 * type with one subtype, covering only that subtype. A caller that edits one
-	 * kind of link leads with that kind:
+	 * type with one subtype, covering only that subtype. A caller that edits
+	 * one kind of link leads with that kind:
 	 *
 	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
 	 */
 	preferTypes?: TypeOrderEntry[];
 	/**
-	 * Which page of results to return.
+	 * Which page of results to return. Only meaningful for a search narrowed by `type`, which is
+	 * a single request; an unscoped search merges several and cannot be paged through.
 	 */
 	page?: number;
 	/**
-	 * Search results per page.
+	 * How many results to ask each request for, and at most how many to return. Naming a number
+	 * here is taken as asking for no more than that, and it is honoured.
+	 *
+	 * Left out, it defaults to 20, or 3 for initial suggestions — and an unscoped search may
+	 * return more. Such a search merges several requests and cannot be paged with `page`, so a
+	 * result it drops is one nothing could ask for again, and a title holding every word that was
+	 * typed is kept however many there are.
 	 */
 	perPage?: number;
 };
@@ -129,13 +136,14 @@ export default async function fetchLinkSuggestions(
 				}
 			: searchOptions;
 
-	const {
-		type,
-		subtype,
-		preferTypes,
-		page,
-		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
-	} = searchOptionsToUse;
+	const { type, subtype, preferTypes, page } = searchOptionsToUse;
+
+	// A caller that names a number is asking for at most that many, and gets them. One that names
+	// none is taking whatever a page holds, so it can be given more.
+	const asksForExactly = searchOptionsToUse.perPage !== undefined;
+	const perPage =
+		searchOptionsToUse.perPage ??
+		( searchOptions.isInitialSuggestions ? 3 : 20 );
 
 	const { disablePostFormats = false } = editorSettings;
 
@@ -256,59 +264,90 @@ export default async function fetchLinkSuggestions(
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
 
-	// A search narrowed to one type comes from a single request, so `perPage` already bounds it
-	// and `page` pages through it. An unscoped search merges four requests, which cannot be
-	// paginated coherently — a result's place is not known until every request has been ranked —
-	// so cutting it would discard results that nothing could ever ask for again.
-	//
-	// Returning all of them instead means dropping the ones that do not answer the search.
-	// WordPress matches a post's body and excerpt as well as its title, so an unscoped search
-	// returns titles with no sign of what was typed in them, and unbounded they would fill the
-	// list. See https://github.com/WordPress/gutenberg/issues/83372.
-	//
-	// A narrowed search is left alone: it is paginated, and its `X-WP-Total` count comes from
-	// WordPress, so dropping results here would leave the caller's page sizes and totals
-	// disagreeing with each other.
-	if ( ! type && search ) {
-		results = results.filter(
-			( result ) => getMatchRank( result.title, search ) > 0
-		);
-	}
-
 	results = sortResults( results, search, preferTypes );
 
-	if ( type ) {
-		results = results.slice( 0, perPage );
+	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
+	// through it. With nothing typed there is no search to answer, so those results are a preview
+	// and there is nothing in them to lose by cutting. And a caller that named a number gets it.
+	if ( type || ! search || asksForExactly ) {
+		return results.slice( 0, perPage );
 	}
 
-	return results;
+	// An unscoped search merges four requests and cannot be paginated coherently — a result's
+	// place is not known until every request has been ranked, and `page` applies to each request
+	// separately — so a result cut here is one nothing could ask for again.
+	//
+	// A title holding every word that was typed answers the search, wherever those words sit in
+	// it, and is never cut. The rest fill whatever room is left, so a search never returns fewer
+	// results than it used to: first the titles holding some of what was typed, then those
+	// holding none, which WordPress returned because it matched a body or an excerpt.
+	const searchTokens = tokenize( search );
+	const answers: SearchResult[] = [];
+	const partial: SearchResult[] = [];
+	const rest: SearchResult[] = [];
+
+	for ( const result of results ) {
+		const titleTokens = tokenize( result.title || '' );
+		const found = searchTokens.filter( ( searchToken ) =>
+			titleTokens.some( ( titleToken ) =>
+				titleToken.includes( searchToken )
+			)
+		).length;
+
+		if ( found === searchTokens.length ) {
+			answers.push( result );
+		} else if ( found ) {
+			partial.push( result );
+		} else {
+			rest.push( result );
+		}
+	}
+
+	return [
+		...answers,
+		...[ ...partial, ...rest ].slice(
+			0,
+			Math.max( 0, perPage - answers.length )
+		),
+	];
 }
 
 /**
  * How well a title answers what was typed.
  *
- * The search string is compared as typed, not word by word: a title "contains" it when the whole
- * string appears somewhere in the title, and it counts for more when the title begins with it.
- * Beginning with what was typed is the clearest sign a title is the thing being looked for.
+ * The search is compared as the string it was typed as, not word by word: a title contains it when
+ * the whole string appears somewhere in the title, and beginning with it is the clearest sign the
+ * title is the thing being looked for.
  *
  * @param title
  * @param search
  *
- * @return 2 when the title begins with the search, 1 when it contains it, otherwise 0.
+ * @return Whether the title contains the search, and whether it begins with it.
  */
-function getMatchRank( title: string, search: string ): number {
-	const haystack = ( title ?? '' ).toLowerCase().trim();
-	const needle = ( search ?? '' ).toLowerCase().trim();
+function getTitleMatch(
+	title: string,
+	search: string
+): { contains: boolean; begins: boolean } {
+	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
+	// written with straight ones. Compare them as the same character.
+	const plain = ( text: string ) =>
+		( text ?? '' )
+			.toLowerCase()
+			.trim()
+			.replace( /[\u2018\u2019]/g, "'" )
+			.replace( /[\u201c\u201d]/g, '"' );
+
+	const haystack = plain( title );
+	const needle = plain( search );
 
 	if ( ! haystack || ! needle ) {
-		return 0;
+		return { contains: false, begins: false };
 	}
 
-	if ( haystack.startsWith( needle ) ) {
-		return 2;
-	}
-
-	return haystack.includes( needle ) ? 1 : 0;
+	return {
+		contains: haystack.includes( needle ),
+		begins: haystack.startsWith( needle ),
+	};
 }
 
 /**
@@ -324,21 +363,20 @@ export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
 /**
  * The order result types are ranked in, most wanted first.
  *
- * A link is usually to content, then to a taxonomy. An attachment is a file rather than a
- * destination, and a post format is a way of styling a post rather than somewhere to go, so those
- * come last: on a site with a large media library they otherwise crowd out what was being looked
- * for. See https://github.com/WordPress/gutenberg/issues/63683.
+ * A link is usually to content, then to a taxonomy. A post format is a way of styling a post
+ * rather than somewhere to go, and an attachment is a file rather than a destination, so those
+ * come last in the order they already had: on a site with a large media library they otherwise
+ * crowd out what was being looked for. See https://github.com/WordPress/gutenberg/issues/63683.
  *
  * Deliberately no finer than the search types themselves. Nothing general can be said about
  * whether a page is a better answer than a post, and ranking by search type means every custom
  * post type counts as content and every custom taxonomy counts as a taxonomy without being named.
- * A caller that knows better says so with `preferTypes`, which does take subtypes.
  */
 const TYPE_ORDER: TypeOrderEntry[] = [
 	'post',
 	'term',
-	'attachment',
 	'post-format',
+	'attachment',
 ];
 
 /**
@@ -364,27 +402,11 @@ function getSearchType( result: SearchResult ): SearchType {
 }
 
 /**
- * Whether an entry in a type order describes a result.
- *
- * @param entry
- * @param result
- *
- * @return True when the entry covers that result.
- */
-function coversResult( entry: TypeOrderEntry, result: SearchResult ): boolean {
-	const searchType = getSearchType( result );
-
-	return typeof entry === 'string'
-		? entry === searchType
-		: entry.type === searchType && entry.subtype === result.type;
-}
-
-/**
  * How much a result's type counts towards its rank.
  *
- * Earlier entries are worth more, and anything a caller prefers outranks the usual order entirely.
- * A weight rather than a band, so a title that plainly answers the search can still outrank a
- * better-placed type that barely does.
+ * Earlier entries are worth more, and anything a caller prefers outranks the usual order
+ * entirely. A weight rather than a band, so a title that plainly answers the search can still
+ * outrank a better-placed type that barely does.
  *
  * @param result
  * @param preferTypes
@@ -395,19 +417,57 @@ function getTypeWeight(
 	result: SearchResult,
 	preferTypes: TypeOrderEntry[] = []
 ): number {
-	const preferred = preferTypes.findIndex( ( entry ) =>
-		coversResult( entry, result )
-	);
+	const covers = ( entry: TypeOrderEntry ) => {
+		const searchType = getSearchType( result );
+
+		return typeof entry === 'string'
+			? entry === searchType
+			: entry.type === searchType && entry.subtype === result.type;
+	};
+
+	const preferred = preferTypes.findIndex( covers );
 
 	if ( preferred !== -1 ) {
 		return TYPE_ORDER.length + ( preferTypes.length - preferred );
 	}
 
-	const rank = TYPE_ORDER.findIndex( ( entry ) =>
-		coversResult( entry, result )
-	);
+	return TYPE_ORDER.length - TYPE_ORDER.findIndex( covers );
+}
 
-	return rank === -1 ? 0 : TYPE_ORDER.length - rank;
+/**
+ * How much of the search a title covers.
+ *
+ * Counts how much of the search the title covers, not how much of the title the search covers: a
+ * title is not a worse answer for having more words in it, and saying the same word twice does not
+ * make it a better one.
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return 10 when every word typed is in the title whole, less as fewer are.
+ */
+function getCoverage( title: string, searchTokens: string[] ): number {
+	if ( ! title || ! searchTokens.length ) {
+		return 0;
+	}
+
+	const titleTokens = tokenize( title );
+
+	const wholeWords = searchTokens.filter( ( searchToken ) =>
+		titleTokens.includes( searchToken )
+	).length;
+
+	// A word typed that only appears inside a longer one, as "coffee" does in "coffeehouse", is
+	// worth much less than the word itself.
+	const partialWords = searchTokens.filter(
+		( searchToken ) =>
+			! titleTokens.includes( searchToken ) &&
+			titleTokens.some( ( titleToken ) =>
+				titleToken.includes( searchToken )
+			)
+	).length;
+
+	return ( wholeWords * 10 + partialWords ) / searchTokens.length;
 }
 
 /**
@@ -420,17 +480,12 @@ function getTypeWeight(
  * A title containing what was typed ranks above one that does not, whatever its type: a title
  * that does not contain the search is not an answer to it.
  *
- * Beginning with what was typed comes next, since a title that opens with the search is the
- * clearest sign it is the thing being looked for.
+ * The type comes next, then whether the title begins with what was typed.
  *
- * Last is a score: how much of the search the title covers, counting a whole word for much more
- * than a word found inside a longer one, plus a weight for the result's type. How much of the
- * *title* the search covers is deliberately not considered, so a long title is never marked down
- * for being long, and repeating a word never makes a title a better answer.
- *
- * The rest is sorted by scoring each result, where the score is the number of tokens in the title
- * that are also in the search query, divided by the total number of tokens in the title. This gives
- * us a score between 0 and 1, where 1 is a perfect match.
+ * Last is how much of the search the title covers, counting a whole word for much more than a word
+ * found inside a longer one. How much of the *title* the search covers is deliberately not
+ * considered, so a long title is never marked down for being long, and repeating a word never
+ * makes a title a better answer.
  *
  * @param results
  * @param search
@@ -443,60 +498,26 @@ export function sortResults(
 ) {
 	const searchTokens = tokenize( search );
 
-	// Give each result a unique key to avoid duplicate ids from different tables
-	// overwriting another's score.
-	const scoreKey = ( result: SearchResult ) =>
-		`${ result.kind }:${ result.type }:${ result.id }`;
+	const ranked = results.map( ( result ) => ( {
+		result,
+		...getTitleMatch( result.title, search ),
+		type: getTypeWeight( result, preferTypes ),
+		score: getCoverage( result.title, searchTokens ),
+	} ) );
 
-	const scores = {};
-	const matches = {};
-	for ( const result of results ) {
-		matches[ scoreKey( result ) ] = getMatchRank( result.title, search );
-
-		if ( result.title && searchTokens.length ) {
-			const titleTokens = tokenize( result.title );
-
-			// Count how much of the search the title covers, not how much of the title the search
-			// covers. A title is not a worse answer for having more words in it, and saying the same
-			// word twice does not make it a better one.
-			const wholeWords = searchTokens.filter( ( searchToken ) =>
-				titleTokens.includes( searchToken )
-			).length;
-
-			// A word typed that only appears inside a longer one, as "coffee" does in
-			// "coffeehouse", is worth much less than the word itself.
-			const partialWords = searchTokens.filter(
-				( searchToken ) =>
-					! titleTokens.includes( searchToken ) &&
-					titleTokens.some( ( titleToken ) =>
-						titleToken.includes( searchToken )
-					)
-			).length;
-
-			scores[ scoreKey( result ) ] =
-				( wholeWords * 10 + partialWords ) / searchTokens.length +
-				getTypeWeight( result, preferTypes );
-		} else {
-			scores[ scoreKey( result ) ] = getTypeWeight( result, preferTypes );
-		}
-	}
-
-	// Containing what was typed is decided before anything else: a title that does not contain it
-	// is not an answer to the search, whatever its type.
-	const contains = ( result: SearchResult ) =>
-		matches[ scoreKey( result ) ] > 0 ? 1 : 0;
-
-	// Where the match sits is decided after the type, so naming an order drops the advantage a
-	// title would otherwise get from beginning with the search.
-	const begins = ( result: SearchResult ) =>
-		matches[ scoreKey( result ) ] === 2 ? 1 : 0;
-
-	return results.sort(
+	ranked.sort(
 		( a, b ) =>
-			contains( b ) - contains( a ) ||
-			begins( b ) - begins( a ) ||
-			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
+			// A title that does not contain what was typed is not an answer to the search, whatever
+			// its type.
+			Number( b.contains ) - Number( a.contains ) ||
+			b.type - a.type ||
+			// After the type: an attachment is named after its file, so it very often begins with
+			// what was typed, and that must not lift it above a page.
+			Number( b.begins ) - Number( a.begins ) ||
+			b.score - a.score
 	);
+
+	return ranked.map( ( { result } ) => result );
 }
 
 /**

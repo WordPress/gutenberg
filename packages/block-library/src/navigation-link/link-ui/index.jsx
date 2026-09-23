@@ -71,13 +71,16 @@ function getOwnTypeSearchOptions( type, kind ) {
  * @return {Object} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
-	// How many results to show initially and per search.
+	// How many suggestions to show before anything is typed.
 	const perPage = 20;
 
 	const ownType = getOwnTypeSearchOptions( type, kind );
 
 	return {
-		perPage,
+		// No `perPage`. A typed search covers every type at once and cannot be
+		// paged through, so naming a number would cut results that nothing
+		// could ask for again.
+		//
 		// The link's own type leads, and everything else keeps its usual place
 		// behind it, so a Category Link lists categories first.
 		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
