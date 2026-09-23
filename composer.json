@@ -10,6 +10,12 @@
 	"support": {
 		"issues": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
 		"squizlabs/php_codesniffer": "^3.5",
