@@ -1,5 +1,5 @@
 import {
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalVStack as VStack,
 	TextControl,
 } from '@wordpress/components';
@@ -30,7 +30,7 @@ function PasswordEdit( {
 			spacing={ 4 }
 			className="fields-controls__password"
 		>
-			<CheckboxControl
+			<WCCheckboxControl
 				label={ __( 'Password protected' ) }
 				help={ __( 'Only visible to those who know the password' ) }
 				checked={ showPassword }
