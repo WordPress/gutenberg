@@ -28,6 +28,9 @@
 		"html": false,
 		"color": {
 			"background": true,
+			"button": true,
+			"heading": true,
+			"link": true,
 			"text": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -53,6 +56,12 @@
 				"fontSize": true,
 				"__experimentalFontFamily": true
 			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		},
 		"visibility": false
 	},
