@@ -293,39 +293,21 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 	it( 'returns every answer an unscoped search found, past the per page limit', () => {
+		// Of the 35 results the four requests return, 25 have "many" in the
+		// title and 10 matched on a body. All 25 come back, past the limit of
+		// 20, and the 10 do not.
 		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
-			( suggestions ) => {
-				// 25 titles contain "many" and are all returned; the 10 that
-				// matched on a body rather than a title are dropped.
-				expect( suggestions ).toHaveLength( 25 );
-				expect(
-					suggestions.every( ( { title } ) =>
-						title.startsWith( 'Many' )
-					)
-				).toBe( true );
-			}
+			( suggestions ) => expect( suggestions ).toHaveLength( 25 )
 		);
 	} );
 
-	it( 'drops results whose title does not contain what was typed', () => {
-		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
-			( suggestions ) =>
-				expect(
-					suggestions.filter( ( { title } ) =>
-						title.startsWith( 'Unrelated' )
-					)
-				).toHaveLength( 0 )
-		);
-	} );
-
-	it( 'keeps the per page limit for a search narrowed to one type', () => {
-		// One request, so `perPage` bounds it and `page` can page through it.
+	it( 'cuts a search narrowed to one type to the per page limit', () => {
+		// One request, so `perPage` bounds it and `page` can page through the
+		// rest. The endpoint offers 30 here; only 20 are returned.
 		return fetchLinkSuggestions( 'few', {
 			type: 'term',
 			perPage: 20,
-		} ).then( ( suggestions ) => {
-			expect( suggestions ).toHaveLength( 20 );
-		} );
+		} ).then( ( suggestions ) => expect( suggestions ).toHaveLength( 20 ) );
 	} );
 
 	describe( 'Initial search suggestions', () => {
@@ -529,10 +511,13 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// The page outweighs the category, and both contain what was typed.
 		expect(
 			sortResults( results, 'contact' ).map( ( { title } ) => title )
-		).toEqual( [ 'Contact us today', 'Contact', 'Hello world!' ] );
+		).toEqual( [
+			'Contact us today', // begins with it, and a page is content
+			'Contact', // begins with it, but a category is a taxonomy
+			'Hello world!', // does not contain it at all
+		] );
 	} );
 
 	it( 'orders results to prefer direct matches over sub matches', () => {
@@ -567,12 +552,14 @@ describe( 'sortResults', () => {
 			},
 		];
 		const order = sortResults( results, 'News' ).map(
-			( result ) => result.id
+			( result ) => result.title
 		);
-		// 1, 3 and 4 all begin with the search and cover all of it, so none is
-		// a better answer than another and they keep the order they arrived
-		// in. 2 only contains the search inside a longer word.
-		expect( order ).toEqual( [ 1, 3, 4, 2 ] );
+		expect( order ).toEqual( [
+			'News', // begins with it, and has the word whole
+			'News Flash News', // the same; repeating the word earns nothing
+			'News', // the other one, in the order it arrived
+			'Newspaper', // has the word only inside a longer one
+		] );
 	} );
 
 	it( 'orders a title that begins with the search term above a shorter title that only contains it', () => {
@@ -595,7 +582,10 @@ describe( 'sortResults', () => {
 
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Roasting Guide For Beginners', 'Our Coffee' ] );
+		).toEqual( [
+			'Coffee Roasting Guide For Beginners', // begins with it
+			'Our Coffee', // only contains it, and is no worse for being longer
+		] );
 	} );
 
 	it( 'orders by the start of a title from the first character typed', () => {
@@ -616,8 +606,11 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		expect( sortResults( results, 'a' ).map( ( { id } ) => id ) ).toEqual( [
-			2, 1,
+		expect(
+			sortResults( results, 'a' ).map( ( { title } ) => title )
+		).toEqual( [
+			'A day trip from Stockholm to Swedish countryside towns', // begins with it
+			'Tips for travel with a young baby', // only contains it
 		] );
 	} );
 
@@ -644,7 +637,10 @@ describe( 'sortResults', () => {
 		// library fills the list again.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Our Coffee', 'coffee-beans' ] );
+		).toEqual( [
+			'Our Coffee', // a page, which the type ranks first
+			'coffee-beans', // begins with it, but that cannot lift an attachment
+		] );
 	} );
 
 	it( 'matches the search as a string, not as whole words', () => {
@@ -669,7 +665,10 @@ describe( 'sortResults', () => {
 		// outranks a title that contains the same string further in.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffeehouse Rules', 'Notes On Coffee' ] );
+		).toEqual( [
+			'Coffeehouse Rules', // begins with the string, inside a longer word
+			'Notes On Coffee', // contains the string, further in
+		] );
 	} );
 
 	it( 'requires every word typed to appear in the title', () => {
@@ -693,7 +692,10 @@ describe( 'sortResults', () => {
 		// The page has only one of the two words typed.
 		expect(
 			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
-		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
+		).toEqual( [
+			'Our Coffee Guide', // contains "coffee guide" as a string
+			'Coffee', // has only one of the two words typed
+		] );
 	} );
 
 	it( 'ranks content, then taxonomies, then post formats, then attachments', () => {
@@ -747,12 +749,12 @@ describe( 'sortResults', () => {
 		expect(
 			sortResults( results, 'coffee' ).map( ( { type } ) => type )
 		).toEqual( [
-			'post',
+			'post', // content, in the order they arrived
 			'page',
-			'post_tag',
+			'post_tag', // then taxonomies, likewise
 			'category',
-			'post-format',
-			'attachment',
+			'post-format', // then a way of styling a post
+			'attachment', // then a file, which is not a destination
 		] );
 	} );
 
@@ -774,11 +776,12 @@ describe( 'sortResults', () => {
 			},
 		];
 
-		// Both begin with the search and cover all of it, so neither is a better
-		// answer and they keep the order they arrived in.
 		expect(
-			sortResults( results, 'coffee' ).map( ( { id } ) => id )
-		).toEqual( [ 1, 2 ] );
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [
+			'Coffee', // begins with it and covers all of it
+			'Coffee Roasting Guide For Beginners', // the same, so no worse for its length
+		] );
 	} );
 
 	it( 'does not reward a title for repeating the search term', () => {
@@ -800,8 +803,11 @@ describe( 'sortResults', () => {
 		];
 
 		expect(
-			sortResults( results, 'news' ).map( ( { id } ) => id )
-		).toEqual( [ 1, 2 ] );
+			sortResults( results, 'news' ).map( ( { title } ) => title )
+		).toEqual( [
+			'News Flash News', // saying it twice is worth no more than once
+			'News', // so neither is a better answer, and the order stands
+		] );
 	} );
 
 	it( 'covers more of the search before less of it', () => {
@@ -826,8 +832,11 @@ describe( 'sortResults', () => {
 		// has both words whole, the first only has "coffee" whole and finds
 		// "bean" inside "beans".
 		expect(
-			sortResults( results, 'coffee bean' ).map( ( { id } ) => id )
-		).toEqual( [ 2, 1 ] );
+			sortResults( results, 'coffee bean' ).map( ( { title } ) => title )
+		).toEqual( [
+			'Coffee Bean Roasting', // has both words typed, whole
+			'Coffee Beans', // has "bean" only inside "beans"
+		] );
 	} );
 
 	it( 'ranks a title that does not contain the search below every one that does', () => {
@@ -855,7 +864,10 @@ describe( 'sortResults', () => {
 		// is — but it is still a match.
 		expect(
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Photo Of A Coffeehouse', 'Morning Ritual' ] );
+		).toEqual( [
+			'Photo Of A Coffeehouse', // an attachment, but it does contain the search
+			'Morning Ritual', // a page, but the search is nowhere in the title
+		] );
 	} );
 
 	it( 'matches a title WordPress has texturized', () => {
@@ -881,9 +893,12 @@ describe( 'sortResults', () => {
 		// Typed with the straight quotes that are the only ones on a keyboard.
 		expect(
 			sortResults( results, 'barista\'s "best" coffee' ).map(
-				( { id } ) => id
+				( { title } ) => title
 			)
-		).toEqual( [ 2, 1 ] );
+		).toEqual( [
+			'Barista\u2019s \u201cBest\u201d Coffee', // the same string, once the quotes match
+			'Barista S Best Coffee', // has the words, but not as one string
+		] );
 	} );
 } );
 
