@@ -3688,6 +3688,16 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/query-with-results/edit.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-with-results/save.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/query/deprecated.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

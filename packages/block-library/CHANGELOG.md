@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Query: Add a "With Results" block, the inverse of Query No Results. It holds the blocks that should only appear when the query has matching posts, so content like a heading or Post Template can be hidden as a group when a Query Loop has nothing to show ([#83125](https://github.com/WordPress/gutenberg/pull/83125)).
+
 ### Enhancements
 
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).

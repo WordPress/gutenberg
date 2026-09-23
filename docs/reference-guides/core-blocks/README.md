@@ -844,6 +844,15 @@ Display the total number of results in a query.
 -	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType
 
+## With Results
+
+Contains the block elements used to render content when a query has results.
+
+-	**Name:** [core/query-with-results](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-with-results/)
+-	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
+-	**Ancestor:** core/query
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+
 ## Quote
 
 Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
