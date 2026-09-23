@@ -122,6 +122,38 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( count ).toBe( 1 );
 	} );
 
+	test( 'should highlight the active format when the canvas root is the editing host', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// With more than one block, the canvas root is the editing host and
+		// has focus, not the field.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'a' );
+
+		expect(
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement === document.body )
+		).toBe( true );
+
+		const boundary = editor.canvas.locator(
+			'[data-rich-text-format-boundary]'
+		);
+		await expect( boundary ).toHaveCount( 1 );
+		await expect( boundary ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
