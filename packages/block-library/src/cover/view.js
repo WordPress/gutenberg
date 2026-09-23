@@ -6,16 +6,15 @@ store(
 	{
 		state: {
 			get videoSrc() {
-				const { src, autoplaySrc } = getContext();
+				const { src, reducedMotionSrc } = getContext();
 
-				// The server renders the source that does not autoplay, so a
-				// visitor who prefers reduced motion keeps it untouched and the
-				// embed is never loaded twice for them.
-				if ( ! autoplaySrc || prefersReducedMotion() ) {
-					return src;
+				// The server renders the autoplaying source, so it is only
+				// replaced for a visitor who has asked for reduced motion.
+				if ( reducedMotionSrc && prefersReducedMotion() ) {
+					return reducedMotionSrc;
 				}
 
-				return autoplaySrc;
+				return src;
 			},
 		},
 	},

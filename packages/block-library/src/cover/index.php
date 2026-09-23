@@ -54,8 +54,8 @@ function render_block_core_cover( $attributes, $content ) {
 				}
 
 				// Modify iframe src to add background video parameters based on provider.
-				$parsed_url   = wp_parse_url( $iframe_src );
-				$autoplay_src = null;
+				$parsed_url         = wp_parse_url( $iframe_src );
+				$reduced_motion_src = null;
 				if ( $parsed_url && isset( $parsed_url['host'] ) ) {
 					// Parse existing query parameters.
 					$query_params = array();
@@ -64,9 +64,9 @@ function render_block_core_cover( $attributes, $content ) {
 					}
 
 					// Add background video parameters based on provider. The
-					// autoplay parameters are kept separate so the video does not
-					// start on its own; the view script adds them back when the
-					// visitor has not asked for reduced motion.
+					// autoplay parameters are kept separate so a source without
+					// them can also be built, which the view script swaps in for
+					// a visitor who has asked for reduced motion.
 					$autoplay_params = array();
 					if ( 'youtube' === $provider ) {
 						$query_params['mute']           = '1';
@@ -107,25 +107,25 @@ function render_block_core_cover( $attributes, $content ) {
 						$iframe_base .= $parsed_url['path'];
 					}
 
-					$iframe_src = empty( $query_params )
+					$reduced_motion_src = empty( $query_params )
 						? $iframe_base
 						: $iframe_base . '?' . http_build_query( $query_params );
 
-					if ( ! empty( $autoplay_params ) ) {
-						$autoplay_src = $iframe_base . '?' . http_build_query( array_merge( $query_params, $autoplay_params ) );
-					}
+					$iframe_src = empty( $autoplay_params )
+						? $reduced_motion_src
+						: $iframe_base . '?' . http_build_query( array_merge( $query_params, $autoplay_params ) );
 				}
 
-				// Build the iframe HTML that will replace the figure. The view
-				// script swaps in the autoplay source unless the visitor prefers
-				// reduced motion, so the server-rendered source never autoplays.
+				// Build the iframe HTML that will replace the figure. The server
+				// renders the autoplaying source, and the view script swaps in the
+				// one without autoplay for a visitor who prefers reduced motion.
 				$iframe_html = sprintf(
 					'<div class="wp-block-cover__video-background wp-block-cover__embed-background" data-wp-interactive="core/cover" data-wp-context=\'%s\'><iframe src="%s" data-wp-bind--src="state.videoSrc" title="Background video" frameborder="0" allow="autoplay; fullscreen"></iframe></div>',
 					esc_attr(
 						wp_json_encode(
 							array(
-								'src'         => $iframe_src,
-								'autoplaySrc' => $autoplay_src,
+								'src'              => $iframe_src,
+								'reducedMotionSrc' => $reduced_motion_src,
 							)
 						)
 					),
