@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `__experimentalFetchLinkSuggestions`: rank content above taxonomies, and both above attachments and post formats, so a media library no longer crowds out what a link search is looking for. An unscoped search returns every title holding each word typed instead of cutting the merged results to `perPage`, fills what room is left with titles holding some of them, and drops titles holding none ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+-   `__experimentalFetchLinkSuggestions`: rank content above taxonomies, and both above attachments and post formats, so a media library no longer crowds out what a link search is looking for. An unscoped search returns every title holding each word typed instead of cutting the merged results to `perPage`, and fills what room is left with the rest ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
 -   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).

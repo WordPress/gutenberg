@@ -123,7 +123,7 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 					} ) ),
 					// Holds neither word; WordPress matched a body. A page, so
 					// it outranks the partial matches on type.
-					...Array.from( { length: 10 }, ( _, index ) => ( {
+					...Array.from( { length: 30 }, ( _, index ) => ( {
 						id: 800 + index,
 						title: `Unrelated ${ index }`,
 						url: `http://wordpress.local/unrelated-${ index }/`,
@@ -133,7 +133,7 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 				] );
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=term':
 				return Promise.resolve(
-					Array.from( { length: 30 }, ( _, index ) => ( {
+					Array.from( { length: 5 }, ( _, index ) => ( {
 						// Holds "notes" but not "few".
 						id: 700 + index,
 						title: `Notes ${ index }`,
@@ -329,27 +329,28 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'fills the page with partial matches, and drops titles holding none of the words', () => {
-		// 5 titles hold both words typed, 30 hold one of them, and 10 hold
-		// neither. The 5 come first, 15 of the 30 fill the room left by a
-		// limit of 20, and the 10 are gone.
+	it( 'fills the page with the titles that answer the search least well, last', () => {
+		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
+		// neither. The 5 answers come first and are never cut, then the 5
+		// partial matches, then 10 of the rest fill the room left by a limit
+		// of 20.
+		const startsWith = ( titles, prefix ) =>
+			titles.every( ( title ) => title.startsWith( prefix ) );
+
 		return fetchLinkSuggestions( 'few notes', { perPage: 20 } ).then(
 			( suggestions ) => {
 				const titles = suggestions.map( ( { title } ) => title );
 
 				expect( titles ).toHaveLength( 20 );
-				expect( titles.slice( 0, 5 ) ).toEqual( [
-					'Few Notes 0',
-					'Few Notes 1',
-					'Few Notes 2',
-					'Few Notes 3',
-					'Few Notes 4',
-				] );
-				expect(
-					titles.filter( ( title ) =>
-						title.startsWith( 'Unrelated' )
-					)
-				).toEqual( [] );
+				expect( startsWith( titles.slice( 0, 5 ), 'Few Notes' ) ).toBe(
+					true
+				);
+				expect( startsWith( titles.slice( 5, 10 ), 'Notes' ) ).toBe(
+					true
+				);
+				expect( startsWith( titles.slice( 10 ), 'Unrelated' ) ).toBe(
+					true
+				);
 			}
 		);
 	} );
