@@ -3,9 +3,10 @@
 		display: none !important;
 	}
 
-	// Prevent blockGap and padding from adding extra spacing when the panel is
-	// closed, which the panel would otherwise keep along with its layout box.
+	// Prevent blockGap, padding and box-shadows from adding extra spacing or
+	// rendering when the panel is closed, which keeps its layout box.
 	&[hidden] {
+		box-shadow: none !important;
 		margin-block-start: 0;
 		padding: 0 !important;
 	}
