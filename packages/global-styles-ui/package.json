@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",
@@ -52,6 +51,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
@@ -66,6 +66,7 @@
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.1",
 		"vitest": "^5.0.0",
 		"vitest-browser-react": "^2.3.0"
 	},

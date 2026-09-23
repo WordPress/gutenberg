@@ -129,11 +129,10 @@ test.describe( 'Style Revisions', () => {
 			.last();
 		await expect( lastRevisionItem ).toContainText( 'Default styles' );
 		await lastRevisionItem.click();
+		// The footer action relabels for the reset entry.
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-		).toBeVisible();
+			page.getByRole( 'button', { name: 'Reset' } )
+		).toBeEnabled();
 	} );
 
 	test( 'should access from the site editor sidebar', async ( {
@@ -485,11 +484,9 @@ test.describe( 'Style Revisions', () => {
 			.last()
 			.click();
 
-		await page
-			.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-			.click();
+		// The last entry is the theme defaults, for which the picker footer
+		// action reads "Reset".
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
@@ -562,10 +559,28 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel( 'Global Styles pagination' );
-		await expect( pagination ).toContainText( '1 of 2' );
-		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
-		await expect( pagination ).toContainText( '2 of 2' );
+		// The page select is the screen's only pagination control.
+		const currentPageSelect = page.getByLabel( 'Current page' );
+		await expect( currentPageSelect ).toHaveValue( '1' );
+		await currentPageSelect.selectOption( '2' );
+		await expect( currentPageSelect ).toHaveValue( '2' );
+		// The theme defaults entry closes the last page.
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Reset the styles to the theme defaults',
+			} )
+		).toBeVisible();
+		// The default selection is the first entry of page one, so this page
+		// holds no selection and nothing to apply. Scope the check to the
+		// listbox: the pagination select has a selected option of its own.
+		await expect(
+			page
+				.getByLabel( 'Global styles revisions list' )
+				.getByRole( 'option', { selected: true } )
+		).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
 	} );
 } );
 
