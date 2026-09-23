@@ -324,8 +324,16 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 	it( 'unscoped searches are not limited by the per page limit and return all results', () => {
+		// No number named, so the default of 20 is what a page holds rather
+		// than what was asked for: all 25 titles holding the word come back.
+		return fetchLinkSuggestions( 'many', {} ).then( ( suggestions ) =>
+			expect( suggestions ).toHaveLength( 25 )
+		);
+	} );
+
+	it( 'returns no more than the caller asked for', () => {
 		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
-			( suggestions ) => expect( suggestions ).toHaveLength( 25 )
+			( suggestions ) => expect( suggestions ).toHaveLength( 20 )
 		);
 	} );
 
@@ -337,7 +345,7 @@ describe( 'fetchLinkSuggestions', () => {
 		const startsWith = ( titles, prefix ) =>
 			titles.every( ( title ) => title.startsWith( prefix ) );
 
-		return fetchLinkSuggestions( 'few notes', { perPage: 20 } ).then(
+		return fetchLinkSuggestions( 'few notes', {} ).then(
 			( suggestions ) => {
 				const titles = suggestions.map( ( { title } ) => title );
 

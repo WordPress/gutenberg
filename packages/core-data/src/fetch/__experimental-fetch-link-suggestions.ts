@@ -31,12 +31,13 @@ export type SearchOptions = {
 	 */
 	page?: number;
 	/**
-	 * How many results to ask each request for, and at most how many to return.
+	 * How many results to ask each request for, and at most how many to return. Naming a number
+	 * here is taken as asking for no more than that, and it is honoured.
 	 *
-	 * A search narrowed by `type` is one request and honours this exactly; `page` pages through
-	 * the rest. An unscoped search merges several requests and cannot be paged, so a result it
-	 * drops is one nothing could ask for again: it returns at most this many, except that a title
-	 * holding every word that was typed is never dropped.
+	 * Left out, it defaults to 20, or 3 for initial suggestions — and an unscoped search may
+	 * return more. Such a search merges several requests and cannot be paged with `page`, so a
+	 * result it drops is one nothing could ask for again, and a title holding every word that was
+	 * typed is kept however many there are.
 	 */
 	perPage?: number;
 };
@@ -124,12 +125,14 @@ export default async function fetchLinkSuggestions(
 				}
 			: searchOptions;
 
-	const {
-		type,
-		subtype,
-		page,
-		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
-	} = searchOptionsToUse;
+	const { type, subtype, page } = searchOptionsToUse;
+
+	// A caller that names a number is asking for at most that many, and gets them. One that names
+	// none is taking whatever a page holds, so it can be given more.
+	const asksForExactly = searchOptionsToUse.perPage !== undefined;
+	const perPage =
+		searchOptionsToUse.perPage ??
+		( searchOptions.isInitialSuggestions ? 3 : 20 );
 
 	const { disablePostFormats = false } = editorSettings;
 
@@ -254,8 +257,8 @@ export default async function fetchLinkSuggestions(
 
 	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
 	// through it. With nothing typed there is no search to answer, so those results are a preview
-	// and there is nothing in them to lose by cutting.
-	if ( type || ! search ) {
+	// and there is nothing in them to lose by cutting. And a caller that named a number gets it.
+	if ( type || ! search || asksForExactly ) {
 		return results.slice( 0, perPage );
 	}
 
