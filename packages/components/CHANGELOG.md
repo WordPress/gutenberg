@@ -34,6 +34,8 @@
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
 -   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
+-   `Draggable`: Render `__experimentalDragComponent` only while a drag is in progress, so long lists of draggables such as the block inserter no longer render a hidden drag preview per item ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
+-   `Flex`, `Grid`: Stop watching the viewport for props that are given a single value rather than an array of breakpoint values. Each instance previously called `window.matchMedia()` and subscribed a `resize` listener that could never change its result ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
 
 ### Internal
 
