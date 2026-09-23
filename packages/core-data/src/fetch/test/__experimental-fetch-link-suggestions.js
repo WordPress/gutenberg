@@ -857,6 +857,34 @@ describe( 'sortResults', () => {
 			sortResults( results, 'coffee' ).map( ( { title } ) => title )
 		).toEqual( [ 'Photo Of A Coffeehouse', 'Morning Ritual' ] );
 	} );
+
+	it( 'matches a title WordPress has texturized', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Jerry S Best Coffee',
+				url: 'http://wordpress.local/jerry-s-best-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				// `get_the_title()` runs `wptexturize`, so a title written with
+				// straight quotes comes back with curly ones.
+				id: 2,
+				title: 'Jerry\u2019s \u201cBest\u201d Coffee',
+				url: 'http://wordpress.local/jerrys-best-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// Typed with the straight quotes that are the only ones on a keyboard.
+		expect(
+			sortResults( results, 'jerry\'s "best" coffee' ).map(
+				( { id } ) => id
+			)
+		).toEqual( [ 2, 1 ] );
+	} );
 } );
 
 describe( 'tokenize', () => {
