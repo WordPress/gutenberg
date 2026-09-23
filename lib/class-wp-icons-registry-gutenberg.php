@@ -214,8 +214,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					return false;
 				}
 			}
-
-			$icon_properties['keywords'] = array_map( 'sanitize_text_field', $icon_properties['keywords'] );
 		}
 
 		if (
