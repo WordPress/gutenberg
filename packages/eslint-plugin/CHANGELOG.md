@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Update `use-recommended-components` deprecation message for `__experimentalZStack` to point to writing CSS ([#83344](https://github.com/WordPress/gutenberg/pull/83344)).
 -   Update `use-recommended-components` deprecation message for `ResponsiveWrapper` to point to the CSS `aspect-ratio` property ([#83347](https://github.com/WordPress/gutenberg/pull/83347)).
 -   Update `use-recommended-components` deprecation message for `__experimentalScrollable` to point to writing CSS ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
 -   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to `Separator` subcomponents and design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
