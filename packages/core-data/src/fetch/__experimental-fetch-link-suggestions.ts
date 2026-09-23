@@ -26,18 +26,18 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
-	 * Which page of results to return. Only meaningful for a search narrowed by `type`, which is
-	 * a single request; an unscoped search merges several and cannot be paged through.
+	 * Which page of results to return. Only meaningful for a search narrowed by `type`.
+	 * Unscoped searches across multiple types do not have paged results due to sorting
+	 * and merging results across multiple tables.
 	 */
 	page?: number;
 	/**
-	 * How many results to ask each request for, and at most how many to return. Naming a number
-	 * here is taken as asking for no more than that, and it is honoured.
+	 * The number of results to return.
 	 *
-	 * Left out, it defaults to 20, or 3 for initial suggestions — and an unscoped search may
-	 * return more. Such a search merges several requests and cannot be paged with `page`, so a
-	 * result it drops is one nothing could ask for again, and a title holding every word that was
-	 * typed is kept however many there are.
+	 * Important: perPage acts as a limiter when searching across types, as multi-type
+	 * searches do not have pagination. If left as the default, this will return up to 80 results
+	 * (20 results from each type). For a single type, perPage follows the standard
+	 * WordPress meaning of number of results per page.
 	 */
 	perPage?: number;
 };
@@ -127,12 +127,10 @@ export default async function fetchLinkSuggestions(
 
 	const { type, subtype, page } = searchOptionsToUse;
 
-	// A caller that names a number is asking for at most that many, and gets them. One that names
-	// none is taking whatever a page holds, so it can be given more.
-	const asksForExactly = searchOptionsToUse.perPage !== undefined;
-	const perPage =
-		searchOptionsToUse.perPage ??
-		( searchOptions.isInitialSuggestions ? 3 : 20 );
+	// Naming a number is asking for no more than that; naming none is taking whatever a page
+	// holds, which an unscoped search may exceed.
+	const limit = searchOptionsToUse.perPage;
+	const perPage = limit ?? ( searchOptions.isInitialSuggestions ? 3 : 20 );
 
 	const { disablePostFormats = false } = editorSettings;
 
@@ -252,13 +250,12 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-
 	results = sortResults( results, search );
 
 	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
 	// through it. With nothing typed there is no search to answer, so those results are a preview
 	// and there is nothing in them to lose by cutting. And a caller that named a number gets it.
-	if ( type || ! search || asksForExactly ) {
+	if ( type || ! search || limit !== undefined ) {
 		return results.slice( 0, perPage );
 	}
 
@@ -266,39 +263,17 @@ export default async function fetchLinkSuggestions(
 	// place is not known until every request has been ranked, and `page` applies to each request
 	// separately — so a result cut here is one nothing could ask for again.
 	//
-	// A title holding every word that was typed answers the search, wherever those words sit in
-	// it, and is never cut. The rest fill whatever room is left, so a search never returns fewer
-	// results than it used to: first the titles holding some of what was typed, then those
-	// holding none, which WordPress returned because it matched a body or an excerpt.
+	// A title holding every word that was typed answers the search and is never cut, however many
+	// there are. They sort first, so they are the front of the list, and the rest fill whatever
+	// room is left.
 	const searchTokens = tokenize( search );
-	const answers: SearchResult[] = [];
-	const partial: SearchResult[] = [];
-	const rest: SearchResult[] = [];
+	const answers = results.filter(
+		( result ) =>
+			countWordsFound( result.title, searchTokens ) ===
+			searchTokens.length
+	).length;
 
-	for ( const result of results ) {
-		const titleTokens = tokenize( result.title || '' );
-		const found = searchTokens.filter( ( searchToken ) =>
-			titleTokens.some( ( titleToken ) =>
-				titleToken.includes( searchToken )
-			)
-		).length;
-
-		if ( found === searchTokens.length ) {
-			answers.push( result );
-		} else if ( found ) {
-			partial.push( result );
-		} else {
-			rest.push( result );
-		}
-	}
-
-	return [
-		...answers,
-		...[ ...partial, ...rest ].slice(
-			0,
-			Math.max( 0, perPage - answers.length )
-		),
-	];
+	return results.slice( 0, Math.max( perPage, answers ) );
 }
 
 /**
@@ -395,6 +370,25 @@ function getTypeWeight( result: SearchResult ): number {
 }
 
 /**
+ * How many of the words typed a title holds.
+ *
+ * A word counts whether it stands alone or sits inside a longer one, so "coffeehouse" holds
+ * "coffee".
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return How many of the words typed appear in the title.
+ */
+function countWordsFound( title: string, searchTokens: string[] ): number {
+	const titleTokens = tokenize( title || '' );
+
+	return searchTokens.filter( ( searchToken ) =>
+		titleTokens.some( ( titleToken ) => titleToken.includes( searchToken ) )
+	).length;
+}
+
+/**
  * How much of the search a title covers.
  *
  * Counts how much of the search the title covers, not how much of the title the search covers: a
@@ -404,7 +398,8 @@ function getTypeWeight( result: SearchResult ): number {
  * @param title
  * @param searchTokens
  *
- * @return 10 when every word typed is in the title whole, less as fewer are.
+ * @return 10 when every word typed is in the title whole, less as fewer are and as the words they
+ *         were found in leave more out.
  */
 function getCoverage( title: string, searchTokens: string[] ): number {
 	if ( ! title || ! searchTokens.length ) {
@@ -413,21 +408,22 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 
 	const titleTokens = tokenize( title );
 
-	const wholeWords = searchTokens.filter( ( searchToken ) =>
-		titleTokens.includes( searchToken )
-	).length;
-
-	// A word typed that only appears inside a longer one, as "coffee" does in "coffeehouse", is
-	// worth much less than the word itself.
-	const partialWords = searchTokens.filter(
-		( searchToken ) =>
-			! titleTokens.includes( searchToken ) &&
-			titleTokens.some( ( titleToken ) =>
+	// How much of the word it was found in a word typed accounts for: all of it when the two are
+	// the same word, and less the more of that word it leaves out. So "cat" is worth little of
+	// "caterpillar", "cater" is worth more of it, and "caterpillar" is worth all of it.
+	const covered = searchTokens.reduce( ( total, searchToken ) => {
+		const best = titleTokens.reduce(
+			( most, titleToken ) =>
 				titleToken.includes( searchToken )
-			)
-	).length;
+					? Math.max( most, searchToken.length / titleToken.length )
+					: most,
+			0
+		);
 
-	return ( wholeWords * 10 + partialWords ) / searchTokens.length;
+		return total + best;
+	}, 0 );
+
+	return ( covered / searchTokens.length ) * 10;
 }
 
 /**
@@ -437,10 +433,11 @@ function getCoverage( title: string, searchTokens: string[] ): number {
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * A title containing what was typed ranks above one that does not, whatever its type: a title
- * that does not contain the search is not an answer to it.
+ * A title holding every word that was typed ranks above one holding some, which ranks above one
+ * holding none — whatever their types, and wherever in the title those words sit. Holding them
+ * together, as the string that was typed, comes next.
  *
- * The type comes next, then whether the title begins with what was typed.
+ * The type comes after that, then whether the title begins with what was typed.
  *
  * Last is how much of the search the title covers, counting a whole word for much more than a word
  * found inside a longer one. How much of the *title* the search covers is deliberately not
@@ -455,6 +452,7 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 	const ranked = results.map( ( result ) => ( {
 		result,
+		found: countWordsFound( result.title, searchTokens ),
 		...getTitleMatch( result.title, search ),
 		type: getTypeWeight( result ),
 		score: getCoverage( result.title, searchTokens ),
@@ -462,8 +460,10 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 	ranked.sort(
 		( a, b ) =>
-			// A title that does not contain what was typed is not an answer to the search, whatever
-			// its type.
+			// How much of the search the title holds at all, before anything else: a title with
+			// every word typed answers it, whatever its type and wherever those words sit.
+			b.found - a.found ||
+			// Then whether it holds them together, as one string.
 			Number( b.contains ) - Number( a.contains ) ||
 			b.type - a.type ||
 			// After the type: an attachment is named after its file, so it very often begins with
