@@ -72,7 +72,7 @@ describe( 'MediaEdit', () => {
 				}
 		);
 		const mediaUploadProps = {
-			unstableFeaturedImageFlow: true,
+			featuredImageFlow: true,
 			mode: 'browse',
 		};
 		const { rerender } = render(
@@ -104,7 +104,7 @@ describe( 'MediaEdit', () => {
 			await screen.findByText( 'Filter marker' )
 		).toBeInTheDocument();
 		expect( received.at( -1 ) ).toMatchObject( {
-			unstableFeaturedImageFlow: true,
+			featuredImageFlow: true,
 			mode: 'browse',
 			allowedTypes: [ 'image' ],
 			multiple: false,

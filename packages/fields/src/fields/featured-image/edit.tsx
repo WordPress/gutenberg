@@ -16,7 +16,13 @@ type Item = BasePostWithEmbeddedFeaturedMedia;
 
 // Opens the featured-image media frame, as the classic panel does; plugins
 // extending `editor.MediaUpload` recognize the featured image by it.
-const mediaUploadProps = { unstableFeaturedImageFlow: true };
+const mediaUploadProps = {
+	featuredImageFlow: true,
+	// The deprecated name is passed too, because those callbacks read it from
+	// the props and would otherwise stop recognizing the featured image. It
+	// will be removed in the near future, and passing both raises no warning.
+	unstableFeaturedImageFlow: true,
+};
 
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 	function PostFeaturedImage( props: DataFormControlProps< Item > ) {
