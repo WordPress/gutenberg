@@ -656,4 +656,61 @@ describe( 'getFontStylesAndWeights', () => {
 			isVariableFont: false,
 		} );
 	} );
+	it( 'should resolve an oblique range descriptor to a style the property accepts', () => {
+		// Roboto Flex: a `slnt` axis of -10 to 0 declared as a descriptor range.
+		const fontFamilyFaces = [
+			{
+				fontStyle: 'oblique -10deg 0deg',
+				fontWeight: '100 1000',
+			},
+		];
+
+		// The raw range is never offered: `font-style` discards the two-angle form.
+		expect( getFontStylesAndWeights( fontFamilyFaces ).fontStyles ).toEqual(
+			[
+				{
+					name: 'Regular',
+					value: 'normal',
+				},
+				{
+					name: 'Italic',
+					value: 'italic',
+				},
+			]
+		);
+	} );
+
+	it( 'should resolve an oblique range that excludes upright to its nearest end', () => {
+		const fontFamilyFaces = [
+			{
+				fontStyle: 'oblique 5deg 20deg',
+				fontWeight: '400',
+			},
+		];
+
+		expect(
+			getFontStylesAndWeights( fontFamilyFaces ).fontStyles[ 0 ]
+		).toEqual( {
+			name: 'oblique 5deg',
+			value: 'oblique 5deg',
+		} );
+	} );
+
+	it( 'should keep single-valued oblique descriptors as declared', () => {
+		expect(
+			getFontStylesAndWeights( [ { fontStyle: 'oblique' } ] )
+				.fontStyles[ 0 ]
+		).toEqual( {
+			name: 'Oblique',
+			value: 'oblique',
+		} );
+
+		expect(
+			getFontStylesAndWeights( [ { fontStyle: 'oblique 40deg' } ] )
+				.fontStyles[ 0 ]
+		).toEqual( {
+			name: 'oblique 40deg',
+			value: 'oblique 40deg',
+		} );
+	} );
 } );
