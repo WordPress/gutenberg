@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest';
 import { RuleTester } from 'eslint';
-import rule from '../no-build-style-imports';
+import rule from '../no-non-module-stylesheet-imports';
 
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -13,11 +13,10 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-build-style-imports', rule, {
+ruleTester.run( 'no-non-module-stylesheet-imports', rule, {
 	valid: [
-		{ code: "import './style.css';" },
-		{ code: "import './style.scss';" },
 		{ code: "import styles from './style.module.css';" },
+		{ code: "import './style.module.scss';" },
 		{ code: "import theme from './style.module.css?inline';" },
 		{ code: "import './component';" },
 		{
@@ -33,6 +32,7 @@ ruleTester.run( 'no-build-style-imports', rule, {
 			code: "import '@wordpress/components/build-style/style.css?inline';",
 		},
 		{ code: "import local from './style.lazy.scss?inline';" },
+		{ code: "import './style.css?raw';" },
 		{
 			code: "import( '@wordpress/components/build-style/style.css?inline' );",
 		},
@@ -51,6 +51,26 @@ ruleTester.run( 'no-build-style-imports', rule, {
 		},
 	],
 	invalid: [
+		{
+			code: "import './style.css';",
+			errors: [ { messageId: 'useCssModule' } ],
+		},
+		{
+			code: "import './style.scss';",
+			errors: [ { messageId: 'useCssModule' } ],
+		},
+		{
+			code: "import styles from './style.scss';",
+			errors: [ { messageId: 'useCssModule' } ],
+		},
+		{
+			code: "import '../style.scss';",
+			errors: [ { messageId: 'useCssModule' } ],
+		},
+		{
+			code: "import './style.sass';",
+			errors: [ { messageId: 'useCssModule' } ],
+		},
 		{
 			code: "import '@wordpress/dataviews/build-style/style.css';",
 			errors: [ { messageId: 'usePackageStylesMatcher' } ],
