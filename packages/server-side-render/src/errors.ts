@@ -37,12 +37,12 @@ export function parseErrorMessage( error: any ): string {
 	// Expect certain errors to be plain objects with a `message`
 	// property, such as those thrown by `apiFetch`. Otherwise, do our
 	// best to infer a message via duck typing.
-	let message;
 	if ( ! error ) {
+		return '';
 	} else if ( typeof error.message === 'string' ) {
-		message = error.message;
+		return error.message;
 	} else if ( typeof error === 'string' ) {
-		message = error;
+		return error;
 	} else if (
 		// Only consider own method, lest we erroneously end up calling
 		// `Object#toString` at the end of the prototype chain, thereby
@@ -52,9 +52,9 @@ export function parseErrorMessage( error: any ): string {
 	) {
 		const result = error.toString();
 		if ( typeof result === 'string' ) {
-			message = result;
+			return result;
 		}
 	}
 
-	return message;
+	return '';
 }
