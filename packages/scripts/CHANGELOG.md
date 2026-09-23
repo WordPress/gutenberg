@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 36.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Switch `test-unit-js` to consumer-installed Vitest 5 and Vite 7/8 at the 36.0.0 boundary. Run once by default, discover consumer Vitest/Vite config, and use Vitest lint defaults for test/spec files. Keep `test-unit-jest` as a maintenance-only adapter for consumer-installed Jest, with no scheduled removal. Remove the bundled Jest dependencies, preset config, Babel transformer, and GitHub Actions reporter. Retire the Jest preset and console package source; published versions remain available. Jest projects must install their own dependencies and configure the published preset if needed. See the [migration guide](docs/vitest-migration.md). ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).

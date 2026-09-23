@@ -7,7 +7,6 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ToggleControl,
 } from '@wordpress/components';
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
@@ -16,16 +15,24 @@ const { Icon, ...availableIcons } = iconsPackage;
 
 const ALL_ICONS_MANIFEST = new Map(
 	manifest.map(
-		( entry: { slug: string; keywords?: string[]; public?: boolean } ) => [
+		( entry: {
+			slug: string;
+			collections?: string[];
+			keywords?: string[];
+		} ) => [
 			entry.slug,
 			{
 				slug: entry.slug,
+				collections: entry.collections ?? [],
 				keywords: entry.keywords ?? [],
-				public: !! entry.public,
 			},
 		]
 	)
 );
+
+const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
+
+type Collection = ( typeof COLLECTIONS )[ number ];
 
 function nameToSlug( name: string ): string {
 	return (
@@ -52,7 +59,7 @@ const meta: Meta = {
 	argTypes: {
 		filter: { control: false },
 		size: { control: false },
-		highlightPublicIcons: { control: false },
+		collection: { control: false },
 	},
 };
 export default meta;
@@ -60,40 +67,43 @@ export default meta;
 type LibraryArgs = {
 	filter: string;
 	size: string | number;
-	highlightPublicIcons: boolean;
+	collection: Collection;
 };
 
 const LibraryExample = ( {
 	filter: initialFilter,
 	size: initialSize,
-	highlightPublicIcons: initialHighlightPublicIcons,
+	collection: initialCollection,
 }: LibraryArgs ): ReactElement => {
 	const [ filter, setFilter ] = useState( initialFilter );
 	const [ size, setSize ] = useState( initialSize );
-	const [ highlightPublicIcons, setHighlightPublicIcons ] = useState(
-		initialHighlightPublicIcons
+	const [ collection, setCollection ] = useState( initialCollection );
+	const normalizedFilter = filter.toLowerCase();
+	const filteredIcons = Object.fromEntries(
+		Object.entries( availableIcons ).filter( ( [ name ] ) => {
+			const iconInfo = ALL_ICONS_MANIFEST.get( nameToSlug( name ) );
+
+			if (
+				collection !== 'all' &&
+				! iconInfo?.collections.includes( collection )
+			) {
+				return false;
+			}
+
+			if ( ! normalizedFilter.length ) {
+				return true;
+			}
+
+			// Keywords live in the manifest, so Storybook and the icon
+			// registry search the same terms.
+			return (
+				name.toLowerCase().includes( normalizedFilter ) ||
+				!! iconInfo?.keywords.some( ( keyword ) =>
+					keyword.toLowerCase().includes( normalizedFilter )
+				)
+			);
+		} )
 	);
-	const filteredIcons = filter.length
-		? Object.fromEntries(
-				Object.entries( availableIcons ).filter( ( [ name ] ) => {
-					const normalizedFilter = filter.toLowerCase();
-
-					if ( name.toLowerCase().includes( normalizedFilter ) ) {
-						return true;
-					}
-
-					// Keywords live in the manifest, so Storybook and the icon
-					// registry search the same terms.
-					const iconInfo = ALL_ICONS_MANIFEST.get(
-						nameToSlug( name )
-					);
-
-					return !! iconInfo?.keywords.some( ( keyword ) =>
-						keyword.toLowerCase().includes( normalizedFilter )
-					);
-				} )
-			)
-		: availableIcons;
 
 	const hasResults = Object.keys( filteredIcons ).length > 0;
 
@@ -125,20 +135,29 @@ const LibraryExample = ( {
 							/>
 						) ) }
 					</ToggleGroupControl>
-					<ToggleControl
-						label="Highlight public icons"
-						checked={ highlightPublicIcons }
-						onChange={ setHighlightPublicIcons }
-						help="Emphasize icons available in the SVG icon registry."
-					/>
+					<ToggleGroupControl
+						label="Collection"
+						isBlock
+						value={ collection }
+						onChange={ ( value: string | number | undefined ) =>
+							setCollection( ( value ?? 'all' ) as Collection )
+						}
+					>
+						{ COLLECTIONS.map( ( option ) => (
+							<ToggleGroupControlOption
+								key={ option }
+								value={ option }
+								label={ option === 'all' ? 'All' : option }
+							/>
+						) ) }
+					</ToggleGroupControl>
 				</HStack>
 				{ hasResults ? (
 					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
 						{ Object.entries( filteredIcons ).map(
 							( [ name, icon ] ) => {
 								const slug = nameToSlug( name );
-								const iconInfo = ALL_ICONS_MANIFEST.get( slug );
-								if ( ! iconInfo ) {
+								if ( ! ALL_ICONS_MANIFEST.has( slug ) ) {
 									throw new Error(
 										`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
 									);
@@ -151,11 +170,6 @@ const LibraryExample = ( {
 											flexDirection: 'column',
 											alignItems: 'center',
 											gap: 8,
-											opacity:
-												highlightPublicIcons &&
-												! iconInfo.public
-													? 0.2
-													: 1,
 										} }
 									>
 										<Icon
@@ -188,7 +202,7 @@ export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
 		size: '24',
-		highlightPublicIcons: false,
+		collection: 'all',
 	},
 	render: ( args ) => <LibraryExample { ...args } />,
 };

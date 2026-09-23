@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 11.1.0 (2026-09-23)
+
 ### Enhancements
 
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
 -   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
 -   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
+-   Icon: Don't render icons from non-public icon collections on the front end, since they aren't available in the editor anyway ([#82774](https://github.com/WordPress/gutenberg/pull/82774)).
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Bug Fixes

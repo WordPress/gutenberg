@@ -184,4 +184,29 @@ describe( 'generateFieldsFromAttributes', () => {
 			'size',
 		] );
 	} );
+
+	it( 'should generate an array field with elements for its items', () => {
+		const attributes = markForAutoInspectorControl( {
+			sizes: {
+				type: 'array',
+				items: {
+					type: 'string',
+					enum: [ 'small', 'large' ],
+				},
+			},
+		} );
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields[ 0 ] ).toEqual( {
+			id: 'sizes',
+			label: 'sizes',
+			type: 'array',
+			elements: [
+				{ value: 'small', label: 'small' },
+				{ value: 'large', label: 'large' },
+			],
+		} );
+		expect( result.form.fields ).toEqual( [ 'sizes' ] );
+	} );
 } );
