@@ -101,11 +101,11 @@ TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 step "Collecting the simulator log"
 xcrun simctl spawn "$UDID" log show --info --debug --style compact \
 	--start "$( date -u -j -f %Y-%m-%dT%H:%M:%SZ "$TEST_START" +'%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u +'%Y-%m-%d %H:%M:%S' )" \
-	--predicate 'process IN {"MobileSafari", "com.apple.WebKit.WebContent", "kbd", "SpringBoard", "backboardd"} AND (subsystem CONTAINS[c] "WebKit" OR subsystem CONTAINS[c] "UIKit" OR subsystem CONTAINS[c] "TextInput" OR subsystem CONTAINS[c] "Keyboard" OR category CONTAINS[c] "Keyboard" OR category CONTAINS[c] "TextInput")' \
+	--predicate 'process IN {"MobileSafari", "com.apple.WebKit.WebContent", "kbd", "SpringBoard", "backboardd"} AND NOT (category IN {"Network", "ResourceLoading", "BackgroundTask"})' \
 	> test/ios/build/simulator.log 2>&1 || true
 echo "Simulator log: $( wc -l < test/ios/build/simulator.log ) lines"
 echo "Lines per process:"
 awk '{ print $3 }' test/ios/build/simulator.log | sed 's/\[.*//' | sort | uniq -c | sort -rn | head -10
 echo "Text input entries:"
-grep -iE "insertText|handleKeyWebEvent|keyboardInput|UIKeyboardImpl|TIKeyboard|_didHandleKeyEvent|didFinishTextInput|updateTextInput|selectionDidChange|inputDelegate" test/ios/build/simulator.log | cut -c1-240 | head -150
+grep -E "KeyboardTouch\] touch|Keyboard receives keyEvent|Keyboard inserts text" test/ios/build/simulator.log | cut -c1-160 | head -60
 exit "$STATUS"
