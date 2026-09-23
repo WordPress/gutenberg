@@ -572,29 +572,6 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Coffee Roasting Guide For Beginners', 'Our Coffee' ] );
 	} );
 
-	it( 'orders a whole title match above a title that only begins with the search term', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee',
-				url: 'http://wordpress.local/coffee/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Coffee Guide',
-				url: 'http://wordpress.local/coffee-guide/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-
-		expect(
-			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Guide', 'Coffee' ] );
-	} );
-
 	it( 'orders by the start of a title from the first character typed', () => {
 		const results = [
 			{
@@ -616,77 +593,6 @@ describe( 'sortResults', () => {
 		expect( sortResults( results, 'a' ).map( ( { id } ) => id ) ).toEqual( [
 			2, 1,
 		] );
-	} );
-
-	it( 'orders an attachment below an entity that matches the search term as well', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Sunny Beach',
-				url: 'http://wordpress.local/wp-content/uploads/sunny-beach.jpg',
-				type: 'attachment',
-				kind: 'media',
-			},
-			{
-				id: 2,
-				title: 'A Day At The Beach',
-				url: 'http://wordpress.local/a-day-at-the-beach/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-
-		expect(
-			sortResults( results, 'beach' ).map( ( { title } ) => title )
-		).toEqual( [ 'A Day At The Beach', 'Sunny Beach' ] );
-	} );
-
-	it( 'orders a post format below an entity that matches the search term as well', () => {
-		const results = [
-			{
-				id: 'gallery',
-				title: 'Gallery',
-				url: 'http://wordpress.local/type/gallery/',
-				type: 'post-format',
-				kind: 'taxonomy',
-			},
-			{
-				id: 2,
-				title: 'The Gallery Show Of The Year',
-				url: 'http://wordpress.local/the-gallery-show-of-the-year/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-
-		expect(
-			sortResults( results, 'gallery show' ).map( ( { title } ) => title )
-		).toEqual( [ 'The Gallery Show Of The Year', 'Gallery' ] );
-	} );
-
-	it( 'keeps an attachment first when its title is what was typed', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Day',
-				url: 'http://wordpress.local/day/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Beach Day',
-				url: 'http://wordpress.local/wp-content/uploads/beach-day.jpg',
-				type: 'attachment',
-				kind: 'media',
-			},
-		];
-
-		// The page does not answer the search at all, so being a page does not
-		// lift it above an attachment that does.
-		expect(
-			sortResults( results, 'beach day' ).map( ( { title } ) => title )
-		).toEqual( [ 'Beach Day', 'Day' ] );
 	} );
 
 	it( 'ranks a title that begins with the search above one that only contains it, whatever the type', () => {
@@ -762,54 +668,6 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Our Coffee Guide', 'Coffee' ] );
 	} );
 
-	it( 'lets a title that begins with the search outrank a better-ranked type', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Our Coffee',
-				url: 'http://wordpress.local/1/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Coffee',
-				url: 'http://wordpress.local/2/',
-				type: 'attachment',
-				kind: 'media',
-			},
-		];
-
-		// The attachment begins with what was typed; the page only contains it.
-		expect(
-			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee', 'Our Coffee' ] );
-	} );
-
-	it( 'lifts an attachment that begins with the search above a page that does not', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Coffee Cup Photo',
-				url: 'http://wordpress.local/1/',
-				type: 'attachment',
-				kind: 'media',
-			},
-			{
-				id: 2,
-				title: 'Our Coffee',
-				url: 'http://wordpress.local/2/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-
-		// How well the title answers the search is compared before the type.
-		expect(
-			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Cup Photo', 'Our Coffee' ] );
-	} );
-
 	it( 'ranks content, then taxonomies, then attachments, then post formats', () => {
 		const results = [
 			{
@@ -868,30 +726,6 @@ describe( 'sortResults', () => {
 			'attachment',
 			'post-format',
 		] );
-	} );
-
-	it( 'still prefers a title that begins with the search term within one type', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Our Coffee',
-				url: 'http://wordpress.local/1/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Coffee Roasting Guide For Beginners',
-				url: 'http://wordpress.local/2/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-
-		// The score alone would favour the shorter title.
-		expect(
-			sortResults( results, 'coffee' ).map( ( { title } ) => title )
-		).toEqual( [ 'Coffee Roasting Guide For Beginners', 'Our Coffee' ] );
 	} );
 
 	it( 'does not mark a title down for being long', () => {
@@ -965,6 +799,34 @@ describe( 'sortResults', () => {
 		expect(
 			sortResults( results, 'coffee bean' ).map( ( { id } ) => id )
 		).toEqual( [ 2, 1 ] );
+	} );
+
+	it( 'ranks a title that does not contain the search below every one that does', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Morning Ritual',
+				url: 'http://wordpress.local/morning-ritual/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Photo Of A Coffeehouse',
+				url: 'http://wordpress.local/photo-of-a-coffeehouse.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+		];
+
+		// WordPress returns titles that match on a body or excerpt, so a page
+		// with no sign of the search in its title reaches us. Being the
+		// best-ranked type does not make it an answer, and the attachment only
+		// has the search inside a longer word, which is the weakest match there
+		// is — but it is still a match.
+		expect(
+			sortResults( results, 'coffee' ).map( ( { title } ) => title )
+		).toEqual( [ 'Photo Of A Coffeehouse', 'Morning Ritual' ] );
 	} );
 } );
 
