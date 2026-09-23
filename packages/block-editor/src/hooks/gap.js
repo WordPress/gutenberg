@@ -1,4 +1,18 @@
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { normalizeLegacyLayout } from '../layouts/utils';
+
+/**
+ * Returns whether the current layout can use separate row and column gaps.
+ *
+ * @param {?Object} layout        The block instance's layout attribute.
+ * @param {?Object} defaultLayout The block's default supported layout.
+ * @return {boolean} Whether axial block gap controls should be available.
+ */
+export function isAxialBlockGapAllowed( layout, defaultLayout ) {
+	const usedLayout = normalizeLegacyLayout( layout ) || defaultLayout || {};
+
+	return [ 'flex', 'grid' ].includes( usedLayout?.type );
+}
 
 /**
  * Returns a BoxControl object value from a given blockGap style value.

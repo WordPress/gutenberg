@@ -6,19 +6,16 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
-} from './components/inserter/search-items';
+	searchItems,
+} from './utils/search-ranking';
+import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './hooks/block-style-state';
+import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -81,6 +78,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -96,17 +94,14 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getRichTextValues,
 	PrivateQuickInserter,
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
-	getStyleForState,
 	isDefaultBlockStyleState,
-	setStyleForState,
 	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
@@ -159,4 +154,7 @@ lock( privateApis, {
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,
+	isElementVisible,
+	getPopulatedCategories,
+	searchItems,
 } );

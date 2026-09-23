@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { convertToTree } from '../util';
 
 describe( 'Convert to tree', () => {

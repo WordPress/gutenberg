@@ -26,6 +26,25 @@ interface MediaEditorModalProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 }
 
+/**
+ * The modal's footer chrome. The fine-rotation ruler and the image controls
+ * both live under the canvas (in `media-editor__content`), never here, so the
+ * footer has one layout at every width: History on the left, Cancel/Save on
+ * the right.
+ */
+function ModalFooter() {
+	return (
+		<div
+			className="media-editor-modal__footer"
+			role="region"
+			aria-label={ __( 'Editor actions' ) }
+		>
+			<MediaEditor.HistoryActions />
+			<MediaEditor.SaveActions />
+		</div>
+	);
+}
+
 export function MediaEditorModal( {
 	fields = [],
 	aspectRatioPresets,
@@ -71,7 +90,6 @@ export function MediaEditorModal( {
 			id={ id }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
-			showCloseButton
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
@@ -107,9 +125,6 @@ export function MediaEditorModal( {
 			} }
 			renderFrame={ ( {
 				children,
-				headerActions,
-				footerActions,
-				footerLayout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -126,16 +141,12 @@ export function MediaEditorModal( {
 						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
 						onKeyDown={ onKeyDown }
 						onRequestClose={ onRequestClose }
-						headerActions={ headerActions }
+						headerActions={
+							<MediaEditor.HeaderActions showCloseButton />
+						}
 					>
 						{ children }
-						<div
-							className={ `media-editor-modal__footer is-${ footerLayout }` }
-							role="region"
-							aria-label={ __( 'Editor actions' ) }
-						>
-							{ footerActions }
-						</div>
+						<ModalFooter />
 					</Modal>
 				</ShortcutProvider>
 			) }

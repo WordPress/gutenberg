@@ -16,27 +16,27 @@ function PreviewUrlBar( {
 	siteIconUrl?: string;
 } ) {
 	return (
-		<div className={ styles.urlBar }>
+		<div className={ styles[ 'url-bar' ] }>
 			<Stack
 				direction="row"
 				align="center"
 				gap="xs"
-				className={ styles.urlField }
+				className={ styles[ 'url-field' ] }
 			>
 				{ siteIconUrl ? (
 					<img
-						className={ styles.urlFavicon }
+						className={ styles[ 'url-favicon' ] }
 						src={ siteIconUrl }
 						alt=""
 					/>
 				) : (
 					<Icon
-						className={ styles.urlIcon }
+						className={ styles[ 'url-icon' ] }
 						icon={ wordpress }
 						size={ 12 }
 					/>
 				) }
-				<Text className={ styles.urlText }>{ siteUrl }</Text>
+				<Text className={ styles[ 'url-text' ] }>{ siteUrl }</Text>
 			</Stack>
 		</div>
 	);
@@ -84,7 +84,7 @@ export default function SitePreview() {
 	return (
 		<Stack direction="column" className={ styles.container }>
 			<PreviewUrlBar siteUrl={ siteUrl } siteIconUrl={ siteIconUrl } />
-			<div className={ styles.previewWrap }>
+			<div className={ styles[ 'preview-wrap' ] }>
 				{ isIframeLoading && (
 					<Stack
 						direction="column"

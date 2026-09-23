@@ -4,12 +4,24 @@ const { readdir, stat, readFile } = require( 'fs/promises' );
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
+// The collections an icon may be shipped in.
+const VALID_ICON_COLLECTIONS = [ 'core', 'core-admin' ];
+
+function isStrokeBasedSvg( svgContent ) {
+	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
+	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
+}
+
 /*
  * Validating the icons collection checks that:
  *
  * - Each manifest entry has a matching SVG in library/, and vice versa.
+ * - Each manifest entry's `collections` property, if present, is a non-empty array of
+ *   known collection slugs.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
+ * - Each stroke-based SVG contains at least one stroked graphical element.
+ * - Each stroked graphical element uses a non-scaling stroke.
  */
 async function validateCollection() {
 	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
@@ -52,6 +64,31 @@ async function validateCollection() {
 		}
 
 		manifestPaths.push( icon.filePath );
+
+		/*
+		 * Verify that `collections`, if present, lists known collection slugs. An icon
+		 * without the property stays in the JS library and is not shipped to core.
+		 */
+		if ( 'collections' in icon ) {
+			const { collections } = icon;
+			const isValid =
+				Array.isArray( collections ) &&
+				collections.length > 0 &&
+				collections.every( ( collection ) =>
+					VALID_ICON_COLLECTIONS.includes( collection )
+				) &&
+				new Set( collections ).size === collections.length;
+
+			if ( ! isValid ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'collections' to be a non-empty array of unique slugs out of ${ VALID_ICON_COLLECTIONS.map(
+						( collection ) => `'${ collection }'`
+					).join( ', ' ) }, saw ${ JSON.stringify( collections ) }`
+				);
+			}
+		}
 
 		/*
 		 * Verify that the corresponding SVG file is found.
@@ -105,6 +142,34 @@ async function validateCollection() {
 				`- Icon ${ svgPath } must set viewBox="${ ICON_VIEW_BOX }"`
 			);
 		}
+
+		if ( isStrokeBasedSvg( svgContent ) ) {
+			const graphicalElements = svgContent.match(
+				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
+			);
+			const strokedElements = graphicalElements?.filter(
+				( element ) => ! element.includes( 'stroke="none"' )
+			);
+
+			if ( ! strokedElements?.length ) {
+				problems.push(
+					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
+				);
+			}
+
+			if (
+				strokedElements?.some(
+					( element ) =>
+						! element.includes(
+							'vector-effect="non-scaling-stroke"'
+						)
+				)
+			) {
+				problems.push(
+					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
+				);
+			}
+		}
 	}
 
 	if ( problems.length ) {
@@ -121,5 +186,6 @@ if ( module === require.main ) {
 }
 
 module.exports = {
+	isStrokeBasedSvg,
 	validateCollection,
 };

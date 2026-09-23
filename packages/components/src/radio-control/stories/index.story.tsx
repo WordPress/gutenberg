@@ -5,7 +5,7 @@ import RadioControl from '..';
 const meta: Meta< typeof RadioControl > = {
 	tags: [ 'manifest' ],
 	component: RadioControl,
-	title: 'Components/Selection & Input/Common/RadioControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/RadioControl',
 	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {
@@ -85,5 +85,17 @@ WithOptionDescriptions.args = {
 			value: 'password',
 			description: 'Protected by a password',
 		},
+	],
+};
+
+export const WithDisabledOption: StoryFn< typeof RadioControl > = Template.bind(
+	{}
+);
+WithDisabledOption.args = {
+	...Default.args,
+	options: [
+		{ label: 'Public', value: 'public' },
+		{ label: 'Private', value: 'private', disabled: true },
+		{ label: 'Password Protected', value: 'password' },
 	],
 };

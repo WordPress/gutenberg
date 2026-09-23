@@ -5,12 +5,14 @@ import { Stack } from '@wordpress/ui';
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-import type { ActionButton, View } from '../../types';
+import type { ActionButton, MediaFit, View } from '../../types';
+import FreeCompositionComponent from './free-composition';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViewsPicker',
+	id: 'dataviews-dataviewspicker',
+	title: 'Design System/DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
 
@@ -21,6 +23,8 @@ const storyArgs = {
 	isMultiselectable: false,
 	isGrouped: false,
 	infiniteScrollEnabled: false,
+	mediaFit: 'cover',
+	mediaFitControl: true,
 };
 
 const storyArgTypes = {
@@ -41,6 +45,17 @@ const storyArgTypes = {
 		description:
 			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
 	},
+	mediaFit: {
+		control: 'select',
+		options: [ 'cover', 'contain' ],
+		description:
+			'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+	},
+	mediaFitControl: {
+		control: 'boolean',
+		description:
+			'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
+	},
 };
 
 interface PickerContentProps {
@@ -48,6 +63,8 @@ interface PickerContentProps {
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 	actions?: ActionButton< SpaceObject >[];
 	selection?: string[];
 }
@@ -57,6 +74,8 @@ const DataViewsPickerContent = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit = 'cover',
+	mediaFitControl = true,
 	actions: customActions,
 	selection: customSelection,
 }: PickerContentProps ) => {
@@ -72,6 +91,7 @@ const DataViewsPickerContent = ( {
 				? { field: 'type', direction: 'asc' as const }
 				: undefined,
 			infiniteScrollEnabled,
+			layout: { mediaFit },
 		};
 
 		if ( infiniteScrollEnabled ) {
@@ -100,6 +120,9 @@ const DataViewsPickerContent = ( {
 						? { field: 'type', direction: 'asc' as const }
 						: undefined,
 				infiniteScrollEnabled,
+				// Spread the previous layout so a change made through the
+				// view options popover survives an unrelated arg change.
+				layout: { ...prevView.layout, mediaFit },
 			};
 
 			if ( infiniteScrollEnabled ) {
@@ -120,7 +143,7 @@ const DataViewsPickerContent = ( {
 				startPosition: undefined,
 			} as View;
 		} );
-	}, [ isGrouped, infiniteScrollEnabled ] );
+	}, [ isGrouped, infiniteScrollEnabled, mediaFit ] );
 
 	const [ selection, setSelection ] = useState< string[] >(
 		customSelection || []
@@ -142,8 +165,8 @@ const DataViewsPickerContent = ( {
 			supportsBulk: isMultiselectable,
 			callback() {
 				const selectedItemNames = data
-					.filter(
-						( item ) => selection?.includes( String( item.id ) )
+					.filter( ( item ) =>
+						selection?.includes( String( item.id ) )
 					)
 					.map( ( item ) => item.name.title )
 					.join( ', ' );
@@ -175,7 +198,7 @@ const DataViewsPickerContent = ( {
 				view={ view }
 				fields={ fields }
 				onChangeView={ setView }
-				config={ { perPageSizes } }
+				config={ { perPageSizes, mediaFitControl } }
 				defaultLayouts={ {
 					pickerGrid: true,
 					pickerTable: true,
@@ -192,33 +215,66 @@ export const Default = ( {
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit,
+	mediaFitControl,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 } ) => (
 	<DataViewsPickerContent
 		perPageSizes={ perPageSizes }
 		isMultiselectable={ isMultiselectable }
 		isGrouped={ isGrouped }
 		infiniteScrollEnabled={ infiniteScrollEnabled }
+		mediaFit={ mediaFit }
+		mediaFitControl={ mediaFitControl }
 	/>
 );
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+Default.parameters = {
+	// FIXME: Picker UI nests interactive controls (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
+export const FreeComposition = {
+	render: FreeCompositionComponent,
+	args: { pagination: 'page-select' as const },
+	argTypes: {
+		pagination: {
+			control: 'select',
+			options: [ 'page-select', 'page-navigation' ],
+			description:
+				'Which pagination part the composed footer keeps: the "Page N of M" select, or the previous/next buttons',
+		},
+	},
+	parameters: {
+		// FIXME: Picker UI nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
 	isMultiselectable,
 	isGrouped,
 	infiniteScrollEnabled,
+	mediaFit,
+	mediaFitControl,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
+	mediaFit?: MediaFit;
+	mediaFitControl?: boolean;
 } ) => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ selectedItems, setSelectedItems ] = useState< SpaceObject[] >( [] );
@@ -292,6 +348,8 @@ export const WithModal = ( {
 							isMultiselectable={ isMultiselectable }
 							isGrouped={ isGrouped }
 							infiniteScrollEnabled={ infiniteScrollEnabled }
+							mediaFit={ mediaFit }
+							mediaFitControl={ mediaFitControl }
 							actions={ modalActions }
 							selection={ selectedItems.map( ( item ) =>
 								String( item.id )

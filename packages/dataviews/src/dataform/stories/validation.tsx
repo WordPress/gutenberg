@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, privateApis } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {
@@ -10,9 +10,6 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import DateControl from '../../components/dataform-controls/date';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedInputControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -22,8 +19,11 @@ function getCustomValidity< Item >(
 	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
-		customValidity = validity?.required?.message
-			? validity.required
+		customValidity = validity.required.message
+			? {
+					type: validity.required.type,
+					message: validity.required.message,
+				}
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
@@ -58,8 +58,13 @@ function CustomEditControl< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
@@ -550,7 +555,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async' ? getElements( 'select' ) : undefined,
 				isValid: {
@@ -570,7 +575,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'item1', label: 'Item 1' },
 								{ value: 'item2', label: 'Item 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'textWithRadio' )
@@ -740,7 +745,7 @@ const ValidationComponent = ( {
 								{ value: 'de', label: 'Germany' },
 								{ value: 'jp', label: 'Japan' },
 								{ value: 'au', label: 'Australia' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'countries' )
@@ -801,7 +806,7 @@ const ValidationComponent = ( {
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
 								{ value: 'option3', label: 'Option 3' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'toggleGroup' )
@@ -843,7 +848,7 @@ const ValidationComponent = ( {
 								{ value: 'strawberry', label: 'Strawberry' },
 								{ value: 'tangerine', label: 'Tangerine' },
 								{ value: 'watermelon', label: 'Watermelon' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'combobox' )

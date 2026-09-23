@@ -6,16 +6,15 @@ import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
 
-export interface RootProps
-	extends Pick<
-		_Drawer.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'disablePointerDismissal'
-	> {
+export interface RootProps extends Pick<
+	_Drawer.Root.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'modal'
+	| 'disablePointerDismissal'
+> {
 	/**
 	 * The edge the drawer slides in from, and the direction used to dismiss it
 	 * via swipe gesture.
@@ -34,15 +33,21 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that Drawer does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Drawer.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
+	extends
+		ComponentProps< 'div' >,
 		Pick< _Drawer.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
@@ -153,11 +158,10 @@ export interface DescriptionProps extends ComponentProps< 'p' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps
-	extends Omit<
-		ComponentProps< typeof IconButton >,
-		'label' | 'icon' | 'loading' | 'loadingAnnouncement'
-	> {
+export interface CloseIconProps extends Omit<
+	ComponentProps< typeof IconButton >,
+	'label' | 'icon' | 'loading' | 'loadingAnnouncement'
+> {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.

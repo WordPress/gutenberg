@@ -50,6 +50,11 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
+		if ( initialPosition === true ) {
+			ref.current.focus();
+			return;
+		}
+
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( ref.current )

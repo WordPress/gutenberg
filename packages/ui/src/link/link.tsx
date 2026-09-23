@@ -21,12 +21,15 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		variant = 'default',
 		tone = 'brand',
 		openInNewTab = false,
+		target,
 		render,
 		className,
 		...props
 	},
 	ref
 ) {
+	const shouldShowNewTabIndicator =
+		openInNewTab || /^_blank$/i.test( target ?? '' );
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
@@ -41,11 +44,11 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				variant === 'unstyled' && styles[ 'is-unstyled' ],
 				className
 			),
-			target: openInNewTab ? '_blank' : undefined,
+			target: target ?? ( openInNewTab ? '_blank' : undefined ),
 			children: (
 				<>
 					{ children }
-					{ openInNewTab && (
+					{ shouldShowNewTabIndicator && (
 						<span
 							className={ styles[ 'link-icon' ] }
 							role="img"

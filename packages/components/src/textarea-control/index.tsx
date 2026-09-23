@@ -2,9 +2,9 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import BaseControl from '../base-control';
-import { StyledTextarea } from './styles/textarea-control-styles';
 import type { TextareaControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import styles from './style.module.scss';
 
 function UnforwardedTextareaControl(
 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
@@ -37,8 +37,11 @@ function UnforwardedTextareaControl(
 			help={ help }
 			className={ classes }
 		>
-			<StyledTextarea
-				className="components-textarea-control__input"
+			<textarea
+				className={ clsx(
+					'components-textarea-control__input',
+					styles.textarea
+				) }
 				id={ id }
 				rows={ rows }
 				onChange={ onChangeValue }

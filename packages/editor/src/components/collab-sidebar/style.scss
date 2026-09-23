@@ -20,6 +20,7 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
+	border-left: $border-width solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .editor-collab-sidebar-panel__thread,
@@ -59,13 +60,17 @@
 	}
 }
 
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
+}
+
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 16px;
 	text-align: left;
 	color: $gray-700;
-	text-transform: capitalize;
+	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {

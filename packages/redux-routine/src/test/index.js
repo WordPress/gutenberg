@@ -1,4 +1,5 @@
 import { createStore, applyMiddleware } from 'redux';
+import { describe, expect, it } from 'vitest';
 import createMiddleware from '../';
 
 describe( 'createMiddleware', () => {
@@ -43,7 +44,7 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should throw if promise rejects', async () => {
-		expect.hasAssertions();
+		let caughtError;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( ( resolve, reject ) => reject( 'Message' ) ),
@@ -53,16 +54,16 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-conditional-expect
-				expect( error ).toBe( 'Message' );
+				caughtError = error;
 			}
 		}
 
 		await store.dispatch( createAction() );
+		expect( caughtError ).toBe( 'Message' );
 	} );
 
-	it( 'should throw if promise throws', () => {
-		expect.hasAssertions();
+	it( 'should throw if promise throws', async () => {
+		let caughtError;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( () => {
@@ -74,22 +75,16 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-conditional-expect
-				expect( error.message ).toBe( 'Message' );
+				caughtError = error;
 			}
 		}
 
-		return store.dispatch( createAction() );
+		await store.dispatch( createAction() );
+		expect( caughtError ).toHaveProperty( 'message', 'Message' );
 	} );
 
-	// Currently this test will not error even under conditions producing it but
-	// instead will have an uncaught error/warning printed in the cli console:
-	// - (node:37109) UnhandledPromiseRejectionWarning: TypeError: Cannot read
-	// property 'type' of null (and others)
-	// See this github thread for context:
-	// https://github.com/facebook/jest/issues/3251
-	it( 'should handle a null returned from a caught promise error', () => {
-		expect.hasAssertions();
+	it( 'should handle a null returned from a caught promise error', async () => {
+		let caughtError;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( () => {
@@ -101,12 +96,12 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				// eslint-disable-next-line jest/no-conditional-expect
-				expect( error.message ).toBe( 'Message' );
+				caughtError = error;
 				return null;
 			}
 		}
-		store.dispatch( createAction() );
+		await store.dispatch( createAction() );
+		expect( caughtError ).toHaveProperty( 'message', 'Message' );
 	} );
 
 	it( 'assigns sync controlled return value into yield assignment', () => {
