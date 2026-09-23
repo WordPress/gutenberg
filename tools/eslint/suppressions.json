@@ -1098,9 +1098,6 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1116,9 +1113,6 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/filters-panel.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -5354,7 +5348,7 @@
 	},
 	"packages/edit-site/src/components/add-new-template/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7434,11 +7428,6 @@
 			"count": 2
 		}
 	},
-	"packages/global-styles-ui/src/pagination/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/presets/dialogs/rename-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -8010,7 +7999,7 @@
 	},
 	"routes/template-list/add-new-template/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		}
 	},
 	"routes/template-list/stage.tsx": {
