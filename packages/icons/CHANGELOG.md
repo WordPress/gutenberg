@@ -12,6 +12,7 @@
 -   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
 -   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
 -   `manifest.json`: The `public` field now only controls whether an icon ships to WordPress Core ([#83277](https://github.com/WordPress/gutenberg/pull/83277)).
+-   `manifest.json`: New `collections` property, listing the collections an icon is registered in once it ships to WordPress Core. It replaces the `public` property and introduces the `core-admin` collection, which is not public and holds the icons the WordPress admin interface renders. ([#83261](https://github.com/WordPress/gutenberg/pull/83261), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
 
 ### Bug Fixes
 
