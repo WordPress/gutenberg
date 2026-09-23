@@ -12,6 +12,10 @@ _Required._ HTML string to make editable. The HTML should be valid, and valid in
 
 _Required._ Called when the value changes.
 
+### `onMarkPersistent(): Function`
+
+_Optional._ Called when a run of edits ends: one second after typing stops, or immediately after a formatting change. Consecutive edits before that merge into one undo level. Defaults to marking the last block editor change as persistent. Pass a callback when `onChange` writes somewhere other than a block attribute, such as `__unstableCreateUndoLevel` for an entity edited with `isCached`.
+
 ### `identifier: String`
 
 _Optional._ If the editable field is bound to a block attribute (through the `value` and `onChange` props) then this prop should specify the attribute name. The field will use this value to set the block editor selection correctly, specifying in which attribute and at what offset does the selection start or end.

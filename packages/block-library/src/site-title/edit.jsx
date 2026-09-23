@@ -1,4 +1,4 @@
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -38,8 +38,9 @@ export default function SiteTitleEdit( props ) {
 		canUserEdit ? 'site' : '__unstableBase',
 		canUserEdit ? 'title' : 'name',
 		undefined,
-		{ coalesce: true }
+		{ isCached: true }
 	);
+	const { __unstableCreateUndoLevel } = useDispatch( coreStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const TagName = level === 0 ? 'p' : `h${ level }`;
@@ -57,6 +58,7 @@ export default function SiteTitleEdit( props ) {
 				placeholder={ __( 'Write site title…' ) }
 				value={ title }
 				onChange={ ( newTitle ) => setSiteTitle( newTitle.trim() ) }
+				onMarkPersistent={ __unstableCreateUndoLevel }
 				allowedFormats={ [] }
 				disableLineBreaks
 			/>

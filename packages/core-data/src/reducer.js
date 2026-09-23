@@ -471,9 +471,8 @@ export function syncUndoManagerState(
 
 /**
  * Tracks the last undoable edit so that `editEntityRecord` can decide whether
- * a new edit continues the same undo level or starts a new one. `target`
- * identifies the record and the set of edited keys; `time` is when the edit
- * was dispatched.
+ * a cached edit continues the same undo level or starts a new one. `target`
+ * identifies the record; `keys` are the keys that edit changed.
  *
  * @param {Object|null} state  Current state.
  * @param {Object}      action Dispatched action.

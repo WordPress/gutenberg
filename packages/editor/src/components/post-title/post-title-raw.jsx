@@ -29,7 +29,7 @@ function PostTitleRaw( _, forwardedRef ) {
 
 	const [ isSelected, setIsSelected ] = useState( false );
 
-	const { title, setTitle: onUpdate } = usePostTitle();
+	const { title, setTitle: onUpdate, endUndoRun } = usePostTitle();
 	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
 
 	function onChange( value ) {
@@ -42,6 +42,7 @@ function PostTitleRaw( _, forwardedRef ) {
 
 	function onUnselect() {
 		setIsSelected( false );
+		endUndoRun();
 	}
 
 	// The wp-block className is important for editor styles.

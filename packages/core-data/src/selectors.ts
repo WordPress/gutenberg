@@ -38,7 +38,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
-	undoCoalesceSession: { target: string; time: number } | null;
+	undoCoalesceSession: { target: string; keys: string[] } | null;
 	syncUndoManagerState: {
 		hasRedo: boolean;
 		hasUndo: boolean;

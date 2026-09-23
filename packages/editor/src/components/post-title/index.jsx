@@ -41,7 +41,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
 
-	const { title, setTitle: onUpdate } = usePostTitle();
+	const { title, setTitle: onUpdate, endUndoRun } = usePostTitle();
 
 	const [ selection, setSelection ] = useState( {} );
 
@@ -90,6 +90,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	function onUnselect() {
 		setIsSelected( false );
 		setSelection( {} );
+		endUndoRun();
 	}
 
 	function onEnterPress() {

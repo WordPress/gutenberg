@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+-   `RichText`: Add an `onMarkPersistent` prop, called when a run of edits ends. Lets a `RichText` that edits something other than a block attribute, such as an entity field, end its own undo run instead of marking a block editor change as persistent.
 
 ### Bug Fixes
 

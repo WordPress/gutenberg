@@ -23,8 +23,8 @@ const REVISION_QUERY = {
  * @param {string}        prop               The property name.
  * @param {number|string} [_id]              An entity ID to use instead of the context-provided one.
  * @param {Object}        [options]          Options for the edits made by the setter.
- * @param {boolean}       [options.coalesce] Merge a burst of edits, such as typing, into
- *                                           one undo level.
+ * @param {boolean}       [options.isCached] Merge consecutive edits, such as typing, into
+ *                                           one undo level. See `editEntityRecord`.
  *
  * @return {[*, Function, *]} An array where the first item is the
  *                            property value, the second is the
@@ -34,7 +34,7 @@ const REVISION_QUERY = {
  * 							  `protected` props.
  */
 export default function useEntityProp( kind, name, prop, _id, options = {} ) {
-	const { coalesce } = options;
+	const { isCached } = options;
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
@@ -95,12 +95,12 @@ export default function useEntityProp( kind, name, prop, _id, options = {} ) {
 				name,
 				id,
 				{ [ prop ]: newValue },
-				{ coalesce }
+				{ isCached }
 			);
 		},
-		// `coalesce` rather than `options`, so that an inline object literal
+		// `isCached` rather than `options`, so that an inline object literal
 		// from the caller does not churn the callback.
-		[ editEntityRecord, kind, name, id, prop, revisionId, coalesce ]
+		[ editEntityRecord, kind, name, id, prop, revisionId, isCached ]
 	);
 
 	return [ value, setValue, fullValue ];

@@ -21,10 +21,6 @@ import {
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
-// Matches the block editor's `useMarkPersistent`, so an entity field and a
-// block attribute build undo levels at the same rate.
-const COALESCE_TIMEOUT = 1000;
-
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
 }
@@ -427,10 +423,11 @@ export const deleteEntityRecord =
  * @param {Object}                  edits                The edits.
  * @param {Object}                  options              Options for the edit.
  * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
- * @param {boolean}                 [options.isCached]   Merge this edit into the previous undo level. The
- *                                                       caller decides where a run of edits starts and ends.
- * @param {boolean}                 [options.coalesce]   Merge a burst of edits, such as typing, into one undo
- *                                                       level. The store decides where the burst ends.
+ * @param {boolean}                 [options.isCached]   Merge this edit into the previous undo level when it
+ *                                                       continues the same run: the last undoable edit was to
+ *                                                       the same record and shared an edited key. Otherwise it
+ *                                                       starts a new level. The caller ends a run with
+ *                                                       `__unstableCreateUndoLevel`.
  *
  * @return {Object} Action object.
  */
@@ -477,25 +474,6 @@ export const editEntityRecord =
 		let coalesceSession;
 		let isCached = options.isCached;
 		if ( ! options.undoIgnore ) {
-			// Record plus the set of edited keys, so editing a different
-			// property starts a new level. Values are irrelevant, and may be
-			// functions.
-			const target = `${ kind }|${ name }|${ recordId }|${ Object.keys(
-				edits
-			)
-				.sort()
-				.join( ',' ) }`;
-			const session = select.getUndoCoalesceSession();
-			const now = Date.now();
-
-			// An explicit `isCached` always wins, so callers that assert it
-			// themselves, such as `useEntityBlockEditor`, are unaffected.
-			isCached =
-				options.isCached ??
-				( !! options.coalesce &&
-					session?.target === target &&
-					now - session.time < COALESCE_TIMEOUT );
-
 			// The undo manager opens no level for a record that changes nothing,
 			// so neither should this. Otherwise the next edit of the run stages
 			// into whichever level happens to be last.
@@ -510,7 +488,19 @@ export const editEntityRecord =
 			} );
 
 			if ( hasChanges ) {
-				coalesceSession = { target, time: now };
+				const target = `${ kind }|${ name }|${ recordId }`;
+				const keys = Object.keys( edits );
+				const session = select.getUndoCoalesceSession();
+
+				// Sharing a key rather than matching the whole set, because
+				// `useEntityBlockEditor` sends `content` only when it opens a
+				// level and `blocks` alone while typing.
+				isCached =
+					!! options.isCached &&
+					session?.target === target &&
+					keys.some( ( key ) => session.keys.includes( key ) );
+
+				coalesceSession = { target, keys };
 			}
 		}
 
@@ -659,13 +649,19 @@ export const redo =
 
 /**
  * Flushes any staged edits into the preceding undo level and ends the current
- * run of coalesced edits, so that the next edit starts a new undo level.
+ * run of cached edits, so that the next edit starts a new undo level.
  *
  * Despite its name it does not create an undo level of its own.
  */
 export const __unstableCreateUndoLevel =
 	() =>
 	( { select, dispatch } ) => {
+		// Outside a run there is nothing to end, and flushing would drop
+		// pending redos, e.g. when an input's timer fires after an undo.
+		// Staged edits still flush with the next level or undo.
+		if ( ! select.getUndoCoalesceSession() ) {
+			return;
+		}
 		select.getUndoManager().addRecord();
 		dispatch( { type: 'END_UNDO_COALESCE_SESSION' } );
 	};

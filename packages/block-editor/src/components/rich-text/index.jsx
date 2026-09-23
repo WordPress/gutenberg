@@ -77,6 +77,7 @@ function RichTextWrapper(
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
 		readOnly,
+		onMarkPersistent,
 		...props
 	},
 	forwardedRef
@@ -457,7 +458,8 @@ function RichTextWrapper(
 	useMarkPersistent( {
 		html: adjustedValue,
 		value,
-		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
+		onMarkPersistent:
+			onMarkPersistent ?? __unstableMarkLastChangeAsPersistent,
 	} );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -680,6 +682,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			disableLineBreaks,
 			__unstableAllowPrefixTransformations,
 			readOnly,
+			onMarkPersistent,
 			...contentProps
 		} = props;
 		return (

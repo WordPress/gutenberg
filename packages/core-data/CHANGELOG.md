@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `editEntityRecord` accepts a `coalesce` option that merges consecutive edits to the same properties of the same record into a single undo level, and starts a new one when an unrelated edit or a pause of more than a second interrupts the run. `useEntityProp` forwards it through a new options argument. ([#82564](https://github.com/WordPress/gutenberg/pull/82564))
+-   `editEntityRecord`: an `isCached` edit merges into the previous undo level only when it continues the same run, meaning the last undoable edit was to the same record and shared an edited key. Otherwise it starts a new level instead of folding into an unrelated one. `__unstableCreateUndoLevel` no longer drops pending redos when no run is open. `useEntityProp` forwards `isCached` through a new options argument. ([#82564](https://github.com/WordPress/gutenberg/pull/82564))
 
 ## 8.1.0 (2026-09-23)
 

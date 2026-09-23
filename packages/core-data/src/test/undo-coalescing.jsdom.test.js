@@ -1,8 +1,9 @@
 /**
- * Consecutive edits to the same entity property merge into one undo level when
- * the caller opts in with `coalesce`. Anything else starts a new level.
+ * A cached edit merges into the previous undo level only when it continues the
+ * same run: the last undoable edit was to the same record and shared a key.
+ * Anything else starts a new level.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
@@ -34,7 +35,7 @@ const ORIGINAL_POSTS = [
 	{ id: 2, title: 'Second Post' },
 ];
 
-const COALESCE = { coalesce: true };
+const CACHED = { isCached: true };
 
 function createTestRegistry() {
 	const registry = createRegistry();
@@ -55,13 +56,8 @@ describe( 'undo coalescing', () => {
 	let registry;
 
 	beforeEach( () => {
-		vi.useFakeTimers();
 		apiFetch.mockReset();
 		registry = createTestRegistry();
-	} );
-
-	afterEach( () => {
-		vi.useRealTimers();
 	} );
 
 	function edit( prop, value, options, target = registry ) {
@@ -81,15 +77,13 @@ describe( 'undo coalescing', () => {
 	}
 
 	function editPost( id, value, options ) {
+		editPostFields( id, { title: value }, options );
+	}
+
+	function editPostFields( id, edits, options ) {
 		registry
 			.dispatch( coreDataStore )
-			.editEntityRecord(
-				'postType',
-				'post',
-				id,
-				{ title: value },
-				options
-			);
+			.editEntityRecord( 'postType', 'post', id, edits, options );
 	}
 
 	function getPost( id ) {
@@ -115,28 +109,18 @@ describe( 'undo coalescing', () => {
 	}
 
 	it( 'merges a burst of edits to one property into a single level', () => {
-		editTitle( 'H', COALESCE );
-		editTitle( 'He', COALESCE );
-		editTitle( 'Hel', COALESCE );
+		editTitle( 'H', CACHED );
+		editTitle( 'He', CACHED );
+		editTitle( 'Hel', CACHED );
 
 		expect( countUndoLevels() ).toBe( 1 );
 		expect( getRecord().title ).toBe( ORIGINAL.title );
 	} );
 
-	it( 'starts a new level once the coalescing window has passed', () => {
-		editTitle( 'H', COALESCE );
-		editTitle( 'He', COALESCE );
-		vi.advanceTimersByTime( 1000 );
-		editTitle( 'Hel', COALESCE );
-		editTitle( 'Hell', COALESCE );
-
-		expect( countUndoLevels() ).toBe( 2 );
-	} );
-
 	it( 'does not fold an edit into the level of an unrelated property', () => {
-		editTitle( 'New Title', COALESCE );
-		edit( 'description', 'New Tagline', COALESCE );
-		editTitle( 'Newer Title', COALESCE );
+		editTitle( 'New Title', CACHED );
+		edit( 'description', 'New Tagline', CACHED );
+		editTitle( 'Newer Title', CACHED );
 
 		expect( countUndoLevels() ).toBe( 3 );
 	} );
@@ -147,16 +131,16 @@ describe( 'undo coalescing', () => {
 	] )(
 		'starts a new level when a plain edit (%s) interrupts a run',
 		( _label, options ) => {
-			editTitle( 'New Title', COALESCE );
+			editTitle( 'New Title', CACHED );
 			edit( 'description', 'New Tagline', options );
-			editTitle( 'Newer Title', COALESCE );
+			editTitle( 'Newer Title', CACHED );
 
 			expect( countUndoLevels() ).toBe( 3 );
 		}
 	);
 
-	it( 'starts a new level when the set of edited keys changes', () => {
-		editTitle( 'New Title', COALESCE );
+	it( 'continues a run when the edited keys overlap', () => {
+		editTitle( 'New Title', CACHED );
 		registry
 			.dispatch( coreDataStore )
 			.editEntityRecord(
@@ -164,24 +148,46 @@ describe( 'undo coalescing', () => {
 				'site',
 				undefined,
 				{ title: 'Newer Title', description: 'New Tagline' },
-				COALESCE
+				CACHED
 			);
 
-		expect( countUndoLevels() ).toBe( 2 );
+		expect( countUndoLevels() ).toBe( 1 );
+	} );
+
+	it( 'continues a run of block edits after the edit that opened it', () => {
+		// `useEntityBlockEditor` sends `content` only with the edit that opens
+		// a level, and `blocks` alone while typing.
+		editPostFields( 1, { content: 'A', blocks: [ 'A' ] } );
+		editPostFields( 1, { blocks: [ 'Ab' ] }, CACHED );
+		editPostFields( 1, { blocks: [ 'Abc' ] }, CACHED );
+
+		expect( countUndoLevels() ).toBe( 1 );
+	} );
+
+	it( 'does not fold block edits into the level of another entity', () => {
+		editPostFields( 1, { content: 'A', blocks: [ 'A' ] } );
+		editPostFields( 1, { blocks: [ 'Ab' ] }, CACHED );
+		editTitle( 'New Title', CACHED );
+		editPostFields( 1, { blocks: [ 'Abc' ] }, CACHED );
+
+		registry.dispatch( coreDataStore ).undo();
+
+		expect( getPost( 1 ).blocks ).toEqual( [ 'Ab' ] );
+		expect( getRecord().title ).toBe( 'New Title' );
 	} );
 
 	it( 'starts a new level when the edited record changes', () => {
-		editPost( 1, 'Edited First', COALESCE );
-		editPost( 2, 'Edited Second', COALESCE );
-		editPost( 1, 'Edited First Again', COALESCE );
+		editPost( 1, 'Edited First', CACHED );
+		editPost( 2, 'Edited Second', CACHED );
+		editPost( 1, 'Edited First Again', CACHED );
 
 		expect( countUndoLevels() ).toBe( 3 );
 	} );
 
 	it( 'folds into the matching record and leaves the others alone', () => {
-		editPost( 1, 'E', COALESCE );
-		editPost( 1, 'Ed', COALESCE );
-		editPost( 2, 'Edited Second', COALESCE );
+		editPost( 1, 'E', CACHED );
+		editPost( 1, 'Ed', CACHED );
+		editPost( 2, 'Edited Second', CACHED );
 
 		registry.dispatch( coreDataStore ).undo();
 
@@ -189,17 +195,26 @@ describe( 'undo coalescing', () => {
 		expect( getPost( 1 ).title ).toBe( 'Ed' );
 	} );
 
-	it( 'stages an explicit `isCached` edit regardless of identity', () => {
+	it( 'starts a new level for a cached edit that does not continue a run', () => {
 		editTitle( 'New Title' );
-		edit( 'description', 'New Tagline', { isCached: true } );
+		edit( 'description', 'New Tagline', CACHED );
 
-		expect( countUndoLevels() ).toBe( 1 );
+		expect( countUndoLevels() ).toBe( 2 );
+	} );
+
+	it( 'keeps pending redos on a cached edit that changes nothing', () => {
+		editTitle( 'New Title', CACHED );
+		registry.dispatch( coreDataStore ).undo();
+
+		edit( 'description', ORIGINAL.description, CACHED );
+
+		expect( registry.select( coreDataStore ).hasRedo() ).toBe( true );
 	} );
 
 	it( 'keeps a run open across an `undoIgnore` edit', () => {
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		edit( 'description', 'Ignored Tagline', { undoIgnore: true } );
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 1 );
 	} );
@@ -208,8 +223,8 @@ describe( 'undo coalescing', () => {
 		edit( 'description', 'New Tagline' );
 		// The Site Title block trims its value, so typing a trailing space
 		// edits the title to the value it already has.
-		editTitle( ORIGINAL.title, COALESCE );
-		editTitle( 'New Title', COALESCE );
+		editTitle( ORIGINAL.title, CACHED );
+		editTitle( 'New Title', CACHED );
 
 		registry.dispatch( coreDataStore ).undo();
 
@@ -218,9 +233,9 @@ describe( 'undo coalescing', () => {
 	} );
 
 	it( 'does not end a run on an edit that changes nothing', () => {
-		editTitle( 'H', COALESCE );
-		edit( 'description', ORIGINAL.description, COALESCE );
-		editTitle( 'He', COALESCE );
+		editTitle( 'H', CACHED );
+		edit( 'description', ORIGINAL.description, CACHED );
+		editTitle( 'He', CACHED );
 
 		registry.dispatch( coreDataStore ).undo();
 
@@ -229,13 +244,13 @@ describe( 'undo coalescing', () => {
 	} );
 
 	it( 'starts a new level when editing after an undo', () => {
-		editTitle( 'H', COALESCE );
-		editTitle( 'He', COALESCE );
+		editTitle( 'H', CACHED );
+		editTitle( 'He', CACHED );
 
 		registry.dispatch( coreDataStore ).undo();
 		expect( registry.select( coreDataStore ).hasRedo() ).toBe( true );
 
-		editTitle( 'Ha', COALESCE );
+		editTitle( 'Ha', CACHED );
 
 		// A staged edit does not drop pending redos, so a stale session would
 		// leave a redo entry that no longer matches the history.
@@ -243,55 +258,46 @@ describe( 'undo coalescing', () => {
 	} );
 
 	it( 'starts a new level when editing after a redo', () => {
-		editTitle( 'H', COALESCE );
-		vi.advanceTimersByTime( 1000 );
-		editTitle( 'He', COALESCE );
+		editTitle( 'H', CACHED );
+		registry.dispatch( coreDataStore ).__unstableCreateUndoLevel();
+		editTitle( 'He', CACHED );
 
 		registry.dispatch( coreDataStore ).undo();
 		registry.dispatch( coreDataStore ).redo();
 
-		editTitle( 'Hel', COALESCE );
+		editTitle( 'Hel', CACHED );
 
 		expect( countUndoLevels() ).toBe( 3 );
 	} );
 
 	it( 'ends the run when `saveEntityRecord` is called directly', async () => {
-		// Real timers: resolving the entity config goes through the data
-		// registry's async resolver queue, which never drains under fake ones.
-		vi.useRealTimers();
 		apiFetch.mockResolvedValue( { ...ORIGINAL } );
 
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		await registry
 			.dispatch( coreDataStore )
 			.saveEntityRecord( 'root', 'site', { title: 'H' } );
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 2 );
 	} );
 
 	it( 'ends the run when `saveEditedEntityRecord` is called', async () => {
-		// Real timers: resolving the entity config goes through the data
-		// registry's async resolver queue, which never drains under fake ones.
-		vi.useRealTimers();
 		apiFetch.mockResolvedValue( { ...ORIGINAL } );
 
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		await registry
 			.dispatch( coreDataStore )
 			.saveEditedEntityRecord( 'root', 'site' );
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 2 );
 	} );
 
 	it( 'keeps the run open across an autosave', async () => {
-		// Real timers: resolving the entity config goes through the data
-		// registry's async resolver queue, which never drains under fake ones.
-		vi.useRealTimers();
 		apiFetch.mockResolvedValue( { ...ORIGINAL } );
 
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		await registry
 			.dispatch( coreDataStore )
 			.saveEntityRecord(
@@ -300,36 +306,45 @@ describe( 'undo coalescing', () => {
 				{ title: 'H' },
 				{ isAutosave: true }
 			);
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 1 );
 	} );
 
 	it( 'ends the run when edits are discarded', () => {
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		registry
 			.dispatch( coreDataStore )
 			.clearEntityRecordEdits( 'root', 'site' );
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 2 );
 	} );
 
 	it( 'ends the run on `__unstableCreateUndoLevel`', () => {
-		editTitle( 'H', COALESCE );
+		editTitle( 'H', CACHED );
 		registry.dispatch( coreDataStore ).__unstableCreateUndoLevel();
-		editTitle( 'He', COALESCE );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 2 );
+	} );
+
+	it( 'keeps pending redos when `__unstableCreateUndoLevel` follows an undo', () => {
+		// An input's timer fires after the value changes, undo included.
+		editTitle( 'H', CACHED );
+		registry.dispatch( coreDataStore ).undo();
+		registry.dispatch( coreDataStore ).__unstableCreateUndoLevel();
+
+		expect( registry.select( coreDataStore ).hasRedo() ).toBe( true );
 	} );
 
 	it( 'keeps sessions separate between registries', () => {
 		const otherRegistry = createTestRegistry();
 
-		editTitle( 'H', COALESCE );
-		// A different key set. Were the session shared, this would end the run.
-		edit( 'description', 'New Tagline', COALESCE, otherRegistry );
-		editTitle( 'He', COALESCE );
+		editTitle( 'H', CACHED );
+		// A different key. Were the session shared, this would end the run.
+		edit( 'description', 'New Tagline', CACHED, otherRegistry );
+		editTitle( 'He', CACHED );
 
 		expect( countUndoLevels() ).toBe( 1 );
 		expect( countUndoLevels( otherRegistry ) ).toBe( 1 );

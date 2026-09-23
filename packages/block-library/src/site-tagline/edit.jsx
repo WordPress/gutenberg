@@ -1,4 +1,4 @@
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import {
 	useBlockProps,
@@ -30,8 +30,9 @@ export default function SiteTaglineEdit( props ) {
 		canUserEdit ? 'site' : '__unstableBase',
 		'description',
 		undefined,
-		{ coalesce: true }
+		{ isCached: true }
 	);
+	const { __unstableCreateUndoLevel } = useDispatch( coreStore );
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -43,6 +44,7 @@ export default function SiteTaglineEdit( props ) {
 		<RichText
 			allowedFormats={ [] }
 			onChange={ setTagline }
+			onMarkPersistent={ __unstableCreateUndoLevel }
 			aria-label={ __( 'Site tagline text' ) }
 			placeholder={ __( 'Write site tagline…' ) }
 			tagName={ TagName }
