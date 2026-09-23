@@ -6,7 +6,8 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof CheckboxControl > = {
-	title: 'Design System/Components/Form/CheckboxControl',
+	title: 'Components/@wordpress-ui/Form/CheckboxControl',
+	id: 'design-system-components-form-checkboxcontrol',
 	component: CheckboxControl,
 	argTypes: {
 		checked: { control: false },

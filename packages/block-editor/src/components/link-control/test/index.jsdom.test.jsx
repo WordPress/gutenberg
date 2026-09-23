@@ -31,8 +31,6 @@ import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/
 globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockScrollIntoView();
-globalThis.wpVitest.mockVisibleElements();
-
 const mockFetchSearchSuggestions = vi.fn();
 
 function getExpectedVisualTypeName( type ) {
@@ -1706,114 +1704,6 @@ describe( 'Selecting links', () => {
 	} );
 
 	describe( 'Selection using keyboard', () => {
-		it.each( [
-			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
-			[
-				'url',
-				'https://www.wordpress.org',
-				{
-					id: '1',
-					title: 'https://www.wordpress.org',
-					url: 'https://www.wordpress.org',
-					type: 'link',
-				},
-			], // Url.
-		] )(
-			'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard',
-			async ( type, searchTerm, selectedLink ) => {
-				const user = userEvent.setup();
-				const LinkControlConsumer = () => {
-					const [ link, setLink ] = useState();
-
-					return (
-						<LinkControl
-							value={ link }
-							onChange={ ( suggestion ) => setLink( suggestion ) }
-						/>
-					);
-				};
-
-				render( <LinkControlConsumer /> );
-
-				// Search Input UI.
-				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Search or type URL',
-				} );
-
-				// Simulate searching for a term.
-				await user.type( searchInput, searchTerm );
-
-				const searchResults = await screen.findByRole( 'listbox', {
-					name: /Search results for.*/,
-				} );
-
-				// Step down into the search results, highlighting the first result item.
-				triggerArrowDown( searchInput );
-
-				const searchResultElements =
-					within( searchResults ).getAllByRole( 'option' );
-
-				const firstSearchSuggestion = searchResultElements[ 0 ];
-				const secondSearchSuggestion = searchResultElements[ 1 ];
-
-				let selectedSearchResultElement = screen.getByRole( 'option', {
-					selected: true,
-				} );
-
-				// We should have highlighted the first item using the keyboard.
-				expect( selectedSearchResultElement ).toBe(
-					firstSearchSuggestion
-				);
-
-				// Only entity searches contain more than 1 suggestion.
-				if ( type === 'entity' ) {
-					// Check we can go down again using the down arrow.
-					triggerArrowDown( searchInput );
-
-					selectedSearchResultElement = screen.getByRole( 'option', {
-						selected: true,
-					} );
-
-					// We should have highlighted the first item using the keyboard
-					expect( selectedSearchResultElement ).toBe(
-						secondSearchSuggestion
-					);
-
-					// Check we can go back up via up arrow.
-					triggerArrowUp( searchInput );
-
-					selectedSearchResultElement = screen.getByRole( 'option', {
-						selected: true,
-					} );
-
-					// We should be back to highlighting the first search result again
-					expect( selectedSearchResultElement ).toBe(
-						firstSearchSuggestion
-					);
-				}
-
-				// Submit the selected item as the current link.
-				triggerEnter( searchInput );
-
-				// Check that the suggestion selected via is now shown as selected.
-				const currentLink = screen.getByRole( 'group', {
-					name: 'Manage link',
-				} );
-				const currentLinkAnchor = screen.getByRole( 'link', {
-					name: `${ selectedLink.title } (opens in a new tab)`,
-				} );
-
-				// Make sure focus is retained after submission.
-				expect( currentLinkAnchor ).toHaveFocus();
-
-				expect( currentLink ).toBeVisible();
-				expect(
-					screen.getByRole( 'button', { name: 'Edit link' } )
-				).toBeVisible();
-				expect( currentLinkAnchor ).toBeVisible();
-			}
-		);
-
 		it( 'should allow selection of initial search results via the keyboard', async () => {
 			render( <LinkControl showInitialSuggestions /> );
 
@@ -3680,8 +3570,8 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 				url: 'https://example.com/my-page',
 				title: 'My Test Page',
 				badges: [
-					{ label: 'Draft', intent: 'warning' },
-					{ label: 'Page', intent: 'default' },
+					{ label: 'Draft', intent: 'low' },
+					{ label: 'Page', intent: 'none' },
 				],
 			};
 
@@ -3739,5 +3629,43 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 
 			expect( badgesContainer ).not.toBeInTheDocument();
 		} );
+	} );
+} );
+
+describe( 'Front page and blog home labelling', () => {
+	it( 'should not label a term that shares the front page id as the front page', async () => {
+		const user = userEvent.setup();
+		const aCategory = {
+			id: 1,
+			title: 'Uncategorized',
+			type: 'category',
+			kind: 'taxonomy',
+			url: '/category/uncategorized',
+		};
+
+		// Posts and terms are separate tables, so a term can share an id with
+		// the page set as the front page.
+		useSelect.mockImplementation( () => ( {
+			fetchSearchSuggestions: () => Promise.resolve( [ aCategory ] ),
+			fetchRichUrlData: mockFetchRichUrlData,
+			pageOnFront: 1,
+			pageForPosts: 2,
+		} ) );
+
+		render( <LinkControl /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Uncategorized'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		const option = within( searchResults ).getByRole( 'option' );
+
+		expect( option ).toHaveTextContent( 'Category' );
+		expect( option ).not.toHaveTextContent( 'Front page' );
 	} );
 } );

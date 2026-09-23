@@ -35,10 +35,10 @@ function setPath( object: Record< string, any >, path: string[], value: any ) {
 		object[ key ] =
 			i === lastIndex
 				? // If at end of path, assign the intended value.
-				  value
+					value
 				: // Otherwise, advance to the next object in the path, creating
-				  // it if it does not yet exist.
-				  object[ key ] || ( isNextKeyArrayIndex ? [] : {} );
+					// it if it does not yet exist.
+					object[ key ] || ( isNextKeyArrayIndex ? [] : {} );
 
 		if ( Array.isArray( object[ key ] ) && ! isNextKeyArrayIndex ) {
 			// If we current key is non-numeric, but the next value is an
@@ -90,7 +90,7 @@ export function getQueryArgs( url: string ): QueryArgs {
 					const value = hasValue
 						? safeDecodeURIComponent(
 								keyValue.slice( separatorIndex + 1 )
-						  )
+							)
 						: '';
 					const segments = key.replace( /\]/g, '' ).split( '[' );
 					setPath( accumulator, segments, value );

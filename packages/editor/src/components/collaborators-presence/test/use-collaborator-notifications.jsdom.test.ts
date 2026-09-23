@@ -3,10 +3,11 @@ import { renderHook } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
 
-type NoticesStore = ( typeof import('@wordpress/notices') )[ 'store' ];
-type PreferencesStore = ( typeof import('@wordpress/preferences') )[ 'store' ];
-type EditorStore = ( typeof import('../../../store') )[ 'store' ];
-type Unlock = ( typeof import('../../../lock-unlock') )[ 'unlock' ];
+type NoticesStore = ( typeof import( '@wordpress/notices' ) )[ 'store' ];
+type PreferencesStore =
+	( typeof import( '@wordpress/preferences' ) )[ 'store' ];
+type EditorStore = ( typeof import( '../../../store' ) )[ 'store' ];
+type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
 
 // --- Mocks ---
 //

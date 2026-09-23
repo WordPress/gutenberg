@@ -1,4 +1,3 @@
-import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -209,7 +208,7 @@ describe( 'WidgetDashboard.Actions', () => {
 		);
 
 		expect(
-			await screen.findByRole( 'menuitem', { name: 'Reset to default' } )
+			await screen.findByRole( 'menuitem', { name: 'Reset to default…' } )
 		).toBeInTheDocument();
 	} );
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "7.3.0",
+	"version": "7.5.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0",
-		"npm": ">=10.2.3"
+		"node": "^20.19.0 || >=22.13.0"
 	},
 	"files": [
 		"src",
@@ -87,7 +86,7 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

@@ -631,6 +631,40 @@ describe( 'DataForm component', () => {
 			expect( fieldsSelector.author.edit() ).toBeInTheDocument();
 		} );
 
+		it.each( [ 'dropdown', 'modal' ] as const )(
+			'renders a disabled field as text without an edit button (%s)',
+			( openAs ) => {
+				render(
+					<Dataform
+						onChange={ noop }
+						fields={ fields.map( ( field ) =>
+							field.id === 'title'
+								? {
+										...field,
+										isDisabled: ( {
+											item,
+										}: {
+											item: typeof data;
+										} ) => item.order === 1,
+									}
+								: field
+						) }
+						form={ {
+							...formPanelMode,
+							layout: { ...formPanelMode.layout, openAs },
+						} }
+						data={ data }
+					/>
+				);
+
+				expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'button', { name: /edit title/i } )
+				).not.toBeInTheDocument();
+				expect( fieldsSelector.order.view() ).toBeInTheDocument();
+			}
+		);
+
 		it( 'should render custom render component', async () => {
 			const fieldsWithCustomRenderFunction = fields.map( ( field ) => {
 				return {
@@ -656,6 +690,103 @@ describe( 'DataForm component', () => {
 			expect( titleField ).toBeInTheDocument();
 			expect( orderField ).toBeInTheDocument();
 			expect( authorField ).toBeInTheDocument();
+		} );
+
+		it( 'should show the placeholder of an empty field when the layout opts in', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
+				/>
+			);
+
+			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should show the value of a non-empty field instead of its placeholder', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'title' ],
+					} }
+					data={ { title: 'Hello World' } }
+				/>
+			);
+
+			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Add a title' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should fall back to the render output when an empty field has no placeholder', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							render: () => <span>No title yet</span>,
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
+				/>
+			);
+
+			expect( screen.getByText( 'No title yet' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should not show the placeholder of an empty field by default', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text',
+							placeholder: 'Add a title',
+						},
+					] }
+					form={ {
+						layout: { type: 'panel' },
+						fields: [ 'title' ],
+					} }
+					data={ { title: '' } }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'Add a title' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should render custom Edit component', async () => {
@@ -944,7 +1075,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 

@@ -6,7 +6,7 @@ import typescript from 'typescript';
 const SOURCE_IGNORES = [ '**/node_modules/**', 'vendor/**' ];
 const JEST_CONFIG_FILE_PATTERN = /(?:^|\/)[^/]*jest[^/]*\.config\.[^/]+$/;
 const JEST_COMMAND_PATTERN =
-	/(?:^|[^\w-])(?:jest|test-unit-js)(?=$|[^\w-])|(?:^|\s)npm\s+run(?:\s+--workspace\s+\S+)?\s+test:unit(?::(?:debug|profile|update|watch))?(?=$|\s)/;
+	/(?:^|[^\w-])(?:jest|test-unit-jest)(?=$|[^\w-])|(?:^|\s)npm\s+run(?:\s+--workspace\s+\S+)?\s+test:unit:jest(?=$|\s)/;
 const JEST_DEPENDENCY_SECTIONS = [
 	'dependencies',
 	'devDependencies',
@@ -362,6 +362,11 @@ export function validateVitestCleanupConfig( vitestConfig ) {
 	if ( vitestConfig.test?.globals !== false ) {
 		violations.push(
 			'test/unit/vitest.config.mjs: test.globals must remain false'
+		);
+	}
+	if ( vitestConfig.test?.clearMocks !== false ) {
+		violations.push(
+			'test/unit/vitest.config.mjs: test.clearMocks must remain false while test.mockReset is true'
 		);
 	}
 
