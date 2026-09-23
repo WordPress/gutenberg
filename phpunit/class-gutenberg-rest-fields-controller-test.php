@@ -439,7 +439,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * than arrays.
 	 *
 	 * @covers ::get_items
-	 * @covers ::prepare_field_for_response
+	 * @covers ::cast_empty_objects
 	 */
 	public function test_empty_object_properties_serialize_as_json_objects() {
 		$this->register_fields(
@@ -453,6 +453,11 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 					'isValid'  => array(),
 					'format'   => array(),
 					'Edit'     => array(),
+					'elements' => array( array() ),
+				),
+				array(
+					'id'       => 'list',
+					'type'     => 'text',
 					'elements' => array(),
 				),
 			)
@@ -466,7 +471,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( '"isValid":{}', $json );
 		$this->assertStringContainsString( '"format":{}', $json );
 		$this->assertStringContainsString( '"Edit":{}', $json );
-		$this->assertStringContainsString( '"elements":[]', $json, 'Lists stay lists.' );
+		$this->assertStringContainsString( '"elements":[{}]', $json, 'Empty items typed as objects encode as objects.' );
+		$this->assertStringContainsString( '"elements":[]', $json, 'Empty lists stay lists.' );
 	}
 
 	/**
