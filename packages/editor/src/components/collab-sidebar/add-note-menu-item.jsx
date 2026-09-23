@@ -7,6 +7,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { comment as commentIcon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
@@ -45,6 +46,7 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 
 	return (
 		<MenuItem
+			icon={ commentIcon }
 			onClick={ onClick }
 			aria-haspopup="dialog"
 			disabled={ isDisabled }
