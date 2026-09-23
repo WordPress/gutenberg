@@ -575,11 +575,12 @@ const { state, actions, callbacks } = store(
 				);
 				let captionSpace = 0;
 				if ( caption ) {
-					if ( caption.dataset.imageId !== state.selectedImageId ) {
+					const hasCaptionChanged =
+						caption.dataset.imageId !== state.selectedImageId;
+					if ( hasCaptionChanged ) {
 						// This HTML was sanitized with wp_kses_post on the server.
 						caption.innerHTML = state.selectedImage.caption || '';
 						caption.dataset.imageId = state.selectedImageId;
-						caption.scrollTop = 0;
 					}
 					caption.hidden = ! state.selectedImage.caption;
 					caption.style.width = `${ Math.max(
@@ -599,6 +600,11 @@ const { state, actions, callbacks } = store(
 						caption.tabIndex = 0;
 					} else {
 						caption.removeAttribute( 'tabindex' );
+					}
+					if ( hasCaptionChanged && ! caption.hidden ) {
+						// Restore the scrolling box first. A reset while hidden can
+						// be ignored when returning from an uncaptioned image.
+						caption.scrollTop = 0;
 					}
 				}
 

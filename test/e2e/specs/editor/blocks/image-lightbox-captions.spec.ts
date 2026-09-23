@@ -136,6 +136,60 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		await expect( dialog.locator( '[aria-live]' ) ).toBeEmpty();
 	} );
 
+	test( 'resets a returning caption after restoring its scrolling box', async ( {
+		page,
+	} ) => {
+		const dialog = page.getByRole( 'dialog' );
+		const caption = dialog.locator( 'figcaption' );
+		const next = dialog.getByRole( 'button', {
+			name: 'Next',
+			exact: true,
+		} );
+		await next.click();
+		await expect( caption ).toContainText( 'Long caption' );
+		await caption.evaluate( ( element ) => {
+			element.scrollTop = element.scrollHeight;
+		} );
+		await expect
+			.poll( () => caption.evaluate( ( element ) => element.scrollTop ) )
+			.toBeGreaterThan( 0 );
+		await next.click();
+		await expect( caption ).toBeHidden();
+
+		// A hidden caption has no scrolling box, so its scrollTop setter can
+		// silently ignore a reset even though its getter reports zero.
+		await caption.evaluate( ( element ) => {
+			const descriptor = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'scrollTop'
+			)!;
+			Object.defineProperty( element, 'scrollTop', {
+				configurable: true,
+				get() {
+					return descriptor.get!.call( this );
+				},
+				set( value ) {
+					this.setAttribute(
+						'data-reset-with-scrolling-box',
+						String( this.getClientRects().length > 0 )
+					);
+					descriptor.set!.call( this, value );
+				},
+			} );
+		} );
+		await dialog
+			.getByRole( 'button', { name: 'Previous', exact: true } )
+			.click();
+		await expect( caption ).toBeVisible();
+		await expect( caption ).toHaveAttribute(
+			'data-reset-with-scrolling-box',
+			'true'
+		);
+		await expect
+			.poll( () => caption.evaluate( ( element ) => element.scrollTop ) )
+			.toBe( 0 );
+	} );
+
 	test( 'traps focus on a standalone image without hidden navigation buttons', async ( {
 		page,
 		requestUtils,
