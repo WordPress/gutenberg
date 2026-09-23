@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Button } from '@wordpress/components';
+import { closeSmall } from '@wordpress/icons';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	useCallback,
@@ -409,6 +410,7 @@ function getGlobalStylesEntries( property, context, element ) {
 		base,
 		user,
 		getPresetName,
+		includeRoot = true,
 	} = context;
 	if ( ! blockName || ! getStylePaths( property ).length ) {
 		return [];
@@ -443,8 +445,9 @@ function getGlobalStylesEntries( property, context, element ) {
 			),
 		} )
 	);
-	// Root values reach a block only through inheritance.
-	if ( property.inherits ) {
+	// Root values reach a block only through inheritance. For a parent
+	// block, they are this block's own root layer instead.
+	if ( property.inherits && includeRoot ) {
 		layers.push( {
 			path: null,
 			label: sprintf(
@@ -465,6 +468,10 @@ function getGlobalStylesEntries( property, context, element ) {
 				label: __( 'Global styles' ),
 				route: layer.label,
 				origin: 'user',
+				preset: getPresetLabel(
+					toCSSValue( userValue ),
+					getPresetName
+				),
 				value: formatConfigValue(
 					property,
 					userValue,
@@ -481,6 +488,10 @@ function getGlobalStylesEntries( property, context, element ) {
 				label: __( 'Theme' ),
 				route: layer.label,
 				origin: 'theme',
+				preset: getPresetLabel(
+					toCSSValue( themeValue ),
+					getPresetName
+				),
 				value: formatConfigValue(
 					property,
 					themeValue,
@@ -498,12 +509,14 @@ function getGlobalStylesEntries( property, context, element ) {
  * the canvas's stylesheets say, with the Global Styles rules among them
  * replaced by the Styles locations (theme or customized) they came from.
  *
- * @param {Object}    property        Property from `getInspectorGroups`.
- * @param {?Object}   trace           The property's result from `traceCascade`.
- * @param {Element}   element         Element being inspected.
- * @param {Object}    describeContext Context for `describeDeclaration`.
- * @param {?Object[]} globalEntries   From `getGlobalStylesEntries`, or `null`
- *                                    for properties Styles does not cover.
+ * @param {Object}    property         Property from `getInspectorGroups`.
+ * @param {?Object}   trace            The property's result from `traceCascade`.
+ * @param {Element}   element          Element being inspected.
+ * @param {Object}    describeContext  Context for `describeDeclaration`.
+ * @param {?Object[]} globalEntries    From `getGlobalStylesEntries`, or `null`
+ *                                     for properties Styles does not cover.
+ * @param {Function}  getParentEntries Styles entries for a parent block, by
+ *                                     client ID, for values it passes down.
  * @return {Object[]} Origins; the first is the one in effect.
  */
 function getOrigins(
@@ -511,7 +524,8 @@ function getOrigins(
 	trace,
 	element,
 	describeContext,
-	globalEntries
+	globalEntries,
+	getParentEntries
 ) {
 	if ( ! trace ) {
 		return [];
@@ -542,11 +556,12 @@ function getOrigins(
 				isGlobalStyles: !! description.isGlobalStyles,
 				// Set by someone on this site, rather than by the theme or a
 				// block's own stylesheet: on a block (this one or a parent),
-				// or in Global CSS.
+				// or in Global CSS. Styles values are judged by their layer.
 				isCustomized:
-					kind === 'block' ||
-					kind === 'parent' ||
-					( kind === 'global' && ! description.isGlobalStyles ),
+					! description.isGlobalStyles &&
+					( kind === 'block' ||
+						kind === 'parent' ||
+						kind === 'global' ),
 				label:
 					fromBlockId && ! description.isGlobalStyles
 						? sprintf(
@@ -557,6 +572,10 @@ function getOrigins(
 						: description.label,
 				kind,
 				clientId: fromBlockId,
+				preset: getPresetLabel(
+					declaration.value,
+					describeContext.getPresetName
+				),
 				value: formatDeclaredValue(
 					property,
 					declaration,
@@ -567,37 +586,66 @@ function getOrigins(
 		} )
 	);
 
-	// Without Styles data for the property (the catch-all), the Global
-	// Styles rules stay as the canvas has them.
-	const firstGlobal =
-		globalEntries === null
-			? -1
-			: traced.findIndex( ( entry ) => entry.isGlobalStyles );
-	const styles = ( globalEntries ?? [] ).map( ( entry ) => ( {
+	// Global Styles rules in the canvas are replaced by the Styles layers they
+	// came from. Rules on this block (or the page) come from this block's
+	// layers; a rule on a parent block comes from that block's layers, and is
+	// passed down. Without Styles data (the catch-all), rules stay as traced.
+	const own = ( globalEntries ?? [] ).map( ( entry ) => ( {
 		...entry,
 		kind: 'global',
 		isCustomized: entry.origin === 'user',
 	} ) );
-	// When something stronger already set the value on this block, the
+	let isOwnListed = globalEntries === null;
+	const expandedParents = new Set();
+	const origins = [];
+	for ( const entry of traced ) {
+		if ( ! entry.isGlobalStyles || globalEntries === null ) {
+			origins.push( entry );
+		} else if ( entry.clientId ) {
+			if ( expandedParents.has( entry.clientId ) ) {
+				continue;
+			}
+			expandedParents.add( entry.clientId );
+			const parentEntries = getParentEntries( entry.clientId );
+			if ( ! parentEntries.length ) {
+				origins.push( entry );
+				continue;
+			}
+			const title = describeContext.getBlockTitle( entry.clientId );
+			origins.push(
+				...parentEntries.map( ( parentEntry ) => ( {
+					...parentEntry,
+					label: sprintf(
+						/* translators: 1: block title, e.g. "Group". 2: where the parent's value was set, e.g. "Global styles" or "Theme". */
+						__( 'From the %1$s block · %2$s' ),
+						title,
+						parentEntry.label
+					),
+					kind: 'parent',
+					clientId: entry.clientId,
+					isCustomized: parentEntry.origin === 'user',
+				} ) )
+			);
+		} else if ( ! isOwnListed ) {
+			origins.push( ...own );
+			isOwnListed = true;
+		}
+	}
+	// When something stronger already set the value on this block, its
 	// Styles values never reach its CSS, but they are still what it
 	// overrides: list them underneath.
-	const origins =
-		firstGlobal === -1
-			? [ ...traced, ...styles ]
-			: [
-					...traced.slice( 0, firstGlobal ),
-					...styles,
-					...traced
-						.slice( firstGlobal )
-						.filter( ( entry ) => ! entry.isGlobalStyles ),
-				];
+	if ( ! isOwnListed ) {
+		origins.push( ...own );
+	}
 
 	// One line per place: the same place can reach the canvas twice, such
 	// as a preset class printed by two stylesheets.
 	const seen = new Set();
 	return origins.filter( ( entry ) => {
 		// Styles values share a label ("Theme"), so they are told apart by route.
-		const key = `${ entry.route ?? entry.label }|${ entry.origin ?? '' }`;
+		const key = `${ entry.clientId ?? '' }|${ entry.route ?? entry.label }|${
+			entry.origin ?? ''
+		}`;
 		if ( seen.has( key ) ) {
 			return false;
 		}
@@ -614,12 +662,12 @@ function PropertyRow( {
 	getPresetName,
 	onSelectBlock,
 } ) {
-	const presetLabel = getPresetLabel(
-		quickSource.presetValue,
-		getPresetName
-	);
-	const displayValue = formatComputedValue( property, computedValue );
 	const [ inEffect, ...rest ] = origins.length ? origins : [ quickSource ];
+	// Name the preset from the origin in use, so it always matches the value.
+	const presetLabel = origins.length
+		? inEffect.preset
+		: getPresetLabel( quickSource.presetValue, getPresetName );
+	const displayValue = formatComputedValue( property, computedValue );
 	// A lower layer holding the same value replaced nothing a person would see.
 	const overridden = rest.filter(
 		( entry ) => ! isSameText( entry.value, inEffect.value )
@@ -770,20 +818,23 @@ function readComputedValues( element, properties ) {
 }
 
 /**
- * Explains the styles a block renders with: what each value is, and where it
- * comes from, in the words the editor's own interface uses.
+ * Explains where a block's styles come from: for each style someone
+ * customized, the value in use, where it was set (this block, a parent
+ * block, Global styles, the theme, Block CSS or Global CSS), and what it
+ * replaced.
  *
- * The values and a quick answer about their source are read straight away,
- * from the canvas and the block editor's data: they are cheap. Asking "Where
- * does this come from?" on a value traces it through every stylesheet in the
- * canvas and up through the blocks around it, like a browser's element
- * inspector does. That is expensive, so it only runs for the values asked
- * about.
+ * Values are traced through every stylesheet in the canvas and up through
+ * the blocks around it, like a browser's element inspector does, for the
+ * properties the block inspector knows about. "Show all" also lists styles
+ * still at the theme's value, and runs a catch-all over every CSS rule for
+ * properties no block setting covers; that is the expensive part, so it only
+ * runs on demand.
  *
- * @param {Object}  props
- * @param {?string} props.clientId Client ID of the block to explain.
+ * @param {Object}    props
+ * @param {?string}   props.clientId Client ID of the block to explain.
+ * @param {?Function} props.onClose  Closes the inspector, when it can be.
  */
-export default function StyleInspector( { clientId } ) {
+export default function StyleInspector( { clientId, onClose } ) {
 	const [ showAll, setShowAll ] = useState( false );
 	const [ snapshot, setSnapshot ] = useState( null );
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -993,6 +1044,37 @@ export default function StyleInspector( { clientId } ) {
 		getPresetName,
 	};
 
+	// A parent block's own Styles layers, for values it passes down. Its
+	// root layer is left out: that one reaches this block directly.
+	const getParentStylesEntries = ( property, parentClientId ) => {
+		const { getBlockName: getName, getBlockAttributes } =
+			registry.select( blockEditorStore );
+		const parentName = getName( parentClientId );
+		const className = getBlockAttributes( parentClientId )?.className ?? '';
+		const parentVariation =
+			className.match( /(?:^|\s)is-style-([\w-]+)/ )?.[ 1 ] ?? null;
+		const variationName =
+			parentVariation === 'default' ? null : parentVariation;
+		return getGlobalStylesEntries(
+			property,
+			{
+				...globalStylesContext,
+				blockName: parentName,
+				blockTitle: getBlockTitle( parentClientId ),
+				variationName,
+				variationLabel:
+					registry
+						.select( blocksStore )
+						.getBlockStyles( parentName )
+						?.find( ( style ) => style.name === variationName )
+						?.label ?? variationName,
+				elements: [],
+				includeRoot: false,
+			},
+			element
+		);
+	};
+
 	const isCurrent = !! snapshot && snapshot.element === element;
 
 	const otherByKey = Object.fromEntries(
@@ -1037,7 +1119,8 @@ export default function StyleInspector( { clientId } ) {
 									other.trace,
 									element,
 									describeContext,
-									null
+									null,
+									() => []
 								),
 							};
 						}
@@ -1065,7 +1148,12 @@ export default function StyleInspector( { clientId } ) {
 									property,
 									globalStylesContext,
 									element
-								)
+								),
+								( parentClientId ) =>
+									getParentStylesEntries(
+										property,
+										parentClientId
+									)
 							),
 						};
 					} )
@@ -1149,6 +1237,14 @@ export default function StyleInspector( { clientId } ) {
 				>
 					{ showAll ? __( 'Show customized' ) : __( 'Show all' ) }
 				</Button>
+				{ onClose && (
+					<Button
+						size="small"
+						icon={ closeSmall }
+						label={ __( 'Close' ) }
+						onClick={ onClose }
+					/>
+				) }
 			</header>
 
 			{ ! clientId && (

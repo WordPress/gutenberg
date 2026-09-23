@@ -19,6 +19,23 @@ const {
 	PrivateListView: ListView,
 } = unlock( blockEditorPrivateApis );
 
+/**
+ * The style inspector, shown in List View under the row of the block it
+ * explains.
+ *
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of the block the row belongs to.
+ */
+function StyleInspectorDetails( { clientId } ) {
+	const { setIsStyleInspectorOpened } = unlock( useDispatch( editorStore ) );
+	return (
+		<StyleInspector
+			clientId={ clientId }
+			onClose={ () => setIsStyleInspectorOpened( false ) }
+		/>
+	);
+}
+
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
@@ -107,7 +124,7 @@ export default function ListViewSidebar() {
 									<ListView
 										dropZoneElement={ dropZoneElement }
 										focusOnMount
-										blockDetails={ StyleInspector }
+										blockDetails={ StyleInspectorDetails }
 										blockDetailsClientId={
 											isStyleInspectorOpened
 												? inspectedClientId
