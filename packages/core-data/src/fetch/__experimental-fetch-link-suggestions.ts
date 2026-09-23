@@ -395,26 +395,6 @@ function getTypeWeight( result: SearchResult ): number {
 }
 
 /**
- * Sort search results by relevance to the given query.
- *
- * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
- * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
- * be ordered after all the (potentially irrelevant) post results.
- *
- * A title containing what was typed ranks above one that does not, whatever its type: a title
- * that does not contain the search is not an answer to it.
- *
- * The type comes next, then whether the title begins with what was typed.
- *
- * Last is how much of the search the title covers, counting a whole word for much more than a word
- * found inside a longer one. How much of the *title* the search covers is deliberately not
- * considered, so a long title is never marked down for being long, and repeating a word never
- * makes a title a better answer.
- *
- * @param results
- * @param search
- */
-/**
  * How much of the search a title covers.
  *
  * Counts how much of the search the title covers, not how much of the title the search covers: a
@@ -450,6 +430,26 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 	return ( wholeWords * 10 + partialWords ) / searchTokens.length;
 }
 
+/**
+ * Sort search results by relevance to the given query.
+ *
+ * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
+ * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
+ * be ordered after all the (potentially irrelevant) post results.
+ *
+ * A title containing what was typed ranks above one that does not, whatever its type: a title
+ * that does not contain the search is not an answer to it.
+ *
+ * The type comes next, then whether the title begins with what was typed.
+ *
+ * Last is how much of the search the title covers, counting a whole word for much more than a word
+ * found inside a longer one. How much of the *title* the search covers is deliberately not
+ * considered, so a long title is never marked down for being long, and repeating a word never
+ * makes a title a better answer.
+ *
+ * @param results
+ * @param search
+ */
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
