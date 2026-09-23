@@ -260,16 +260,13 @@ export default async function fetchLinkSuggestions(
 	// separately — so a result cut here is one nothing could ask for again.
 	//
 	// A title holding every word that was typed answers the search, wherever those words sit in
-	// it, and is never cut. One holding some of them still might be what was wanted, so it ranks
-	// below and fills whatever room is left, which keeps a search from returning fewer results
-	// than it used to.
-	//
-	// A title holding none of them is dropped. WordPress matches a post's body and excerpt as
-	// well as its title, so those arrive with no sign of the search in them, and filling a list
-	// with them helps nobody. See https://github.com/WordPress/gutenberg/issues/83372.
+	// it, and is never cut. The rest fill whatever room is left, so a search never returns fewer
+	// results than it used to: first the titles holding some of what was typed, then those
+	// holding none, which WordPress returned because it matched a body or an excerpt.
 	const searchTokens = tokenize( search );
 	const answers: SearchResult[] = [];
 	const partial: SearchResult[] = [];
+	const rest: SearchResult[] = [];
 
 	for ( const result of results ) {
 		const titleTokens = tokenize( result.title || '' );
@@ -283,12 +280,17 @@ export default async function fetchLinkSuggestions(
 			answers.push( result );
 		} else if ( found ) {
 			partial.push( result );
+		} else {
+			rest.push( result );
 		}
 	}
 
 	return [
 		...answers,
-		...partial.slice( 0, Math.max( 0, perPage - answers.length ) ),
+		...[ ...partial, ...rest ].slice(
+			0,
+			Math.max( 0, perPage - answers.length )
+		),
 	];
 }
 
