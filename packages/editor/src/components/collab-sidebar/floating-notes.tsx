@@ -167,12 +167,12 @@ export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
 		css:
 			hasRoom && ! isDevicePreview
 				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}` +
-				  `body{overflow-x:clip}` +
-				  `:root::after{content:"";position:fixed;top:0;bottom:0;` +
-				  `inset-inline-end:${ NOTES_PANEL_WIDTH - DIVIDER_WIDTH }px;` +
-				  `width:${ DIVIDER_WIDTH }px;` +
-				  `background:color-mix(in srgb, currentColor 10%, transparent);` +
-				  `pointer-events:none}`
+					`body{overflow-x:clip}` +
+					`:root::after{content:"";position:fixed;top:0;bottom:0;` +
+					`inset-inline-end:${ NOTES_PANEL_WIDTH - DIVIDER_WIDTH }px;` +
+					`width:${ DIVIDER_WIDTH }px;` +
+					`background:color-mix(in srgb, currentColor 10%, transparent);` +
+					`pointer-events:none}`
 				: '',
 	} );
 
