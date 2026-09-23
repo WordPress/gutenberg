@@ -15,6 +15,12 @@
 	pointer-events: none;
 	z-index: 1;
 
+	// The canvas draws its own divider for the reserved space, which also
+	// follows the narrower compact width.
+	.editor-collab-sidebar-panel {
+		border-left: 0;
+	}
+
 	.editor-collab-sidebar-panel__thread,
 	.editor-collab-sidebar-panel__add-note {
 		pointer-events: auto;
