@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 1.23.0 (2026-09-23)
+
 ### New Features
 
 -   Add text shadow settings and presets ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   `generateGlobalStyles`: Treat a missing `spacing.blockGap` setting like a `null` one, as the server's `isset()` check does. WordPress stores `null` for themes that do not opt into block gap, but `getSetting` returns `undefined` for it, so the editor considered block gap supported and rendered the global block gap instead of the fallback gap styles the front end renders, such as the Columns block's `2em` default ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
 
 ## 1.22.0 (2026-09-10)
 

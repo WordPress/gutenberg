@@ -1,7 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;
+
+const DEPRECATION_MESSAGE =
+	'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
 
 const testStore = {
 	reducer: ( state = null, action ) => {
@@ -29,10 +41,8 @@ describe( 'getIsResolving', () => {
 		registry.registerStore( 'testStore', testStore );
 	} );
 
-	const DEPRECATION_MESSAGE =
-		'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
-
 	it( 'should return undefined if no state by reducerKey, selectorName', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		const result = registry
 			.select( 'testStore' )
 			.getIsResolving( 'getFoo', [] );
@@ -459,7 +469,7 @@ describe( 'Selector arguments normalization', () => {
 		const normalizationFunction = vi.fn( ( args ) => {
 			return args.map( Number );
 		} );
-		getFooSelector.__unstableNormalizeArgs = normalizationFunction;
+		getFooSelector.normalizeArgs = normalizationFunction;
 
 		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [ 123 ] );
 		const { getIsResolving, hasStartedResolution, hasFinishedResolution } =
@@ -478,6 +488,6 @@ describe( 'Selector arguments normalization', () => {
 		expect( hasFinishedResolution( 'getFoo', [ '123' ] ) ).toBe( true );
 		expect( normalizationFunction ).toHaveBeenCalledWith( [ '123' ] );
 
-		getFooSelector.__unstableNormalizeArgs = undefined;
+		getFooSelector.normalizeArgs = undefined;
 	} );
 } );

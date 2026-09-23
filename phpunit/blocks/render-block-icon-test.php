@@ -28,12 +28,20 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 			'attrs'     => array(),
 		);
 
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
+		/*
+		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
+		 * icons that `init` only registers once. Replay the registration so order-dependent
+		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
+		 * collection at once, so drop whatever survived rather than topping up.
+		 */
+		$collections_registry = WP_Icon_Collections_Registry::get_instance();
+		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
+			if ( $collections_registry->is_registered( $collection_slug ) ) {
+				$collections_registry->unregister( $collection_slug );
+			}
 		}
-		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
-			gutenberg_register_default_icons();
-		}
+		gutenberg_register_default_icon_collections();
+		gutenberg_register_default_icons();
 	}
 
 	public function tear_down() {
@@ -78,5 +86,15 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/(?:^|;)\s*fill\s*:\s*none\s*(?:;|$)/', $style );
 		$this->assertMatchesRegularExpression( '/(?:^|;)\s*rotate\s*:\s*90deg\s*(?:;|$)/', $style );
 		$this->assertLessThan( strpos( $style, 'rotate' ), strpos( $style, 'fill' ) );
+	}
+
+	public function test_renders_only_icons_in_public_collections() {
+		// Renders public core icon.
+		$processor = new WP_HTML_Tag_Processor( gutenberg_render_block_core_icon( array( 'icon' => 'core/caution' ) ) );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+
+		// Does not render private core-admin icon.
+		$this->assertNotEmpty( wp_get_icon( 'core-admin/wordpress' ) );
+		$this->assertEmpty( gutenberg_render_block_core_icon( array( 'icon' => 'core-admin/wordpress' ) ) );
 	}
 }

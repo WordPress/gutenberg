@@ -184,7 +184,7 @@ export function useWidgetTypes(
 									attributes: resolveFields(
 										record.attributes
 									),
-							  }
+								}
 							: {} ),
 						...( record.icon ? { icon: pendingIcon } : {} ),
 						...( record.actions
@@ -193,7 +193,7 @@ export function useWidgetTypes(
 										record.actions,
 										true
 									),
-							  }
+								}
 							: {} ),
 						...recordOverlay( record ),
 					} as WidgetType;
@@ -247,7 +247,7 @@ export function useWidgetTypes(
 										actions,
 										actions === record.actions
 									),
-							  }
+								}
 							: {} ),
 						...recordOverlay( record ),
 					} as WidgetType;

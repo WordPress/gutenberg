@@ -12,7 +12,8 @@ import {
 } from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
-	title: 'Design System/Components/Form/Primitives/Combobox',
+	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
+	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
 		'Combobox.Trigger': Combobox.Trigger,

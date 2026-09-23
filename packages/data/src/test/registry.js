@@ -670,6 +670,46 @@ describe( 'createRegistry', () => {
 
 			expect( listener ).not.toHaveBeenCalled();
 		} );
+
+		it( 'calls a listener subscribed to a store that gets registered later', () => {
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+
+			expect( listener ).not.toHaveBeenCalled();
+
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'does not call a listener waiting for a store when another store updates', () => {
+			const otherStore = registry.registerStore( 'otherStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			otherStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not call a listener that unsubscribed before the store was registered', () => {
+			const listener = vi.fn();
+			const unsubscribe = registry.subscribe( listener, 'lateStore' );
+			unsubscribe();
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'dispatch', () => {
@@ -885,6 +925,25 @@ describe( 'createRegistry', () => {
 
 			expect( mySelector2 ).toHaveBeenCalled();
 			expect( myAction2 ).toHaveBeenCalled();
+		} );
+
+		it( 'should hand a subscription to an unregistered store over to the parent', () => {
+			const subRegistry = createRegistry( {}, registry );
+
+			const listener = vi.fn();
+			const unsubscribe = subRegistry.subscribe( listener, 'lateStore' );
+
+			const parentStore = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			unsubscribe();
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
