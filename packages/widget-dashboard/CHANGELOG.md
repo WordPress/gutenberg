@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-09-23)
+
 ### Enhancements
 
 -   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the

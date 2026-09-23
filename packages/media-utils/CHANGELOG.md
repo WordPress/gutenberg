@@ -6,6 +6,16 @@
 
 -   Route uploads started from the editor's media modal through the client-side media pipeline instead of `async-upload.php`, so they are processed the same way as a file dropped on a block ([#82473](https://github.com/WordPress/gutenberg/pull/82473)).
 
+## 5.56.0 (2026-09-23)
+
+### New Features
+
+-   `MediaUpload`: Add a `featuredImageFlow` prop that opens the featured image media frame. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
+### Deprecations
+
+-   `MediaUpload`: Deprecate the `unstableFeaturedImageFlow` prop in favor of `featuredImageFlow`. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
 ## 5.55.0 (2026-09-10)
 
 ### New Features
