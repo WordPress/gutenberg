@@ -21,9 +21,7 @@ export type SidebarCapture = {
  * What should happen to the complementary area once the composer is gone.
  */
 export type RestoreTarget =
-	| { type: 'enable'; area: string }
-	| { type: 'disable' }
-	| { type: 'none' };
+	{ type: 'enable'; area: string } | { type: 'disable' } | { type: 'none' };
 
 /**
  * Decides how to restore the complementary area after a note composer that
