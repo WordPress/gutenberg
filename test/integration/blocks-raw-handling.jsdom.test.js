@@ -285,6 +285,51 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should remove non-breaking spaces at the end of pasted lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>a&nbsp;</p><p>b&nbsp;<br>c&nbsp;d</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a</p><p>b<br>c&nbsp;d</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of inline pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a&nbsp;',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'a' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of pasted plain text lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: 'a\u00a0\nb\u00a0',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a<br>b</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should keep non-breaking spaces at the end of lines in raw handling', () => {
+		const filtered = rawHandler( {
+			HTML: '<p>a&nbsp;</p>',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a&nbsp;</p>' );
+	} );
+
 	it( 'should normalize decomposed characters', () => {
 		const filtered = pasteHandler( {
 			HTML: 'schön',

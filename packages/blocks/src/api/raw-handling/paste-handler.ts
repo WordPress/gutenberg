@@ -22,6 +22,7 @@ import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import formatSpaceCorrector from './format-space-corrector';
+import trailingNonBreakingSpaceRemover from './trailing-non-breaking-space-remover';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
@@ -58,6 +59,7 @@ function filterInlineHTML( HTML: string ): string {
 
 	HTML = deepFilterHTML( HTML, [
 		htmlFormattingRemover,
+		trailingNonBreakingSpaceRemover,
 		formatSpaceCorrector,
 		brRemover,
 	] );
@@ -226,6 +228,7 @@ export function pasteHandler( {
 				piece,
 				[
 					htmlFormattingRemover,
+					trailingNonBreakingSpaceRemover,
 					formatSpaceCorrector,
 					brRemover,
 					emptyParagraphRemover,
