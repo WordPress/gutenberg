@@ -223,7 +223,30 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( props.__directives?.[ 'each-child' ] ) {
+		const hasDefaultHtmlDirective = props.__directives?.html?.some(
+			( { suffix }: DirectiveEntry ) => suffix === null
+		);
+
+		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
+			// `data-wp-html` owns this element's content entirely — whether
+			// that's still the server-rendered fallback or HTML the
+			// directive has since applied — so it's treated as opaque here,
+			// the same way `each-child` is: don't walk its children into
+			// vnodes, since the directive writes to the DOM directly rather
+			// than through Preact's own props diffing (see
+			// `directives/html.ts`).
+			//
+			// Any interactive islands inside are marked as already hydrated
+			// so `hydrateRegions()` doesn't also initialize them
+			// independently; nested router regions aren't excluded yet and
+			// may still process on their own.
+			if ( hasDefaultHtmlDirective ) {
+				elementNode
+					.querySelectorAll( '[data-wp-interactive]' )
+					.forEach( ( islandNode ) => {
+						hydratedIslands.add( islandNode );
+					} );
+			}
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};
