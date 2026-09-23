@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Add the `fullscreenExit`, `justifySpaceEvenly`, `multimedia`, `paintbrush` and `reaction` icons ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+-   Add the `fullscreenExit`, `justifySpaceEvenly` and `reaction` icons ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 
 ### Enhancements
 
@@ -17,6 +17,7 @@
 -   `manifest.json`: The `public` field now only controls whether an icon ships to WordPress Core ([#83277](https://github.com/WordPress/gutenberg/pull/83277)).
 -   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
 -   `comment` and `plugins`: redraw for better optical balance ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+-   `brush` and `media`: redraw. `brush` becomes a wide paintbrush rather than a pencil, which the existing `pencil` icon already covers, and `media` becomes a camera with music notes so it is no longer easily confused with `image` ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 
 ### Bug Fixes
 
