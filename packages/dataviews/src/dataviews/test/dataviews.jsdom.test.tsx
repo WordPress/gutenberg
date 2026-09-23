@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -751,6 +751,47 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in grid view', () => {
+		it( 'lays the grid out at its real column count on the first render', async () => {
+			// The resize observer only reports after that first render has
+			// painted. Without a measurement taken as the grid attaches, it
+			// renders once at width 0, which puts every item in a row of its
+			// own at full width before snapping to the real column count.
+			const offsetWidth = Object.getOwnPropertyDescriptor(
+				window.HTMLElement.prototype,
+				'offsetWidth'
+			);
+			Object.defineProperty(
+				window.HTMLElement.prototype,
+				'offsetWidth',
+				{ configurable: true, value: 500 }
+			);
+			vi.useFakeTimers();
+
+			try {
+				render( <DataViewWrapper view={ { type: 'grid' } } /> );
+
+				// 500px fits two columns at the default 230px preview size, so
+				// the three items make two rows rather than three.
+				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
+
+				// The observer then reports the same width, leaving the layout
+				// as it is.
+				await act( async () => {
+					vi.runOnlyPendingTimers();
+				} );
+				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
+			} finally {
+				vi.useRealTimers();
+				if ( offsetWidth ) {
+					Object.defineProperty(
+						window.HTMLElement.prototype,
+						'offsetWidth',
+						offsetWidth
+					);
+				}
+			}
+		} );
+
 		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
