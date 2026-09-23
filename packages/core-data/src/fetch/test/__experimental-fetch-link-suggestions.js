@@ -827,6 +827,59 @@ describe( 'sortResults', () => {
 		] );
 	} );
 
+	it( 'ranks a title holding both words typed above one holding a single word whole', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/coffee-beans/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffeehouse Guidebook',
+				url: 'http://wordpress.local/coffeehouse-guidebook/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// How many of the words typed a title holds is compared before how well
+		// it holds them. Both are pages, so nothing else separates them.
+		expect(
+			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
+		).toEqual( [
+			'Coffeehouse Guidebook', // holds both, each inside a longer word
+			'Coffee Beans', // holds "coffee" whole, and no "guide" at all
+		] );
+	} );
+
+	it( 'ranks a word found in a longer one by how much of it that word is', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Caterpillar',
+				url: 'http://wordpress.local/caterpillar/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Catering',
+				url: 'http://wordpress.local/catering/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// "cater" is five of the eight letters of "catering" and five of the
+		// eleven of "caterpillar", so it answers the shorter word better.
+		expect(
+			sortResults( results, 'cater' ).map( ( { title } ) => title )
+		).toEqual( [ 'Catering', 'Caterpillar' ] );
+	} );
+
 	it( 'leads with a type the caller prefers', () => {
 		const results = [
 			{
