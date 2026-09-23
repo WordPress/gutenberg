@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Term Template: Fall back to the values the editor requests when the markup leaves out `termQuery` keys such as `order`, `orderBy` or `hideEmpty`, instead of logging "Undefined array key" warnings and ordering the terms newest first ([#83161](https://github.com/WordPress/gutenberg/pull/83161)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
@@ -15,7 +19,6 @@
 
 -   Image: The resize box no longer takes the pointer from the image while the block is selected, so the image has its context menu and is the source of a drag by it; the resize handles are unaffected ([#72983](https://github.com/WordPress/gutenberg/pull/72983)).
 -   Navigation: Stop the flyout `min-width` from applying to always-open submenus. Hovering, focusing or selecting an item in a vertical menu with submenus set to always show forced its inline submenu to at least 200px and made the menu re-wrap ([#83142](https://github.com/WordPress/gutenberg/pull/83142)).
--   Term Template: Fall back to the values the editor requests when the markup leaves out `termQuery` keys such as `order`, `orderBy` or `hideEmpty`, instead of logging "Undefined array key" warnings and ordering the terms newest first ([#83161](https://github.com/WordPress/gutenberg/pull/83161)).
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
