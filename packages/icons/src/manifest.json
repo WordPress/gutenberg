@@ -60,6 +60,12 @@
 		"filePath": "library/archive.svg"
 	},
 	{
+		"slug": "arrow-down",
+		"label": "Arrow Down",
+		"filePath": "library/arrow-down.svg",
+		"public": true
+	},
+	{
 		"slug": "arrow-down-left",
 		"label": "Arrow Down Left",
 		"filePath": "library/arrow-down-left.svg",
@@ -69,12 +75,6 @@
 		"slug": "arrow-down-right",
 		"label": "Arrow Down Right",
 		"filePath": "library/arrow-down-right.svg",
-		"public": true
-	},
-	{
-		"slug": "arrow-down",
-		"label": "Arrow Down",
-		"filePath": "library/arrow-down.svg",
 		"public": true
 	},
 	{
@@ -90,6 +90,12 @@
 		"public": true
 	},
 	{
+		"slug": "arrow-up",
+		"label": "Arrow Up",
+		"filePath": "library/arrow-up.svg",
+		"public": true
+	},
+	{
 		"slug": "arrow-up-left",
 		"label": "Arrow Up Left",
 		"filePath": "library/arrow-up-left.svg",
@@ -99,12 +105,6 @@
 		"slug": "arrow-up-right",
 		"label": "Arrow Up Right",
 		"filePath": "library/arrow-up-right.svg",
-		"public": true
-	},
-	{
-		"slug": "arrow-up",
-		"label": "Arrow Up",
-		"filePath": "library/arrow-up.svg",
 		"public": true
 	},
 	{
@@ -407,6 +407,11 @@
 		"filePath": "library/connection.svg"
 	},
 	{
+		"slug": "contents",
+		"label": "Contents",
+		"filePath": "library/contents.svg"
+	},
+	{
 		"slug": "copy",
 		"label": "Copy",
 		"filePath": "library/copy.svg"
@@ -452,11 +457,6 @@
 		"label": "Create",
 		"filePath": "library/create.svg",
 		"public": true
-	},
-	{
-		"slug": "contents",
-		"label": "Contents",
-		"filePath": "library/contents.svg"
 	},
 	{
 		"slug": "crop",
@@ -672,6 +672,11 @@
 		"filePath": "library/fullscreen.svg"
 	},
 	{
+		"slug": "fullscreen-exit",
+		"label": "Fullscreen Exit",
+		"filePath": "library/fullscreen-exit.svg"
+	},
+	{
 		"slug": "funnel",
 		"label": "Funnel",
 		"filePath": "library/funnel.svg"
@@ -847,6 +852,11 @@
 		"slug": "justify-space-between-vertical",
 		"label": "Justify Space Between Vertical",
 		"filePath": "library/justify-space-between-vertical.svg"
+	},
+	{
+		"slug": "justify-space-evenly",
+		"label": "Justify Space Evenly",
+		"filePath": "library/justify-space-evenly.svg"
 	},
 	{
 		"slug": "justify-stretch",
@@ -1131,11 +1141,6 @@
 		"filePath": "library/pin-small.svg"
 	},
 	{
-		"slug": "plugins",
-		"label": "Plugins",
-		"filePath": "library/plugins.svg"
-	},
-	{
 		"slug": "play",
 		"label": "Play",
 		"filePath": "library/play.svg"
@@ -1149,6 +1154,11 @@
 		"slug": "playlist-track",
 		"label": "Playlist Track",
 		"filePath": "library/playlist-track.svg"
+	},
+	{
+		"slug": "plugins",
+		"label": "Plugins",
+		"filePath": "library/plugins.svg"
 	},
 	{
 		"slug": "plus",
@@ -1301,6 +1311,11 @@
 		"public": true
 	},
 	{
+		"slug": "reaction",
+		"label": "Reaction",
+		"filePath": "library/reaction.svg"
+	},
+	{
 		"slug": "receipt",
 		"label": "Receipt",
 		"filePath": "library/receipt.svg",
@@ -1322,11 +1337,6 @@
 		"filePath": "library/remove-submenu.svg"
 	},
 	{
-		"slug": "replace",
-		"label": "Replace",
-		"filePath": "library/replace.svg"
-	},
-	{
 		"slug": "repeat",
 		"label": "Repeat",
 		"filePath": "library/repeat.svg"
@@ -1335,6 +1345,11 @@
 		"slug": "repeat-all",
 		"label": "Repeat All",
 		"filePath": "library/repeat-all.svg"
+	},
+	{
+		"slug": "replace",
+		"label": "Replace",
+		"filePath": "library/replace.svg"
 	},
 	{
 		"slug": "replay",
@@ -1490,16 +1505,6 @@
 		"filePath": "library/sides-vertical.svg"
 	},
 	{
-		"slug": "skip-back",
-		"label": "Skip Back",
-		"filePath": "library/skip-back.svg"
-	},
-	{
-		"slug": "skip-forward",
-		"label": "Skip Forward",
-		"filePath": "library/skip-forward.svg"
-	},
-	{
 		"slug": "site-logo",
 		"label": "Site Logo",
 		"filePath": "library/site-logo.svg"
@@ -1508,6 +1513,16 @@
 		"slug": "sites",
 		"label": "Sites",
 		"filePath": "library/sites.svg"
+	},
+	{
+		"slug": "skip-back",
+		"label": "Skip Back",
+		"filePath": "library/skip-back.svg"
+	},
+	{
+		"slug": "skip-forward",
+		"label": "Skip Forward",
+		"filePath": "library/skip-forward.svg"
 	},
 	{
 		"slug": "square",
@@ -1587,6 +1602,16 @@
 		"public": true
 	},
 	{
+		"slug": "tab-list",
+		"label": "Tab List",
+		"filePath": "library/tab-list.svg"
+	},
+	{
+		"slug": "tab-panel",
+		"label": "Tab Panel",
+		"filePath": "library/tab-panel.svg"
+	},
+	{
 		"slug": "table",
 		"label": "Table",
 		"filePath": "library/table.svg",
@@ -1632,16 +1657,6 @@
 		"label": "Tablet",
 		"filePath": "library/tablet.svg",
 		"public": true
-	},
-	{
-		"slug": "tab-list",
-		"label": "Tab List",
-		"filePath": "library/tab-list.svg"
-	},
-	{
-		"slug": "tab-panel",
-		"label": "Tab Panel",
-		"filePath": "library/tab-panel.svg"
 	},
 	{
 		"slug": "tabs",
@@ -1791,20 +1806,5 @@
 		"slug": "wordpress",
 		"label": "WordPress",
 		"filePath": "library/wordpress.svg"
-	},
-	{
-		"slug": "fullscreen-exit",
-		"label": "Fullscreen Exit",
-		"filePath": "library/fullscreen-exit.svg"
-	},
-	{
-		"slug": "justify-space-evenly",
-		"label": "Justify Space Evenly",
-		"filePath": "library/justify-space-evenly.svg"
-	},
-	{
-		"slug": "reaction",
-		"label": "Reaction",
-		"filePath": "library/reaction.svg"
 	}
 ]
