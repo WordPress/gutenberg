@@ -26,11 +26,13 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
-	 * Which page of results to return.
+	 * Which page of results to return. Only meaningful for a search narrowed by `type`, which is
+	 * a single request; an unscoped search merges several and cannot be paged through.
 	 */
 	page?: number;
 	/**
-	 * Search results per page.
+	 * Search results per page. Bounds each request, and bounds the results of a search narrowed by
+	 * `type`; an unscoped search returns everything it found, so it can return more than this.
 	 */
 	perPage?: number;
 };
@@ -249,25 +251,33 @@ export default async function fetchLinkSuggestions(
 	// paginated coherently — a result's place is not known until every request has been ranked —
 	// so cutting it would discard results that nothing could ever ask for again.
 	//
-	// Returning all of them instead means dropping the ones that do not answer the search.
+	// Returning all of them instead means dropping the ones that do not answer the search at all.
 	// WordPress matches a post's body and excerpt as well as its title, so an unscoped search
 	// returns titles with no sign of what was typed in them, and unbounded they would fill the
-	// list. See https://github.com/WordPress/gutenberg/issues/83372.
+	// list. A title is kept when it has every word that was typed, wherever they sit in it —
+	// the ranking below prefers them together, but a title is still an answer with them apart.
+	// See https://github.com/WordPress/gutenberg/issues/83372.
 	//
 	// A narrowed search is left alone: it is paginated, and its `X-WP-Total` count comes from
 	// WordPress, so dropping results here would leave the caller's page sizes and totals
 	// disagreeing with each other.
-	if ( ! type && search ) {
-		results = results.filter(
-			( result ) => getMatchRank( result.title, search ) > 0
-		);
+	if ( ! type ) {
+		const searchTokens = tokenize( search );
+
+		results = results.filter( ( result ) => {
+			const titleTokens = tokenize( result.title || '' );
+
+			return searchTokens.every( ( searchToken ) =>
+				titleTokens.includes( searchToken )
+			);
+		} );
 	}
 
 	results = sortResults( results, search );
 
-	// Initial suggestions are bounded too. Nothing has been typed, so they are a preview rather
-	// than an answer to a search, and there is nothing in them to lose.
-	if ( type || searchOptions.isInitialSuggestions ) {
+	// Only an unscoped search is unbounded. With nothing typed there is no search to be an answer
+	// to, so those results are a preview and there is nothing in them to lose by cutting.
+	if ( type || ! search ) {
 		results = results.slice( 0, perPage );
 	}
 
@@ -287,8 +297,17 @@ export default async function fetchLinkSuggestions(
  * @return 2 when the title begins with the search, 1 when it contains it, otherwise 0.
  */
 function getMatchRank( title: string, search: string ): number {
-	const haystack = ( title ?? '' ).toLowerCase().trim();
-	const needle = ( search ?? '' ).toLowerCase().trim();
+	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
+	// written with straight ones. Compare them as the same character.
+	const plain = ( text: string ) =>
+		( text ?? '' )
+			.toLowerCase()
+			.trim()
+			.replace( /[\u2018\u2019]/g, "'" )
+			.replace( /[\u201c\u201d]/g, '"' );
+
+	const haystack = plain( title );
+	const needle = plain( search );
 
 	if ( ! haystack || ! needle ) {
 		return 0;
@@ -366,13 +385,12 @@ function getTypeWeight( result: SearchResult ): number {
  * A title containing what was typed ranks above one that does not, whatever its type: a title
  * that does not contain the search is not an answer to it.
  *
- * Beginning with what was typed comes next, since a title that opens with the search is the
- * clearest sign it is the thing being looked for.
+ * The type comes next, then whether the title begins with what was typed.
  *
- * Last is a score: how much of the search the title covers, counting a whole word for much more
- * than a word found inside a longer one, plus a weight for the result's type. How much of the
- * *title* the search covers is deliberately not considered, so a long title is never marked down
- * for being long, and repeating a word never makes a title a better answer.
+ * Last is how much of the search the title covers, counting a whole word for much more than a word
+ * found inside a longer one. How much of the *title* the search covers is deliberately not
+ * considered, so a long title is never marked down for being long, and repeating a word never
+ * makes a title a better answer.
  *
  * @param results
  * @param search
@@ -411,10 +429,9 @@ export function sortResults( results: SearchResult[], search: string ) {
 			).length;
 
 			scores[ scoreKey( result ) ] =
-				( wholeWords * 10 + partialWords ) / searchTokens.length +
-				getTypeWeight( result );
+				( wholeWords * 10 + partialWords ) / searchTokens.length;
 		} else {
-			scores[ scoreKey( result ) ] = getTypeWeight( result );
+			scores[ scoreKey( result ) ] = 0;
 		}
 	}
 
@@ -423,14 +440,15 @@ export function sortResults( results: SearchResult[], search: string ) {
 	const contains = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] > 0 ? 1 : 0;
 
-	// Then whether it begins with what was typed, which outranks the score below and so cannot be
-	// outweighed by a better-placed type.
+	// Then the type, before anything about where the match sits: an attachment is named after its
+	// file, so it very often begins with what was typed, and that must not lift it above a page.
 	const begins = ( result: SearchResult ) =>
 		matches[ scoreKey( result ) ] === 2 ? 1 : 0;
 
 	return results.sort(
 		( a, b ) =>
 			contains( b ) - contains( a ) ||
+			getTypeWeight( b ) - getTypeWeight( a ) ||
 			begins( b ) - begins( a ) ||
 			scores[ scoreKey( b ) ] - scores[ scoreKey( a ) ]
 	);
