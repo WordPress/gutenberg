@@ -7,6 +7,7 @@
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
 -   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
 -   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
+-   Embed: Add an "Alternate sources" panel, where mirrors of the embedded content are listed, reordered and edited. The list is saved with the block as `data-fallbacks` on the wrapper element, for a theme or plugin to try in order when the embed cannot be played; WordPress itself does not switch sources. A block without alternate sources saves exactly as before ([#82746](https://github.com/WordPress/gutenberg/pull/82746)).
 
 ### Bug Fixes
 
@@ -32,15 +33,12 @@
 
 ### Enhancements
 
--   Navigation Link: emit `@wordpress/ui` `Badge` intents for the link preview badges, replacing the private `@wordpress/components` `Badge` vocabulary. Draft, Scheduled and Pending previously shared one `warning` intent; Draft and Pending now read as `low` and Scheduled as `informational` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
--   Gallery: Support viewport-specific aspect ratios, in every Gallery layout and in dynamic galleries. ([#82233](https://github.com/WordPress/gutenberg/pull/82233))
 
 ### Bug Fixes
 
--   Navigation: Give the block appender an explicit width so it renders square, matching the appender in other container blocks ([#82718](https://github.com/WordPress/gutenberg/pull/82718)).
 -   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
 -   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).

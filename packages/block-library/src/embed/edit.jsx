@@ -31,6 +31,7 @@ const EmbedEdit = ( props ) => {
 			previewable,
 			responsive,
 			url: attributesUrl,
+			fallbacks,
 		},
 		attributes,
 		isSelected,
@@ -264,6 +265,11 @@ const EmbedEdit = ( props ) => {
 				allowResponsive={ allowResponsive }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
+				url={ url }
+				fallbacks={ fallbacks }
+				setFallbacks={ ( value ) =>
+					setAttributes( { fallbacks: value } )
+				}
 			/>
 			<figure
 				{ ...blockProps }

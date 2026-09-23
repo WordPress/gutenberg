@@ -38,6 +38,14 @@
 			"type": "boolean",
 			"default": true,
 			"role": "content"
+		},
+		"fallbacks": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "string"
+			},
+			"role": "content"
 		}
 	},
 	"supports": {

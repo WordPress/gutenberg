@@ -4,9 +4,10 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
+import { toSourceList } from './sources';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug } = attributes;
+	const { url, caption, type, providerNameSlug, fallbacks } = attributes;
 
 	if ( ! url ) {
 		return null;
@@ -18,8 +19,15 @@ export default function save( { attributes } ) {
 		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
 	} );
 
+	// Only emitted when fallbacks are set, so blocks without them save exactly
+	// as before and no deprecation is needed.
+	const sources = toSourceList( fallbacks );
+	const fallbackProps = sources.length
+		? { 'data-fallbacks': sources.join( ' ' ) }
+		: {};
+
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure { ...useBlockProps.save( { className, ...fallbackProps } ) }>
 			<div className="wp-block-embed__wrapper">
 				{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 			</div>
