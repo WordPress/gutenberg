@@ -12,6 +12,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 import BlockActions from '../block-actions';
 import NoteIconSlotFill from '../../components/collab/note-icon-slot';
+import BlockStylesMenuItemsSlotFill from './block-styles-menu-items-slot';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
@@ -362,6 +363,15 @@ export function BlockSettingsDropdown( {
 											<MenuItem onClick={ onPasteStyles }>
 												{ __( 'Paste styles' ) }
 											</MenuItem>
+										) }
+										{ count === 1 && (
+											<BlockStylesMenuItemsSlotFill.Slot
+												fillProps={ {
+													clientId:
+														firstBlockClientId,
+													onClose,
+												} }
+											/>
 										) }
 									</MenuGroup>
 								) }

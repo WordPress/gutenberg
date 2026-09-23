@@ -67,6 +67,7 @@ import StyleInspector, {
 	isStyleInspectorEnabled,
 } from './components/style-inspector';
 import NoteIconSlotFill from './components/collab/note-icon-slot';
+import BlockStylesMenuItemsSlotFill from './components/block-settings-menu/block-styles-menu-items-slot';
 import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
@@ -142,6 +143,7 @@ lock( privateApis, {
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	NoteIconSlotFill,
+	BlockStylesMenuItemsSlotFill,
 	NoteIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,

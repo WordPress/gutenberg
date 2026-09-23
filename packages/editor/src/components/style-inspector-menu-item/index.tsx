@@ -6,19 +6,20 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
+const { privateApis: blockEditorPrivateApis, store: blockEditorStore } =
+	blockEditor;
 const {
-	BlockSettingsMenuControls,
-	privateApis: blockEditorPrivateApis,
-	store: blockEditorStore,
-} = blockEditor;
-const { isStyleInspectorEnabled, StyleInspector, useBlockElement } = unlock(
-	blockEditorPrivateApis
-);
+	BlockStylesMenuItemsSlotFill,
+	isStyleInspectorEnabled,
+	StyleInspector,
+	useBlockElement,
+} = unlock( blockEditorPrivateApis );
 
 /**
  * Adds "Inspect styles" to the block options menu, in the toolbar and in
- * List View. It opens the style inspector in a popover attached to the
- * block, and reads "Hide styles" while the popover is open.
+ * List View, after Copy styles and Paste styles. It opens the style
+ * inspector in a popover attached to the block. Like other popovers, it
+ * closes with its close button, Escape, or a click elsewhere.
  */
 export default function StyleInspectorMenuItem() {
 	if ( ! isStyleInspectorEnabled() ) {
@@ -35,40 +36,28 @@ export default function StyleInspectorMenuItem() {
 function StyleInspectorMenuItemFill() {
 	const { setIsStyleInspectorOpened } = unlock( useDispatch( editorStore ) );
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const isOpen = useSelect(
-		( select ) => unlock( select( editorStore ) ).isStyleInspectorOpened(),
-		[]
-	);
 
 	return (
-		<BlockSettingsMenuControls>
+		<BlockStylesMenuItemsSlotFill.Fill>
 			{ ( {
-				selectedClientIds,
+				clientId,
 				onClose,
 			}: {
-				selectedClientIds: string[];
+				clientId: string;
 				onClose: () => void;
-			} ) =>
-				selectedClientIds.length === 1 && (
-					<MenuItem
-						aria-haspopup="dialog"
-						onClick={ () => {
-							if ( isOpen ) {
-								setIsStyleInspectorOpened( false );
-							} else {
-								selectBlock( selectedClientIds[ 0 ], null );
-								setIsStyleInspectorOpened( true );
-							}
-							onClose();
-						} }
-					>
-						{ isOpen
-							? __( 'Hide styles' )
-							: __( 'Inspect styles' ) }
-					</MenuItem>
-				)
-			}
-		</BlockSettingsMenuControls>
+			} ) => (
+				<MenuItem
+					aria-haspopup="dialog"
+					onClick={ () => {
+						selectBlock( clientId, null );
+						setIsStyleInspectorOpened( true );
+						onClose();
+					} }
+				>
+					{ __( 'Inspect styles' ) }
+				</MenuItem>
+			) }
+		</BlockStylesMenuItemsSlotFill.Fill>
 	);
 }
 
