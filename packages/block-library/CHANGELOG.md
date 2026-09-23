@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.1.0 (2026-09-23)
+
 ### Enhancements
 
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
