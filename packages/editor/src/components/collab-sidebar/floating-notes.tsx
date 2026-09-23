@@ -185,12 +185,12 @@ export function FloatingNotes( {
 		css:
 			hasRoom && ! isDevicePreview
 				? `:root{padding-inline-end:${ reservedWidth }px}` +
-				  `body{overflow-x:clip}` +
-				  `:root::after{content:"";position:fixed;top:0;bottom:0;` +
-				  `inset-inline-end:${ reservedWidth - DIVIDER_WIDTH }px;` +
-				  `width:${ DIVIDER_WIDTH }px;` +
-				  `background:color-mix(in srgb, currentColor 10%, transparent);` +
-				  `pointer-events:none}`
+					`body{overflow-x:clip}` +
+					`:root::after{content:"";position:fixed;top:0;bottom:0;` +
+					`inset-inline-end:${ reservedWidth - DIVIDER_WIDTH }px;` +
+					`width:${ DIVIDER_WIDTH }px;` +
+					`background:color-mix(in srgb, currentColor 10%, transparent);` +
+					`pointer-events:none}`
 				: '',
 	} );
 
