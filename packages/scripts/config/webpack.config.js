@@ -413,7 +413,7 @@ const scriptConfig = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+		// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 		new MiniCSSExtractPlugin( {
 			filename: '[name].css',
 		} ),
@@ -496,7 +496,7 @@ if ( hasExperimentalModulesFlag ) {
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+			// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 			// generated, and the default externals set.
