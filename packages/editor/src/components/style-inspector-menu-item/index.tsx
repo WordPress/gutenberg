@@ -87,6 +87,10 @@ function StyleInspectorPopover() {
 
 	return (
 		<Popover
+			// A new block is a new dialog: remounting moves focus into it,
+			// rather than leaving it on the Inspect button that just
+			// unmounted, so a click elsewhere still closes it.
+			key={ clientId }
 			className="editor-style-inspector-popover"
 			anchor={ blockElement }
 			placement="bottom-start"
