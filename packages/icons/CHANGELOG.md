@@ -21,7 +21,7 @@
 -   `manifest.json`: New `collections` property, listing the collections an icon is registered in once it ships to WordPress Core. It replaces the `public` property and introduces the `core-admin` collection, which is not public and holds the icons the WordPress admin interface renders. ([#83261](https://github.com/WordPress/gutenberg/pull/83261), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
 -   `comment` and `plugins`: redraw for better optical balance ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 -   `brush` and `media`: redraw. `brush` becomes a wide paintbrush rather than a pencil, which the existing `pencil` icon already covers, and `media` becomes a camera with music notes so it is no longer easily confused with `image` ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
--   Add optional `keywords` to the icon manifest, giving icons extra search terms, and emit them from the generated `manifest.php`. The manifest is now the single source of these terms: the Storybook icon library reads them from it instead of keeping its own list, and the icons it had keywords for carry them in the manifest. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+-   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Bug Fixes
 
