@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))
@@ -9,6 +11,8 @@
 
 ### New Features
 
+-   Add `RadioGroupControl` component. ([#83143](https://github.com/WordPress/gutenberg/pull/83143))
+-   Add `SwitchControl` component. ([#83146](https://github.com/WordPress/gutenberg/pull/83146))
 -   Add `Switch` form primitive ([#83039](https://github.com/WordPress/gutenberg/pull/83039)).
 -   Add `RadioGroup` form primitive ([#83038](https://github.com/WordPress/gutenberg/pull/83038)).
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
@@ -20,6 +24,7 @@
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
 -   `Select`, `Combobox`, `Autocomplete`: Allow browsing read-only controls while keeping their value unchanged ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
+-   `Radio`: Enlarge the hit target to 24px without changing the visual size. ([#83275](https://github.com/WordPress/gutenberg/pull/83275))
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 -   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add `statusContent` for the list status live region. The region stays mounted. Use it for async loading. Use `emptyContent` for the empty list. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   `Autocomplete`, `Combobox`, `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Export a `useFilteredItems` hook that returns the client-side filtered item list, for result-count status. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))

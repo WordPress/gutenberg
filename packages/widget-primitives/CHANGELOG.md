@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-09-23)
+
 ### New Features
 
 -   `HostLink`: an anchor that mounts the host router's link for a target
