@@ -31,7 +31,7 @@ If you've worked with the system, you've likely found a shortcoming when you're 
 
 A local workaround fixes the problem once, for one interface. The next person to meet the same gap has to rediscover it and solve it again, often differently, and the interfaces drift apart. Overrides that depend on a component's internals can also break without warning when that component changes, because internals aren't part of its public contract.
 
-Sometimes you have to ship a workaround anyway. Sometimes you have to ship a workaround anyway, and that's fine. Please report the gap as well, and perhaps leave a code comment next to the workaround linking to the issue, so that whoever fixes the issue can find and remove the workaround. It's a way to manage the drift.
+Sometimes you have to ship a workaround anyway, and that's fine. Please report the gap as well, and perhaps leave a code comment next to the workaround linking to the issue, so that whoever fixes the issue can find and remove the workaround. It's a way to manage the drift.
 
 ## Check first
 
