@@ -27,7 +27,7 @@
 
 ### Bug Fixes
 
--   `BaseControl`, `CheckboxControl`, `RadioControl`, `ToggleControl`: Use the design system foreground color for labels so they stay readable instead of inheriting the surrounding text color. Help text keeps the weaker gray ([#83318](https://github.com/WordPress/gutenberg/pull/83318)).
+-   `BaseControl`, `CheckboxControl`, `RadioControl`, `ToggleControl`: Use the design system foreground color for labels so they stay the correct color instead of inheriting the surrounding text color ([#83318](https://github.com/WordPress/gutenberg/pull/83318)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
 -   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
