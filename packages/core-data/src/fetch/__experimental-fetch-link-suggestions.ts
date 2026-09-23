@@ -246,40 +246,50 @@ export default async function fetchLinkSuggestions(
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
 
-	// WordPress matches a post's body and excerpt as well as its title, so an unscoped search
-	// returns titles with no sign of what was typed in them. Since it is returned whole below,
-	// those would fill the list. A title is kept when it has every word that was typed, wherever
-	// they sit in it: the ranking prefers them together, but a title is still an answer with them
-	// apart. See https://github.com/WordPress/gutenberg/issues/83372.
-	//
-	// A narrowed search keeps everything WordPress sent, so that the caller's page sizes still
-	// add up to the `X-WP-Total` it reports.
-	if ( ! type ) {
-		const searchTokens = tokenize( search );
-
-		results = results.filter( ( result ) => {
-			const titleTokens = tokenize( result.title || '' );
-
-			return searchTokens.every( ( searchToken ) =>
-				titleTokens.includes( searchToken )
-			);
-		} );
-	}
-
 	results = sortResults( results, search );
 
 	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
-	// through it. An unscoped search merges four, which cannot be paginated coherently — a
-	// result's place is not known until every request has been ranked, and `page` applies to each
-	// request separately — so cutting it would discard results nothing could ask for again.
-	//
-	// With nothing typed there is no search to answer, so those results are a preview and there is
-	// nothing in them to lose by cutting.
+	// through it. With nothing typed there is no search to answer, so those results are a preview
+	// and there is nothing in them to lose by cutting.
 	if ( type || ! search ) {
-		results = results.slice( 0, perPage );
+		return results.slice( 0, perPage );
 	}
 
-	return results;
+	// An unscoped search merges four requests and cannot be paginated coherently — a result's
+	// place is not known until every request has been ranked, and `page` applies to each request
+	// separately — so a result cut here is one nothing could ask for again.
+	//
+	// A title holding every word that was typed answers the search, wherever those words sit in
+	// it, and is never cut. One holding some of them still might be what was wanted, so it ranks
+	// below and fills whatever room is left, which keeps a search from returning fewer results
+	// than it used to.
+	//
+	// A title holding none of them is dropped. WordPress matches a post's body and excerpt as
+	// well as its title, so those arrive with no sign of the search in them, and filling a list
+	// with them helps nobody. See https://github.com/WordPress/gutenberg/issues/83372.
+	const searchTokens = tokenize( search );
+	const answers: SearchResult[] = [];
+	const partial: SearchResult[] = [];
+
+	for ( const result of results ) {
+		const titleTokens = tokenize( result.title || '' );
+		const found = searchTokens.filter( ( searchToken ) =>
+			titleTokens.some( ( titleToken ) =>
+				titleToken.includes( searchToken )
+			)
+		).length;
+
+		if ( found === searchTokens.length ) {
+			answers.push( result );
+		} else if ( found ) {
+			partial.push( result );
+		}
+	}
+
+	return [
+		...answers,
+		...partial.slice( 0, Math.max( 0, perPage - answers.length ) ),
+	];
 }
 
 /**
