@@ -333,6 +333,8 @@ $navigation-icon-size: 24px;
 			border: none;
 			background-color: transparent;
 			color: inherit;
+			// Has to be !important to override the inline instance style.
+			box-shadow: none !important;
 		}
 	}
 }
@@ -699,6 +701,12 @@ button.wp-block-navigation-item__content {
 			.wp-block-page-list {
 				color: inherit !important;
 				background: transparent !important;
+			}
+
+			// Submenus unfold inline here, so drop the dropdown shadow.
+			// Has to be !important to override the inline instance style.
+			.wp-block-navigation-item .wp-block-navigation__submenu-container {
+				box-shadow: none !important;
 			}
 
 			// Override justification dropdown menu positioning rules.

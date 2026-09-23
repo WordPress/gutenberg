@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createRegistry } from '@wordpress/data';
+import { logged } from '@wordpress/deprecated';
 import type { DataRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '../';
@@ -15,6 +16,9 @@ describe( 'actions', () => {
 	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistryWithStores();
+	} );
+	afterEach( () => {
+		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
 	} );
 
 	describe( 'enableComplementaryArea', () => {
@@ -218,6 +222,8 @@ describe( 'actions', () => {
 					.select( interfaceStore )
 					.isFeatureActive( 'test', 'feature2' )
 			).toBe( false );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -251,6 +257,8 @@ describe( 'actions', () => {
 					.select( interfaceStore )
 					.isFeatureActive( 'test', 'feature1' )
 			).toBe( true );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 } );
