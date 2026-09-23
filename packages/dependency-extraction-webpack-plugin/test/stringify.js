@@ -1,4 +1,9 @@
-const DependencyExtractionWebpackPlugin = require( '../lib/index' );
+import { createRequire } from 'node:module';
+import { describe, expect, test } from 'vitest';
+
+const DependencyExtractionWebpackPlugin = createRequire( import.meta.url )(
+	'../lib/index'
+);
 
 describe( 'stringify', () => {
 	const asset = {
