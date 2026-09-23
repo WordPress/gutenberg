@@ -31,8 +31,12 @@ export type SearchOptions = {
 	 */
 	page?: number;
 	/**
-	 * Search results per page. Bounds each request, and bounds the results of a search narrowed by
-	 * `type`; an unscoped search returns everything it found, so it can return more than this.
+	 * How many results to ask each request for, and at most how many to return.
+	 *
+	 * A search narrowed by `type` is one request and honours this exactly; `page` pages through
+	 * the rest. An unscoped search merges several requests and cannot be paged, so a result it
+	 * drops is one nothing could ask for again: it returns at most this many, except that a title
+	 * holding every word that was typed is never dropped.
 	 */
 	perPage?: number;
 };
