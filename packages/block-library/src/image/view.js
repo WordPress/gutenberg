@@ -266,10 +266,14 @@ const { state, actions, callbacks } = store(
 				callbacks.setOverlayStyles();
 				state.currentLiveText = state.ariaLabel;
 			} ),
-			handleCaptionClick: withSyncEvent( ( event ) => {
-				// Keep text selection and links from closing the dialog.
-				event.stopPropagation();
-			} ),
+			handleOverlayClick( event ) {
+				// Keep text selection and links from closing the dialog without
+				// making the caption itself an interactive accessibility target.
+				if ( event.target.closest( '.lightbox-caption' ) ) {
+					return;
+				}
+				actions.hideLightbox();
+			},
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					if ( event.key === 'Escape' ) {

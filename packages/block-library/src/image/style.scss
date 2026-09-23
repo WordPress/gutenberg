@@ -170,6 +170,12 @@
 		text-align: center;
 		padding: 0;
 		border-radius: 4px;
+		// Touch screen reader focus does not necessarily trigger :focus or :hover.
+		// Include devices with both a mouse and a touchscreen.
+		@media (hover: none), (any-pointer: coarse) {
+			opacity: 1;
+		}
+
 		@media not (prefers-reduced-motion) {
 			transition: opacity 0.2s ease;
 		}

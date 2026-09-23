@@ -51,6 +51,68 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		} );
 	} );
 
+	test( 'keeps touch Enlarge buttons visible without hover or keyboard focus', async ( {
+		page,
+		browser,
+	} ) => {
+		const touchContext = await browser.newContext( {
+			hasTouch: true,
+			viewport: { width: 390, height: 844 },
+		} );
+		try {
+			const touchPage = await touchContext.newPage();
+			await touchPage.goto( page.url() );
+			const triggers = touchPage.getByRole( 'button', {
+				name: /^Enlarge [1-3] of 3$/,
+			} );
+			await expect( triggers ).toHaveCount( 3 );
+			for ( const trigger of await triggers.all() ) {
+				await expect( trigger ).not.toBeFocused();
+				expect(
+					await trigger.evaluate( ( element ) =>
+						element.parentElement!.matches(
+							':hover, :focus-within'
+						)
+					)
+				).toBe( false );
+				await expect( trigger ).toHaveCSS( 'opacity', '1' );
+			}
+			await touchPage
+				.getByRole( 'button', { name: 'Enlarge 2 of 3', exact: true } )
+				.tap();
+			const dialog = touchPage.getByRole( 'dialog' );
+			await expect( dialog ).toBeVisible();
+			await expect( dialog.locator( 'figcaption' ) ).toContainText(
+				'Long caption'
+			);
+		} finally {
+			await touchContext.close();
+		}
+	} );
+
+	test( 'reveals Enlarge buttons on hover or keyboard focus with a mouse', async ( {
+		page,
+	} ) => {
+		await page.mouse.move( 0, 0 );
+		await page.goto( `/?p=${ postId }` );
+		const trigger = page.getByRole( 'button', {
+			name: 'Enlarge 3 of 3',
+			exact: true,
+		} );
+		await expect( trigger ).not.toBeFocused();
+		await expect( trigger ).toHaveCSS( 'opacity', '0' );
+		await page
+			.locator( '.wp-lightbox-container' )
+			.nth( 2 )
+			.locator( 'img' )
+			.hover();
+		await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		await page.mouse.move( 0, 0 );
+		await expect( trigger ).toHaveCSS( 'opacity', '0' );
+		await trigger.focus();
+		await expect( trigger ).toHaveCSS( 'opacity', '1' );
+	} );
+
 	test( 'preserves a visible rich caption and exposes only the enlarged image', async ( {
 		page,
 	} ) => {
@@ -69,10 +131,15 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 			'First rich & safe credit <caption>'
 		);
 		await expect( caption.locator( 'strong' ) ).toHaveText( 'rich & safe' );
+		await expect( caption ).not.toHaveAttribute( 'data-wp-on--click' );
 		await expect( caption ).toBeInViewport( { ratio: 1 } );
 		await expect( caption ).toHaveCSS( 'clip-path', 'none' );
 		await expect( dialog.locator( '[aria-live]' ) ).toBeEmpty();
 		expect( await dialog.ariaSnapshot() ).toContain( 'credit' );
+		await caption.locator( 'strong' ).click();
+		await expect( dialog ).toBeVisible();
+		await caption.click( { position: { x: 1, y: 1 } } );
+		await expect( dialog ).toBeVisible();
 
 		const credit = caption.getByRole( 'link', {
 			name: 'credit',
@@ -95,6 +162,24 @@ test.describe( 'Image lightbox captions @webkit @firefox', () => {
 		await expect(
 			dialog.getByRole( 'button', { name: 'Next', exact: true } )
 		).toBeFocused();
+	} );
+
+	test( 'still closes from the enlarged image, backdrop, and Close button', async ( {
+		page,
+	} ) => {
+		const dialog = page.getByRole( 'dialog' );
+		for ( const target of [
+			dialog.getByRole( 'img' ),
+			dialog.locator( '.scrim' ),
+			dialog.getByRole( 'button', { name: 'Close', exact: true } ),
+		] ) {
+			await target.click( { position: { x: 1, y: 1 } } );
+			await expect( dialog ).toBeHidden();
+			await page
+				.getByRole( 'button', { name: 'Enlarge 1 of 3', exact: true } )
+				.click();
+			await expect( dialog ).toBeVisible();
+		}
 	} );
 
 	test( 'updates and clears captions on navigation and reopening', async ( {

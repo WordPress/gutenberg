@@ -383,7 +383,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-on--touchstart="actions.handleTouchStart"
 			data-wp-on--touchmove="actions.handleTouchMove"
 			data-wp-on--touchend="actions.handleTouchEnd"
-			data-wp-on--click="actions.hideLightbox"
+			data-wp-on--click="actions.handleOverlayClick"
 			data-wp-on-window--resize="callbacks.setOverlayStyles"
 			data-wp-on-window--scroll="actions.handleScroll"
 			data-wp-bind--style="state.overlayStyles"
@@ -415,7 +415,7 @@ function block_core_image_print_lightbox_overlay() {
 							>
 						</div>
 					</div>
-					<figcaption class="lightbox-caption wp-element-caption" style="color: {$close_button_color}; background-color: {$background_color}" hidden data-wp-init="callbacks.initCaption" data-wp-on--click="actions.handleCaptionClick"></figcaption>
+					<figcaption class="lightbox-caption wp-element-caption" style="color: {$close_button_color}; background-color: {$background_color}" hidden data-wp-init="callbacks.initCaption"></figcaption>
 				</figure>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>

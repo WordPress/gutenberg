@@ -209,4 +209,19 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * @covers ::block_core_image_print_lightbox_overlay
+	 */
+	public function test_should_not_make_lightbox_caption_a_click_target() {
+		ob_start();
+		gutenberg_block_core_image_print_lightbox_overlay();
+		$overlay = ob_get_clean();
+
+		$processor = new WP_HTML_Tag_Processor( $overlay );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-lightbox-overlay' ) ) );
+		$this->assertSame( 'actions.handleOverlayClick', $processor->get_attribute( 'data-wp-on--click' ) );
+		$this->assertTrue( $processor->next_tag( 'figcaption' ) );
+		$this->assertNull( $processor->get_attribute( 'data-wp-on--click' ) );
+	}
 }
