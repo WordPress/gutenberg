@@ -5,6 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
+	'arrow-down'          => array(
+		'label'       => _x( 'Arrow Down', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/arrow-down.svg',
+		'collections' => array( 'core' ),
+	),
 	'arrow-down-left'     => array(
 		'label'       => _x( 'Arrow Down Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-down-left.svg',
@@ -13,11 +18,6 @@ return array(
 	'arrow-down-right'    => array(
 		'label'       => _x( 'Arrow Down Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-down-right.svg',
-		'collections' => array( 'core' ),
-	),
-	'arrow-down'          => array(
-		'label'       => _x( 'Arrow Down', 'icon label', 'gutenberg' ),
-		'filePath'    => 'library/arrow-down.svg',
 		'collections' => array( 'core' ),
 	),
 	'arrow-left'          => array(
@@ -30,6 +30,11 @@ return array(
 		'filePath'    => 'library/arrow-right.svg',
 		'collections' => array( 'core' ),
 	),
+	'arrow-up'            => array(
+		'label'       => _x( 'Arrow Up', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/arrow-up.svg',
+		'collections' => array( 'core' ),
+	),
 	'arrow-up-left'       => array(
 		'label'       => _x( 'Arrow Up Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-up-left.svg',
@@ -38,11 +43,6 @@ return array(
 	'arrow-up-right'      => array(
 		'label'       => _x( 'Arrow Up Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-up-right.svg',
-		'collections' => array( 'core' ),
-	),
-	'arrow-up'            => array(
-		'label'       => _x( 'Arrow Up', 'icon label', 'gutenberg' ),
-		'filePath'    => 'library/arrow-up.svg',
 		'collections' => array( 'core' ),
 	),
 	'at-symbol'           => array(
