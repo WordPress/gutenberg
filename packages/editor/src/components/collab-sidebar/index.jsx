@@ -165,6 +165,35 @@ function NotesSidebar( { postId } ) {
 		}
 	);
 
+	// Keyboard equivalents for the display-mode choices in the Options menu,
+	// available wherever those choices are.
+	const notesDisplayShortcutsDisabled =
+		isDistractionFree || ! showNotesDisplayOptions;
+	useShortcut(
+		'core/editor/expand-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'full' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/minimize-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'minimized' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/hide-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'hidden' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
 		blockNoteIds.length > 0
