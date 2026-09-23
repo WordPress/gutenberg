@@ -1,5 +1,6 @@
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { reaction as reactionIcon } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import {
@@ -8,7 +9,7 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
-import { AddReactionButton, smileyIcon } from './add-reaction-picker';
+import { AddReactionButton } from './add-reaction-picker';
 import { getBlockReactionsId, type ReactionTarget } from './block-reactions';
 import {
 	useBlockReactionActions,
@@ -68,7 +69,7 @@ export function BlockReactionsToolbarButton( {
 				onPrefetch,
 			} ) => (
 				<ToolbarButton
-					icon={ smileyIcon }
+					icon={ reactionIcon }
 					label={ label }
 					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
