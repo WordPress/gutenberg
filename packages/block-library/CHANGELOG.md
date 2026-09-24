@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83479](https://github.com/WordPress/gutenberg/issues/83479)).
 -   Image: The resize box no longer takes the pointer from the image while the block is selected, so the image has its context menu and is the source of a drag by it; the resize handles are unaffected ([#72983](https://github.com/WordPress/gutenberg/pull/72983)).
 -   Navigation: Stop the flyout `min-width` from applying to always-open submenus. Hovering, focusing or selecting an item in a vertical menu with submenus set to always show forced its inline submenu to at least 200px and made the menu re-wrap ([#83142](https://github.com/WordPress/gutenberg/pull/83142)).
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
