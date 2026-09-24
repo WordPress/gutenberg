@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { User } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
@@ -24,12 +25,14 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 			if ( ! shouldFetch ) {
 				return null;
 			}
-			const { getEntityRecord } = select( coreStore );
-			// This doesn't make extra REST requests because the records are
-			// already in the store from the field's getElements function.
-			return authorId
-				? getEntityRecord( 'root', 'user', authorId )
-				: null;
+			const { getEntityRecords } = select( coreStore );
+			return (
+				getEntityRecords< User >( 'root', 'user', {
+					include: [ authorId ],
+					who: 'authors',
+					context: 'view',
+				} )?.[ 0 ] ?? null
+			);
 		},
 		[ authorId, shouldFetch ]
 	);
