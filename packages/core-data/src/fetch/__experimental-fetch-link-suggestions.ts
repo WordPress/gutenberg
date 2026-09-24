@@ -519,15 +519,19 @@ function rankResults(
 
 	scored.sort(
 		( a, b ) =>
-			// How much of the search the title holds at all, before anything else: a title with
-			// every word typed answers it, whatever its type and wherever those words sit.
+			// Does the title contain all words searched or just one?
+			// If the search is "black cat" then "Black is my favorite color" should rank lower than "Cats that are black"
 			b.found - a.found ||
-			// Then whether it holds them together, as one string.
+			// Then whether it holds them together, as one string: i.e. "Black cats are great" vs "Cats that are black"
 			Number( b.contains ) - Number( a.contains ) ||
+			// Matches are equal so far, so enforce banding by type
 			b.type - a.type ||
-			// After the type: an attachment is named after its file, so it very often begins with
-			// what was typed, and that must not lift it above a page.
+			// Within a band, rank matches that start with the search string higher than mid-string matches:
+			// i.e the search "cat" ranks the title "caterpillar" higher than "concatenate"
 			Number( b.begins ) - Number( a.begins ) ||
+			// Rank by how much of the matched word the search contains: the search
+			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
+			// and only 27% of "Caterpillar"
 			b.score - a.score
 	);
 
