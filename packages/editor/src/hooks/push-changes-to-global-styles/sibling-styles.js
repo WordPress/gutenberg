@@ -19,9 +19,10 @@ const isPresetValue = ( value ) =>
 /**
  * Deep equality for style values.
  *
- * Style values are plain JSON: a string, a number, or an object of them (a
- * border or a per-side spacing object). That's narrow enough not to warrant a
- * dependency, and `@wordpress/editor` doesn't declare one.
+ * Style values are plain JSON: a string, a number, or an object or array of
+ * them (a border, a per-side spacing object, or the list of values a grouped
+ * row covers). That's narrow enough not to warrant a dependency, and
+ * `@wordpress/editor` doesn't declare one.
  *
  * @param {*} a First value.
  * @param {*} b Second value.
@@ -56,12 +57,68 @@ export function isEqualStyleValue( a, b ) {
 	);
 }
 
+// The parts a `border` row is about, in the order CSS writes them. The flat
+// `style.border` object also carries `radius` and a sub-object per side, both
+// of which have rows of their own, so reading `border` in one go would take in
+// more than the row covers.
+const BORDER_SHORTHAND_KEYS = [ 'width', 'style', 'color' ];
+
+/**
+ * A block's current value for a change row, shaped like the row's `newValue` so
+ * the "Current" and "New" columns read the same way.
+ *
+ * A border row is assembled from the properties it actually writes rather than
+ * read off `style.border` wholesale, which keeps a radius or a width the row
+ * leaves alone out of the comparison.
+ *
+ * @param {Object} row        The change row.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {*} The value, or `undefined` when the block sets none of the row's
+ *   properties.
+ */
+function getRowCurrentValue( row, attributes ) {
+	if ( row.format !== 'border' ) {
+		return getBlockStyleValue( attributes, row.primaryPath );
+	}
+
+	const writtenProperties = new Set(
+		row.paths.map( ( { path } ) => path[ path.length - 1 ] )
+	);
+
+	const border = {};
+	let hasValue = false;
+
+	for ( const key of BORDER_SHORTHAND_KEYS ) {
+		if ( ! writtenProperties.has( key ) ) {
+			continue;
+		}
+		// Read through `getBlockStyleValue` so a preset border color held in
+		// the `borderColor` attribute counts as the sibling's current color.
+		const value = getBlockStyleValue( attributes, [
+			...row.primaryPath,
+			key,
+		] );
+		if ( value !== undefined ) {
+			border[ key ] = value;
+			hasValue = true;
+		}
+	}
+
+	return hasValue ? border : undefined;
+}
+
 /**
  * The value the siblings currently share for a change row.
  *
  * With more than one sibling there's no single "current" value to show, so the
  * shared value is only meaningful when they all agree. When they don't, the
  * caller shows that the value varies rather than picking one arbitrarily.
+ *
+ * A row can cover more than one style path — a link color row also writes the
+ * hover color, a border row writes each side — so the siblings are compared
+ * across every path the row writes as well as the value on show. Anything the
+ * row leaves alone, such as a border radius, isn't a difference for this row.
  *
  * @param {Object} row      The change row.
  * @param {Array}  siblings Siblings as `{ clientId, attributes }`.
@@ -74,15 +131,23 @@ export function getSiblingCurrentValue( row, siblings ) {
 		return { value: undefined, varies: false };
 	}
 
-	const values = siblings.map( ( { attributes } ) =>
-		getBlockStyleValue( attributes, row.primaryPath )
-	);
-	const [ first ] = values;
-	const varies = ! values.every( ( value ) =>
-		isEqualStyleValue( value, first )
+	const entries = siblings.map( ( { attributes } ) => ( {
+		value: getRowCurrentValue( row, attributes ),
+		// Every path the row writes, so a difference it would overwrite counts
+		// even when the displayed value doesn't cover it.
+		written: row.paths.map( ( { path } ) =>
+			getBlockStyleValue( attributes, path )
+		),
+	} ) );
+
+	const [ first ] = entries;
+	const varies = ! entries.every(
+		( entry ) =>
+			isEqualStyleValue( entry.value, first.value ) &&
+			isEqualStyleValue( entry.written, first.written )
 	);
 
-	return { value: varies ? undefined : first, varies };
+	return { value: varies ? undefined : first.value, varies };
 }
 
 /**

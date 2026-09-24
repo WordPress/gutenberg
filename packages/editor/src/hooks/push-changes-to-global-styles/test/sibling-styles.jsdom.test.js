@@ -241,6 +241,95 @@ describe( 'getSiblingCurrentValue', () => {
 			varies: false,
 		} );
 	} );
+
+	it( 'compares only the properties the border row covers', () => {
+		const borderRow = getChangesToPush(
+			[ 'borderColor', 'borderWidth', 'borderStyle', 'borderRadius' ],
+			{
+				style: {
+					border: { color: '#c00', width: '2px', style: 'solid' },
+				},
+			},
+			undefined
+		).find( ( row ) => row.id === 'border' );
+
+		const withRadius = ( clientId, radius ) => ( {
+			clientId,
+			attributes: {
+				style: {
+					border: {
+						color: '#111',
+						width: '1px',
+						style: 'solid',
+						radius,
+					},
+				},
+			},
+		} );
+
+		// The radius has a row of its own, so it isn't this row's business.
+		expect(
+			getSiblingCurrentValue( borderRow, [
+				withRadius( 'a', '4px' ),
+				withRadius( 'b', '8px' ),
+			] )
+		).toEqual( {
+			value: { color: '#111', width: '1px', style: 'solid' },
+			varies: false,
+		} );
+
+		// A preset border colour is held in `borderColor` rather than `style`,
+		// so reading `style.border` alone would miss it.
+		expect(
+			getSiblingCurrentValue( borderRow, [
+				{ clientId: 'a', attributes: { borderColor: 'vivid-red' } },
+				{ clientId: 'b', attributes: { borderColor: 'vivid-red' } },
+			] )
+		).toEqual( {
+			value: { color: 'var:preset|color|vivid-red' },
+			varies: false,
+		} );
+	} );
+
+	it( 'reports that the value varies when only the link hover colour differs', () => {
+		const linkAttributes = {
+			style: {
+				elements: {
+					link: {
+						color: { text: '#c00' },
+						':hover': { color: { text: '#900' } },
+					},
+				},
+			},
+		};
+		const [ linkRow ] = getChangesToPush(
+			[ 'linkColor' ],
+			linkAttributes,
+			undefined
+		);
+		const makeSibling = ( clientId, hover ) => ( {
+			clientId,
+			attributes: {
+				style: {
+					elements: {
+						link: {
+							color: { text: '#111' },
+							':hover': { color: { text: hover } },
+						},
+					},
+				},
+			},
+		} );
+
+		// The row overwrites the hover colour too, so a hover difference is a
+		// difference for this row.
+		expect(
+			getSiblingCurrentValue( linkRow, [
+				makeSibling( 'a', '#222' ),
+				makeSibling( 'b', '#333' ),
+			] )
+		).toEqual( { value: undefined, varies: true } );
+	} );
 } );
 
 describe( 'isEqualStyleValue', () => {
