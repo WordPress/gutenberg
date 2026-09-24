@@ -1,7 +1,10 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"login": true,
 	"steps": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; $source = glob( WP_PLUGIN_DIR . '/*/test/ios/mu-plugins/always-admin.php' ); if ( ! $source ) { throw new Exception( 'always-admin.php not found under ' . WP_PLUGIN_DIR ); } if ( ! is_dir( WP_CONTENT_DIR . '/mu-plugins' ) ) { mkdir( WP_CONTENT_DIR . '/mu-plugins' ); } copy( $source[0], WP_CONTENT_DIR . '/mu-plugins/always-admin.php' );"
+		},
 		{
 			"step": "runPHP",
 			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
