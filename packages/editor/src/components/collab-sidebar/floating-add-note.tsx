@@ -190,7 +190,7 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 									blockRect.height,
 									BLOCK_ANCHOR_HEIGHT
 								),
-						  };
+							};
 				const DOMRect =
 					ownerDocument.defaultView?.DOMRect ?? window.DOMRect;
 				return new DOMRect( right, top, 0, height );
