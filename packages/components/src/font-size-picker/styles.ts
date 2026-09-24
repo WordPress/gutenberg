@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import Button from '../button';
+import CustomSelectControl from '../custom-select-control';
 import { HStack } from '../h-stack';
 import { space } from '../utils/space';
 
@@ -31,4 +25,12 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 	gap: ${ space( 1 ) };
 	justify-content: flex-start;
 	margin-bottom: 0;
+`;
+
+// Custom styled component to force line break between name and hint while keeping checkmark on the right
+export const StyledCustomSelectControl = styled( CustomSelectControl )`
+	.components-custom-select-control__item
+		.components-custom-select-control__item-hint {
+		width: 100%;
+	}
 `;

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch, select as selectStore } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as customizeWidgetsStore } from '../../store';
 
 export default function useInserter( inserter ) {

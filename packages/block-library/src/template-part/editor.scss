@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-template-part__selection-modal {
 	z-index: z-index(".block-editor-template-part__selection-modal");
 
@@ -20,7 +25,7 @@
 	position: sticky;
 	top: 0;
 	padding: $grid-unit-20 0;
-	z-index: z-index(".block-library-template-part__selection-search");
+	z-index: 2; // Above the BlockPreview z-index: 1 overlay in the scrolling list.
 }
 
 // We don't use .is-outline-mode in this case so colors take effect properly in the block editor.

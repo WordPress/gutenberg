@@ -56,19 +56,47 @@ const REGEXP_SPRINTF_PLACEHOLDER_UNORDERED =
 	/(?:(?<!%)%[+-]?(?:(?:0|'.)?-?[0-9]*(?:\.(?:[ 0]|'.)?[0-9]+)?|(?:[ ])?-?[0-9]+(?:\.(?:[ 0]|'.)?[0-9]+)?)[bcdeEfFgGosuxX])/;
 
 /**
- * Regular expression matching comment placeholders.
+ * Regular expression to extract placeholder keys from translator comments.
  *
- * /(?:^|\s|,)\s*(%[sdf]|%?[a-zA-Z0-9_]+|%[0-9]+\$?[sdf]{0,1})(:)?/g;
- * 		▲			▲			▲				▲		  ▲
- * 		│			 │			  │ 				│		  │
- * 		│			 │			  │					│		  └─ Match colon at the end of the placeholder ( optional )
- * 		│			 │			  │					└─ Match a Index placeholder but allow variations (e.g. %1, %1s, %1$d)
- * 		│			 │			  └─ Match a placeholder with index or named argument (e.g. %1, %name, %2)
- * 		│			 └─ Match Unamed placeholder (e.g. %s, %d)
- * 		└─ Match the start of string, whitespace, or comma
+ * It matches common i18n placeholders and comment-only keys, with optional
+ * precision and a trailing colon (indicating a description).
+ *
+ * Breakdown of the regex:
+ *```md
+ * (?:^|\s|,)       — Non-capturing group that matches the start of the string, a whitespace character, or a comma (ensures proper separation).
+ *
+ * \s*              — Optional whitespace after the separator.
+ *
+ * (                — Capturing group for the full placeholder (used as key):
+ *   %?             — Optional `%` to allow bare keys like `1`, `label` in comments.
+ *   (              — Group for matching placeholder variants:
+ *     \(?<named>[a-zA-Z_][a-zA-Z0-9_]*\)        — Named placeholder in the form: %(name)
+ *     (?:\.\d+|\.\*)?                           — Optional precision: .2 or .*
+ *     [sdf]                                     — Format specifier: s, d, or f
+ *
+ *     |
+ *     (?<positional>[1-9][0-9]*)\$?             — Positional placeholder like %1$
+ *     (?:\.\d+|\.\*)?                           — Optional precision
+ *     [sdf]                                     — Format specifier
+ *
+ *     |                                         — OR
+ *     (?:\.\d+|\.\*)?[sdf]                      — Unnamed placeholder with optional precision
+ *
+ *     | [1-9][0-9]*                             — Bare positional key like `1`, `2`
+ *     | [sdf]                                   — Just a format type
+ *     | [a-zA-Z_][a-zA-Z0-9_]*                  — Bare named key (used in comments)
+ *   )
+ * )
+ *
+ * (?<colon>:[ \t]+)? — Optional named group `colon`, matches a colon followed by space or tab,
+ *                      indicating that this placeholder has a description in the comment.
+ *
+ * Flags:
+ * g — global, so it matches all placeholders in the comment string.
+ * ```
  */
 const REGEXP_COMMENT_PLACEHOLDER =
-	/(?:^|\s|,)\s*(%[sdf]|%?[a-zA-Z0-9_]+|%[0-9]+\$?[sdf]{0,1})(:)?/g;
+	/(?:^|\s|,)\s*(%?(?:\((?<named>[a-zA-Z_][a-zA-Z0-9_]*)\)(?:\.\d+|\.\*)?[sdf]|(?<positional>[1-9][0-9]*)\$?(?:\.\d+|\.\*)?[sdf]|(?:\.\d+|\.\*)?[sdf]|[1-9][0-9]*|[sdf]|[a-zA-Z_][a-zA-Z0-9_]*))(?<colon>:[ \t]+)?/g;
 
 module.exports = {
 	TRANSLATION_FUNCTIONS,

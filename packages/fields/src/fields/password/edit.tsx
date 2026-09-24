@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import {
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalVStack as VStack,
 	TextControl,
 } from '@wordpress/components';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 function PasswordEdit( {
@@ -37,8 +30,7 @@ function PasswordEdit( {
 			spacing={ 4 }
 			className="fields-controls__password"
 		>
-			<CheckboxControl
-				__nextHasNoMarginBottom
+			<WCCheckboxControl
 				label={ __( 'Password protected' ) }
 				help={ __( 'Only visible to those who know the password' ) }
 				checked={ showPassword }
@@ -56,8 +48,6 @@ function PasswordEdit( {
 						value={ field.getValue( { item: data } ) || '' }
 						placeholder={ __( 'Use a secure password' ) }
 						type="text"
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						maxLength={ 255 }
 					/>
 				</div>

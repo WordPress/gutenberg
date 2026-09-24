@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import {
 	toWidthPrecision,
 	getEffectiveColumnWidth,
@@ -119,7 +113,7 @@ describe( 'getColumnWidths', () => {
 
 describe( 'getRedistributedColumnWidths', () => {
 	describe( 'explicit width', () => {
-		let blocks = [
+		const blocks = [
 			{ clientId: 'a', attributes: { width: 30 } },
 			{ clientId: 'b', attributes: { width: 40 } },
 		];
@@ -143,11 +137,14 @@ describe( 'getRedistributedColumnWidths', () => {
 		} );
 
 		it( 'should decrease proportionally for third column', () => {
-			blocks = [
+			const blocksWithThirdColumn = [
 				{ clientId: 'a', attributes: { width: 99 } },
 				{ clientId: 'b', attributes: { width: 1 } },
 			];
-			const widths = getRedistributedColumnWidths( blocks, 66.67 );
+			const widths = getRedistributedColumnWidths(
+				blocksWithThirdColumn,
+				66.67
+			);
 
 			expect( widths ).toEqual( {
 				a: 66,
@@ -156,12 +153,15 @@ describe( 'getRedistributedColumnWidths', () => {
 		} );
 
 		it( 'should decrease proportionally for fourth column', () => {
-			blocks = [
+			const blocksWithFourthColumn = [
 				{ clientId: 'a', attributes: { width: 98 } },
 				{ clientId: 'b', attributes: { width: 1 } },
 				{ clientId: 'c', attributes: { width: 1 } },
 			];
-			const widths = getRedistributedColumnWidths( blocks, 75 );
+			const widths = getRedistributedColumnWidths(
+				blocksWithFourthColumn,
+				75
+			);
 
 			expect( widths ).toEqual( {
 				a: 73.5,

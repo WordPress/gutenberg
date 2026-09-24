@@ -5,10 +5,6 @@
  * @property {string}                    [className] Class name
  * @property {number}                    [size]      Size of the icon
  */
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { DashiconProps } from './types';
 
@@ -37,7 +33,7 @@ function Dashicon( {
 					fontSize: `${ size }px`,
 					width: `${ size }px`,
 					height: `${ size }px`,
-			  }
+				}
 			: {};
 
 	const styles = {

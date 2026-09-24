@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import DropdownMenu from '../../dropdown-menu';
@@ -45,4 +34,5 @@ function UnforwardedToolbarDropdownMenu(
 }
 
 export const ToolbarDropdownMenu = forwardRef( UnforwardedToolbarDropdownMenu );
+ToolbarDropdownMenu.displayName = 'ToolbarDropdownMenu';
 export default ToolbarDropdownMenu;

@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/accordion-heading",
+		"isValid": true,
+		"attributes": {
+			"openByDefault": false,
+			"title": "title",
+			"iconPosition": "right",
+			"showIcon": true,
+			"style": {
+				"typography": {
+					"letterSpacing": "39px",
+					"textDecoration": "underline",
+					"fontStyle": "normal",
+					"fontWeight": "100",
+					"fontSize": "3.19rem"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

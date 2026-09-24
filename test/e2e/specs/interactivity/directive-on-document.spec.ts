@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-on-document', () => {
@@ -65,15 +62,18 @@ test.describe( 'data-wp-on-document', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '2' );
 	} );
+
 	test( 'should work with multiple event handlers on the same event type', async ( {
 		page,
 	} ) => {
 		const keydownHandler = page.getByTestId( 'keydownHandler' );
 		const keydownSecondHandler = page.getByTestId( 'keydownSecondHandler' );
+		const keydownThirdHandler = page.getByTestId( 'keydownThirdHandler' );
 
 		// Initial value.
 		await expect( keydownHandler ).toHaveText( 'no' );
 		await expect( keydownSecondHandler ).toHaveText( 'no' );
+		await expect( keydownThirdHandler ).toHaveText( 'no' );
 
 		// Make sure the event listener is attached.
 		await page
@@ -85,5 +85,6 @@ test.describe( 'data-wp-on-document', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( keydownHandler ).toHaveText( 'yes' );
 		await expect( keydownSecondHandler ).toHaveText( 'yes' );
+		await expect( keydownThirdHandler ).toHaveText( 'yes' );
 	} );
 } );

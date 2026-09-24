@@ -1,56 +1,30 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import RangeControl from '../../range-control';
-import type { RangeControlProps } from '../../range-control/types';
-
-type Value = RangeControlProps[ 'value' ];
 
 const UnforwardedValidatedRangeControl = (
 	{
 		required,
-		customValidator,
-		onChange,
+		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof RangeControl >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps< Value >,
+	}: React.ComponentProps< typeof RangeControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
-	const valueRef = useRef< Value >( restProps.value );
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
-			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				ref={ mergedRefs }
-				onChange={ ( value ) => {
-					valueRef.current = value;
-					onChange?.( value );
-				} }
-				{ ...restProps }
-			/>
+			<RangeControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -58,3 +32,4 @@ const UnforwardedValidatedRangeControl = (
 export const ValidatedRangeControl = forwardRef(
 	UnforwardedValidatedRangeControl
 );
+ValidatedRangeControl.displayName = 'ValidatedRangeControl';

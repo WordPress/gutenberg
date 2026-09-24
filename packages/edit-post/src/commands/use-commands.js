@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { fullscreen } from '@wordpress/icons';
@@ -25,6 +22,7 @@ export default function useCommands() {
 			? __( 'Exit fullscreen' )
 			: __( 'Enter fullscreen' ),
 		icon: fullscreen,
+		category: 'command',
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fullscreenMode' );
 			close();

@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/tab-panels",
+	"title": "Tab Panels",
+	"description": "Container for tab panel content in a tabbed interface.",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tabs" ],
+	"allowedBlocks": [ "core/tab-panel" ],
+	"supports": {
+		"html": false,
+		"visibility": false,
+		"lock": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"heading": true,
+			"button": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"shadow": true,
+		"spacing": {
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	}
+}

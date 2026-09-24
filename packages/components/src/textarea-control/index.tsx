@@ -1,28 +1,18 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
-import { StyledTextarea } from './styles/textarea-control-styles';
 import type { TextareaControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import styles from './style.module.scss';
 
 function UnforwardedTextareaControl(
 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
 	ref: React.ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
-		__nextHasNoMarginBottom,
+		// Prevent passing this to `textarea`.
+		__nextHasNoMarginBottom: _,
 		label,
 		hideLabelFromVision,
 		value,
@@ -41,16 +31,17 @@ function UnforwardedTextareaControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="TextareaControl"
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 			className={ classes }
 		>
-			<StyledTextarea
-				className="components-textarea-control__input"
+			<textarea
+				className={ clsx(
+					'components-textarea-control__input',
+					styles.textarea
+				) }
 				id={ id }
 				rows={ rows }
 				onChange={ onChangeValue }
@@ -77,7 +68,6 @@ function UnforwardedTextareaControl(
  *
  *   return (
  *     <TextareaControl
- *       __nextHasNoMarginBottom
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }
@@ -88,5 +78,6 @@ function UnforwardedTextareaControl(
  * ```
  */
 export const TextareaControl = forwardRef( UnforwardedTextareaControl );
+TextareaControl.displayName = 'TextareaControl';
 
 export default TextareaControl;

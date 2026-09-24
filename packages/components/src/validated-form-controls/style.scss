@@ -1,23 +1,23 @@
+%red-focus-ring {
+	--focus-color: var(--wpds-color-stroke-interactive-error);
+}
+
+%red-error-border {
+	@extend %red-focus-ring;
+
+	border-color: var(--wpds-color-stroke-interactive-error);
+}
+
 .components-validated-control {
 	// For components based on InputBase
-	&:has(:is(input, select):user-invalid)
+	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
-		border-color: $alert-red;
+		@extend %red-error-border;
 	}
 
-	// For TextControl, TextareaControl
-	:is(textarea, input[type="text"]):user-invalid {
-		--wp-admin-theme-color: $alert-red;
-		--wp-components-color-accent: $alert-red;
-		border-color: $alert-red;
-	}
-
-	// For ComboboxControl
-	.components-combobox-control__suggestions-container:has(
-	input:user-invalid
-):not(:has([aria-expanded="true"])) {
-		border-color: $alert-red;
+	// For TextareaControl
+	textarea:invalid[data-validity-visible] {
+		@extend %red-error-border;
 	}
 }
 
@@ -25,14 +25,14 @@
 	position: relative;
 
 	// For CustomSelectControl
-	&:has(select:user-invalid) .components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
-		border-color: $alert-red;
+	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
+		@extend %red-error-border;
 	}
 
-	// For ToggleGroupControl
-	&:has(input[type="radio"]:invalid) {
-		--wp-components-color-accent: $alert-red;
+	// For ContentEditableControl
+	&:has(input:invalid[data-validity-visible])
+	.components-validated-control__content-editable [role="textbox"] {
+		@extend %red-error-border;
 	}
 }
 
@@ -43,33 +43,4 @@
 	width: 100%;
 	opacity: 0;
 	pointer-events: none;
-}
-
-.components-validated-control__error {
-	display: flex;
-	align-items: flex-start;
-	gap: 4px;
-	margin: 8px 0 0;
-	font-family: $font-family-body;
-	font-size: 0.75rem;
-	line-height: 16px; // matches the icon size
-	color: $alert-red;
-	animation:
-		components-validated-control__error-jump 0.2s
-		cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-.components-validated-control__error-icon {
-	flex-shrink: 0;
-}
-
-@keyframes components-validated-control__error-jump {
-	0% {
-		transform: translateY(-4px);
-		opacity: 0;
-	}
-	100% {
-		transform: translateY(0);
-		opacity: 1;
-	}
 }

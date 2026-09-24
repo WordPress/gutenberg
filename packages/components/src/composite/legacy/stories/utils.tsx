@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { StoryContext } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { StoryContext } from '@storybook/react-vite';
 import type { LegacyStateOptions } from '..';
 
 /**

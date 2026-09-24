@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block variations', () => {
@@ -49,7 +46,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
@@ -85,10 +82,12 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -102,10 +101,12 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Columns' );
-		await page.getByRole( 'option', { name: 'Columns' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Columns', exact: true } )
+			.click();
 
 		await editor.canvas
 			.getByRole( 'list', { name: 'Block variations' } )
@@ -127,13 +128,13 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
 
 		// Select the quote block.
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect(
 			page
@@ -164,10 +165,12 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Success Message' );
 		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
@@ -200,10 +203,12 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.getByRole( 'option', { name: 'Heading' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
 		await page.keyboard.type( '/Warning Message' );
 		await page.getByRole( 'option', { name: 'Warning Message' } ).click();
 

@@ -1,27 +1,20 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { link, more, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TabPanel from '..';
 
 const meta: Meta< typeof TabPanel > = {
-	title: 'Components/Containers/TabPanel',
+	title: 'Components/@wordpress-components/Containers/TabPanel',
 	id: 'components-tabpanel',
 	component: TabPanel,
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
+		},
 	},
 	args: {
 		onSelect: fn(),

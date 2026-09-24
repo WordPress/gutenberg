@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { info, caution, error, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { BadgeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Icon from '../icon';
@@ -52,15 +41,17 @@ function Badge( {
 			} ) }
 			{ ...props }
 		>
-			{ hasIcon && (
-				<Icon
-					icon={ icon }
-					size={ 16 }
-					fill="currentColor"
-					className="components-badge__icon"
-				/>
-			) }
-			<span className="components-badge__content">{ children }</span>
+			<span className="components-badge__flex-wrapper">
+				{ hasIcon && (
+					<Icon
+						icon={ icon }
+						size={ 16 }
+						fill="currentColor"
+						className="components-badge__icon"
+					/>
+				) }
+				<span className="components-badge__content">{ children }</span>
+			</span>
 		</span>
 	);
 }

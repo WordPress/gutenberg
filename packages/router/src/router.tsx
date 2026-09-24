@@ -1,17 +1,12 @@
-/**
- * External dependencies
- */
 import RouteRecognizer from 'route-recognizer';
 import { createBrowserHistory } from 'history';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
 	useSyncExternalStore,
 	useMemo,
+	useState,
+	useEffect,
 } from '@wordpress/element';
 import {
 	addQueryArgs,
@@ -19,11 +14,7 @@ import {
 	getPath,
 	buildQueryString,
 } from '@wordpress/url';
-import { useEvent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import { useEvent, usePrevious } from '@wordpress/compose';
 import type { ReactNode } from 'react';
 
 const history = createBrowserHistory();
@@ -63,10 +54,14 @@ interface Config {
 export interface NavigationOptions {
 	transition?: string;
 	state?: Record< string, any >;
+	replace?: boolean;
 }
 
 const RoutesContext = createContext< Match | null >( null );
+RoutesContext.displayName = 'RoutesContext';
+
 export const ConfigContext = createContext< Config >( { pathArg: 'p' } );
+ConfigContext.displayName = 'ConfigContext';
 
 const locationMemo = new WeakMap();
 function getLocationWithQuery() {
@@ -101,7 +96,7 @@ export function useHistory() {
 				const result = beforeNavigate
 					? beforeNavigate( { path, query } )
 					: { path, query };
-				return history.push(
+				return history[ options.replace ? 'replace' : 'push' ](
 					{
 						search: buildQueryString( {
 							[ pathArg ]: result.path,
@@ -145,6 +140,11 @@ export function useHistory() {
 		() => ( {
 			navigate,
 			back: history.back,
+			invalidate: () => {
+				history.replace( {
+					search: history.location.search,
+				} );
+			},
 		} ),
 		[ navigate ]
 	);
@@ -155,50 +155,66 @@ export default function useMatch(
 	matcher: RouteRecognizer,
 	pathArg: string,
 	matchResolverArgs: Record< string, any >
-): Match {
+): Match | undefined {
 	const { query: rawQuery = {} } = location;
+	const [ resolvedMatch, setMatch ] = useState< Match | undefined >();
 
-	return useMemo( () => {
+	useEffect( () => {
 		const { [ pathArg ]: path = '/', ...query } = rawQuery;
-		const result = matcher.recognize( path )?.[ 0 ];
-		if ( ! result ) {
-			return {
+		const ret = matcher.recognize( path )?.[ 0 ];
+		async function resolveMatch( result: any ) {
+			const matchedRoute = result.handler as Route;
+			const resolveFunctions = async (
+				record: Record< string, any > = {}
+			) => {
+				const entries = await Promise.all(
+					Object.entries( record ).map( async ( [ key, value ] ) => {
+						if ( typeof value === 'function' ) {
+							return [
+								key,
+								await value( {
+									query,
+									params: result.params,
+									...matchResolverArgs,
+								} ),
+							];
+						}
+						return [ key, value ];
+					} )
+				);
+				return Object.fromEntries( entries );
+			};
+			const [ resolvedAreas, resolvedWidths ] = await Promise.all( [
+				resolveFunctions( matchedRoute.areas ),
+				resolveFunctions( matchedRoute.widths ),
+			] );
+			setMatch( {
+				name: matchedRoute.name,
+				areas: resolvedAreas,
+				widths: resolvedWidths,
+				params: result.params,
+				query,
+				path: addQueryArgs( path, query ),
+			} );
+		}
+
+		if ( ! ret ) {
+			setMatch( {
 				name: '404',
 				path: addQueryArgs( path, query ),
 				areas: {},
 				widths: {},
 				query,
 				params: {},
-			};
+			} );
+		} else {
+			resolveMatch( ret );
 		}
 
-		const matchedRoute = result.handler as Route;
-		const resolveFunctions = ( record: Record< string, any > = {} ) => {
-			return Object.fromEntries(
-				Object.entries( record ).map( ( [ key, value ] ) => {
-					if ( typeof value === 'function' ) {
-						return [
-							key,
-							value( {
-								query,
-								params: result.params,
-								...matchResolverArgs,
-							} ),
-						];
-					}
-					return [ key, value ];
-				} )
-			);
-		};
-		return {
-			name: matchedRoute.name,
-			areas: resolveFunctions( matchedRoute.areas ),
-			widths: resolveFunctions( matchedRoute.widths ),
-			params: result.params,
-			query,
-			path: addQueryArgs( path, query ),
-		};
+		return () => setMatch( undefined );
 	}, [ matcher, rawQuery, pathArg, matchResolverArgs ] );
+
+	return resolvedMatch;
 }
 
 export function RouterProvider( {
@@ -221,7 +237,7 @@ export function RouterProvider( {
 	);
 	const matcher = useMemo( () => {
 		const ret = new RouteRecognizer();
-		routes.forEach( ( route ) => {
+		( routes ?? [] ).forEach( ( route ) => {
 			ret.add( [ { path: route.path, handler: route } ], {
 				as: route.name,
 			} );
@@ -229,14 +245,20 @@ export function RouterProvider( {
 		return ret;
 	}, [ routes ] );
 	const match = useMatch( location, matcher, pathArg, matchResolverArgs );
+	const previousMatch = usePrevious( match );
 	const config = useMemo(
 		() => ( { beforeNavigate, pathArg } ),
 		[ beforeNavigate, pathArg ]
 	);
+	const renderedMatch = match || previousMatch;
+
+	if ( ! renderedMatch ) {
+		return null;
+	}
 
 	return (
 		<ConfigContext.Provider value={ config }>
-			<RoutesContext.Provider value={ match }>
+			<RoutesContext.Provider value={ renderedMatch }>
 				{ children }
 			</RoutesContext.Provider>
 		</ConfigContext.Provider>

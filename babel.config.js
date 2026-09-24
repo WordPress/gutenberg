@@ -1,16 +1,6 @@
-module.exports = ( api ) => {
-	api.cache( true );
-
-	return {
-		presets: [ '@wordpress/babel-preset-default' ],
-		plugins: [ '@emotion/babel-plugin', 'babel-plugin-inline-json-import' ],
-		overrides: [
-			{
-				test: 'packages/block-library/src/index.js',
-				plugins: [
-					require.resolve( '@wordpress/block-library/babel-plugin' ),
-				],
-			},
-		],
-	};
-};
+/*
+ * Root babel config delegates to `tools/build-scripts/babel.config.cjs` so
+ * that babel-related dependencies and resolution context live in a workspace
+ * rather than at the repo root.
+ */
+module.exports = require( './tools/build-scripts/babel.config.cjs' );

@@ -6,7 +6,6 @@
 			'bordercontrol',
 			'boxcontrol',
 			'confirmdialog',
-			'customselectcontrol-v2',
 			'dimensioncontrol',
 			'heading',
 			'hstack',
@@ -27,8 +26,20 @@
 		];
 		const REDIRECTS = [
 			{
+				from: /^\/docs\/docs-introduction--/,
+				to: '/docs/introduction--',
+			},
+			{
 				from: /\/components-deprecated-/,
 				to: '/components-',
+			},
+			{
+				from: /\/components-experimental-validated-form-controls-/,
+				to: '/components-',
+			},
+			{
+				from: /\/(?:docs|story)\/components-(?:experimental-)?customselectcontrol-v2\b.*/,
+				to: '/docs/components-customselectcontrol--docs',
 			},
 			{
 				from: new RegExp(
