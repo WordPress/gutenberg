@@ -24,6 +24,28 @@ describe( 'typography utils', () => {
 				expected: '28px',
 			},
 			{
+				message:
+					'should coerce a numeric size to `px` when fluid typography is not active',
+				preset: {
+					size: 22,
+					name: 'preset',
+					slug: 'preset',
+				},
+				typographySettings: undefined,
+				expected: '22px',
+			},
+			{
+				message:
+					'should coerce a numeric string size to `px` when fluid typography is not active',
+				preset: {
+					size: '22',
+					name: 'preset',
+					slug: 'preset',
+				},
+				typographySettings: undefined,
+				expected: '22px',
+			},
+			{
 				message: 'should return value where font size is 0',
 				preset: {
 					size: 0,
