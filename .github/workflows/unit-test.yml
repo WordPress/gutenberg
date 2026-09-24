@@ -20,9 +20,9 @@ on:
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events. Keep focused trace runs separate
-    # so they cannot cancel full test runs for the same commit.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}${{ inputs.browser-trace-file && '-browser-trace' || '' }}
+    # or the commit hash for any other events. Keep each focused trace run separate
+    # so it cannot cancel full test runs or other diagnostics for the same commit.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}${{ inputs.browser-trace-file && format('-browser-trace-{0}', github.run_id) || '' }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
