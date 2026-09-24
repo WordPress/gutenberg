@@ -65,9 +65,17 @@ class Tests_Notes_Unwrap_Mentions extends WP_UnitTestCase {
 				'<span class="wp-note-mention user-7">@Reviewer',
 				'@Reviewer',
 			),
-			'a stray closer is left as it is'              => array(
-				'@Reviewer</span>',
-				'@Reviewer</span>',
+			'a stray closer after a chip is dropped'       => array(
+				'<span class="wp-note-mention user-7">@Reviewer</span></span>',
+				'@Reviewer',
+			),
+			'the rest is written back normalized'          => array(
+				"<EM>Hi</EM> <span class='wp-note-mention user-7'>@Reviewer</span> <b>bold",
+				'<em>Hi</em> @Reviewer <b>bold</b>',
+			),
+			'text comes back with the entities the email decodes' => array(
+				'Ana &amp; Rui&#8217;s "draft" <span class="wp-note-mention user-7">@Reviewer</span>',
+				'Ana &amp; Rui’s "draft" @Reviewer',
 			),
 		);
 	}
