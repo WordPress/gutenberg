@@ -24,7 +24,11 @@ export const SearchableSelectControl = forwardRef<
 			<Field.Label hideFromVision={ hideLabelFromVision }>
 				{ label }
 			</Field.Label>
-			<SearchableSelect ref={ ref } { ...restProps } />
+			<SearchableSelect
+				ref={ ref }
+				aria-label={ label }
+				{ ...restProps }
+			/>
 			{ description && (
 				<Field.Description>{ description }</Field.Description>
 			) }

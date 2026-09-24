@@ -49,6 +49,18 @@ describe( 'SearchableSelectControl', () => {
 		).toBeVisible();
 	} );
 
+	it( 'uses the field label to name the popup dialog', async () => {
+		const user = userEvent.setup();
+
+		render( <SearchableSelectControl label="Fruit" items={ mockItems } /> );
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		expect(
+			await screen.findByRole( 'dialog', { name: 'Fruit' } )
+		).toBeVisible();
+	} );
+
 	describe( 'Form data behavior', () => {
 		it( 'submits correct form data when option is selected with custom name', async () => {
 			const user = userEvent.setup();
