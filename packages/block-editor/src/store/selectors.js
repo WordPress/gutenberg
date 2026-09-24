@@ -13,7 +13,11 @@ import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { createSelector, createRegistrySelector } from '@wordpress/data';
+import {
+	createSelector,
+	createRegistrySelector,
+	select as globalSelect,
+} from '@wordpress/data';
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -2450,6 +2454,10 @@ const buildReusableBlockInserterItem = ( state ) => ( reusableBlock ) => {
  * is for identity, not speed: the per-root cache cannot keep the objects.
  */
 
+// Read from the default registry, like `getBlockTypes()`.
+const getBlockVariationsRaw = () =>
+	unlock( globalSelect( blocksStore ) ).getBlockVariationsRaw();
+
 /**
  * Returns an inserter item for every registered block type that supports the
  * inserter, variations expanded and core blocks first.
@@ -2501,6 +2509,7 @@ const getBlockTypeInserterItems = createSelector(
 	},
 	( state ) => [
 		getBlockTypes(),
+		getBlockVariationsRaw(),
 		state.blocks.order,
 		state.preferences.insertUsage,
 	]
@@ -2654,6 +2663,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 		},
 		( state, rootClientId ) => [
 			getBlockTypes(),
+			getBlockVariationsRaw(),
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 			state.blocks.order,
 			state.preferences.insertUsage,
