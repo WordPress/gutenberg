@@ -294,7 +294,7 @@ final class Gutenberg_Fields_Registry {
 		if ( ! did_action( 'init' ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'The registered fields were read before the `init` action finished. Post types and their supports are not final until then, so read the fields on `init` or later.', 'gutenberg' ),
+				__( 'The registered fields were read before the `init` action finished. Post types and their supports are not final until then, so read the fields after `init` has run.', 'gutenberg' ),
 				'7.2.0'
 			);
 		}
@@ -307,7 +307,7 @@ final class Gutenberg_Fields_Registry {
 		 * Fires the first time the registered fields are read, after `init`.
 		 *
 		 * Register or adjust fields here. The default fields of every post
-		 * type are registered at priority 0 and adjusted at priority 1, so a
+		 * type are registered at priority 0 and adjusted at priority 9, so a
 		 * callback at the default priority sees the final defaults.
 		 *
 		 * @since 7.2.0

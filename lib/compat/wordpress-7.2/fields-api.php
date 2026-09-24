@@ -195,7 +195,7 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
  *
  * The post types whose fields differ from the defaults derived from their
  * supports (templates, attachments) adjust them in their own step, hooked
- * to the same action at priority 1, right after this one.
+ * to the same action at priority 9, right after this one.
  */
 function _gutenberg_register_posttype_fields() {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
@@ -294,7 +294,7 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_fields', 0 );
  * reads the theme or plugin that provides them instead of the post author.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_wp_template_fields() {
@@ -311,7 +311,7 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_fields', 9
  * reads the theme or plugin that provides them instead of the post author.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_wp_template_part_fields() {
@@ -330,7 +330,7 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_part_field
  * registered instead.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_attachment_fields() {
