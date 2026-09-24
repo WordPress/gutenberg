@@ -6,6 +6,10 @@
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
 ## 15.1.0 (2026-09-23)
 
 ### Enhancements
@@ -20,7 +24,6 @@
 ### Bug Fixes
 
 -   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
--   Error boundary: Explicitly announce the error title and description, excluding action labels. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
 -   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
 -   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))

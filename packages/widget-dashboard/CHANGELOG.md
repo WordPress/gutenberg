@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
 ## 0.8.0 (2026-09-23)
 
 ### Enhancements
@@ -27,11 +31,6 @@
 -   Migrate dashboard menus from the private Components API to the public
     `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
 -   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
-
-### Bug Fixes
-
--   Widget error boundary: Explicitly announce widget errors with polite priority. ([#82737](https://github.com/WordPress/gutenberg/pull/82737))
-
 
 ## 0.7.0 (2026-09-10)
 
