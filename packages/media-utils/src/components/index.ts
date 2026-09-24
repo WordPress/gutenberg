@@ -1,1 +1,1 @@
-export { default as MediaUpload } from './media-upload';
+export { default as MediaUpload, slimImageObject } from './media-upload';
