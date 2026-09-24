@@ -1,5 +1,3 @@
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
 type AttributeObject = Record< string, unknown >;
 
 /**
@@ -18,74 +16,100 @@ function isObjectAttribute( attribute: unknown ): attribute is AttributeObject {
 }
 
 /**
- * Applies the change made to one block's attribute onto another block's value
- * for the same attribute.
+ * Returns the changes between two sets of attribute values, holding only the
+ * values that differ.
  *
- * Object attributes such as `style` are walked key by key, so each block keeps
- * the values the change did not touch: setting a text color leaves every
- * block's own background alone, while a value the change removed is removed
- * everywhere. Every other attribute — a string, a number, an array, or
- * `undefined` — replaces the other block's attribute outright, so clearing an
- * attribute clears it across the whole selection.
+ * A key is absent when its value did not change, and present with an
+ * `undefined` value when it was removed. Object attributes such as `style` are
+ * walked key by key, so a change to a single style produces a change holding
+ * that style alone.
  *
- * @param previousAttribute The first block's attribute before the change.
- * @param nextAttribute     The first block's attribute after the change.
- * @param blockAttribute    The attribute belonging to the block being updated.
+ * @param previousValues Values before the change.
+ * @param nextValues     Values after the change.
  *
- * @return The block's new attribute, or `undefined` when nothing is left of it.
+ * @return The changed values, or `undefined` when none of them changed.
  */
-function applyAttributeChange(
-	previousAttribute: unknown,
-	nextAttribute: unknown,
-	blockAttribute: unknown
-): unknown {
-	if (
-		! isObjectAttribute( previousAttribute ) &&
-		! isObjectAttribute( nextAttribute )
-	) {
-		return nextAttribute;
-	}
-
-	// Either side may be absent, because a control can add an attribute that
-	// was not set before, or remove one entirely. The missing side stands in as
-	// an empty object so the keys of the other side are still visited.
-	const previousObject = isObjectAttribute( previousAttribute )
-		? previousAttribute
-		: {};
-	const nextObject = isObjectAttribute( nextAttribute ) ? nextAttribute : {};
-	const updatedAttribute = isObjectAttribute( blockAttribute )
-		? { ...blockAttribute }
-		: {};
+function getAttributeChanges(
+	previousValues: AttributeObject,
+	nextValues: AttributeObject
+): AttributeObject | undefined {
+	const changes: AttributeObject = {};
 
 	const keys = new Set( [
-		...Object.keys( previousObject ),
-		...Object.keys( nextObject ),
+		...Object.keys( previousValues ),
+		...Object.keys( nextValues ),
 	] );
 
 	for ( const key of keys ) {
-		// This attribute did not change, so keep the block's own value for it.
-		if ( previousObject[ key ] === nextObject[ key ] ) {
+		const previousValue = previousValues[ key ];
+		const nextValue = nextValues[ key ];
+
+		if ( previousValue === nextValue ) {
 			continue;
 		}
 
+		// A value that is or becomes an object is compared key by key. The
+		// side that is not an object stands in as an empty one, so adding an
+		// object records every value in it, and removing one records the
+		// removal of each value it held.
+		if (
+			isObjectAttribute( previousValue ) ||
+			isObjectAttribute( nextValue )
+		) {
+			const nestedChanges = getAttributeChanges(
+				isObjectAttribute( previousValue ) ? previousValue : {},
+				isObjectAttribute( nextValue ) ? nextValue : {}
+			);
+
+			if ( nestedChanges ) {
+				changes[ key ] = nestedChanges;
+			}
+		} else {
+			changes[ key ] = nextValue;
+		}
+	}
+
+	return Object.keys( changes ).length > 0 ? changes : undefined;
+}
+
+/**
+ * Applies a change to a block's value for the attribute it belongs to.
+ *
+ * A change that is not an object replaces the block's value, so a cleared
+ * attribute is cleared on every block. A change that is an object is merged
+ * into the block's own value key by key, so the block keeps the values the
+ * change does not mention.
+ *
+ * @param change     The change to apply.
+ * @param blockValue The block's current value.
+ *
+ * @return The block's new value, or `undefined` when nothing is left of it.
+ */
+function applyAttributeChange( change: unknown, blockValue: unknown ): unknown {
+	if ( ! isObjectAttribute( change ) ) {
+		return change;
+	}
+
+	const newBlockValue = isObjectAttribute( blockValue )
+		? { ...blockValue }
+		: {};
+
+	for ( const key of Object.keys( change ) ) {
 		const newValue = applyAttributeChange(
-			previousObject[ key ],
-			nextObject[ key ],
-			updatedAttribute[ key ]
+			change[ key ],
+			newBlockValue[ key ]
 		);
 
 		if ( newValue === undefined ) {
-			delete updatedAttribute[ key ];
+			delete newBlockValue[ key ];
 		} else {
-			updatedAttribute[ key ] = newValue;
+			newBlockValue[ key ] = newValue;
 		}
 	}
 
 	// Blocks do not keep empty branches such as `style.color: {}` around, so a
 	// branch the change emptied out is dropped rather than left behind.
-	return Object.keys( updatedAttribute ).length > 0
-		? updatedAttribute
-		: undefined;
+	return Object.keys( newBlockValue ).length > 0 ? newBlockValue : undefined;
 }
 
 /**
@@ -112,31 +136,31 @@ export function getMultiSelectionAttributeUpdates(
 	attributeUpdates: AttributeObject,
 	attributesByClientId: Record< string, AttributeObject >
 ): Record< string, AttributeObject > | undefined {
-	// Calculate the attribute keys that actually contain updates
-	// for the first block in the selection.
-	const changedKeys = Object.keys( attributeUpdates ).filter(
-		( key ) =>
-			! fastDeepEqual(
-				firstBlockAttributes[ key ],
-				attributeUpdates[ key ]
-			)
+	// Only the attributes the update mentions are being changed, so the rest of
+	// the first block's attributes are left out of the comparison.
+	const previousAttributes = Object.fromEntries(
+		Object.keys( attributeUpdates ).map( ( key ) => [
+			key,
+			firstBlockAttributes[ key ],
+		] )
 	);
+	const changes = getAttributeChanges( previousAttributes, attributeUpdates );
 
-	if ( changedKeys.length === 0 ) {
+	if ( ! changes ) {
 		return undefined;
 	}
 
-	// For each block, calculate the attributes updates.
+	// For each block, calculate the attribute updates.
 	const updatesByClientId: Record< string, AttributeObject > = {};
+
 	for ( const [ clientId, blockAttributes ] of Object.entries(
 		attributesByClientId
 	) ) {
 		const blockUpdates: AttributeObject = {};
 
-		for ( const key of changedKeys ) {
+		for ( const key of Object.keys( changes ) ) {
 			blockUpdates[ key ] = applyAttributeChange(
-				firstBlockAttributes[ key ],
-				attributeUpdates[ key ],
+				changes[ key ],
 				blockAttributes[ key ]
 			);
 		}
