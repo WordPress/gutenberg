@@ -114,9 +114,10 @@
 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
-			display: flex;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
 			align-items: start;
-			justify-content: flex-start;
+			align-content: center;
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
@@ -132,6 +133,10 @@
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
+			}
+
+			&:has(> .item-icon) {
+				grid-template-columns: auto minmax(0, 1fr);
 			}
 
 			&.is-size-small {
