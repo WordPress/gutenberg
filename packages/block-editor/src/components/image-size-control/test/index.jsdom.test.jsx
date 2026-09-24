@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageSizeControl from '../index';
 
@@ -16,7 +16,7 @@ describe( 'ImageSizeControl', () => {
 		vi.clearAllMocks();
 	} );
 
-	it( 'returns custom dimensions when they exist', () => {
+	it( 'returns custom dimensions when they exist', async () => {
 		render(
 			<ImageSizeControl
 				imageHeight="100"
@@ -29,14 +29,14 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } )
+			await screen.findByRole( 'spinbutton', { name: 'Height' } )
 		).toHaveValue( 300 );
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Width' } )
 		).toHaveValue( 400 );
 	} );
 
-	it( 'returns default dimensions when custom dimensions are undefined', () => {
+	it( 'returns default dimensions when custom dimensions are undefined', async () => {
 		render(
 			<ImageSizeControl
 				imageHeight="100"
@@ -46,32 +46,32 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } )
+			await screen.findByRole( 'spinbutton', { name: 'Height' } )
 		).toHaveValue( 100 );
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Width' } )
 		).toHaveValue( 200 );
 	} );
 
-	it( 'returns no value when custom and default dimensions are undefined', () => {
+	it( 'returns no value when custom and default dimensions are undefined', async () => {
 		render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } )
+			await screen.findByRole( 'spinbutton', { name: 'Height' } )
 		).toHaveValue( null );
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Width' } )
 		).toHaveValue( null );
 	} );
 
-	it( 'returns default dimensions when initially undefined defaults are defined on rerender', () => {
+	it( 'returns default dimensions when initially undefined defaults are defined on rerender', async () => {
 		// Simulates an initial render with custom and default dimensions undefined.
 		// This occurs when an image is uploaded for the first time, for example.
 		const { rerender } = render(
 			<ImageSizeControl onChange={ mockOnChange } />
 		);
 
-		const heightInput = screen.getByRole( 'spinbutton', {
+		const heightInput = await screen.findByRole( 'spinbutton', {
 			name: 'Height',
 		} );
 		const widthInput = screen.getByRole( 'spinbutton', { name: 'Width' } );
@@ -91,7 +91,7 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		// The dimensions should update to the defaults.
-		expect( heightInput ).toHaveValue( 300 );
+		await waitFor( () => expect( heightInput ).toHaveValue( 300 ) );
 		expect( widthInput ).toHaveValue( 400 );
 	} );
 
@@ -263,7 +263,7 @@ describe( 'ImageSizeControl', () => {
 			{ value: 'large', label: 'Large' },
 		];
 
-		it( 'displays the selected slug', () => {
+		it( 'displays the selected slug', async () => {
 			render(
 				<ImageSizeControl
 					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
@@ -274,7 +274,7 @@ describe( 'ImageSizeControl', () => {
 			);
 
 			expect(
-				screen.getByRole( 'combobox', { name: 'Resolution' } )
+				await screen.findByRole( 'combobox', { name: 'Resolution' } )
 			).toHaveValue( 'medium' );
 		} );
 
