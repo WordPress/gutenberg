@@ -3,7 +3,7 @@
  * Tests for the post author's note notification email.
  *
  * `wp_notify_postauthor()` places the note content in its plain text email as
- * stored, and the plugin replaces it with its plain text on
+ * stored, and the plugin unwraps the mention chips in it on
  * `comment_notification_text`.
  *
  * @group notes
@@ -103,7 +103,7 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
 	public function test_note_email_drops_the_markup_around_a_mention(): void {
 		$message = $this->notify_post_author( 'Hi <span class="wp-note-mention user-7">@Reviewer</span>, please check the intro.', 'note' );
@@ -113,38 +113,21 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
-	 */
-	public function test_note_email_keeps_the_line_breaks(): void {
-		$message = $this->notify_post_author( 'Fix the intro.<br>Then publish.', 'note' );
-
-		$this->assertStringContainsString( "Note: \r\nFix the intro.\nThen publish.", $message );
-	}
-
-	/**
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
-	 */
-	public function test_note_email_drops_the_inline_formatting_markup(): void {
-		$message = $this->notify_post_author( 'A <strong>bold</strong> <a href="https://example.com/">link</a> and <code>code</code>.', 'note' );
-
-		$this->assertStringContainsString( "Note: \r\nA bold link and code.", $message );
-	}
-
-	/**
-	 * Text the author typed as an escaped tag is text, and is not read as a tag and dropped.
+	 * Only the mention chips are unwrapped. The rest of the note, including the
+	 * formatting the author chose, is placed in the email as it is, like a comment.
 	 *
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
-	public function test_note_email_keeps_escaped_text(): void {
-		$message = $this->notify_post_author( 'Rename &lt;code&gt; to &lt;kbd&gt; here.', 'note' );
+	public function test_note_email_keeps_the_rest_of_the_content_as_is(): void {
+		$message = $this->notify_post_author( '<strong>Bold</strong> &lt;code&gt;<br><span class="wp-note-mention user-7">@Reviewer</span>', 'note' );
 
-		$this->assertStringContainsString( 'Rename <code> to <kbd> here.', $message );
+		$this->assertStringContainsString( "Note: \r\n<strong>Bold</strong> <code><br>@Reviewer", $message );
 	}
 
 	/**
 	 * A note without content marks a thread as resolved or reopened, which the email says.
 	 *
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
 	public function test_note_email_keeps_the_wording_for_an_empty_note(): void {
 		$message = $this->notify_post_author( '', 'note' );
@@ -155,7 +138,7 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	/**
 	 * The content of a regular comment is placed in the email as it always was.
 	 *
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
 	public function test_comment_email_leaves_the_content_as_is(): void {
 		$message = $this->notify_post_author( 'A <strong>bold</strong> <a href="https://example.com/">claim</a>.' );
@@ -164,31 +147,31 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The stored content is replaced wherever WordPress places it, with the tags
-	 * stripped before the entities are decoded.
+	 * The stored content is replaced wherever WordPress places it, with the chips
+	 * unwrapped before the entities are decoded.
 	 *
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
-	public function test_filter_replaces_the_stored_content_with_its_plain_text(): void {
-		$note_id = $this->insert_comment( 'Hi <span class="wp-note-mention user-7">@Reviewer</span>,<br>rename &lt;code&gt; here.', 'note' );
-		$message = "Note: \r\nHi <span class=\"wp-note-mention user-7\">@Reviewer</span>,<br>rename <code> here.\r\n";
+	public function test_filter_unwraps_the_chips_in_the_stored_content(): void {
+		$note_id = $this->insert_comment( '<strong>Bold</strong> &lt;code&gt;<br><span class="wp-note-mention user-7">@Reviewer</span>', 'note' );
+		$message = "Note: \r\n<strong>Bold</strong> <code><br><span class=\"wp-note-mention user-7\">@Reviewer</span>\r\n";
 
 		$this->assertSame(
-			"Note: \r\nHi @Reviewer,\nrename <code> here.\r\n",
-			gutenberg_strip_note_markup_from_notification_text( $message, $note_id )
+			"Note: \r\n<strong>Bold</strong> <code><br>@Reviewer\r\n",
+			gutenberg_unwrap_note_mentions_in_notification_text( $message, $note_id )
 		);
 	}
 
 	/**
-	 * A WordPress version that places the plain text itself composes a message
+	 * A WordPress version that unwraps the chips itself composes a message
 	 * without the stored content, which the filter must leave unchanged.
 	 *
-	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 * @covers ::gutenberg_unwrap_note_mentions_in_notification_text
 	 */
 	public function test_filter_leaves_a_message_without_the_stored_content_unchanged(): void {
 		$note_id = $this->insert_comment( 'Hi <span class="wp-note-mention user-7">@Reviewer</span>.', 'note' );
 		$message = "Note: \r\nHi @Reviewer.\r\n";
 
-		$this->assertSame( $message, gutenberg_strip_note_markup_from_notification_text( $message, $note_id ) );
+		$this->assertSame( $message, gutenberg_unwrap_note_mentions_in_notification_text( $message, $note_id ) );
 	}
 }
