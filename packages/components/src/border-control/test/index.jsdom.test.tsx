@@ -151,16 +151,30 @@ describe( 'BorderControl', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should keep the unit of a percentage width that is already set', () => {
+		it( 'should keep the unit of a percentage width until it is changed', async () => {
+			const user = userEvent.setup();
 			const props = createProps( {
 				value: { ...defaultBorder, width: '10%' },
 			} );
-			render( <TestBorderControl { ...props } /> );
+			const { rerender } = render( <TestBorderControl { ...props } /> );
 
 			const unitSelect = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
 			expect( unitSelect ).toHaveValue( '%' );
+
+			await user.selectOptions( unitSelect, 'px' );
+
+			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+				...defaultBorder,
+				width: '10px',
+			} );
+
+			rerender( <TestBorderControl { ...props } /> );
+
+			expect(
+				within( unitSelect ).queryByRole( 'option', { name: '%' } )
+			).not.toBeInTheDocument();
 		} );
 
 		describe( 'color indicator inline styles', () => {
