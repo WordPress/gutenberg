@@ -3,6 +3,9 @@
 	box-sizing: border-box;
 }
 
+.wp-block-group.is-horizontal figure {
+    flex-shrink: 0;
+}
 // We need this so groups with negative margins overlap as expected.
 :where(.wp-block-group.wp-block-group-is-layout-constrained) {
 	position: relative;
