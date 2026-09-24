@@ -1,14 +1,18 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
-import { getBlockStyleValue } from './style-paths';
+import {
+	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
+	getBlockStyleValue,
+} from './style-paths';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const PRESET_USER_PREFIX = 'var:preset|';
 
-// True for a preset in its user form, e.g. `var:preset|color|vivid-red`. Those
-// are carried by a block attribute rather than by `style`.
+// True for a preset in its user form, e.g. `var:preset|color|vivid-red`. Some
+// of those are carried by a block attribute (`textColor`) and some live in
+// `style` (a spacing size, a link color, a per-side border color).
 const isPresetValue = ( value ) =>
 	typeof value === 'string' && value.startsWith( PRESET_USER_PREFIX );
 
@@ -127,14 +131,33 @@ export function getSiblingStylesUpdate( {
 			}
 
 			for ( const { path, value } of row.paths ) {
-				if ( isPresetValue( value ) ) {
-					// Clear any custom value the sibling had at this path so it
-					// doesn't compete with the preset attribute set above.
+				// This row's preset travels as a block attribute, copied above,
+				// so clear any custom value the sibling had at this path rather
+				// than writing the `var:preset|…` form into `style`, where it
+				// would compete with the attribute.
+				if ( isPresetValue( value ) && row.presetAttributes.length ) {
 					setNestedValue( newStyles, path, undefined );
 					continue;
 				}
+
+				// Everything else is copied as-is, including a preset with no
+				// attribute behind it: a spacing size, a link color and a
+				// per-side border color all live in `style` on the source
+				// block, so they belong in `style` on the siblings too.
 				setNestedValue( newStyles, path, value );
 				hasChange = true;
+
+				// A preset attribute the sibling already has would survive the
+				// copy and keep winning over the value just written, so clear
+				// it.
+				const competingAttribute =
+					STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ path.join( '.' ) ];
+				if (
+					competingAttribute &&
+					sibling.attributes?.[ competingAttribute ] !== undefined
+				) {
+					update[ competingAttribute ] = undefined;
+				}
 			}
 		}
 

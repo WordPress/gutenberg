@@ -88,6 +88,74 @@ describe( 'getSiblingStylesUpdate', () => {
 		expect( updates.a.style?.color?.text ).toBeUndefined();
 	} );
 
+	it( 'copies a preset that has no block attribute to carry it', () => {
+		const applyTo = ( supports, attributes, siblingAttributes ) =>
+			getSiblingStylesUpdate( {
+				rowsToApply: getChangesToPush(
+					supports,
+					attributes,
+					undefined
+				),
+				attributes,
+				siblings: [ { clientId: 'a', attributes: siblingAttributes } ],
+			} );
+
+		// A spacing size lives in `style`. Clearing it instead of copying it
+		// left the sibling with no gap at all, since nothing else in the row
+		// counted as a change.
+		const gap = applyTo(
+			[ 'blockGap' ],
+			{ style: { spacing: { blockGap: 'var:preset|spacing|40' } } },
+			{ style: { spacing: { blockGap: '1rem' } } }
+		);
+		expect( gap.a.style.spacing.blockGap ).toBe( 'var:preset|spacing|40' );
+
+		// So does a per-side border colour.
+		const side = applyTo(
+			[ 'borderColor' ],
+			{
+				style: {
+					border: { top: { color: 'var:preset|color|vivid-red' } },
+				},
+			},
+			{}
+		);
+		expect( side.a.style.border.top.color ).toBe(
+			'var:preset|color|vivid-red'
+		);
+
+		// A flat border colour is the opposite case: `borderColor` carries it,
+		// so it travels as that attribute and is kept out of `style`, where it
+		// would otherwise be duplicated onto all four sides.
+		const flat = applyTo(
+			[ 'borderColor' ],
+			{ borderColor: 'vivid-red' },
+			{}
+		);
+		expect( flat.a.borderColor ).toBe( 'vivid-red' );
+		expect( flat.a.style?.border?.color ).toBeUndefined();
+		expect( flat.a.style?.border?.top?.color ).toBeUndefined();
+	} );
+
+	it( "clears a sibling's preset attribute that would win over a custom value", () => {
+		const attributes = { style: { color: { text: '#c00' } } };
+		const rows = getChangesToPush( [ 'color' ], attributes, undefined );
+		const siblings = [
+			{ clientId: 'a', attributes: { textColor: 'vivid-red' } },
+		];
+
+		const updates = getSiblingStylesUpdate( {
+			rowsToApply: rows,
+			attributes,
+			siblings,
+		} );
+
+		expect( updates.a.style.color.text ).toBe( '#c00' );
+		// The preset class would otherwise stay on the sibling alongside the
+		// custom colour that was just copied.
+		expect( updates.a ).toHaveProperty( 'textColor', undefined );
+	} );
+
 	it( 'only applies the rows it is given', () => {
 		const attributes = {
 			style: {
