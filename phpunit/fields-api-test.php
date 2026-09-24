@@ -271,6 +271,40 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The notes field follows the `notes` argument of the `editor` support,
+	 * which WordPress stores as a list of argument arrays; a bare `editor`
+	 * support does not enable it.
+	 */
+	public function test_the_notes_field_follows_the_editor_support_argument() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' => array( 'notes' => true ) ),
+			)
+		);
+		register_post_type(
+			'gutenberg_note',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' ),
+			)
+		);
+
+		try {
+			Gutenberg_Fields_Registry::get_instance()->reset();
+			$with_notes    = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
+			$without_notes = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' );
+		} finally {
+			unregister_post_type( 'gutenberg_book' );
+			unregister_post_type( 'gutenberg_note' );
+		}
+
+		$this->assertContains( 'notesCount', $with_notes );
+		$this->assertNotContains( 'notesCount', $without_notes );
+	}
+
+	/**
 	 * The author field is the only default field with JavaScript parts, so
 	 * it is the only one registered with the default fields script module.
 	 */
