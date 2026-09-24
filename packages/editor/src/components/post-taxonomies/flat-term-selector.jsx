@@ -417,20 +417,6 @@ export function FlatTermSelector( { slug } ) {
 				}
 				emptyContent={ isSearching ? null : notFoundLabel }
 				showClearButton={ false }
-				chipsContent={ ( selectedTerms ) =>
-					selectedTerms.map( ( term ) => (
-						<SearchableChipSelectControl.ChipWithRemove
-							key={ term.value }
-							removeLabel={ sprintf(
-								/* translators: %s: term name. */
-								_x( 'Remove %s', 'term' ),
-								term.label
-							) }
-						>
-							{ term.label }
-						</SearchableChipSelectControl.ChipWithRemove>
-					) )
-				}
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
 		</Stack>

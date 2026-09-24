@@ -85,7 +85,11 @@ export const SearchableSelect = forwardRef<
 	warnSearchableSelectProps( items, children );
 
 	return (
-		<Combobox.Root< Item, false > items={ items } { ...restProps }>
+		<Combobox.Root< Item, false >
+			items={ items }
+			{ ...restProps }
+			grid={ undefined }
+		>
 			<Combobox.Trigger
 				ref={ ref }
 				placeholder={ placeholder }
