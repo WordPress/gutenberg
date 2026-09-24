@@ -13,6 +13,10 @@
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 
+### Internal
+
+-   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+
 ## 41.0.0 (2026-09-23)
 
 ### Breaking Changes
