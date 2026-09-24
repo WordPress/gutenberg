@@ -123,6 +123,10 @@ function App() {
 }
 ```
 
+When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
 The `color` prop accepts an object with the following optional properties:
 
 - `primary`: The primary/accent seed color (default: `'#3858e9'`).
@@ -182,10 +186,6 @@ The `cursor` prop accepts an object with the following optional properties:
 - `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
-
-When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
-
-`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Light and dark themes
 
@@ -390,10 +390,6 @@ export default defineConfig( {
 	},
 } );
 ```
-
-## Compatibility checks for maintainers
-
-Before removing a compatibility API, run the [mixed-version WordPress fixture](https://github.com/WordPress/gutenberg/tree/trunk/tools/validation/fixtures/theme-compatibility). It checks published and checkout UI bundles against core and candidate theme runtimes, including generated asset dependencies and rendered theme values. Keep the compatibility bridge until the required combinations pass or the support change is explicit.
 
 ## Contributing to this package
 

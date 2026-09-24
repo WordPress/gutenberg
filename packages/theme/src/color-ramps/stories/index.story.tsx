@@ -33,6 +33,18 @@ const meta: Meta< typeof ColorGen > = {
 		},
 	},
 	parameters: {
+		a11y: {
+			config: {
+				rules: [
+					{
+						id: 'color-contrast',
+						// These samples demonstrate generated contrast, including failures.
+						// Keep contrast checks enabled for all other story content.
+						selector: ':not([data-color-contrast-sample])',
+					},
+				],
+			},
+		},
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -139,8 +151,8 @@ function ColorScaleCombination( {
 				</p>
 			</header>
 			<p>
-				Squares show foreground colors on their corresponding
-				backgrounds. Hover over a square for its step and color value,
+				Text samples show foreground colors on their corresponding
+				backgrounds. Hover over a sample for its step and color value,
 				or expand Color values below the ramps. Color pairs may not meet
 				text contrast requirements.
 			</p>

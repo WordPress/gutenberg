@@ -6,7 +6,7 @@ Use it with [Testing published packages across WordPress versions](../../../../d
 
 ## Compatibility boundaries
 
-An export fallback protects access to the component, but props and CSS tokens can differ across versions. WordPress 7.0 reads `color.bg`, while UI 0.15.1 and the current UI pass `color.background`. UI 0.15.1 also consumes `--wpds-color-bg-*` and `--wpds-color-fg-*` names, which the current theme replaced with `--wpds-color-background-*` and `--wpds-color-foreground-*`. Treat these as separate visual compatibility checks. A successful private API unlock does not prove that the requested theme was applied.
+An export fallback protects access to the component, but props and CSS tokens can differ across versions. WordPress 7.0 reads `color.bg`, while UI 0.15.1 and the current UI pass `color.background`. UI 0.15.1 also consumes `--wpds-color-bg-*` and `--wpds-color-fg-*` names, which the current theme replaced with `--wpds-color-background-*` and `--wpds-color-foreground-*`. The checkout UI on WordPress 7.0 is a current consumer compatibility bug, even though the mismatch predates this fixture. Treat prop and token mismatches as separate visual compatibility checks. A successful private API unlock does not prove that the requested theme was applied.
 
 ## Build the consumers
 

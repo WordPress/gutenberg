@@ -129,14 +129,14 @@ function ColorSample( {
 		<span
 			role="img"
 			aria-label={ label }
+			data-color-contrast-sample
 			title={ label }
 			style={ {
-				backgroundColor: ramp[ foreground ],
-				display: 'inline-block',
-				width: 12,
-				height: 12,
+				color: ramp[ foreground ],
 			} }
-		/>
+		>
+			Aa
+		</span>
 	);
 }
 
@@ -363,10 +363,10 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 				<details>
 					<summary>Color values</summary>
 					<p>
-						The surface3 squares show fgSurface1 through fgSurface4
-						in order. The bgFill1, bgFillInverted1, and bgFillDark
-						squares show fgFill, fgFillInverted, and fgFillDark,
-						respectively.
+						The surface3 text samples show fgSurface1 through
+						fgSurface4 in order. The bgFill1, bgFillInverted1, and
+						bgFillDark text samples show fgFill, fgFillInverted, and
+						fgFillDark, respectively.
 					</p>
 					{ ramps.map( ( { name, ramp } ) => (
 						<table key={ name }>
