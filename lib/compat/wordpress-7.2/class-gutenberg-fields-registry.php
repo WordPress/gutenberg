@@ -439,6 +439,11 @@ final class Gutenberg_Fields_Registry {
 		 * nothing else; script modules, styles, and their enqueue hooks
 		 * belong on `init`.
 		 *
+		 * The first read happens wherever the fields are needed: while
+		 * handling a REST request as well as on `admin_init`. A callback
+		 * should register fields and nothing else; script modules, styles,
+		 * and their enqueue hooks belong on `init`.
+		 *
 		 * @since 7.2.0
 		 *
 		 * @param Gutenberg_Fields_Registry $registry The registry being read.
