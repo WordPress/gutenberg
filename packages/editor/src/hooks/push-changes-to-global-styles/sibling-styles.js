@@ -4,7 +4,6 @@ import setNestedValue from '../../utils/set-nested-value';
 import {
 	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
 	getBlockStyleValue,
-	getValueFromObjectPath,
 } from './style-paths';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -74,16 +73,16 @@ const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
  * collapsed the way the modal displays a per-side border: a value is kept only
  * when every side that sets one agrees.
  *
+ * @param {Function} read        Reads a style path on a block, falling back to
+ *                               the block type's Global Styles value.
  * @param {Object}   attributes  Block attributes.
  * @param {string[]} primaryPath The row's style path.
  * @param {string}   key         A border property (`width`, `style`, `color`).
  *
- * @return {*} The value, or `undefined` when the block sets none.
+ * @return {*} The value, or `undefined` when the block has none.
  */
-function getBorderPropertyValue( attributes, primaryPath, key ) {
-	// Read through `getBlockStyleValue` so a preset border color held in the
-	// `borderColor` attribute counts as the block's current color.
-	const flatValue = getBlockStyleValue( attributes, [ ...primaryPath, key ] );
+function getBorderPropertyValue( read, attributes, primaryPath, key ) {
+	const flatValue = read( attributes, [ ...primaryPath, key ] );
 
 	// A side row (`border.top`) has no sides of its own to collapse.
 	if ( flatValue !== undefined || primaryPath.length > 1 ) {
@@ -91,10 +90,10 @@ function getBorderPropertyValue( attributes, primaryPath, key ) {
 	}
 
 	const setSides = BORDER_SIDES.filter( ( side ) =>
-		getValueFromObjectPath( attributes?.style, [ ...primaryPath, side ] )
+		read( attributes, [ ...primaryPath, side ] )
 	);
 	const sideValues = setSides.map( ( side ) =>
-		getBlockStyleValue( attributes, [ ...primaryPath, side, key ] )
+		read( attributes, [ ...primaryPath, side, key ] )
 	);
 
 	return sideValues.length &&
@@ -111,15 +110,17 @@ function getBorderPropertyValue( attributes, primaryPath, key ) {
  * read off `style.border` wholesale, which keeps a radius or a width the row
  * leaves alone out of the comparison.
  *
- * @param {Object} row        The change row.
- * @param {Object} attributes Block attributes.
+ * @param {Function} read       Reads a style path on a block, falling back to
+ *                              the block type's Global Styles value.
+ * @param {Object}   row        The change row.
+ * @param {Object}   attributes Block attributes.
  *
- * @return {*} The value, or `undefined` when the block sets none of the row's
+ * @return {*} The value, or `undefined` when the block has none of the row's
  *   properties.
  */
-function getRowCurrentValue( row, attributes ) {
+function getRowCurrentValue( read, row, attributes ) {
 	if ( row.format !== 'border' ) {
-		return getBlockStyleValue( attributes, row.primaryPath );
+		return read( attributes, row.primaryPath );
 	}
 
 	const writtenProperties = new Set(
@@ -134,6 +135,7 @@ function getRowCurrentValue( row, attributes ) {
 			continue;
 		}
 		const value = getBorderPropertyValue(
+			read,
 			attributes,
 			row.primaryPath,
 			key
@@ -159,24 +161,38 @@ function getRowCurrentValue( row, attributes ) {
  * across every path the row writes as well as the value on show. Anything the
  * row leaves alone, such as a border radius, isn't a difference for this row.
  *
- * @param {Object} row      The change row.
- * @param {Array}  siblings Siblings as `{ clientId, attributes }`.
+ * A sibling that sets nothing of its own still renders with whatever Global
+ * Styles gives the block type, and Apply replaces that, so `getInheritedValue`
+ * stands in where the sibling has no value. Without it a sibling inheriting a
+ * color shows an em dash, and reads as varying from a sibling that sets the
+ * same color itself. Every sibling is the same block type as the block being
+ * applied from, so they all inherit the same values.
+ *
+ * @param {Object}    row               The change row.
+ * @param {Array}     siblings          Siblings as `{ clientId, attributes }`.
+ * @param {?Function} getInheritedValue Returns the block type's Global Styles
+ *                                      value for a style path.
  *
  * @return {{value: *, varies: boolean}} The shared value, and whether the
  *   siblings disagree.
  */
-export function getSiblingCurrentValue( row, siblings ) {
+export function getSiblingCurrentValue( row, siblings, getInheritedValue ) {
 	if ( ! siblings?.length ) {
 		return { value: undefined, varies: false };
 	}
 
+	const read = ( attributes, path ) => {
+		// A preset attribute (e.g. `textColor`) counts as the block's own
+		// value, so read through `getBlockStyleValue` rather than `style`.
+		const value = getBlockStyleValue( attributes, path );
+		return value !== undefined ? value : getInheritedValue?.( path );
+	};
+
 	const entries = siblings.map( ( { attributes } ) => ( {
-		value: getRowCurrentValue( row, attributes ),
+		value: getRowCurrentValue( read, row, attributes ),
 		// Every path the row writes, so a difference it would overwrite counts
 		// even when the displayed value doesn't cover it.
-		written: row.paths.map( ( { path } ) =>
-			getBlockStyleValue( attributes, path )
-		),
+		written: row.paths.map( ( { path } ) => read( attributes, path ) ),
 	} ) );
 
 	const [ first ] = entries;

@@ -235,6 +235,50 @@ describe( 'getSiblingCurrentValue', () => {
 		} );
 	} );
 
+	it( 'falls back to the value a sibling inherits from Global Styles', () => {
+		const inherited = ( path ) =>
+			path.join( '.' ) === 'color.text' ? '#111' : undefined;
+		const sibling = ( clientId, siblingAttributes ) => ( {
+			clientId,
+			attributes: siblingAttributes,
+		} );
+
+		// Nothing of their own, so both render with the block type's colour
+		// and that's what Apply replaces.
+		expect(
+			getSiblingCurrentValue(
+				colorRow,
+				[ sibling( 'a', {} ), sibling( 'b', {} ) ],
+				inherited
+			)
+		).toEqual( { value: '#111', varies: false } );
+
+		// One sets the inherited colour itself: they look the same on screen,
+		// so the row doesn't vary.
+		expect(
+			getSiblingCurrentValue(
+				colorRow,
+				[
+					sibling( 'a', {} ),
+					sibling( 'b', { style: { color: { text: '#111' } } } ),
+				],
+				inherited
+			)
+		).toEqual( { value: '#111', varies: false } );
+
+		// A sibling's own value still wins over what it would inherit.
+		expect(
+			getSiblingCurrentValue(
+				colorRow,
+				[
+					sibling( 'a', { style: { color: { text: '#222' } } } ),
+					sibling( 'b', { style: { color: { text: '#222' } } } ),
+				],
+				inherited
+			)
+		).toEqual( { value: '#222', varies: false } );
+	} );
+
 	it( 'handles having no siblings', () => {
 		expect( getSiblingCurrentValue( colorRow, [] ) ).toEqual( {
 			value: undefined,

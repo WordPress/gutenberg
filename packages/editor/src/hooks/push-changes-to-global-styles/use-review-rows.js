@@ -93,7 +93,9 @@ export function useReviewRows( rows, merged, name ) {
  *
  * The "Current" column means something different here: rather than the block
  * type's Global Styles value, it's the value the siblings already share, or
- * `Varies` when they disagree.
+ * `Varies` when they disagree. A sibling that sets nothing of its own falls
+ * back to the block type's Global Styles value, which is what it renders with
+ * and what Apply replaces.
  *
  * @param {Array}  rows     Grouped rows from `useChangesToPush`.
  * @param {Array}  siblings Siblings as `{ clientId, attributes }`.
@@ -108,8 +110,17 @@ export function useSiblingReviewRows( rows, siblings, merged, name ) {
 		const resolve = ( value ) =>
 			getValueFromVariable( merged, name, value );
 
+		// Keep preset values encoded so they compare against the siblings'
+		// own preset values, which are read in the same form.
+		const getInheritedValue = ( path ) =>
+			getStyle( merged, path.join( '.' ), name, false );
+
 		return rows.map( ( row ) => {
-			const { value, varies } = getSiblingCurrentValue( row, siblings );
+			const { value, varies } = getSiblingCurrentValue(
+				row,
+				siblings,
+				getInheritedValue
+			);
 
 			return {
 				...row,
