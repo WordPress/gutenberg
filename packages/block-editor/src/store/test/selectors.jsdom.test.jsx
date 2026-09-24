@@ -5317,6 +5317,17 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 } );
 
 describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5342,12 +5353,19 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	afterEach( () => {
-		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5370,7 +5388,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5398,7 +5416,7 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 

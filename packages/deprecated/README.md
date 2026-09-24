@@ -105,6 +105,8 @@ describe( 'legacyFeature', () => {
 
 Setting a `logged` entry also prevents the `deprecated` action from firing. Leave the entry absent when testing that action.
 
+If every test that triggers a deprecation already asserts the warning, delete the message's entry in both `beforeEach` and `afterEach` instead of marking it as logged. This keeps the warning assertions independent without suppressing them.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
