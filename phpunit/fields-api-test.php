@@ -409,8 +409,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registering does not read the registry, so a plugin can register new
-	 * fields on `init`, before the action fires, without firing it early.
+	 * Registering does not read the registry, so a registration made before
+	 * the action fires does not fire it early.
 	 */
 	public function test_registering_does_not_fire_the_action() {
 		Gutenberg_Fields_Registry::get_instance()->reset();

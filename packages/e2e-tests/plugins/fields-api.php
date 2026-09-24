@@ -5,7 +5,9 @@
  * Author: Gutenberg Team
  *
  * Extends the fields of Pages through the fields API, one self-contained
- * function per case:
+ * function per case. Every case registers its fields on
+ * `gutenberg_fields_init`, the action the registry fires the first time its
+ * fields are read, after `init`, once the default fields are registered:
  *
  * 1. `add_field_declarative`: a declarative field (`menu_order`), plain data,
  *    no JavaScript.
@@ -30,10 +32,7 @@
 
 /**
  * Case 1: a declarative field (`menu_order`), whose value is a property of
- * the record. No JavaScript, no styles. A new field can be registered on
- * `init`: registering does not read the registry, so it does not fire
- * `gutenberg_fields_init` early, and the default fields registered later
- * do not touch it.
+ * the record. No JavaScript, no styles.
  */
 function gutenberg_test_fields_api_add_field_declarative() {
 	gutenberg_register_fields(
@@ -51,14 +50,17 @@ function gutenberg_test_fields_api_add_field_declarative() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_test_fields_api_add_field_declarative' );
+add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_declarative' );
 
 /**
  * Case 2: a field (`reading_time`) whose value and render come from a script
  * module, styled by a stylesheet. The module is registered, not enqueued:
  * Gutenberg adds the modules of the registered fields to the import map of
  * the editor pages. A stylesheet cannot ride along with a script module, so
- * the function enqueues it on every screen where the field can show.
+ * the function enqueues it on every screen where the field can show. On the
+ * editor pages, `gutenberg_fields_init` fires early on `admin_init`, when
+ * Gutenberg reads the registry to build the import map, so the enqueue
+ * actions below are in place before those screens render.
  *
  * The module also exports a complete `word_count` field, id and label
  * included, that no `gutenberg_register_fields()` call names. A module only
@@ -106,18 +108,17 @@ function gutenberg_test_fields_api_add_field_with_script_module() {
 	// The extensible site editor rendered inside the wp-admin chrome.
 	add_action( 'site-editor-v2-wp-admin_init', $enqueue_style );
 }
-add_action( 'init', 'gutenberg_test_fields_api_add_field_with_script_module' );
+add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_script_module' );
 
 /**
  * Case 3: a patch of a default field (`comment_status`). Only the properties
  * given change, and the module applies to the field on top of the modules it
  * has. Hideable, so the field can be shown from the view options.
  *
- * The default fields are registered on `gutenberg_fields_init`, the action
- * the registry fires the first time its fields are read, and a registration
- * with the id of an existing field patches it, so the function hooks the
- * same action at the default priority, after the defaults: a patch
- * registered before would be patched by the default definition in turn.
+ * A registration with the id of an existing field patches it, so the patch
+ * must come after the default fields, registered on `gutenberg_fields_init`
+ * at priority 0: the default priority does. A patch registered before would
+ * be patched by the default definition in turn.
  */
 function gutenberg_test_fields_api_update_field() {
 	wp_register_script_module(
@@ -158,9 +159,8 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_update_field' );
 /**
  * Case 4: a substitute for a default field (`author`). Unregistering drops
  * its definition and detaches its script modules, so the registration that
- * follows is the whole field. Hooked to `gutenberg_fields_init` at the
- * default priority, after the default fields: there is nothing to
- * unregister before.
+ * follows is the whole field. The default priority runs after the default
+ * fields: there is nothing to unregister before.
  */
 function gutenberg_test_fields_api_replace_field() {
 	gutenberg_unregister_fields( 'postType', 'page', array( 'author' ) );
@@ -185,41 +185,19 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_replace_field' )
  *
  * - A REST field reading and writing post meta the plugin owns, which the
  *   endpoint does not expose otherwise, so the record of every page carries
- *   `subtitle` and a request updating a page can set it. Registered on
- *   `rest_api_init`, which fires after `init`.
+ *   `subtitle` and a request updating a page can set it. Hooked to
+ *   `rest_api_init` on its own: a request to the Pages endpoint does not read
+ *   the fields registry, so `gutenberg_fields_init` may never fire during it.
  * - A declarative field like case 1. The field API reads the value from the
  *   record and, as the field is not read-only, the Quick Edit form saves the
  *   edits with the record, through the REST field.
  * - An entry in the Quick Edit form of Pages. The form lists its fields
  *   explicitly in the view configuration of the entity, so a new field is
  *   not offered for editing until it is added there. Merging appends the
- *   field to the end of the form.
+ *   field to the end of the form. Filtered from the moment the plugin
+ *   loads, whenever the view configuration is read.
  */
 function gutenberg_test_fields_api_add_field_with_data() {
-	add_action(
-		'rest_api_init',
-		function () {
-			register_rest_field(
-				'page',
-				'subtitle',
-				array(
-					'schema'          => array(
-						'description' => 'A secondary title shown under the title.',
-						'type'        => 'string',
-						'context'     => array( 'view', 'edit' ),
-					),
-					'get_callback'    => function ( $item ) {
-						return (string) get_post_meta( $item['id'], '_gutenberg_test_subtitle', true );
-					},
-					'update_callback' => function ( $value, $post ) {
-						update_post_meta( $post->ID, '_gutenberg_test_subtitle', sanitize_text_field( $value ) );
-						return true;
-					},
-				)
-			);
-		}
-	);
-
 	gutenberg_register_fields(
 		'postType',
 		'page',
@@ -234,22 +212,46 @@ function gutenberg_test_fields_api_add_field_with_data() {
 			),
 		)
 	);
-
-	add_filter(
-		'get_entity_view_config_posttype_page',
-		function ( $data ) {
-			return $data->merge(
-				array(
-					'form' => array(
-						'fields' => array( 'subtitle' ),
-					),
-				),
-				1
-			);
-		}
-	);
 }
-add_action( 'init', 'gutenberg_test_fields_api_add_field_with_data' );
+add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_data' );
+
+add_action(
+	'rest_api_init',
+	function () {
+		register_rest_field(
+			'page',
+			'subtitle',
+			array(
+				'schema'          => array(
+					'description' => 'A secondary title shown under the title.',
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'get_callback'    => function ( $item ) {
+					return (string) get_post_meta( $item['id'], '_gutenberg_test_subtitle', true );
+				},
+				'update_callback' => function ( $value, $post ) {
+					update_post_meta( $post->ID, '_gutenberg_test_subtitle', sanitize_text_field( $value ) );
+					return true;
+				},
+			)
+		);
+	}
+);
+
+add_filter(
+	'get_entity_view_config_posttype_page',
+	function ( $data ) {
+		return $data->merge(
+			array(
+				'form' => array(
+					'fields' => array( 'subtitle' ),
+				),
+			),
+			1
+		);
+	}
+);
 
 /**
  * Registers a submenu rendering the extensible site editor inside the
