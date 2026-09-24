@@ -1,6 +1,7 @@
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
 import { getRectangleFromRange } from '@wordpress/dom';
+import { NOTE_FORMAT_NAME } from './constants';
 
 /**
  * Sanitizes a note string by trimming leading and trailing whitespace.
@@ -131,14 +132,12 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 	return { ...metadata, noteId: [ ...ids ] };
 }
 
-const NOTE_FORMAT_TYPE = 'core/note';
-
 /**
  * Search a rich-text value for a `core/note` marker matching `noteId` and
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
  *
- * @param {*}             value  Block attribute value (RichTextData, string, or other).
+ * @param {unknown}       value  Block attribute value (RichTextData, string, or other).
  * @param {number|string} noteId Note id to search for.
  * @return {?{start: number, end: number}} Range or null when no marker is found.
  */
@@ -163,7 +162,7 @@ export function findNoteRange( value, noteId ) {
 		const stack = formats[ i ];
 		const hit = stack?.find(
 			( f ) =>
-				f.type === NOTE_FORMAT_TYPE &&
+				f.type === NOTE_FORMAT_NAME &&
 				f.attributes &&
 				f.attributes[ 'data-id' ] === target
 		);
@@ -351,7 +350,7 @@ export function applyNoteFormat( record, format, start, end ) {
 			continue;
 		}
 		for ( const fmt of stack ) {
-			if ( fmt.type !== NOTE_FORMAT_TYPE ) {
+			if ( fmt.type !== NOTE_FORMAT_NAME ) {
 				continue;
 			}
 			const id = fmt.attributes?.[ 'data-id' ];
@@ -376,7 +375,7 @@ export function applyNoteFormat( record, format, start, end ) {
 		if ( ! stack || stack.length < 2 ) {
 			continue;
 		}
-		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_TYPE );
+		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_NAME );
 		if ( notes.length === 0 ) {
 			continue;
 		}
@@ -387,11 +386,81 @@ export function applyNoteFormat( record, format, start, end ) {
 					sizeOf( a.attributes?.[ 'data-id' ] )
 			);
 		}
-		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_TYPE );
+		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_NAME );
 		formats[ i ] = [ ...notes, ...others ];
 	}
 
 	return { ...record, formats };
+}
+
+/**
+ * @typedef {Object} WPSelectionPoint
+ * @property {string} [clientId]     Selected block client id.
+ * @property {string} [attributeKey] Selected rich-text attribute.
+ * @property {number} [offset]       Offset within the attribute.
+ */
+
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {() => WPSelectionPoint} getSelectionStart Block-editor selector.
+ * @param {() => WPSelectionPoint} getSelectionEnd   Block-editor selector.
+ * @return {?{clientId: string, attributeKey: string, start: number, end: number}} Normalized selection or null.
+ */
+export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param {unknown} value Existing block attribute value.
+ * @param {number}  id    New note id to embed as `data-id`.
+ * @param {number}  start Range start offset.
+ * @param {number}  end   Range end offset.
+ * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ */
+export function wrapInlineNote( value, id, start, end ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyNoteFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString(
+		new RichTextData( record ).toHTMLString()
+	);
 }
 
 /**
@@ -403,7 +472,7 @@ export function applyNoteFormat( record, format, start, end ) {
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param {*}             value  Block attribute value (RichTextData or other).
+ * @param {unknown}       value  Block attribute value (RichTextData or other).
  * @param {number|string} noteId Note id whose marker should be removed.
  * @return {?RichTextData} A new value with the marker removed, or null when the
  *                         attribute isn't rich text or carries no such marker.
@@ -422,7 +491,7 @@ export function removeNoteFormat( value, noteId ) {
 		const filtered = stack.filter(
 			( format ) =>
 				! (
-					format.type === NOTE_FORMAT_TYPE &&
+					format.type === NOTE_FORMAT_NAME &&
 					format.attributes?.[ 'data-id' ] === target
 				)
 		);
@@ -438,6 +507,41 @@ export function removeNoteFormat( value, noteId ) {
 				new RichTextData( { ...record, formats } ).toHTMLString()
 			)
 		: null;
+}
+
+/**
+ * Strip a note's inline `core/note` marker from whichever block holds it, if
+ * any, so a deleted or resolved note's highlight does not linger in the content.
+ * No-op for block-level notes (those carry no marker). Used by the resolve path,
+ * which only knows the note id; the delete path strips the marker inline since
+ * it already has the block.
+ *
+ * @param {number}                                         noteId                      Note id whose marker to remove.
+ * @param {() => string[]}                                 getClientIdsWithDescendants Block-editor selector.
+ * @param {(clientId: string) => Record<string, unknown>}  getBlockAttributes          Block-editor selector.
+ * @param {(clientId: string, attributes: Object) => void} updateBlockAttributes       Block-editor action.
+ */
+export function clearInlineNoteMarker(
+	noteId,
+	getClientIdsWithDescendants,
+	getBlockAttributes,
+	updateBlockAttributes
+) {
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+		}
+		return;
+	}
 }
 
 /**

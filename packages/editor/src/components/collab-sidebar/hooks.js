@@ -18,23 +18,23 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
-import { RichTextData, create } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { NOTE_FORMAT_NAME } from './format';
 import {
-	applyNoteFormat,
 	calculateNotePositions,
+	clearInlineNoteMarker,
 	findNoteInBlock,
 	focusNoteThread,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	pickPrimaryNote,
+	readInlineSelection,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
+	wrapInlineNote,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -171,104 +171,6 @@ export function useNoteThreads( postId ) {
 		notes,
 		unresolvedNotes,
 	};
-}
-
-/**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
- *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
- */
-function readInlineSelection( getSelectionStart, getSelectionEnd ) {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
-	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
-}
-
-/**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
- *
- * @param {*}      value Existing block attribute value.
- * @param {number} id    New note id to embed as `data-id`.
- * @param {number} start Range start offset.
- * @param {number} end   Range end offset.
- * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
- */
-function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
-		return null;
-	}
-	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
-		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
-		start,
-		end
-	);
-	// Round-trip through HTML to normalise format references (applyNoteFormat
-	// leaves them un-normalised) so the stored value matches a fresh reload.
-	return RichTextData.fromHTMLString(
-		new RichTextData( record ).toHTMLString()
-	);
-}
-
-/**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
- *
- * @param {number}   noteId                      Note id whose marker to remove.
- * @param {Function} getClientIdsWithDescendants Block-editor selector.
- * @param {Function} getBlockAttributes          Block-editor selector.
- * @param {Function} updateBlockAttributes       Block-editor action.
- */
-function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
-) {
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
-		}
-		return;
-	}
 }
 
 export function useNoteActions() {
