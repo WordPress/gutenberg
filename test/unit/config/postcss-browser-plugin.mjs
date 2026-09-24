@@ -8,6 +8,10 @@ const EMPTY_MODULE_ID = '\0postcss-browser-empty';
 // Remove this plugin and its optimizer registration once the installed Vite
 // version handles browser:false imports without warnings. Keep the Browser
 // regression test to verify removal.
+//
+// The separate CSS Modules missing-`from` warning is tracked in:
+// https://github.com/madyankin/postcss-modules/pull/173
+// https://github.com/vitejs/vite/issues/15410
 export function createPostcssBrowserPlugin( rootDir ) {
 	const require = createRequire(
 		path.join( rootDir, 'packages/block-editor/package.json' )
