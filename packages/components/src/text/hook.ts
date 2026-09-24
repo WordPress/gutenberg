@@ -95,9 +95,7 @@ export default function useText(
 	};
 	const textStyle: React.CSSProperties & {
 		[ key: `--wp-components-text-${ string }` ]:
-			| string
-			| number
-			| undefined;
+			string | number | undefined;
 	} = {};
 	const keywordClasses: string[] = [];
 
