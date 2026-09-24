@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Remove the unused Jest peer dependency from the fixture package.
+
 ## 9.21.0 (2026-09-23)
 
 ## 9.20.0 (2026-09-10)
