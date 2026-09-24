@@ -26,6 +26,13 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
+	 * Result types to rank above the usual order, most wanted first. Everything
+	 * left out keeps its usual place behind them.
+	 *
+	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
+	 */
+	preferTypes?: TypeOrderEntry[];
+	/**
 	 * Which page of results to return. Only meaningful for a search narrowed by `type`.
 	 * Unscoped searches across multiple types do not have paged results due to sorting
 	 * and merging results across multiple tables.
@@ -125,7 +132,7 @@ export default async function fetchLinkSuggestions(
 				}
 			: searchOptions;
 
-	const { type, subtype, page } = searchOptionsToUse;
+	const { type, subtype, preferTypes, page } = searchOptionsToUse;
 
 	// Naming a number is asking for no more than that; naming none is taking whatever a page
 	// holds, which an unscoped search may exceed.
@@ -252,10 +259,13 @@ export default async function fetchLinkSuggestions(
 	results = results.filter( ( result ) => !! result.id );
 
 	if ( searchOptions.isInitialSuggestions || ! search ) {
-		return sortResults( results, search ).slice( 0, perPage );
+		return sortResults( { results, search, preferTypes } ).slice(
+			0,
+			perPage
+		);
 	}
 
-	const sortedResults = rankResults( results, search );
+	const sortedResults = rankResults( { results, search, preferTypes } );
 
 	// Determine how many results to return
 	//
@@ -311,6 +321,12 @@ function getTitleMatch(
 }
 
 /**
+ * A position in a type order: a search type, covering everything of that type, or a search type
+ * with one subtype, covering only that subtype.
+ */
+export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
+
+/**
  * The order result types are ranked in, most wanted first.
  *
  * A link is usually to content, then to a taxonomy. A post format is a way of styling a post
@@ -354,15 +370,32 @@ function getSearchType( result: SearchResult ): SearchType {
 /**
  * How much a result's type counts towards its rank.
  *
- * Earlier entries in `TYPE_ORDER` are worth more. A weight rather than a band, so a title that
- * plainly answers the search can still outrank a better-placed type that barely does.
+ * Earlier entries are worth more, and anything a caller prefers outranks the usual order
+ * entirely. A weight rather than a band, so a title that plainly answers the search can still
+ * outrank a better-placed type that barely does.
  *
  * @param result
+ * @param preferTypes
  *
  * @return The weight to add to the result's score.
  */
-function getTypeWeight( result: SearchResult ): number {
-	return TYPE_ORDER.length - TYPE_ORDER.indexOf( getSearchType( result ) );
+function getTypeWeight(
+	result: SearchResult,
+	preferTypes: TypeOrderEntry[] = []
+): number {
+	const searchType = getSearchType( result );
+
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		typeof entry === 'string'
+			? entry === searchType
+			: entry.type === searchType && entry.subtype === result.type
+	);
+
+	if ( preferred !== -1 ) {
+		return TYPE_ORDER.length + ( preferTypes.length - preferred );
+	}
+
+	return TYPE_ORDER.length - TYPE_ORDER.indexOf( searchType );
 }
 
 /**
@@ -453,6 +486,18 @@ type ScoredResult = {
 };
 
 /**
+ * What to rank, and how.
+ */
+type RankOptions = {
+	results: SearchResult[];
+	search: string;
+	/**
+	 * Result types to rank above the usual order, most wanted first.
+	 */
+	preferTypes?: TypeOrderEntry[];
+};
+
+/**
  * Work out how well each result answers the query, and order them by it.
  *
  * The scores come back attached to the results, so that deciding how many to keep can read what a
@@ -473,20 +518,23 @@ type ScoredResult = {
  * considered, so a long title is never marked down for being long, and repeating a word never
  * makes a title a better answer.
  *
- * @param results
- * @param search
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-function rankResults(
-	results: SearchResult[],
-	search: string
-): ScoredResult[] {
+function rankResults( {
+	results,
+	search,
+	preferTypes,
+}: RankOptions ): ScoredResult[] {
 	const searchTokens = tokenize( search );
 
 	const scored = results.map( ( result ) => ( {
 		result,
 		found: countWordsFound( result.title, searchTokens ),
 		...getTitleMatch( result.title, search ),
-		type: getTypeWeight( result ),
+		type: getTypeWeight( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
 	} ) );
 
@@ -516,11 +564,19 @@ function rankResults(
  *
  * See `rankResults` for the order this puts them in.
  *
- * @param results
- * @param search
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-export function sortResults( results: SearchResult[], search: string ) {
-	return rankResults( results, search ).map( ( { result } ) => result );
+export function sortResults( {
+	results,
+	search,
+	preferTypes,
+}: RankOptions ): SearchResult[] {
+	return rankResults( { results, search, preferTypes } ).map(
+		( { result } ) => result
+	);
 }
 
 /**

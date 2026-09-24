@@ -1899,9 +1899,19 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'Navigation Link Inspector Link Editing', () => {
+		// WordPress always has this category, so nothing needs creating or
+		// removing.
+		const DEFAULT_CATEGORY_NAME = 'Uncategorized';
 		let testPage1;
 
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			// Shares a word with the default category, so one search returns
+			// both a page and a term and their order can be asserted.
+			await requestUtils.createPage( {
+				title: `${ DEFAULT_CATEGORY_NAME } Notes`,
+				status: 'publish',
+			} );
+
 			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
@@ -2019,6 +2029,73 @@ test.describe( 'Navigation block', () => {
 					.first();
 
 				await expect( navLinkBlock ).toContainText( 'Test Page 1' );
+			} );
+
+			// The search is not limited to the entity type of the link being
+			// edited, so a page link can be pointed at a category.
+			// See https://github.com/WordPress/gutenberg/issues/77072.
+			await test.step( 'Select a category from suggestions', async () => {
+				const settingsControls = navigation.getContentControls();
+
+				await settingsControls
+					.getByRole( 'button', { name: /Link to:/ } )
+					.click();
+
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
+
+				const searchResults = page.getByRole( 'listbox', {
+					name: /Search results/,
+				} );
+				await expect( searchResults ).toBeVisible();
+
+				await searchResults
+					// The page sharing the word sorts first, so match the term's URL.
+					.getByRole( 'option', { name: /\/category\// } )
+					.click();
+
+				await expect( navigation.getLinkPopover() ).toBeHidden();
+			} );
+
+			await test.step( 'Verify the link became a category link', async () => {
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', {
+							name: 'Block: Category Link',
+						} )
+						.first()
+				).toBeVisible();
+			} );
+
+			// Ordering follows the block's own entity type, so a category link
+			// lists categories before pages and posts.
+			await test.step( 'Verify categories are listed first when editing a category link', async () => {
+				const settingsControls = navigation.getContentControls();
+
+				await settingsControls
+					.getByRole( 'button', { name: /Link to:/ } )
+					.click();
+
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
+
+				const searchResults = page.getByRole( 'listbox', {
+					name: /Search results/,
+				} );
+				await expect( searchResults ).toBeVisible();
+
+				// The page fixture shares the word, so assert on the type
+				// rather than the label.
+				await expect(
+					searchResults.getByRole( 'option' ).first()
+				).toContainText( 'Category' );
 			} );
 		} );
 
