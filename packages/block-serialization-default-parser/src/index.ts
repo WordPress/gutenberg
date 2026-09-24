@@ -518,7 +518,10 @@ function implicitlyCloseAllOpenBlocks() {
 		let html: string;
 
 		if ( lastFreeform !== null ) {
-			html = document.substr( stackTop.prevOffset, lastFreeform[ 1 ] - stackTop.prevOffset );
+			html = document.substr(
+				stackTop.prevOffset,
+				lastFreeform[ 1 ] - stackTop.prevOffset
+			);
 		} else {
 			html = document.substr( stackTop.prevOffset );
 		}
@@ -538,7 +541,10 @@ function implicitlyCloseAllOpenBlocks() {
 	}
 
 	if ( lastFreeform !== null && lastFreeform[ 1 ] > lastFreeform[ 0 ] ) {
-		const html = document.substr( lastFreeform[ 0 ], lastFreeform[ 1 ] - lastFreeform[ 0 ] );
+		const html = document.substr(
+			lastFreeform[ 0 ],
+			lastFreeform[ 1 ] - lastFreeform[ 0 ]
+);
 		output.push( Freeform( html ) );
 	}
 
