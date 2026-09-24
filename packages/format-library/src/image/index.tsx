@@ -15,7 +15,11 @@ import {
 	MediaUploadCheck,
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-import type { EditImageProps, InlineImageUIProps } from '../types';
+import type {
+	FormatEditProps,
+	ImageFormatAttributes,
+	InlineImageUIProps,
+} from '../types';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -28,9 +32,9 @@ const title = __( 'Inline image' );
  * @return The extracted image ID or undefined if not found.
  */
 function getCurrentImageId(
-	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
+	activeObjectAttributes: ImageFormatAttributes
 ): number | undefined {
-	if ( ! activeObjectAttributes?.className ) {
+	if ( ! activeObjectAttributes.className ) {
 		return undefined;
 	}
 
@@ -62,8 +66,8 @@ function InlineUI( {
 	activeObjectAttributes,
 	contentRef,
 }: InlineImageUIProps ) {
-	const style = activeObjectAttributes?.style;
-	const alt = activeObjectAttributes?.alt;
+	const style = activeObjectAttributes.style;
+	const alt = activeObjectAttributes.alt;
 
 	const width = style?.replace( /\D/g, '' );
 	const [ editedWidth, setEditedWidth ] = useState( width );
@@ -164,7 +168,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditImageProps ) {
+}: FormatEditProps< ImageFormatAttributes > ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload

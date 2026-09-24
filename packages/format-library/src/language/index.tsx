@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
 import type {
-	LanguageEditProps,
+	FormatEditProps,
 	InlineLanguageUIProps,
 	LanguageFormat,
 } from '../types';
@@ -32,7 +32,7 @@ export const language = {
 	edit: Edit,
 } satisfies LanguageFormat;
 
-function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
+function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );

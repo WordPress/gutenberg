@@ -1,57 +1,30 @@
 import type { RichTextValue } from '@wordpress/rich-text';
 
 /**
- * The props every format's `edit()` receives from the rich text toolbar.
+ * The props the rich text toolbar passes to every format's `edit()`.
+ *
+ * `Attributes` types the format's own attribute bag. Only one of
+ * `activeAttributes` and `activeObjectAttributes` carries meaning for a given
+ * format: the former for inline formats, the latter for object formats.
  */
-export interface FormatEditProps {
+export interface FormatEditProps< Attributes = Record< string, string > > {
 	isActive: boolean;
+	activeAttributes: Attributes;
+	isObjectActive: boolean;
+	activeObjectAttributes: Attributes;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	onFocus: () => void;
-}
-
-/**
- * `FormatEditProps` for the formats whose toolbar button can be hidden.
- */
-export interface FormatEditWithVisibilityProps extends FormatEditProps {
+	contentRef: React.RefObject< HTMLElement >;
+	/**
+	 * The block context values the format asked for through `usesContext`.
+	 */
+	context: Record< string, unknown >;
+	/**
+	 * Whether the format's toolbar button should render. Hosts that never hide
+	 * format buttons leave it unset, so treat an absent value as `true`.
+	 */
 	isVisible?: boolean;
-}
-
-export interface NonBreakingSpacePopoverAnchorProps {
-	contentRef: React.RefObject< HTMLElement >;
-}
-
-export type NonBreakingSpaceEditProps = Pick<
-	FormatEditProps,
-	'value' | 'onChange'
-> &
-	NonBreakingSpacePopoverAnchorProps;
-export interface LanguageEditProps {
-	isActive: boolean;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	contentRef: React.RefObject< HTMLElement >;
-}
-
-export interface TextColorEditProps extends FormatEditProps {
-	activeAttributes: Record< string, string >;
-	contentRef: React.RefObject< HTMLElement >;
-}
-
-export interface InlineColorUIProps {
-	name: string;
-	onClose: () => void;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	contentRef: React.RefObject< HTMLElement >;
-	isActive: boolean;
-}
-
-export interface ColorPickerProps {
-	name: string;
-	property: 'color' | 'backgroundColor';
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
 }
 
 /**
@@ -66,38 +39,15 @@ export interface LanguageFormat {
 		lang: string;
 		dir: string;
 	};
-	edit: ( props: LanguageEditProps ) => React.ReactNode;
+	edit: ( props: FormatEditProps ) => React.ReactNode;
 }
 
-export interface InlineLanguageUIProps {
-	value: RichTextValue;
-	contentRef: React.RefObject< HTMLElement >;
-	onChange: ( value: RichTextValue ) => void;
+export type InlineLanguageUIProps = Pick<
+	FormatEditProps,
+	'value' | 'onChange' | 'contentRef'
+> & {
 	onClose: () => void;
-}
-
-export interface InlineMathUIProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	activeAttributes: Record< string, string > | null;
-	contentRef: React.RefObject< HTMLElement >;
-	/**
-	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
-	 */
-	latexToMathML?: (
-		latex: string,
-		options?: { displayMode?: boolean }
-	) => string;
-}
-
-export interface EditMathProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-	isObjectActive: boolean;
-	activeObjectAttributes: Record< string, string > | null;
-	contentRef: React.RefObject< HTMLElement >;
-}
+};
 
 /**
  * A colour entry from the `color.palette` theme setting.
@@ -108,37 +58,49 @@ export interface ColorObject {
 	name?: string;
 }
 
-export interface EditImageProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-	isObjectActive: boolean;
-	activeObjectAttributes: {
-		style?: string;
-		alt?: string;
-		className?: string;
-		url?: string;
-	} | null;
-	contentRef: React.RefObject< HTMLElement >;
-}
+export type InlineColorUIProps = Pick<
+	FormatEditProps,
+	'isActive' | 'value' | 'onChange' | 'contentRef'
+> & {
+	name: string;
+	onClose: () => void;
+};
+
+export type ColorPickerProps = Pick< FormatEditProps, 'value' | 'onChange' > & {
+	name: string;
+	property: 'color' | 'backgroundColor';
+};
+
+export type InlineMathUIProps = Pick<
+	FormatEditProps,
+	'value' | 'onChange' | 'activeObjectAttributes' | 'contentRef'
+> & {
+	/**
+	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
+	 */
+	latexToMathML?: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+};
 
 /**
- * The subset of `EditImageProps` the inline image popover actually reads.
+ * The attributes carried on an active `core/image` format.
+ */
+export type ImageFormatAttributes = {
+	className?: string;
+	style?: string;
+	url?: string;
+	alt?: string;
+};
+
+/**
+ * The subset of the image format's props the inline image popover reads.
  */
 export type InlineImageUIProps = Pick<
-	EditImageProps,
+	FormatEditProps< ImageFormatAttributes >,
 	'value' | 'onChange' | 'activeObjectAttributes' | 'contentRef'
 >;
-
-export interface EditLinkProps {
-	isActive: boolean;
-	activeAttributes: LinkFormatAttributes;
-	value: RichTextValue;
-	onChange: ( newValue: RichTextValue ) => void;
-	onFocus: () => void;
-	contentRef: React.RefObject< HTMLElement >;
-	isVisible?: boolean;
-}
 
 export interface OpenedBy {
 	el: HTMLElement;
@@ -164,16 +126,14 @@ export interface CSSClassesSettingProps {
 	onChange: ( newValue: { cssClasses?: string } ) => void;
 }
 
-export interface InlineLinkUIProps {
-	isActive: boolean;
-	activeAttributes: LinkFormatAttributes;
-	value: RichTextValue;
-	onChange: ( newValue: RichTextValue ) => void;
+export type InlineLinkUIProps = Pick<
+	FormatEditProps< LinkFormatAttributes >,
+	'isActive' | 'activeAttributes' | 'value' | 'onChange' | 'contentRef'
+> & {
 	onFocusOutside: () => void;
 	stopAddingLink: () => void;
-	contentRef: React.RefObject< HTMLElement >;
 	focusOnMount?: 'firstElement' | false;
-}
+};
 
 /**
  * The options accepted by `createLinkFormat`.

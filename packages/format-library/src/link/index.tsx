@@ -21,7 +21,7 @@ import { speak } from '@wordpress/a11y';
 import type { RichTextValue } from '@wordpress/rich-text';
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
-import type { EditLinkProps, OpenedBy } from '../types';
+import type { FormatEditProps, LinkFormatAttributes, OpenedBy } from '../types';
 
 const name = 'core/link';
 const title = __( 'Link' );
@@ -34,7 +34,7 @@ function Edit( {
 	onFocus,
 	contentRef,
 	isVisible = true,
-}: EditLinkProps ) {
+}: FormatEditProps< LinkFormatAttributes > ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
