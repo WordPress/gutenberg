@@ -201,15 +201,31 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 			case '/wp/v2/media?search=few&per_page=20':
 				return Promise.resolve( [] );
 			case '/wp/v2/search?search=&per_page=3&type=post':
-			case '/wp/v2/search?search=&per_page=3&type=term':
-			case '/wp/v2/search?search=&per_page=3&type=post-format':
 				return Promise.resolve(
 					Array.from( { length: 3 }, ( _, index ) => ( {
 						id: 500 + index,
-						title: `Initial ${ index }`,
-						url: `http://wordpress.local/initial-${ index }/`,
+						title: `Initial Page ${ index }`,
+						url: `http://wordpress.local/initial-page-${ index }/`,
 						type: 'post',
 						subtype: 'page',
+					} ) )
+				);
+			case '/wp/v2/search?search=&per_page=3&type=term':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 510 + index,
+						title: `Initial Category ${ index }`,
+						url: `http://wordpress.local/initial-category-${ index }/`,
+						type: 'category',
+					} ) )
+				);
+			case '/wp/v2/search?search=&per_page=3&type=post-format':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 520 + index,
+						title: `Initial Format ${ index }`,
+						url: `http://wordpress.local/initial-format-${ index }/`,
+						type: 'post-format',
 					} ) )
 				);
 			case '/wp/v2/media?search=&per_page=3':
@@ -445,6 +461,21 @@ describe( 'fetchLinkSuggestions', () => {
 				isInitialSuggestions: true,
 			} ).then( ( suggestions ) =>
 				expect( suggestions ).toHaveLength( 3 )
+			);
+		} );
+
+		it( 'orders initial suggestions by the types a caller prefers', () => {
+			// Nothing is typed, so the type is all there is to order them by.
+			// Without a preference the usual order leads with the page.
+			return fetchLinkSuggestions( '', {
+				isInitialSuggestions: true,
+				preferTypes: [ { type: 'term', subtype: 'category' } ],
+			} ).then( ( suggestions ) =>
+				expect( suggestions.map( ( { title } ) => title ) ).toEqual( [
+					'Initial Category 0',
+					'Initial Category 1',
+					'Initial Category 2',
+				] )
 			);
 		} );
 
