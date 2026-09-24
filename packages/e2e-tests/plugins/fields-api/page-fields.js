@@ -3,7 +3,9 @@
  *
  * The default export maps field ids to the properties of the field that PHP
  * cannot serialize. The module applies to the fields it was registered with:
- * `reading_time` and `comment_status`.
+ * `reading_time` and `comment_status`. The `word_count` entry is a whole
+ * field no PHP registration names: the editor ignores it, as a module only
+ * augments the fields registered with it.
  *
  * No build step: script modules cannot import the `@wordpress/*` scripts, so
  * the `wp.*` globals the editor already loaded are used instead.
@@ -56,7 +58,39 @@ const commentStatus = {
 	},
 };
 
+/**
+ * A complete field definition, id and label included, with no registration
+ * in PHP naming it. The editor merges a module into the fields the server
+ * registered the module with, so this entry never becomes a field.
+ */
+const wordCount = {
+	id: 'word_count',
+	type: 'integer',
+	label: 'Word count',
+	enableSorting: false,
+	enableHiding: true,
+	filterBy: false,
+	readOnly: true,
+	getValue: ( { item } ) => {
+		const content =
+			typeof item.content === 'string'
+				? item.content
+				: ( item.content?.raw ?? item.content?.rendered ?? '' );
+		return content
+			.replace( /<[^>]*>/g, ' ' )
+			.split( /\s+/ )
+			.filter( Boolean ).length;
+	},
+	render: ( { item, field } ) =>
+		createElement(
+			'span',
+			{ className: 'gutenberg-test-word-count' },
+			`${ field.getValue( { item } ) } words`
+		),
+};
+
 export default {
 	reading_time: readingTime,
 	comment_status: commentStatus,
+	word_count: wordCount,
 };

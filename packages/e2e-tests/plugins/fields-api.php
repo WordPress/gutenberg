@@ -17,6 +17,10 @@
  * 5. A field whose value is data the plugin adds to the Pages REST endpoint
  *    (`subtitle`): a REST field backed by post meta, readable in the list and
  *    writable from the Quick Edit form, which the plugin adds the field to.
+ * 6. A field defined only in the script module (`word_count`): a complete
+ *    definition in `fields-api/page-fields.js` that no `gutenberg_register_fields()`
+ *    call names. The module augments the fields it was registered with, so
+ *    the entry is ignored and the field is not registered.
  *
  * @package gutenberg-test-fields-api
  */
