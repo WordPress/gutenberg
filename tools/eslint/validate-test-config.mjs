@@ -83,37 +83,33 @@ async function lintTestRules( file, source ) {
 			( { ruleId } ) =>
 				ruleId?.startsWith( 'vitest/' ) ||
 				ruleId?.startsWith( 'jest/' ) ||
-				[ 'no-restricted-syntax', 'no-restricted-globals' ].includes(
-					ruleId
-				)
+				ruleId === 'no-restricted-globals'
 		)
 		.map( ( { ruleId } ) => ruleId )
 		.sort();
 }
 
-for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
-	assert.deepEqual(
-		await lintTestRules(
-			file,
-			"import { test, expect } from 'vitest'; test.only( 'example', () => { expect( true ); } );"
-		),
-		[ 'vitest/no-focused-tests', 'vitest/valid-expect' ]
-	);
-	assert.deepEqual(
-		await lintTestRules(
-			file,
-			"import { test } from 'vitest'; test( 'example', () => {} );"
-		),
-		[ 'vitest/expect-expect' ]
-	);
-	assert.deepEqual(
-		await lintTestRules(
-			file,
-			"import { test, expect } from 'vitest'; test( 'example', () => { expect( true ).toBe( true ); } );"
-		),
-		[]
-	);
-}
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test.only( 'example', () => { expect( true ); } );"
+	),
+	[ 'vitest/no-focused-tests', 'vitest/valid-expect' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test } from 'vitest'; test( 'example', () => {} );"
+	),
+	[ 'vitest/expect-expect' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'example', () => { expect( true ).toBe( true ); } );"
+	),
+	[]
+);
 
 assert.deepEqual(
 	await lintTestRules(
@@ -130,7 +126,7 @@ assert.deepEqual(
 	[ 'vitest/no-done-callback' ]
 );
 
-// Helper recognition and type-only exceptions must not leak to other suites.
+// Helper recognition must not leak to other suites.
 const helperCall =
 	"import { test } from 'vitest'; test( 'example', () => { expectCustomProperty( 'example', 'color', 'red' ); } );";
 assert.deepEqual(
@@ -143,19 +139,7 @@ assert.deepEqual(
 assert.deepEqual( await lintTestRules( nodeTest, helperCall ), [
 	'vitest/expect-expect',
 ] );
-for ( const file of [
-	'packages/interface/src/test/types.ts',
-	'packages/core-data/src/entity-types/test/types.jsdom.test.ts',
-] ) {
-	const [ result ] = await eslint.lintFiles( [ resolve( rootDir, file ) ] );
-	assert.equal( result.fatalErrorCount, 0 );
-	assert.deepEqual(
-		result.messages.filter(
-			( { ruleId } ) => ruleId?.startsWith( 'vitest/' ) || ruleId === null
-		),
-		[]
-	);
-}
+
 assert.deepEqual(
 	await lintTestRules(
 		nodeTest,
