@@ -23,9 +23,10 @@ function isSameHeights( a, b ) {
  * Measures the floating notes layout inputs from the DOM.
  *
  * All DOM reads happen in one place, the `ResizeObserver` callback, which runs
- * after layout and before paint. Registering or unregistering a thread asks
- * the observer for a new pass instead of measuring directly. The observer only
- * exists while the store has subscribers.
+ * after layout and before paint. Registering or unregistering a thread, or an
+ * inline style change in the canvas, asks the observer for a new pass instead
+ * of measuring directly. The observers only exist while the store has
+ * subscribers.
  *
  * @return {Object} Store.
  */
@@ -38,6 +39,7 @@ export function createBoardStore() {
 	let rootEl = null;
 	let canvas = null;
 	let observer = null;
+	let styleObserver = null;
 	let snapshot = EMPTY_SNAPSHOT;
 
 	function measure() {
@@ -91,6 +93,19 @@ export function createBoardStore() {
 		}
 	}
 
+	function observeRoot() {
+		if ( ! observer || ! rootEl ) {
+			return;
+		}
+		observer.observe( rootEl );
+		// The block move animation offsets blocks with a transform, which
+		// resizes nothing, so the first pass reads their old positions.
+		styleObserver.observe( rootEl, {
+			subtree: true,
+			attributeFilter: [ 'style' ],
+		} );
+	}
+
 	// Watch the block-list root, so editing, adding or removing any block
 	// re-anchors the threads after it. Climbing to the root also keeps nested
 	// scroll containers (e.g. a Group with overflow:auto) from shadowing the
@@ -104,27 +119,27 @@ export function createBoardStore() {
 		}
 		if ( observer && rootEl ) {
 			observer.unobserve( rootEl );
+			styleObserver.disconnect();
 		}
 		rootEl = nextRootEl;
 		canvas = rootEl ? getScrollContainer( rootEl ) : null;
-		if ( observer && rootEl ) {
-			observer.observe( rootEl );
-		}
+		observeRoot();
 	}
 
 	function connect() {
 		observer = new window.ResizeObserver( onResize );
+		styleObserver = new window.MutationObserver( requestMeasure );
 		for ( const floatingEl of floatingRefs.values() ) {
 			observer.observe( floatingEl );
 		}
-		if ( rootEl ) {
-			observer.observe( rootEl );
-		}
+		observeRoot();
 	}
 
 	function disconnect() {
 		observer.disconnect();
+		styleObserver.disconnect();
 		observer = null;
+		styleObserver = null;
 	}
 
 	return {
