@@ -77,15 +77,14 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalScrollable: '{{ name }} is planned for deprecation.',
+		__experimentalScrollable: 'Write your own CSS instead.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
 		__experimentalSurface:
 			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalZStack:
-			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		BaseControl:
@@ -104,7 +103,7 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
-		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
+		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-engine",
-	"version": "1.22.0",
+	"version": "1.23.0",
 	"description": "Pure CSS generation engine for WordPress global styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",
