@@ -16,20 +16,19 @@ function isObjectAttribute( attribute: unknown ): attribute is AttributeObject {
 }
 
 /**
- * Returns the changes between two sets of attribute values, holding only the
- * values that differ.
+ * Recursive function that computes the changes between two sets of values,
+ * holding only those that differ. Performs a deep check.
  *
  * A key is absent when its value did not change, and present with an
- * `undefined` value when it was removed. Object attributes such as `style` are
- * walked key by key, so a change to a single style produces a change holding
- * that style alone.
+ * `undefined` value when it was removed. Nested objects are walked key by key,
+ * so a change to a single style produces changes holding that style alone.
  *
  * @param previousValues Values before the change.
  * @param nextValues     Values after the change.
  *
  * @return The changed values, or `undefined` when none of them changed.
  */
-function getAttributeChanges(
+function getValueChanges(
 	previousValues: AttributeObject,
 	nextValues: AttributeObject
 ): AttributeObject | undefined {
@@ -56,7 +55,7 @@ function getAttributeChanges(
 			isObjectAttribute( previousValue ) ||
 			isObjectAttribute( nextValue )
 		) {
-			const nestedChanges = getAttributeChanges(
+			const nestedChanges = getValueChanges(
 				isObjectAttribute( previousValue ) ? previousValue : {},
 				isObjectAttribute( nextValue ) ? nextValue : {}
 			);
@@ -73,19 +72,50 @@ function getAttributeChanges(
 }
 
 /**
- * Applies a change to a block's value for the attribute it belongs to.
+ * Returns the changes an attribute update makes to a block's attributes.
  *
- * A change that is not an object replaces the block's value, so a cleared
- * attribute is cleared on every block. A change that is an object is merged
- * into the block's own value key by key, so the block keeps the values the
- * change does not mention.
+ * `setAttributes` only performs a shallow update, so an update to an object
+ * attribute carries that attribute whole: changing a single style means passing
+ * the block's entire `style` object. Comparing the two tells apart the values
+ * the update changes from the values it merely carries along, which is what
+ * lets the same edit be applied to a block holding different values.
  *
- * @param change     The change to apply.
+ * @param attributes       The block's current attributes.
+ * @param attributeUpdates The attribute update made to the block.
+ *
+ * @return The changed values, keyed by attribute name, or `undefined` when the
+ *         update changes nothing.
+ */
+export function getAttributeChanges(
+	attributes: AttributeObject,
+	attributeUpdates: AttributeObject
+): AttributeObject | undefined {
+	// An update only mentions the attributes it means to change, so the rest of
+	// the block's attributes are left out of the comparison. Without this they
+	// would look like removals.
+	const previousAttributes = Object.fromEntries(
+		Object.keys( attributeUpdates ).map( ( key ) => [
+			key,
+			attributes[ key ],
+		] )
+	);
+
+	return getValueChanges( previousAttributes, attributeUpdates );
+}
+
+/**
+ * Recursive function that applies a change to a block's attribute value.
+ *
+ * A change that is not an object replaces the value outright. A change that is
+ * an object is merged into the value key by key, so any existing deep attributes
+ * on a block are not replaced.
+ *
  * @param blockValue The block's current value.
+ * @param change     The change to apply.
  *
  * @return The block's new value, or `undefined` when nothing is left of it.
  */
-function applyAttributeChange( change: unknown, blockValue: unknown ): unknown {
+function applyValueChange( blockValue: unknown, change: unknown ): unknown {
 	if ( ! isObjectAttribute( change ) ) {
 		return change;
 	}
@@ -95,9 +125,9 @@ function applyAttributeChange( change: unknown, blockValue: unknown ): unknown {
 		: {};
 
 	for ( const key of Object.keys( change ) ) {
-		const newValue = applyAttributeChange(
-			change[ key ],
-			newBlockValue[ key ]
+		const newValue = applyValueChange(
+			newBlockValue[ key ],
+			change[ key ]
 		);
 
 		if ( newValue === undefined ) {
@@ -113,60 +143,30 @@ function applyAttributeChange( change: unknown, blockValue: unknown ): unknown {
 }
 
 /**
- * Spreads an attribute update made to the first block of a multi-selection
- * across every block in that selection.
+ * Applies changes made to one block's attributes to another block's attributes.
  *
- * `setAttributes` only performs a shallow update, which won't work for block
- * multi-selections, since the attribute object can contain data that can overwrite
- * existing values on other blocks in the selection.
+ * Only the values the changes hold are applied, so the block keeps the values
+ * they do not mention. A block with its own background color keeps it when a
+ * text color is applied across a selection.
  *
- * This function calculates a deep merge for each block in the selection to avoid
- * incorrect overwrites across the selection.
+ * @param attributes The block's current attributes.
+ * @param changes    Changes from `getAttributeChanges`.
  *
- * @param firstBlockAttributes Attributes of the first block in the selection.
- * @param attributeUpdates     Attribute update made to the first block.
- * @param attributesByClientId Current attributes of each selected block.
- *
- * @return Attribute updates keyed by client ID, ready for
- *         `updateBlockAttributes` with the `uniqueByBlock` option, or
- *         `undefined` when nothing changed.
+ * @return The attributes to update on the block, ready for
+ *         `updateBlockAttributes`.
  */
-export function getMultiSelectionAttributeUpdates(
-	firstBlockAttributes: AttributeObject,
-	attributeUpdates: AttributeObject,
-	attributesByClientId: Record< string, AttributeObject >
-): Record< string, AttributeObject > | undefined {
-	// Only the attributes the update mentions are being changed, so the rest of
-	// the first block's attributes are left out of the comparison.
-	const previousAttributes = Object.fromEntries(
-		Object.keys( attributeUpdates ).map( ( key ) => [
-			key,
-			firstBlockAttributes[ key ],
-		] )
-	);
-	const changes = getAttributeChanges( previousAttributes, attributeUpdates );
+export function applyAttributeChanges(
+	attributes: AttributeObject,
+	changes: AttributeObject
+): AttributeObject {
+	const attributeUpdates: AttributeObject = {};
 
-	if ( ! changes ) {
-		return undefined;
+	for ( const key of Object.keys( changes ) ) {
+		attributeUpdates[ key ] = applyValueChange(
+			attributes[ key ],
+			changes[ key ]
+		);
 	}
 
-	// For each block, calculate the attribute updates.
-	const updatesByClientId: Record< string, AttributeObject > = {};
-
-	for ( const [ clientId, blockAttributes ] of Object.entries(
-		attributesByClientId
-	) ) {
-		const blockUpdates: AttributeObject = {};
-
-		for ( const key of Object.keys( changes ) ) {
-			blockUpdates[ key ] = applyAttributeChange(
-				changes[ key ],
-				blockAttributes[ key ]
-			);
-		}
-
-		updatesByClientId[ clientId ] = blockUpdates;
-	}
-
-	return updatesByClientId;
+	return attributeUpdates;
 }
