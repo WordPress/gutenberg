@@ -36,6 +36,13 @@ function LinkControlSearchResults( {
 	const noResultsSuggestionIndex = suggestions.findIndex(
 		( suggestion ) => suggestion.type === NO_RESULTS_TYPE
 	);
+	const noResultsSuggestionItemProps =
+		noResultsSuggestionIndex === -1
+			? {}
+			: buildSuggestionItemProps(
+					suggestions[ noResultsSuggestionIndex ],
+					noResultsSuggestionIndex
+				);
 	const hasEntitySuggestions = suggestions.some(
 		( suggestion ) =>
 			suggestion.type !== CREATE_TYPE &&
@@ -70,12 +77,7 @@ function LinkControlSearchResults( {
 				<MenuGroup>
 					{ shouldShowNoResults && (
 						<div
-							{ ...( noResultsSuggestionIndex === -1
-								? {}
-								: buildSuggestionItemProps(
-										suggestions[ noResultsSuggestionIndex ],
-										noResultsSuggestionIndex
-									) ) }
+							{ ...noResultsSuggestionItemProps }
 							role="option"
 							aria-disabled="true"
 							className={ clsx(

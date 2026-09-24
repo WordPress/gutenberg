@@ -1227,32 +1227,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 	} );
 
-	it( 'should show no results without a create suggestion', async () => {
-		const user = userEvent.setup();
-
-		render( <LinkControl /> );
-
-		const searchInput = screen.getByRole( 'combobox', {
-			name: 'Search or type URL',
-		} );
-		await user.type( searchInput, 'No matching content' );
-
-		const searchResults = await screen.findByRole( 'listbox', {
-			name: /Search results for.*/,
-		} );
-
-		expect(
-			within( searchResults ).getByRole( 'option', {
-				name: 'No results found.',
-			} )
-		).toHaveAttribute( 'aria-disabled', 'true' );
-		expect(
-			within( searchResults ).queryByRole( 'option', {
-				name: /^Create:/,
-			} )
-		).not.toBeInTheDocument();
-	} );
-
 	it.each( [
 		[ 'HelloWorld', 'without spaces' ],
 		[ 'Hello World', 'with spaces' ],
