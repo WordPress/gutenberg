@@ -571,6 +571,16 @@ export default function GalleryEdit( props ) {
 		setAttributes( { randomOrder: nextRandomOrder } );
 	}
 
+	// Choosing any other order turns "Random" off. Called straight after the
+	// edit that applies the order, and marked non-persistent so the two writes
+	// share one undo level: a single undo restores both the order and Random.
+	function clearRandomOrderAfterEdit() {
+		if ( randomOrder ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { randomOrder: false } );
+		}
+	}
+
 	// Reorders the inner image blocks in place. Left persistent on purpose so
 	// the sort is a single undoable step.
 	function sortImages( order ) {
@@ -582,7 +592,13 @@ export default function GalleryEdit( props ) {
 				order
 			)
 		);
+		clearRandomOrderAfterEdit();
 		setLastAppliedOrder( order );
+	}
+
+	function changeSourceOrder( { orderby, order } ) {
+		dynamic.setSourceOrder( orderby, order );
+		clearRandomOrderAfterEdit();
 	}
 
 	function onUploadError( message ) {
@@ -985,12 +1001,15 @@ export default function GalleryEdit( props ) {
 											DEFAULT_ORDER ) )
 							}
 							onDeselect={ () => {
-								setRandomOrder( false );
 								if ( isDynamic ) {
+									// Two writes, folded into one undo level.
 									dynamic.setSourceOrder(
 										undefined,
 										undefined
 									);
+									clearRandomOrderAfterEdit();
+								} else {
+									setRandomOrder( false );
 								}
 							} }
 						>
@@ -1001,9 +1020,7 @@ export default function GalleryEdit( props ) {
 										order: dynamic.sourceOrder,
 									} }
 									isRandom={ !! randomOrder }
-									onChange={ ( { orderby, order } ) =>
-										dynamic.setSourceOrder( orderby, order )
-									}
+									onChange={ changeSourceOrder }
 									onRandomChange={ setRandomOrder }
 								/>
 							) : (
