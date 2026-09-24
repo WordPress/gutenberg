@@ -15,6 +15,7 @@
 ### Breaking Changes
 
 -   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Remove the `readOnly` prop ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 
 ### New Features
@@ -39,6 +40,7 @@
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: Assistive technology now hears selected chip names, how to remove them, and how to move to them from the input ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
