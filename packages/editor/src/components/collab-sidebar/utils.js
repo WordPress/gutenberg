@@ -271,6 +271,30 @@ export function getSelectionRect( blockEl ) {
 	return rect;
 }
 
+/**
+ * Measure where a note's floating thread should line up in the canvas.
+ *
+ * An inline note anchors to its in-content marker, so the thread aligns with
+ * the noted text rather than the block. A marker split into several runs
+ * (crossing overlaps) resolves to its first run. The pending new note has no
+ * marker yet, so it anchors to the text selection it will attach to. Anything
+ * else falls back to the block itself.
+ *
+ * Resolved at read time, because rich-text re-renders replace the marker.
+ *
+ * @param {number|string} noteId  Note id.
+ * @param {HTMLElement}   blockEl Block element the note belongs to.
+ * @return {DOMRect} Anchor rect, in viewport coordinates.
+ */
+export function getNoteAnchorRect( noteId, blockEl ) {
+	if ( noteId === 'new' ) {
+		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
+	}
+	const anchor =
+		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
+	return anchor.getBoundingClientRect();
+}
+
 // Sentinel that sorts a block-level (whole-block) note before any inline note
 // within the same block. Negative so any real character offset (>= 0) ranks
 // after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
@@ -454,7 +478,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
- * @param {Object<string,DOMRect>}  params.blockRects     Pre-read anchor rects keyed by thread ID.
+ * @param {Object<string,Object>}   params.blockRects     Anchor rects (`{ top }`) keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
  * @return {{ positions: Object<string,number> }} Computed top positions.
