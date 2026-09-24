@@ -276,9 +276,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 			}
 
 			// Only the first block of a multi-selection renders its inspector
-			// and toolbar, so this update describes that block's attributes.
-			// Spread it across the selection as the changes it makes, so the
-			// other blocks keep the attributes they do not share.
+			// and toolbar. For a multi-block attribute update, take that
+			// first block's attributes and get only the changed values
+			// from the update.
 			const changes = getAttributeChanges(
 				attributes ?? {},
 				newAttributes ?? {}
@@ -288,6 +288,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				return;
 			}
 
+			// Apply the changed attributes to every block in the selection.
 			const updatesByClientId = {};
 			for ( const selectedClientId of multiSelectedBlockClientIds ) {
 				updatesByClientId[ selectedClientId ] = applyAttributeChanges(
