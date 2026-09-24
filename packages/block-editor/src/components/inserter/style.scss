@@ -1,5 +1,11 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -9,45 +15,95 @@ $block-inserter-tabs-height: 44px;
 	padding: 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	line-height: $default-line-height;
+	line-height: 0;
 
 	@include break-medium {
 		position: relative;
 	}
 }
 
-.block-editor-inserter__popover > .components-popover__content {
-	@include break-medium {
-		overflow-y: visible;
-		height: 100vh;
-		padding: 0;
+.block-editor-inserter__main-area {
+	height: 100%;
+	gap: $grid-unit-20;
+	position: relative;
+
+	&.show-as-tabs {
+		gap: 0;
+	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
+	}
+}
+
+.block-editor-inserter__popover.is-quick {
+	.components-popover__content {
+		border: none;
+		outline: none;
+		box-shadow: $elevation-x-small;
+
+		.block-editor-inserter__quick-inserter > * {
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
+
+			&:first-child {
+				border-top: $border-width solid $gray-400;
+				border-radius: $radius-medium $radius-medium 0 0;
+			}
+
+			&:last-child {
+				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-medium $radius-medium;
+			}
+
+			&.components-button {
+				border: $border-width solid $gray-900;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__popover .block-editor-inserter__menu {
+	margin: -$grid-unit-15;
+
+	.block-editor-inserter__tablist {
+		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
+	}
+
+	.block-editor-inserter__main-area {
+		overflow: visible;
+		height: auto;
+	}
+
+	.block-editor-inserter__preview-container {
+		display: none;
 	}
 }
 
 .block-editor-inserter__toggle.components-button {
 	display: inline-flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	border: none;
 	outline: none;
 	padding: 0;
-	transition: color 0.2s ease;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: color 0.2s ease;
+	}
+
 }
 
 .block-editor-inserter__menu {
 	height: 100%;
 	position: relative;
 	overflow: visible;
-}
 
-.block-editor-inserter__main-area {
-	width: auto;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	@include break-medium {
-		width: $block-inserter-width;
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
 	}
 }
 
@@ -65,98 +121,58 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20;
-	z-index: 1;
-	flex-shrink: 0;
-	position: relative;
-
-	input[type="search"].block-editor-inserter__search-input {
-		display: block;
-		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		border-radius: $radius-block-ui;
-		background: $light-gray-200;
-		border: none;
-		width: 100%;
-		height: $grid-unit-60;
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&:focus {
-			background: $white;
-			box-shadow: 0 0 0 $border-width-focus $theme-color;
-		}
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background-color: $white;
+	border-bottom: 1px solid transparent;
+	@media not ( prefers-reduced-motion ) {
+		transition: border-bottom-color 0.1s linear;
+	}
+	&.is-scrolled {
+		border-bottom-color: $gray-200;
 	}
 }
 
-.block-editor-inserter__search-icon {
-	position: absolute;
-	top: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
-	right: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
-}
-
-.block-editor-inserter__tabs {
-	display: flex;
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
 	flex-grow: 1;
-	flex-direction: column;
-	margin-top: -$grid-unit-10;
-
-	.components-tab-panel__tabs {
-		border-bottom: $border-width solid $light-gray-500;
-
-		.components-tab-panel__tabs-item {
-			flex-grow: 1;
-			margin-bottom: -$border-width;
-		}
-	}
-
-	.components-tab-panel__tab-content {
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		position: relative;
-	}
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
 }
 
 .block-editor-inserter__panel-header {
+	// Use `position: relative` to ensure any absolute positioned child elements are
+	// positioned relative to the panel header.
+	// This makes the overflow rule of the panel work correctly, particularly when the
+	// `VisuallyHidden` component is used within the inserter UI.
+	position: relative;
+
 	display: inline-flex;
 	align-items: center;
-	padding: $grid-unit-20 $grid-unit-20 0;
-}
-
-.block-editor-inserter__panel-content {
 	padding: 0 $grid-unit-20;
 }
 
-.block-editor-inserter__panel-title {
-	color: $theme-color;
+.block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button {
+	margin: 0 $grid-unit-15 0 0;
+	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 500;
-	margin-right: $grid-unit-10;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
-.block-editor-inserter__block-list {
-	flex-grow: 1;
-	position: relative;
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	height: 36px;
+	line-height: 36px;
 }
 
-// This extra div is needed because
-// flex grow and overflow auto doesn't work well together.
-.block-editor-inserter__scrollable {
-	overflow: auto;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	overflow-y: scroll;
-}
-
-.block-editor-inserter__popover .block-editor-block-types-list {
-	margin: 0 -8px;
+.block-editor-inserter__panel-dropdown select {
+	border: none;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -164,19 +180,10 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
-.block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
-}
-
-.block-editor-inserter__no-results {
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
-	margin-top: $grid-unit-40 * 2;
 	text-align: center;
-}
-
-.block-editor-inserter__no-results-icon {
-	fill: $light-gray-800;
 }
 
 .block-editor-inserter__child-blocks {
@@ -198,30 +205,98 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $light-gray-500;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
 
 	@include break-medium {
 		display: block;
 	}
 
-	.block-editor-block-card {
-		padding: $grid-unit-20;
+	.block-editor-inserter__media-list__list-item {
+		height: 100%;
 	}
 
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
+.block-editor-inserter__insertable-blocks-at-selection {
+	border-bottom: $border-width solid $gray-200;
+}
+
+.block-editor-inserter__media-tabs-container,
+.block-editor-inserter__block-patterns-tabs-container {
+	flex-grow: 1;
+	padding: 0 $grid-unit-20 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.block-editor-inserter__media-tabs-container {
+	padding-top: $grid-unit-20;
+}
+
+.block-editor-inserter__category-tablist {
+	margin-bottom: $grid-unit-10;
+}
+
+.block-editor-inserter__category-panel {
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+	display: flex;
+	flex-direction: column;
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		border-left: $border-width solid $gray-200;
+		padding: 0;
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
+		position: absolute;
+		top: -$border-width;
+		height: calc(100% + #{$border-width});
+		background: $gray-100;
+		border-top: $border-width solid $gray-200;
+
+		.block-editor-inserter__media-list,
+		.block-editor-block-patterns-list {
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel-header {
+	padding: $grid-unit-10 0;
+	@include break-medium {
+		padding: $grid-unit-10 $grid-unit-30;
+	}
+}
+
+.block-editor-inserter__patterns-category-no-results {
+	margin-top: $grid-unit-30;
+}
+
+.block-editor-inserter__patterns-filter-help {
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
+	color: $gray-700;
+	min-width: 280px;
+}
+
+.block-editor-inserter__media-list,
+.block-editor-block-patterns-list {
+	overflow-y: auto;
+	flex-grow: 1;
+	height: 100%;
+}
+
 .block-editor-inserter__preview-content {
-	min-height: $grid-unit-60 * 3;
-	background: $light-gray-200;
+	background: $gray-100;
 	display: grid;
 	flex-grow: 1;
 	align-items: center;
@@ -233,42 +308,453 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $dark-gray-400;
-	background: $light-gray-200;
+	color: $gray-700;
+	background: $gray-100;
+	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $light-gray-500;
+	border-top: $border-width solid $gray-300;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
+	position: relative; // prevents overscroll when block library is open
 }
 
-.block-editor-inserter__patterns-item {
-	border-radius: $radius-block-ui;
-	cursor: pointer;
+.block-editor-inserter__quick-inserter {
+	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
+
+	@include break-medium {
+		width: $block-quick-inserter-width;
+	}
+}
+
+.block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {
+	height: 0;
+	padding: 0;
+	float: left;
+}
+
+.block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
+.block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__quick-inserter-patterns {
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: $grid-unit-10;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-inserter__media-list__list-item {
+			min-height: 100px;
+		}
+	}
+}
+
+.block-editor-inserter__quick-inserter-separator {
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-inserter__popover.is-quick > .components-popover__content {
+	padding: 0;
+}
+
+.block-editor-inserter__quick-inserter-expand {
+	padding: 0 $grid-unit-20 $grid-unit-20;
+}
+
+.block-editor-inserter__quick-inserter-expand-toggle {
+	width: 100%;
+	justify-content: center;
+}
+
+.block-editor-block-patterns-explorer__sidebar {
+	padding-bottom: $grid-unit-30;
+
+	@include break-medium() {
+		position: absolute;
+		top: $header-height + $grid-unit-10;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30;
+		overflow-x: visible;
+		overflow-y: auto;
+	}
+}
+
+.block-editor-block-patterns-explorer__panel {
+	@include break-medium() {
+		margin-inline-start: $sidebar-width;
+	}
+}
+
+.block-editor-block-patterns-explorer__no-results {
+	padding: $grid-unit-40;
+	text-align: center;
+}
+
+.block-editor-block-patterns-explorer__list {
+	padding: $grid-unit-30 0 $grid-unit-40;
+
+	.block-editor-patterns__sync-status-filter .components-input-control__container {
+		width: 380px;
+	}
+}
+
+.block-editor-block-patterns-explorer .block-editor-block-patterns-list {
+	display: grid;
+	gap: $grid-unit-40;
+	grid-template-columns: repeat(1, 1fr);
+	margin-bottom: $grid-unit-20;
+
+	@include break-xlarge() {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@include break-huge() {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		min-height: 240px;
+	}
+
+	.block-editor-inserter__media-list__list-item {
+		height: inherit;
+		min-height: 100px;
+		max-height: 800px;
+	}
+}
+
+.components-heading.block-editor-inserter__patterns-category-panel-title {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.block-editor-inserter__patterns-explore-button,
+.block-editor-inserter__media-library-button {
+	&.components-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+// On mobile the media category renders inside a `Navigator.Screen`. The screen
+// is a grid item the navigator aligns to the start (so it's content-height by
+// default); stretch it to full height and make it a flex column so the panel
+// below the back-button header fills the remaining space rather than overflowing.
+.block-editor-inserter__media-mobile-screen {
+	display: flex;
+	flex-direction: column;
+	align-self: stretch;
+}
+
+.block-editor-inserter__media-panel {
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+	// Mobile: fill the height left below the screen's back-button header so the
+	// results scroll internally and the attach footer stays on-screen.
+	flex: 1;
+	min-height: 0;
+
+	@include break-medium {
+		padding: 0;
+		// Desktop: the panel lives in the absolutely-positioned category panel,
+		// so fill its height directly instead.
+		flex: 0 1 auto;
+		min-height: 100%;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		margin-bottom: $grid-unit-30;
+		@include break-medium() {
+			margin-bottom: 0;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+		}
+	}
+
+	// The empty state grows to fill, alongside `-results`/`-spinner`, so the
+	// attach footer below stays pinned to the bottom in every state.
+	.block-editor-inserter__no-results {
+		flex-grow: 1;
+	}
+
+	.block-editor-inserter__media-panel-footer {
+		// Keeps the footer at its natural height rather than collapsing to make
+		// room for the scrolling grid above.
+		flex-shrink: 0;
+		padding-top: $grid-unit-20;
+		padding-bottom: $grid-unit-20;
+		@include break-medium() {
+			// Align with the search field and grid gutters.
+			padding-left: $grid-unit-30;
+			padding-right: $grid-unit-30;
+		}
+	}
+
+	.block-editor-inserter__media-panel-attach {
+		// Match the padding (and so the height) of the "Open Media Library"
+		// footer button in the adjacent column, so the two line up.
+		&.components-button {
+			justify-content: center;
+			padding: $grid-unit-20;
+		}
+	}
+
+	.block-editor-inserter__media-panel-results {
+		// Take over the scroll host role the media list had when it was a direct
+		// flex child of the panel: grow to fill and constrain height
+		// (`min-height: 0` lets the inner list's `overflow-y: auto` engage).
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		min-height: 0;
+
+		// While an attach/detach refetch is in flight, dim the existing grid (and
+		// gently pulse it) rather than clearing it or blocking it with a spinner.
+		// Mirrors the DataViews "refreshing" treatment; the delayed `is-loading`
+		// class (see `useDelayedLoading`) means quick refetches show nothing.
+		&.is-loading .block-editor-inserter__media-list {
+			opacity: 0.5;
+			pointer-events: none;
+
+			@media not ( prefers-reduced-motion ) {
+				opacity: 1;
+				animation: inserter-media-panel-pulse 1s ease-in-out infinite;
+			}
+		}
+	}
+
+	// When the footer is present it supplies the breathing room beneath the grid,
+	// so drop the list's own bottom padding — otherwise scrolling to the end
+	// leaves a doubled gap before the footer.
+	&.has-footer .block-editor-inserter__media-list {
+		padding-bottom: 0;
+	}
+}
+
+@keyframes inserter-media-panel-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.block-editor-inserter__media-panel-detach-modal {
+	// Render above the ellipsis dropdown (a `.components-popover`) it opens from,
+	// which otherwise stacks over the modal. Matches other dropdown-triggered
+	// modals (e.g. block rename).
+	z-index: z-index(".block-editor-inserter__media-panel-detach-modal");
+
+	p {
+		margin-top: 0;
+	}
+}
+
+.block-editor-inserter__media-panel-detach-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: $grid-unit-10;
 	margin-top: $grid-unit-20;
-	transition: all 0.05s ease-in-out;
+}
+
+.block-editor-inserter__media-list__list-item {
 	position: relative;
-	border: $border-width solid transparent;
-
-	&:hover {
-		border: $border-width solid $theme-color;
-	}
-
-	&:focus {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
+	cursor: var(--wpds-cursor-control);
+	margin-bottom: $grid-unit-30;
 
 	&.is-placeholder {
 		min-height: 100px;
 	}
+
+	&[draggable="true"] .block-editor-inserter__media-list__list-item {
+		cursor: grab;
+	}
+
+	&.is-hovered {
+		.block-editor-inserter__media-list__item-preview > * {
+			outline-color: rgba($black, 0.3);
+		}
+	}
+
+	// Reveal the per-item options button on hover, and — so keyboard users can
+	// reach it — whenever focus is within the item (e.g. its preview is
+	// focused). The button is `display: none` by default, which can never
+	// receive focus, so without `:focus-within` the detach/report action is
+	// unreachable by keyboard.
+	&.is-hovered,
+	&:focus-within {
+		.block-editor-inserter__media-list__item-preview-options > button {
+			display: block;
+		}
+	}
+
+	.block-editor-inserter__media-list__item-preview-options {
+		position: absolute;
+		right: $grid-unit-10;
+		top: $grid-unit-10;
+
+		> button {
+			background: $white;
+			display: none;
+
+			// These styles are important so as focus isn't lost
+			// when the button is focused and we hover away.
+			&.is-opened,
+			&:focus {
+				display: block;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
 }
 
-.block-editor-inserter__patterns-item-title {
-	padding: $grid-unit-05;
-	font-size: 12px;
-	text-align: center;
+.block-editor-inserter__media-list__item {
+	height: 100%;
+
+	.block-editor-inserter__media-list__item-preview {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: $radius-small;
+
+		> * {
+			margin: 0 auto;
+			max-width: 100%;
+			outline: $border-width solid rgba($black, 0.1);
+			outline-offset: -$border-width;
+		}
+
+		.block-editor-inserter__media-list__item-preview-spinner {
+			display: flex;
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			justify-content: center;
+			background: rgba($white, 0.7);
+			align-items: center;
+			pointer-events: none;
+		}
+	}
+
+	&:focus .block-editor-inserter__media-list__item-preview > * {
+		outline-color: var(--wp-admin-theme-color);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s linear;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
+}
+
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
+
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
+	}
+}
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
+		}
+	}
+}
+
+.block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	display: none;
+	padding: 0 $grid-unit-30 $grid-unit-20;
+
+	@include break-mobile {
+		display: block;
+	}
 }

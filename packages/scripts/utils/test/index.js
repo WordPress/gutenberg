@@ -1,39 +1,43 @@
-/**
- * External dependencies
- */
-import crossSpawn from 'cross-spawn';
-
-/**
- * Internal dependencies
- */
-import { hasArgInCLI, hasProjectFile, spawnScript } from '../';
-import { getPackagePath as getPackagePathMock } from '../package';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
-	exit as exitMock,
-	getArgsFromCLI as getArgsFromCLIMock,
-} from '../process';
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
+const crossSpawn = require( 'cross-spawn' );
+const processUtils = require( '../process' );
+const getArgsFromCLIMock = vi.spyOn( processUtils, 'getArgsFromCLI' );
+const exitMock = vi.spyOn( processUtils, 'exit' );
+const packageUtils = require( '../package' );
+const getPackagePathMock = vi.spyOn( packageUtils, 'getPackagePath' );
+const fileUtils = require( '../file' );
+const hasProjectFileMock = vi.spyOn( fileUtils, 'hasProjectFile' );
+const fromProjectRootMock = vi.spyOn( fileUtils, 'fromProjectRoot' );
+const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
+let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+const {
+	hasArgInCLI,
+	hasProjectFile,
+	getWebpackArgs,
+	spawnScript,
+} = require( '../' );
 
-jest.mock( '../package', () => {
-	const module = require.requireActual( '../package' );
-
-	jest.spyOn( module, 'getPackagePath' );
-
-	return module;
-} );
-jest.mock( '../process', () => {
-	const module = require.requireActual( '../process' );
-
-	jest.spyOn( module, 'exit' );
-	jest.spyOn( module, 'getArgsFromCLI' );
-
-	return module;
+beforeEach( () => {
+	crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 } );
 
 describe( 'utils', () => {
-	const crossSpawnMock = jest.spyOn( crossSpawn, 'sync' );
-
 	describe( 'hasArgInCLI', () => {
-		beforeAll( () => {
+		beforeEach( () => {
 			getArgsFromCLIMock.mockReturnValue( [
 				'-a',
 				'--b',
@@ -64,22 +68,57 @@ describe( 'utils', () => {
 
 	describe( 'hasProjectFile', () => {
 		test( 'should return false for the current directory and unknown file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
 
 			expect( hasProjectFile( 'unknown-file.name' ) ).toBe( false );
 		} );
 
 		test( 'should return true for the current directory and this file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
+			getPackagePathMock.mockReturnValueOnce( currentDirectory );
 
 			expect( hasProjectFile( 'index.js' ) ).toBe( true );
 		} );
 	} );
 
+	describe( 'getWebpackArgs', () => {
+		beforeEach( () => {
+			hasProjectFileMock.mockReturnValue( false );
+			fromProjectRootMock.mockImplementation(
+				( filePath ) => '/p/' + filePath
+			);
+			fromConfigRootMock.mockImplementation(
+				( filePath ) => '/c/' + filePath
+			);
+		} );
+
+		afterEach( () => {
+			getArgsFromCLIMock.mockReset();
+			hasProjectFileMock.mockReset();
+			fromProjectRootMock.mockReset();
+			fromConfigRootMock.mockReset();
+			delete process.env.WP_ENTRY;
+		} );
+
+		it.each( [ 'js', 'jsx', 'ts', 'tsx' ] )(
+			'removes the .%s extension from direct build entry names',
+			( extension ) => {
+				getArgsFromCLIMock.mockReturnValue( [
+					`entry.${ extension }`,
+				] );
+
+				getWebpackArgs();
+
+				expect( JSON.parse( process.env.WP_ENTRY ) ).toEqual( {
+					entry: `/p/entry.${ extension }`,
+				} );
+			}
+		);
+	} );
+
 	describe( 'spawnScript', () => {
 		const scriptName = 'test-unit-js';
 
-		beforeAll( () => {
+		beforeEach( () => {
 			exitMock.mockImplementation( ( code ) => {
 				throw new Error( `Exit code: ${ code }.` );
 			} );

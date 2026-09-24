@@ -1,9 +1,12 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
-	"include": [ "src/**/*" ],
-	"references": [ { "path": "../primitives" } ]
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../primitives" }
+	]
 }

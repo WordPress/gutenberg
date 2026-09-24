@@ -1,140 +1,63 @@
-/**
- * External dependencies
- */
-import {
-	deburr,
-	differenceWith,
-	find,
-	intersectionWith,
-	isEmpty,
-	words,
-} from 'lodash';
+import { SEARCH_RANK, searchItems } from '../../utils/search-ranking';
 
 /**
- * Converts the search term into a list of normalized terms.
+ * Core blocks are ranked above third-party ones, and a core block is ranked
+ * above its own variations. This only breaks ties between matches that are
+ * otherwise equally good, so it can never pull a weak match to the top.
  *
- * @param {string} term The search term to normalize.
+ * @param {Object} item Inserter item.
  *
- * @return {string[]} The normalized list of search terms.
+ * @return {number} Priority, higher wins.
  */
-export const normalizeSearchTerm = ( term = '' ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
+function getCorePriority( item ) {
+	const name = item.name || '';
 
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
+	if ( ! name.startsWith( 'core/' ) ) {
+		return 0;
+	}
 
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
+	return name === item.id ? 2 : 1;
+}
 
-	// Extract words.
-	return words( term );
-};
-
-const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
-	return differenceWith(
-		unmatchedTerms,
-		normalizeSearchTerm( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
-	);
-};
-
+/**
+ * Filters and ranks the inserter's block items against a search input.
+ *
+ * @param {Array}  items       Inserter items.
+ * @param {Array}  categories  Block categories.
+ * @param {Object} collections Block collections.
+ * @param {string} searchInput Search input.
+ *
+ * @return {Array} Filtered and ranked item list.
+ */
 export const searchBlockItems = (
 	items,
 	categories,
 	collections,
-	searchTerm
+	searchInput
 ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
-	if ( normalizedSearchTerms.length === 0 ) {
-		return items;
-	}
+	const fields = [
+		{ get: ( item ) => item.title },
+		{ get: ( item ) => item.name, maxRank: SEARCH_RANK.WORD_STARTS_WITH },
+		{
+			get: ( item ) => item.keywords,
+			maxRank: SEARCH_RANK.WORD_STARTS_WITH,
+		},
+		{
+			get: ( item ) =>
+				categories.find( ( { slug } ) => slug === item.category )
+					?.title,
+			maxRank: SEARCH_RANK.CONTAINS,
+		},
+		{
+			get: ( item ) =>
+				collections[ ( item.name || '' ).split( '/' )[ 0 ] ]?.title,
+			maxRank: SEARCH_RANK.CONTAINS,
+		},
+		{ get: ( item ) => item.description, maxRank: SEARCH_RANK.CONTAINS },
+	];
 
-	return searchItems( items, searchTerm, {
-		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
-		getCollection: ( item ) =>
-			collections[ item.name.split( '/' )[ 0 ] ]?.title,
-		getVariations: ( item ) =>
-			( item.variations || [] ).map( ( variation ) => variation.title ),
-	} ).map( ( item ) => {
-		if ( isEmpty( item.variations ) ) {
-			return item;
-		}
-
-		const matchedVariations = item.variations.filter( ( variation ) => {
-			return (
-				intersectionWith(
-					normalizedSearchTerms,
-					normalizeSearchTerm( variation.title ),
-					( termToMatch, labelTerm ) =>
-						labelTerm.includes( termToMatch )
-				).length > 0
-			);
-		} );
-		// When no variations matched, fallback to all variations.
-		if ( isEmpty( matchedVariations ) ) {
-			return item;
-		}
-
-		return {
-			...item,
-			variations: matchedVariations,
-		};
-	} );
-};
-
-/**
- * Filters an item list given a search term.
- *
- * @param {Array} items       Item list
- * @param {string} searchTerm Search term.
- * @param {Object} config     Search Config.
- * @return {Array}            Filtered item list.
- */
-export const searchItems = ( items, searchTerm, config = {} ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
-	if ( normalizedSearchTerms.length === 0 ) {
-		return items;
-	}
-
-	const defaultGetTitle = ( item ) => item.title;
-	const defaultGetKeywords = ( item ) => item.keywords || [];
-	const defaultGetCategory = ( item ) => item.category;
-	const defaultGetCollection = () => null;
-	const defaultGetVariations = () => [];
-	const {
-		getTitle = defaultGetTitle,
-		getKeywords = defaultGetKeywords,
-		getCategory = defaultGetCategory,
-		getCollection = defaultGetCollection,
-		getVariations = defaultGetVariations,
-	} = config;
-
-	return items.filter( ( item ) => {
-		const title = getTitle( item );
-		const keywords = getKeywords( item );
-		const category = getCategory( item );
-		const collection = getCollection( item );
-		const variations = getVariations( item );
-
-		const terms = [
-			title,
-			...keywords,
-			category,
-			collection,
-			...variations,
-		].join( ' ' );
-
-		const unmatchedTerms = removeMatchingTerms(
-			normalizedSearchTerms,
-			terms
-		);
-
-		return unmatchedTerms.length === 0;
+	return searchItems( items, searchInput, {
+		fields,
+		tiebreak: ( a, b ) => getCorePriority( b ) - getCorePriority( a ),
 	} );
 };

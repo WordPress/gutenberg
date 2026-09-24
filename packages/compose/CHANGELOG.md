@@ -1,18 +1,409 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 8.9.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useFocusOutside`: Cancel the previous pending blur check so repeated blur events from portaled content do not report focus leaving after it returns ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+
+## 8.8.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `useResizeObserver`: Disconnect the observer when the hook unmounts so queued callbacks cannot run after teardown ([#82687](https://github.com/WordPress/gutenberg/pull/82687)).
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 8.7.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 8.6.0 (2026-08-12)
+
+### Enhancements
+
+-   `useFixedWindowList`: Only re-render when the rendered window is missing items, avoiding a second style recalculation before the list is first painted ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
+
+### Bug Fixes
+
+-   `useFixedWindowList`: Remove a duplicate `resize` listener registration, and page by the measured viewport height rather than the initial window size ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
+-   `useViewportMatch`: Scope the generated media query to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).
+## 8.5.0 (2026-07-29)
+
+## 8.4.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+### Bug Fixes
+
+-   `useMergeRefs`: Apply ref changes when the element attached outside a render of the calling component (e.g. a merged ref passed to a child that mounts the element in its own commit); previously the first ref change after such an attachment was skipped, leaving stale callbacks on the element ([#80133](https://github.com/WordPress/gutenberg/pull/80133)).
+
+## 8.3.0 (2026-07-01)
+
+## 8.2.0 (2026-06-24)
+
+## 8.1.1 (2026-06-16)
+
+## 8.1.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 8.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   `useDialog`: The returned `props` object now exposes an `onKeyDown` handler. Consumers that spread it onto a wrapper which also receives an `onKeyDown` from elsewhere should pass that handler via the new `onKeyDown` option (which merges it with close-on-Escape) or merge the two themselves ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+
+### Enhancements
+
+-   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
+
+### Bug Fixes
+
+-   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
+-   `useDialog`: Handle Escape via React `onKeyDown` so portaled descendants can stop propagation to prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+-   `useMediaQuery`, `useViewportMatch`: Resolve the `view` default lazily so the hooks no longer throw `ReferenceError: window is not defined` during server-side rendering. Regression from [#76446](https://github.com/WordPress/gutenberg/pull/76446).
+
+### Deprecations
+
+-   The `pure` HoC now logs a runtime deprecation warning. Use `memo` or `PureComponent` from `@wordpress/element` instead.
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+## 7.44.0 (2026-04-15)
+
+## 7.43.0 (2026-04-01)
+
+### Bug Fixes
+
+-   `useDialog`: Add `event.stopPropagation()` to the Escape key handler to prevent the event from bubbling to parent overlays ([#76861](https://github.com/WordPress/gutenberg/pull/76861)).
+
+## 7.42.0 (2026-03-18)
+
+### New Features
+
+-   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
+
+## 7.41.0 (2026-03-04)
+
+## 7.40.0 (2026-02-18)
+
+## 7.39.0 (2026-01-29)
+
+## 7.38.0 (2026-01-16)
+
+## 7.36.0 (2025-11-26)
+
+### New Features
+
+-   `useFocusOnMount`: Now the hook supports `firstInputElement` option which when enabled focuses the first input element and not the first tabbable element (as happens on default mode) ([#72322](https://github.com/WordPress/gutenberg/pull/72322)).
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
+## 7.32.0 (2025-10-01)
+
+## 7.31.0 (2025-09-17)
+
+## 7.30.0 (2025-09-03)
+
+## 7.29.0 (2025-08-20)
+
+## 7.28.0 (2025-08-07)
+
+## 7.27.0 (2025-07-23)
+
+## 7.26.0 (2025-06-25)
+
+## 7.25.0 (2025-06-04)
+
+## 7.24.0 (2025-05-22)
+
+## 7.23.0 (2025-05-07)
+
+## 7.22.0 (2025-04-11)
+
+## 7.21.0 (2025-03-27)
+
+## 7.20.0 (2025-03-13)
+
+## 7.19.0 (2025-02-28)
+
+## 7.18.0 (2025-02-12)
+
+## 7.17.0 (2025-01-29)
+
+## 7.16.0 (2025-01-15)
+
+## 7.15.0 (2025-01-02)
+
+## 7.14.0 (2024-12-11)
+
+## 7.13.0 (2024-11-27)
+
+## 7.12.0 (2024-11-16)
+
+## 7.11.0 (2024-10-30)
+
+## 7.10.0 (2024-10-16)
+
+## 7.9.0 (2024-10-03)
+
+### Bug Fixes
+
+-   `useResizeObserver`: export legacy API at top-level for React Native ([#65588](https://github.com/WordPress/gutenberg/pull/65588)).
+
+## 7.8.0 (2024-09-19)
+
+### New Features
+
+-   `useEvent`: a new utility that creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
+-   `useResizeObserver`: new and improved version of the utility (legacy API is still supported) ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
+
+## 7.7.0 (2024-09-05)
+
+## 7.6.0 (2024-08-21)
+
+## 7.5.0 (2024-08-07)
+
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+### Internal
+
+-   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.35.0 (2024-05-16)
+
+## 6.34.0 (2024-05-02)
+
+-   Added new `observableMap` data structure and `useObservableValue` React hook ([#60945](https://github.com/WordPress/gutenberg/pull/60945)).
+
+## 6.33.0 (2024-04-19)
+
+## 6.32.0 (2024-04-03)
+
+## 6.31.0 (2024-03-21)
+
+## 6.30.0 (2024-03-06)
+
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
+### Deprecations
+
+-   The `pure` HoC has been deprecated. Use `memo` or `PureComponent` instead ([#57173](https://github.com/WordPress/gutenberg/pull/57173)).
+
+## 6.26.0 (2024-01-10)
+
+## 6.25.0 (2023-12-13)
+
+## 6.24.0 (2023-11-29)
+
+## 6.23.0 (2023-11-16)
+
+## 6.22.0 (2023-11-02)
+
+## 6.21.0 (2023-10-18)
+
+## 6.20.0 (2023-10-05)
+
+## 6.19.0 (2023-09-20)
+
+### New Features
+
+-   `useStateWithHistory`: Add a new hook to manage state with undo/redo support.
+
+## 6.18.0 (2023-08-31)
+
+## 6.17.0 (2023-08-16)
+
+## 6.16.0 (2023-08-10)
+
+## 6.15.0 (2023-07-20)
+
+## 6.14.0 (2023-07-05)
+
+## 6.13.0 (2023-06-23)
+
+## 6.12.0 (2023-06-07)
+
+## 6.11.0 (2023-05-24)
+
+## 6.10.0 (2023-05-10)
+
+## 6.9.0 (2023-04-26)
+
+## 6.8.0 (2023-04-12)
+
+## 6.7.0 (2023-03-29)
+
+## 6.6.0 (2023-03-15)
+
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Internal
+
+-   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute ([#44865](https://github.com/WordPress/gutenberg/pull/44865)).
+-   `useFocusOutside`: Refactor the hook to TypeScript, rewrite tests using modern RTL and jest features ([#45317](https://github.com/WordPress/gutenberg/pull/45317)).
+-   `useFocusableIframe`: Refactor to TypeScript ([#45428](https://github.com/WordPress/gutenberg/pull/45428)).
+
+## 5.18.0 (2022-10-19)
+
+## 5.17.0 (2022-10-05)
+
+## 5.16.0 (2022-09-21)
+
+### New Features
+
+-   Compose: Introduce an in-house `debounce()` utility, deprecate Lodash version ([#43943](https://github.com/WordPress/gutenberg/pull/43943)).
+-   Compose: Introduce in-house `compose` and `pipe` utils ([#44112](https://github.com/WordPress/gutenberg/pull/44112)).
+
+### Internal
+
+-   `useInstanceId`: refactor to TypeScript ([#43790](https://github.com/WordPress/gutenberg/pull/43790)).
+
+## 5.15.0 (2022-09-13)
+
+### Internal
+
+-   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).
+
+## 5.14.0 (2022-08-24)
+
+## 5.13.0 (2022-08-10)
+
+## 5.12.0 (2022-07-27)
+
+## 5.11.0 (2022-07-13)
+
+## 5.10.0 (2022-06-29)
+
+## 5.9.0 (2022-06-15)
+
+## 5.8.0 (2022-06-01)
+
+## 5.7.0 (2022-05-18)
+
+### Bug Fixes
+
+-   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
+
+### New Features
+
+-   Add `useDisabled` hook.
+
+### Internal
+
+-   Update the implementation of useResizeObserver to rely on the ResizableObserver API.
+
+## 5.6.0 (2022-05-04)
+
+## 5.5.0 (2022-04-21)
+
+## 5.4.0 (2022-04-08)
+
+## 5.3.0 (2022-03-23)
+
+## 5.2.0 (2022-03-11)
+
+## 5.1.0 (2022-01-27)
+
+## 5.0.0 (2021-07-29)
+
+### Breaking Changes
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 4.2.0 (2021-07-21)
+
+### Deprecations
+
+-   `withState` HOC has been deprecated. Use `useState` hook instead.
+
+### New Features
+
+-   Publish TypeScript types.
+
+## 4.1.0 (2021-05-20)
+
+## 4.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
+
+## 3.25.0 (2021-03-17)
+
+## 3.24.0 (2021-01-21)
+
+### New Features
+
+-   Add the `useIsomorphicLayoutEffect` hook.
 
 ## 3.4.0 (2019-06-12)
 
 ### New Features
 
-- Add the `useMediaQuery` and `useReducedMotion` hooks.
+-   Add the `useMediaQuery` and `useReducedMotion` hooks.
 
 ## 3.0.0 (2018-11-15)
 
 ### Breaking Changes
 
-- `remountOnPropChange` has been removed.
+-   `remountOnPropChange` has been removed.
 
 ## 2.1.2 (2018-11-09)
 
@@ -20,9 +411,9 @@
 
 ## 2.1.0 (2018-10-29)
 
-### Deprecation
+### Deprecations
 
-- `remountOnPropChange` has been deprecated.
+-   `remountOnPropChange` has been deprecated.
 
 ## 2.0.5 (2018-10-19)
 
@@ -30,6 +421,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

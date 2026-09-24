@@ -1,38 +1,45 @@
-/**
- * External dependencies
- */
-import { map, flowRight } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import {
-	conservativeMapItem,
-	ifMatchingAction,
-	replaceAction,
-	onSubKey,
-} from '../utils';
+import { combineReducers, keyedReducer } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { conservativeMapItem, ifMatchingAction, replaceAction } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
+
+function getContextFromAction( action ) {
+	const { query } = action;
+	if ( ! query ) {
+		return 'default';
+	}
+
+	const queryParts = getQueryParts( query );
+	return queryParts.context;
+}
 
 /**
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
  *
- * @param {?Array<number>} itemIds     Original item IDs (default empty array).
- * @param {number[]}       nextItemIds Item IDs to merge.
- * @param {number}         page        Page of items merged.
- * @param {number}         perPage     Number of items per page.
+ * @param {number[]|undefined} itemIds          Original item IDs (default empty array).
+ * @param {number[]}           nextItemIds      Item IDs to merge.
+ * @param {Object}             options          Options object.
+ * @param {number}             [options.page]   Page of items merged.
+ * @param {number}             [options.offset] Offset of items merged.
+ * @param {number}             options.perPage  Number of items per page.
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+export function getMergedItemIds(
+	itemIds = [],
+	nextItemIds,
+	// The defaults for `page` and `perPage` are the same as in `getQueryParts`.
+	{ page = 1, offset, perPage = 10 } = {}
+) {
+	// If the query is unbounded, then `nextItemIds` is a complete replacement.
+	if ( perPage === -1 ) {
+		return nextItemIds;
+	}
+
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
+	const nextItemIdsRange = Math.max( perPage, nextItemIds.length );
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
@@ -46,16 +53,42 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
+		// We need to check against the possible maximum upper boundary because
+		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length;
-
-		mergedItemIds[ i ] = isInNextItemsRange
-			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+			i < nextItemIdsStartIndex + nextItemIdsRange;
+		if ( isInNextItemsRange ) {
+			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
+		} else {
+			mergedItemIds[ i ] = itemIds[ i ];
+		}
 	}
 
 	return mergedItemIds;
+}
+
+/**
+ * Helper function to filter out entities with certain IDs.
+ * Entities are keyed by their ID.
+ *
+ * @param {Object} entities Entity objects, keyed by entity ID.
+ * @param {Array}  ids      Entity IDs to filter out.
+ *
+ * @return {Object} Filtered entities.
+ */
+function removeEntitiesById( entities, ids ) {
+	return Object.fromEntries(
+		Object.entries( entities ).filter(
+			( [ id ] ) =>
+				! ids.some( ( itemId ) => {
+					if ( Number.isInteger( itemId ) ) {
+						return itemId === +id;
+					}
+					return itemId === id;
+				} )
+		)
+	);
 }
 
 /**
@@ -67,21 +100,96 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  *
  * @return {Object} Next state.
  */
-function items( state = {}, action ) {
+export function items( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ITEMS':
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
 			return {
 				...state,
-				...action.items.reduce( ( accumulator, value ) => {
-					const itemId = value[ key ];
-					accumulator[ itemId ] = conservativeMapItem(
-						state[ itemId ],
-						value
-					);
-					return accumulator;
-				}, {} ),
+				[ context ]: {
+					...state[ context ],
+					...Object.fromEntries(
+						itemsList.map( ( item ) => [
+							item?.[ key ],
+							conservativeMapItem(
+								state?.[ context ]?.[ item?.[ key ] ],
+								item
+							),
+						] )
+					),
+				},
 			};
+		}
+		case 'REMOVE_ITEMS':
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
+			);
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking item completeness, keyed by ID. A complete item is one for
+ * which all fields are known. This is used in supporting `_fields` queries,
+ * where not all properties associated with an entity are necessarily returned.
+ * In such cases, completeness is used as an indication of whether it would be
+ * safe to use queried data for a non-`_fields`-limited request.
+ *
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
+ *
+ * @return {Object<string,Object<string,boolean>>} Next state.
+ */
+export function itemIsComplete( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
+			const { query, key = DEFAULT_ENTITY_KEY } = action;
+			const itemsList = Array.isArray( action.items )
+				? action.items
+				: [ action.items ];
+
+			// An item is considered complete if it is received without an associated
+			// fields query. Ideally, this would be implemented in such a way where the
+			// complete aggregate of all fields would satisfy completeness. Since the
+			// fields are not consistent across all entities, this would require
+			// introspection on the REST schema for each entity to know which fields
+			// compose a complete item for that entity.
+			const queryParts = query ? getQueryParts( query ) : {};
+			const isCompleteQuery =
+				! query || ! Array.isArray( queryParts.fields );
+
+			return {
+				...state,
+				[ context ]: {
+					...state[ context ],
+					...itemsList.reduce( ( result, item ) => {
+						const itemId = item?.[ key ];
+
+						// Defer to completeness if already assigned. Technically the
+						// data may be outdated if receiving items for a field subset.
+						result[ itemId ] =
+							state?.[ context ]?.[ itemId ] || isCompleteQuery;
+
+						return result;
+					}, {} ),
+				},
+			};
+		}
+		case 'REMOVE_ITEMS':
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
+			);
 	}
 
 	return state;
@@ -96,16 +204,16 @@ function items( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const queries = flowRight( [
+const receiveQueries = compose( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
 
-	// Inject query parts into action for use both in `onSubKey` and reducer.
+	// Inject query parts into action for use both in `keyedReducer` and reducer.
 	replaceAction( ( action ) => {
 		// `ifMatchingAction` still passes on initialization, where state is
 		// undefined and a query is not assigned. Avoid attempting to parse
-		// parts. `onSubKey` will omit by lack of `stableKey`.
+		// parts. `keyedReducer` will omit by lack of `stableKey`.
 		if ( action.query ) {
 			return {
 				...action,
@@ -116,25 +224,123 @@ const queries = flowRight( [
 		return action;
 	} ),
 
+	keyedReducer( 'context' ),
+
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
-	onSubKey( 'stableKey' ),
-] )( ( state = null, action ) => {
-	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
-
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	keyedReducer( 'stableKey' ),
+] )( ( state = {}, action ) => {
+	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;
 	}
 
-	return getMergedItemIds(
-		state || [],
-		map( action.items, key ),
-		page,
-		perPage
-	);
+	// Single items don't have page or total count metadata
+	// (only collection query responses do), so skip updating itemIds.
+	if ( ! Array.isArray( action.items ) ) {
+		return state;
+	}
+
+	const key = action.key ?? DEFAULT_ENTITY_KEY;
+
+	return {
+		itemIds: getMergedItemIds(
+			state.itemIds,
+			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
+			{
+				page: action.page,
+				offset: action.offset,
+				perPage: action.perPage,
+			}
+		),
+		meta: action.meta,
+	};
 } );
+
+/**
+ * Removes items from a query's item IDs, keeping the pagination metadata in
+ * sync. Every removed item the query listed was counted by the endpoint in
+ * `totalItems`, so the total shrinks by that many. Nothing else refreshes the
+ * totals until the next fetch, and a consumer whose page has just emptied
+ * would otherwise keep requesting a page that no longer exists.
+ *
+ * `totalPages` can't be recomputed here — the page size that produced the
+ * `X-WP-TotalPages` header isn't known to the reducer — so it is reset to
+ * `null` ("unknown") rather than left next to a fresh `totalItems` it no
+ * longer matches. Queries that set `per_page` are unaffected: the selectors
+ * derive their page count from `totalItems` and never read the header value.
+ *
+ * @param {Object} queryItems   Query state, with `itemIds` and optional `meta`.
+ * @param {Object} removedItems Removed item IDs, as object keys.
+ *
+ * @return {Object} Updated query state.
+ */
+function removeQueryItems( queryItems, removedItems ) {
+	const itemIds = queryItems.itemIds.filter(
+		( itemId ) => ! removedItems[ itemId ]
+	);
+	const removedCount = queryItems.itemIds.length - itemIds.length;
+	if ( removedCount === 0 ) {
+		return queryItems;
+	}
+
+	const nextQueryItems = { ...queryItems, itemIds };
+	if ( Number.isFinite( queryItems.meta?.totalItems ) ) {
+		nextQueryItems.meta = {
+			...queryItems.meta,
+			totalItems: Math.max(
+				0,
+				queryItems.meta.totalItems - removedCount
+			),
+			totalPages: null,
+		};
+	}
+
+	return nextQueryItems;
+}
+
+/**
+ * Reducer tracking queries state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const queries = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS':
+			return receiveQueries( state, action );
+		case 'REMOVE_ITEMS':
+			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
+				result[ itemId ] = true;
+				return result;
+			}, {} );
+
+			return Object.fromEntries(
+				Object.entries( state ).map(
+					( [ queryGroup, contextQueries ] ) => [
+						queryGroup,
+						Object.fromEntries(
+							Object.entries( contextQueries ).map(
+								( [ query, queryItems ] ) => [
+									query,
+									removeQueryItems(
+										queryItems,
+										removedItems
+									),
+								]
+							)
+						),
+					]
+				)
+			);
+		default:
+			return state;
+	}
+};
 
 export default combineReducers( {
 	items,
+	itemIsComplete,
 	queries,
 } );

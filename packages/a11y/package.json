@@ -1,15 +1,17 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "2.9.0",
+	"version": "4.56.0",
 	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
+		"accessibility",
 		"a11y",
 		"aria-live"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/a11y/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,13 +20,35 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpScriptModuleExports": "./build-module/module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"@wordpress/dom-ready": "file:../dom-ready"
+		"@wordpress/dom-ready": "file:../dom-ready",
+		"@wordpress/i18n": "file:../i18n"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^7.0.1",
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

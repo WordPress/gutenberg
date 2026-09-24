@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { split } from '../split';
 import { getSparseArrayLength } from './helpers';
 
@@ -97,39 +90,6 @@ describe( 'split', () => {
 				formats: [],
 				replacements: [],
 				text: '',
-				start: 0,
-				end: 0,
-			},
-		];
-		const result = split( deepFreeze( record ) );
-
-		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
-			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) ).toBe(
-				getSparseArrayLength( expected[ index ].formats )
-			);
-		} );
-	} );
-
-	it( 'should split multiline', () => {
-		const record = {
-			formats: [ , , , , , , , , , , ],
-			replacements: [ , , , , , , , , , , ],
-			text: 'test\u2028\u2028test',
-			start: 5,
-			end: 5,
-		};
-		const expected = [
-			{
-				formats: [ , , , , ],
-				replacements: [ , , , , ],
-				text: 'test',
-			},
-			{
-				formats: [ , , , , ],
-				replacements: [ , , , , ],
-				text: 'test',
 				start: 0,
 				end: 0,
 			},
@@ -257,5 +217,14 @@ describe( 'split', () => {
 				getSparseArrayLength( expected[ index ].formats )
 			);
 		} );
+	} );
+
+	it( 'should not split without selection', () => {
+		const record = {
+			formats: [],
+			replacements: [],
+			text: '',
+		};
+		expect( split( deepFreeze( record ) ) ).toBe( undefined );
 	} );
 } );

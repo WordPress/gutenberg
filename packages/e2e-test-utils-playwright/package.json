@@ -1,0 +1,59 @@
+{
+	"name": "@wordpress/e2e-test-utils-playwright",
+	"version": "2.1.0",
+	"description": "End-To-End (E2E) test utils for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"e2e",
+		"utils",
+		"playwright"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-test-utils-playwright/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/e2e-test-utils-playwright"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"files": [
+		"build",
+		"build-types"
+	],
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./build/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./build-types",
+	"dependencies": {
+		"change-case": "^4.1.2",
+		"get-port": "^5.1.1",
+		"lighthouse": "^13.4.1",
+		"mime": "^3.0.0",
+		"web-vitals": "^4.2.4"
+	},
+	"devDependencies": {
+		"@types/mime": "^2.0.3",
+		"@types/node": "^24.13.3"
+	},
+	"peerDependencies": {
+		"@playwright/test": ">=1",
+		"@types/node": ">=20"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
+	}
+}

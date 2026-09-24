@@ -1,32 +1,26 @@
-/**
- * External dependencies
- */
-import { get } from 'lodash';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '../../store';
 
 /**
- * WordPress dependencies
+ * Wrapper component that renders its children only if post has a publish action.
+ *
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children Children to be rendered.
+ *
+ * @return {React.ReactNode} - The component to be rendered or null if there is no publish action.
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+export default function PostScheduleCheck( { children } ) {
+	const hasPublishAction = useSelect( ( select ) => {
+		return (
+			select( editorStore ).getCurrentPost()._links?.[
+				'wp:action-publish'
+			] ?? false
+		);
+	}, [] );
 
-export function PostScheduleCheck( { hasPublishAction, children } ) {
 	if ( ! hasPublishAction ) {
 		return null;
 	}
 
 	return children;
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
-		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			postType: getCurrentPostType(),
-		};
-	} ),
-] )( PostScheduleCheck );

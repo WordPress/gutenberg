@@ -1,9 +1,7 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { isAction, isActionOfType } from '../is-action';
 
-const nonActions = [ null, [], 42, 'foo', function() {}, { foo: 'bar' } ];
+const nonActions = [ null, [], 42, 'foo', () => {}, { foo: 'bar' } ];
 const validAction = { type: 'winner' };
 
 describe( 'isAction()', () => {

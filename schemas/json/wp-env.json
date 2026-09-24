@@ -1,0 +1,223 @@
+{
+	"title": "JSON schema for WordPress wp-env configuration files",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"//": {
+			"reference": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/"
+		},
+		"wpEnvProperties": {
+			"type": "object",
+			"properties": {
+				"core": {
+					"description": "The WordPress installation to use. If null is specified, wp-env will use the latest production release of WordPress.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"default": null
+				},
+				"phpVersion": {
+					"description": "The PHP version to use. If null is specified, wp-env will use the default version used with production release of WordPress.",
+					"oneOf": [
+						{
+							"type": "string",
+							"pattern": "^[0-9]+(?:\\.[0-9]+)*$"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"default": null
+				},
+				"plugins": {
+					"description": "A list of plugins to install and activate in the environment.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
+				"themes": {
+					"description": "A list of themes to install in the environment.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
+				"port": {
+					"description": "The primary port number to use for the installation. You'll access the instance through the port: http://localhost:8888",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 65535,
+					"default": 8888
+				},
+				"mysqlPort": {
+					"description": "The port number for the MySQL database. If null, the port is not exposed.",
+					"oneOf": [
+						{
+							"type": "integer",
+							"minimum": 0,
+							"maximum": 65535
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"config": {
+					"description": "Mapping of wp-config.php constants to their desired values.",
+					"type": "object",
+					"additionalProperties": {
+						"type": [ "string", "number", "boolean" ]
+					},
+					"default": {}
+				},
+				"mappings": {
+					"description": "Mapping of WordPress directories to local directories to be mounted in the WordPress instance.",
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					},
+					"default": {}
+				},
+				"phpmyadmin": {
+					"description": "Whether to enable phpMyAdmin for database management.",
+					"type": "boolean",
+					"default": false
+				},
+				"phpmyadminPort": {
+					"description": "The port number to access phpMyAdmin. Setting this also enables phpMyAdmin.",
+					"oneOf": [
+						{
+							"type": "integer",
+							"minimum": 0,
+							"maximum": 65535
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"multisite": {
+					"description": "Whether to set up a multisite installation.",
+					"type": "boolean"
+				}
+			}
+		},
+		"wpEnvPropertyNames": {
+			"enum": [
+				"core",
+				"phpVersion",
+				"plugins",
+				"themes",
+				"port",
+				"mysqlPort",
+				"config",
+				"mappings",
+				"phpmyadmin",
+				"phpmyadminPort",
+				"multisite"
+			]
+		}
+	},
+	"allOf": [
+		{
+			"$ref": "#/definitions/wpEnvProperties"
+		},
+		{
+			"type": "object",
+			"properties": {
+				"$schema": {
+					"type": "string"
+				},
+				"env": {
+					"description": "The key env is available to override any of the above options on an individual-environment basis.",
+					"type": "object",
+					"patternProperties": {
+						"[a-zA-Z]": {
+							"allOf": [
+								{ "$ref": "#/definitions/wpEnvProperties" },
+								{
+									"type": "object",
+									"propertyNames": {
+										"$ref": "#/definitions/wpEnvPropertyNames"
+									}
+								}
+							]
+						}
+					},
+					"default": {}
+				},
+				"testsPort": {
+					"description": "The port number for the test site. You'll access the instance through the port: http://localhost:8889",
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 65535,
+					"default": 8889
+				},
+				"testsEnvironment": {
+					"description": "Whether to create the tests environment. Set to false to skip creating test containers, saving resources.",
+					"type": "boolean",
+					"default": true
+				},
+				"autoPort": {
+					"description": "Whether to automatically find available HTTP ports when configured ports are busy.",
+					"type": "boolean",
+					"default": false
+				},
+				"lifecycleScripts": {
+					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
+					"type": "object",
+					"default": {},
+					"properties": {
+						"afterStart": {
+							"description": "Runs after wp-env start has finished setting up the environment.",
+							"type": "string"
+						},
+						"afterClean": {
+							"description": "Runs after wp-env clean has finished cleaning the environment.",
+							"type": "string"
+						},
+						"afterReset": {
+							"description": "Runs after wp-env reset has finished resetting the environment.",
+							"type": "string"
+						},
+						"afterCleanup": {
+							"description": "Runs after wp-env cleanup has finished cleaning up the environment.",
+							"type": "string"
+						},
+						"afterDestroy": {
+							"description": "Runs after wp-env destroy has destroyed the environment.",
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		{
+			"type": "object",
+			"propertyNames": {
+				"anyOf": [
+					{
+						"$ref": "#/definitions/wpEnvPropertyNames"
+					},
+					{
+						"enum": [
+							"$schema",
+							"env",
+							"testsPort",
+							"testsEnvironment",
+							"autoPort",
+							"lifecycleScripts"
+						]
+					}
+				]
+			}
+		}
+	]
+}

@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "3.14.0",
+	"version": "7.56.0",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"rest-api",
 		"fetch"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-fetch/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/api-fetch/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,15 +19,36 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"wpScriptDefaultExport": true,
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

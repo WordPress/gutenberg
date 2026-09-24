@@ -1,0 +1,82 @@
+import clsx from 'clsx';
+import type { DisabledProps } from './types';
+import type { WordPressComponentProps } from '../context';
+import Context from './context';
+import styles from './style.module.scss';
+
+const { Consumer, Provider } = Context;
+
+/**
+ * `Disabled` is a component which disables descendant tabbable elements and
+ * prevents pointer interaction.
+ *
+ * _Note: this component may not behave as expected in browsers that don't
+ * support the `inert` HTML attribute. We recommend adding the official WICG
+ * polyfill when using this component in your project._
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert
+ *
+ * ```jsx
+ * import { Button, Disabled, TextControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyDisabled = () => {
+ * 	const [ isDisabled, setIsDisabled ] = useState( true );
+ *
+ *	let input = (
+ *		<TextControl
+ *			label="Input"
+ *			onChange={ () => {} }
+ *		/>
+ *	);
+ * 	if ( isDisabled ) {
+ * 		input = <Disabled>{ input }</Disabled>;
+ * 	}
+ *
+ * 	const toggleDisabled = () => {
+ * 		setIsDisabled( ( state ) => ! state );
+ * 	};
+ *
+ * 	return (
+ * 		<div>
+ * 			{ input }
+ * 			<Button variant="primary" onClick={ toggleDisabled }>
+ * 				Toggle Disabled
+ * 			</Button>
+ * 		</div>
+ * 	);
+ * };
+ * ```
+ */
+function Disabled( {
+	className,
+	children,
+	isDisabled = true,
+	...props
+}: WordPressComponentProps< DisabledProps, 'div' > ) {
+	return (
+		<Provider value={ isDisabled }>
+			<div
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ isDisabled ? 'true' : undefined }
+				// Only the disabled styling is conditional. The consumer's own
+				// className has to stick around so the wrapper stays targetable
+				// whether or not it is currently disabled.
+				className={
+					clsx(
+						className,
+						isDisabled && [ styles.disabled, 'components-disabled' ]
+					) || undefined
+				}
+				{ ...props }
+			>
+				{ children }
+			</div>
+		</Provider>
+	);
+}
+
+Disabled.Context = Context;
+Disabled.Consumer = Consumer;
+
+export default Disabled;

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	getArgsFromCLI,
@@ -18,16 +11,20 @@ const {
 
 const args = getArgsFromCLI();
 
-const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,scss}' ];
+const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,pcss,scss}' ];
 
-// See: https://stylelint.io/user-guide/configuration
+// See: https://stylelint.io/user-guide/configure/
 const hasLintConfig =
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.stylelintrc.js' ) ||
+	hasProjectFile( '.stylelintrc.cjs' ) ||
+	hasProjectFile( '.stylelintrc.mjs' ) ||
 	hasProjectFile( '.stylelintrc.json' ) ||
 	hasProjectFile( '.stylelintrc.yaml' ) ||
 	hasProjectFile( '.stylelintrc.yml' ) ||
 	hasProjectFile( 'stylelint.config.js' ) ||
+	hasProjectFile( 'stylelint.config.cjs' ) ||
+	hasProjectFile( 'stylelint.config.mjs' ) ||
 	hasProjectFile( '.stylelintrc' ) ||
 	hasPackageProp( 'stylelint' );
 
@@ -35,7 +32,7 @@ const defaultConfigArgs = ! hasLintConfig
 	? [ '--config', fromConfigRoot( '.stylelintrc.json' ) ]
 	: [];
 
-// See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#stylelintignore.
+// See: https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/ignore-code.md#files-entirely.
 const hasIgnoredFiles =
 	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.stylelintignore' );
 

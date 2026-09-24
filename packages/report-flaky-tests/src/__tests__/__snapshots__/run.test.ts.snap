@@ -1,0 +1,83 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Report flaky tests > should write the report 1`] = `
+"Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
+
+<details>
+<summary>should copy only partial selection of text blocks in <code>/test/e2e/specs/editor/various/copy-cut-paste.spec.js</code>, passed after 1 failed attempt.</summary>
+
+\`\`\`
+Error: Snapshot comparison failed:
+
+  <!-- wp:paragraph -->
+  <p>block</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>B </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>A block</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p></p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>B block</p>
+  <!-- /wp:paragraph -->
+
+Expected: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt
+Received: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt
+    at /home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js:253:52
+\`\`\`
+
+</details>
+<details>
+<summary>Should insert new template part on creation in <code>specs/site-editor/template-part.test.js</code>, passed after 2 failed attempts.</summary>
+
+\`\`\`
+  ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
+
+    expect(jest.fn()).not.toHaveErrored(expected)
+
+    Expected mock function not to be called but it was called with:
+    ["TypeError: Cannot read properties of null (reading 'frameElement')
+
+      at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
+      at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
+      at Wt (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)
+      at ts (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)
+      at Fr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)
+      at Dr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)
+      at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
+      at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
+      at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)"]
+          at runMicrotasks (<anonymous>)
+
+  ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
+
+    expect(jest.fn()).not.toHaveErrored(expected)
+
+    Expected mock function not to be called but it was called with:
+    ["TypeError: Cannot read properties of null (reading 'frameElement')
+
+      at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
+      at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
+      at Wt (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)
+      at ts (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)
+      at Fr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)
+      at Dr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)
+      at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
+      at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
+      at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)"]
+          at runMicrotasks (<anonymous>)
+
+\`\`\`
+
+</details>"
+`;

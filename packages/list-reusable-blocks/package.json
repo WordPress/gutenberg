@@ -1,14 +1,16 @@
 {
 	"name": "@wordpress/list-reusable-blocks",
-	"version": "1.16.0",
+	"version": "5.56.0",
 	"description": "Adding Export/Import support to the reusable blocks listing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
+		"gutenberg",
 		"templates",
 		"reusable blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/list-reusable-blocks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/list-reusable-blocks/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,16 +19,50 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json",
+		"./build-style/*": "./build-style/*"
+	},
+	"wpScript": true,
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.15"
+		"change-case": "^4.1.2",
+		"remove-accents": "^0.5.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

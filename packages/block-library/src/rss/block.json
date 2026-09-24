@@ -1,14 +1,13 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/rss",
+	"title": "RSS",
 	"category": "widgets",
+	"description": "Display entries from any RSS or Atom feed.",
+	"keywords": [ "atom", "feed" ],
+	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string",
-			"enum": [ "left", "center", "right", "wide", "full" ]
-		},
-		"className": {
-			"type": "string"
-		},
 		"columns": {
 			"type": "number",
 			"default": 2
@@ -19,7 +18,8 @@
 		},
 		"feedURL": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"itemsToShow": {
 			"type": "number",
@@ -40,6 +40,49 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"openInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"rel": {
+			"type": "string"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"html": false,
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": false,
+				"margin": false
+			}
+		},
+		"shadow": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"gradients": true,
+			"link": true
+		}
+	},
+	"editorStyle": "wp-block-rss-editor",
+	"style": "wp-block-rss"
 }

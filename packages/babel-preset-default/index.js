@@ -1,4 +1,8 @@
-module.exports = function( api ) {
+const browserslist = require( 'browserslist' );
+const exclusions = require( './polyfill-exclusions' );
+const replacePolyfills = require( './replace-polyfills' );
+
+module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
 		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
@@ -17,7 +21,14 @@ module.exports = function( api ) {
 
 	const getPresetEnv = () => {
 		const opts = {
-			shippedProposals: true,
+			bugfixes: true,
+			...( wpBuildOpts.addPolyfillComments
+				? {
+						useBuiltIns: 'usage',
+						exclude: exclusions,
+						corejs: require( 'core-js/package.json' ).version,
+					}
+				: {} ),
 		};
 
 		if ( isTestEnv ) {
@@ -26,8 +37,12 @@ module.exports = function( api ) {
 			};
 		} else {
 			opts.modules = false;
+			const localBrowserslistConfig =
+				browserslist.findConfig( '.' ) || {};
 			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
+				browsers:
+					localBrowserslistConfig.defaults ||
+					require( '@wordpress/browserslist-config' ),
 			};
 		}
 
@@ -56,26 +71,21 @@ module.exports = function( api ) {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			require.resolve( '@babel/preset-typescript' ),
+		],
 		plugins: [
+			require.resolve( '@babel/plugin-syntax-import-attributes' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
-			[
-				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
-				{
-					scopeVariable: 'createElement',
-					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
-					isDefault: false,
-				},
-			],
 			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
 				{
-					pragma: 'createElement',
-					pragmaFrag: 'Fragment',
+					runtime: 'automatic',
 				},
 			],
 			maybeGetPluginTransformRuntime(),
+			wpBuildOpts.addPolyfillComments && replacePolyfills,
 		].filter( Boolean ),
 	};
 };

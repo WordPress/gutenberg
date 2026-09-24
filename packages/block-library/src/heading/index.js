@@ -1,66 +1,60 @@
-/**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
- * WordPress dependencies
- */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { getBlockType, unregisterBlockVariation } from '@wordpress/blocks';
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Heading' ),
-	description: __(
-		'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
-	),
 	icon,
-	keywords: [ __( 'title' ), __( 'subtitle' ) ],
-	supports: {
-		className: false,
-		anchor: true,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-		__experimentalColor: Platform.OS === 'web',
-		__experimentalLineHeight: true,
-		__experimentalFontSize: true,
-	},
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			const { content, level } = attributes;
+		const { content, level } = attributes;
 
-			return isEmpty( content )
+		const customName = attributes?.metadata?.name;
+		const hasContent = content?.trim().length > 0;
+
+		// In the list view, use the block's content as the label.
+		// If the content is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || content;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
+		if ( context === 'accessibility' ) {
+			return ! hasContent
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
 						level
-				  )
+					)
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
 						content
-				  );
+					);
 		}
 	},
 	transforms,
@@ -74,4 +68,24 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
+};
+
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+
+	// Unregister heading level variations based on `levelOptions` attribute.
+	// This is for backwards compatibility, as extenders can now unregister the
+	// variation directly: `wp.blocks.unregisterBlockVariation( 'core/heading', 'h1' )`.
+	const levelOptions =
+		getBlockType( name )?.attributes?.levelOptions?.default;
+	if ( levelOptions ) {
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			if ( ! levelOptions.includes( level ) ) {
+				unregisterBlockVariation( name, `h${ level }` );
+			}
+		} );
+	}
+
+	return block;
 };

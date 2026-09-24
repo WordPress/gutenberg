@@ -1,0 +1,41 @@
+import { useMemo } from '@wordpress/element';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
+import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
+import type { BodyProps } from '../types';
+import { getPaddingBySize } from '../get-padding-by-size';
+
+export function useCardBody(
+	props: WordPressComponentProps< BodyProps, 'div' >
+) {
+	const {
+		className,
+		isScrollable = false,
+		isShady = false,
+		size = 'medium',
+		...otherProps
+	} = useContextSystem( props, 'CardBody' );
+
+	const cx = useCx();
+
+	const classes = useMemo(
+		() =>
+			cx(
+				styles.getCardBodyStyles( { isScrollable } ),
+				styles.borderRadius,
+				getPaddingBySize( size ),
+				isShady && styles.shady,
+				// This classname is added for legacy compatibility reasons.
+				'components-card__body',
+				className
+			),
+		[ className, cx, isScrollable, isShady, size ]
+	);
+
+	return {
+		...otherProps,
+		className: classes,
+		isScrollable,
+	};
+}

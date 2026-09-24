@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/url",
-	"version": "2.14.0",
+	"version": "4.56.0",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"url"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/url/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/url/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,16 +18,34 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"lodash": "^4.17.15",
-		"qs": "^6.5.2",
-		"react-native-url-polyfill": "^1.1.2"
+		"remove-accents": "^0.5.0"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

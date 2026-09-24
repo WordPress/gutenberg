@@ -1,22 +1,19 @@
-/**
- * External dependencies
- */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
-import { noop, times } from 'lodash';
-
-/**
- * Internal dependencies
- */
+import '../../store';
 import {
 	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	cloneSanitizedBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
 	isWildcardBlockTransform,
 	isContainerGroupBlock,
-	isBlockSelectionOfSameType,
+	getBlockFromExample,
 } from '../factory';
 import {
 	getBlockType,
@@ -25,22 +22,26 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
+
+const noop = () => {};
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			value: {
 				type: 'string',
 			},
 		},
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
-	beforeAll( () => {
-		// Load blocks store
-		require( '../../store' );
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
 	} );
 
 	afterEach( () => {
@@ -52,6 +53,7 @@ describe( 'block factory', () => {
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType, attributes, inner blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -66,7 +68,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = createBlock( 'core/test-block', { align: 'left' }, [
@@ -159,11 +161,154 @@ describe( 'block factory', () => {
 				content: 'test',
 			} );
 		} );
+
+		it( 'should sanitize attributes not defined in the block type', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
+
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent and warn for other blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
+		} );
+	} );
+
+	describe( 'createBlocksFromInnerBlocksTemplate', () => {
+		it( 'should create a block without InnerBlocks', () => {
+			const blockName = 'core/test-block';
+			registerBlockType( blockName, { ...defaultBlockSettings } );
+			const res = createBlock(
+				blockName,
+				{ ...defaultBlockSettings },
+				createBlocksFromInnerBlocksTemplate()
+			);
+			expect( res ).toEqual(
+				expect.objectContaining( {
+					name: blockName,
+					innerBlocks: [],
+				} )
+			);
+		} );
+		describe( 'create block with InnerBlocks', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-other', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-paragraph', {
+					apiVersion: 3,
+					...defaultBlockSettings,
+					attributes: {
+						content: {
+							type: 'string',
+							default: 'hello',
+						},
+					},
+				} );
+			} );
+			it( 'should create block with InnerBlocks from template', () => {
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[ 'core/test-paragraph', { content: 'fromTemplate' } ],
+						[ 'core/test-paragraph' ],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 3 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'hello' },
+						} ),
+					] )
+				);
+			} );
+			it( 'should create blocks with InnerBlocks template and InnerBlock objects', () => {
+				const nestedInnerBlocks = [
+					createBlock( 'core/test-other' ),
+					createBlock( 'core/test-paragraph' ),
+				];
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[
+							'core/test-paragraph',
+							{ content: 'fromTemplate' },
+							nestedInnerBlocks,
+						],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 2 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+							innerBlocks: expect.arrayContaining( [
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+							] ),
+						} ),
+					] )
+				);
+			} );
+		} );
 	} );
 
 	describe( 'cloneBlock()', () => {
 		it( 'should merge attributes into the existing block', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -172,9 +317,34 @@ describe( 'block factory', () => {
 						type: 'boolean',
 						default: false,
 					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
+					content: {
+						type: 'string',
+						source: 'html',
+					},
+					defaultContent: {
+						type: 'string',
+						source: 'html',
+						default: 'test',
+					},
+					unknownDefaultContent: {
+						type: 'string',
+						source: 'html',
+						default: 1,
+					},
+					htmlContent: {
+						source: 'html',
+					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -185,12 +355,18 @@ describe( 'block factory', () => {
 
 			const clonedBlock = cloneBlock( block, {
 				isDifferent: true,
+				htmlContent: 'test',
 			} );
 
 			expect( clonedBlock.name ).toEqual( block.name );
 			expect( clonedBlock.attributes ).toEqual( {
+				includesDefault: true,
+				includesFalseyDefault: 0,
 				align: 'left',
 				isDifferent: true,
+				defaultContent: 'test',
+				unknownDefaultContent: 1,
+				htmlContent: 'test',
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( typeof clonedBlock.clientId ).toBe( 'string' );
@@ -199,6 +375,7 @@ describe( 'block factory', () => {
 
 		it( 'should replace inner blocks of the existing block', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -209,7 +386,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -231,6 +408,7 @@ describe( 'block factory', () => {
 
 		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -241,7 +419,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -275,9 +453,50 @@ describe( 'block factory', () => {
 		} );
 	} );
 
+	describe( 'cloneSanitizedBlock', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+		} );
+
+		it( 'sanitizes attributes not defined in the block type', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = cloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+
+		it( 'keeps the experimental function as a deprecated alias', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+			expect( console ).toHaveWarnedWith(
+				'__experimentalCloneSanitizedBlock is deprecated since version 7.1. Please use cloneSanitizedBlock instead.'
+			);
+		} );
+	} );
+
 	describe( 'getPossibleBlockTransformations()', () => {
-		it( 'should should show as available a simple "from" transformation"', () => {
+		it( 'should show as available a simple "from" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -293,7 +512,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -314,6 +533,7 @@ describe( 'block factory', () => {
 
 		it( 'should show as available a simple "to" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -329,7 +549,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -346,8 +566,48 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
+		it( 'should preserve variation metadata for possible transformations', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							variationName: 'grid',
+							transform: noop,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/text-block',
+				variationName: 'grid',
+			} );
+		} );
+
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -363,7 +623,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -386,6 +646,7 @@ describe( 'block factory', () => {
 
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "to" transform)', () => {
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -401,7 +662,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -427,6 +688,7 @@ describe( 'block factory', () => {
 
 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -443,7 +705,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -469,6 +731,7 @@ describe( 'block factory', () => {
 
 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "to" transform)', () => {
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -485,7 +748,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -514,6 +777,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -536,7 +800,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -562,6 +826,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations when multiple blocks have a matching `from` transform', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -578,10 +843,11 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/another-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -598,7 +864,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'another text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -622,6 +888,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations for a single `to` transform object with multiple block names', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -640,7 +907,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -666,6 +933,7 @@ describe( 'block factory', () => {
 
 		it( 'returns a single transformation for a "from" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -682,7 +950,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -703,6 +971,7 @@ describe( 'block factory', () => {
 
 		it( 'returns no transformations for a "from" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -719,7 +988,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -737,6 +1006,7 @@ describe( 'block factory', () => {
 
 		it( 'returns a single transformation for a "to" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -753,7 +1023,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -772,6 +1042,7 @@ describe( 'block factory', () => {
 
 		it( 'returns no transformations for a "to" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -788,7 +1059,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -804,10 +1075,11 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object as its first argument', () => {
-			const isMatch = jest.fn();
+		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object and the block object as its arguments', () => {
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -824,7 +1096,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -835,13 +1107,14 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ block ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
+			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' }, block );
 		} );
 
-		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes as its first argument', () => {
-			const isMatch = jest.fn();
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes and an array of source blocks as its arguments', () => {
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -859,7 +1132,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -874,15 +1147,16 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( [
-				{ value: 'ribs' },
-				{ value: 'halloumi' },
-			] );
+			expect( isMatch ).toHaveBeenCalledWith(
+				[ { value: 'ribs' }, { value: 'halloumi' } ],
+				[ meatBlock, cheeseBlock ]
+			);
 		} );
 
 		describe( 'wildcard block transforms', () => {
 			beforeEach( () => {
 				registerBlockType( 'core/group', {
+					apiVersion: 3,
 					attributes: {
 						value: {
 							type: 'string',
@@ -898,40 +1172,39 @@ describe( 'block factory', () => {
 						],
 					},
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'A block that groups other blocks.',
 				} );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 4, ( index ) => {
+				const textBlocks = [ ...Array( 4 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					textBlocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( textBlocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of different types', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of different types', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 2, ( index ) => {
+				const textBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const imageBlocks = times( 2, ( index ) => {
+				const imageBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/image-block', {
 						value: `imageBlock${ index + 1 }`,
 					} );
@@ -946,18 +1219,17 @@ describe( 'block factory', () => {
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+			it( 'should show wildcard "from" transformation as available for single blocks', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 
-				const blocks = times( 1, ( index ) => {
+				const blocks = [ ...Array( 1 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					blocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( blocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
@@ -968,6 +1240,7 @@ describe( 'block factory', () => {
 	describe( 'switchToBlockType()', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -987,7 +1260,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1018,6 +1291,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1037,7 +1311,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text-block',
 			} );
 
@@ -1058,6 +1332,70 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
+			} );
+		} );
+
+		it( 'should switch the blockType of a block using a variation transform', () => {
+			registerBlockType( 'core/group-block', {
+				...defaultBlockSettings,
+				attributes: {
+					layout: {
+						type: 'object',
+					},
+				},
+			} );
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'constrained' },
+								} ),
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							variationName: 'grid',
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'grid' },
+								} ),
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group-block',
+				'grid'
+			);
+			const defaultTransformedBlocks = switchToBlockType(
+				block,
+				'core/group-block'
+			);
+
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'grid' },
+			} );
+			expect( defaultTransformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'constrained' },
 			} );
 		} );
 
@@ -1082,6 +1420,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject transformations that return null', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1096,7 +1435,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1113,8 +1452,103 @@ describe( 'block factory', () => {
 			expect( transformedBlocks ).toBeNull();
 		} );
 
+		it( 'should accept transformations that have an isMatch method that returns true', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: true,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+		} );
+
+		it( 'should reject transformations that have an isMatch method that returns false', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: false,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toBeNull();
+		} );
+
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1129,7 +1563,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1148,6 +1582,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject single transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1168,7 +1603,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1187,6 +1622,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject array transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1212,7 +1648,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1235,6 +1671,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1253,7 +1690,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1275,6 +1712,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1298,7 +1736,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1320,6 +1758,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1344,7 +1783,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1362,15 +1801,11 @@ describe( 'block factory', () => {
 			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].clientId ).not.toBe(
-				block.clientId
-			);
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ].clientId ).toBe( block.clientId );
 			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe(
 				'core/updated-text-block'
@@ -1383,6 +1818,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass through inner blocks to transform', () => {
 			registerBlockType( 'core/updated-columns-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1408,7 +1844,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1432,6 +1868,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass through inner blocks to transform (multi)', () => {
 			registerBlockType( 'core/updated-columns-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1467,7 +1904,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1500,6 +1937,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass entire block object(s) to the "__experimentalConvert" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1532,18 +1970,20 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1559,8 +1999,8 @@ describe( 'block factory', () => {
 			);
 		} );
 
-		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+		it( 'should call "__experimentalConvert" with mixed block types and wildcard', () => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -1573,9 +2013,10 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1593,18 +2034,206 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock(
+						index % 2 ? 'core/text-block' : 'core/image-block',
+						{
+							value: `block-value-${ index + 1 }`,
+						}
+					);
+				}
+			);
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
+
+		it( 'should call "__experimentalConvert" with same block types', () => {
+			const convertSpy = vi.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = vi.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
+
+		it( 'should not call "__experimentalConvert" with non-matching block types', () => {
+			const convertSpy = vi.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = vi.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/image-block' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toEqual( null );
+			expect( convertSpy.mock.calls ).toHaveLength( 0 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
+
+		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
+			const convertSpy = vi.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = vi.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ '*' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1621,6 +2250,7 @@ describe( 'block factory', () => {
 		beforeEach( () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 			registerBlockType( 'core/transform-from-text-block-1', {
+				apiVersion: 3,
 				transforms: {
 					from: [
 						{
@@ -1629,10 +2259,11 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/transform-from-text-block-2', {
+				apiVersion: 3,
 				transforms: {
 					from: [
 						{
@@ -1641,7 +2272,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 		} );
@@ -1745,7 +2376,7 @@ describe( 'block factory', () => {
 			const validWildcardBlockTransform = {
 				type: 'block',
 				blocks: [
-					'core/some-other-block-first', // unlikely to happen but...
+					'core/some-other-block-first', // Unlikely to happen but...
 					'*',
 				],
 				blockName: 'core/test-block',
@@ -1796,6 +2427,7 @@ describe( 'block factory', () => {
 	describe( 'isContainerGroupBlock', () => {
 		beforeEach( () => {
 			registerBlockType( 'core/registered-grouping-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1811,7 +2443,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'A Block with InnerBlocks that supports grouping',
 			} );
 		} );
@@ -1829,46 +2461,35 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( 'isBlockSelectionOfSameType', () => {
-		it( 'should return false when all blocks do not match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/another-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( false );
-		} );
-
-		it( 'should return true when all blocks match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( true );
+	describe( 'getBlockFromExample', () => {
+		it( 'should replace unregistered block with core/missing block', () => {
+			registerBlockType( 'core/missing', {
+				apiVersion: 3,
+				title: 'Unsupported',
+			} );
+			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
+				title: 'Paragraph',
+			} );
+			registerBlockType( 'core/group', {
+				apiVersion: 3,
+				title: 'A block that groups other blocks.',
+			} );
+			const example = {
+				innerBlocks: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/image' },
+				],
+			};
+			expect(
+				getBlockFromExample( 'core/group', example )
+			).toMatchObject( {
+				name: 'core/group',
+				innerBlocks: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/missing' },
+				],
+			} );
 		} );
 	} );
 } );

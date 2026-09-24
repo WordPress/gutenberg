@@ -1,0 +1,134 @@
+import { useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	hasBlockSupport,
+	createBlock,
+	cloneBlock,
+	getDefaultBlockName,
+} from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+
+export function useOnEnter( props ) {
+	const { batch } = useRegistry();
+	const { moveBlocksToPosition, replaceBlocks, selectionChange } =
+		useDispatch( blockEditorStore );
+	const {
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockOrder,
+		getBlockName,
+		getBlock,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
+	const propsRef = useRef( props );
+	propsRef.current = props;
+	return useRefEffect( ( element ) => {
+		function onBeforeInput( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( event.inputType !== 'insertParagraph' ) {
+				return;
+			}
+
+			const { content, clientId } = propsRef.current;
+
+			// The paragraph should be empty.
+			if ( content.length ) {
+				return;
+			}
+
+			const wrapperClientId = getBlockRootClientId( clientId );
+
+			if (
+				! hasBlockSupport(
+					getBlockName( wrapperClientId ),
+					'__experimentalOnEnter',
+					false
+				)
+			) {
+				return;
+			}
+
+			const order = getBlockOrder( wrapperClientId );
+			const position = order.indexOf( clientId );
+
+			// If it is the last block, exit.
+			if ( position === order.length - 1 ) {
+				let newWrapperClientId = wrapperClientId;
+
+				while (
+					! canInsertBlockType(
+						getBlockName( clientId ),
+						getBlockRootClientId( newWrapperClientId )
+					)
+				) {
+					newWrapperClientId =
+						getBlockRootClientId( newWrapperClientId );
+				}
+
+				if ( typeof newWrapperClientId === 'string' ) {
+					event.preventDefault();
+					moveBlocksToPosition(
+						[ clientId ],
+						wrapperClientId,
+						getBlockRootClientId( newWrapperClientId ),
+						getBlockIndex( newWrapperClientId ) + 1
+					);
+				}
+				return;
+			}
+
+			const defaultBlockName = getDefaultBlockName();
+			const wrapperBlockName = getBlockName( wrapperClientId );
+			const grandparentClientId = getBlockRootClientId( wrapperClientId );
+
+			if (
+				! canInsertBlockType( defaultBlockName, grandparentClientId ) ||
+				! canInsertBlockType( wrapperBlockName, grandparentClientId )
+			) {
+				return;
+			}
+
+			event.preventDefault();
+
+			// If it is in the middle, split the block in two.
+			const wrapperBlock = getBlock( wrapperClientId );
+			const head = cloneBlock( {
+				...wrapperBlock,
+				innerBlocks: wrapperBlock.innerBlocks.slice( 0, position ),
+			} );
+			const middle = createBlock( defaultBlockName );
+			const tail = cloneBlock( {
+				...wrapperBlock,
+				innerBlocks: wrapperBlock.innerBlocks.slice( position + 1 ),
+			} );
+
+			batch( () => {
+				replaceBlocks( wrapperClientId, [ head, middle, tail ] );
+				// The selected paragraph is a descendant of the replaced
+				// wrapper, so `replaceBlocks` leaves the selection stale.
+				// Move it to the new default block explicitly.
+				selectionChange( middle.clientId );
+			} );
+		}
+
+		// Enter is handled on beforeinput: moving focus while the keydown
+		// is still being handled leaves the iOS keyboard's
+		// auto-capitalization stale. Capture phase so we run before
+		// writing-flow's ancestor-bubble handler that gates on
+		// `event.defaultPrevented`.
+		return subscribeOwnedListener(
+			element,
+			'beforeinput',
+			onBeforeInput,
+			true
+		);
+	}, [] );
+}

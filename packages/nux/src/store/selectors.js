@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-import { includes, difference, keys, has } from 'lodash';
-
-/**
  * An object containing information about a guide.
  *
  * @typedef {Object} NUXGuideInfo
@@ -14,69 +8,28 @@ import { includes, difference, keys, has } from 'lodash';
  */
 
 /**
- * Returns an object describing the guide, if any, that the given tip is a part
- * of.
+ * Returns null because the deprecated NUX package no longer displays guides.
  *
- * @param {Object} state Global application state.
- * @param {string} tipId The tip to query.
- *
- * @return {?NUXGuideInfo} Information about the associated guide.
+ * @return {null} No associated guide.
  */
-export const getAssociatedGuide = createSelector(
-	( state, tipId ) => {
-		for ( const tipIds of state.guides ) {
-			if ( includes( tipIds, tipId ) ) {
-				const nonDismissedTips = difference(
-					tipIds,
-					keys( state.preferences.dismissedTips )
-				);
-				const [
-					currentTipId = null,
-					nextTipId = null,
-				] = nonDismissedTips;
-				return { tipIds, currentTipId, nextTipId };
-			}
-		}
-
-		return null;
-	},
-	( state ) => [ state.guides, state.preferences.dismissedTips ]
-);
-
-/**
- * Determines whether or not the given tip is showing. Tips are hidden if they
- * are disabled, have been dismissed, or are not the current tip in any
- * guide that they have been added to.
- *
- * @param {Object} state Global application state.
- * @param {string} tipId The tip to query.
- *
- * @return {boolean} Whether or not the given tip is showing.
- */
-export function isTipVisible( state, tipId ) {
-	if ( ! state.preferences.areTipsEnabled ) {
-		return false;
-	}
-
-	if ( has( state.preferences.dismissedTips, [ tipId ] ) ) {
-		return false;
-	}
-
-	const associatedGuide = getAssociatedGuide( state, tipId );
-	if ( associatedGuide && associatedGuide.currentTipId !== tipId ) {
-		return false;
-	}
-
-	return true;
+export function getAssociatedGuide() {
+	return null;
 }
 
 /**
- * Returns whether or not tips are globally enabled.
+ * Returns false because the deprecated NUX package no longer displays tips.
  *
- * @param {Object} state Global application state.
+ * @return {boolean} Whether or not the given tip is showing.
+ */
+export function isTipVisible() {
+	return false;
+}
+
+/**
+ * Returns false because the deprecated NUX package no longer displays tips.
  *
  * @return {boolean} Whether tips are globally enabled.
  */
-export function areTipsEnabled( state ) {
-	return state.preferences.areTipsEnabled;
+export function areTipsEnabled() {
+	return false;
 }

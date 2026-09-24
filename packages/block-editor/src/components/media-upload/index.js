@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { withFilters } from '@wordpress/components';
 
 /**
@@ -8,11 +5,11 @@ import { withFilters } from '@wordpress/components';
  * an integration with the core blocks that handle media files. By default it renders nothing but
  * it provides a way to have it overridden with the `editor.MediaUpload` filter.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const MediaUpload = () => null;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md
  */
 export default withFilters( 'editor.MediaUpload' )( MediaUpload );

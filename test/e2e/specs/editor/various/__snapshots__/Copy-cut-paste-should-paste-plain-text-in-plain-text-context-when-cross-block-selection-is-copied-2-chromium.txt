@@ -1,0 +1,13 @@
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>ading
+
+Paragra</code></pre>
+<!-- /wp:code -->

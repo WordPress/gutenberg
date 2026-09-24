@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-unguarded-get-range-at';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
@@ -17,12 +13,12 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'no-unguarded-get-range-at', rule, {
 	valid: [
 		{
-			code: `const selection = window.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
+			code: `const selection = defaultView.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
 		},
 	],
 	invalid: [
 		{
-			code: `window.getSelection().getRangeAt( 0 );`,
+			code: `defaultView.getSelection().getRangeAt( 0 );`,
 			errors: [ { message: 'Avoid unguarded getRangeAt' } ],
 		},
 	],

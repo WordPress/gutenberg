@@ -1,0 +1,10 @@
+{
+	"version": 3,
+	"blockTypes": [ "core/group", "core/columns", "core/media-text" ],
+	"styles": {
+		"color": {
+			"background": "darkcyan",
+			"text": "aliceblue"
+		}
+	}
+}

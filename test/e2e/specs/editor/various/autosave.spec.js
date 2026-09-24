@@ -1,0 +1,423 @@
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.describe( 'Autosave', () => {
+	test.beforeEach( async ( { admin, page } ) => {
+		await admin.createNewPost();
+		await page.evaluate( () => window.sessionStorage.clear() );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( () => window.sessionStorage.clear() );
+	} );
+
+	test( 'should save to sessionStorage', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		const autosave = await page.evaluate( () => {
+			const postId = window.wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+
+			return window.sessionStorage.getItem(
+				`wp-autosave-block-editor-post-${
+					postId ? postId : 'auto-draft'
+				}`
+			);
+		} );
+
+		const { content } = JSON.parse( autosave );
+		expect( content ).toBe( `<!-- wp:paragraph -->
+<p>before save after save</p>
+<!-- /wp:paragraph -->` );
+	} );
+
+	test( 'should recover from sessionStorage', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		// Reload without saving on the server.
+		await page.reload();
+
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'The backup of this post in your browser is different from the version below.'
+		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+
+		await page
+			.getByRole( 'button', { name: 'Restore the backup' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save after save' },
+			},
+		] );
+	} );
+
+	test( "shouldn't contaminate other posts", async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+
+		await page.reload();
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'The backup of this post in your browser is different from the version below.'
+		);
+
+		await admin.createNewPost();
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toBeHidden();
+	} );
+
+	test( 'should clear local autosave after successful remote autosave', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBeGreaterThanOrEqual( 1 );
+
+		// Trigger remote autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
+	} );
+
+	test( "shouldn't clear local autosave if remote autosave fails", async ( {
+		editor,
+		context,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBeGreaterThanOrEqual( 1 );
+
+		// Intercept autosave request and abort it.
+		await context.setOffline( true );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+	} );
+
+	test( 'should clear local autosave after successful save', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		const notice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } );
+
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await notice.waitFor();
+		await page.keyboard.type( ' after save' );
+		await notice.click();
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBeGreaterThanOrEqual( 1 );
+
+		await pageUtils.pressKeys( 'primary+s' );
+		await notice.waitFor();
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
+	} );
+
+	test( "shouldn't clear local autosave if save fails", async ( {
+		editor,
+		context,
+		page,
+		pageUtils,
+	} ) => {
+		const notice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await notice.waitFor();
+		await page.keyboard.type( ' after save' );
+		await notice.click();
+
+		// Trigger local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBeGreaterThanOrEqual( 1 );
+
+		await context.setOffline( true );
+		await pageUtils.pressKeys( 'primary+s' );
+
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'Updating failed because you were offline. Please verify your connection and try again.'
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/17501.
+	test( "shouldn't conflict with server-side autosave", async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await editor.publishPost();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		// Type slowly to ensure that autosave happens more than 1s after publish.
+		await page.keyboard.type( ' after save', { delay: 100 } );
+
+		// Trigger remote autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect
+			.poll( async () => {
+				return await page.evaluate( () => {
+					const postId = window.wp.data
+						.select( 'core/editor' )
+						.getCurrentPostId();
+					const autosaves = window.wp.data
+						.select( 'core' )
+						.getAutosaves( 'post', postId );
+
+					return autosaves?.length ?? 0;
+				} );
+			} )
+			.toBeGreaterThanOrEqual( 1 );
+
+		// Force conflicting local autosave.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBeGreaterThanOrEqual( 1 );
+
+		await page.reload();
+		await page.waitForFunction( () => window?.wp?.data );
+
+		// Only remote autosave notice should be applied.
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText(
+			'There is an autosave of this post that is more recent than the version below.'
+		);
+	} );
+
+	test( 'opens the visual revisions view from the autosave notice', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await editor.publishPost();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		// Type slowly so the autosave happens more than 1s after publish.
+		await page.keyboard.type( ' after save', { delay: 100 } );
+
+		// Trigger a server-side autosave newer than the saved version.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect
+			.poll( async () => {
+				return await page.evaluate( () => {
+					const postId = window.wp.data
+						.select( 'core/editor' )
+						.getCurrentPostId();
+					const autosaves = window.wp.data
+						.select( 'core' )
+						.getAutosaves( 'post', postId );
+
+					return autosaves?.length ?? 0;
+				} );
+			} )
+			.toBeGreaterThanOrEqual( 1 );
+
+		// Reload so the autosave notice appears.
+		await page.reload();
+		await page.waitForFunction( () => window?.wp?.data );
+
+		const autosaveNotice = page
+			.locator( '.components-notice__content' )
+			.filter( {
+				hasText:
+					'There is an autosave of this post that is more recent than the version below.',
+			} );
+		await expect( autosaveNotice ).toBeVisible();
+
+		// Opening the autosave switches to the visual revisions view in place.
+		await page.getByRole( 'button', { name: 'View the autosave' } ).click();
+		await expect(
+			page.getByRole( 'button', { name: 'Exit' } )
+		).toBeVisible();
+
+		// Restoring the autosave dismisses the notice.
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+		await expect( autosaveNotice ).toBeHidden();
+	} );
+
+	test.skip( 'should clear sessionStorage upon user logout', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+
+		await page.locator( '#wp-admin-bar-my-account' ).hover();
+		await page.locator( '#wp-admin-bar-logout' ).click();
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
+	} );
+} );

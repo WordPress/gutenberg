@@ -1,19 +1,27 @@
-/**
- * External dependencies
- */
-import { get } from 'lodash';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '../../store';
 
 /**
- * WordPress dependencies
+ * This component checks the publishing status of the current post.
+ * If the post is already published or the user doesn't have the
+ * capability to publish, it returns null.
+ *
+ * @param {Object}          props          Component properties.
+ * @param {React.ReactNode} props.children Children to be rendered.
+ *
+ * @return {React.ReactNode} The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+export function PostPendingStatusCheck( { children } ) {
+	const { hasPublishAction, isPublished } = useSelect( ( select ) => {
+		const { isCurrentPostPublished, getCurrentPost } =
+			select( editorStore );
+		return {
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+			isPublished: isCurrentPostPublished(),
+		};
+	}, [] );
 
-export function PostPendingStatusCheck( {
-	hasPublishAction,
-	isPublished,
-	children,
-} ) {
 	if ( isPublished || ! hasPublishAction ) {
 		return null;
 	}
@@ -21,21 +29,4 @@ export function PostPendingStatusCheck( {
 	return children;
 }
 
-export default compose(
-	withSelect( ( select ) => {
-		const {
-			isCurrentPostPublished,
-			getCurrentPostType,
-			getCurrentPost,
-		} = select( 'core/editor' );
-		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			isPublished: isCurrentPostPublished(),
-			postType: getCurrentPostType(),
-		};
-	} )
-)( PostPendingStatusCheck );
+export default PostPendingStatusCheck;

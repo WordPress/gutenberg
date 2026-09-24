@@ -1,16 +1,26 @@
+/** @typedef {import('estree').Comment} Comment */
+/** @typedef {import('estree').Node} Node */
+/** @typedef {import('estree').SourceLocation} SourceLocation */
+
+/** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
-			url:
-				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
-		schema: [],
-		fixable: true,
+		schema: [
+			{
+				enum: [ 'always', 'never' ],
+			},
+		],
+		fixable: 'code',
 	},
 	create( context ) {
-		const comments = context.getSourceCode().getAllComments();
+		const mode = context.options[ 0 ] || 'always';
+		const sourceCode = context.sourceCode;
+		const comments = sourceCode.getAllComments();
 
 		/**
 		 * Locality classification of an import, one of "External",
@@ -22,11 +32,11 @@ module.exports = {
 		/**
 		 * Object describing a dependency block correction to be made.
 		 *
-		 * @property {?espree.Node} comment Comment node on which to replace
-		 *                                  value, if one can be salvaged.
-		 * @property {string}       value   Expected comment node value.
+		 * @typedef WPDependencyBlockCorrection
 		 *
-		 * @typedef {Object} WPDependencyBlockCorrection
+		 * @property {Comment} [comment] Comment node on which to replace value,
+		 *                               if one can be salvaged.
+		 * @property {string}  value     Expected comment node value.
 		 */
 
 		/**
@@ -63,7 +73,7 @@ module.exports = {
 		 * Returns true if the given comment node satisfies a desired locality,
 		 * or false otherwise.
 		 *
-		 * @param {espree.Node}       node     Comment node to check.
+		 * @param {Comment}           node     Comment node to check.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
 		 * @return {boolean} Whether comment node satisfies locality.
@@ -78,7 +88,7 @@ module.exports = {
 			// - Normalize `/**` and `/*`
 			// - Case insensitive "Dependencies" vs. "dependencies"
 			// - Ending period
-			// - "Node" dependencies as an alias for External
+			// - "Node" dependencies as an alias for External.
 
 			if ( locality === 'External' ) {
 				locality = '(External|Node)';
@@ -92,16 +102,33 @@ module.exports = {
 		}
 
 		/**
+		 * Returns true if the given comment node is any dependency block comment.
+		 *
+		 * @param {Comment} node Comment node to check.
+		 *
+		 * @return {boolean} Whether comment node is a dependency block.
+		 */
+		function isDependencyBlock( node ) {
+			return [ 'External', 'WordPress', 'Internal' ].some( ( locality ) =>
+				isLocalityDependencyBlock( node, locality )
+			);
+		}
+
+		/**
 		 * Returns true if the given node occurs prior in code to a reference,
 		 * or false otherwise.
 		 *
-		 * @param {espree.Node} node      Node to test being before reference.
-		 * @param {espree.Node} reference Node against which to compare.
+		 * @param {Comment} node      Node to test being before reference.
+		 * @param {Node}    reference Node against which to compare.
 		 *
 		 * @return {boolean} Whether node occurs before reference.
 		 */
 		function isBefore( node, reference ) {
-			return node.start < reference.start;
+			if ( ! node.range || ! reference.range ) {
+				return false;
+			}
+
+			return node.range[ 0 ] < reference.range[ 0 ];
 		}
 
 		/**
@@ -110,10 +137,10 @@ module.exports = {
 		 * updates, the function returns undefined. Otherwise, it will return
 		 * a WPDependencyBlockCorrection object describing a correction.
 		 *
-		 * @param {espree.Node}       node     Node to test.
+		 * @param {Node}              node     Node to test.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
-		 * @return {?WPDependencyBlockCorrection} Correction, if applicable.
+		 * @return {WPDependencyBlockCorrection | undefined} Correction, if applicable.
 		 */
 		function getDependencyBlockCorrection( node, locality ) {
 			const value = getCommentValue( locality );
@@ -146,7 +173,48 @@ module.exports = {
 		}
 
 		return {
+			/**
+			 * @param {import('estree').Program} node Program node.
+			 */
 			Program( node ) {
+				if ( mode === 'never' ) {
+					for ( const comment of comments ) {
+						if ( isDependencyBlock( comment ) ) {
+							context.report( {
+								loc: /** @type {SourceLocation} */ (
+									comment.loc
+								),
+								message:
+									'Unexpected dependency group comment block',
+								fix( fixer ) {
+									if ( ! comment.range ) {
+										return null;
+									}
+
+									const text = sourceCode.getText();
+
+									// Trim preceding and trailing newlines.
+									let [ start, end ] = comment.range;
+									while (
+										start > 1 &&
+										text[ start - 1 ] === '\n' &&
+										text[ start - 2 ] === '\n'
+									) {
+										start--;
+									}
+									while ( text[ end ] === '\n' ) {
+										end++;
+									}
+
+									return fixer.removeRange( [ start, end ] );
+								},
+							} );
+						}
+					}
+
+					return;
+				}
+
 				/**
 				 * The set of package localities which have been reported for
 				 * the current program. Each locality is reported at most one
@@ -157,36 +225,61 @@ module.exports = {
 				 */
 				const verified = new Set();
 
+				/**
+				 * Nodes to check for violations associated with module import,
+				 * an array of tuples of the node and its import source string.
+				 *
+				 * @type {Array<[Node,string]>}
+				 */
+				const candidates = [];
+
 				// Since we only care to enforce imports which occur at the
 				// top-level scope, match on Program and test its children,
 				// rather than matching the import nodes directly.
 				node.body.forEach( ( child ) => {
+					/** @type {string} */
 					let source;
 					switch ( child.type ) {
 						case 'ImportDeclaration':
-							source = child.source.value;
+							source = /** @type {string} */ (
+								child.source.value
+							);
+							candidates.push( [ child, source ] );
 							break;
 
-						case 'CallExpression':
-							const { callee, arguments: args } = child;
-							if (
-								callee.name === 'require' &&
-								args.length === 1 &&
-								args[ 0 ].type === 'Literal' &&
-								typeof args[ 0 ].value === 'string'
-							) {
-								source = args[ 0 ].value;
-							}
-							break;
-					}
+						case 'VariableDeclaration':
+							child.declarations.forEach( ( declaration ) => {
+								const { init } = declaration;
+								if (
+									! init ||
+									init.type !== 'CallExpression' ||
+									/** @type {import('estree').CallExpression} */ (
+										init
+									).callee.type !== 'Identifier' ||
+									/** @type {import('estree').Identifier} */ (
+										init.callee
+									).name !== 'require'
+								) {
+									return;
+								}
 
-					if ( ! source ) {
-						return;
+								const { arguments: args } = init;
+								if (
+									args.length === 1 &&
+									args[ 0 ].type === 'Literal' &&
+									typeof args[ 0 ].value === 'string'
+								) {
+									source = args[ 0 ].value;
+									candidates.push( [ child, source ] );
+								}
+							} );
 					}
+				} );
 
+				for ( const [ child, source ] of candidates ) {
 					const locality = getPackageLocality( source );
 					if ( verified.has( locality ) ) {
-						return;
+						continue;
 					}
 
 					// Avoid verifying any other imports for the locality,
@@ -199,7 +292,7 @@ module.exports = {
 						locality
 					);
 					if ( ! correction ) {
-						return;
+						continue;
 					}
 
 					context.report( {
@@ -208,14 +301,17 @@ module.exports = {
 						fix( fixer ) {
 							const { comment, value } = correction;
 							const text = `/*${ value }*/`;
-							if ( comment ) {
-								return fixer.replaceText( comment, text );
+							if ( comment && comment.range ) {
+								return fixer.replaceTextRange(
+									comment.range,
+									text
+								);
 							}
 
 							return fixer.insertTextBefore( child, text + '\n' );
 						},
 					} );
-				} );
+				}
 			},
 		};
 	},

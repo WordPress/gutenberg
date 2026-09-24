@@ -1,0 +1,627 @@
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+// The rendering mode preference is keyed by theme, so the tests that set it
+// have to name the same theme the fixture activates.
+const THEME = 'emptytheme';
+
+test.use( {
+	userGlobalStylesRevisions: async (
+		{ editor, page, requestUtils },
+		use
+	) => {
+		await use(
+			new UserGlobalStylesRevisions( { editor, page, requestUtils } )
+		);
+	},
+} );
+
+test.describe( 'Style Revisions', () => {
+	let stylesPostId;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( THEME ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllTemplates( 'wp_template_part' ),
+		] );
+		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: `${ THEME }//index`,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'should display revisions UI when there is 1 revision', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		const currentRevisions =
+			await userGlobalStylesRevisions.getGlobalStylesRevisions();
+		// Create a revision: change a style and save it.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+
+		// Now there should be enough revisions to show the revisions UI.
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		const revisionButtons = page.getByRole( 'option', {
+			name: /^Changes saved by /,
+		} );
+
+		// Shows changes made in the revision.
+		await expect(
+			page
+				.getByTestId( 'global-styles-revision-changes' )
+				.getByRole( 'listitem' )
+				.first()
+		).toHaveText( 'Colors styles.' );
+
+		// There should be 2 revisions not including the reset to theme defaults button.
+		await expect( revisionButtons ).toHaveCount(
+			currentRevisions.length + 1
+		);
+	} );
+
+	test( 'should warn of unsaved changes before loading reset revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
+			.click( { force: true } );
+
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		const unSavedButton = page.getByRole( 'option', {
+			name: /^Unsaved changes/,
+		} );
+
+		await expect( unSavedButton ).toBeVisible();
+
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.last()
+			.click();
+
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const confirm = page.getByRole( 'dialog' );
+		await expect( confirm ).toBeVisible();
+		await expect( confirm ).toHaveText(
+			/^Are you sure you want to apply this revision\? Any unsaved changes will be lost./
+		);
+
+		// This is to make sure there are no lingering unsaved changes.
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Cancel' } )
+			.click();
+		await editor.saveSiteEditorEntities();
+	} );
+
+	test( 'should have a reset to defaults button', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		const lastRevisionItem = page
+			.getByLabel( 'Global styles revisions list' )
+			.getByRole( 'option' )
+			.last();
+		await expect( lastRevisionItem ).toContainText( 'Default styles' );
+		await lastRevisionItem.click();
+		// The footer action relabels for the reset entry.
+		await expect(
+			page.getByRole( 'button', { name: 'Reset' } )
+		).toBeEnabled();
+	} );
+
+	test( 'should access from the site editor sidebar', async ( {
+		admin,
+		editor,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		// The Revisions entry is only offered once revisions exist, so create
+		// one first — the shared `beforeEach` already opened the editor this
+		// helper saves through.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+
+		if ( isSiteEditorV2 ) {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Styles' } )
+				.getByRole( 'button', { name: 'Revisions' } )
+				.click();
+		} else {
+			// This flow starts from the browse-mode sidebar, not the edit
+			// mode the shared `beforeEach` opens.
+			await admin.visitSiteEditor();
+
+			const navigationContainer = page.getByRole( 'region', {
+				name: 'Navigation',
+			} );
+
+			await navigationContainer
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+
+			// wait for the editor canvas to be ready (to contain a block)
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await navigationContainer
+				.getByRole( 'button', { name: 'Revisions' } )
+				.click();
+		}
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+	} );
+
+	test( 'should access from the site editor sidebar with a static front page', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		userGlobalStylesRevisions,
+	} ) => {
+		// With a static front page the site editor canvas edits that page
+		// rather than a template, which used to hide the Styles sidebar and
+		// leave Revisions with nowhere to open. See
+		// https://github.com/WordPress/gutenberg/issues/82172.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			// The Revisions entry is only offered once revisions exist, so
+			// create one first — the shared `beforeEach` already opened the
+			// editor this helper saves through.
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
+			if ( isSiteEditorV2 ) {
+				await admin.visitSiteEditor();
+				await page.getByRole( 'link', { name: 'Styles' } ).click();
+				await page
+					.getByRole( 'region', { name: 'Styles' } )
+					.getByRole( 'button', { name: 'Revisions' } )
+					.click();
+			} else {
+				// This flow starts from the browse-mode sidebar, not the edit
+				// mode the shared `beforeEach` opens.
+				await admin.visitSiteEditor();
+
+				const navigationContainer = page.getByRole( 'region', {
+					name: 'Navigation',
+				} );
+
+				await navigationContainer
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				// wait for the editor canvas to be ready (to contain a block)
+				await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+				await navigationContainer
+					.getByRole( 'button', { name: /\d+ Revisions?/ } )
+					.click();
+			}
+
+			await expect(
+				page.getByLabel( 'Global styles revisions list' )
+			).toBeVisible();
+		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	// The controls this checks belong to the v1 site editor shell.
+	test( 'should show the template on the styles route whatever the user prefers', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		try {
+			// Styling the site means styling the template around it, so the
+			// styles route shows the template even when the canvas is a page
+			// and the user has turned "Show template" off while editing pages.
+			const frontPage = await requestUtils.createPage( {
+				title: 'Home',
+				status: 'publish',
+			} );
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'page',
+				page_on_front: frontPage.id,
+			} );
+
+			// Set over REST rather than dispatched, so it is persisted before
+			// the editor reads it.
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: { [ THEME ]: { page: 'post-only' } },
+			} );
+
+			await admin.visitSiteEditor();
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getRenderingMode()
+					)
+				)
+				.toBe( 'template-locked' );
+
+			// With one mode to be in, the editor does not offer to leave it.
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+		} finally {
+			await requestUtils.setPreferences( 'core', {
+				renderingModes: {},
+			} );
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	// The back button this exercises ("Open Navigation") and the clickable
+	// canvas belong to the v1 site editor shell; v2 has no equivalent.
+	test( 'should keep the site preview clickable after leaving the styles editor', async ( {
+		admin,
+		page,
+		requestUtils,
+		userGlobalStylesRevisions,
+	} ) => {
+		test.skip(
+			isSiteEditorV2,
+			'The v1 site editor shell is not present in v2.'
+		);
+
+		// Opening a revision used to leave the canvas showing that revision's
+		// blocks, which are rendered without change or selection handlers, so
+		// the site preview stopped responding to clicks.
+		const frontPage = await requestUtils.createPage( {
+			title: 'Home',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: frontPage.id,
+		} );
+
+		try {
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				color: { background: 'blue' },
+			} );
+
+			// The styles route (site-editor.php?p=%2Fstyles) is where the
+			// Revisions entry lives.
+			await admin.visitSiteEditor();
+			const navigationContainer = page.getByRole( 'region', {
+				name: 'Navigation',
+			} );
+			await navigationContainer
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+			await expect( page ).toHaveURL( /p=%2Fstyles/ );
+
+			await navigationContainer
+				.getByRole( 'button', { name: /\d+ Revisions?/ } )
+				.click();
+
+			// The revisions sidebar is open in the editor.
+			await expect(
+				page.getByLabel( 'Global styles revisions list' )
+			).toBeVisible();
+
+			// Leave via the Back button while the revisions sidebar is still
+			// open. A client-side navigation, unlike a fresh page load, keeps
+			// the editor store intact, so anything not torn down survives.
+			await page
+				.locator( '.editor-header__back-button' )
+				.getByRole( 'button', { name: 'Open Navigation' } )
+				.click();
+
+			// Back in view mode the canvas is a button again, and clicking it
+			// enters the editor.
+			const canvasButton = page.locator(
+				'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+			);
+			await expect( canvasButton ).toBeVisible();
+			await canvasButton.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+		} finally {
+			await requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} );
+			await requestUtils.deleteAllPages();
+		}
+	} );
+
+	test( 'should allow switching to style book view', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.openStylesPanel();
+		// Search for exact names to avoid selecting the command bar button in the header.
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+			exact: true,
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+			exact: true,
+		} );
+		await revisionsButton.click();
+		// We can see the Revisions list.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeHidden();
+		await styleBookButton.click();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		await expect( page.locator( 'iframe[name="revisions"]' ) ).toBeHidden();
+
+		// Deactivating revisions view while the style book is open should close revisions,
+		// but not the style book.
+		await revisionsButton.click();
+
+		// Style book is still visible but...
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		// The Revisions list is hidden.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close the revisions panel with a single click of Back after selecting a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Selecting a revision puts its id in the path (`/revisions/12`).
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.last()
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close the revisions panel after applying a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		await page
+			.getByLabel( 'Global styles revisions list' )
+			.getByRole( 'option' )
+			.last()
+			.click();
+
+		// The last entry is the theme defaults, for which the picker footer
+		// action reads "Reset".
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close revisions panel and leave style book open if activated', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		await styleBookButton.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+
+		// The site editor canvas has been restored.
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page
+			.getByRole( 'button', {
+				name: 'Revisions',
+				exact: true,
+			} )
+			.click();
+
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Revisions',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
+		).toBeVisible();
+	} );
+
+	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
+		// Create > 10 revisions to display pagination navigation component.
+		for ( let i = 9; i < 21; i++ ) {
+			await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+				typography: { fontSize: `${ i }px` },
+			} );
+		}
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		// The page select is the screen's only pagination control.
+		const currentPageSelect = page.getByLabel( 'Current page' );
+		await expect( currentPageSelect ).toHaveValue( '1' );
+		await currentPageSelect.selectOption( '2' );
+		await expect( currentPageSelect ).toHaveValue( '2' );
+		// The theme defaults entry closes the last page.
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Reset the styles to the theme defaults',
+			} )
+		).toBeVisible();
+		// The default selection is the first entry of page one, so this page
+		// holds no selection and nothing to apply. Scope the check to the
+		// listbox: the pagination select has a selected option of its own.
+		await expect(
+			page
+				.getByLabel( 'Global styles revisions list' )
+				.getByRole( 'option', { selected: true } )
+		).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
+	} );
+} );
+
+class UserGlobalStylesRevisions {
+	constructor( { editor, page, requestUtils } ) {
+		this.page = page;
+		this.editor = editor;
+		this.requestUtils = requestUtils;
+	}
+
+	async getGlobalStylesRevisions() {
+		const stylesPostId =
+			await this.requestUtils.getCurrentThemeGlobalStylesPostId();
+		if ( stylesPostId ) {
+			return await this.requestUtils.getThemeGlobalStylesRevisions(
+				stylesPostId
+			);
+		}
+		return [];
+	}
+
+	async openStylesPanel() {
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+	}
+
+	async saveRevision( stylesPostId, styles = {}, settings = {} ) {
+		await this.page.evaluate(
+			async ( [ _stylesPostId, _styles, _settings ] ) => {
+				window.wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'globalStyles', _stylesPostId, {
+						id: _stylesPostId,
+						settings: _settings,
+						styles: _styles,
+					} );
+			},
+			[ stylesPostId, styles, settings ]
+		);
+		await this.editor.saveSiteEditorEntities();
+	}
+}

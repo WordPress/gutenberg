@@ -1,23 +1,19 @@
-/**
- * WordPress dependencies
- */
-import { registerStore } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { createReduxStore, register } from '@wordpress/data';
 import reducer from './reducer';
 import * as actions from './actions';
+import * as privateActions from './private-actions';
 import * as selectors from './selectors';
-import controls from './controls';
-import { STORE_KEY } from './constants';
+import * as privateSelectors from './private-selectors';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
-const store = registerStore( STORE_KEY, {
+export const storeConfig = {
 	reducer,
 	actions,
 	selectors,
-	controls,
-	persist: [ 'preferences' ],
-} );
+};
 
-export default store;
+export const store = createReduxStore( STORE_NAME, storeConfig );
+register( store );
+unlock( store ).registerPrivateSelectors( privateSelectors );
+unlock( store ).registerPrivateActions( privateActions );

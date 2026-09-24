@@ -1,147 +1,137 @@
-/**
- * External dependencies
- */
-const dockerCompose = require( 'docker-compose' );
-const util = require( 'util' );
-const path = require( 'path' );
+'use strict';
 const fs = require( 'fs' ).promises;
-const inquirer = require( 'inquirer' );
+const path = require( 'path' );
+const { confirm } = require( '@inquirer/prompts' );
+const { rimraf } = require( 'rimraf' );
+const { loadConfig } = require( '../config' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
+const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 
 /**
- * Promisified dependencies
+ * @typedef {import('../config').WPConfig} WPConfig
  */
-const sleep = util.promisify( setTimeout );
-const rimraf = util.promisify( require( 'rimraf' ) );
-
-/**
- * Internal dependencies
- */
-const retry = require( '../retry' );
-const stop = require( './stop' );
-const initConfig = require( '../init-config' );
-const downloadSource = require( '../download-source' );
-const {
-	checkDatabaseConnection,
-	makeContentDirectoriesWritable,
-	configureWordPress,
-	copyCoreFiles,
-} = require( '../wordpress' );
 
 /**
  * Starts the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}      options
+ * @param {Object}      options.spinner  A CLI spinner which indicates progress.
+ * @param {boolean}     options.update   If true, update sources.
+ * @param {string}      options.xdebug   The Xdebug mode to set.
+ * @param {string}      options.spx      The SPX mode to set.
+ * @param {boolean}     options.scripts  Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.debug    True if debug mode is enabled.
+ * @param {string}      options.runtime  The runtime to use ('docker' or 'playground').
+ * @param {boolean}     options.autoPort If true, automatically find available ports when configured ports are busy.
+ * @param {string|null} options.config   Path to a custom .wp-env.json configuration file.
  */
-module.exports = async function start( { spinner, debug } ) {
-	/**
-	 * If the Docker image is already running and the `wp-env` files have been
-	 * deleted, the start command will not complete successfully. Stopping
-	 * the container before continuing allows the docker entrypoint script,
-	 * which restores the files, to run again when we start the containers.
-	 *
-	 * Additionally, this serves as a way to restart the container entirely
-	 * should the need arise.
-	 *
-	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
-	 */
-	await stop( { spinner, debug } );
+module.exports = async function start( {
+	spinner,
+	update,
+	xdebug,
+	spx,
+	scripts,
+	debug,
+	runtime: runtimeName = 'docker',
+	autoPort,
+	config: customConfigPath,
+} ) {
+	spinner.text = 'Reading configuration.';
 
-	await checkForLegacyInstall( spinner );
+	const runtime = getRuntime( runtimeName );
 
-	const config = await initConfig( { spinner, debug } );
-
-	spinner.text = 'Downloading WordPress.';
-
-	const progresses = {};
-	const getProgressSetter = ( id ) => ( progress ) => {
-		progresses[ id ] = progress;
-		spinner.text =
-			'Downloading WordPress.\n' +
-			Object.entries( progresses )
-				.map(
-					( [ key, value ] ) =>
-						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }/100%`
-				)
-				.join( '\n' );
-	};
-
-	await Promise.all( [
-		// Preemptively start the database while we wait for sources to download.
-		dockerCompose.upOne( 'mysql', {
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
-		} ),
-
-		( async () => {
-			if ( config.coreSource ) {
-				await downloadSource( config.coreSource, {
-					onProgress: getProgressSetter( 'core' ),
-					spinner,
-					debug: config.debug,
-				} );
-				await copyCoreFiles(
-					config.coreSource.path,
-					config.coreSource.testsPath
-				);
-			}
-		} )(),
-
-		...config.pluginSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-
-		...config.themeSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-	] );
-
-	spinner.text = 'Starting WordPress.';
-
-	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		config: config.dockerComposeConfigPath,
-		log: config.debug,
-	} );
-
-	if ( config.coreSource === null ) {
-		// Don't chown wp-content when it exists on the user's local filesystem.
-		await Promise.all( [
-			makeContentDirectoriesWritable( 'development', config ),
-			makeContentDirectoriesWritable( 'tests', config ),
-		] );
+	// Check for legacy Docker installs (Docker-specific UI concern)
+	if ( runtimeName === 'docker' ) {
+		await checkForLegacyInstall( spinner );
 	}
 
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
+		resolvePorts: true,
+		autoPort,
+		spinner,
+	} );
+	config.debug = debug;
+	config.xdebug = xdebug;
+	config.spx = spx;
+
+	// Check if switching runtimes and prompt user to destroy old environment first.
+	const savedRuntime = await getSavedRuntime( config.workDirectoryPath );
+	if ( savedRuntime && savedRuntime !== runtimeName ) {
+		spinner.stop();
+		let shouldDestroy = false;
+		try {
+			shouldDestroy = await confirm( {
+				message: `Environment was previously started with '${ savedRuntime }' runtime. Destroy it and start with '${ runtimeName }'?`,
+				default: true,
+			} );
+		} catch ( error ) {
+			if ( error.name === 'ExitPromptError' ) {
+				console.log( 'Cancelled.' );
+				process.exit( 1 );
+			}
+			throw error;
+		}
+
+		if ( ! shouldDestroy ) {
+			spinner.fail(
+				`Aborted. Run 'wp-env destroy' manually or start with '--runtime=${ savedRuntime }'.`
+			);
+			process.exit( 1 );
+		}
+
+		// User confirmed - destroy old runtime first.
+		spinner.start();
+		spinner.text = `Destroying previous ${ savedRuntime } environment.`;
+		const oldRuntime = getRuntime( savedRuntime );
+		await oldRuntime.destroy( config, { spinner } );
+	}
+
+	if ( ! config.detectedLocalConfig ) {
+		const { configDirectoryPath } = config;
+		spinner.warn(
+			`Warning: could not find a .wp-env.json configuration file and could not determine if '${ configDirectoryPath }' is a WordPress installation, a plugin, or a theme.`
+		);
+		spinner.start();
+	}
+
+	if ( config.testsEnvironment !== false ) {
+		spinner.warn(
+			'Warning: wp-env starts both development and tests environments by default.\n' +
+				'This behavior is deprecated and will be removed in a future version.\n' +
+				'To avoid this warning, add "testsEnvironment": false to your .wp-env.json.\n' +
+				'The "env", "testsPort", and "testsEnvironment" options are also deprecated.\n' +
+				'Use the --config option with a separate config file for test environments instead.\n'
+		);
+		spinner.start();
+	}
+
+	let result;
 	try {
-		await checkDatabaseConnection( config );
-	} catch ( error ) {
-		// Wait 30 seconds for MySQL to accept connections.
-		await retry( () => checkDatabaseConnection( config ), {
-			times: 30,
-			delay: 1000,
+		result = await runtime.start( config, {
+			spinner,
+			update,
 		} );
 
-		// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-		await sleep( 4000 );
+		// Save the runtime type after successful start.
+		await saveRuntime( runtimeName, config.workDirectoryPath );
+	} catch ( error ) {
+		// Attempt to stop any partially-started environment so that
+		// processes do not linger after a failed start.
+		try {
+			await runtime.stop( config, { spinner } );
+		} catch {
+			// Ignore cleanup errors.
+		}
+		throw error;
 	}
 
-	// Retry WordPress installation in case MySQL *still* wasn't ready.
-	await Promise.all( [
-		retry( () => configureWordPress( 'development', config ), {
-			times: 2,
-		} ),
-		retry( () => configureWordPress( 'tests', config ), { times: 2 } ),
-	] );
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterStart', config, spinner );
+	}
 
-	spinner.text = 'WordPress started.';
+	spinner.prefixText = result.message;
+	spinner.prefixText += '\n\n';
+	spinner.text = 'Done!';
 };
 
 /**
@@ -174,15 +164,21 @@ async function checkForLegacyInstall( spinner ) {
 			' and '
 		) }. Installs are now in your home folder.\n`
 	);
-	const { yesDelete } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'yesDelete',
+	let yesDelete = false;
+	try {
+		yesDelete = confirm( {
 			message:
 				'Do you wish to delete these old installs to reclaim disk space?',
 			default: true,
-		},
-	] );
+		} );
+	} catch ( error ) {
+		if ( error.name === 'ExitPromptError' ) {
+			console.log( 'Cancelled.' );
+			process.exit( 1 );
+		}
+		throw error;
+	}
+
 	if ( yesDelete ) {
 		await Promise.all( installs.map( ( install ) => rimraf( install ) ) );
 		spinner.info( 'Old installs deleted successfully.' );

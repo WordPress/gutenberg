@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/verse",
+		"attrs": {
+			"style": {
+				"typography": {
+					"fontFamily": "var:preset|font-family|cambria-georgia"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<pre style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\" class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n",
+		"innerContent": [
+			"\n<pre style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\" class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n"
+		]
+	}
+]

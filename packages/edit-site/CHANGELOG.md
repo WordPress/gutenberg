@@ -1,9 +1,364 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
+## 7.5.0 (2026-09-23)
+
+### Enhancements
+
+-   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
+## 7.4.0 (2026-09-10)
+
+### Enhancements
+
+-   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
+
+### Bug Fixes
+
+-   `Layout`: Add a root `ErrorBoundary`, so a throw outside the per-area ones no longer blanks the screen. ([#82486](https://github.com/WordPress/gutenberg/pull/82486))
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Internal
+
+-   `PostList`: Stop re-sorting the fetched page in memory when the view sorts by author. The author field now sorts by author id, the same order the REST API already returns for `orderby=author`, so the re-sort no longer changes anything ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
+-   Stop registering the `editorTool` preference default; the Write/Design tool that read it was removed in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+-   Remove the template activation (`active_templates`) experiment: the Templates page and its sidebar always use the previous (non-activation) implementations ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
+-   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 7.3.0 (2026-08-26)
+
+### Enhancements
+
+-   Offer the Export tool only while editing a template or a template part, the entities the exported theme is made of. The menu item now lives in the editor package ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+
+### Bug Fixes
+
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
+
+### Enhancements
+
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
+### Internal
+
+-   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+### Bug Fixes
+
+-   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults, and stop writing the current width back into the param when leaving an entity ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
+
+## 7.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+
+## 7.1.0 (2026-07-29)
+
+## 7.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Raise the required Node.js version to `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
+
+### Enhancements
+
+-   Update template-selection labels from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+### Enhancements
+
+-   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
+## 6.41.0 (2026-03-04)
+
+## 6.40.0 (2026-02-18)
+
+## 6.39.0 (2026-01-29)
+
+## 6.38.0 (2026-01-16)
+
+## 6.36.0 (2025-11-26)
+
+### Internal
+
+-   Updated `welcome-guide` styles to apply the close-button hover color locally, following changes to the shared `Guide` component.
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+## 6.33.0 (2025-10-17)
+
+## 6.32.0 (2025-10-01)
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
+## 6.15.0 (2025-01-02)
+
+## 6.14.0 (2024-12-11)
+
+## 6.13.0 (2024-11-27)
+
+## 6.12.0 (2024-11-16)
+
+## 6.11.0 (2024-10-30)
+
+## 6.10.0 (2024-10-16)
+
+## 6.9.0 (2024-10-03)
+
+## 6.8.0 (2024-09-19)
+
+## 6.7.0 (2024-09-05)
+
+## 6.6.0 (2024-08-21)
+
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
+## 6.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 5.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 5.34.0 (2024-05-02)
+
+## 5.33.0 (2024-04-19)
+
+## 5.32.0 (2024-04-03)
+
+## 5.31.0 (2024-03-21)
+
+## 5.30.0 (2024-03-06)
+
+## 5.29.0 (2024-02-21)
+
+## 5.28.0 (2024-02-09)
+
+## 5.27.0 (2024-01-24)
+
+## 5.26.0 (2024-01-10)
+
+## 5.25.0 (2023-12-13)
+
+## 5.24.0 (2023-11-29)
+
+## 5.23.0 (2023-11-16)
+
+## 5.22.0 (2023-11-02)
+
+## 5.21.0 (2023-10-18)
+
+## 5.20.0 (2023-10-05)
+
+## 5.19.0 (2023-09-20)
+
+## 5.18.0 (2023-08-31)
+
+## 5.17.0 (2023-08-16)
+
+## 5.16.0 (2023-08-10)
+
+## 5.15.0 (2023-07-20)
+
+## 5.14.0 (2023-07-05)
+
+## 5.13.0 (2023-06-23)
+
+### Enhancements
+
+-   Site editor sidebar: add home template details and controls [#51223](https://github.com/WordPress/gutenberg/pull/51223).
+-   Site editor sidebar: add footer to template part and ensure nested template areas display [#51669](https://github.com/WordPress/gutenberg/pull/51669).
+-   Global styles: split styles menus into revisions and other styles actions ([#51318](https://github.com/WordPress/gutenberg/pull/51318)).
+
+## 5.12.0 (2023-06-07)
+
+## 5.11.0 (2023-05-24)
+
+## 5.10.0 (2023-05-10)
+
+## 5.9.0 (2023-04-26)
+
+## 5.8.0 (2023-04-12)
+
+## 5.7.0 (2023-03-29)
+
+## 5.6.0 (2023-03-15)
+
+## 5.5.0 (2023-03-01)
+
+## 5.4.0 (2023-02-15)
+
+## 5.3.0 (2023-02-01)
+
+### Bug Fixes
+
+-   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+
+## 5.2.0 (2023-01-11)
+
+## 5.1.0 (2023-01-02)
+
+## 5.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235)).
+
+### Enhancements
+
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
+
+### Bug Fixes
+
+-   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
+
+## 4.19.0 (2022-11-16)
+
+## 4.18.0 (2022-11-02)
+
+## 4.17.0 (2022-10-19)
+
+## 4.16.0 (2022-10-05)
+
+## 4.15.0 (2022-09-21)
+
+## 4.14.0 (2022-09-13)
+
+## 4.13.0 (2022-08-24)
+
+## 4.12.0 (2022-08-10)
+
+## 4.11.0 (2022-07-27)
+
+## 4.10.0 (2022-07-13)
+
+## 4.9.0 (2022-06-29)
+
+## 4.8.0 (2022-06-15)
+
+## 4.7.0 (2022-06-01)
+
+## 4.6.0 (2022-05-18)
+
+## 4.5.0 (2022-05-04)
+
+## 4.4.0 (2022-04-21)
+
+## 4.3.0 (2022-04-08)
+
+## 4.2.0 (2022-03-23)
+
+## 4.1.0 (2022-03-11)
+
+## 4.0.0 (2022-02-10)
+
+### Breaking Changes
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fixes
+
+-   Removed unused `@wordpress/primitives`, `file-saver` and `jszip` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 3.1.0 (2022-01-27)
+
+## 3.0.0 (2021-07-29)
+
+### Breaking Changes
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 2.2.0 (2021-07-21)
+
+## 2.1.0 (2021-05-20)
+
+## 2.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
+
+## 1.17.0 (2021-03-17)
+
 ## 1.0.0 (2020-01-13)
 
-### New Feature
+### New Features
 
-- Initial version of the module.
+-   Initial version of the package.

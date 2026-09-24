@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	getTranslateFunctionName,
@@ -10,7 +7,7 @@ const {
  * Returns the text domain passed to the given translation function.
  *
  * @param {string} functionName Translation function name.
- * @param {Array} args Function arguments.
+ * @param {Array}  args         Function arguments.
  * @return {undefined|*} Text domain argument.
  */
 function getTextDomain( functionName, args ) {
@@ -61,7 +58,7 @@ module.exports = {
 			unnecessaryDefault: 'Unnecessary default text domain',
 			missing: 'Missing text domain',
 			useAllowedValue:
-				'Use one of the whitelisted text domains: {{ textDomains }}',
+				'Use one of the allowed text domains: {{ textDomains }}',
 		},
 		fixable: 'code',
 	},
@@ -141,7 +138,7 @@ module.exports = {
 				) {
 					const replaceTextDomain = ( fixer ) => {
 						return fixer.replaceTextRange(
-							// account for quotes.
+							// Account for quotes.
 							[ range[ 0 ] + 1, range[ 1 ] - 1 ],
 							allowedTextDomains[ 0 ]
 						);

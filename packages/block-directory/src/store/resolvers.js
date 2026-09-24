@@ -1,52 +1,30 @@
-/**
- * External dependencies
- */
-import { camelCase, mapKeys } from 'lodash';
+import { camelCase } from 'change-case';
+import apiFetch from '@wordpress/api-fetch';
+import { fetchDownloadableBlocks, receiveDownloadableBlocks } from './actions';
 
-/**
- * Internal dependencies
- */
-import { apiFetch } from './controls';
-import {
-	fetchDownloadableBlocks,
-	receiveDownloadableBlocks,
-	setInstallBlocksPermission,
-} from './actions';
-
-export default {
-	*getDownloadableBlocks( filterValue ) {
+export const getDownloadableBlocks =
+	( filterValue ) =>
+	async ( { dispatch } ) => {
 		if ( ! filterValue ) {
 			return;
 		}
 
 		try {
-			yield fetchDownloadableBlocks( filterValue );
-			const results = yield apiFetch( {
-				path: `__experimental/block-directory/search?term=${ filterValue }`,
+			dispatch( fetchDownloadableBlocks( filterValue ) );
+			const results = await apiFetch( {
+				path: `wp/v2/block-directory/search?term=${ filterValue }`,
 			} );
 			const blocks = results.map( ( result ) =>
-				mapKeys( result, ( value, key ) => {
-					return camelCase( key );
-				} )
+				Object.fromEntries(
+					Object.entries( result ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
 			);
 
-			yield receiveDownloadableBlocks( blocks, filterValue );
-		} catch ( error ) {
-			if ( error.code === 'rest_user_cannot_view' ) {
-				yield setInstallBlocksPermission( false );
-			}
+			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );
+		} catch {
+			dispatch( receiveDownloadableBlocks( [], filterValue ) );
 		}
-	},
-	*hasInstallBlocksPermission() {
-		try {
-			yield apiFetch( {
-				path: `__experimental/block-directory/search?term=`,
-			} );
-			yield setInstallBlocksPermission( true );
-		} catch ( error ) {
-			if ( error.code === 'rest_user_cannot_view' ) {
-				yield setInstallBlocksPermission( false );
-			}
-		}
-	},
-};
+	};

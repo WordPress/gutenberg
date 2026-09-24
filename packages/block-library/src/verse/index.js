@@ -1,12 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { verse as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -18,10 +12,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Verse' ),
-	description: __(
-		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
-	),
 	icon,
 	example: {
 		attributes: {
@@ -33,17 +23,15 @@ export const settings = {
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	supports: {
-		lightBlockWrapper: true,
-	},
-	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: attributes.content + '\n\n' + attributesToMerge.content,
 		};
 	},
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

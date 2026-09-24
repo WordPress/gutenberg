@@ -1,14 +1,37 @@
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { _x } from '@wordpress/i18n';
+import { getFilename } from '@wordpress/url';
+
+// Transforms bypass the default variation, so set the localized default here.
+const downloadButtonText = _x( 'Download', 'button label' );
+
+// The File → audio/video/image transforms are identical apart from the target
+// block, its media MIME type, and the src attribute name (image uses `url`).
+const toMediaTransform = ( blockName, mediaType, srcAttribute ) => ( {
+	type: 'block',
+	blocks: [ blockName ],
+	isMatch: ( { id } ) => {
+		if ( ! id ) {
+			return false;
+		}
+		const { getEntityRecord } = select( coreStore );
+		const media = getEntityRecord( 'postType', 'attachment', id, {
+			context: 'view',
+		} );
+		return !! media && media.mime_type.includes( mediaType );
+	},
+	transform: ( attributes ) => {
+		return createBlock( blockName, {
+			[ srcAttribute ]: attributes.href,
+			caption: attributes.fileName,
+			id: attributes.id,
+			anchor: attributes.anchor,
+		} );
+	},
+} );
 
 const transforms = {
 	from: [
@@ -17,7 +40,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length > 0;
 			},
-			// We define a lower priorty (higher number) than the default of 10. This
+			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: ( files ) => {
@@ -27,13 +50,33 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
-						} )
-					);
+					if ( file.type.startsWith( 'video/' ) ) {
+						blocks.push(
+							createBlock( 'core/video', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'image/' ) ) {
+						blocks.push(
+							createBlock( 'core/image', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'audio/' ) ) {
+						blocks.push(
+							createBlock( 'core/audio', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else {
+						blocks.push(
+							createBlock( 'core/file', {
+								blob: blobURL,
+								fileName: file.name,
+								downloadButtonText,
+							} )
+						);
+					}
 				} );
 
 				return blocks;
@@ -41,99 +84,25 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/audio' ],
+			blocks: [ 'core/audio', 'core/video', 'core/image' ],
 			transform: ( attributes ) => {
+				// Audio/Video use `src`, Image uses `url`.
+				const href = attributes.src ?? attributes.url;
 				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
+					href,
+					fileName: attributes.caption || getFilename( href ),
+					textLinkHref: href,
 					id: attributes.id,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/video' ],
-			transform: ( attributes ) => {
-				return createBlock( 'core/file', {
-					href: attributes.src,
-					fileName: attributes.caption,
-					textLinkHref: attributes.src,
-					id: attributes.id,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/image' ],
-			transform: ( attributes ) => {
-				return createBlock( 'core/file', {
-					href: attributes.url,
-					fileName: attributes.caption,
-					textLinkHref: attributes.url,
-					id: attributes.id,
+					anchor: attributes.anchor,
+					downloadButtonText,
 				} );
 			},
 		},
 	],
 	to: [
-		{
-			type: 'block',
-			blocks: [ 'core/audio' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'audio' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/audio', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/video' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'video' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/video', {
-					src: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/image' ],
-			isMatch: ( { id } ) => {
-				if ( ! id ) {
-					return false;
-				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'image' );
-			},
-			transform: ( attributes ) => {
-				return createBlock( 'core/image', {
-					url: attributes.href,
-					caption: attributes.fileName,
-					id: attributes.id,
-				} );
-			},
-		},
+		toMediaTransform( 'core/audio', 'audio', 'src' ),
+		toMediaTransform( 'core/video', 'video', 'src' ),
+		toMediaTransform( 'core/image', 'image', 'url' ),
 	],
 };
 

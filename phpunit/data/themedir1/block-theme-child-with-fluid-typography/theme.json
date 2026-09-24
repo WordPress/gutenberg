@@ -1,0 +1,10 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"settings": {
+		"appearanceTools": true,
+		"typography": {
+			"fluid": true
+		}
+	}
+}

@@ -1,0 +1,15 @@
+@media all and (max-width: 699px) and (min-width: 520px) {
+
+	/* Your selectors */
+}
+
+@media screen and (color),
+	print and (color) {
+
+	/* Your selectors */
+}
+
+@media screen and (color), print and (color) {
+
+	/* Your selectors */
+}

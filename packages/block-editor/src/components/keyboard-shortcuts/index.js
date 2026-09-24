@@ -1,137 +1,50 @@
-/**
- * External dependencies
- */
-import { first, last } from 'lodash';
-/**
- * WordPress dependencies
- */
-import { useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { useSettings } from '../use-settings';
 
 function KeyboardShortcuts() {
-	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select(
-			'core/block-editor'
-		);
-		return {
-			clientIds: getSelectedBlockClientIds(),
-			rootBlocksClientIds: getBlockOrder(),
-		};
-	}, [] );
-
-	const {
-		duplicateBlocks,
-		removeBlocks,
-		insertAfterBlock,
-		insertBeforeBlock,
-		multiSelect,
-		clearSelectedBlock,
-	} = useDispatch( 'core/block-editor' );
-
-	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
-	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
-	useShortcut(
-		'core/block-editor/duplicate',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				duplicateBlocks( clientIds );
-			},
-			[ clientIds, duplicateBlocks ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Does not clash with any known browser/native shortcuts, but preventDefault
-	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut(
-		'core/block-editor/remove',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			},
-			[ clientIds, removeBlocks ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Does not clash with any known browser/native shortcuts, but preventDefault
-	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut(
-		'core/block-editor/insert-after',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				insertAfterBlock( last( clientIds ) );
-			},
-			[ clientIds, insertAfterBlock ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Prevent 'view recently closed tabs' in Opera using preventDefault.
-	useShortcut(
-		'core/block-editor/insert-before',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				insertBeforeBlock( first( clientIds ) );
-			},
-			[ clientIds, insertBeforeBlock ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	useShortcut(
-		'core/block-editor/delete-multi-selection',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			},
-			[ clientIds, removeBlocks ]
-		),
-		{ isDisabled: clientIds.length < 1 }
-	);
-
-	useShortcut(
-		'core/block-editor/select-all',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				multiSelect(
-					first( rootBlocksClientIds ),
-					last( rootBlocksClientIds )
-				);
-			},
-			[ rootBlocksClientIds, multiSelect ]
-		)
-	);
-
-	useShortcut(
-		'core/block-editor/unselect',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				clearSelectedBlock();
-				window.getSelection().removeAllRanges();
-			},
-			[ clientIds, clearSelectedBlock ]
-		),
-		{ isDisabled: clientIds.length < 2 }
-	);
-
 	return null;
 }
 
 function KeyboardShortcutsRegister() {
-	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	// Registering the shortcuts.
+	const { registerShortcut, unregisterShortcut } = useDispatch(
+		keyboardShortcutsStore
+	);
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	useEffect( () => {
+		registerShortcut( {
+			name: 'core/block-editor/copy',
+			category: 'block',
+			description: __( 'Copy the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'c',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/cut',
+			category: 'block',
+			description: __( 'Cut the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste',
+			category: 'block',
+			description: __( 'Paste the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'v',
+			},
+		} );
+
 		registerShortcut( {
 			name: 'core/block-editor/duplicate',
 			category: 'block',
@@ -149,6 +62,18 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste-styles',
+			category: 'block',
+			description: __(
+				'Paste the copied style to the selected block(s).'
+			),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'v',
 			},
 		} );
 
@@ -179,7 +104,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
-			description: __( 'Remove multiple selected blocks.' ),
+			description: __( 'Delete selection.' ),
 			keyCombination: {
 				character: 'del',
 			},
@@ -188,6 +113,15 @@ function KeyboardShortcutsRegister() {
 					character: 'backspace',
 				},
 			],
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/stop-editing-as-blocks',
+			category: 'block',
+			description: __( 'Finish editing a design.' ),
+			keyCombination: {
+				character: 'escape',
+			},
 		} );
 
 		registerShortcut( {
@@ -212,6 +146,17 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/multi-text-selection',
+			category: 'selection',
+			description: __( 'Select text across multiple blocks.' ),
+			keyCombination: {
+				modifier: 'shift',
+				// Spotted during my own research — invalid character?
+				character: 'arrow',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/focus-toolbar',
 			category: 'global',
 			description: __( 'Navigate to the nearest toolbar.' ),
@@ -220,7 +165,79 @@ function KeyboardShortcutsRegister() {
 				character: 'F10',
 			},
 		} );
-	}, [ registerShortcut ] );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-up',
+			category: 'block',
+			description: __( 'Move the selected block(s) up.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 't',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-down',
+			category: 'block',
+			description: __( 'Move the selected block(s) down.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'y',
+			},
+		} );
+
+		// List view shortcuts.
+		registerShortcut( {
+			name: 'core/block-editor/collapse-list-view',
+			category: 'list-view',
+			description: __( 'Collapse all other items.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'l',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/group',
+			category: 'block',
+			description: __(
+				'Create a group block from the selected multiple blocks.'
+			),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'g',
+			},
+		} );
+
+		// Keep the block visibility shortcut in sync with the theme.json
+		// setting. The setting resolves asynchronously, so the shortcut may be
+		// registered before its value arrives; it must be removed once the
+		// value is known to be `false`, otherwise it lingers in the keyboard
+		// shortcut help list while doing nothing.
+		if ( blockVisibility === false ) {
+			unregisterShortcut( 'core/block-editor/toggle-block-visibility' );
+		} else {
+			registerShortcut( {
+				name: 'core/block-editor/toggle-block-visibility',
+				category: 'block',
+				description: __( 'Show or hide the selected block(s).' ),
+				keyCombination: {
+					modifier: 'primaryShift',
+					character: 'h',
+				},
+			} );
+		}
+
+		registerShortcut( {
+			name: 'core/block-editor/rename',
+			category: 'block',
+			description: __( 'Rename the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'r',
+			},
+		} );
+	}, [ registerShortcut, unregisterShortcut, blockVisibility ] );
 
 	return null;
 }

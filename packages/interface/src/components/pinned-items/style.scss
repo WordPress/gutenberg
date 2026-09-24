@@ -1,20 +1,32 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-pinned-items {
-	display: none;
+	display: flex;
 
-	@include break-small() {
-		display: flex;
-	}
-
+	// We intentionally hide pinned items (plugins) on mobile, and unhide them at desktop breakpoints.
+	// Otherwise the list can wreak havoc on the layout.
 	.components-button {
-		margin-left: 4px;
+		display: none;
+		margin: 0;
 
-		&.is-pressed {
-			margin-left: 5px;
+		&[aria-controls="edit-post:document"],
+		&[aria-controls="edit-post:block"],
+		&[aria-controls="edit-site:template"],
+		&[aria-controls="edit-site:block-inspector"] {
+			display: flex;
 		}
 
 		svg {
-			max-width: 24px;
-			max-height: 24px;
+			max-width: $icon-size;
+			max-height: $icon-size;
+		}
+
+		@include break-small() {
+			display: flex;
 		}
 	}
+
+	// Gap between pinned items.
+	gap: $grid-unit-10;
 }

@@ -1,54 +1,24 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
+import initBlock from '../utils/init-block';
+import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
 
-export const name = 'core/navigation';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Navigation' ),
-
 	icon,
-
-	description: __( 'Add a navigation block to your site.' ),
-
-	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
-
-	category: 'layout',
-
-	supports: {
-		align: [ 'wide', 'full' ],
-		anchor: true,
-		html: false,
-		inserter: true,
-		lightBlockWrapper: true,
-	},
-
-	variations: [
-		{
-			name: 'horizontal',
-			isDefault: true,
-			title: __( 'Navigation (horizontal)' ),
-			description: __( 'Links shown in a row.' ),
-			attributes: { orientation: 'horizontal' },
-		},
-		{
-			name: 'vertical',
-			title: __( 'Navigation (vertical)' ),
-			description: __( 'Links shown in a column.' ),
-			attributes: { orientation: 'vertical' },
-		},
-	],
-
 	example: {
+		attributes: {
+			overlayMenu: 'never',
+		},
 		innerBlocks: [
 			{
 				name: 'core/navigation-link',
@@ -76,15 +46,26 @@ export const settings = {
 			},
 		],
 	},
-
-	styles: [
-		{ name: 'light', label: __( 'Light' ), isDefault: true },
-		{ name: 'dark', label: __( 'Dark' ) },
-	],
-
 	edit,
-
 	save,
+	__experimentalLabel: ( { ref } ) => {
+		if ( ! ref ) {
+			return;
+		}
 
+		const navigation = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_navigation',
+			ref
+		);
+
+		if ( ! navigation?.title ) {
+			return;
+		}
+
+		return decodeEntities( navigation.title );
+	},
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

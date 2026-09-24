@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/comment-author-avatar",
+		"isValid": true,
+		"attributes": {
+			"width": 120,
+			"height": 120,
+			"backgroundColor": "text-color",
+			"borderColor": "recommended-color-02",
+			"style": {
+				"border": {
+					"width": "3px",
+					"style": "solid",
+					"radius": "100px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

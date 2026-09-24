@@ -1,190 +1,110 @@
-/**
- * External dependencies
- */
-const dockerCompose = require( 'docker-compose' );
-const util = require( 'util' );
+'use strict';
+const dns = require( 'dns' ).promises;
+const fs = require( 'fs' ).promises;
+const path = require( 'path' );
+const got = require( 'got' );
+const { getCache, setCache } = require( './cache' );
 
 /**
- * Promisified dependencies
- */
-const copyDir = util.promisify( require( 'copy-dir' ) );
-
-/**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPSource} WPSource
  */
 
 /**
- * Makes the WordPress content directories (wp-content, wp-content/plugins,
- * wp-content/themes) owned by the www-data user. This ensures that WordPress
- * can write to these directories.
+ * Scans through a WordPress source to find the version of WordPress it contains.
  *
- * This is necessary when running wp-env with `"core": null` because Docker
- * will automatically create these directories as the root user when binding
- * volumes during `docker-compose up`, and `docker-compose up` doesn't support
- * the `-u` option.
- *
- * See https://github.com/docker-library/wordpress/issues/436.
- *
- * @param {string} environment The environment to check. Either 'development' or 'tests'.
- * @param {Config} config The wp-env config object.
+ * @param {WPSource} coreSource The WordPress source.
+ * @param {Object}   spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  debug      Indicates whether or not the CLI is in debug mode.
+ * @return {string} The version of WordPress the source is for.
  */
-async function makeContentDirectoriesWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
+async function readWordPressVersion( coreSource, spinner, debug ) {
+	const versionFilePath = path.join(
+		coreSource.path,
+		'wp-includes',
+		'version.php'
 	);
-}
-
-/**
- * Checks a WordPress database connection. An error is thrown if the test is
- * unsuccessful.
- *
- * @param {Config} config The wp-env config object.
- */
-async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
-	await dockerCompose.run( 'cli', 'wp db check', {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: debug,
+	const versionFile = await fs.readFile( versionFilePath, {
+		encoding: 'utf-8',
 	} );
+	const versionMatch = versionFile.match(
+		/\$wp_version = '([A-Za-z\-0-9.]+)'/
+	);
+	if ( ! versionMatch ) {
+		throw new Error( `Failed to find version in ${ versionFilePath }` );
+	}
+
+	if ( debug ) {
+		spinner.info(
+			`Found WordPress ${ versionMatch[ 1 ] } in ${ versionFilePath }.`
+		);
+	}
+
+	return versionMatch[ 1 ];
 }
 
 /**
- * Configures WordPress for the given environment by installing WordPress,
- * activating all plugins, and activating the first theme. These steps are
- * performed sequentially so as to not overload the WordPress instance.
+ * Basically a quick check to see if we can connect to the internet.
  *
- * @param {string} environment The environment to configure. Either 'development' or 'tests'.
- * @param {Config} config The wp-env config object.
+ * @return {boolean} True if we can connect to WordPress.org, false otherwise.
  */
-async function configureWordPress( environment, config ) {
-	const options = {
-		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: config.debug,
+let IS_OFFLINE;
+async function canAccessWPORG() {
+	// Avoid situations where some parts of the code think we're offline and others don't.
+	if ( IS_OFFLINE !== undefined ) {
+		return IS_OFFLINE;
+	}
+	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+	return IS_OFFLINE;
+}
+
+/**
+ * Returns the latest stable version of WordPress by requesting the stable-check
+ * endpoint on WordPress.org.
+ *
+ * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
+ * @return {string} The latest stable version of WordPress, like "6.0.1"
+ */
+let CACHED_WP_VERSION;
+async function getLatestWordPressVersion( options ) {
+	// Avoid extra network requests.
+	if ( CACHED_WP_VERSION ) {
+		return CACHED_WP_VERSION;
+	}
+
+	const cacheOptions = {
+		workDirectoryPath: options.cacheDirectoryPath,
 	};
 
-	const port = environment === 'development' ? config.port : config.testsPort;
-
-	// Install WordPress.
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		[
-			'wp',
-			'core',
-			'install',
-			`--url=localhost:${ port }`,
-			`--title=${ config.name }`,
-			'--admin_user=admin',
-			'--admin_password=password',
-			'--admin_email=wordpress@example.com',
-			'--skip-email',
-		],
-		options
-	);
-
-	// Set wp-config.php values.
-	for ( const [ key, value ] of Object.entries( config.config ) ) {
-		const command = [ 'wp', 'config', 'set', key, value ];
-		if ( typeof value !== 'string' ) {
-			command.push( '--raw' );
+	// When we can't connect to the internet, we don't want to break wp-env or
+	// wait for the stable-check result to timeout.
+	if ( ! ( await canAccessWPORG() ) ) {
+		const latestVersion = await getCache(
+			'latestWordPressVersion',
+			cacheOptions
+		);
+		if ( ! latestVersion ) {
+			throw new Error(
+				'Could not find the current WordPress version in the cache and the network is not available.'
+			);
 		}
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			command,
-			options
-		);
+		return latestVersion;
 	}
 
-	// Activate all plugins.
-	for ( const pluginSource of config.pluginSources ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp plugin activate ${ pluginSource.basename }`,
-			options
-		);
+	const versions = await got(
+		'https://api.wordpress.org/core/stable-check/1.0/'
+	).json();
+
+	for ( const [ version, status ] of Object.entries( versions ) ) {
+		if ( status === 'latest' ) {
+			CACHED_WP_VERSION = version;
+			await setCache( 'latestWordPressVersion', version, cacheOptions );
+			return version;
+		}
 	}
-
-	// Activate the first theme.
-	const [ themeSource ] = config.themeSources;
-	if ( themeSource ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp theme activate ${ themeSource.basename }`,
-			options
-		);
-	}
-}
-
-/**
- * Resets the development server's database, the tests server's database, or both.
- *
- * @param {string} environment The environment to clean. Either 'development', 'tests', or 'all'.
- * @param {Config} config The wp-env config object.
- */
-async function resetDatabase(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	const options = {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: debug,
-	};
-
-	const tasks = [];
-
-	if ( environment === 'all' || environment === 'development' ) {
-		tasks.push( dockerCompose.run( 'cli', 'wp db reset --yes', options ) );
-	}
-
-	if ( environment === 'all' || environment === 'tests' ) {
-		tasks.push(
-			dockerCompose.run( 'tests-cli', 'wp db reset --yes', options )
-		);
-	}
-
-	await Promise.all( tasks );
-}
-
-/**
- * Copies a WordPress installation, taking care to ignore large directories
- * (.git, node_modules) and configuration files (wp-config.php).
- *
- * @param {string} fromPath Path to the WordPress directory to copy.
- * @param {string} toPath Destination path.
- */
-async function copyCoreFiles( fromPath, toPath ) {
-	await copyDir( fromPath, toPath, {
-		filter( stat, filepath, filename ) {
-			if ( stat === 'symbolicLink' ) {
-				return false;
-			}
-			if ( stat === 'directory' && filename === '.git' ) {
-				return false;
-			}
-			if ( stat === 'directory' && filename === 'node_modules' ) {
-				return false;
-			}
-			if ( stat === 'file' && filename === 'wp-config.php' ) {
-				return false;
-			}
-			return true;
-		},
-	} );
 }
 
 module.exports = {
-	makeContentDirectoriesWritable,
-	checkDatabaseConnection,
-	configureWordPress,
-	resetDatabase,
-	copyCoreFiles,
+	readWordPressVersion,
+	canAccessWPORG,
+	getLatestWordPressVersion,
 };

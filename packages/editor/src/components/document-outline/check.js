@@ -1,26 +1,24 @@
-/**
- * External dependencies
- */
-import { filter } from 'lodash';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
- * WordPress dependencies
+ * Component check if there are any headings (core/heading blocks) present in the document.
+ *
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children Children to be rendered.
+ *
+ * @return {React.ReactNode} The component to be rendered or null if there are headings.
  */
-import { withSelect } from '@wordpress/data';
+export default function DocumentOutlineCheck( { children } ) {
+	const hasHeadings = useSelect( ( select ) => {
+		const { getGlobalBlockCount } = select( blockEditorStore );
 
-function DocumentOutlineCheck( { blocks, children } ) {
-	const headings = filter(
-		blocks,
-		( block ) => block.name === 'core/heading'
-	);
+		return getGlobalBlockCount( 'core/heading' ) > 0;
+	} );
 
-	if ( headings.length < 1 ) {
+	if ( ! hasHeadings ) {
 		return null;
 	}
 
 	return children;
 }
-
-export default withSelect( ( select ) => ( {
-	blocks: select( 'core/block-editor' ).getBlocks(),
-} ) )( DocumentOutlineCheck );

@@ -3,7 +3,7 @@
  *
  * @see eslint-plugin-wpcalypso
  *
- * @param  {Object} node    A Literal, TemplateLiteral or BinaryExpression (+) node
+ * @param {Object} node A Literal, TemplateLiteral or BinaryExpression (+) node
  * @return {string|boolean} The concatenated string or false.
  */
 function getTextContentFromNode( node ) {

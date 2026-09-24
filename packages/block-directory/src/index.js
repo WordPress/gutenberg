@@ -1,5 +1,3 @@
-/**
- * Internal dependencies
- */
-import './store';
 import './plugins';
+
+export { store } from './store';

@@ -1,6 +1,5 @@
-/**
- * Internal dependencies
- */
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { memo } from '@wordpress/element';
 import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 
 describe( 'registerPlugin', () => {
@@ -27,6 +26,24 @@ describe( 'registerPlugin', () => {
 		} );
 	} );
 
+	it( 'successfully registers a plugin with a memoized render', () => {
+		const name = 'plugin';
+		const icon = 'smiley';
+		const Component = () => 'plugin content';
+		const MemoizedComponent = memo( Component );
+
+		registerPlugin( name, {
+			render: MemoizedComponent,
+			icon,
+		} );
+
+		expect( getPlugin( name ) ).toEqual( {
+			name,
+			render: MemoizedComponent,
+			icon,
+		} );
+	} );
+
 	it( 'fails to register a plugin without a settings object', () => {
 		registerPlugin();
 		expect( console ).toHaveErroredWith( 'No settings object provided!' );
@@ -37,7 +54,7 @@ describe( 'registerPlugin', () => {
 			render: () => {},
 		} );
 		expect( console ).toHaveErroredWith(
-			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
+			'Plugin name must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 	} );
 
@@ -48,13 +65,31 @@ describe( 'registerPlugin', () => {
 				render: () => {},
 			}
 		);
-		expect( console ).toHaveErroredWith( 'Plugin names must be strings.' );
+		expect( console ).toHaveErroredWith( 'Plugin name must be string.' );
 	} );
 
 	it( 'fails to register a plugin without a render function', () => {
 		registerPlugin( 'another-plugin', {} );
 		expect( console ).toHaveErroredWith(
-			'The "render" property must be specified and must be a valid function.'
+			'The "render" property must be specified and must be a valid component.'
+		);
+	} );
+
+	it( 'fails to register a plugin with a non-string scope', () => {
+		registerPlugin( 'my-plugin', {
+			render: () => {},
+			scope: {},
+		} );
+		expect( console ).toHaveErroredWith( 'Plugin scope must be string.' );
+	} );
+
+	it( 'fails to register a plugin with special character in the scope', () => {
+		registerPlugin( 'my-plugin', {
+			render: () => {},
+			scope: 'special/characters!',
+		} );
+		expect( console ).toHaveErroredWith(
+			'Plugin scope must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-page".'
 		);
 	} );
 
@@ -68,5 +103,39 @@ describe( 'registerPlugin', () => {
 		expect( console ).toHaveErroredWith(
 			'Plugin "plugin" is already registered.'
 		);
+	} );
+} );
+
+describe( 'getPlugins', () => {
+	const scope = 'my-page';
+
+	beforeAll( () => {
+		const Component = () => 'plugin content';
+		const icon = 'smiley';
+
+		registerPlugin( 'unscoped', {
+			render: Component,
+			icon,
+		} );
+		registerPlugin( 'scoped', {
+			render: Component,
+			icon,
+			scope,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterPlugin( 'unscoped' );
+		unregisterPlugin( 'scoped' );
+	} );
+
+	it( 'returns all unscoped plugins', () => {
+		expect( getPlugins() ).toHaveLength( 1 );
+	} );
+
+	it( 'returns all plugins of a given scope', () => {
+		const scopedPlugins = getPlugins( scope );
+		expect( scopedPlugins ).toHaveLength( 1 );
+		expect( scopedPlugins[ 0 ].name ).toBe( 'scoped' );
 	} );
 } );

@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/keycodes",
-	"version": "2.12.0",
+	"version": "4.56.0",
 	"description": "Keycodes utilities for WordPress. Used to check for keyboard events across browsers/operating systems.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"keycodes"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/keycodes/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/keycodes/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,14 +18,41 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.15"
+		"@wordpress/i18n": "file:../i18n"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

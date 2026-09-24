@@ -1,0 +1,11 @@
+// Center flex items. This has an equivalent in style.scss.
+.wp-block[data-align="center"] > .wp-block-query-pagination {
+	justify-content: center;
+}
+
+:where(.editor-styles-wrapper) {
+	.wp-block-query-pagination {
+		max-width: 100%;
+	}
+}
+

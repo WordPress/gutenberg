@@ -1,0 +1,37 @@
+.wp-block-query-pagination {
+	// This moves the next link to the right side of the container,
+	// which is important when it's the only block displayed
+	// and the block has a "space-between" justification.
+	&.is-content-justification-space-between {
+		> .wp-block-query-pagination-next:last-of-type {
+			margin-inline-start: auto;
+		}
+		> .wp-block-query-pagination-previous:first-child {
+			margin-inline-end: auto;
+		}
+	}
+
+
+	.wp-block-query-pagination-previous-arrow {
+		margin-right: 1ch;
+		display: inline-block; // Needed so that the transform works.
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+	.wp-block-query-pagination-next-arrow {
+		margin-left: 1ch;
+		display: inline-block; // Needed so that the transform works.
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+
+	&.aligncenter {
+		justify-content: center;
+	}
+}

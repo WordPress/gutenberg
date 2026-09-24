@@ -1,0 +1,10 @@
+/**
+ * Element styles for the editor
+ */
+.wp-element-button {
+	cursor: revert;
+
+	&[role="textbox"] {
+		cursor: text;
+	}
+}

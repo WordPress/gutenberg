@@ -1,0 +1,131 @@
+# Folder Structure
+
+The following snippet explains how the Gutenberg repository is structured omitting irrelevant or obvious items with further explanations:
+
+    │
+    ├── LICENSE
+    ├── README.md
+    ├── SECURITY.md
+    ├── CONTRIBUTING.md
+    │
+    ├── .editorconfig
+    ├── eslint.config.mjs
+    ├── .jshintignore
+    ├── prettier.config.mjs
+    ├── .stylelintignore
+    ├── .stylelintrc.js
+    ├── .markdownlintignore
+    ├── .npmpackagejsonlintrc.json
+    ├── phpcs.xml.dist
+    │   Dot files and config files used to configure the various linting tools
+    │   used in the repository (PHP, JS, styles...).
+    │
+    ├── .browserslistrc
+    ├── babel.config.js
+    ├── jsconfig.json
+    ├── tsconfig.json
+    ├── tsconfig.build.json
+    ├── webpack.config.js
+    │   Transpilation and bundling Config files.
+    │
+    ├── .wp-env.json
+    │   Config file for the development and testing environment.
+    │   Includes WordPress and the Gutenberg plugin.
+    │
+    ├── composer.lock
+    ├── composer.json
+    │   Handling of PHP dependencies. Essentially used for development tools.
+    │   The production code don't use external PHP dependencies.
+    │
+    ├── package-lock.json
+    ├── package.json
+    │	Handling of JavaScript dependencies. Both for development tools and
+    │   production dependencies.
+    │   The package.json also serves to define common tasks and scripts
+    |   used for day to day development.
+    │
+    ├── changelog.txt
+    ├── readme.txt
+    │   Readme and Changelog of the Gutenberg plugin hosted on the WordPress
+    │   plugin repository.
+    │
+    ├── gutenberg.php
+    │   Entry point of the Gutenberg plugin.
+    │
+    ├── .github/*
+    │   Config of the different GitHub features (issues and PR templates, CI, owners).
+    │
+    ├── tools/docs
+    │   Tools for generating Gutenberg documentation (manifest generator, API docs, block library list, component docs, theme reference).
+    │
+    ├── tools/build-scripts
+    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-scripts).
+    │
+    ├── tools/release
+    │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
+    │
+    ├── docs/*.md
+    │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
+    │
+    ├── lib
+    │   PHP Source code of the Gutenberg plugin.
+    │
+    ├── lib/compat/wordpress-x.x
+    │   PHP code that was included in WordPress on the WordPress X.X version.
+    │   It is kept to ensure plugin compatibility with older WordPress versions.
+    │
+    ├── packages
+    │   Source code of the WordPress packages.
+    │   Packages can be:
+    │    - Production JavaScript scripts and styles loaded on WordPress
+    │      and the Gutenberg plugin or distributed as npm packages.
+    │    - Development tools available on npm.
+    │
+    ├── packages/{packageName}/package.json
+    │   Dependencies of the current package.
+    │
+    ├── packages/{packageName}/CHANGELOG.md
+    ├── packages/{packageName}/README.md
+    │
+    ├── packages/{packageName}/src/**/*.js
+    ├── packages/{packageName}/src/**/*.scss
+    │   Source code of a given package.
+    |
+    ├── packages/{packageName}/src/**/*.test.js
+    │   JavaScript unit tests.
+    |
+    ├── packages/{packageName}/src/**/{ComponentName}/index.js
+    │   Entry point of a given component.
+    |
+    ├── packages/{packageName}/src/**/{ComponentName}/style.scss
+    │   Style entry point for a given component.
+    │
+    ├── packages/{packageName}/src/**/{ComponentName}/stories/*.jsx
+    │   Component Stories to load on the Gutenberg storybook.
+    │
+    ├── phpunit
+    │   Unit tests for the PHP code of the Gutenberg plugin.
+    │
+    ├── storybook
+    │   Config of the [Gutenberg Storybook](https://wordpress.github.io/gutenberg/).
+    │
+    ├── test/integration
+    │   Set of WordPress packages integration tests.
+    │
+    ├── test/native
+    │   Configuration for the Gutenberg Mobile unit tests.
+    │
+    ├── test/unit
+    │   Configuration for the Packages unit tests.
+    │
+    ├── test/e2e
+    │   End-2-end tests of the Gutenberg plugin.
+    │
+    ├── test/performance
+    │   Performance metrics. Results are tracked on the [Gutenberg performance dashboard](https://codevitals.run/project/gutenberg).
+    │
+    ├── tools/eslint
+    │   Configuration files for the ESLint linter.
+    │
+    ├── tools/webpack
+    │   Configuration files for the webpack build.

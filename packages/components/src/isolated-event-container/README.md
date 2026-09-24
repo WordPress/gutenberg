@@ -1,5 +1,7 @@
 # Isolated Event Container
 
+**Deprecated**
+
 This is a container that prevents certain events from propagating outside of the container. This is used to wrap
 UI elements such as modals and popovers where the propagated event can cause problems. The event continues to work
 inside the component.
@@ -8,7 +10,8 @@ For example, a `mousedown` event in a modal container can propagate to the surro
 modal to be interacted with.
 
 The current isolated events are:
-- mousedown - This prevents UI interaction with other `mousedown` event handlers, such as selection
+
+-   mousedown - This prevents UI interaction with other `mousedown` event handlers, such as selection
 
 ## Usage
 

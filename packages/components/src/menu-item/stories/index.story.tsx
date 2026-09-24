@@ -1,0 +1,79 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { link, more, check } from '@wordpress/icons';
+import MenuGroup from '../../menu-group';
+import MenuItem from '..';
+import Shortcut from '../../shortcut';
+import { NavigableMenu } from '../../navigable-container';
+
+const meta: Meta< typeof MenuItem > = {
+	tags: [ 'manifest' ],
+	component: MenuItem,
+	title: 'Components/@wordpress-components/Actions/MenuItem',
+	id: 'components-menuitem',
+	argTypes: {
+		children: { control: false },
+		icon: {
+			control: { type: 'select' },
+			options: [ 'check', 'link', 'more' ],
+			mapping: {
+				check,
+				link,
+				more,
+			},
+		},
+	},
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof MenuItem > = ( props ) => {
+	return (
+		<NavigableMenu>
+			<MenuGroup>
+				<MenuItem { ...props }>Menu Item 1</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
+	);
+};
+
+export const Default: StoryFn< typeof MenuItem > = Template.bind( {} );
+
+/**
+ * When the `role` prop is either `"menuitemcheckbox"` or `"menuitemradio"`, the
+ * `isSelected` prop should be used so screen readers can tell which item is currently selected.
+ */
+export const IsSelected = Template.bind( {} );
+IsSelected.args = {
+	...Default.args,
+	isSelected: true,
+	role: 'menuitemcheckbox',
+};
+
+export const WithIcon = Template.bind( {} );
+WithIcon.args = {
+	...Default.args,
+	icon: link,
+	iconPosition: 'left',
+};
+
+export const WithInfo = Template.bind( {} );
+WithInfo.args = {
+	...Default.args,
+	info: 'Menu Item description',
+};
+
+export const WithSuffix = Template.bind( {} );
+WithSuffix.args = {
+	...Default.args,
+	suffix: <Shortcut shortcut="Ctrl+M"></Shortcut>,
+};

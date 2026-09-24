@@ -8,14 +8,10 @@ Block Settings Menu Controls appear in the block settings dropdown menu when the
 import { BlockSettingsMenuControls } from '@wordress/block-editor';
 import MyButton from './my-toggle-button';
 
-function ReusableBlocksButtons() {
+function ReusableBlocksMenuItems() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<MyToggleButton
-					onToggle={ onClose }
-				/>
-			) }
+			{ ( { onClose } ) => <MyToggleButton onToggle={ onClose } /> }
 		</BlockSettingsMenuControls>
 	);
 }

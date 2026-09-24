@@ -1,15 +1,22 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/post-author",
-	"category": "layout",
+	"title": "Author (deprecated)",
+	"category": "theme",
+	"description": "This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead.",
+	"textdomain": "default",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"avatarSize": {
-			"type": "number"
+			"type": "number",
+			"default": 48
 		},
 		"showAvatar": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		},
 		"showBio": {
 			"type": "boolean"
@@ -17,18 +24,71 @@
 		"byline": {
 			"type": "string"
 		},
-		"backgroundColor": {
-			"type": "string"
+		"isLink": {
+			"type": "boolean",
+			"default": false,
+			"role": "content"
 		},
-		"textColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"role": "content"
 		}
 	},
-	"context": [ "postId" ]
+	"usesContext": [ "postType", "postId", "queryId" ],
+	"supports": {
+		"inserter": false,
+		"anchor": true,
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
+		"filter": {
+			"duotone": true
+		}
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-post-author .wp-block-post-author__avatar img"
+		}
+	},
+	"editorStyle": "wp-block-post-author-editor",
+	"style": "wp-block-post-author"
 }

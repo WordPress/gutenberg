@@ -1,0 +1,505 @@
+import { mkdir, writeFile } from 'fs/promises';
+import { join } from 'path';
+import type { Page, Browser } from '@playwright/test';
+// resolution-mode support in TypeScript 5.3 will resolve this.
+// See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
+// @ts-expect-error `web-vitals` is ESM, so a type-only import needs a `resolution-mode`.
+import type { Metric } from 'web-vitals';
+
+type EventType =
+	| 'click'
+	| 'focus'
+	| 'focusin'
+	| 'keydown'
+	| 'keypress'
+	| 'keyup'
+	| 'mouseout'
+	| 'mouseover'
+	| 'pointerup'
+	| 'selectionchange';
+
+interface TraceEvent {
+	cat: string;
+	name: string;
+	ts: number;
+	dur?: number;
+	args: {
+		data?: {
+			type: EventType;
+		};
+	};
+}
+
+// A traced `EventDispatch`, once filtered down to the events that carry both a
+// duration and an event type.
+type EventDispatch = TraceEvent & {
+	dur: number;
+	args: { data: { type: EventType } };
+};
+
+interface Trace {
+	traceEvents: TraceEvent[];
+}
+
+type MetricsConstructorProps = {
+	page: Page;
+};
+
+interface WebVitalsMeasurements {
+	CLS?: number;
+	FCP?: number;
+	FID?: number;
+	INP?: number;
+	LCP?: number;
+	TTFB?: number;
+}
+
+export class Metrics {
+	browser: Browser;
+	page: Page;
+	trace: Trace;
+
+	webVitals: WebVitalsMeasurements = {};
+
+	constructor( { page }: MetricsConstructorProps ) {
+		this.page = page;
+		this.browser = page.context().browser()!;
+		this.trace = { traceEvents: [] };
+	}
+
+	/**
+	 * Returns durations from the Server-Timing header.
+	 *
+	 * @param fields Optional fields to filter.
+	 */
+	async getServerTiming( fields: string[] = [] ) {
+		return this.page.evaluate< Record< string, number >, string[] >(
+			( f: string[] ) =>
+				(
+					performance.getEntriesByType(
+						'navigation'
+					) as PerformanceNavigationTiming[]
+				 )[ 0 ].serverTiming.reduce(
+					( acc, entry ) => {
+						if ( f.length === 0 || f.includes( entry.name ) ) {
+							acc[ entry.name ] = entry.duration;
+						}
+						return acc;
+					},
+					{} as Record< string, number >
+				),
+			fields
+		);
+	}
+
+	/**
+	 * Returns time to first byte (TTFB) using the Navigation Timing API.
+	 *
+	 * @see https://web.dev/ttfb/#measure-ttfb-in-javascript
+	 *
+	 * @return TTFB value.
+	 */
+	async getTimeToFirstByte() {
+		return await this.page.evaluate< number >( () => {
+			const { responseStart, startTime } = (
+				performance.getEntriesByType(
+					'navigation'
+				) as PerformanceNavigationTiming[]
+			 )[ 0 ];
+			return responseStart - startTime;
+		} );
+	}
+
+	/**
+	 * Returns the Largest Contentful Paint (LCP) value using the dedicated API.
+	 *
+	 * @see https://w3c.github.io/largest-contentful-paint/
+	 * @see https://web.dev/lcp/#measure-lcp-in-javascript
+	 *
+	 * @return LCP value.
+	 */
+	async getLargestContentfulPaint() {
+		return await this.page.evaluate< number >(
+			() =>
+				new Promise( ( resolve ) => {
+					new PerformanceObserver( ( entryList ) => {
+						const entries = entryList.getEntries();
+						// The last entry is the largest contentful paint.
+						const largestPaintEntry = entries.at( -1 );
+
+						resolve( largestPaintEntry?.startTime || 0 );
+					} ).observe( {
+						type: 'largest-contentful-paint',
+						buffered: true,
+					} );
+				} )
+		);
+	}
+
+	/**
+	 * Returns the Cumulative Layout Shift (CLS) value using the dedicated API.
+	 *
+	 * @see https://github.com/WICG/layout-instability
+	 * @see https://web.dev/cls/#measure-layout-shifts-in-javascript
+	 *
+	 * @return CLS value.
+	 */
+	async getCumulativeLayoutShift() {
+		return await this.page.evaluate< number >(
+			() =>
+				new Promise( ( resolve ) => {
+					let CLS = 0;
+
+					new PerformanceObserver( ( l ) => {
+						const entries = l.getEntries() as LayoutShift[];
+
+						entries.forEach( ( entry ) => {
+							if ( ! entry.hadRecentInput ) {
+								CLS += entry.value;
+							}
+						} );
+
+						resolve( CLS );
+					} ).observe( {
+						type: 'layout-shift',
+						buffered: true,
+					} );
+				} )
+		);
+	}
+
+	/**
+	 * Returns the loading durations using the Navigation Timing API. All the
+	 * durations exclude the server response time.
+	 *
+	 * @return Object with loading metrics durations.
+	 */
+	async getLoadingDurations() {
+		return await this.page.evaluate( () => {
+			const [
+				{
+					requestStart,
+					responseStart,
+					responseEnd,
+					domContentLoadedEventEnd,
+					loadEventEnd,
+				},
+			] = performance.getEntriesByType(
+				'navigation'
+			) as PerformanceNavigationTiming[];
+			const paintTimings = performance.getEntriesByType(
+				'paint'
+			) as PerformancePaintTiming[];
+
+			const firstPaintStartTime = paintTimings.find(
+				( { name } ) => name === 'first-paint'
+			)!.startTime;
+
+			const firstContentfulPaintStartTime = paintTimings.find(
+				( { name } ) => name === 'first-contentful-paint'
+			)!.startTime;
+
+			return {
+				// Server side metric.
+				serverResponse: responseStart - requestStart,
+				// For client side metrics, consider the end of the response (the
+				// browser receives the HTML) as the start time (0).
+				firstPaint: firstPaintStartTime - responseEnd,
+				domContentLoaded: domContentLoadedEventEnd - responseEnd,
+				loaded: loadEventEnd - responseEnd,
+				firstContentfulPaint:
+					firstContentfulPaintStartTime - responseEnd,
+				timeSinceResponseEnd: performance.now() - responseEnd,
+			};
+		} );
+	}
+
+	/**
+	 * Starts Chromium tracing with predefined options for performance testing.
+	 *
+	 * The category set mirrors what Chrome DevTools enables when recording in
+	 * the Performance panel: `devtools.timeline` provides the top-level event
+	 * tree, and the `disabled-by-default-v8.cpu_profiler` + companion
+	 * `devtools.timeline.stack` categories enable the V8 sampler that
+	 * populates JavaScript call stacks. Without the latter, the saved trace
+	 * shows only opaque "Function call" blocks with no JS frames inside.
+	 *
+	 * @param options Options to pass to `browser.startTracing()`.
+	 */
+	async startTracing( options = {} ) {
+		await this.browser.startTracing( this.page, {
+			screenshots: false,
+			categories: [
+				'devtools.timeline',
+				'disabled-by-default-devtools.timeline',
+				'disabled-by-default-devtools.timeline.stack',
+				'disabled-by-default-v8.cpu_profiler',
+				'v8.execute',
+			],
+			...options,
+		} );
+
+		// Enabling the V8 sampling profiler queues an isolate interrupt that
+		// logs every function compiled so far. It runs on the next stack
+		// guard check, so its cost would land in the first thing the test
+		// does, which is usually the interaction being measured. Absorb it
+		// here instead. A cross-origin iframe runs in its own isolate and
+		// gets its own interrupt, so every frame needs the warm-up, not just
+		// the main one.
+		await Promise.all(
+			this.page
+				.frames()
+				// A frame can detach between listing and evaluating.
+				.map( ( frame ) =>
+					frame.evaluate( () => {} ).catch( () => {} )
+				)
+		);
+	}
+
+	/**
+	 * Stops Chromium tracing.
+	 *
+	 * When `name` is a non-empty string and the `WP_ARTIFACTS_PATH` environment
+	 * variable is set, the raw trace is written to
+	 * `${WP_ARTIFACTS_PATH}/traces/<name>.trace.json`. The resulting file can
+	 * be opened in Chrome DevTools (Performance panel → "Load profile…") to
+	 * inspect the flame graph. Pass a falsy value (or omit the argument) to
+	 * just parse the trace into `this.trace` without writing — this is the
+	 * default for iteration loops, where you typically want to save only one
+	 * representative sample. Callers pick which iteration that is, e.g.
+	 * `i === Math.floor( iterations / 2 ) && 'post-editor-first-block'`.
+	 *
+	 * @param name File name (without extension) identifying the scenario, or
+	 *             `false`/`undefined` to skip writing.
+	 */
+	async stopTracing( name?: string | false ) {
+		const traceBuffer = await this.browser.stopTracing();
+		const traceJSON = JSON.parse( traceBuffer.toString() );
+
+		this.trace = traceJSON;
+
+		if ( ! name ) {
+			return;
+		}
+
+		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
+		if ( ! artifactsPath ) {
+			return;
+		}
+
+		// The perf comparison flow runs the same suite against multiple
+		// branches into a single artifacts directory; the comparison branches
+		// set WP_PERF_NO_TRACE so the head branch's traces aren't overwritten.
+		if ( process.env.WP_PERF_NO_TRACE ) {
+			return;
+		}
+
+		// Traces are saved minified. Run the following against a downloaded trace
+		// + matching `build/` directory to rewrite minified `functionName`s back
+		// to their source identifiers:
+		//
+		//   node tools/build-scripts/packages/resolve-trace-source-maps.cjs
+		//
+		// Or via the workspace script:
+		//
+		//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace.json> [--build-dir <dir>]
+		const tracesDir = join( artifactsPath, 'traces' );
+		const filePath = join( tracesDir, `${ name }.trace.json` );
+		await mkdir( tracesDir, { recursive: true } );
+		await writeFile( filePath, JSON.stringify( traceJSON ) );
+	}
+
+	/**
+	 * @return Durations of all traced `keydown`, `keypress`, and `keyup`
+	 * events.
+	 */
+	getTypingEventDurations() {
+		return [
+			this.getEventDurations( 'keydown' ),
+			this.getEventDurations( 'keypress' ),
+			this.getEventDurations( 'keyup' ),
+		];
+	}
+
+	/**
+	 * Selecting a block within an editing host moves only the native
+	 * selection, so `focus`/`focusin` do not fire for those clicks. Event
+	 * types that did not fire are left out: callers sum the durations, and an
+	 * empty list sums to `undefined`, which would poison the total.
+	 *
+	 * The dispatches also nest — a click that moves focus into the editing
+	 * host dispatches `focus`/`focusin` inside the `pointerup` dispatch — so
+	 * each dispatch is clipped to the time not already covered by an earlier
+	 * one. Summing then measures the wall clock instead of counting the
+	 * nested work once per enclosing dispatch.
+	 *
+	 * @return Non-overlapping durations of the traced `focus`, `focusin`,
+	 * `pointerup`, and `selectionchange` dispatches that fired, grouped by
+	 * event type.
+	 */
+	getSelectionEventDurations() {
+		const eventTypes: EventType[] = [
+			'focus',
+			'focusin',
+			'pointerup',
+			'selectionchange',
+		];
+		const durations = new Map< EventType, number[] >(
+			eventTypes.map( ( type ): [ EventType, number[] ] => [ type, [] ] )
+		);
+		const dispatches = this.getEventDispatches( eventTypes ).sort(
+			( a, b ) => a.ts - b.ts
+		);
+
+		let coveredUntil = -Infinity;
+		for ( const item of dispatches ) {
+			const end = item.ts + item.dur;
+			const from = Math.max( item.ts, coveredUntil );
+			coveredUntil = Math.max( coveredUntil, end );
+			durations
+				.get( item.args.data.type )!
+				.push( Math.max( 0, end - from ) / 1000 );
+		}
+
+		return [ ...durations.values() ].filter(
+			( eventDurations ) => eventDurations.length
+		);
+	}
+
+	/**
+	 * @return Durations of all traced `click` events.
+	 */
+	getClickEventDurations() {
+		return [ this.getEventDurations( 'click' ) ];
+	}
+
+	/**
+	 * @return Durations of all traced `mouseover` and `mouseout` events.
+	 */
+	getHoverEventDurations() {
+		return [
+			this.getEventDurations( 'mouseover' ),
+			this.getEventDurations( 'mouseout' ),
+		];
+	}
+
+	/**
+	 * @param eventType Type of event to filter.
+	 * @return Durations of all events of a given type.
+	 */
+	getEventDurations( eventType: EventType ) {
+		return this.getEventDispatches( [ eventType ] ).map(
+			( item ) => item.dur / 1000
+		);
+	}
+
+	/**
+	 * @param eventTypes Types of event to filter.
+	 * @return The `EventDispatch` trace events of the given types.
+	 */
+	private getEventDispatches( eventTypes: EventType[] ) {
+		if ( this.trace.traceEvents.length === 0 ) {
+			throw new Error(
+				'No trace events found. Did you forget to call stopTracing()?'
+			);
+		}
+
+		return this.trace.traceEvents.filter(
+			( item: TraceEvent ): item is EventDispatch =>
+				item.cat === 'devtools.timeline' &&
+				item.name === 'EventDispatch' &&
+				!! item.dur &&
+				!! item.args?.data &&
+				eventTypes.includes( item.args.data.type )
+		);
+	}
+
+	/**
+	 * Initializes the web-vitals library upon next page navigation.
+	 *
+	 * Defaults to automatically triggering the navigation,
+	 * but it can also be done manually.
+	 *
+	 * @example
+	 * ```js
+	 * await metrics.initWebVitals();
+	 * console.log( await metrics.getWebVitals() );
+	 * ```
+	 *
+	 * @example
+	 * ```js
+	 * await metrics.initWebVitals( false );
+	 * await page.goto( '/some-other-page' );
+	 * console.log( await metrics.getWebVitals() );
+	 * ```
+	 *
+	 * @param reload Whether to force navigation by reloading the current page.
+	 */
+	async initWebVitals( reload = true ) {
+		await this.page.addInitScript( {
+			path: require.resolve( 'web-vitals' ),
+		} );
+
+		await this.page.exposeFunction(
+			'__reportVitals__',
+			( data: string ) => {
+				const measurement: Metric = JSON.parse( data );
+				this.webVitals[ measurement.name ] = measurement.value;
+			}
+		);
+
+		await this.page.addInitScript( () => {
+			const reportVitals = ( measurement: unknown ) =>
+				window.__reportVitals__( JSON.stringify( measurement ) );
+
+			window.addEventListener( 'DOMContentLoaded', () => {
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onCLS( reportVitals );
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onFCP( reportVitals );
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onFID( reportVitals );
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onINP( reportVitals );
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onLCP( reportVitals );
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
+				window.webVitals.onTTFB( reportVitals );
+			} );
+		} );
+
+		if ( reload ) {
+			// By reloading the page the script will be applied.
+			await this.page.reload();
+		}
+	}
+
+	/**
+	 * Returns web vitals as collected by the web-vitals library.
+	 *
+	 * If the web-vitals library hasn't been loaded on the current page yet,
+	 * it will be initialized with a page reload.
+	 *
+	 * Reloads the page to force web-vitals to report all collected metrics.
+	 *
+	 * @return {WebVitalsMeasurements} Web vitals measurements.
+	 */
+	async getWebVitals() {
+		// Reset values.
+		this.webVitals = {};
+
+		const hasScript = await this.page.evaluate(
+			// @ts-expect-error This is valid but web-vitals does not register the global types.
+			() => typeof window.webVitals !== 'undefined'
+		);
+
+		if ( ! hasScript ) {
+			await this.initWebVitals();
+		}
+
+		// Trigger navigation so the web-vitals library reports values on unload.
+		await this.page.reload();
+
+		return this.webVitals;
+	}
+}

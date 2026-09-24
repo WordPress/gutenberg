@@ -1,6 +1,3 @@
-// These embeds do not work in sandboxes due to the iframe's security restrictions.
-export const HOSTS_NO_PREVIEWS = [ 'facebook.com', 'smugmug.com' ];
-
 export const ASPECT_RATIOS = [
 	// Common video resolutions.
 	{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
@@ -13,5 +10,4 @@ export const ASPECT_RATIOS = [
 	{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
 ];
 
-export const DEFAULT_EMBED_BLOCK = 'core/embed';
-export const WORDPRESS_EMBED_BLOCK = 'core-embed/wordpress';
+export const WP_EMBED_TYPE = 'wp-embed';

@@ -1,0 +1,784 @@
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.describe( 'Buttons', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'adds a sibling after the selected button from the parent selector', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'First' } },
+				{ name: 'core/button', attributes: { text: 'Second' } },
+			],
+		} );
+		await editor.canvas
+			.locator( '[data-type="core/button"]' )
+			.first()
+			.click();
+
+		await editor.showBlockToolbar();
+		await page.locator( 'role=button[name="Add button"]' ).click();
+		await page.keyboard.type( 'New' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{ name: 'core/button', attributes: { text: 'First' } },
+					{ name: 'core/button', attributes: { text: 'New' } },
+					{ name: 'core/button', attributes: { text: 'Second' } },
+				],
+			},
+		] );
+	} );
+
+	test( 'has focus on button content', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+		await page.keyboard.type( 'Content' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'has focus on button content (slash inserter)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '/buttons' );
+		await expect(
+			page.getByRole( 'option', { name: 'Buttons' } )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Content' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'dismisses link editor when escape is pressed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: https://github.com/WordPress/gutenberg/pull/19885
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect(
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
+		).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+		await page.keyboard.type( 'WordPress' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">WordPress</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'moves focus from the link editor back to the button when escape is pressed after the URL has been submitted', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: https://github.com/WordPress/gutenberg/issues/34307
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect(
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
+		).toBeFocused();
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.locator( 'role=link[name=/^example\\.com/]' )
+		).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+
+		// Focus should move from the link control to the button block's text.
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+
+		// The link control should still be visible when a URL is set.
+		await expect(
+			page.locator( 'role=link[name=/^example\\.com/]' )
+		).toBeVisible();
+	} );
+
+	test( 'appends https protocol to links added which are missing a protocol', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: https://github.com/WordPress/gutenberg/issues/34307
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.locator(
+			'role=combobox[name="Search or type URL"i]'
+		);
+
+		await expect( urlInput ).toBeFocused();
+		await page.keyboard.type( 'example.com' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to "Edit" and switch UI back to edit mode
+		await pageUtils.pressKeys( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the value of the URL input has had https:// prepended.
+		await expect( urlInput ).toHaveValue( 'https://example.com' );
+	} );
+
+	test( 'can jump to the link editor using the keyboard shortcut', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'WordPress' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
+		await page.keyboard.press( 'Enter' );
+		// Make sure that the dialog is still opened, and that focus is retained
+		// within (focusing on the link preview).
+		await expect(
+			page.locator( 'role=link[name=/^wordpress\\.org/]' )
+		).toBeFocused();
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/">WordPress</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can toggle button link settings', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'WordPress' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
+
+		// Open Advanced settings panel.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		const newTabCheckbox = page.getByLabel( 'Open in new tab' );
+		const noFollowCheckbox = page.getByLabel( 'nofollow' );
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		await newTabCheckbox.click();
+
+		// Toggle should still have focus and be checked.
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( newTabCheckbox ).toBeFocused();
+
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Apply' } )
+			.click();
+
+		// The link should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noopener',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
+
+		// Edit link again.
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
+
+		// Navigate to and toggle the "nofollow" checkbox.
+		await noFollowCheckbox.click();
+
+		// expect settings for `Open in new tab` and `No follow`
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( noFollowCheckbox ).toBeChecked();
+
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Apply' } )
+			.click();
+
+		// Check the content again.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noopener nofollow',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'can apply named colors', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply custom colors', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		// Match by substring: when the control has a value (e.g. an inherited
+		// color), the button's accessible name gains a "The currently selected
+		// color is…" suffix, so an exact-name match no longer works.
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
+
+		await editorSettings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: /Custom color picker/i } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"},\"elements\":{\"link\":{\"color\":{\"text\":\"#ff0000\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background has-link-color wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply named gradient background color', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Gradient: Purple to yellow' } )
+			.click();
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'can apply custom gradient background color', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Gradient', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 0% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( 'ff0000' );
+		await page.keyboard.press( 'Escape' );
+		await page
+			.getByRole( 'button', {
+				name: /^Gradient control point at position 100% with color code/,
+			} )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'Hex color' } )
+			.fill( '00ff00' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
+	test( 'copies attributes when inserting a sibling via the appender', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		// Apply named colors to the first button. Text and background color
+		// controls now live in the Typography and Background panels.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+
+		// Select the parent Buttons block so the appender is visible.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
+		);
+
+		// Insert a sibling via the appender; should auto-insert a button.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+
+		// The new button should inherit color attributes from its sibling.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'copies attributes when adding a sibling with Enter', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'Content',
+						backgroundColor: 'vivid-red',
+						textColor: 'cyan-bluish-gray',
+						anchor: 'first-button',
+					},
+				},
+			],
+		} );
+
+		// Place the caret at the end of the button text and press Enter.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		// The new button inherits everything but the content, like a
+		// duplicated block would.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+							anchor: 'first-button',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Second',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/64222.
+	test( 'shows the in-between inserter between buttons on a wrapped line', async ( {
+		editor,
+		page,
+	} ) => {
+		const texts = Array.from(
+			{ length: 9 },
+			( _, index ) => `Button number ${ index + 1 }`
+		);
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: texts.map( ( text ) => ( {
+				name: 'core/button',
+				attributes: { text },
+			} ) ),
+		} );
+
+		const buttons = editor.canvas.locator( '[data-type="core/button"]' );
+		const boxes = [];
+		for ( let index = 0; index < ( await buttons.count() ); index++ ) {
+			boxes.push( await buttons.nth( index ).boundingBox() );
+		}
+
+		// The buttons have to wrap for this test to mean anything.
+		const wrapIndex = boxes.findIndex( ( box ) => box.y > boxes[ 0 ].y );
+		expect( wrapIndex ).toBeGreaterThan( 0 );
+		expect( boxes.length ).toBeGreaterThan( wrapIndex + 1 );
+
+		// Hover over the gap between the first two buttons of the second row.
+		const before = boxes[ wrapIndex ];
+		const after = boxes[ wrapIndex + 1 ];
+		await page.mouse.move(
+			( before.x + before.width + after.x ) / 2,
+			after.y + after.height / 2,
+			// An arbitrary number of `steps` imitates cursor movement in the
+			// test environment, activating the in-between inserter.
+			{ steps: 10 }
+		);
+
+		// Only buttons are allowed here, so the inserter adds one directly.
+		await page
+			.locator( '.block-editor-block-list__insertion-point-inserter' )
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+		await page.keyboard.type( 'New' );
+
+		const expectedTexts = [ ...texts ];
+		expectedTexts.splice( wrapIndex + 1, 0, 'New' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: expectedTexts.map( ( text ) => ( {
+					name: 'core/button',
+					attributes: { text },
+				} ) ),
+			},
+		] );
+	} );
+
+	test.describe( 'Width support', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'can resize width', async ( { editor, page } ) => {
+			// Mock spacing units to include % for the width control
+			await page.waitForFunction( () => window?.wp?.data );
+			await page.evaluate( () => {
+				const settings = window.wp.data
+					.select( 'core/block-editor' )
+					.getSettings();
+				window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+					...settings,
+					spacing: { units: [ 'px', '%', 'em', 'rem', 'vh', 'vw' ] },
+				} );
+			} );
+
+			await editor.insertBlock( { name: 'core/buttons' } );
+			await page.keyboard.type( 'Content' );
+
+			// Select the inner Button block (not the outer Buttons container)
+			const buttonBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.filter( { hasText: 'Content' } );
+			await editor.selectBlocks( buttonBlock );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsPanel = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Switch from preset slider to custom value input
+			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
+				.getByLabel( 'Set custom value' )
+				.click();
+
+			// Change the unit from px to % using the combobox. Scope the
+			// lookup to the Width control's group: the block inspector now
+			// renders other unit selectors (e.g. Typography font size) above
+			// it, so a panel-wide `.first()` would match the wrong control.
+			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
+				.getByRole( 'combobox', { name: 'Select unit' } )
+				.first()
+				.selectOption( '%' );
+
+			// Set the width value
+			await settingsPanel
+				.getByRole( 'spinbutton', { name: 'Width', exact: true } )
+				.fill( '25' );
+
+			// Check the content.
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+			);
+		} );
+	} );
+
+	test.describe( 'Block transforms', () => {
+		test.describe( 'FROM paragraph', () => {
+			test( 'should preserve the content', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+					},
+				} );
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect( buttonBlock.attributes.text ).toBe( 'initial content' );
+			} );
+
+			test( 'should preserve the metadata attribute', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							name: 'Custom name',
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect( buttonBlock.attributes.metadata ).toMatchObject( {
+					name: 'Custom name',
+				} );
+			} );
+
+			test( 'should preserve the block bindings', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'initial content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'custom_field',
+									},
+								},
+							},
+						},
+					},
+				} );
+
+				await editor.transformBlockTo( 'core/buttons' );
+				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
+					.innerBlocks[ 0 ];
+				expect( buttonBlock.name ).toBe( 'core/button' );
+				expect(
+					buttonBlock.attributes.metadata.bindings
+				).toMatchObject( {
+					text: {
+						source: 'core/post-meta',
+						args: {
+							key: 'custom_field',
+						},
+					},
+				} );
+			} );
+		} );
+	} );
+} );

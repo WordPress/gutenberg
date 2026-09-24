@@ -1,0 +1,11 @@
+const DependencyExtractionWebpackPlugin = require( '../../..' );
+
+module.exports = {
+	plugins: [
+		new DependencyExtractionWebpackPlugin( {
+			requestToExternalModule( request ) {
+				return request === 'lodash';
+			},
+		} ),
+	],
+};

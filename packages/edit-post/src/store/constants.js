@@ -3,7 +3,7 @@
  *
  * @type {string}
  */
-export const STORE_KEY = 'core/edit-post';
+export const STORE_NAME = 'core/edit-post';
 
 /**
  * CSS selector string for the admin bar view post link anchor tag.

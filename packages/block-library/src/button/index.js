@@ -1,12 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -17,31 +11,36 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Button' ),
-	description: __(
-		'Prompt visitors to take action with a button-style link.'
-	),
 	icon,
-	keywords: [ __( 'link' ) ],
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			backgroundColor: 'vivid-green-cyan',
-			text: __( 'Call to Action' ),
+			text: __( 'Call to action' ),
 		},
 	},
-	supports: {
-		align: true,
-		alignWide: false,
-		reusable: false,
-		lightBlockWrapper: true,
-	},
-	parent: [ 'core/buttons' ],
-	styles: [
-		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-	],
 	edit,
 	save,
 	deprecated,
+	merge: ( a, { text = '' } ) => ( {
+		...a,
+		text: ( a.text || '' ) + text,
+	} ),
+	__experimentalLabel( attributes, { context } ) {
+		const { text } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasContent = text?.trim().length > 0;
+
+		// In the list view, use the block's text as the label.
+		// If the text is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || text;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+	},
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

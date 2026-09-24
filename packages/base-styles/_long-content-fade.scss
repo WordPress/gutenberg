@@ -1,0 +1,57 @@
+/**
+ * Long content fade mixin
+ *
+ * Creates a fading overlay to signify that the content is longer
+ * than the space allows.
+ */
+
+@mixin long-content-fade($direction: right, $size: 20%, $color: #fff, $edge: 0, $z-index: false) {
+	content: "";
+	display: block;
+	position: absolute;
+	-webkit-touch-callout: none;
+	user-select: none;
+	pointer-events: none;
+
+	@if $z-index {
+		z-index: $z-index;
+	}
+
+	@if $direction == "bottom" {
+		background: linear-gradient(to top, transparent, $color 90%);
+		left: $edge;
+		right: $edge;
+		top: $edge;
+		bottom: calc(100% - $size);
+		width: auto;
+	}
+
+	@if $direction == "top" {
+		background: linear-gradient(to bottom, transparent, $color 90%);
+		top: calc(100% - $size);
+		left: $edge;
+		right: $edge;
+		bottom: $edge;
+		width: auto;
+	}
+
+	@if $direction == "left" {
+		background: linear-gradient(to left, transparent, $color 90%);
+		top: $edge;
+		left: $edge;
+		bottom: $edge;
+		right: auto;
+		width: $size;
+		height: auto;
+	}
+
+	@if $direction == "right" {
+		background: linear-gradient(to right, transparent, $color 90%);
+		top: $edge;
+		bottom: $edge;
+		right: $edge;
+		left: auto;
+		width: $size;
+		height: auto;
+	}
+}

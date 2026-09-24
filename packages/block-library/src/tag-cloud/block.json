@@ -1,13 +1,17 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/tag-cloud",
+	"title": "Tag Cloud",
 	"category": "widgets",
+	"description": "A cloud of popular keywords, each sized by how often it appears.",
+	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string",
-			"enum": [ "left", "center", "right", "wide", "full" ]
-		},
-		"className": {
-			"type": "string"
+		"numberOfTags": {
+			"type": "number",
+			"default": 45,
+			"minimum": 1,
+			"maximum": 100
 		},
 		"taxonomy": {
 			"type": "string",
@@ -16,6 +20,69 @@
 		"showTagCounts": {
 			"type": "boolean",
 			"default": false
+		},
+		"smallestFontSize": {
+			"type": "string",
+			"default": "8pt"
+		},
+		"largestFontSize": {
+			"type": "string",
+			"default": "22pt"
+		}
+	},
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "outline", "label": "Outline" }
+	],
+	"supports": {
+		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"html": false,
+		"align": true,
+		"color": {
+			"background": true,
+			"link": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
+		},
+		"shadow": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	}
 }

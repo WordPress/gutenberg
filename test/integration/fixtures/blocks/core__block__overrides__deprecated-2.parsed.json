@@ -1,0 +1,18 @@
+[
+	{
+		"blockName": "core/block",
+		"attrs": {
+			"ref": 123,
+			"content": {
+				"V98q_x": {
+					"values": {
+						"content": "Some value"
+					}
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

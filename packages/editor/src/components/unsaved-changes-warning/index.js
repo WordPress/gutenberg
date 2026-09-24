@@ -1,51 +1,45 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
-class UnsavedChangesWarning extends Component {
-	constructor() {
-		super( ...arguments );
-		this.warnIfUnsavedChanges = this.warnIfUnsavedChanges.bind( this );
-	}
+/**
+ * Warns the user if there are unsaved changes before leaving the editor.
+ * Compatible with Post Editor and Site Editor.
+ *
+ * @return {React.ReactNode} The component.
+ */
+export default function UnsavedChangesWarning() {
+	const { __experimentalGetDirtyEntityRecords } = useSelect( coreStore );
 
-	componentDidMount() {
-		window.addEventListener( 'beforeunload', this.warnIfUnsavedChanges );
-	}
+	useEffect( () => {
+		/**
+		 * Warns the user if there are unsaved changes before leaving the editor.
+		 *
+		 * @param {Event} event `beforeunload` event.
+		 *
+		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
+		 */
+		const warnIfUnsavedChanges = ( event ) => {
+			// We need to call the selector directly in the listener to avoid race
+			// conditions with `BrowserURL` where `componentDidUpdate` gets the
+			// new value of `isEditedPostDirty` before this component does,
+			// causing this component to incorrectly think a trashed post is still dirty.
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			if ( dirtyEntityRecords.length > 0 ) {
+				event.returnValue = __(
+					'You have unsaved changes. If you proceed, they will be lost.'
+				);
+				return event.returnValue;
+			}
+		};
 
-	componentWillUnmount() {
-		window.removeEventListener( 'beforeunload', this.warnIfUnsavedChanges );
-	}
+		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
 
-	/**
-	 * Warns the user if there are unsaved changes before leaving the editor.
-	 *
-	 * @param {Event} event `beforeunload` event.
-	 *
-	 * @return {?string} Warning prompt message, if unsaved changes exist.
-	 */
-	warnIfUnsavedChanges( event ) {
-		const { isEditedPostDirty } = this.props;
+		return () => {
+			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
+		};
+	}, [ __experimentalGetDirtyEntityRecords ] );
 
-		if ( isEditedPostDirty() ) {
-			event.returnValue = __(
-				'You have unsaved changes. If you proceed, they will be lost.'
-			);
-			return event.returnValue;
-		}
-	}
-
-	render() {
-		return null;
-	}
+	return null;
 }
-
-export default withSelect( ( select ) => ( {
-	// We need to call the selector directly in the listener to avoid race
-	// conditions with `BrowserURL` where `componentDidUpdate` gets the
-	// new value of `isEditedPostDirty` before this component does,
-	// causing this component to incorrectly think a trashed post is still dirty.
-	isEditedPostDirty: select( 'core/editor' ).isEditedPostDirty,
-} ) )( UnsavedChangesWarning );

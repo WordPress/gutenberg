@@ -1,0 +1,509 @@
+name: Unit Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact unit tests. A series of ignore patterns are used in place of an include
+    # list to ensure tests run even if the list of filters happens to become stale.
+    detect-relevant-changes:
+        name: Detect changes relevant to unit tests
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check for changes that may impact unit test results
+              id: filter
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          # Start from every file, then exclude what cannot change a test result.
+                          - '**'
+                          # Documentation.
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,storybook}/**'
+                          # Development tooling and its configuration.
+                          - '!tools/{docs,eslint,stylelint}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          # Repository metadata.
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
+                          - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
+
+    svn-release:
+        name: SVN release recovery
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+                  sparse-checkout: tools/release
+
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
+
+            - name: Lint release scripts
+              run: shellcheck tools/release/*.sh tools/release/test/*.sh
+
+            - name: Test SVN publication and recovery
+              run: bash tools/release/test/publish-to-svn.sh
+
+    unit-js:
+        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: false
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['24', '26']
+                shard: ['1/4', '2/4', '3/4', '4/4']
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
+
+            - name: Run the Vitest Node and jsdom projects
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Keep a separate Flakiness.io history for each Node.js major.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: |
+                  npm run test:unit:vitest:shuffled -- \
+                    --project=node \
+                    --project=jsdom \
+                    --shard="$SHARD" \
+                    --passWithNoTests
+
+    unit-js-browser:
+        name: JavaScript Browser (Chromium, Node.js 24)
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: 24
+
+            - name: Install Chromium for Browser Mode tests
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
+
+            - name: Run the Vitest Browser project
+              env:
+                  FK_ENV_NODEJS: '24'
+              run: npm run test:unit:vitest:shuffled -- --project=browser
+
+    unit-js-date:
+        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: false
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['24', '26']
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
+
+            - name: Run the date tests
+              env:
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: npm run test:unit:date
+
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        permissions: {}
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
+
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
+                  # shellcheck disable=SC2034
+                  IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION="$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)"
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> "$GITHUB_OUTPUT"
+                  rm versions.json
+
+    build-assets:
+        name: Build JavaScript assets for PHP unit tests
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Run build scripts
+              run: npm run build
+
+            - name: Upload built JavaScript assets
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: build-assets
+                  path: |
+                      ./build/
+
+    test-php:
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
+        needs:
+            [
+                detect-relevant-changes,
+                compute-previous-wordpress-version,
+                build-assets,
+            ]
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: true
+            matrix:
+                event: ['${{ github.event_name }}']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+                multisite: [false, true]
+                wordpress: ['', 'previous major version']
+                exclude:
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
+                    - event: 'pull_request'
+                      php: '8.0'
+                    - event: 'pull_request'
+                      php: '8.1'
+                    - event: 'pull_request'
+                      php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
+                    - event: 'pull_request'
+                      multisite: true
+                    - event: 'pull_request'
+                      wordpress: 'previous major version'
+                    # On trunk/releases: Only test previous WP version with specific PHP versions
+                    - php: '8.0'
+                      wordpress: 'previous major version'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
+                      wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
+                      wordpress: 'previous major version'
+
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+              with:
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-assets
+                  path: build
+
+            - name: Docker debug information
+              run: |
+                  docker -v
+
+            - name: General debug information
+              run: |
+                  npm --version
+                  node --version
+                  curl --version
+                  git --version
+                  locale -a
+
+            - name: Start Docker environment
+              run: npm run wp-env-test start
+
+            - name: Log running Docker containers
+              run: docker ps -a
+
+            - name: Docker container debug information
+              run: |
+                  npm run wp-env-test -- run mysql mariadb -- --version
+                  npm run wp-env-test -- run wordpress php -- --version
+                  npm run wp-env-test -- run wordpress php -m
+                  npm run wp-env-test -- run wordpress php -i
+                  npm run wp-env-test -- run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env-test -- run wordpress locale -a
+                  npm run wp-env-test -- run cli wp core version
+
+            - name: Running single site unit tests
+              if: ${{ ! matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
+
+            - name: Running multisite unit tests
+              if: ${{ matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
+
+            # Verifies that PHPUnit actually runs in the first place. We want visibility
+            # into issues which can cause it to fail silently, so we check the output
+            # to verify that at least 500 tests have passed. This is an arbitrary
+            # number, but makes sure a drastic change doesn't happen without us noticing.
+            - name: Check number of passed tests
+              run: |
+                  # Note: relies on PHPUnit execution to fail on test failure.
+                  # Extract the number of executed tests from the log file.
+                  if ! num_tests="$(grep -Eo 'OK \([0-9]+ tests' phpunit.log)" ; then
+                    if ! num_tests="$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log)" ; then
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
+                    fi
+                  fi
+                  # Extract just the number of tests from the string.
+                  num_tests="$(echo "$num_tests" | grep -Eo '[0-9]+')"
+                  if [ "$num_tests" -lt 500 ] ; then
+                    echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
+                  fi
+                  echo "$num_tests tests passed."
+
+    phpcs:
+        name: PHP coding standards
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+              with:
+                  php-version: '7.4'
+                  coverage: none
+                  tools: cs2pr
+
+            # This date is used to ensure that the PHPCS cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
+
+            - name: Cache PHPCS scan cache
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpcs.json
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            - name: Make Composer packages available globally
+              run: echo "${PWD}/vendor/bin" >> "$GITHUB_PATH"
+
+            - name: Run PHPCS on all Gutenberg files
+              id: phpcs-gutenberg
+              run: phpcs --report-full --report-checkstyle=./.cache/phpcs-report.xml
+
+            - name: Show PHPCS results in PR
+              if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
+    #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    #
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
+    unit-status-check:
+        name: Unit Tests - Status Check
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        needs:
+            [
+                detect-relevant-changes,
+                svn-release,
+                unit-js,
+                unit-js-browser,
+                unit-js-date,
+                test-php,
+                phpcs,
+            ]
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Check for any failures of required jobs
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'

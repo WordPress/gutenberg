@@ -1,5 +1,4 @@
-Persistence Plugin
-==================
+# Persistence Plugin
 
 The persistence plugin enhances a registry to enable registered stores to opt in to persistent storage.
 

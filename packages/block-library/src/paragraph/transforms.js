@@ -1,12 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import metadata from './block.json';
 
-/**
- * Internal dependencies
- */
-import { name } from './block.json';
+const { name } = metadata;
 
 const transforms = {
 	from: [
@@ -18,7 +13,7 @@ const transforms = {
 			schema: ( { phrasingContentSchema, isPaste } ) => ( {
 				p: {
 					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style' ],
+					attributes: isPaste ? [] : [ 'style', 'id' ],
 				},
 			} ),
 			transform( node ) {
@@ -30,7 +25,13 @@ const transforms = {
 					textAlign === 'center' ||
 					textAlign === 'right'
 				) {
-					attributes.align = textAlign;
+					attributes.style = {
+						...attributes.style,
+						typography: {
+							...attributes.style?.typography,
+							textAlign,
+						},
+					};
 				}
 
 				return createBlock( name, attributes );

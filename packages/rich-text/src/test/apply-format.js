@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { applyFormat } from '../apply-format';
 import { getSparseArrayLength } from './helpers';
 
@@ -249,5 +242,24 @@ describe( 'applyFormat', () => {
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+	} );
+
+	it( 'should merge equal neighbouring formats', () => {
+		const record = {
+			// Use a different reference but equal content.
+			formats: [ , , [ { ...em } ], [ { ...em } ] ],
+			text: 'test',
+		};
+		const expected = {
+			...record,
+			activeFormats: [ em ],
+			// All references should be the same.
+			formats: [ [ em ], [ em ], [ em ], [ em ] ],
+		};
+		const result = applyFormat( deepFreeze( record ), em, 0, 2 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
 } );

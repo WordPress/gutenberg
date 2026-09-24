@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/freeform",
+		"isValid": true,
+		"attributes": {
+			"content": "<p><!-- wp:core/invalid-$special /--></p>"
+		},
+		"innerBlocks": []
+	}
+]

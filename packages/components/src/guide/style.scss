@@ -1,56 +1,100 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-guide {
+	$image-height: 300px;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+	$image-width: 320px;
+
+	@include break-small() {
+		// TODO: Replace with a --wpds-dimension-surface-width-* token.
+		width: 600px;
+	}
+
+	.components-modal__content {
+		padding: 0;
+		margin-top: 0;
+
+		&::before {
+			content: none;
+		}
+	}
+
 	.components-modal__header {
-		background: none;
 		border-bottom: none;
+		padding: 0;
+		position: sticky;
+		height: $header-height;
 
 		.components-button {
 			align-self: flex-start;
-			margin-top: $grid-unit-30;
+			margin: $grid-unit-10 $grid-unit-10 0 0;
 			position: static;
 		}
 	}
 
-	&__container {
+	.components-guide__container {
 		display: flex;
 		flex-direction: column;
+		justify-content: space-between;
 		margin-top: -$header-height;
 		min-height: 100%;
 	}
 
-	&__footer {
-		align-content: center;
+	.components-guide__page {
 		display: flex;
-		height: 30px;
+		flex-direction: column;
 		justify-content: center;
-		margin: auto 0 $grid-unit-30 0;
 		position: relative;
-		width: 100%;
 
 		@include break-small() {
-			margin: $grid-unit-30 0 0;
+			min-height: $image-height;
 		}
 	}
 
-	&__page-control {
+	.components-guide__footer {
+		align-content: center;
+		display: flex;
+		height: $button-size;
+		justify-content: center;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-30;
+		position: relative;
+		width: 100%;
+	}
+
+	.components-guide__page-control {
 		margin: 0;
+		text-align: center;
 
 		li {
 			display: inline-block;
-			margin: 0 2px;
+			margin: 0;
 		}
 
 		.components-button {
-			height: 30px;
+			margin: -6px 0;
+			color: $gray-200;
+		}
+
+		li[aria-current="step"] .components-button {
+			color: $components-color-accent;
 		}
 	}
 }
 
 .components-modal__frame.components-guide {
-	@media (max-width: $break-small) {
-		bottom: 15%;
-		left: $grid-unit-30;
-		right: $grid-unit-30;
-		top: 15%;
+	border: none;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+	min-width: 312px;
+	max-height: 575px;
+
+	@media ( max-width: $break-small ) {
+		margin: auto;
+		max-width: calc(100vw - #{$grid-unit-20} * 2);
 	}
 }
 
@@ -58,61 +102,15 @@
 	&.components-guide__back-button,
 	&.components-guide__forward-button,
 	&.components-guide__finish-button {
-		height: 30px;
 		position: absolute;
 	}
 
-	&.components-guide__back-button,
-	&.components-guide__forward-button {
-		font-size: 0;
-		padding: 4px 2px;
-
-		&.has-text svg {
-			margin: 0;
-		}
-
-		@include break-small() {
-			font-size: $default-font-size;
-		}
-	}
-
 	&.components-guide__back-button {
-		left: 0;
-
-		@include break-small() {
-			padding: 4px 8px 4px 2px;
-
-			&.has-text svg {
-				margin-right: 4px;
-			}
-		}
+		left: $grid-unit-30;
 	}
 
-	&.components-guide__forward-button {
-		right: 0;
-
-		@include break-small() {
-			padding: 4px 2px 4px 8px;
-
-			&.has-text svg {
-				margin-left: 4px;
-				order: 1;
-			}
-		}
-	}
-
+	&.components-guide__forward-button,
 	&.components-guide__finish-button {
-		display: none;
-		right: 0;
-
-		@include break-small() {
-			display: block;
-		}
-	}
-
-	&.components-guide__inline-finish-button {
-		@include break-small() {
-			display: none;
-		}
+		right: $grid-unit-30;
 	}
 }

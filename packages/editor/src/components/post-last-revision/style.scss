@@ -1,23 +1,34 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-last-revision__title {
 	width: 100%;
-	font-weight: 600;
-
-	.dashicon {
-		margin-right: 5px;
-	}
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
-.components-button.editor-post-last-revision__title {
-	height: auto;
+.editor-post-last-revision__title.components-button.has-icon {
+	height: 100%;
+	justify-content: space-between;
 
 	&:hover,
 	&:active {
 		// Override the default button hover style
-		background: $light-gray-200;
+		background: $gray-100;
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		border-radius: 0;
 	}
 }
+
+// Needs specificity, because this panel is just a button
+.components-panel__body.is-opened.editor-post-last-revision__panel {
+	padding: 0;
+	height: $grid-unit-60;
+
+	.editor-post-last-revision__title.components-button.components-button {
+		padding: $grid-unit-20;
+	}
+}
+

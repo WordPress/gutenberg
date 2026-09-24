@@ -1,0 +1,75 @@
+import type { ChangeEvent, ForwardedRef } from 'react';
+import { useInstanceId } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
+import BaseControl from '../base-control';
+import type { WordPressComponentProps } from '../context';
+import type { TextControlProps } from './types';
+
+function UnforwardedTextControl(
+	props: WordPressComponentProps< TextControlProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
+	const {
+		// Prevent passing legacy props to `input`.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: __,
+		label,
+		hideLabelFromVision,
+		value,
+		help,
+		id: idProp,
+		className,
+		onChange,
+		type = 'text',
+		...additionalProps
+	} = props;
+	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
+	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+		onChange( event.target.value );
+
+	return (
+		<BaseControl
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
+			<input
+				className="components-text-control__input"
+				type={ type }
+				id={ id }
+				value={ value }
+				onChange={ onChangeValue }
+				aria-describedby={ !! help ? id + '__help' : undefined }
+				ref={ ref }
+				{ ...additionalProps }
+			/>
+		</BaseControl>
+	);
+}
+
+/**
+ * TextControl components let users enter and edit text.
+ *
+ * ```jsx
+ * import { TextControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTextControl = () => {
+ *   const [ className, setClassName ] = useState( '' );
+ *
+ *   return (
+ *     <TextControl
+ *       label="Additional CSS Class"
+ *       value={ className }
+ *       onChange={ ( value ) => setClassName( value ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const TextControl = forwardRef( UnforwardedTextControl );
+TextControl.displayName = 'TextControl';
+
+export default TextControl;

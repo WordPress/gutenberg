@@ -1,5 +1,8 @@
-.components-dropdown-menu__popover .components-popover__content {
-	width: 200px;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-dropdown-menu__toggle {
+	vertical-align: top;
 }
 
 .components-dropdown-menu__menu {
@@ -13,8 +16,9 @@
 		width: 100%;
 		padding: 6px;
 		outline: none;
-		cursor: pointer;
-		margin-bottom: $grid-unit-05;
+		cursor: var(--wpds-cursor-control);
+		white-space: nowrap;
+		font-weight: var(--wpds-typography-font-weight-default);
 
 		&.has-separator {
 			margin-top: 6px;
@@ -26,7 +30,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: var(--wpds-color-stroke-surface-neutral);
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -34,57 +38,30 @@
 			height: 1px;
 		}
 
-		&.is-active svg {
-			// Block UI appearance.
-			color: $white;
-			background: $dark-gray-primary;
-			box-shadow: 0 0 0 $border-width $dark-gray-primary;
-			border-radius: $border-width;
+		&.is-active {
+			svg,
+			.dashicon {
+				// Block UI appearance.
+				color: $white;
+				background: $gray-900;
+				box-shadow: 0 0 0 $border-width $gray-900;
+				border-radius: $border-width;
+			}
 		}
 
-		// Formatting buttons
-		> svg {
-			border-radius: $radius-block-ui;
-			width: $button-size-small;
-			height: $button-size-small;
+		// If menu items are icon-only, make them stretch only to the icon size.
+		&.is-icon-only {
+			width: auto;
 		}
 	}
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-button {
-		min-height: $button-size;
+		min-height: $grid-unit-40;
 		height: auto;
-		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 		text-align: left;
-
-		&.has-icon {
-			padding-left: $grid-unit-10;
-		}
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 	}
 
-	.components-menu-group {
-		padding: $grid-unit-15;
-		margin-top: 0;
-		margin-bottom: 0;
-		margin-left: -$grid-unit-15;
-		margin-right: -$grid-unit-15;
-
-		&:first-child {
-			margin-top: -$grid-unit-15;
-		}
-
-		&:last-child {
-			margin-bottom: -$grid-unit-15;
-		}
-	}
-
-	.components-menu-group + .components-menu-group {
-		margin-top: 0;
-		border-top: $border-width solid $light-gray-secondary;
-		padding: $grid-unit-15;
-	}
-}
-
-.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
-	padding: 0 $grid-unit-15;
 }

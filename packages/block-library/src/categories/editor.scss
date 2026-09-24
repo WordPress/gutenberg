@@ -1,7 +1,16 @@
-.block-editor .wp-block-categories ul {
+.wp-block-categories ul {
 	padding-left: 2.5em;
 
 	ul {
 		margin-top: 6px;
 	}
+}
+
+/* Center alignment for classic themes. */
+[data-align="center"] .wp-block-categories {
+	text-align: center;
+}
+
+.wp-block-categories__indentation {
+	padding-left: 16px;
 }

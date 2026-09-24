@@ -10,24 +10,38 @@ Install the module
 npm install @wordpress/api-fetch --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
+### GET
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-// GET
-apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
+```
 
-// POST
+### GET with Query Args
+```js
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+
+const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
+
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
+	console.log( posts );
+} );
+```
+
+### POST
+```js
 apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
 	data: { title: 'New Post Title' },
-} ).then( res => {
+} ).then( ( res ) => {
 	console.log( res );
 } );
 ```
@@ -44,7 +58,7 @@ Shorthand to be used in place of `url`, appended to the REST API root URL for th
 
 #### `url` (`string`)
 
-Absolute URL to the endpoint from which to fetch.
+Absolute URL to the endpoint from which to fetch. The request still goes through the registered middlewares, so see [Requests to other sites](#requests-to-other-sites) before pointing it at another site.
 
 #### `parse` (`boolean`, default `true`)
 
@@ -52,7 +66,58 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+
+### Requests to other sites
+
+`apiFetch` is meant for the REST API of the WordPress site the script runs on. Whenever WordPress loads the package it registers the root URL and nonce middlewares, so with the default fetch handler every request, including one made with a full `url`, is sent with the current user's `X-WP-Nonce` header and with cookies (`credentials: 'include'`). A WordPress site on another origin cannot validate that nonce and rejects the request with a `403` `rest_cookie_invalid_nonce` error, even for public endpoints, and other origins may refuse a credentialed cross-origin request altogether.
+
+Use `window.fetch` for requests to other sites, or make them from the server. A browser request to another site still needs that site to allow the cross-origin request; a WordPress site does so through the CORS headers its REST API sends by default.
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+// Same site: goes through the middlewares.
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
+	console.log( posts );
+} );
+
+// Another site: use fetch directly.
+window
+	.fetch( 'https://example.com/wp-json/wp/v2/posts' )
+	.then( ( response ) => response.json() )
+	.then( ( posts ) => {
+		console.log( posts );
+	} );
+```
+
+### Aborting a request
+
+Aborting a request can be achieved through the use of [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) in the same way as you would when using the native `fetch` API.
+
+For legacy browsers that don't support `AbortController`, you can either:
+
+-   Provide your own polyfill of `AbortController` if you still want it to be abortable.
+-   Ignore it as shown in the example below.
+
+**Example**
+
+```js
+const controller =
+	typeof AbortController === 'undefined' ? undefined : new AbortController();
+
+apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } ).catch(
+	( error ) => {
+		// If the browser doesn't support AbortController then the code below will never log.
+		// However, in most cases this should be fine as it can be considered to be a progressive enhancement.
+		if ( error.name === 'AbortError' ) {
+			console.log( 'Request has been aborted' );
+		}
+	}
+);
+
+controller?.abort();
+```
 
 ### Middlewares
 
@@ -67,11 +132,24 @@ apiFetch.use( ( options, next ) => {
 	const start = Date.now();
 	const result = next( options );
 	result.then( () => {
-		console.log( 'The request took ' + Date.now() - start );
+		console.log( 'The request took ' + ( Date.now() - start ) + 'ms' );
 	} );
 	return result;
 } );
 ```
+
+### Removing middlewares
+
+`apiFetch.unregister` removes a middleware by reference, and returns whether it was registered. Built-in middlewares can be removed too, as long as they are exposed on `apiFetch`.
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+// Send `DELETE` as `DELETE`, rather than as a `POST` carrying an `X-HTTP-Method-Override` header.
+apiFetch.unregister( apiFetch.httpV1Middleware );
+```
+
+Removal is global. Every `apiFetch` call on the page loses the middleware, so only remove a middleware you registered yourself, or a built-in whose behavior the whole page can do without. `httpV1Middleware` in particular exists so that requests keep working on servers and firewalls that reject `PATCH`, `PUT` and `DELETE`; removing it can break saving on those sites.
 
 ### Built-in middlewares
 
@@ -82,7 +160,7 @@ The `api-fetch` package provides built-in middlewares you can use to provide a `
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const nonce = "nonce value";
+const nonce = 'nonce value';
 apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 ```
 
@@ -93,7 +171,7 @@ The function returned by `createNonceMiddleware` includes a `nonce` property cor
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const rootURL = "http://my-wordpress-site/wp-json/";
+const rootURL = 'http://my-wordpress-site/wp-json/';
 apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 
@@ -120,4 +198,16 @@ apiFetch.setFetchHandler( ( options ) => {
 } );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+The default handler remains available, so it can be restored later.
+
+```js
+apiFetch.setFetchHandler( apiFetch.defaultFetchHandler );
+```
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

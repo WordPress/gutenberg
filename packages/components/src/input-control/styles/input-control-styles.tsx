@@ -1,0 +1,387 @@
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
+import type { CSSProperties, ReactNode } from 'react';
+import type { WordPressComponentProps } from '../../context';
+import { Flex, FlexItem } from '../../flex';
+import { Text } from '../../text';
+import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
+import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
+
+type ContainerProps = {
+	disabled?: boolean;
+	hideLabel?: boolean;
+	__unstableInputWidth?: CSSProperties[ 'width' ];
+	labelPosition?: LabelPosition;
+};
+
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
+
+export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+`;
+
+type BackdropProps = {
+	disabled?: boolean;
+	isBorderless?: boolean;
+};
+
+const backdropBorderColor = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
+	if ( isBorderless ) {
+		return 'transparent';
+	}
+
+	if ( disabled ) {
+		return COLORS.ui.borderDisabled;
+	}
+
+	return COLORS.ui.border;
+};
+
+const backdropDisabledStyles = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ) => {
+	if ( ! disabled || isBorderless ) {
+		return undefined;
+	}
+
+	return css`
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+		}
+	`;
+};
+
+export const BackdropUI = styled.div< BackdropProps >`
+	&&& {
+		box-sizing: border-box;
+		border-color: ${ backdropBorderColor };
+		border-radius: inherit;
+		border-style: solid;
+		border-width: 1px;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		${ rtl( { paddingLeft: 2 } ) }
+		${ backdropDisabledStyles }
+	}
+`;
+
+export const Root = styled( Flex )`
+	box-sizing: border-box;
+	position: relative;
+	border-radius: ${ CONFIG.radiusSmall };
+	padding-top: 0;
+`;
+
+const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+	if ( ! disabled ) {
+		return undefined;
+	}
+
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
+};
+
+const containerWidthStyles = ( {
+	__unstableInputWidth,
+	labelPosition,
+}: ContainerProps ) => {
+	if ( ! __unstableInputWidth ) {
+		return css( { width: '100%' } );
+	}
+
+	if ( labelPosition === 'side' ) {
+		return '';
+	}
+
+	if ( labelPosition === 'edge' ) {
+		return css( {
+			flex: `0 0 ${ __unstableInputWidth }`,
+		} );
+	}
+
+	return css( { width: __unstableInputWidth } );
+};
+
+export const Container = styled.div< ContainerProps >`
+	align-items: center;
+	box-sizing: border-box;
+	border-radius: inherit;
+	display: flex;
+	flex: 1;
+	position: relative;
+	background-color: ${ COLORS.ui.background };
+
+	${ containerDisabledStyles }
+	${ containerWidthStyles }
+`;
+
+type InputProps = {
+	disabled?: boolean;
+	inputSize?: Size;
+	isDragging?: boolean;
+	dragCursor?: CSSProperties[ 'cursor' ];
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
+};
+
+const disabledStyles = ( { disabled }: InputProps ) => {
+	if ( ! disabled ) {
+		return '';
+	}
+
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
+	`;
+};
+
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+	const sizes = {
+		default: '13px',
+		small: '11px',
+		compact: '13px',
+	};
+
+	const fontSize = sizes[ size as Size ] || sizes.default;
+	const fontSizeMobile = '16px';
+
+	if ( ! fontSize ) {
+		return '';
+	}
+
+	return css`
+		font-size: ${ fontSizeMobile };
+
+		@media ( min-width: 600px ) {
+			font-size: ${ fontSize };
+		}
+	`;
+};
+
+export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
+	// Paddings may be overridden by the custom paddings props.
+	const sizes = {
+		default: {
+			height: 40,
+			lineHeight: 1,
+			minHeight: 40,
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
+		},
+		small: {
+			height: 24,
+			lineHeight: 1,
+			minHeight: 24,
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
+		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
+		},
+	};
+
+	return sizes[ size as Size ] || sizes.default;
+};
+
+const sizeStyles = ( props: InputProps ) => {
+	return css( getSizeConfig( props ) );
+};
+
+const customPaddings = ( {
+	paddingInlineStart,
+	paddingInlineEnd,
+}: InputProps ) => {
+	return css( { paddingInlineStart, paddingInlineEnd } );
+};
+
+const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
+	let defaultArrowStyles: SerializedStyles | undefined;
+	let activeDragCursorStyles: SerializedStyles | undefined;
+
+	if ( isDragging ) {
+		defaultArrowStyles = css`
+			cursor: ${ dragCursor };
+			user-select: none;
+
+			&::-webkit-outer-spin-button,
+			&::-webkit-inner-spin-button {
+				-webkit-appearance: none !important;
+				margin: 0 !important;
+			}
+		`;
+	}
+
+	if ( isDragging && dragCursor ) {
+		activeDragCursorStyles = css`
+			&:active {
+				cursor: ${ dragCursor };
+			}
+		`;
+	}
+
+	return css`
+		${ defaultArrowStyles }
+		${ activeDragCursorStyles }
+	`;
+};
+
+// TODO: Resolve need to use &&& to increase specificity
+// https://github.com/WordPress/gutenberg/issues/18483
+
+export const Input = styled.input< InputProps >`
+	&&& {
+		background-color: transparent;
+		box-sizing: border-box;
+		border: none;
+		box-shadow: none !important;
+		color: ${ COLORS.theme.foreground };
+		display: block;
+		font-family: inherit;
+		margin: 0;
+		outline: none;
+		width: 100%;
+
+		${ dragStyles }
+		${ disabledStyles }
+		${ fontSizeStyles }
+		${ sizeStyles }
+		${ customPaddings }
+
+		&::-webkit-input-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&::-moz-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&:-ms-input-placeholder {
+			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+
+		/* Hide Safari's value-like placeholder (e.g. \`12:30\`) in empty
+		   date/time inputs. While the input is focused, the browser's
+		   segment editor must stay visible for typing. */
+		@supports ( -webkit-hyphens: none ) and
+			( not ( -moz-appearance: none ) ) {
+			/* Safari only */
+			&[type='date'][data-empty-value]:not( :focus ),
+			&[type='time'][data-empty-value]:not( :focus ),
+			&[type='datetime-local'][data-empty-value]:not( :focus ) {
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
+			}
+		}
+
+		&[type='email'],
+		&[type='url'] {
+			/* rtl:ignore */
+			direction: ltr;
+		}
+	}
+`;
+
+const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+	&&& {
+		${ baseLabelTypography };
+
+		box-sizing: border-box;
+		display: block;
+		padding-top: 0;
+		padding-bottom: 0;
+		max-width: 100%;
+		z-index: 1;
+	}
+`;
+
+export const Label = (
+	props: WordPressComponentProps<
+		{ labelPosition?: LabelPosition; children: ReactNode },
+		'label',
+		false
+	>
+) => <BaseLabel { ...props } as="label" />;
+
+export const LabelWrapper = styled( FlexItem )`
+	max-width: calc( 100% - 10px );
+`;
+
+const prefixSuffixWrapperStyles = ( {
+	variant = 'default',
+	size,
+	isPrefix,
+}: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
+	const { paddingLeft: padding } = getSizeConfig( {
+		inputSize: size,
+	} );
+
+	const paddingProperty = isPrefix
+		? 'paddingInlineStart'
+		: 'paddingInlineEnd';
+
+	if ( variant === 'default' ) {
+		return css( {
+			[ paddingProperty ]: padding,
+		} );
+	}
+
+	// If variant is 'icon' or 'control'
+	return css( {
+		display: 'flex',
+		[ paddingProperty ]: padding - 4,
+	} );
+};
+
+export const PrefixSuffixWrapper = styled.div`
+	${ prefixSuffixWrapperStyles }
+`;

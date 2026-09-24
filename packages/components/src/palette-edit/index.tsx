@@ -1,0 +1,909 @@
+import clsx from 'clsx';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { lineSolid, moreVertical, plus } from '@wordpress/icons';
+import { useDebounce, useInstanceId } from '@wordpress/compose';
+import { kebabCase } from '@wordpress/kebab-case';
+import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+import Button from '../button';
+import { ColorPicker } from '../color-picker';
+import { FlexBlock, FlexItem } from '../flex';
+import { HStack } from '../h-stack';
+import { Item, ItemGroup } from '../item-group';
+import { VStack } from '../v-stack';
+import GradientPicker from '../gradient-picker';
+import ColorPalette from '../color-palette';
+import { DuotonePicker } from '../duotone-picker';
+import ColorListPicker from '../duotone-picker/color-list-picker';
+import CustomDuotoneBar from '../duotone-picker/custom-duotone-bar';
+import {
+	getDefaultColors,
+	getGradientFromCSSColors,
+} from '../duotone-picker/utils';
+import Popover from '../popover';
+import {
+	PaletteEditStyles,
+	PaletteHeading,
+	IndicatorStyled,
+	NameContainer,
+	NameInputControl,
+	DoneButton,
+	RemoveButton,
+	PaletteEditContents,
+} from './styles';
+import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
+import CustomGradientPicker from '../custom-gradient-picker';
+import type {
+	Color,
+	ColorPickerPopoverProps,
+	Duotone,
+	NameInputProps,
+	OptionProps,
+	PaletteEditListViewProps,
+	PaletteEditProps,
+	PaletteElement,
+	PaletteVariant,
+} from './types';
+
+extend( [ namesPlugin ] );
+
+const DEFAULT_COLOR = '#000';
+
+/**
+ * Filters a color palette down to the colors a duotone can actually be built
+ * from, and normalizes each one to hex.
+ *
+ * Duotone values are turned into SVG filter matrices, so each color has to
+ * resolve to a concrete value. A theme palette may legitimately contain CSS
+ * that does not, such as `color-mix()` or `currentColor` — Twenty Twenty-Five
+ * ships one — and picking such a color would produce a duotone that neither the
+ * editor nor the front end can render.
+ *
+ * Surviving colors are normalized because the two ends disagree on syntax. The
+ * front end parses duotone colors with a PHP port of colord that only accepts
+ * hex, `rgb()` and `hsl()` (`WP_Duotone::colord_parse`), while colord in the
+ * editor also accepts CSS named colors such as `red`, since `namesPlugin` is
+ * registered. Passing a palette value straight through would let a named color
+ * be saved as a duotone that renders in the editor and is dropped, with a
+ * `_doing_it_wrong` notice, on the front end.
+ *
+ * @param colorPalette The colors to filter.
+ *
+ * @return The colors usable in a duotone, as hex.
+ */
+function getUsableDuotoneColors( colorPalette: Color[] = [] ) {
+	return colorPalette.flatMap( ( paletteColor ) => {
+		if ( typeof paletteColor.color !== 'string' ) {
+			return [];
+		}
+		const parsed = colord( paletteColor.color );
+		return parsed.isValid()
+			? [ { ...paletteColor, color: parsed.toHex() } ]
+			: [];
+	} );
+}
+
+/**
+ * Reads the colors off a duotone element. Duotone presets can come from a
+ * theme's `theme.json`, so the value is not guaranteed to be an array.
+ *
+ * @param element The palette element.
+ *
+ * @return The duotone's colors, or an empty array if it has none usable.
+ */
+function getDuotoneColors( element: PaletteElement | undefined ) {
+	const colors = ( element as Duotone | undefined )?.colors;
+	return Array.isArray( colors ) ? colors : [];
+}
+
+/**
+ * Returns the single CSS value that represents a palette element, used both for
+ * its swatch and for the labels that refer to it. Duotones have two colors, so
+ * they are represented by the same gradient the duotone swatches use.
+ *
+ * @param element The palette element.
+ * @param variant The kind of preset being edited.
+ *
+ * @return A CSS color or gradient string.
+ */
+function getElementValue(
+	element: PaletteElement | undefined,
+	variant: PaletteVariant
+) {
+	if ( ! element ) {
+		return undefined;
+	}
+	switch ( variant ) {
+		case 'duotone':
+			return getGradientFromCSSColors(
+				getDuotoneColors( element ),
+				'135deg'
+			);
+		case 'gradient':
+			return element.gradient;
+		default:
+			return element.color;
+	}
+}
+
+/**
+ * Returns the hidden label for the name input of a palette element.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getNameInputLabel( variant: PaletteVariant ) {
+	switch ( variant ) {
+		case 'duotone':
+			return __( 'Duotone name' );
+		case 'gradient':
+			return __( 'Gradient name' );
+		default:
+			return __( 'Color name' );
+	}
+}
+
+/**
+ * Returns the `sprintf` format string for the remove button label.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getRemoveLabelFormat( variant: PaletteVariant ) {
+	return variant === 'duotone'
+		? /* translators: %s is a duotone name, e.g. "Purple and yellow". */
+			__( 'Remove duotone: %s' )
+		: /* translators: %s is a color or gradient name, e.g. "Red". */
+			__( 'Remove color: %s' );
+}
+
+/**
+ * Returns the label for the button that adds a new palette element.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getAddLabel( variant: PaletteVariant ) {
+	switch ( variant ) {
+		case 'duotone':
+			return __( 'Add duotone' );
+		case 'gradient':
+			return __( 'Add gradient' );
+		default:
+			return __( 'Add color' );
+	}
+}
+
+/**
+ * Returns the label for the palette's options menu.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getOptionsLabel( variant: PaletteVariant ) {
+	switch ( variant ) {
+		case 'duotone':
+			return __( 'Duotone options' );
+		case 'gradient':
+			return __( 'Gradient options' );
+		default:
+			return __( 'Color options' );
+	}
+}
+
+/**
+ * Returns the label for the menu item that empties the palette.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getRemoveAllLabel( variant: PaletteVariant ) {
+	switch ( variant ) {
+		case 'duotone':
+			return __( 'Remove all duotones' );
+		case 'gradient':
+			return __( 'Remove all gradients' );
+		default:
+			return __( 'Remove all colors' );
+	}
+}
+
+/**
+ * Returns the label for the menu item that resets the palette.
+ *
+ * @param variant The kind of preset being edited.
+ */
+function getResetLabel( variant: PaletteVariant ) {
+	switch ( variant ) {
+		case 'duotone':
+			return __( 'Reset duotones' );
+		case 'gradient':
+			return __( 'Reset gradient' );
+		default:
+			return __( 'Reset colors' );
+	}
+}
+
+function NameInput( { value, onChange, label }: NameInputProps ) {
+	return (
+		<NameInputControl
+			size="compact"
+			label={ label }
+			hideLabelFromVision
+			value={ value }
+			onChange={ onChange }
+		/>
+	);
+}
+
+/*
+ * Deduplicates the slugs of the provided elements.
+ */
+export function deduplicateElementSlugs< T extends PaletteElement >(
+	elements: T[]
+) {
+	const slugCounts: { [ slug: string ]: number } = {};
+
+	return elements.map( ( element ) => {
+		let newSlug: string | undefined;
+
+		const { slug } = element;
+		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+
+		if ( slugCounts[ slug ] > 1 ) {
+			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		}
+
+		return { ...element, slug: newSlug ?? slug };
+	} );
+}
+
+/**
+ * Returns a name and slug for a palette item. The name takes the format "Color + id".
+ * To ensure there are no duplicate ids, this function checks all slugs.
+ * It expects slugs to be in the format: slugPrefix + color- + number.
+ * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+ *
+ * @param elements   An array of color palette items.
+ * @param slugPrefix The slug prefix used to match the element slug.
+ * @param variant    The kind of preset being edited. Duotones are named
+ *                   "Duotone + id" and slugged with a `duotone-` stem;
+ *                   colors and gradients both use `color-`.
+ *
+ * @return A name and slug for the new palette item.
+ */
+export function getNameAndSlugForPosition(
+	elements: PaletteElement[],
+	slugPrefix: string,
+	variant: PaletteVariant = 'color'
+) {
+	const stem = variant === 'duotone' ? 'duotone' : 'color';
+	const nameRegex = new RegExp( `^${ slugPrefix }${ stem }-([\\d]+)$` );
+	const position = elements.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( nameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
+
+	return {
+		name:
+			variant === 'duotone'
+				? sprintf(
+						/* translators: %d: is an id for a custom duotone */
+						__( 'Duotone %d' ),
+						position
+					)
+				: sprintf(
+						/* translators: %d: is an id for a custom color */
+						__( 'Color %d' ),
+						position
+					),
+		slug: `${ slugPrefix }${ stem }-${ position }`,
+	};
+}
+
+function ColorPickerPopover< T extends PaletteElement >( {
+	variant,
+	colorPalette,
+	element,
+	onChange,
+	popoverProps: receivedPopoverProps,
+	onClose = () => {},
+}: ColorPickerPopoverProps< T > ) {
+	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
+		useMemo(
+			() => ( {
+				shift: true,
+				offset: 20,
+				// Disabling resize as it would otherwise cause the popover to show
+				// scrollbars while dragging the color picker's handle close to the
+				// popover edge.
+				resize: false,
+				placement: 'left-start',
+				...receivedPopoverProps,
+				className: clsx(
+					'components-palette-edit__popover',
+					receivedPopoverProps?.className
+				),
+			} ),
+			[ receivedPopoverProps ]
+		);
+
+	return (
+		<Popover { ...popoverProps } onClose={ onClose }>
+			{ variant === 'color' && (
+				<ColorPicker
+					color={ element.color }
+					enableAlpha
+					onChange={ ( newColor ) => {
+						onChange( {
+							...element,
+							color: newColor,
+						} );
+					} }
+				/>
+			) }
+			{ variant === 'gradient' && (
+				<div className="components-palette-edit__popover-gradient-picker">
+					<CustomGradientPicker
+						__experimentalIsRenderedInSidebar
+						value={ element.gradient }
+						onChange={ ( newGradient ) => {
+							onChange( {
+								...element,
+								gradient: newGradient,
+							} );
+						} }
+					/>
+				</div>
+			) }
+			{ variant === 'duotone' && (
+				<div className="components-palette-edit__popover-duotone-picker">
+					{ /* Mirrors the layout `DuotonePicker` uses for its own
+					     custom duotone controls, so the editor here reads the
+					     same as the one in the block toolbar. */ }
+					<VStack spacing={ 3 }>
+						<CustomDuotoneBar
+							value={ getDuotoneColors( element ) }
+							onChange={ ( newColors ) => {
+								// A duotone needs two colors to render, and the
+								// bar refuses to drop below two stops, so an
+								// empty value means there is nothing to save.
+								if ( ! newColors?.length ) {
+									return;
+								}
+								onChange( { ...element, colors: newColors } );
+							} }
+						/>
+						<ColorListPicker
+							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
+							colors={ colorPalette ?? [] }
+							value={ getDuotoneColors( element ) }
+							enableAlpha
+							onChange={ ( newColors ) => {
+								const [ defaultDark, defaultLight ] =
+									getDefaultColors( colorPalette ?? [] );
+								onChange( {
+									...element,
+									colors: [
+										// Falsy rather than nullish, to match
+										// how `DuotonePicker` fills a cleared
+										// shadow or highlight.
+										newColors[ 0 ] || defaultDark,
+										newColors[ 1 ] || defaultLight,
+									],
+								} );
+							} }
+						/>
+					</VStack>
+				</div>
+			) }
+		</Popover>
+	);
+}
+
+function Option< T extends PaletteElement >( {
+	canOnlyChangeValues,
+	element,
+	onChange,
+	onRemove,
+	popoverProps: receivedPopoverProps,
+	slugPrefix,
+	variant,
+	colorPalette,
+}: OptionProps< T > ) {
+	const value = getElementValue( element, variant );
+	const [ isEditingColor, setIsEditingColor ] = useState( false );
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const popoverProps = useMemo(
+		() => ( {
+			...receivedPopoverProps,
+			// Use the custom palette color item as the popover anchor.
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor, receivedPopoverProps ]
+	);
+
+	return (
+		<Item ref={ setPopoverAnchor } size="small">
+			<HStack justify="flex-start">
+				<Button
+					size="small"
+					onClick={ () => {
+						setIsEditingColor( true );
+					} }
+					aria-label={ sprintf(
+						// translators: %s is a color, gradient or duotone name, e.g. "Red".
+						__( 'Edit: %s' ),
+						element.name.trim().length ? element.name : value || ''
+					) }
+					style={ { padding: 0 } }
+				>
+					<IndicatorStyled colorValue={ value } />
+				</Button>
+				<FlexBlock>
+					{ ! canOnlyChangeValues ? (
+						<NameInput
+							label={ getNameInputLabel( variant ) }
+							value={ element.name }
+							onChange={ ( nextName?: string ) =>
+								onChange( {
+									...element,
+									name: nextName,
+									slug:
+										slugPrefix +
+										kebabCase( nextName ?? '' ),
+								} )
+							}
+						/>
+					) : (
+						<NameContainer>
+							{ element.name.trim().length
+								? element.name
+								: /* Fall back to non-breaking space to maintain height */
+									'\u00A0' }
+						</NameContainer>
+					) }
+				</FlexBlock>
+				{ ! canOnlyChangeValues && (
+					<FlexItem>
+						<RemoveButton
+							size="small"
+							icon={ lineSolid }
+							label={ sprintf(
+								getRemoveLabelFormat( variant ),
+								element.name.trim().length
+									? element.name
+									: value || ''
+							) }
+							onClick={ onRemove }
+						/>
+					</FlexItem>
+				) }
+			</HStack>
+			{ isEditingColor && (
+				<ColorPickerPopover
+					variant={ variant }
+					colorPalette={ colorPalette }
+					onChange={ onChange }
+					element={ element }
+					popoverProps={ popoverProps }
+					onClose={ () => setIsEditingColor( false ) }
+				/>
+			) }
+		</Item>
+	);
+}
+
+function PaletteEditListView< T extends PaletteElement >( {
+	elements,
+	onChange,
+	canOnlyChangeValues,
+	slugPrefix,
+	variant,
+	colorPalette,
+	popoverProps,
+	addColorRef,
+}: PaletteEditListViewProps< T > ) {
+	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
+	const elementsReferenceRef = useRef< T[] >( undefined );
+	useEffect( () => {
+		elementsReferenceRef.current = elements;
+	}, [ elements ] );
+
+	const debounceOnChange = useDebounce(
+		( updatedElements: T[] ) =>
+			onChange( deduplicateElementSlugs( updatedElements ) ),
+		100
+	);
+
+	return (
+		<VStack spacing={ 3 }>
+			<ItemGroup isRounded isBordered isSeparated>
+				{ elements.map( ( element, index ) => (
+					<Option
+						variant={ variant }
+						colorPalette={ colorPalette }
+						canOnlyChangeValues={ canOnlyChangeValues }
+						key={ index }
+						element={ element }
+						onChange={ ( newElement ) => {
+							debounceOnChange(
+								elements.map(
+									( currentElement, currentIndex ) => {
+										if ( currentIndex === index ) {
+											return newElement;
+										}
+										return currentElement;
+									}
+								)
+							);
+						} }
+						onRemove={ () => {
+							const newElements = elements.filter(
+								( _currentElement, currentIndex ) => {
+									if ( currentIndex === index ) {
+										return false;
+									}
+									return true;
+								}
+							);
+							onChange(
+								newElements.length ? newElements : undefined
+							);
+							addColorRef.current?.focus();
+						} }
+						slugPrefix={ slugPrefix }
+						popoverProps={ popoverProps }
+					/>
+				) ) }
+			</ItemGroup>
+		</VStack>
+	);
+}
+
+const EMPTY_ARRAY: Color[] = [];
+
+/**
+ * Allows editing a palette of colors, gradients or duotones.
+ *
+ * ```jsx
+ * import { PaletteEdit } from '@wordpress/components';
+ * const MyPaletteEdit = () => {
+ *   const [ controlledColors, setControlledColors ] = useState( colors );
+ *
+ *   return (
+ *     <PaletteEdit
+ *       colors={ controlledColors }
+ *       onChange={ ( newColors?: Color[] ) => {
+ *         setControlledColors( newColors );
+ *       } }
+ *       paletteLabel="Here is a label"
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export function PaletteEdit( {
+	gradients,
+	duotones,
+	colors = EMPTY_ARRAY,
+	colorPalette,
+	onChange,
+	paletteLabel,
+	paletteLabelHeadingLevel = 2,
+	emptyMessage,
+	canOnlyChangeValues,
+	canReset,
+	slugPrefix = '',
+	popoverProps,
+}: PaletteEditProps ) {
+	// PaletteEdit combines Components overlays with UI Menu. Direct package
+	// consumers do not expose window.wp.components for automatic opt-in.
+	useEnableWpCompatOverlaySlot();
+
+	let variant: PaletteVariant = 'color';
+	if ( gradients ) {
+		variant = 'gradient';
+	} else if ( duotones ) {
+		variant = 'duotone';
+	}
+	const elements = gradients ?? duotones ?? colors;
+	// Filtered once here so every duotone path — the swatches, the shadows and
+	// highlights pickers, and the value a newly added duotone starts from —
+	// works from colors a duotone can actually be built with.
+	const duotoneColorPalette = useMemo(
+		() => getUsableDuotoneColors( colorPalette ),
+		[ colorPalette ]
+	);
+	const [ isEditing, setIsEditing ] = useState( false );
+	const [ editingElement, setEditingElement ] = useState<
+		number | null | undefined
+	>( null );
+	const isAdding =
+		isEditing &&
+		!! editingElement &&
+		elements[ editingElement ] &&
+		! elements[ editingElement ].slug;
+	const elementsLength = elements.length;
+	const hasElements = elementsLength > 0;
+	const debounceOnChange = useDebounce( onChange, 100 );
+	const onSelectPaletteItem = useCallback(
+		(
+			value?: PaletteElement[ keyof PaletteElement ],
+			newEditingElementIndex?: number
+		) => {
+			const selectedElement =
+				newEditingElementIndex === undefined
+					? undefined
+					: elements[ newEditingElementIndex ];
+			const key = variant === 'gradient' ? 'gradient' : 'color';
+			// Ensures that the index returned matches a known element value.
+			if ( !! selectedElement && selectedElement[ key ] === value ) {
+				setEditingElement( newEditingElementIndex );
+			} else {
+				setIsEditing( true );
+			}
+		},
+		[ variant, elements ]
+	);
+
+	// Two duotones can hold the same pair of colors, so the picker's reported
+	// index is what identifies the one that was clicked. Matching on the colors
+	// instead would edit whichever duotone happened to come first.
+	const onSelectDuotoneItem = useCallback(
+		( value?: string[] | 'unset', newEditingElementIndex?: number ) => {
+			if (
+				newEditingElementIndex !== undefined &&
+				( duotones ?? [] )[ newEditingElementIndex ]
+			) {
+				setEditingElement( newEditingElementIndex );
+			} else {
+				setIsEditing( true );
+			}
+		},
+		[ duotones ]
+	);
+
+	const addColorRef = useRef< HTMLButtonElement >( null );
+
+	// Names the swatch picker after this palette's heading, so a screen reader
+	// announces "Theme", "Default" or "Custom" rather than an unlabelled list.
+	const paletteLabelId = useInstanceId(
+		PaletteEdit,
+		'components-palette-edit__heading'
+	);
+
+	return (
+		<PaletteEditStyles>
+			<HStack>
+				<PaletteHeading
+					id={ paletteLabelId }
+					level={ paletteLabelHeadingLevel }
+				>
+					{ paletteLabel }
+				</PaletteHeading>
+				<Stack direction="row" gap="xs">
+					{ hasElements && isEditing && (
+						<DoneButton
+							size="small"
+							onClick={ () => {
+								setIsEditing( false );
+								setEditingElement( null );
+							} }
+						>
+							{ __( 'Done' ) }
+						</DoneButton>
+					) }
+					{ ! canOnlyChangeValues && (
+						<Button
+							ref={ addColorRef }
+							size="small"
+							isPressed={ isAdding }
+							icon={ plus }
+							label={ getAddLabel( variant ) }
+							onClick={ () => {
+								const { name, slug } =
+									getNameAndSlugForPosition(
+										elements,
+										slugPrefix,
+										variant
+									);
+
+								if ( !! gradients ) {
+									onChange( [
+										...gradients,
+										{
+											gradient: DEFAULT_GRADIENT,
+											name,
+											slug,
+										},
+									] );
+								} else if ( !! duotones ) {
+									onChange( [
+										...duotones,
+										{
+											colors: getDefaultColors(
+												duotoneColorPalette
+											),
+											name,
+											slug,
+										},
+									] );
+								} else {
+									onChange( [
+										...colors,
+										{
+											color: DEFAULT_COLOR,
+											name,
+											slug,
+										},
+									] );
+								}
+								setIsEditing( true );
+								setEditingElement( elements.length );
+							} }
+						/>
+					) }
+
+					{ hasElements &&
+						( ! isEditing ||
+							! canOnlyChangeValues ||
+							canReset ) && (
+							<Menu.Root modal={ false }>
+								<Menu.Trigger
+									render={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ getOptionsLabel( variant ) }
+											showTooltip
+										/>
+									}
+								/>
+								<Menu.Popup
+									positioner={
+										<Menu.Positioner align="end" />
+									}
+								>
+									{ ! isEditing && (
+										<Menu.Item
+											onClick={ () =>
+												setIsEditing( true )
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Show details' ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ ! canOnlyChangeValues && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												setIsEditing( false );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getRemoveAllLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ canReset && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getResetLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+								</Menu.Popup>
+							</Menu.Root>
+						) }
+				</Stack>
+			</HStack>
+			{ hasElements && (
+				<PaletteEditContents>
+					{ isEditing && (
+						<PaletteEditListView< ( typeof elements )[ number ] >
+							canOnlyChangeValues={ canOnlyChangeValues }
+							elements={ elements }
+							// @ts-expect-error TODO: Don't know how to resolve
+							onChange={ onChange }
+							slugPrefix={ slugPrefix }
+							variant={ variant }
+							colorPalette={ duotoneColorPalette }
+							popoverProps={ popoverProps }
+							addColorRef={ addColorRef }
+						/>
+					) }
+					{ ! isEditing && editingElement !== null && (
+						<ColorPickerPopover
+							variant={ variant }
+							colorPalette={ duotoneColorPalette }
+							onClose={ () => setEditingElement( null ) }
+							onChange={ (
+								newElement: ( typeof elements )[ number ]
+							) => {
+								debounceOnChange(
+									// @ts-expect-error TODO: Don't know how to resolve
+									elements.map(
+										(
+											currentElement: ( typeof elements )[ number ],
+											currentIndex: number
+										) => {
+											if (
+												currentIndex === editingElement
+											) {
+												return newElement;
+											}
+											return currentElement;
+										}
+									)
+								);
+							} }
+							element={ elements[ editingElement ?? -1 ] }
+							popoverProps={ popoverProps }
+						/>
+					) }
+					{ ! isEditing && variant === 'gradient' && (
+						<GradientPicker
+							presentation="command-buttons"
+							aria-labelledby={ paletteLabelId }
+							gradients={ gradients }
+							onChange={ onSelectPaletteItem }
+							clearable={ false }
+							disableCustomGradients
+						/>
+					) }
+					{ ! isEditing && variant === 'duotone' && (
+						<DuotonePicker
+							presentation="command-buttons"
+							aria-labelledby={ paletteLabelId }
+							duotonePalette={ duotones ?? [] }
+							colorPalette={ duotoneColorPalette }
+							onChange={ onSelectDuotoneItem }
+							clearable={ false }
+							unsetable={ false }
+							disableCustomDuotone
+							disableCustomColors
+						/>
+					) }
+					{ ! isEditing && variant === 'color' && (
+						<ColorPalette
+							presentation="command-buttons"
+							aria-labelledby={ paletteLabelId }
+							colors={ colors }
+							onChange={ onSelectPaletteItem }
+							clearable={ false }
+							disableCustomColors
+						/>
+					) }
+				</PaletteEditContents>
+			) }
+			{ ! hasElements && emptyMessage && (
+				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
+			) }
+		</PaletteEditStyles>
+	);
+}
+
+export default PaletteEdit;

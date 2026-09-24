@@ -1,23 +1,14 @@
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import '../generated-class-name';
+
+const noop = () => {};
 
 describe( 'generated className', () => {
 	const blockSettings = {
 		name: 'chicken/ribs',
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

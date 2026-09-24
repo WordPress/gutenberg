@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/post-excerpt",
+		"isValid": true,
+		"attributes": {
+			"showMoreOnNewLine": true,
+			"excerptLength": 55
+		},
+		"innerBlocks": []
+	}
+]

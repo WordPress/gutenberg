@@ -1,22 +1,13 @@
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
- * Internal dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
+import '../store';
 import { getFormatType } from '../get-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
 import { getFormatTypes } from '../get-format-types';
 
-describe( 'getFormatType', () => {
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
+const noop = () => {};
 
+describe( 'getFormatType', () => {
 	afterEach( () => {
 		getFormatTypes().forEach( ( format ) => {
 			unregisterFormatType( format.name );

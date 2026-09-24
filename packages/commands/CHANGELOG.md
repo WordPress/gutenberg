@@ -1,0 +1,223 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 1.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
+
+## 1.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove unused dependency `@wordpress/warning` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 1.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
+
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`. Adds a `@wordpress/keycodes` dependency ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+
+## 1.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 1.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77358](https://github.com/WordPress/gutenberg/pull/77358)).
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+### Enhancements
+
+-   Add a new section of recently used commands to the Command Palette.
+
+## 1.42.0 (2026-03-18)
+
+## 1.41.0 (2026-03-04)
+
+## 1.40.0 (2026-02-18)
+
+-   Add `category` property to command config, used to visually differentiate commands in the Command Palette.
+
+## 1.39.0 (2026-01-29)
+
+## 1.38.0 (2026-01-16)
+
+## 1.36.0 (2025-11-26)
+
+## 1.35.0 (2025-11-12)
+
+## 1.34.0 (2025-10-29)
+
+## 1.33.0 (2025-10-17)
+
+## 1.32.0 (2025-10-01)
+
+## 1.31.0 (2025-09-17)
+
+## 1.30.0 (2025-09-03)
+
+## 1.29.0 (2025-08-20)
+
+## 1.28.0 (2025-08-07)
+
+## 1.27.0 (2025-07-23)
+
+## 1.26.0 (2025-06-25)
+
+## 1.25.0 (2025-06-04)
+
+## 1.24.0 (2025-05-22)
+
+## 1.23.0 (2025-05-07)
+
+## 1.22.0 (2025-04-11)
+
+## 1.21.0 (2025-03-27)
+
+## 1.20.0 (2025-03-13)
+
+## 1.19.0 (2025-02-28)
+
+## 1.18.0 (2025-02-12)
+
+## 1.17.0 (2025-01-29)
+
+## 1.16.0 (2025-01-15)
+
+## 1.15.0 (2025-01-02)
+
+## 1.14.0 (2024-12-11)
+
+## 1.13.0 (2024-11-27)
+
+## 1.12.0 (2024-11-16)
+
+## 1.11.0 (2024-10-30)
+
+## 1.10.0 (2024-10-16)
+
+## 1.9.0 (2024-10-03)
+
+## 1.8.0 (2024-09-19)
+
+## 1.7.0 (2024-09-05)
+
+## 1.6.0 (2024-08-21)
+
+## 1.5.0 (2024-08-07)
+
+## 1.4.0 (2024-07-24)
+
+## 1.3.0 (2024-07-10)
+
+## 1.2.0 (2024-06-26)
+
+## 1.1.0 (2024-06-15)
+
+## 1.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 0.29.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 0.28.0 (2024-05-02)
+
+## 0.27.0 (2024-04-19)
+
+## 0.26.0 (2024-04-03)
+
+## 0.25.0 (2024-03-21)
+
+## 0.24.0 (2024-03-06)
+
+## 0.23.0 (2024-02-21)
+
+## 0.22.0 (2024-02-09)
+
+## 0.21.0 (2024-01-24)
+
+## 0.20.0 (2024-01-10)
+
+### Enhancements
+
+-   Support conditional commands and commands loaders using the "disabled" config.
+
+## 0.19.0 (2023-12-13)
+
+## 0.18.0 (2023-11-29)
+
+## 0.17.0 (2023-11-16)
+
+## 0.16.0 (2023-11-02)
+
+## 0.15.0 (2023-10-18)
+
+## 0.14.0 (2023-10-05)
+
+## 0.13.0 (2023-09-20)
+
+## 0.12.0 (2023-08-31)
+
+## 0.11.0 (2023-08-16)
+
+## 0.10.0 (2023-08-10)
+
+## 0.9.0 (2023-07-20)
+
+## 0.8.0 (2023-07-05)
+
+## 0.7.0 (2023-06-23)
+
+## 0.6.0 (2023-06-07)
+
+## 0.5.0 (2023-05-24)
+
+## 0.4.0 (2023-05-10)
+
+## 0.3.0 (2023-04-26)
+
+## 0.2.0 (2023-04-12)
+
+Initial release.

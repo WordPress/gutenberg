@@ -1,40 +1,37 @@
-/**
- * External dependencies
- */
-import { isEmpty, each } from 'lodash';
+import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
 
 /**
- * Internal dependencies
+ * Evaluates a CSS aspect-ratio property value as a number.
+ *
+ * Degenerate or invalid ratios behave as 'auto'. And 'auto' ratios return NaN.
+ *
+ * @see https://drafts.csswg.org/css-sizing-4/#aspect-ratio
+ *
+ * @param {string} value CSS aspect-ratio property value.
+ * @return {number} Numerical aspect ratio or NaN if invalid.
  */
-import { NEW_TAB_REL } from './constants';
-
-export function calculatePreferedImageSize( image, container ) {
-	const maxWidth = container.clientWidth;
-	const exceedMaxWidth = image.width > maxWidth;
-	const ratio = image.height / image.width;
-	const width = exceedMaxWidth ? maxWidth : image.width;
-	const height = exceedMaxWidth ? maxWidth * ratio : image.height;
-	return { width, height };
+export function evalAspectRatio( value ) {
+	const [ width, height = 1 ] = value.split( '/' ).map( Number );
+	const aspectRatio = width / height;
+	return aspectRatio === Infinity || aspectRatio === 0 ? NaN : aspectRatio;
 }
 
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
 
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, function( relVal ) {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
+	if ( currentRel !== undefined && newRel ) {
+		NEW_TAB_REL.forEach( ( relVal ) => {
+			const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
+			newRel = newRel.replace( regExp, '' );
+		} );
 
-			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
-				newRel = newRel.trim();
-			}
+		// Only trim if NEW_TAB_REL values was replaced.
+		if ( newRel !== currentRel ) {
+			newRel = newRel.trim();
+		}
 
-			if ( isEmpty( newRel ) ) {
-				newRel = undefined;
-			}
+		if ( ! newRel ) {
+			newRel = undefined;
 		}
 	}
 
@@ -44,9 +41,9 @@ export function removeNewTabRel( currentRel ) {
 /**
  * Helper to get the link target settings to be stored.
  *
- * @param {boolean} value         The new link target value.
- * @param {Object} attributes     Block attributes.
- * @param {Object} attributes.rel Image block's rel attribute.
+ * @param {boolean} value          The new link target value.
+ * @param {Object}  attributes     Block attributes.
+ * @param {Object}  attributes.rel Image block's rel attribute.
  *
  * @return {Object} Updated link target settings.
  */
@@ -64,4 +61,36 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
 		linkTarget,
 		rel: updatedRel,
 	};
+}
+
+/**
+ * Determines new Image block attributes size selection.
+ *
+ * @param {Object} image Media file object for gallery image.
+ * @param {string} size  Selected size slug to apply.
+ */
+export function getImageSizeAttributes( image, size ) {
+	const url = image?.media_details?.sizes?.[ size ]?.source_url;
+
+	if ( url ) {
+		return { url, width: undefined, height: undefined, sizeSlug: size };
+	}
+
+	return {};
+}
+
+/**
+ * Checks if the file has a valid file type.
+ *
+ * @param {File} file - The file to check.
+ * @return {boolean} - Returns true if the file has a valid file type, otherwise false.
+ */
+export function isValidFileType( file ) {
+	return ALLOWED_MEDIA_TYPES.some(
+		( mediaType ) => file.type.indexOf( mediaType ) === 0
+	);
+}
+
+export function mediaPosition( { x, y } = { x: 0.5, y: 0.5 } ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }

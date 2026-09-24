@@ -1,24 +1,15 @@
-/**
- * GitHub dependencies
- */
-const { setFailed, getInput } = require( '@actions/core' );
-const { context, GitHub } = require( '@actions/github' );
-
-/**
- * Internal dependencies
- */
-const assignFixedIssues = require( './assign-fixed-issues' );
-const firstTimeContributor = require( './first-time-contributor' );
-const addMilestone = require( './add-milestone' );
-const debug = require( './debug' );
-const ifNotFork = require( './if-not-fork' );
-
-/** @typedef {import('@actions/github').GitHub} GitHub */
+import { setFailed, getInput } from '@actions/core';
+import { getOctokit, context } from '@actions/github';
+import assignFixedIssues from './tasks/assign-fixed-issues/index.js';
+import firstTimeContributorAccountLink from './tasks/first-time-contributor-account-link/index.js';
+import firstTimeContributorLabel from './tasks/first-time-contributor-label/index.js';
+import addMilestone from './tasks/add-milestone/index.js';
+import debug from './debug.js';
 
 /**
  * Automation task function.
  *
- * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ * @typedef {( payload: any, octokit: ReturnType<typeof getOctokit> ) => void} WPAutomationTask
  */
 
 /**
@@ -37,13 +28,18 @@ const ifNotFork = require( './if-not-fork' );
  */
 const automations = [
 	{
-		event: 'pull_request',
+		event: 'pull_request_target',
 		action: 'opened',
-		task: ifNotFork( assignFixedIssues ),
+		task: assignFixedIssues,
+	},
+	{
+		event: 'pull_request_target',
+		action: 'opened',
+		task: firstTimeContributorLabel,
 	},
 	{
 		event: 'push',
-		task: firstTimeContributor,
+		task: firstTimeContributorAccountLink,
 	},
 	{
 		event: 'push',
@@ -58,7 +54,7 @@ const automations = [
 		return;
 	}
 
-	const octokit = new GitHub( token );
+	const octokit = getOctokit( token );
 
 	debug(
 		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`

@@ -11,15 +11,16 @@
 const FUNCTION_SCOPE_JSX_IDENTIFIERS = new WeakMap();
 
 /**
- * Returns the closest function scope for the current ESLint context object, or
- * undefined if it cannot be determined.
+ * Returns the closest function scope for the given node, or undefined if it
+ * cannot be determined.
  *
  * @param {ESLintRuleContext} context ESLint context object.
+ * @param {ESTreeNode}        node    Current AST node.
  *
  * @return {ESLintScope|undefined} Function scope, if known.
  */
-function getClosestFunctionScope( context ) {
-	let functionScope = context.getScope();
+function getClosestFunctionScope( context, node ) {
+	let functionScope = context.sourceCode.getScope( node );
 	while ( functionScope.type !== 'function' && functionScope.upper ) {
 		functionScope = functionScope.upper;
 	}
@@ -73,7 +74,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 				// identifiers. Account for this by visiting JSX identifiers
 				// first, and tracking them in a map per function scope, which
 				// is later merged with the known variable references.
-				const functionScope = getClosestFunctionScope( context );
+				const functionScope = getClosestFunctionScope( context, node );
 				if ( ! functionScope ) {
 					return;
 				}
@@ -88,7 +89,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 				FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope ).add( node );
 			},
 			'ReturnStatement:exit'( node ) {
-				const functionScope = getClosestFunctionScope( context );
+				const functionScope = getClosestFunctionScope( context, node );
 				if ( ! functionScope ) {
 					return;
 				}
@@ -104,7 +105,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							// Allow unused if part of an object destructuring.
 							! isExemptObjectDestructureDeclarator( def.node ) &&
 							// Only target assignments preceding `return`.
-							def.node.end < node.end
+							def.node.range[ 1 ] < node.range[ 1 ]
 						);
 					} );
 
@@ -129,15 +130,15 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 
 					// Merge with any JSX identifiers in scope, if any.
 					if ( FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope ) ) {
-						const jsxIdentifiers = FUNCTION_SCOPE_JSX_IDENTIFIERS.get(
-							functionScope
-						);
+						const jsxIdentifiers =
+							FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope );
 
 						identifiers.push( ...jsxIdentifiers );
 					}
 
 					const isUsedBeforeReturn = identifiers.some(
-						( identifier ) => identifier.end < node.end
+						( identifier ) =>
+							identifier.range[ 1 ] < node.range[ 1 ]
 					);
 
 					if ( isUsedBeforeReturn ) {

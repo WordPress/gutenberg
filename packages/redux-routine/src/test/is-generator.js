@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, test } from 'vitest';
 import isGenerator from '../is-generator';
 
 describe( 'isGenerator', () => {
@@ -23,13 +21,13 @@ describe( 'isGenerator', () => {
 	} );
 
 	it( 'should return false if an async generator', () => {
-		const value = ( async function*() {} )();
+		const value = ( async function* () {} )();
 
 		expect( isGenerator( value ) ).toBe( false );
 	} );
 
 	it( 'should return true if a generator', () => {
-		const value = ( function*() {} )();
+		const value = ( function* () {} )();
 
 		expect( isGenerator( value ) ).toBe( true );
 	} );

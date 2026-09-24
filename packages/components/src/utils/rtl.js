@@ -1,31 +1,10 @@
-/**
- * External dependencies
- */
-import { css } from '@emotion/core';
-import { mapKeys } from 'lodash';
+import { css } from '@emotion/react';
+import { isRTL } from '@wordpress/i18n';
 
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
 const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
 const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
 const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
-
-/**
- * Checks to see whether the document is set to rtl.
- *
- * @return {boolean} Whether document is RTL.
- */
-function getRtl() {
-	return !! ( document && document.documentElement.dir === 'rtl' );
-}
-
-/**
- * Simple hook to retrieve RTL direction value
- *
- * @return {boolean} Whether document is RTL.
- */
-export function useRtl() {
-	return getRtl();
-}
 
 /**
  * Flips a CSS property from left <-> right.
@@ -65,30 +44,49 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {Object} ltrStyles
+ * @param {React.CSSProperties} ltrStyles
  *
- * @return {Object} Converted ltr -> rtl styles
+ * @return {React.CSSProperties} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
-	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
+	return Object.fromEntries(
+		Object.entries( ltrStyles ).map( ( [ key, value ] ) => [
+			getConvertedKey( key ),
+			value,
+		] )
+	);
 };
 
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
+ * @param {React.CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {React.CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
  *
- * @return {Function} A function to output CSS styles for Emotion's renderer
+ * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
-		const isRtl = getRtl();
-
 		if ( rtlStyles ) {
-			return isRtl ? css( rtlStyles ) : css( ltrStyles );
+			// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
+			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		return isRtl ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+		// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
+		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }
+
+/**
+ * Call this in the `useMemo` dependency array to ensure that subsequent renders will
+ * cause rtl styles to update based on the `isRTL` return value even if all other dependencies
+ * remain the same.
+ *
+ * @example
+ * const styles = useMemo( () => {
+ *   return css`
+ *     ${ rtl( { marginRight: '10px' } ) }
+ *   `;
+ * }, [ rtl.watch() ] );
+ */
+rtl.watch = () => isRTL();

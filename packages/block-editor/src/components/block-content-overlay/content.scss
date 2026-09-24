@@ -1,0 +1,13 @@
+.block-editor-block-list__block.has-block-overlay {
+	cursor: default;
+
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+
+	.block-editor-block-list__block.has-block-overlay::before {
+		left: 0;
+		right: 0;
+		width: auto;
+	}
+}

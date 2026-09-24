@@ -1,58 +1,75 @@
-/**
- * External dependencies
- */
-import classnames from 'classnames';
-import { isObject } from 'lodash';
-
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useRef, useEffect, Platform } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { getBlockSupport } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 import {
 	getColorClassName,
-	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import {
-	__experimentalGetGradientClass,
-	getGradientValueBySlug,
-	getGradientSlugByValue,
-} from '../components/gradients';
-import { cleanEmptyObject } from './utils';
-import ColorPanel from './color-panel';
+import { __experimentalGetGradientClass } from '../components/gradients';
+import { transformStyles, shouldSkipSerialization } from './utils';
+import { getBackgroundImageClasses } from './background';
+import { useSettings } from '../components/use-settings';
 
-export const COLOR_SUPPORT_KEY = '__experimentalColor';
+export const COLOR_SUPPORT_KEY = 'color';
 
-const hasColorSupport = ( blockType ) =>
-	hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasColorSupport = ( blockNameOrType ) => {
+	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
+	return (
+		colorSupport &&
+		( colorSupport.link === true ||
+			colorSupport.gradient === true ||
+			colorSupport.background !== false ||
+			colorSupport.text !== false )
+	);
+};
 
-const hasGradientSupport = ( blockType ) => {
+const hasLinkColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.gradients;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.link
+	);
+};
+
+const hasGradientSupport = ( blockNameOrType ) => {
+	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
+
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.gradients
+	);
+};
+
+const hasBackgroundColorSupport = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport && colorSupport.background !== false;
+};
+
+const hasTextColorSupport = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport && colorSupport.text !== false;
 };
 
 /**
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addAttributes( settings ) {
 	if ( ! hasColorSupport( settings ) ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.backgroundColor ) {
 		Object.assign( settings.attributes, {
 			backgroundColor: {
@@ -82,197 +99,172 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject colors classnames.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object}        props           Additional props applied to save element.
+ * @param {Object|string} blockNameOrType Block type.
+ * @param {Object}        attributes      Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasColorSupport( blockType ) ) {
+export function addSaveProps( props, blockNameOrType, attributes ) {
+	if (
+		! hasColorSupport( blockNameOrType ) ||
+		shouldSkipSerialization( blockNameOrType, COLOR_SUPPORT_KEY )
+	) {
 		return props;
 	}
 
-	const hasGradient = hasGradientSupport( blockType );
+	const hasGradient = hasGradientSupport( blockNameOrType );
 
-	// I'd have prefered to avoid the "style" attribute usage here
+	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
-	const backgroundClass = getColorClassName(
-		'background-color',
-		backgroundColor
-	);
-	const gradientClass = __experimentalGetGradientClass( gradient );
-	const textClass = getColorClassName( 'color', textColor );
-	const newClassName = classnames(
-		props.className,
-		textClass,
-		gradientClass,
-		{
-			// Don't apply the background class if there's a custom gradient
-			[ backgroundClass ]:
-				( ! hasGradient || ! style?.color?.gradient ) &&
-				!! backgroundClass,
-			'has-text-color': textColor || style?.color?.text,
-			'has-background':
-				backgroundColor ||
-				style?.color?.background ||
-				( hasGradient && ( gradient || style?.color?.gradient ) ),
-		}
-	);
+	const shouldSerialize = ( feature ) =>
+		! shouldSkipSerialization(
+			blockNameOrType,
+			COLOR_SUPPORT_KEY,
+			feature
+		);
+
+	// Primary color classes must come before the `has-text-color`,
+	// `has-background` and `has-link-color` classes to maintain backwards
+	// compatibility and avoid block invalidations.
+	const textClass = shouldSerialize( 'text' )
+		? getColorClassName( 'color', textColor )
+		: undefined;
+
+	const gradientClass = shouldSerialize( 'gradients' )
+		? __experimentalGetGradientClass( gradient )
+		: undefined;
+
+	const backgroundClass = shouldSerialize( 'background' )
+		? getColorClassName( 'background-color', backgroundColor )
+		: undefined;
+
+	const serializeHasBackground =
+		shouldSerialize( 'background' ) || shouldSerialize( 'gradients' );
+	const hasBackground =
+		backgroundColor ||
+		style?.color?.background ||
+		( hasGradient && ( gradient || style?.color?.gradient ) );
+
+	const newClassName = clsx( props.className, textClass, gradientClass, {
+		// Don't apply the background class if there's a custom gradient.
+		[ backgroundClass ]:
+			( ! hasGradient || ! style?.color?.gradient ) && !! backgroundClass,
+		'has-text-color':
+			shouldSerialize( 'text' ) && ( textColor || style?.color?.text ),
+		'has-background': serializeHasBackground && hasBackground,
+		'has-link-color':
+			shouldSerialize( 'link' ) && style?.elements?.link?.color,
+	} );
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
 }
 
-/**
- * Filters registered block settings to extand the block edit wrapper
- * to apply the desired styles and classnames properly.
- *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
- */
-export function addEditProps( settings ) {
-	if ( ! hasColorSupport( settings ) ) {
-		return settings;
-	}
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
+function useBlockProps( {
+	name,
+	backgroundColor,
+	textColor,
+	gradient,
+	style,
+} ) {
+	const [ userPalette, themePalette, defaultPalette ] = useSettings(
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default'
+	);
 
-	return settings;
+	const colors = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
+	if (
+		! hasColorSupport( name ) ||
+		shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
+	) {
+		return {};
+	}
+	const extraStyles = {};
+
+	if (
+		textColor &&
+		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
+	) {
+		extraStyles.color = getColorObjectByAttributeValues(
+			colors,
+			textColor
+		)?.color;
+	}
+	if (
+		backgroundColor &&
+		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
+	) {
+		extraStyles.backgroundColor = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		)?.color;
+	}
+
+	const saveProps = addSaveProps( { style: extraStyles }, name, {
+		textColor,
+		backgroundColor,
+		gradient,
+		style,
+	} );
+
+	const hasBackgroundValue =
+		backgroundColor ||
+		style?.color?.background ||
+		gradient ||
+		style?.color?.gradient;
+
+	return {
+		...saveProps,
+		className: clsx(
+			saveProps.className,
+			// Add background image classes in the editor, if not already handled by background color values.
+			! hasBackgroundValue && getBackgroundImageClasses( style )
+		),
+	};
 }
 
-/**
- * Inspector control panel containing the color related configuration
- *
- * @param {Object} props
- *
- * @return {WPElement} Color edit element.
- */
-export function ColorEdit( props ) {
-	const { name: blockName, attributes } = props;
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
-	// Shouldn't be needed but right now the ColorGradientsPanel
-	// can trigger both onChangeColor and onChangeBackground
-	// synchronously causing our two callbacks to override changes
-	// from each other.
-	const localAttributes = useRef( attributes );
-	useEffect( () => {
-		localAttributes.current = attributes;
-	}, [ attributes ] );
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
+	hasSupport: hasColorSupport,
+};
 
-	if ( ! hasColorSupport( blockName ) ) {
-		return null;
-	}
+const MIGRATION_PATHS = {
+	linkColor: [ [ 'style', 'elements', 'link', 'color', 'text' ] ],
+	textColor: [ [ 'textColor' ], [ 'style', 'color', 'text' ] ],
+	backgroundColor: [
+		[ 'backgroundColor' ],
+		[ 'style', 'color', 'background' ],
+	],
+	gradient: [ [ 'gradient' ], [ 'style', 'color', 'gradient' ] ],
+};
 
-	const hasGradient = hasGradientSupport( blockName );
-
-	const { style, textColor, backgroundColor, gradient } = attributes;
-	let gradientValue;
-	if ( hasGradient && gradient ) {
-		gradientValue = getGradientValueBySlug( gradients, gradient );
-	} else if ( hasGradient ) {
-		gradientValue = style?.color?.gradient;
-	}
-
-	const onChangeColor = ( name ) => ( value ) => {
-		const colorObject = getColorObjectByColorValue( colors, value );
-		const attributeName = name + 'Color';
-		const newStyle = {
-			...localAttributes.current.style,
-			color: {
-				...localAttributes.current?.style?.color,
-				[ name ]: colorObject?.slug ? undefined : value,
-			},
-		};
-
-		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
-		const newAttributes = {
-			style: cleanEmptyObject( newStyle ),
-			[ attributeName ]: newNamedColor,
-		};
-
-		props.setAttributes( newAttributes );
-		localAttributes.current = {
-			...localAttributes.current,
-			...newAttributes,
-		};
+export function addTransforms( result, source, index, results ) {
+	const destinationBlockType = result.name;
+	const activeSupports = {
+		linkColor: hasLinkColorSupport( destinationBlockType ),
+		textColor: hasTextColorSupport( destinationBlockType ),
+		backgroundColor: hasBackgroundColorSupport( destinationBlockType ),
+		gradient: hasGradientSupport( destinationBlockType ),
 	};
-
-	const onChangeGradient = ( value ) => {
-		const slug = getGradientSlugByValue( gradients, value );
-		let newAttributes;
-		if ( slug ) {
-			const newStyle = {
-				...localAttributes.current?.style,
-				color: {
-					...localAttributes.current?.style?.color,
-					gradient: undefined,
-				},
-			};
-			newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-				gradient: slug,
-			};
-		} else {
-			const newStyle = {
-				...localAttributes.current?.style,
-				color: {
-					...localAttributes.current?.style?.color,
-					gradient: value,
-				},
-			};
-			newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-				gradient: undefined,
-			};
-		}
-		props.setAttributes( newAttributes );
-		localAttributes.current = {
-			...localAttributes.current,
-			...newAttributes,
-		};
-	};
-
-	return (
-		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
-			clientId={ props.clientId }
-			settings={ [
-				{
-					label: __( 'Text Color' ),
-					onColorChange: onChangeColor( 'text' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						textColor,
-						style?.color?.text
-					).color,
-				},
-				{
-					label: __( 'Background Color' ),
-					onColorChange: onChangeColor( 'background' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						backgroundColor,
-						style?.color?.background
-					).color,
-					gradientValue,
-					onGradientChange: hasGradient
-						? onChangeGradient
-						: undefined,
-				},
-			] }
-		/>
+	return transformStyles(
+		activeSupports,
+		MIGRATION_PATHS,
+		result,
+		source,
+		index,
+		results
 	);
 }
 
@@ -283,13 +275,7 @@ addFilter(
 );
 
 addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/color/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/color/addEditProps',
-	addEditProps
+	'blocks.switchToBlockType.transformedBlock',
+	'core/color/addTransforms',
+	addTransforms
 );

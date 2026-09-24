@@ -1,16 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
 		{
 			type: 'block',
-			blocks: [ 'core/code', 'core/paragraph' ],
-			transform: ( { content } ) =>
+			blocks: [ 'core/code', 'core/paragraph', 'core/verse' ],
+			transform: ( { content, anchor } ) =>
 				createBlock( 'core/preformatted', {
 					content,
+					anchor,
 				} ),
 		},
 		{
@@ -34,6 +32,17 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				createBlock( 'core/paragraph', attributes ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/code' ],
+			transform: ( attributes ) => createBlock( 'core/code', attributes ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/verse' ],
+			transform: ( attributes ) =>
+				createBlock( 'core/verse', attributes ),
 		},
 	],
 };

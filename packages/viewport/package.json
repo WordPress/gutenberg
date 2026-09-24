@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.16.0",
+	"version": "6.56.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"viewport"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/viewport/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/viewport/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,14 +18,47 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"@wordpress/element": "file:../element"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/react": "^16.3.3",
+		"deep-freeze": "^0.0.1",
+		"vitest": "^5.0.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

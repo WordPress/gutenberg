@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
@@ -13,11 +7,8 @@ import { createRegistry } from '../../../';
 describe( 'persistence', () => {
 	let registry;
 
-	beforeAll( () => {
-		jest.spyOn( objectStorage, 'setItem' );
-	} );
-
 	beforeEach( () => {
+		vi.spyOn( objectStorage, 'setItem' );
 		objectStorage.clear();
 		objectStorage.setItem.mockClear();
 
@@ -26,9 +17,10 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should not mutate options', () => {
-		const options = Object.freeze( { persist: true, reducer() {} } );
-
-		registry.registerStore( 'test', options );
+		expect( () => {
+			const options = Object.freeze( { persist: true, reducer() {} } );
+			registry.registerStore( 'test', options );
+		} ).not.toThrow( /object is not extensible/ );
 	} );
 
 	it( 'should load a persisted value as initialState', () => {
@@ -349,7 +341,7 @@ describe( 'persistence', () => {
 
 	describe( 'withLazySameState', () => {
 		it( 'should call the original reducer if action.nextState differs from state', () => {
-			const reducer = jest
+			const reducer = vi
 				.fn()
 				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
@@ -363,7 +355,7 @@ describe( 'persistence', () => {
 		} );
 
 		it( 'should not call the original reducer if action.nextState equals state', () => {
-			const reducer = jest
+			const reducer = vi
 				.fn()
 				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );

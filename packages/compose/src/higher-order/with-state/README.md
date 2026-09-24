@@ -1,5 +1,6 @@
-withState
-=========
+# withState
+
+**Deprecated**
 
 `withState` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) which enables a function component to have internal state.
 
@@ -8,16 +9,17 @@ Wrapping a component with `withState` provides state as props to the wrapped com
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { withState } from '@wordpress/compose';
 
 function MyCounter( { count, setState } ) {
 	return (
 		<>
 			Count: { count }
-			<button onClick={ () => setState( ( state ) => ( { count: state.count + 1 } ) ) }>
+			<button
+				onClick={ () =>
+					setState( ( state ) => ( { count: state.count + 1 } ) )
+				}
+			>
 				Increment
 			</button>
 		</>

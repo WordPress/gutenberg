@@ -1,0 +1,92 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { ComponentProps } from 'react';
+import { useState } from '@wordpress/element';
+import Button from '../../button';
+import { BorderBoxControl } from '../';
+
+const meta: Meta< typeof BorderBoxControl > = {
+	id: 'components-borderboxcontrol',
+	title: 'Components/@wordpress-components/BorderBoxControl',
+	component: BorderBoxControl,
+	argTypes: {
+		onChange: { action: 'onChange' },
+		value: { control: false },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
+	},
+};
+export default meta;
+
+// Available border colors.
+const colors = [
+	{ name: 'Blue 20', color: '#72aee6' },
+	{ name: 'Blue 40', color: '#3582c4' },
+	{ name: 'Red 40', color: '#e65054' },
+	{ name: 'Red 70', color: '#8a2424' },
+	{ name: 'Yellow 10', color: '#f2d675' },
+	{ name: 'Yellow 40', color: '#bd8600' },
+];
+
+const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
+	const { onChange, ...otherProps } = props;
+	const [ borders, setBorders ] = useState< ( typeof props )[ 'value' ] >();
+
+	const onChangeMerged: ComponentProps<
+		typeof BorderBoxControl
+	>[ 'onChange' ] = ( newBorders ) => {
+		setBorders( newBorders );
+		onChange( newBorders );
+	};
+
+	return (
+		<>
+			<BorderBoxControl
+				{ ...otherProps }
+				onChange={ onChangeMerged }
+				value={ borders }
+			/>
+			<hr
+				style={ {
+					marginTop: '100px',
+					borderColor: '#ddd',
+					borderStyle: 'solid',
+					borderBottom: 'none',
+				} }
+			/>
+			<p style={ { color: '#6c6c6c', fontSize: '0.9em' } }>
+				The BorderBoxControl is intended to be used within a component
+				that will provide reset controls. The button below is only for
+				convenience.
+			</p>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => onChangeMerged( undefined ) }
+			>
+				Reset
+			</Button>
+		</>
+	);
+};
+export const Default = Template.bind( {} );
+Default.args = {
+	colors,
+	label: 'Borders',
+	enableStyle: true,
+};
+
+/**
+ * With no visible label there is no label row for the linked/unlinked toggle to
+ * join, so it is rendered alongside the border inputs instead.
+ */
+export const WithoutLabel = Template.bind( {} );
+WithoutLabel.args = {
+	...Default.args,
+	label: undefined,
+};

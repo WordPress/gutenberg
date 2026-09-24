@@ -1,95 +1,14 @@
-$tree-border-width: 2px;
-$tree-item-height: 36px;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-navigation__container {
-	padding: $grid-unit-10 - $border-width;
+	min-width: 280px;
 }
 
 .block-editor-block-navigation__label {
-	margin: 0 0 $grid-unit-10;
-	color: $dark-gray-300;
-}
-
-.block-editor-block-navigation__list,
-.block-editor-block-navigation__paragraph {
-	padding: 0;
-	margin: 0;
-}
-
-.block-editor-block-navigation__list .block-editor-button-block-appender {
-	outline: none;
-	background: none;
-	padding: $grid-unit-10;
-	padding: 6px;
-	margin-left: 0.8em;
-	width: calc(100% - 0.8em);
-}
-
-.block-editor-block-navigation__list .block-editor-block-navigation__list {
-	margin-top: 2px;
-	border-left: $tree-border-width solid $light-gray-900;
-	margin-left: 1em;
-
-	.block-editor-block-navigation__list {
-		margin-left: 1.5em;
-	}
-
-	.block-editor-block-navigation__list-item {
-		position: relative;
-
-		&::before {
-			position: absolute;
-			left: 0;
-			background: $light-gray-900;
-			width: 0.5em;
-			height: $tree-border-width;
-			content: "";
-			top: calc(50% - #{ $tree-border-width / 2 });
-		}
-	}
-
-	.block-editor-block-navigation__list-item-button {
-		margin-left: 0.8em;
-		width: calc(100% - 0.8em);
-		height: auto;
-	}
-
-	& > li:last-child {
-		position: relative;
-		&::after {
-			position: absolute;
-			content: "";
-			background: $white;
-			top: ($tree-item-height + $tree-border-width ) / 2;
-			bottom: 0;
-			left: -$tree-border-width;
-			width: $tree-border-width;
-		}
-	}
-}
-
-.block-editor-block-navigation__list-item-button {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	padding: 6px;
-	text-align: left;
-	color: $dark-gray-600;
-	border-radius: 2px;
-
-	.block-editor-block-icon {
-		margin-right: 6px;
-	}
-
-	&.is-selected svg,
-	&.is-selected:focus svg {
-		color: $white;
-		background: $dark-gray-primary;
-		box-shadow: 0 0 0 $border-width $dark-gray-primary;
-		border-radius: $border-width;
-	}
-}
-
-.components-popover.block-editor-block-navigation__popover {
-	z-index: z-index(".components-popover.block-editor-block-navigation__popover");
+	margin: 0 0 $grid-unit-15;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }

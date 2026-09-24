@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/read-more",
+		"isValid": true,
+		"attributes": {
+			"linkTarget": "_self"
+		},
+		"innerBlocks": []
+	}
+]

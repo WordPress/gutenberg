@@ -1,12 +1,10 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { convertLTRToRTL } from '../rtl';
 
 describe( 'convertLTRToRTL', () => {
 	it( 'converts (*)Left <-> (*)Right', () => {
 		const style = {
-			// left values
+			// Left values.
 			borderLeft: '10px solid red',
 			borderLeftColor: 'red',
 			borderLeftStyle: 'solid',
@@ -15,7 +13,7 @@ describe( 'convertLTRToRTL', () => {
 			marginLeft: 10,
 			scrollMarginLeft: 10,
 			scrollPaddingLeft: 10,
-			// right values
+			// Right values.
 			paddingLeft: 10,
 			borderRight: '20px solid blue',
 			borderRightColor: 'blue',
@@ -26,7 +24,7 @@ describe( 'convertLTRToRTL', () => {
 			paddingRight: 20,
 			scrollMarginRight: 20,
 			scrollPaddingRight: 20,
-			// edge cases
+			// Edge cases.
 			textCombineUpright: 'none',
 		};
 		const nextStyle = convertLTRToRTL( style );
@@ -35,7 +33,7 @@ describe( 'convertLTRToRTL', () => {
 			Object.keys( nextStyle ).length
 		);
 
-		// Left -> Right
+		// Left -> Right.
 		expect( nextStyle.borderRight ).toBe( '10px solid red' );
 		expect( nextStyle.borderRightColor ).toBe( 'red' );
 		expect( nextStyle.borderRightStyle ).toBe( 'solid' );
@@ -46,7 +44,7 @@ describe( 'convertLTRToRTL', () => {
 		expect( nextStyle.scrollMarginRight ).toBe( 10 );
 		expect( nextStyle.scrollPaddingRight ).toBe( 10 );
 
-		// Right -> Left
+		// Right -> Left.
 		expect( nextStyle.borderLeft ).toBe( '20px solid blue' );
 		expect( nextStyle.borderLeftColor ).toBe( 'blue' );
 		expect( nextStyle.borderLeftStyle ).toBe( 'dashed' );
@@ -57,13 +55,13 @@ describe( 'convertLTRToRTL', () => {
 		expect( nextStyle.scrollMarginLeft ).toBe( 20 );
 		expect( nextStyle.scrollPaddingLeft ).toBe( 20 );
 
-		// Edge cases
+		// Edge cases.
 		expect( nextStyle.textCombineUpright ).toBe( 'none' );
 	} );
 
 	it( 'converts (*)left <-> (*)right', () => {
 		const style = {
-			// left values
+			// Left values.
 			'border-left': '10px solid red',
 			'border-left-color': 'red',
 			'border-left-style': 'solid',
@@ -74,7 +72,7 @@ describe( 'convertLTRToRTL', () => {
 			'scroll-margin-left': 10,
 			'scroll-padding-left': 10,
 			left: 10,
-			// right values
+			// Right values.
 			'border-right': '20px solid blue',
 			'border-right-color': 'blue',
 			'border-right-style': 'dashed',
@@ -85,7 +83,7 @@ describe( 'convertLTRToRTL', () => {
 			'scroll-margin-right': 20,
 			'scroll-padding-right': 20,
 			right: 20,
-			// edge cases
+			// Edge cases.
 			'text-combine-upright': 'none',
 		};
 		const nextStyle = convertLTRToRTL( style );
@@ -94,7 +92,7 @@ describe( 'convertLTRToRTL', () => {
 			Object.keys( nextStyle ).length
 		);
 
-		// left -> right
+		// Left -> right.
 		expect( nextStyle[ 'border-right' ] ).toBe( '10px solid red' );
 		expect( nextStyle[ 'border-right-color' ] ).toBe( 'red' );
 		expect( nextStyle[ 'border-right-style' ] ).toBe( 'solid' );
@@ -106,7 +104,7 @@ describe( 'convertLTRToRTL', () => {
 		expect( nextStyle[ 'scroll-padding-right' ] ).toBe( 10 );
 		expect( nextStyle.right ).toBe( 10 );
 
-		// right -> left
+		// Right -> left.
 		expect( nextStyle[ 'border-left' ] ).toBe( '20px solid blue' );
 		expect( nextStyle[ 'border-left-color' ] ).toBe( 'blue' );
 		expect( nextStyle[ 'border-left-style' ] ).toBe( 'dashed' );
@@ -118,7 +116,7 @@ describe( 'convertLTRToRTL', () => {
 		expect( nextStyle[ 'scroll-padding-left' ] ).toBe( 20 );
 		expect( nextStyle.left ).toBe( 20 );
 
-		// Edge cases
+		// Edge cases.
 		expect( nextStyle[ 'text-combine-upright' ] ).toBe( 'none' );
 	} );
 } );

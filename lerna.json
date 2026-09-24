@@ -10,8 +10,7 @@
 		"**/{__mocks__,__tests__,test}/**",
 		"**/{storybook,stories}/**"
 	],
-	"packages": [
-		"packages/*"
-	],
-	"version": "independent"
+	"packages": [ "packages/*" ],
+	"version": "independent",
+	"$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

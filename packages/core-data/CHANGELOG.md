@@ -1,19 +1,412 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
+## 8.1.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
+-   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
+-   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
+
+## 8.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `Post` and `Page` now match the REST schema: `content.is_protected` is replaced by `content.protected`, and `content.block_version` is typed as a `number` rather than a `string`. Rename any read of `content.is_protected`, and drop annotations or casts that treated `block_version` as a string. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   The `getGlobalStyles` and `saveGlobalStyles` shortcuts now use `GlobalStyles` instead of the unrelated `GlobalStylesRevision` record. `saveGlobalStyles` requires the record ID and accepts a plain string title, matching the REST API update route and schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+
+### Bug Fixes
+
+-   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
+-   `EntityProvider`: a `revisionId` now only affects the entity it is set on. Other entities rendered inside it, such as the posts in a Query Loop, keep showing their own data ([#82517](https://github.com/WordPress/gutenberg/pull/82517)).
+-   `getEntityRecord` and `getRevision` return the same record for queries that request the same `_fields`, instead of a new object on every call, which made `useSelect` warn under `SCRIPT_DEBUG` ([#82552](https://github.com/WordPress/gutenberg/pull/82552)).
+
+### Enhancements
+
+-   `getEntityRecord` and `getEntityRecords` now infer verified post, page, media, block, navigation, global styles, icon, and icon collection records from their `kind` and `name` arguments and resolve their context from the query, so `getEntityRecord( 'postType', 'post', id ).title` type checks without naming `Post` by hand, and a `context: 'view'` request is not typed with the edit-context fields. Pairs the map does not cover still resolve to the previous union, and a plugin opts in by merging into `EntityRecordTypes` or a per-kind interface. A call that names no context resolves the one its entity is registered to be fetched in, declared in `EntityContextDefaults` and extended the same way; a pair that declares none resolves to every context. Adds `Block`, `Navigation`, `GlobalStyles`, and `IconCollection` records, and drops assertions only from mapped call sites; one assertion was hiding a nullable draft date. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Add the REST `class_list` field to inferred posts, pages, and media, and add media `filename` and `filesize` fields. Embed records omit these view/edit-only fields. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Queries that use `_fields` infer a recursively partial entity record, so TypeScript requires callers to account for omitted top-level and nested object fields. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Keep `Attachment.caption.rendered` available in view and embed contexts while limiting `caption.raw` to edit responses, matching the REST schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Match the Navigation embed record and current global styles ID types to their REST responses. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Export `ContextualField` so plugins can describe context-sensitive fields when extending the entity record map. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `PostStatus` accepts statuses registered by WordPress or plugins while preserving autocomplete for the built-in values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+
+### Internal
+
+-   Remove the template activation (`active_templates`) experiment: drop the `registeredTemplate` entity and the experiment-only `wp_template` endpoint rewrites and query params ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependency `@wordpress/is-shallow-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 7.54.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Validate the shared parsed-blocks cache against the registered block types as well as the content, so a record resolved before the block types register — as happens when the editor's assets load lazily — is re-parsed instead of rendering, and one save later persisting, an empty block list ([#81809](https://github.com/WordPress/gutenberg/pull/81809)).
+-   Allow keyless entities to be addressed without a record ID in the entity record selectors and actions ([#81857](https://github.com/WordPress/gutenberg/pull/81857)).
+-   Fix `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` returning `NaN` for endpoints that send no pagination headers.
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Gate entity sync configuration and sync manager creation on the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 7.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
+
+### Bug Fixes
+
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   `saveEntityRecord`: Reset persisted edits using the original edits instead of the `__unstablePrePersist`-augmented request payload. With collaborative editing enabled, the injected CRDT snapshot made the post-save comparison against the state edits fail, leaving the record dirty after a successful save whenever `meta` was edited.
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
+### Internal
+
+-   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
+
+## 7.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+## 7.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 7.50.0 (2026-07-01)
+
+## 7.49.0 (2026-06-24)
+
+## 7.48.1 (2026-06-16)
+
+## 7.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+### Internal
+
+-   Remove redundant `createSelector` wrapper from `getQueriedItems`; the inner deep-equality cache already handles inlined query objects.
+
+## 7.44.0 (2026-04-15)
+
+### Bug Fixes
+
+-   Fix `getEntityRecords` returning incomplete results for non-paginated entities by normalizing `per_page` in queries ([#76406](https://github.com/WordPress/gutenberg/pull/76406)).
+
+## 7.43.0 (2026-04-01)
+
+## 7.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   `canUser` no longer returns `undefined` when the allow header is missing from the response ([#76307](https://github.com/WordPress/gutenberg/pull/76307)).
+
+## 7.41.0 (2026-03-04)
+
+## 7.40.0 (2026-02-18)
+
+## 7.39.0 (2026-01-29)
+
+## 7.38.0 (2026-01-16)
+
+## 7.36.0 (2025-11-26)
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
+## 7.32.0 (2025-10-01)
+
+## 7.31.0 (2025-09-17)
+
+## 7.30.0 (2025-09-03)
+
+## 7.29.0 (2025-08-20)
+
+## 7.28.0 (2025-08-07)
+
+## 7.27.0 (2025-07-23)
+
+-   Fixed the TS type for meta values for core entities ([#70788](https://github.com/WordPress/gutenberg/pull/70788))
+
+## 7.26.0 (2025-06-25)
+
+## 7.25.0 (2025-06-04)
+
+## 7.24.0 (2025-05-22)
+
+## 7.23.0 (2025-05-07)
+
+## 7.22.0 (2025-04-11)
+
+## 7.21.0 (2025-03-27)
+
+## 7.20.0 (2025-03-13)
+
+## 7.19.0 (2025-02-28)
+
+## 7.18.0 (2025-02-12)
+
+## 7.17.0 (2025-01-29)
+
+## 7.16.0 (2025-01-15)
+
+## 7.15.0 (2025-01-02)
+
+## 7.14.0 (2024-12-11)
+
+## 7.13.0 (2024-11-27)
+
+## 7.12.0 (2024-11-16)
+
+## 7.11.0 (2024-10-30)
+
+## 7.10.0 (2024-10-16)
+
+## 7.9.0 (2024-10-03)
+
+## 7.8.0 (2024-09-19)
+
+## 7.7.0 (2024-09-05)
+
+## 7.6.0 (2024-08-21)
+
+## 7.5.0 (2024-08-07)
+
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.35.0 (2024-05-16)
+
+## 6.34.0 (2024-05-02)
+
+## 6.33.0 (2024-04-19)
+
+## 6.32.0 (2024-04-03)
+
+## 6.31.0 (2024-03-21)
+
+## 6.30.0 (2024-03-06)
+
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
+## 6.26.0 (2024-01-10)
+
+## 6.25.0 (2023-12-13)
+
+## 6.24.0 (2023-11-29)
+
+## 6.23.0 (2023-11-16)
+
+## 6.22.0 (2023-11-02)
+
+## 6.21.0 (2023-10-18)
+
+### Enhancements
+
+-   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).
+-   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
+
+## 6.20.0 (2023-10-05)
+
+## 6.19.0 (2023-09-20)
+
+## 6.18.0 (2023-08-31)
+
+## 6.17.0 (2023-08-16)
+
+## 6.16.0 (2023-08-10)
+
+## 6.15.0 (2023-07-20)
+
+## 6.14.0 (2023-07-05)
+
+## 6.13.0 (2023-06-23)
+
+## 6.12.0 (2023-06-07)
+
+## 6.11.0 (2023-05-24)
+
+## 6.10.0 (2023-05-10)
+
+## 6.9.0 (2023-04-26)
+
+## 6.8.0 (2023-04-12)
+
+## 6.7.0 (2023-03-29)
+
+## 6.6.0 (2023-03-15)
+
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.5.0 (2022-11-16)
+
+## 5.4.0 (2022-11-02)
+
+## 5.3.0 (2022-10-19)
+
+## 5.2.0 (2022-10-05)
+
+## 5.1.0 (2022-09-21)
+
+## 5.0.0 (2022-09-13)
+
+### Breaking Changes
+
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+## 4.14.0 (2022-08-24)
+
+### New Features
+
+-   Stabilized the `useResourcePermissions` hook ([#43268](https://github.com/WordPress/gutenberg/pull/43268))
+
+## 4.13.0 (2022-08-10)
+
+## 4.12.0 (2022-07-27)
+
+## 4.11.0 (2022-07-13)
+
+## 4.10.0 (2022-06-29)
+
+## 4.9.0 (2022-06-15)
+
+## 4.8.0 (2022-06-01)
+
+## 4.7.0 (2022-05-18)
+
+### New Features
+
+-   Stabilized the `useEntityRecord` and `useEntityRecords` hooks ([#40162](https://github.com/WordPress/gutenberg/pull/40162))
+
+## 4.6.0 (2022-05-04)
+
+## 4.5.0 (2022-04-21)
+
+## 4.4.0 (2022-04-08)
+
+## 4.3.0 (2022-03-23)
+
+### New Features
+
+-   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
+-   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
+
+## 4.2.0 (2022-03-11)
+
+## 4.1.2 (2022-02-23)
+
+### Bug Fixes
+
+-   The `canUser` no longer uses the `GET` request with the resource ID argument [#38901](https://github.com/WordPress/gutenberg/pull/38901).
+
+## 4.1.0 (2022-01-27)
+
+### Bug Fixes
+
+-   `getEntityRecords` no longer returns an empty array for unknown entities but returns `null` instead. `hasEntityRecords` now also returns `false` when the entity configuration is unknown. ([#36984](https://github.com/WordPress/gutenberg/pull/36984))
+
+## 4.0.0 (2021-07-29)
+
+### Breaking Changes
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 3.2.0 (2021-07-21)
+
+## 3.1.0 (2021-05-20)
+
+## 3.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+### Enhancements
+
+-   The `getEntityRecords` resolver has been updated and now uses the batched variants of start and finish resolution actions.
+
+## 2.26.0 (2021-03-17)
+
+## 2.25.0 (2020-12-17)
+
+### New Features
+
+-   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+
+## 2.21.0 (2020-09-03)
+
+### New Features
+
+-   The `deleteEntityRecord` and `removeItems` actions have been added.
+-   The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
+-   A `delete<entity.name>` helper is created for every registered entity.
+
 ## 2.3.0 (2019-05-21)
 
-### New features
+### New Features
 
-- The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
-- The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
+-   The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
+-   The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
 
 ## 2.0.16 (2019-01-03)
 
 ### Bug Fixes
 
-- Fixed the `hasUploadPermissions` selector to always return a boolean. Previously, it may have returned an empty object. This should have no impact for most consumers, assuming usage as a [truthy value](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) in conditions.
+-   Fixed the `hasUploadPermissions` selector to always return a boolean. Previously, it may have returned an empty object. This should have no impact for most consumers, assuming usage as a [truthy value](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) in conditions.
 
 ## 2.0.15 (2018-12-12)
 
@@ -39,12 +432,12 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
-- `dispatch("core").receiveTerms` has been deprecated. Please use `dispatch("core").receiveEntityRecords` instead.
-- `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
-- `select("core").getTerms` has been deprecated. Please use `select("core").getEntityRecords` instead.
-- `select("core").getCategories` has been deprecated. Please use `select("core").getEntityRecords` instead.
-- `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
-- `select("core").isRequestingTerms` has been deprecated. Please use `select("core").isResolving` instead.
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   `dispatch("core").receiveTerms` has been deprecated. Please use `dispatch("core").receiveEntityRecords` instead.
+-   `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
+-   `select("core").getTerms` has been deprecated. Please use `select("core").getEntityRecords` instead.
+-   `select("core").getCategories` has been deprecated. Please use `select("core").getEntityRecords` instead.
+-   `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
+-   `select("core").isRequestingTerms` has been deprecated. Please use `select("core").isResolving` instead.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

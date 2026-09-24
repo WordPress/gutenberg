@@ -1,155 +1,774 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
+## 27.0.0 (2026-09-23)
+
 ### Breaking Changes
 
--  The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+-   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 
-### Improvements
+### Enhancements
 
-- `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
+-   Update `use-recommended-components` deprecation message for `__experimentalZStack` to point to writing CSS ([#83344](https://github.com/WordPress/gutenberg/pull/83344)).
+-   Update `use-recommended-components` deprecation message for `ResponsiveWrapper` to point to the CSS `aspect-ratio` property ([#83347](https://github.com/WordPress/gutenberg/pull/83347)).
+-   Update `use-recommended-components` deprecation message for `__experimentalScrollable` to point to writing CSS ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
+-   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to `Separator` subcomponents and design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
+-   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
+-   `recommended`: Apply the TypeScript rules and parser to `.mts` and `.cts` files ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `recommended`: Resolve imports through `.mjs`, `.cjs`, `.mts` and `.cts`, and exempt `.d.mts` and `.d.cts` from the TypeScript resolver settings alongside `.d.ts` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `recommended`: Report type-only imports of undeclared packages in `import/no-extraneous-dependencies` ([#83336](https://github.com/WordPress/gutenberg/pull/83336)).
+-   `no-i18n-in-save`: Recognise the `.mjs`, `.cjs`, `.mts` and `.cts` spellings of `save` and `deprecated` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+
+## 26.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+
+### Bug Fixes
+
+-   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Fix `no-unused-vars-before-return` false positive on variables used only in JSX ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
+### Internal
+
+-   Update `eslint-plugin-jest` to 29.16.5 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+
+## 25.10.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Remove `fixable` option from `i18n-no-flanking-whitespace` rule [#70279](https://github.com/WordPress/gutenberg/pull/70279).
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to mark `SearchableChipSelect` and `SearchableChipSelectControl` from `@wordpress/ui` as recommended ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
+-   Update `use-recommended-components` rule to mark `Autocomplete`, `Field`, and `Fieldset` from `@wordpress/ui` as recommended ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
+-   Allow the public `@wordpress/ui` keyboard shortcut utilities in the `use-recommended-components` rule. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
+-   Update `use-recommended-components` rule to mark `Input`, `InputControl`, and `InputLayout` from `@wordpress/ui` as recommended, and to prefer `@wordpress/ui` `InputControl` over legacy `@wordpress/components` `InputControl` and `TextControl` ([#81658](https://github.com/WordPress/gutenberg/pull/81658)).
+-   The `use-recommended-components` rule now allows `ControlWithError` and `ValidityIndicator` from `@wordpress/ui`. ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+
+## 25.9.0 (2026-08-12)
+
+### Enhancements
+
+-   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
+-   Update `use-recommended-components` rule to allow `Calendar` and `RangeCalendar` from `@wordpress/ui` ([#81337](https://github.com/WordPress/gutenberg/pull/81337)).
+
+## 25.8.0 (2026-07-29)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to flag `Animate`, `Flex`, `FlexBlock`, `FlexItem`, `ResponsiveWrapper`, `TabbableContainer`, and `__experimentalDivider`, `__experimentalElevation`, `__experimentalGrid`, `__experimentalScrollable`, `__experimentalSpacer`, `__experimentalSurface`, and `__experimentalView` from `@wordpress/components` as not recommended ([#80754](https://github.com/WordPress/gutenberg/pull/80754)).
+-   Updated `use-recommended-components` deprecation messages for `Animate` and `__experimentalSurface` to point to design tokens ([#80931](https://github.com/WordPress/gutenberg/pull/80931), [#80943](https://github.com/WordPress/gutenberg/pull/80943)).
+
+## 25.7.0 (2026-07-14)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to allow `Skeleton` from `@wordpress/ui` ([#79671](https://github.com/WordPress/gutenberg/pull/79671)).
+
+## 25.6.0 (2026-07-01)
+
+## 25.5.0 (2026-06-24)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to prefer `Tooltip` from `@wordpress/ui` over `@wordpress/components` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
+
+## 25.4.1 (2026-06-16)
+
+## 25.4.0 (2026-06-10)
+
+## 25.3.0 (2026-05-27)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to allow `Icon` and `Tabs` from `@wordpress/ui` ([#78365](https://github.com/WordPress/gutenberg/pull/78365), [#78442](https://github.com/WordPress/gutenberg/pull/78442)).
+-   Extended `use-recommended-components` to flag not-recommended components imported via `unlock( privateApis )` destructuring ([#78451](https://github.com/WordPress/gutenberg/pull/78451)).
+
+## 25.2.0 (2026-05-14)
+
+### New Features
+
+-   Added [`no-non-module-stylesheet-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md) rule to prevent importing non-module stylesheets from JavaScript files ([#77984](https://github.com/WordPress/gutenberg/pull/77984)).
+
+## 25.1.0 (2026-04-29)
+
+### New Features
+
+-   Added [`use-import-as`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-import-as.md) rule to enforce configured aliases for selected named imports and direct `unlock( privateApis )` destructuring ([#77389](https://github.com/WordPress/gutenberg/pull/77389)).
+-   Added [`no-unsafe-render-order`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md) rule to flag unsafe render-prop composition with `VisuallyHidden` and `Link`/`Text` ([#77428](https://github.com/WordPress/gutenberg/pull/77428)).
+
+### Enhancements
+
+-   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
+-   Update `use-recommended-components` rule to recommend `Card`, `Collapsible`, and `CollapsibleCard` from `@wordpress/ui` over legacy `@wordpress/components` card components ([#77423](https://github.com/WordPress/gutenberg/pull/77423)).
+-   Update `use-recommended-components` rule to prefer `Link` from `@wordpress/ui` over `ExternalLink` from `@wordpress/components` ([#77505](https://github.com/WordPress/gutenberg/pull/77505)).
+-   Update `use-recommended-components` rule to allow `EmptyState` from `@wordpress/ui` ([#77765](https://github.com/WordPress/gutenberg/pull/77765)).
+-   Update `use-recommended-components` rule to prefer `VisuallyHidden` from `@wordpress/ui` over `@wordpress/components` ([#77575](https://github.com/WordPress/gutenberg/pull/77575)).
+
+## 25.0.0 (2026-04-15)
+
+### Breaking Changes
+
+-   Upgraded to ESLint v10 with flat config format. The plugin now exports flat config arrays instead of eslintrc objects. Consumers must migrate from `.eslintrc.*` files to `eslint.config.mjs`. See the [migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for details ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The minimum required ESLint version is now `^9.0.0 || ^10.0.0` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Upgraded `eslint-plugin-import` to v2.31+ (wrapped with `fixupPluginRules` for flat config compatibility) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Upgraded `@typescript-eslint/*` from v6 to v8 (via the unified `typescript-eslint` package) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Replaced `eslint-plugin-eslint-comments` with `@eslint-community/eslint-plugin-eslint-comments`. Rule prefixes changed from `eslint-comments/*` to `@eslint-community/eslint-comments/*` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+### New Features
+
+-   Added `@wordpress/eslint-plugin/eslintrc` entry point — a compatibility wrapper for ESLint v9 consumers still using `.eslintrc.*` files. This is deprecated and will be removed in a future major version ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Configs are now exported as flat config arrays (e.g., `wordpress.configs.recommended` returns an array of config objects suitable for spreading into `eslint.config.mjs`) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+### Enhancements
+
+-   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).
+-   Update `use-recommended-components` rule to allow `Text` from `@wordpress/ui` ([#77044](https://github.com/WordPress/gutenberg/pull/77044)).
+
+## 24.5.0 (2026-04-01)
+
+## 24.4.0 (2026-03-18)
+
+### New Features
+
+-   Added [`no-dom-globals-in-module-scope`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-module-scope.md), [`no-dom-globals-in-constructor`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-constructor.md), [`no-dom-globals-in-react-cc-render`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-cc-render.md), and [`no-dom-globals-in-react-fc`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md) rules to prevent DOM global usage in SSR-unsafe contexts, replacing the unmaintained `eslint-plugin-ssr-friendly` package ([#76508](https://github.com/WordPress/gutenberg/pull/76508)).
+-   Added [`use-recommended-components`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md) rule to encourage the use of recommended UI components in a WordPress environment ([#76222](https://github.com/WordPress/gutenberg/pull/76222)).
+-   Added [`no-unmerged-classname`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unmerged-classname.md) rule to flag components that set an explicit `className` while spreading rest props without destructuring and merging the incoming `className` ([#76458](https://github.com/WordPress/gutenberg/pull/76458)).
+
+### Enhancements
+
+-   The `no-unknown-ds-tokens` rule now reports bare `--wpds-*` tokens not wrapped in `var()`, which would silently miss build-time fallback injection.
+-   The `no-setting-ds-tokens` rule now checks all object property keys, not just those inside JSX `style` attributes ([#76212](https://github.com/WordPress/gutenberg/pull/76212)).
+
+## 24.3.0 (2026-03-04)
+
+### New Features
+
+-   Added [`no-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md) rule to disallow usage of Design System token CSS custom properties (`--wpds-*`).
+
+### Enhancements
+
+-   The `no-unknown-ds-tokens` rule now checks all string literals and template literals, not just JSX `style` attributes. It also reports dynamically constructed `--wpds-*` token names.
+
+## 24.2.0 (2026-02-18)
+
+## 24.1.0 (2026-01-29)
+
+### Enhancements
+
+-   The `dependency-group` rule now accepts an optional `"never"` mode to forbid dependency group comments.
+
+## 24.0.0 (2026-01-16)
+
+### Breaking Changes
+
+-   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+-   Removed default configuration of [`import/internal-regex`](https://github.com/import-js/eslint-plugin-import/tree/main?tab=readme-ov-file#importinternal-regex) to classify `@wordpress/` packages as internal. From the perspective of an external consumer of this package, `@wordpress/` packages should be considered external. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+
+### New Features
+
+-   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`components-no-missing-40px-size-prop`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md) rule to opt-in to the new 40px default size for components from the `@wordpress/components` package. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+-   Added [`components-no-unsafe-button-disabled`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md) rule to ensure that buttons from the `@wordpress/components` package are accessible when disabled. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+
+### Enhancements
+
+-   The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
+
+## 22.22.0 (2025-11-26)
+
+## 22.21.0 (2025-11-12)
+
+### Enhancements
+
+-   Disabled `import/no-unresolved`, `import/default`, and `import/named` checks for TypeScript files when TypeScript is installed, since these issues are [already checked by TypeScript](https://typescript-eslint.io/troubleshooting/typed-linting/performance/).
+-   Improved resolution behavior to support modern package export semantics by updating default import resolver to [`eslint-import-resolver-typescript`](https://www.npmjs.com/package/eslint-import-resolver-typescript), including for non-TypeScript files.
+
+## 22.20.0 (2025-10-29)
+
+## 22.19.0 (2025-10-17)
+
+## 22.18.0 (2025-10-01)
+
+## 22.17.0 (2025-09-17)
+
+## 22.16.0 (2025-09-03)
+
+## 22.15.0 (2025-08-20)
+
+## 22.14.0 (2025-08-07)
+
+## 22.13.0 (2025-07-23)
+
+### Enhancements
+
+-   Added stricter ESLint checks for translator comments.
+-   Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
+-   Flags missing and extra/outdated placeholders.
+
+## 22.12.0 (2025-06-25)
+
+## 22.11.0 (2025-06-04)
+
+## 22.10.0 (2025-05-22)
+
+## 22.9.0 (2025-05-07)
+
+## 22.8.0 (2025-04-11)
+
+## 22.7.0 (2025-03-27)
+
+## 22.6.0 (2025-03-13)
+
+## 22.5.0 (2025-02-28)
+
+## 22.4.0 (2025-02-12)
+
+## 22.3.0 (2025-01-29)
+
+## 22.2.0 (2025-01-15)
+
+## 22.1.0 (2025-01-02)
+
+## 22.0.0 (2024-12-11)
+
+### Breaking Changes
+
+-   The minimum required TypeScript version changed to 5 ([#67461](https://github.com/WordPress/gutenberg/pull/67461))
+
+## 21.6.0 (2024-11-27)
+
+## 21.5.0 (2024-11-16)
+
+## 21.4.0 (2024-10-30)
+
+## 21.3.0 (2024-10-16)
+
+## 21.2.0 (2024-10-03)
+
+## 21.1.0 (2024-09-19)
+
+## 21.0.0 (2024-09-05)
+
+### Breaking Changes
+
+-   Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710)).
+-   Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710)).
+
+## 20.3.0 (2024-08-21)
+
+## 20.2.0 (2024-08-07)
+
+## 20.1.0 (2024-07-24)
+
+## 20.0.0 (2024-07-10)
+
+### Breaking Changes
+
+-   Add [`@typescript-eslint/no-unused-vars` rule](https://typescript-eslint.io/rules/no-unused-vars) to the recommended TypeScript ruleset ([#62925](https://github.com/WordPress/gutenberg/pull/62925)).
+-   Add [`@typescript-eslint/method-signature-style` rule](https://typescript-eslint.io/rules/method-signature-style) to the recommended TypeScript ruleset ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
+## 19.2.0 (2024-06-26)
+
+## 19.1.0 (2024-06-15)
+
+## 19.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   `@wordpress/is-gutenberg-plugin` rule has been replaced by `@wordpress/wp-global-usage` ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/wp-process-env` rule has been added and included in the recommended configurations ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/gutenberg-phase` rule has been removed (deprecated in v10.0.0) ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 18.1.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 18.0.0 (2024-05-02)
+
+### Breaking Changes
+
+-   Enable `curly` eslint rule when using prettier ([#61204](https://github.com/WordPress/gutenberg/pull/61204)).
+
+## 17.13.0 (2024-04-19)
+
+## 17.12.0 (2024-04-03)
+
+## 17.11.0 (2024-03-21)
+
+## 17.10.0 (2024-03-06)
+
+## 17.9.0 (2024-02-21)
+
+## 17.8.0 (2024-02-09)
+
+## 17.7.0 (2024-01-24)
+
+## 17.6.0 (2024-01-10)
+
+## 17.5.0 (2023-12-13)
+
+## 17.4.0 (2023-11-29)
+
+## 17.3.0 (2023-11-16)
+
+## 17.2.0 (2023-11-02)
+
+## 17.1.0 (2023-10-18)
+
+## 17.0.0 (2023-10-05)
+
+### Breaking Changes
+
+-   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
+
+## 16.0.0 (2023-09-20)
+
+### Breaking Changes
+
+-   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):
+    -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
+
+### Enhancements
+
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.3.0` to requiring `^5.0.0` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
+
+## 15.1.0 (2023-08-31)
+
+## 15.0.0 (2023-08-16)
+
+### Breaking Changes
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring ^39.6.9 to requiring ^46.4.6 ([#53629](https://github.com/WordPress/gutenberg/pull/53629)):
+    -   Removes `jsdoc/newline-after-description` rule in favor of `jsdoc/tag-lines` with option `startLines: 0` for "never" and `startLines: 1` for "always". Defaults now to `startLines: null`.
+    -   Removes `dropEndLines: true` from `jsdoc/tag-lines` in favor of option `endLines: 0`.
+    -   Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`.
+    -   Disables the newly introduced `jsdoc/no-defaults` rule.
+
+### Enhancements
+
+-   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
+
+## 14.12.0 (2023-08-10)
+
+## 14.11.0 (2023-07-20)
+
+## 14.10.0 (2023-07-05)
+
+## 14.9.0 (2023-06-23)
+
+## 14.8.0 (2023-06-07)
+
+## 14.7.0 (2023-05-24)
+
+## 14.6.0 (2023-05-10)
+
+### Enhancements
+
+-   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
+
+## 14.5.0 (2023-04-26)
+
+## 14.4.0 (2023-04-12)
+
+## 14.3.0 (2023-03-29)
+
+## 14.2.0 (2023-03-15)
+
+## 14.1.0 (2023-03-01)
+
+## 14.0.0 (2023-02-15)
+
+### Breaking Changes
+
+-   Increase the severity of the rule `jsdoc/check-line-alignment` from `warn` to `error`. ([#47878](https://github.com/WordPress/gutenberg/pull/47878)).
+
+## 13.10.0 (2023-02-01)
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+
+### Enhancements
+
+-   Bump `eslint-plugin-jest` version to 27.2.1.
+
+## 13.9.0 (2023-01-11)
+
+## 13.8.0 (2023-01-02)
+
+## 13.7.0 (2022-12-14)
+
+## 13.6.0 (2022-11-16)
+
+## 13.5.0 (2022-11-02)
+
+## 13.4.0 (2022-10-19)
+
+## 13.3.0 (2022-10-05)
+
+## 13.2.0 (2022-09-21)
+
+## 13.0.0 (2022-08-24)
+
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
+
+## 12.8.0 (2022-07-27)
+
+### Internal
+
+-   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
+
+## 12.6.0 (2022-06-29)
+
+-   Enable `no-unused-vars`'s setting `ignoreRestSiblings` to allow unused variables when destructuring with rest properties ([#41897](https://github.com/WordPress/gutenberg/pull/41897)).
+
+## 12.2.0 (2022-05-04)
+
+### Bug Fixes
+
+-   Fix the `recommended` preset when Prettier is not installed ([#40634](https://github.com/WordPress/gutenberg/pull/40634)).
+
+## 12.0.0 (2022-04-08)
+
+### Breaking Changes
+
+-   Revert the removal of the automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. However, They will still be disabled if `@playwright/test` is installed in the project.
+
+## 11.0.0 (2022-03-11)
+
+### Breaking Changes
+
+-   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
+
+### Bug Fixes
+
+-   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
+
+### Breaking Changes
+
+-   Remove automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. It's now recommended to opt-in to specific preset explicitly.
+
+## 10.0.0 (2022-01-27)
+
+### Breaking Changes
+
+-   The peer dependency constraint for ESLint has been updated from `^6 || ^7` to `^8`.
+-   The bundled `@typescript-eslint/eslint-plugin` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `@typescript-eslint/parser` dependency has been updated from requiring `^4.31.0` to requiring `^5.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-config-prettier` dependency has been updated from requiring `^7.1.0` to requiring `^8.3.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^24.1.3` to requiring `^25.2.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^36.0.8` to requiring `^37.0.3` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The bundled `globals` dependency has been updated from requiring `^12.0.0` to requiring `^13.12.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   The `gutenberg-phase` rule has been deprecated and replaced by the `is-gutenberg-plugin` rule. ([#38202](https://github.com/WordPress/gutenberg/pull/38202))
+
+### Enhancements
+
+-   Omit verification for WordPress dependencies in the import statements since they get externalized when used with WordPress ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
+
+### Bug Fixes
+
+-   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)). Warning: it won't recognize the `babel.config.json` file present in the project until the upstream bug in `cosmiconfig` is fixed.
+
+## 9.3.0 (2021-11-15)
+
+### Enhancements
+
+-   Replaced deprecated `babel-eslint` dependency with `@babel/eslint-parser` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `eslint-plugin-import` dependency has been updated from requiring `^2.23.4` to requiring `^2.25.2` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 9.2.0 (2021-10-12)
+
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
+
+### Bug Fixes
+
+-   Use Jest related rules only when the `jest` package is installed ([#33120](https://github.com/WordPress/gutenberg/pull/33120)).
+
+## 9.1.2 (2021-09-09)
+
+### Bug Fixes
+
+-   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
+
+## 9.1.1 (2021-08-23)
+
+### Bug Fixes
+
+-   Include `.jsx` extension when linting import statements in case TypeScript not present ([#33746](https://github.com/WordPress/gutenberg/pull/33746)).
+
+## 9.1.0 (2021-07-21)
+
+### Enhancements
+
+-   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
+
+## 9.0.1 (2021-03-19)
+
+### Bug Fixes
+
+-   Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
+
+## 9.0.0 (2021-03-17)
+
+### Breaking Changes
+
+-   Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+
+### New Features
+
+-   Enabled `import/default` and `import/named` rules in the `recommended` ruleset. [#28513](https://github.com/WordPress/gutenberg/pull/28513)
+-   Add new rule `@wordpress/data-no-store-string-literals` to discourage passing string literals to reference data stores ([#28726](https://github.com/WordPress/gutenberg/pull/28726)).
+
+## 8.0.1 (2021-01-28)
+
+### Bug Fixes
+
+-   Add missing `eslint-plugin-import` npm dependency ([#28545](https://github.com/WordPress/gutenberg/pull/28545)).
+
+## 8.0.0 (2021-01-21)
+
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   Enabled `import/no-extraneous-dependencies` rule in the `recommended` ruleset.
+-   Enabled `import/no-unresolved` rule in the `recommended` ruleset.
+-   Enabled `no-unsafe-wp-apis` rule in the `recommended` ruleset ([#27327](https://github.com/WordPress/gutenberg/pull/27327)).
+-   The bundled `eslint-config-prettier` dependency has been updated from requiring `^6.10.1` to requiring `^7.1.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^23.8.2` to requiring `^24.1.3` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^30.2.2` to requiring `^30.7.13` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.2.3` to requiring `^6.4.1` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.1.2` to requiring `^3.3.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.20.0` to requiring `^7.22.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^4.0.4` to requiring `^4.2.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules in the react config in "warn" mode ([#24914](https://github.com/WordPress/gutenberg/pull/24914)).
+
+## 7.4.0 (2020-12-17)
+
+### New Features
+
+-   Add `no-unsafe-wp-apis` rule to discourage usage of unsafe APIs ([#27301](https://github.com/WordPress/gutenberg/pull/27301)).
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.0.5` to `2.2.1`.
+
+### Documentation
+
+-   Include a note about the minimum version required for `node` (10.0.0) and `npm` (6.9.0).
+
+## 7.2.1 (2020-09-17)
+
+### Bug Fixes
+
+-   Fix TypeError for projects without a local Prettier configuration.
+
+## 7.2.0 (2020-09-03)
+
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^26.0.0` to requiring `^30.2.2`.
+
+### Bug Fixes
+
+-   The recommended configuration will now respect local Prettier configuration. These are merged to the default WordPress configuration.
+
+## 7.1.0-rc.0 (2020-06-24)
+
+### Enhancements
+
+-   Support ESLint `^7` as peer dependency.
+
+## 7.0.0 (2020-06-15)
+
+### Breaking Changes
+
+-   The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
+-   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^3.0.0` to requiring `^4.0.4`.
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^22.1.0` to requiring `^26.0.0`.
+
+### Enhancements
+
+-   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.19.0` to requiring `^7.20.0`.
+
+## 6.1.0 (2020-05-28)
+
+### Bug Fixes
+
+-   `@wordpress/dependency-group` will now correctly identify issues associated with CommonJS (`require`) module imports.
+
+## 6.0.0 (2020-05-14)
+
+### Breaking Changes
+
+-   The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+
+### Enhancements
+
+-   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
 ## 5.1.0 (2020-04-30)
 
 ### Bug Fixes
 
-- The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
-- Make `@wordpress/i18n-text-domain` rule less strict by default. When `allowedTextDomain` option is not provided it allows now skipping text domain or providing any string ([#21928](https://github.com/WordPress/gutenberg/pull/21928)).
+-   The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
+-   Make `@wordpress/i18n-text-domain` rule less strict by default. When `allowedTextDomain` option is not provided it allows now skipping text domain or providing any string ([#21928](https://github.com/WordPress/gutenberg/pull/21928)).
 
 ## 5.0.1 (2020-04-15)
 
 ### Bug Fixes
 
-- Fixes an error caused by missing `utils` directory from published package ([#21609](https://github.com/WordPress/gutenberg/pull/21609)).
-- Added the recommended `Prettier` config that enforces WordPress coding style guidelines ([#21602](https://github.com/WordPress/gutenberg/pull/21602)).
+-   Fixes an error caused by missing `utils` directory from published package ([#21609](https://github.com/WordPress/gutenberg/pull/21609)).
+-   Added the recommended `Prettier` config that enforces WordPress coding style guidelines ([#21602](https://github.com/WordPress/gutenberg/pull/21602)).
 
 ## 5.0.0 (2020-04-15)
 
 ### Breaking Changes
 
-- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
-- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
-- The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
-- The bundled `eslint-plugin-jest` dependency has been updated from requiring `^22.15.1` to requiring `^23.8.2` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
-- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^21.0.0` to requiring `^22.1.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
-- The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^1.6.1` to requiring `^3.0.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+-   There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
+-   The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
+-   The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^22.15.1` to requiring `^23.8.2` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^21.0.0` to requiring `^22.1.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+-   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^1.6.1` to requiring `^3.0.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
 
 ### New Features
 
-- New Rule: [`@wordpress/i18n-text-domain`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-text-domain.md)
-- New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
-- New Rule: [`@wordpress/i18n-no-variables`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-variables.md)
-- New Rule: [`@wordpress/i18n-no-placeholders-only`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)
-- New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
-- New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
-- The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.14.3` to requiring `^7.19.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+-   New Rule: [`@wordpress/i18n-text-domain`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)
+-   New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
+-   New Rule: [`@wordpress/i18n-no-variables`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-variables.md)
+-   New Rule: [`@wordpress/i18n-no-placeholders-only`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)
+-   New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
+-   New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
+-   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.14.3` to requiring `^7.19.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
 
 ### Bug Fixes
 
-- The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
-- `@wordpress/no-unused-vars-before-return` will correctly consider other unused variables after encountering an instance of an `excludePattern` option exception.
+-   The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
+-   `@wordpress/no-unused-vars-before-return` will correctly consider other unused variables after encountering an instance of an `excludePattern` option exception.
 
 ## 4.1.0 (2020-04-01)
 
 ### New Features
 
-- The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
+-   The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
 
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes
 
-- The `recommended` ruleset checks again code formatting (whitespace, indenting, etc.). These rules are now enforced by Prettier itself through a plugin that diffs the code with its formatted output and reports the differences as lint errors. `eslint-plugin-prettier` was chosen over options like `prettier-eslint` because we don't run `eslint --fix` in hooks as we'd rather leave certain linting errors to be resolved or ignored at the author's discretion. We also don't apply any additional formatting with `eslint` over `prettier`, so the overhead would be unnecessary. `eslint-plugin-prettier` was chosen over options like `prettier --check` because it's nice to see format errors as you type as it leads you to write code with a more optimal auto-formatted output and it avoids issues like comment directives being moved out of place by `prettier` and the author not realizing it.
+-   The `recommended` ruleset checks again code formatting (whitespace, indenting, etc.). These rules are now enforced by Prettier itself through a plugin that diffs the code with its formatted output and reports the differences as lint errors. `eslint-plugin-prettier` was chosen over options like `prettier-eslint` because we don't run `eslint --fix` in hooks as we'd rather leave certain linting errors to be resolved or ignored at the author's discretion. We also don't apply any additional formatting with `eslint` over `prettier`, so the overhead would be unnecessary. `eslint-plugin-prettier` was chosen over options like `prettier --check` because it's nice to see format errors as you type as it leads you to write code with a more optimal auto-formatted output and it avoids issues like comment directives being moved out of place by `prettier` and the author not realizing it.
 
 ## 3.4.1 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
-- Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
+-   Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
 
 ## 3.4.0 (2020-02-04)
 
 ### New Features
 
-- The `recommended` ruleset no longer enables rules that check code formatting (whitespace, indenting, etc.) and that could conflict with Prettier.
-- There is a new `recommended-with-formatting` ruleset that has the code formatting rules still enabled, for projects that want to opt out from Prettier and continue checking code formatting with ESLint.
+-   The `recommended` ruleset no longer enables rules that check code formatting (whitespace, indenting, etc.) and that could conflict with Prettier.
+-   There is a new `recommended-with-formatting` ruleset that has the code formatting rules still enabled, for projects that want to opt out from Prettier and continue checking code formatting with ESLint.
 
 ## 3.3.0 (2019-12-19)
 
 ### Bug Fixes
 
-- The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.
+-   The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.
 
 ## 3.0.0 (2019-08-29)
 
 ### Breaking Changes
 
-- The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
-- Stricter JSDoc linting using [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc).
-- Stricter validation enabled for test files only using new `test-e2e` and `test-unit` rulesets.
+-   The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
+-   Stricter JSDoc linting using [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc).
+-   Stricter validation enabled for test files only using new `test-e2e` and `test-unit` rulesets.
 
 ### New Features
 
-- New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
-- Enable `wp` global by default in the `recommended` config.
-- New ruleset `test-e2e` added for end-to-end tests validation.
-- New ruleset `test-unit` added for unit tests validation.
+-   New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
+-   Enable `wp` global by default in the `recommended` config.
+-   New ruleset `test-e2e` added for end-to-end tests validation.
+-   New ruleset `test-unit` added for unit tests validation.
 
 ### Enhancements
 
-- Remove `@wordpress/dependency-group` and `@wordpress/gutenberg-phase` rules from the `custom` and `recommended` configs and leave them as opt-in features.
+-   Remove `@wordpress/dependency-group` and `@wordpress/gutenberg-phase` rules from the `custom` and `recommended` configs and leave them as opt-in features.
 
 ## 2.4.0 (2019-08-05)
 
 ### New Features
 
-- [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
+-   [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
 
-### Improvements
+### Enhancements
 
-- The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
-- The plugin now uses [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), rather than the `valid-jsdoc` rule, for more reliable linting of JSDoc blocks.
+-   The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
+-   The plugin now uses [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), rather than the `valid-jsdoc` rule, for more reliable linting of JSDoc blocks.
 
 ## 2.3.0 (2019-06-12)
 
-### Bug Fix
+### Bug Fixes
 
-- Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
-- Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
-- Fixed false positive with `react-no-unsafe-timeout` which would wrongly flag errors when assigning `setTimeout` result to a variable (for example, in a `useEffect` hook).
+-   Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+-   Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+-   Fixed false positive with `react-no-unsafe-timeout` which would wrongly flag errors when assigning `setTimeout` result to a variable (for example, in a `useEffect` hook).
 
 ## 2.2.0 (2019-05-21)
 
 ### New Features
 
-- New Rule: [`@wordpress/react-no-unsafe-timeout`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)
-- Add [React Hooks Rules](https://reactjs.org/docs/hooks-rules.html) config.
+-   New Rule: [`@wordpress/react-no-unsafe-timeout`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)
+-   Add [React Hooks Rules](https://reactjs.org/docs/hooks-rules.html) config.
 
 ## 2.1.0 (2019-03-20)
 
 ### New Features
 
-- The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
-- The bundled `eslint-plugin-react` dependency has been updated from requiring `7.7.0` to requiring `^7.12.4` (see new features added in [7.12.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.12.0), [7.11.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.11.0), [7.10.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.10.0), [7.9.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.9.0) and [7.8.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.8.0)).
+-   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
+-   The bundled `eslint-plugin-react` dependency has been updated from requiring `7.7.0` to requiring `^7.12.4` (see new features added in [7.12.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.12.0), [7.11.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.11.0), [7.10.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.10.0), [7.9.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.9.0) and [7.8.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.8.0)).
 
 ## 2.0.0 (2019-03-06)
 
 ### Breaking Changes
 
-- The `esnext` and `recommended` rulesets now enforce [`object-shorthand`](https://eslint.org/docs/rules/object-shorthand)
-- The `es5` and `recommended` rulesets now enforce [`array-callback-return`](https://eslint.org/docs/rules/array-callback-return)
+-   The `esnext` and `recommended` rulesets now enforce [`object-shorthand`](https://eslint.org/docs/rules/object-shorthand)
+-   The `es5` and `recommended` rulesets now enforce [`array-callback-return`](https://eslint.org/docs/rules/array-callback-return)
 
 ### New Features
 
-- New Rule: [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)
-- New Rule: [`@wordpress/dependency-group`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md)
-- New Rule: [`@wordpress/valid-sprintf`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/valid-sprintf.md)
-- New Rule: [`@wordpress/gutenberg-phase`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/gutenberg-phase.md)
-- New Rule: [`@wordpress/no-base-control-with-label-without-id`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)
+-   New Rule: [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)
+-   New Rule: [`@wordpress/dependency-group`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)
+-   New Rule: [`@wordpress/valid-sprintf`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)
+-   New Rule: [`@wordpress/gutenberg-phase`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/gutenberg-phase.md)
+-   New Rule: [`@wordpress/no-base-control-with-label-without-id`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)
 
 ## 1.0.0 (2018-12-12)
 
 ### New Features
 
-- Initial release.
+-   Initial release.

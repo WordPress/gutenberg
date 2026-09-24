@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-
-const pegjs = require( 'pegjs' );
-const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const pegjs = require( 'pegjs' );
+const phpegjs = require( 'phpegjs' );
 
 const peg = fs.readFileSync(
 	path.join( __dirname, '..', 'grammar.pegjs' ),

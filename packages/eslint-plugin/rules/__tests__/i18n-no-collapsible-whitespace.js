@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../i18n-no-collapsible-whitespace';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
@@ -20,8 +16,7 @@ ruleTester.run( 'i18n-no-collapsible-whitespace', rule, {
 			code: `__( 'Hello World…' )`,
 		},
 		{
-			code:
-				'__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
+			code: '__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
 		},
 	],
 	invalid: [
@@ -54,8 +49,7 @@ ruleTester.run( 'i18n-no-collapsible-whitespace', rule, {
 			errors: [ { messageId: 'noCollapsibleWhitespace' } ],
 		},
 		{
-			code:
-				"__( 'A string with consecutive spaces.  These two are after a full stop.' );",
+			code: "__( 'A string with consecutive spaces.  These two are after a full stop.' );",
 			errors: [ { messageId: 'noCollapsibleWhitespace' } ],
 		},
 	],

@@ -1,6 +1,11 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/missing",
-	"category": "common",
+	"title": "Unsupported",
+	"category": "text",
+	"description": "Your site doesn’t include support for this block.",
+	"textdomain": "default",
 	"attributes": {
 		"originalName": {
 			"type": "string"
@@ -10,7 +15,21 @@
 		},
 		"originalContent": {
 			"type": "string",
-			"source": "html"
+			"source": "raw"
 		}
+	},
+	"supports": {
+		"className": false,
+		"customClassName": false,
+		"inserter": false,
+		"html": false,
+		"lock": false,
+		"reusable": false,
+		"renaming": false,
+		"visibility": false,
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"customCSS": false
 	}
 }

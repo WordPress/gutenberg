@@ -1,10 +1,13 @@
-( function() {
-	const { createElement: el, Fragment } = wp.element;
+( function () {
+	const { createElement: el } = wp.element;
 	const { registerBlockType } = wp.blocks;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 
 	registerBlockType( 'gutenberg/test-context-provider', {
+		apiVersion: 3,
 		title: 'Test Context Provider',
+
+		icon: 'list-view',
 
 		// TODO: While redundant with server-side registration, it's required
 		// to assign this value since it is not picked in the implementation of
@@ -13,12 +16,19 @@
 			'gutenberg/recordId': 'recordId',
 		},
 
-		category: 'common',
+		category: 'text',
 
-		edit( { attributes, setAttributes } ) {
+		template: [ [ 'gutenberg/test-context-consumer', {} ] ],
+		templateInsertUpdatesSelection: true,
+
+		edit: function Edit( { attributes, setAttributes } ) {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				templateLock: 'all',
+			} );
 			return el(
-				Fragment,
-				null,
+				'div',
+				innerBlocksProps,
 				el( 'input', {
 					value: attributes.recordId,
 					onChange( event ) {
@@ -27,10 +37,7 @@
 						} );
 					},
 				} ),
-				el( InnerBlocks, {
-					template: [ [ 'gutenberg/test-context-consumer', {} ] ],
-					templateLock: 'all',
-				} )
+				innerBlocksProps.children
 			);
 		},
 
@@ -40,17 +47,25 @@
 	} );
 
 	registerBlockType( 'gutenberg/test-context-consumer', {
+		apiVersion: 3,
 		title: 'Test Context Consumer',
+
+		icon: 'list-view',
 
 		// TODO: While redundant with server-side registration, it's required
 		// to assign this value since it is not picked in the implementation of
 		// `get_block_editor_server_block_settings`.
-		context: [ 'gutenberg/recordId' ],
+		usesContext: [ 'gutenberg/recordId' ],
 
-		category: 'common',
+		category: 'text',
 
-		edit( { context } ) {
-			return 'The record ID is: ' + context[ 'gutenberg/recordId' ];
+		edit: function Edit( { context } ) {
+			const blockProps = useBlockProps();
+			return el(
+				'div',
+				blockProps,
+				'The record ID is: ' + context[ 'gutenberg/recordId' ]
+			);
 		},
 
 		save() {
