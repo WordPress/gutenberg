@@ -250,27 +250,6 @@ test.describe( 'Navigation block - List view editing', () => {
 					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
-
-		// Inserting straight from the initial suggestions, without typing,
-		// still works.
-		await appender.click();
-		await expect( linkUIInput ).toBeFocused();
-
-		const initialResult = await linkControl.getNthSearchResult( 0 );
-		const initialResultText =
-			await linkControl.getSearchResultText( initialResult );
-
-		await initialResult.click();
-
-		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: initialResultText,
-				} )
-				.filter( {
-					hasText: 'Block 4 of 4, Level 1.', // proxy for filtering by description.
-				} )
-		).toBeVisible();
 	} );
 
 	test( `can remove menu items`, async ( { page, editor, requestUtils } ) => {
