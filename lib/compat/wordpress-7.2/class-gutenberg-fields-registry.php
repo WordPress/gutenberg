@@ -310,6 +310,11 @@ final class Gutenberg_Fields_Registry {
 		 * type are registered at priority 0 and adjusted at priority 9, so a
 		 * callback at the default priority sees the final defaults.
 		 *
+		 * The first read happens wherever the fields are needed: while
+		 * handling a REST request as well as on `admin_init`. A callback
+		 * should register fields and nothing else; script modules, styles,
+		 * and their enqueue hooks belong on `init`.
+		 *
 		 * @since 7.2.0
 		 *
 		 * @param Gutenberg_Fields_Registry $registry The registry being read.
