@@ -95,9 +95,9 @@ function getContrastFromLuminances( first: number, second: number ): number {
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
  * registered.
  *
- * @param seed The seed-color string to validate.
+ * @param  seed The seed-color string to validate.
  * @return The parsed seed color.
- * @throws If `seed` is not an sRGB-parseable, fully opaque string.
+ * @throws {Error} If `seed` is not an sRGB-parseable, fully opaque string with finite channels.
  */
 export function parseSeedColor( seed: string ): ReturnType< typeof parse > {
 	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>

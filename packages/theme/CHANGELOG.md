@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject invalid RGB seed channels. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
+-   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite or missing RGB seed channels, including CSS `none` channels that were previously accepted. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
 
 ## 2.2.0 (2026-09-23)
 
