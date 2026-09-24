@@ -89,7 +89,7 @@ describe( 'getLayoutStyle', () => {
 describe( 'FlexLayoutInspectorControls', () => {
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
-		await screen.findByRole( 'radio', { name: 'Justify items left' } );
+		await screen.findByRole( 'button', { name: 'Left' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {

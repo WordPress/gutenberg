@@ -8,6 +8,7 @@ import {
 	justifySpaceEvenly,
 	justifyStretch,
 	justifyTop,
+	chevronDown,
 	justifyCenterVertical,
 	justifyBottom,
 	justifyStretchVertical,
@@ -16,12 +17,15 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
+	Button,
 	Flex,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Menu is being adopted early for the layout control design.
+import { Field, Menu } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -517,17 +521,17 @@ function FlexLayoutJustifyContentControl( {
 		{
 			value: 'left',
 			icon: justifyLeft,
-			label: __( 'Justify items left' ),
+			label: __( 'Left' ),
 		},
 		{
 			value: 'center',
 			icon: justifyCenter,
-			label: __( 'Justify items center' ),
+			label: __( 'Center' ),
 		},
 		{
 			value: 'right',
 			icon: justifyRight,
-			label: __( 'Justify items right' ),
+			label: __( 'Right' ),
 		},
 	];
 	if ( orientation === 'horizontal' ) {
@@ -535,17 +539,17 @@ function FlexLayoutJustifyContentControl( {
 			{
 				value: 'space-between',
 				icon: justifySpaceBetween,
-				label: __( 'Space between items' ),
+				label: __( 'Space between' ),
 			},
 			{
 				value: 'space-around',
 				icon: justifySpaceAround,
-				label: __( 'Space around items' ),
+				label: __( 'Space around' ),
 			},
 			{
 				value: 'space-evenly',
 				icon: justifySpaceEvenly,
-				label: __( 'Space evenly between items' ),
+				label: __( 'Space evenly' ),
 			}
 		);
 	} else {
@@ -556,24 +560,53 @@ function FlexLayoutJustifyContentControl( {
 		} );
 	}
 
+	const selectedOption =
+		justificationOptions.find(
+			( option ) => option.value === justifyContent
+		) ?? justificationOptions[ 0 ];
+
 	return (
-		<ToggleGroupControl
-			label={ __( 'Justification' ) }
-			value={ justifyContent }
-			onChange={ onJustificationChange }
-			className="block-editor-hooks__flex-layout-justification-controls"
-		>
-			{ justificationOptions.map( ( { value, icon, label } ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ value }
-						value={ value }
-						icon={ icon }
-						label={ label }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+		<div className="block-editor-hooks__flex-layout-justification-controls">
+			<Field.VisualLabel>{ __( 'Justification' ) }</Field.VisualLabel>
+			<Menu.Root>
+				<Menu.Trigger
+					render={
+						<Button
+							__next40pxDefaultSize
+							className="block-editor-hooks__flex-layout-justification-trigger"
+							icon={ chevronDown }
+							iconPosition="right"
+							variant="secondary"
+						/>
+					}
+				>
+					{ selectedOption.label }
+				</Menu.Trigger>
+				<Menu.Popup
+					positioner={
+						<Menu.Positioner side="bottom" align="start" />
+					}
+				>
+					<Menu.RadioGroup
+						aria-label={ __( 'Justification' ) }
+						value={ justifyContent }
+						onValueChange={ onJustificationChange }
+					>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => (
+								<Menu.RadioItem
+									key={ value }
+									value={ value }
+									prefix={ <Menu.PrefixIcon icon={ icon } /> }
+								>
+									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+								</Menu.RadioItem>
+							)
+						) }
+					</Menu.RadioGroup>
+				</Menu.Popup>
+			</Menu.Root>
+		</div>
 	);
 }
 

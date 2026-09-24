@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Flex layout: Add Space around and Space evenly justification options, using a menu in the Layout panel to keep all options legible ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
