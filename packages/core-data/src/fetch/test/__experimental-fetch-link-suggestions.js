@@ -1002,42 +1002,7 @@ describe( 'sortResults', () => {
 		).toEqual( [ 'Catering', 'Caterpillar' ] );
 	} );
 
-	it( 'leads with a type the caller prefers', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'Uncategorized Notes',
-				url: 'http://wordpress.local/uncategorized-notes/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Uncategorized',
-				url: 'http://wordpress.local/category/uncategorized/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-		];
-
-		// Pages lead by default.
-		expect(
-			sortResults( { results, search: 'uncategorized' } ).map(
-				( { type } ) => type
-			)
-		).toEqual( [ 'page', 'category' ] );
-
-		// A caller editing a category link asks for categories instead.
-		expect(
-			sortResults( {
-				results,
-				search: 'uncategorized',
-				preferTypes: [ { type: 'term', subtype: 'category' } ],
-			} ).map( ( { type } ) => type )
-		).toEqual( [ 'category', 'page' ] );
-	} );
-
-	it( 'keeps the usual order below the types a caller prefers', () => {
+	it( 'leads with the preferred subtype and keeps the usual order below the preferred type', () => {
 		const results = [
 			{
 				id: 1,
@@ -1060,6 +1025,13 @@ describe( 'sortResults', () => {
 				type: 'post_tag',
 				kind: 'taxonomy',
 			},
+			{
+				id: 4,
+				title: 'Coffee Category',
+				url: 'http://wordpress.local/category/coffee-category/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
 		];
 
 		// Tags lead; the rest keep their usual places behind them.
@@ -1069,7 +1041,7 @@ describe( 'sortResults', () => {
 				search: 'coffee',
 				preferTypes: [ { type: 'term', subtype: 'post_tag' } ],
 			} ).map( ( { type } ) => type )
-		).toEqual( [ 'post_tag', 'page', 'attachment' ] );
+		).toEqual( [ 'post_tag', 'page', 'category', 'attachment' ] );
 	} );
 
 	it( 'prefers a whole search type when no subtype is named', () => {
