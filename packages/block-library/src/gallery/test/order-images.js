@@ -5,55 +5,90 @@ import {
 	sortImageBlocks,
 } from '../order-images';
 
-function block( id, clientId = `block-${ id }` ) {
+/**
+ * Creates the minimal `core/image` block the helpers read: an attachment id
+ * and a client ID, which defaults from the id.
+ *
+ * @param {number|undefined} id       Attachment id, or `undefined` for an external image.
+ * @param {string}           clientId Block client ID.
+ */
+function createImageBlock( id, clientId = `block-${ id }` ) {
 	return { clientId, attributes: { id } };
 }
 
-function record( id, title, date ) {
+/**
+ * Creates image blocks for the given attachment ids, in that order.
+ *
+ * @param {...number} ids Attachment ids.
+ */
+function createImageBlocks( ...ids ) {
+	return ids.map( ( id ) => createImageBlock( id ) );
+}
+
+/**
+ * Creates the minimal attachment record the helpers read.
+ *
+ * @param {number} id    Attachment id.
+ * @param {string} title Attachment title.
+ * @param {string} date  Upload date, ISO 8601.
+ */
+function createAttachment( id, title, date ) {
 	return { id, title: { raw: title, rendered: title }, date };
 }
 
-const MEDIA = [
-	record( 1, 'Beach', '2024-03-01T10:00:00' ),
-	record( 2, 'apple', '2024-01-15T10:00:00' ),
-	record( 3, 'IMG_10', '2024-02-01T10:00:00' ),
-	record( 4, 'IMG_2', '2024-04-01T10:00:00' ),
+// Listed oldest to newest, so the date order reads top to bottom: 2, 3, 1, 4.
+// The ids deliberately don't follow the dates, so a sort keyed on the id (or
+// on the position in this list) can't pass the date tests by accident. The
+// title order is different again: apple, Beach, IMG_2, IMG_10 (2, 1, 4, 3),
+// which requires the compare to ignore case and treat numbers naturally.
+const ATTACHMENTS = [
+	createAttachment( 2, 'apple', '2024-01-15T10:00:00' ),
+	createAttachment( 3, 'IMG_10', '2024-02-01T10:00:00' ),
+	createAttachment( 1, 'Beach', '2024-03-01T10:00:00' ),
+	createAttachment( 4, 'IMG_2', '2024-04-01T10:00:00' ),
 ];
 
-const ids = ( blocks ) => blocks.map( ( { attributes } ) => attributes.id );
+const getImageIds = ( blocks ) =>
+	blocks.map( ( { attributes } ) => attributes.id );
 
 describe( 'sortImageBlocks', () => {
 	it( 'sorts by date, newest first', () => {
-		const blocks = [ block( 1 ), block( 2 ), block( 3 ), block( 4 ) ];
+		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			ids( sortImageBlocks( blocks, MEDIA, 'date', 'desc' ) )
+			getImageIds(
+				sortImageBlocks( blocks, ATTACHMENTS, 'date', 'desc' )
+			)
 		).toEqual( [ 4, 1, 3, 2 ] );
 	} );
 
 	it( 'sorts by date, oldest first', () => {
-		const blocks = [ block( 1 ), block( 2 ), block( 3 ), block( 4 ) ];
+		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			ids( sortImageBlocks( blocks, MEDIA, 'date', 'asc' ) )
+			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' ) )
 		).toEqual( [ 2, 3, 1, 4 ] );
 	} );
 
 	it( 'sorts by title ascending, ignoring case and comparing numbers naturally', () => {
-		const blocks = [ block( 1 ), block( 2 ), block( 3 ), block( 4 ) ];
+		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			ids( sortImageBlocks( blocks, MEDIA, 'title', 'asc' ) )
+			getImageIds(
+				sortImageBlocks( blocks, ATTACHMENTS, 'title', 'asc' )
+			)
 		).toEqual( [ 2, 1, 4, 3 ] );
 	} );
 
 	it( 'sorts by title descending', () => {
-		const blocks = [ block( 1 ), block( 2 ), block( 3 ), block( 4 ) ];
+		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			ids( sortImageBlocks( blocks, MEDIA, 'title', 'desc' ) )
+			getImageIds(
+				sortImageBlocks( blocks, ATTACHMENTS, 'title', 'desc' )
+			)
 		).toEqual( [ 3, 4, 1, 2 ] );
 	} );
 
 	it( 'returns a new array containing the same block objects', () => {
-		const blocks = [ block( 1 ), block( 2 ) ];
-		const sorted = sortImageBlocks( blocks, MEDIA, 'date', 'asc' );
+		const blocks = createImageBlocks( 1, 2 );
+		const sorted = sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' );
 		expect( sorted ).not.toBe( blocks );
 		expect( sorted[ 0 ] ).toBe( blocks[ 1 ] );
 		expect( sorted[ 1 ] ).toBe( blocks[ 0 ] );
@@ -61,13 +96,13 @@ describe( 'sortImageBlocks', () => {
 
 	it( 'moves images without an id or attachment record to the end, in their existing order', () => {
 		const blocks = [
-			block( undefined, 'external-a' ),
-			block( 1 ),
-			block( 99 ),
-			block( 2 ),
-			block( undefined, 'external-b' ),
+			createImageBlock( undefined, 'external-a' ),
+			createImageBlock( 1 ),
+			createImageBlock( 99 ),
+			createImageBlock( 2 ),
+			createImageBlock( undefined, 'external-b' ),
 		];
-		const sorted = sortImageBlocks( blocks, MEDIA, 'date', 'asc' );
+		const sorted = sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' );
 		expect( sorted.map( ( { clientId } ) => clientId ) ).toEqual( [
 			'block-2',
 			'block-1',
@@ -79,15 +114,15 @@ describe( 'sortImageBlocks', () => {
 
 	it( 'keeps the existing order of images with equal keys', () => {
 		const media = [
-			record( 1, 'Same', '2024-01-01T00:00:00' ),
-			record( 2, 'Same', '2024-01-01T00:00:00' ),
+			createAttachment( 1, 'Same', '2024-01-01T00:00:00' ),
+			createAttachment( 2, 'Same', '2024-01-01T00:00:00' ),
 		];
-		const blocks = [ block( 2 ), block( 1 ) ];
+		const blocks = createImageBlocks( 2, 1 );
 		expect(
-			ids( sortImageBlocks( blocks, media, 'date', 'desc' ) )
+			getImageIds( sortImageBlocks( blocks, media, 'date', 'desc' ) )
 		).toEqual( [ 2, 1 ] );
 		expect(
-			ids( sortImageBlocks( blocks, media, 'title', 'asc' ) )
+			getImageIds( sortImageBlocks( blocks, media, 'title', 'asc' ) )
 		).toEqual( [ 2, 1 ] );
 	} );
 
@@ -97,9 +132,9 @@ describe( 'sortImageBlocks', () => {
 			{ id: 2, title: { rendered: 'a' }, date: '' },
 		];
 		expect(
-			ids(
+			getImageIds(
 				sortImageBlocks(
-					[ block( 1 ), block( 2 ) ],
+					createImageBlocks( 1, 2 ),
 					media,
 					'title',
 					'asc'
@@ -111,13 +146,13 @@ describe( 'sortImageBlocks', () => {
 
 describe( 'hasSortableImages', () => {
 	it( 'is true with two or more images that have an attachment record', () => {
-		expect( hasSortableImages( [ block( 1 ), block( 2 ) ], MEDIA ) ).toBe(
-			true
-		);
+		expect(
+			hasSortableImages( createImageBlocks( 1, 2 ), ATTACHMENTS )
+		).toBe( true );
 	} );
 
 	it( 'is false while the attachment records have not resolved', () => {
-		expect( hasSortableImages( [ block( 1 ), block( 2 ) ], [] ) ).toBe(
+		expect( hasSortableImages( createImageBlocks( 1, 2 ), [] ) ).toBe(
 			false
 		);
 	} );
@@ -125,8 +160,8 @@ describe( 'hasSortableImages', () => {
 	it( 'does not count images without an id or attachment record', () => {
 		expect(
 			hasSortableImages(
-				[ block( 1 ), block( undefined ), block( 99 ) ],
-				MEDIA
+				createImageBlocks( 1, undefined, 99 ),
+				ATTACHMENTS
 			)
 		).toBe( false );
 	} );
@@ -135,58 +170,43 @@ describe( 'hasSortableImages', () => {
 describe( 'getCurrentOrder', () => {
 	it( 'detects newest to oldest', () => {
 		expect(
-			getCurrentOrder(
-				[ block( 4 ), block( 1 ), block( 3 ), block( 2 ) ],
-				MEDIA
-			)
+			getCurrentOrder( createImageBlocks( 4, 1, 3, 2 ), ATTACHMENTS )
 		).toEqual( { orderby: 'date', order: 'desc' } );
 	} );
 
 	it( 'detects oldest to newest', () => {
 		expect(
-			getCurrentOrder(
-				[ block( 2 ), block( 3 ), block( 1 ), block( 4 ) ],
-				MEDIA
-			)
+			getCurrentOrder( createImageBlocks( 2, 3, 1, 4 ), ATTACHMENTS )
 		).toEqual( { orderby: 'date', order: 'asc' } );
 	} );
 
 	it( 'detects title A to Z', () => {
 		expect(
-			getCurrentOrder(
-				[ block( 2 ), block( 1 ), block( 4 ), block( 3 ) ],
-				MEDIA
-			)
+			getCurrentOrder( createImageBlocks( 2, 1, 4, 3 ), ATTACHMENTS )
 		).toEqual( { orderby: 'title', order: 'asc' } );
 	} );
 
 	it( 'detects title Z to A', () => {
 		expect(
-			getCurrentOrder(
-				[ block( 3 ), block( 4 ), block( 1 ), block( 2 ) ],
-				MEDIA
-			)
+			getCurrentOrder( createImageBlocks( 3, 4, 1, 2 ), ATTACHMENTS )
 		).toEqual( { orderby: 'title', order: 'desc' } );
 	} );
 
 	it( 'returns null for a custom order', () => {
 		expect(
-			getCurrentOrder(
-				[ block( 1 ), block( 2 ), block( 3 ), block( 4 ) ],
-				MEDIA
-			)
+			getCurrentOrder( createImageBlocks( 1, 2, 3, 4 ), ATTACHMENTS )
 		).toBeNull();
 	} );
 
 	it( 'returns null while the attachment records have not resolved', () => {
-		expect( getCurrentOrder( [ block( 1 ), block( 2 ) ], [] ) ).toBeNull();
+		expect( getCurrentOrder( createImageBlocks( 1, 2 ), [] ) ).toBeNull();
 	} );
 
 	it( 'returns null when fewer than two images have an attachment record', () => {
 		expect(
 			getCurrentOrder(
-				[ block( 1 ), block( undefined ), block( 99 ) ],
-				MEDIA
+				createImageBlocks( 1, undefined, 99 ),
+				ATTACHMENTS
 			)
 		).toBeNull();
 	} );
@@ -194,14 +214,8 @@ describe( 'getCurrentOrder', () => {
 	it( 'ignores unplaceable images at the end when detecting the order', () => {
 		expect(
 			getCurrentOrder(
-				[
-					block( 4 ),
-					block( 1 ),
-					block( 3 ),
-					block( 2 ),
-					block( undefined ),
-				],
-				MEDIA
+				createImageBlocks( 4, 1, 3, 2, undefined ),
+				ATTACHMENTS
 			)
 		).toEqual( { orderby: 'date', order: 'desc' } );
 	} );
@@ -209,10 +223,10 @@ describe( 'getCurrentOrder', () => {
 	describe( 'when a sequence satisfies several orders', () => {
 		// Oldest to newest and A → Z both match.
 		const media = [
-			record( 1, 'a', '2024-01-01T00:00:00' ),
-			record( 2, 'b', '2024-01-02T00:00:00' ),
+			createAttachment( 1, 'a', '2024-01-01T00:00:00' ),
+			createAttachment( 2, 'b', '2024-01-02T00:00:00' ),
 		];
-		const blocks = [ block( 1 ), block( 2 ) ];
+		const blocks = createImageBlocks( 1, 2 );
 
 		it( 'reports the first matching option by default', () => {
 			expect( getCurrentOrder( blocks, media ) ).toEqual( {
