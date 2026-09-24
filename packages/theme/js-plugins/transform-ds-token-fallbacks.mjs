@@ -47,7 +47,7 @@ function isNonValue( ancestors ) {
  *
  * @param {string} source   JavaScript or TypeScript source.
  * @param {string} filename Source filename, without a query string.
- * @return {{ code: string, map: import('magic-string').SourceMap, sourceMappingURL: string | undefined } | null} Transformation, or null when unchanged.
+ * @return {{ code: string, map: import('magic-string').SourceMap, sourceMappingURL: string | undefined } | null} Transformation, or null when unchanged or unparseable.
  */
 export function transformDsTokenFallbacks( source, filename ) {
 	if ( ! source.includes( '--wpds-' ) ) {
@@ -83,10 +83,20 @@ export function transformDsTokenFallbacks( source, filename ) {
 	for (;;) {
 		try {
 			ast = parse( parserSource, options );
+			// Unambiguous parsing can retain module errors in a valid script.
+			if ( ast.program.sourceType === 'script' && ast.errors?.length ) {
+				ast = parse( parserSource, {
+					...options,
+					sourceType: 'script',
+				} );
+			}
 			break;
 		} catch ( error ) {
 			const parseError =
 				/** @type {import('@babel/parser').ParseError} */ ( error );
+			if ( parseError.code !== 'BABEL_PARSER_SYNTAX_ERROR' ) {
+				throw error;
+			}
 			if (
 				! isTypeScript ||
 				! [ 'UnexpectedLeadingDecorator', 'UnexpectedToken' ].includes(
@@ -95,7 +105,8 @@ export function transformDsTokenFallbacks( source, filename ) {
 				! Number.isInteger( parseError.pos ) ||
 				parserSource[ parseError.pos ] !== '!'
 			) {
-				throw error;
+				// A later compiler plugin may understand syntax Babel does not.
+				return null;
 			}
 			// Babel's decorator grammar rejects TypeScript non-null assertions.
 			// Mask only the rejected token for parsing, preserving source offsets.
@@ -106,11 +117,6 @@ export function transformDsTokenFallbacks( source, filename ) {
 				parserSource.slice( parseError.pos + 1 );
 		}
 	}
-	// With error recovery, unambiguous parsing can retain module-mode errors
-	// even after identifying a script. Reparse it under the correct rules.
-	if ( ast.program.sourceType === 'script' && ast.errors?.length ) {
-		ast = parse( parserSource, { ...options, sourceType: 'script' } );
-	}
 	// Babel's standard decorators grammar reports parameter decorators even
 	// in TypeScript. Leave that one check to the compiler's tsconfig settings.
 	for ( const error of ast.errors ?? [] ) {
@@ -118,7 +124,7 @@ export function transformDsTokenFallbacks( source, filename ) {
 			! isTypeScript ||
 			error.reasonCode !== 'UnsupportedParameterDecorator'
 		) {
-			throw error;
+			return null;
 		}
 	}
 	const output = new MagicString( source );

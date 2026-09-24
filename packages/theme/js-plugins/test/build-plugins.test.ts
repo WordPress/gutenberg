@@ -403,3 +403,39 @@ it( 'transforms Vite query-string modules while preserving raw and URL imports',
 		await server.close();
 	}
 } );
+
+it( 'lets a later Vite pre plugin compile syntax the token parser cannot read', async () => {
+	const source = 'export const gap: string = "var(--wpds-dimension-gap-sm)";';
+	const filename = join( await realpath( directory ), 'fixture.js' );
+	await writeFile( filename, source );
+	const server = await createServer( {
+		configFile: false,
+		root: directory,
+		logLevel: 'silent',
+		plugins: [
+			vitePlugin(),
+			{
+				name: 'compile-typed-javascript',
+				enforce: 'pre',
+				transform( code, id ) {
+					if ( id !== filename ) {
+						return null;
+					}
+					return esbuildTransform( code, {
+						loader: 'ts',
+						sourcefile: id,
+						sourcemap: 'external',
+					} );
+				},
+			},
+		],
+		server: { middlewareMode: true, watch: null },
+	} );
+	try {
+		const result = await server.transformRequest( '/fixture.js' );
+		expect( result?.code ).toContain( 'var(--wpds-dimension-gap-sm)' );
+		expect( result?.code ).not.toContain( ': string' );
+	} finally {
+		await server.close();
+	}
+} );

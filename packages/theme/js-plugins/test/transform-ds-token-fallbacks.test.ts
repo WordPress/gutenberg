@@ -84,24 +84,18 @@ const element = <div>var(--wpds-not-a-token)</div>;
 		);
 	} );
 
-	it( 'does not suppress other recoverable parser errors', () => {
-		expect( () =>
-			transformDsTokenFallbacks(
-				'let gap = "var(--wpds-dimension-gap-sm)"; let gap = "duplicate";',
-				'fixture.ts'
-			)
-		).toThrow( 'has already been declared' );
-	} );
-
-	it.each( [ '"use strict";', 'export {};' ] )(
-		'still rejects strict-mode violations after %s',
-		( prefix ) => {
-			expect( () =>
-				transformDsTokenFallbacks(
-					`${ prefix } function last(value, value) { return "var(--wpds-dimension-gap-sm)"; }`,
-					'fixture.js'
-				)
-			).toThrow( 'Argument name clash' );
+	it.each( [
+		'let gap = "var(--wpds-dimension-gap-sm)"; let gap = "duplicate";',
+		'const gap: string = "var(--wpds-dimension-gap-sm)";',
+		'"use strict"; function last(value, value) { return "var(--wpds-dimension-gap-sm)"; }',
+		'export {}; function last(value, value) { return "var(--wpds-dimension-gap-sm)"; }',
+		'export const gap = "var(--wpds-dimension-gap-sm)"; function unfinished(',
+	] )(
+		'leaves unparseable source for the downstream compiler: %s',
+		( source ) => {
+			expect(
+				transformDsTokenFallbacks( source, 'fixture.js' )
+			).toBeNull();
 		}
 	);
 
