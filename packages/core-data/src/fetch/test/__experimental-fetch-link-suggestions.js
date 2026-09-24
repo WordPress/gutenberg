@@ -756,10 +756,17 @@ describe( 'sortResults', () => {
 			},
 			{
 				id: 2,
-				title: 'Our Coffee Guide',
+				title: 'Our Coffee is a Guide',
 				url: 'http://wordpress.local/category/our-coffee-guide/',
 				type: 'category',
 				kind: 'taxonomy',
+			},
+			{
+				id: 1,
+				title: 'Our Coffee Guide',
+				url: 'http://wordpress.local/attachment/our-coffee-is-a-guide',
+				type: 'attachment',
+				kind: 'media',
 			},
 		];
 
@@ -768,6 +775,7 @@ describe( 'sortResults', () => {
 			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
 		).toEqual( [
 			'Our Coffee Guide', // contains "coffee guide" as a string
+			'Our Coffee is a Guide', // contains "coffee" and "guide" strings
 			'Coffee', // has only one of the two words typed
 		] );
 	} );
