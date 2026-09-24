@@ -257,6 +257,11 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
+
+	if ( searchOptions.isInitialSuggestions || ! search ) {
+		return sortResults( results, search, preferTypes ).slice( 0, perPage );
+	}
+
 	const sortedResults = rankResults( results, search, preferTypes );
 
 	// Determine how many results to return
@@ -266,10 +271,10 @@ export default async function fetchLinkSuggestions(
 	// every title matching a word typed even if they exceed 20. Titles matching no word typed are
 	// left out: `/wp/v2/search` matches post content and excerpts too, with no way to narrow it.
 	// Explicitly passed perPage unscoped searches respect the perPage value.
-	const bounded = type || ! search || limit !== undefined;
-	const kept = bounded
-		? sortedResults.slice( 0, perPage )
-		: sortedResults.filter( ( { found } ) => found > 0 );
+	const matches = sortedResults.filter( ( { found } ) => found > 0 );
+
+	const bounded = type || limit !== undefined;
+	const kept = bounded ? matches.slice( 0, perPage ) : matches;
 
 	return kept.map( ( { result } ) => result );
 }

@@ -104,14 +104,21 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 					} ) )
 				);
 			case '/wp/v2/search?search=few&per_page=20&type=term':
-				return Promise.resolve(
-					Array.from( { length: 30 }, ( _, index ) => ( {
+				return Promise.resolve( [
+					...Array.from( { length: 30 }, ( _, index ) => ( {
 						id: 400 + index,
+						title: `Few ${ index }`,
+						url: `http://wordpress.local/few-${ index }/`,
+						type: 'category',
+					} ) ),
+					// Matched on a body, so the title holds nothing typed.
+					...Array.from( { length: 10 }, ( _, index ) => ( {
+						id: 450 + index,
 						title: `Unrelated ${ index }`,
 						url: `http://wordpress.local/unrelated-${ index }/`,
 						type: 'category',
-					} ) )
-				);
+					} ) ),
+				] );
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
 				return Promise.resolve( [
 					...Array.from( { length: 5 }, ( _, index ) => ( {
@@ -175,6 +182,21 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 			case '/wp/v2/media?search=few%20notes&per_page=20':
 			case '/wp/v2/search?search=many&per_page=20&type=post-format':
 			case '/wp/v2/media?search=many&per_page=20':
+			case '/wp/v2/search?search=brewing&per_page=20&type=term':
+				return Promise.resolve( [
+					...Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 500 + index,
+						title: `Brewing ${ index }`,
+						url: `http://wordpress.local/brewing-${ index }/`,
+						type: 'category',
+					} ) ),
+					...Array.from( { length: 10 }, ( _, index ) => ( {
+						id: 550 + index,
+						title: `Unrelated ${ index }`,
+						url: `http://wordpress.local/unrelated-${ index }/`,
+						type: 'category',
+					} ) ),
+				] );
 			case '/wp/v2/search?search=few&per_page=20&type=post-format':
 			case '/wp/v2/media?search=few&per_page=20':
 				return Promise.resolve( [] );
@@ -397,6 +419,15 @@ describe( 'fetchLinkSuggestions', () => {
 				expect( countStartingWith( titles, 'Unrelated' ) ).toBe( 0 );
 			}
 		);
+	} );
+
+	it( 'leaves out titles holding nothing typed on a scoped search too', () => {
+		// The endpoint offers 3 titles holding the word and 10 matched on a
+		// body. Only the 3 are offered, though `perPage` allows 20.
+		return fetchLinkSuggestions( 'brewing', {
+			type: 'term',
+			perPage: 20,
+		} ).then( ( suggestions ) => expect( suggestions ).toHaveLength( 3 ) );
 	} );
 
 	it( 'specific type searches respect the per page limit', () => {
@@ -756,10 +787,17 @@ describe( 'sortResults', () => {
 			},
 			{
 				id: 2,
-				title: 'Our Coffee Guide',
+				title: 'Our Coffee is a Guide',
 				url: 'http://wordpress.local/category/our-coffee-guide/',
 				type: 'category',
 				kind: 'taxonomy',
+			},
+			{
+				id: 1,
+				title: 'Our Coffee Guide',
+				url: 'http://wordpress.local/attachment/our-coffee-is-a-guide',
+				type: 'attachment',
+				kind: 'media',
 			},
 		];
 
@@ -768,6 +806,7 @@ describe( 'sortResults', () => {
 			sortResults( results, 'coffee guide' ).map( ( { title } ) => title )
 		).toEqual( [
 			'Our Coffee Guide', // contains "coffee guide" as a string
+			'Our Coffee is a Guide', // contains "coffee" and "guide" strings
 			'Coffee', // has only one of the two words typed
 		] );
 	} );
