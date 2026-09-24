@@ -129,13 +129,14 @@ describe( 'Gallery block', () => {
 			} );
 			expect( orderBy ).toHaveDisplayValue( 'Custom' );
 			// The attachment records never resolve in this environment, so
-			// there's nothing to sort by yet; Custom and Random don't need them.
+			// there's nothing to sort by yet; Random doesn't need them. Custom
+			// is only choosable while Random is on, since that's all it does.
 			expect(
 				screen.getByRole( 'option', { name: 'Newest to oldest' } )
 			).toBeDisabled();
 			expect(
 				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeEnabled();
+			).toBeDisabled();
 			expect(
 				screen.getByRole( 'option', { name: 'Random' } )
 			).toBeEnabled();
@@ -152,9 +153,15 @@ describe( 'Gallery block', () => {
 			// its display value reflects the stored state after each change.
 			await userEvent.selectOptions( orderBy, 'random' );
 			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeEnabled();
 
 			await userEvent.selectOptions( orderBy, 'custom' );
 			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeDisabled();
 		} );
 
 		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
