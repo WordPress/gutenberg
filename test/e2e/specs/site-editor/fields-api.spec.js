@@ -265,6 +265,38 @@ test.describe( 'Fields API', () => {
 		).toHaveText( '' );
 	} );
 
+	test( 'ignores a field defined only in a script module', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await showFieldsInTable( page, [ 'Reading time' ] );
+		const table = page.getByRole( 'table' );
+
+		// The module loaded: the field registered with it renders.
+		await expect(
+			table
+				.getByRole( 'row', { name: /Short Page/ } )
+				.locator( '.gutenberg-test-reading-time' )
+		).toHaveText( '2 min' );
+
+		// The same module exports a complete definition of a `word_count`
+		// field no PHP registration names. A module only augments the
+		// fields it was registered with, so the field is neither a column
+		// nor offered from the view options.
+		await expect(
+			table.getByRole( 'columnheader', { name: /Word count/ } )
+		).toHaveCount( 0 );
+		await expect(
+			page.locator( '.gutenberg-test-word-count' )
+		).toHaveCount( 0 );
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await expect(
+			page.getByRole( 'button', { name: 'Word count', exact: true } )
+		).toHaveCount( 0 );
+		await page.keyboard.press( 'Escape' );
+	} );
+
 	test( 'loads the fields in the extensible site editor embedded in wp-admin', async ( {
 		admin,
 		page,
