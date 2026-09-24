@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
@@ -1058,6 +1058,26 @@ describe( 'DataForm component', () => {
 			expect(
 				screen.queryByText( /needs? attention/ )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'renders collapsible card headers as native buttons inside a heading', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithRequiredTitle }
+					form={ formCardMode }
+					data={ data }
+				/>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 2,
+				name: /main card/i,
+			} );
+			const trigger = within( heading ).getByRole( 'button', {
+				name: /main card/i,
+			} );
+			expect( trigger.tagName ).toBe( 'BUTTON' );
 		} );
 
 		it( 'should show errors for fields that become invalid after focus already left the card once', async () => {
