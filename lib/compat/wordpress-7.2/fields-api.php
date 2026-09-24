@@ -108,11 +108,8 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 		$scripts = wp_scripts();
 	}
 
-	// TODO:
 	// Field registration as well as actions live in packages/editor/src/dataviews/store/private-actions.ts
 	// which means any screen that wants to use this mechanism needs to load the editor script.
-	// This is fine for our current use cases (site editor, post editor), but regular wp-admin screens
-	// that want to use the fields API will need to load the editor script as well, which is not ideal.
 	if ( ! $scripts->query( 'wp-editor', 'registered' ) ) {
 		return;
 	}
