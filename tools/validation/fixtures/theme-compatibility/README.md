@@ -6,7 +6,7 @@ Use it with [Testing published packages across WordPress versions](../../../../d
 
 ## Compatibility boundaries
 
-An export fallback protects access to the component, but props and CSS tokens can differ across versions. WordPress 7.0 reads `color.bg`, while UI 0.15.1 and the current UI pass `color.background`. UI 0.15.1 also consumes `--wpds-color-bg-*` and `--wpds-color-fg-*` names, which the current theme replaced with `--wpds-color-background-*` and `--wpds-color-foreground-*`. The checkout UI on WordPress 7.0 is a current consumer compatibility bug, even though the mismatch predates this fixture. Treat prop and token mismatches as separate visual compatibility checks. A successful private API unlock does not prove that the requested theme was applied.
+An export fallback protects access to the component, but props and CSS tokens can differ across versions. WordPress 7.0 reads `color.bg`, while UI 0.15.1 and the current UI pass `color.background`. UI 0.15.1 also consumes `--wpds-color-bg-*` and `--wpds-color-fg-*` names, which the current theme replaced with `--wpds-color-background-*` and `--wpds-color-foreground-*`. Generated CSS fallbacks keep the popup readable when its token names are unavailable. These fixed default colors do not translate provider props or reproduce a requested custom theme. Record fallback rendering separately from custom theme application; a light popup alone does not establish a compatibility regression.
 
 ## Build the consumers
 
@@ -44,16 +44,16 @@ npm exec --no -- wp-env --config /absolute/path/to/new.wp-env.json status
 npm exec --no -- wp-env --config /absolute/path/to/new.wp-env.json start
 ```
 
-In each environment, sign in and open **Tools → Theme compatibility**. Add `&bundle=old` or `&bundle=new` to the page URL to select the consumer. Focus the trigger with Tab, check the visible popup, and press Escape to dismiss it. Repeat with a pointer. Inspect the popup's computed foreground/background colors, its inherited theme custom properties, and the browser console. A popup that renders only through CSS fallback values does not prove that runtime theming works.
+In each environment, sign in and open **Tools → Theme compatibility**. Add `&bundle=old` or `&bundle=new` to the page URL to select the consumer. Focus the trigger with Tab, check the visible popup, and press Escape to dismiss it. Repeat with a pointer. Inspect the popup's computed foreground/background colors, its inherited theme custom properties, and the browser console. Record whether the requested theme was applied or the popup uses default colors, including generated CSS fallbacks. Both can produce a usable popup.
 
 | UI bundle | WordPress theme dependency | Required evidence |
 | --- | --- | --- |
 | Published | Core | Baseline loading, private API access, theme values, and dismissal. |
-| Published | Candidate Gutenberg | Existing private API access and the old consumer's theme values remain usable. |
-| Checkout | Core | The compatibility fallback loads, and the required props and token names work on the minimum runtime. |
+| Published | Candidate Gutenberg | Existing private API access, usable rendering with available tokens or CSS fallbacks, and dismissal. |
+| Checkout | Core | The compatibility fallback loads, the popup remains usable, and dismissal works. Record custom theme application separately. |
 | Checkout | Candidate Gutenberg | The public export loads and the popup consumes the generated theme values. |
 
-Record each row as `pass`, `fail`, or `unverified`, with the exact core version, Gutenberg revision, UI version, asset dependencies, computed colors, and any console errors. Distinguish module loading from visual compatibility. Add intermediate WordPress versions when their API or tokens differ. Repeat with `SCRIPT_DEBUG` disabled before removing the compatibility bridge.
+Record loading and interactions as `pass`, `fail`, or `unverified`, with the exact core version, Gutenberg revision, UI version, asset dependencies, computed colors, and any console errors. For rendering, record whether the requested theme is applied, default or fallback colors are used, or the result is unverified. Do not classify default colors alone as a regression unless preserving the custom theme is a supported requirement. Add intermediate WordPress versions when their API or tokens differ. Repeat with `SCRIPT_DEBUG` disabled before removing the compatibility bridge.
 
 A scheduled removal version is a review point. Keep `privateApis.ThemeProvider` and the UI fallback until maintained consumers have migrated and the required combinations pass, or document an explicit support change. See the public type derivation example in the [theme README](../../../../packages/theme/README.md#typescript-props-and-warnings) when compiling existing consumers against packed declarations.
 
