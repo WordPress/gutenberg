@@ -222,20 +222,47 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Registers an icon carrying keywords, so the keyword tests do not depend on
+	 * the terms any bundled icon happens to ship with.
+	 *
+	 * @return string The registered icon name.
+	 */
+	private function register_keyword_icon() {
+		$icon_name = 'core/keyword-icon';
+
+		wp_register_icon(
+			$icon_name,
+			array(
+				'label'    => 'Keyword Icon',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'hamburger' ),
+			)
+		);
+
+		return $icon_name;
+	}
+
+	/**
 	 * Test that GET /wp/v2/icons/?search=%s searches icon keywords too.
 	 */
 	public function test_get_items_search_includes_keywords() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$icon_name = $this->register_keyword_icon();
 
-		// 'hamburger' is only found in the *keywords* for core/menu.
-		$request->set_param( 'search', 'hamburger' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertEquals( array( 'core/menu' ), array_column( $data, 'name' ) );
+			// 'hamburger' is in neither the name nor the label, only the keywords.
+			$request->set_param( 'search', 'hamburger' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertEquals( array( $icon_name ), array_column( $data, 'name' ) );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
 	}
 
 	/**
@@ -245,15 +272,21 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	public function test_get_items_response_includes_keywords() {
 		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
-		$request->set_param( 'search', 'core/menu' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		$icon_name = $this->register_keyword_icon();
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertCount( 1, $data );
-		$this->assertArrayHasKey( 'keywords', $data[0] );
-		$this->assertContains( 'hamburger', $data[0]['keywords'] );
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', $icon_name );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertArrayHasKey( 'keywords', $data[0] );
+			$this->assertContains( 'hamburger', $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
 	}
 
 	/**

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `manifest.json`: Support an optional `keywords` property, an array of extra search terms the icons registry matches alongside an icon's name and label. The terms are emitted and localized in the generated `manifest.php`. No bundled icon sets them yet. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+
 ## 17.0.0 (2026-09-23)
 
 ### Breaking Changes
@@ -21,7 +25,6 @@
 -   `manifest.json`: New `collections` property, listing the collections an icon is registered in once it ships to WordPress Core. It replaces the `public` property and introduces the `core-admin` collection, which is not public and holds the icons the WordPress admin interface renders. ([#83261](https://github.com/WordPress/gutenberg/pull/83261), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
 -   `comment` and `plugins`: redraw for better optical balance ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 -   `brush` and `media`: redraw. `brush` becomes a wide paintbrush rather than a pencil, which the existing `pencil` icon already covers, and `media` becomes a camera with music notes so it is no longer easily confused with `image` ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
--   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Bug Fixes
 
