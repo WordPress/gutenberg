@@ -1934,11 +1934,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/rich-text/utils.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/rich-text/with-deprecations.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
