@@ -96,8 +96,9 @@ type SortImagesControlProps = {
  * inner image blocks once, and the user can drag them into any other order
  * afterwards. Nothing is stored for them, so the displayed value is derived
  * from the order the images are currently in, or "Custom" when that matches
- * none of them. "Custom" is also choosable: it means the order arranged in the
- * editor, so picking it turns "Random" off without reordering anything.
+ * none of them. "Custom" means the order arranged in the editor, and is
+ * choosable only while "Random" is on: picking it turns "Random" off without
+ * reordering anything.
  *
  * "Random" is the one stored value (the `randomOrder` attribute). It applies
  * on the front end only, leaving the editor order as it is, and choosing any
@@ -111,7 +112,10 @@ export function SortImagesControl( {
 	onRandomChange,
 }: SortImagesControlProps ) {
 	const options = [
-		{ label: __( 'Custom' ), value: CUSTOM_ORDER },
+		// Choosing Custom only turns Random off, so it's only choosable while
+		// Random is on; otherwise it's a read-only status for a hand-arranged
+		// order. It stays in the list either way so the options never shift.
+		{ label: __( 'Custom' ), value: CUSTOM_ORDER, disabled: ! isRandom },
 		...ORDER_OPTIONS.map( ( option ) => ( {
 			...option,
 			disabled: ! canSort,
@@ -139,10 +143,8 @@ export function SortImagesControl( {
 				}
 				if ( nextValue === CUSTOM_ORDER ) {
 					// Custom means the editor order, so this only turns
-					// Random off, and only when it's on.
-					if ( isRandom ) {
-						onRandomChange( false );
-					}
+					// Random off (the option is disabled when it's off).
+					onRandomChange( false );
 					return;
 				}
 				onSort( parseOrderValue( nextValue ) );
