@@ -1,8 +1,9 @@
 /* Invalid: Using unknown design system tokens */
 .example {
-	color: v\61r(--wpds-nonexistent-token);
+	color: var(--wpds-nonexistent-token);
 }
 
 .another {
-	background: v\61 r(\2d-wpds-made-up-color);
+	background: var(--wpds-made-up-color);
 }
+

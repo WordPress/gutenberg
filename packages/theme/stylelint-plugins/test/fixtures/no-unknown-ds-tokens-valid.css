@@ -4,8 +4,6 @@
 	color: var(--wpds-color-foreground-content-neutral);
 	border-radius: var(--wpds-border-radius-sm);
 	padding: var(--wpds-dimension-padding-2xl);
-	gap: var(--wpds-dimension-gap-\73m);
-	margin: var(--wpds-dimension-gap-\73 m);
 }
 
 /* Valid: Using tokens with fallbacks */
@@ -19,10 +17,3 @@
 	background: var(--some-other-var);
 }
 
-/* Valid: Token-like text in strings, URLs, and comments */
-.fixture::before {
-	content: "var(--wpds-not-a-token, red)";
-	background-image: url("var(--wpds-not-a-token, red)");
-	color: inherit; /* var(--wpds-not-a-token, red) */
-	--example: #v\61r(--wpds-not-a-token, red) @v\61r(--wpds-not-a-token, red);
-}

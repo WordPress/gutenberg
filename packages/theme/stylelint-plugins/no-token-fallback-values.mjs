@@ -1,5 +1,4 @@
 import stylelint from 'stylelint';
-import { parseCSSVariableReferences } from '../postcss-plugins/parse-css-variables.mjs';
 
 const {
 	createPlugin,
@@ -7,6 +6,12 @@ const {
 } = stylelint;
 
 const ruleName = 'plugin-wpds/no-token-fallback-values';
+
+/**
+ * Matches `var(--wpds-<name>,` — the comma signals a fallback value.
+ * Captures the token name (e.g. `--wpds-color-foreground-content-neutral`).
+ */
+const varWithFallbackRegex = /var\(\s*(--wpds-[\w-]+)\s*,/g;
 
 const messages = ruleMessages( ruleName, {
 	rejected: ( tokenName ) =>
@@ -26,44 +31,15 @@ const ruleFunction = ( primary ) => {
 		}
 
 		root.walkDecls( ( ruleNode ) => {
-			const declaration = ruleNode.toString();
-			const references =
-				parseCSSVariableReferences( declaration ).references;
-			let { line, column } = ruleNode.rangeBy( { index: 0 } ).start;
-			let offset = 0;
+			const { value } = ruleNode;
 
-			// SCSS serialization adds closing delimiters to line comments. Those
-			// change offsets, but not line/column positions on subsequent lines.
-			// References are visited in source order, so advance one shared cursor.
-			/** @param {number} index Offset in the serialized declaration. */
-			const getPosition = ( index ) => {
-				while ( offset < index ) {
-					if ( declaration[ offset++ ] === '\n' ) {
-						line++;
-						column = 1;
-					} else {
-						column++;
-					}
-				}
-				return { line, column };
-			};
-
-			for ( const reference of references ) {
-				if (
-					! reference.name.startsWith( '--wpds-' ) ||
-					! reference.fallbackSeparator
-				) {
-					continue;
-				}
-
+			let match;
+			varWithFallbackRegex.lastIndex = 0;
+			while ( ( match = varWithFallbackRegex.exec( value ) ) !== null ) {
 				report( {
-					message: messages.rejected( reference.name ),
+					message: messages.rejected( match[ 1 ] ),
 					node: ruleNode,
-					start: getPosition( reference.sourceIndex ),
-					end: getPosition(
-						reference.fallbackSeparator.sourceEndIndex -
-							reference.fallbackSeparator.after.length
-					),
+					word: match[ 0 ],
 					result,
 					ruleName,
 				} );

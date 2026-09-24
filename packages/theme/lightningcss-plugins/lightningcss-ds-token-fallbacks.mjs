@@ -62,7 +62,10 @@ const plugin = {
 		const fallback = parsedFallbacks.get( tokenName );
 		if ( ! fallback ) {
 			getTokenFallback( tokenName );
-			return;
+			throw new Error(
+				`No parsed fallback for design token: ${ tokenName }. ` +
+					'Check that its generated fallback can be parsed by Lightning CSS.'
+			);
 		}
 
 		return {

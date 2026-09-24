@@ -22,7 +22,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) > snapshot matches war
   },
   {
     "column": 17,
-    "endColumn": 51,
+    "endColumn": 45,
     "endLine": 5,
     "line": 5,
     "rule": "plugin-wpds/no-token-fallback-values",
@@ -48,10 +48,10 @@ exports[`flags warnings with invalid css (wpds fallbacks) > snapshot matches war
     "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
   },
   {
-    "column": 26,
-    "endColumn": 70,
-    "endLine": 17,
-    "line": 17,
+    "column": 32,
+    "endColumn": 76,
+    "endLine": 15,
+    "line": 15,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
     "text": "Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",

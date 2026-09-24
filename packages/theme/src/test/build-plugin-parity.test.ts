@@ -13,6 +13,7 @@ import {
 	transform as lightningcssTransform,
 } from 'lightningcss';
 import postcss from 'postcss';
+import tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
 import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
 import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
@@ -180,6 +181,26 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( transformWithLightningcss( source, 'styles.css' ) ).toContain(
 			'var(--wpds-dimension-gap-sm, 8px)'
 		);
+	} );
+
+	it( 'throws when a known token has no parsed fallback', () => {
+		const tokenName = '--wpds-test-missing-fallback';
+		// Simulate a generated token missing from the plugin's parsed cache.
+		Object.defineProperty( tokenFallbacks, tokenName, {
+			value: '1px',
+			configurable: true,
+		} );
+
+		try {
+			expect( () =>
+				transformWithLightningcss(
+					`a { gap: var(${ tokenName }); }`,
+					'styles.css'
+				)
+			).toThrow( `No parsed fallback for design token: ${ tokenName }.` );
+		} finally {
+			Reflect.deleteProperty( tokenFallbacks, tokenName );
+		}
 	} );
 
 	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {

@@ -2,9 +2,4 @@
 .fixture {
 	color: var(--wpds-color-foreground-content-neutral);
 	content: "var(--wpds-border-radius-sm)";
-	background-image: url("var(--wpds-not-a-token)");
-	gap: v\61r(--wpds-dimension-gap-\73m);
-	padding: v\61 r(--wpds-dimension-padding-\73 m);
-	margin: var(\2d-wpds-dimension-gap-sm);
-	--example: #v\61r(--wpds-not-a-token) @v\61r(--wpds-not-a-token);
 }

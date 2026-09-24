@@ -1,7 +1,6 @@
 import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
 import {
 	addFallbackToVar as _addFallbackToVar,
-	addFallbackToVarInCSS as _addFallbackToVarInCSS,
 	getTokenFallback as _getTokenFallback,
 } from './add-fallback-to-var.mjs';
 
@@ -30,16 +29,6 @@ import {
  */
 export function addFallbackToVar( cssValue, options ) {
 	return _addFallbackToVar( cssValue, tokenFallbacks, options );
-}
-
-/**
- * Replace bare design token references in a parsed CSS declaration value.
- *
- * @param {string} cssValue A CSS declaration value.
- * @return {string} The value with fallbacks injected.
- */
-export function addFallbackToVarInCSS( cssValue ) {
-	return _addFallbackToVarInCSS( cssValue, tokenFallbacks );
 }
 
 /**

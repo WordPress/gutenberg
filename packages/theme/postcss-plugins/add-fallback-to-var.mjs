@@ -1,6 +1,3 @@
-import valueParser from 'postcss-value-parser';
-import { parseCSSVariableReferences } from './parse-css-variables.mjs';
-
 /**
  * Replace bare `var(--wpds-*)` references in a CSS value string with
  * `var(--wpds-*, <fallback>)` using the provided token fallback map.
@@ -37,31 +34,6 @@ export function addFallbackToVar(
 			return `var(${ tokenName }, ${ fallback })`;
 		}
 	);
-}
-
-/**
- * Replace bare `var(--wpds-*)` references in a parsed CSS value.
- *
- * @param {string}                 cssValue       A CSS declaration value.
- * @param {Record<string, string>} tokenFallbacks Map of CSS variable names to fallback expressions.
- * @return {string} The value with fallbacks injected.
- */
-export function addFallbackToVarInCSS( cssValue, tokenFallbacks ) {
-	const { parsed, references } = parseCSSVariableReferences( cssValue );
-
-	for ( const reference of references ) {
-		if (
-			! reference.name.startsWith( '--wpds-' ) ||
-			reference.fallbackSeparator
-		) {
-			continue;
-		}
-
-		const fallback = getTokenFallback( reference.name, tokenFallbacks );
-		reference.node.nodes.push( ...valueParser( `, ${ fallback }` ).nodes );
-	}
-
-	return parsed.toString();
 }
 
 /**
