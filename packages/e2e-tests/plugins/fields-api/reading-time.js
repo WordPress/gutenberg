@@ -1,11 +1,12 @@
 /**
- * The JavaScript parts of the fields the test plugin registers for Pages.
+ * The JavaScript parts of the `reading_time` field the test plugin registers
+ * for Pages.
  *
  * The default export maps field ids to the properties of the field that PHP
  * cannot serialize. The module applies to the fields it was registered with:
- * `reading_time` and `comment_status`. The `word_count` entry is a whole
- * field no PHP registration names: the editor ignores it, as a module only
- * augments the fields registered with it.
+ * `reading_time`. The `word_count` entry is a whole field no PHP registration
+ * names: the editor ignores it, as a module only augments the fields
+ * registered with it.
  *
  * No build step: script modules cannot import the `@wordpress/*` scripts, so
  * the `wp.*` globals the editor already loaded are used instead.
@@ -44,20 +45,6 @@ const readingTime = {
 	},
 };
 
-const commentStatus = {
-	render: ( { item, field } ) => {
-		const value = field.getValue( { item } );
-		const option = ( field.elements ?? [] ).find(
-			( element ) => element.value === value
-		);
-		return createElement(
-			'span',
-			{ className: `gutenberg-test-comment-status is-${ value }` },
-			option ? option.label : value
-		);
-	},
-};
-
 /**
  * A complete field definition, id and label included, with no registration
  * in PHP naming it. The editor merges a module into the fields the server
@@ -91,6 +78,5 @@ const wordCount = {
 
 export default {
 	reading_time: readingTime,
-	comment_status: commentStatus,
 	word_count: wordCount,
 };
