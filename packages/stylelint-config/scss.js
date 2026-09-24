@@ -13,9 +13,20 @@ export default {
 		'at-rule-empty-line-before': [
 			'always',
 			{
-				except: [ 'blockless-after-blockless' ],
-				ignore: [ 'after-comment' ],
-				ignoreAtRules: [ 'else' ],
+				except: [ 'blockless-after-blockless', 'after-same-name' ],
+				ignore: [ 'after-comment', 'first-nested' ],
+				ignoreAtRules: [
+					'else',
+					'if',
+					'include',
+					'mixin',
+					'extend',
+					'media',
+					'warn',
+					'for',
+					'each',
+					'content',
+				],
 			},
 		],
 
