@@ -19,7 +19,7 @@ When reviewing pull requests:
 - Do not suggest replacing `@wordpress/data` selectors / actions with local React state — this is the project's intentional state pattern.
 - Do not suggest replacing `__()` / `_x()` / `_n()` calls with template literals — these are WordPress i18n functions.
 - Do not suggest moving code between `block-editor`, `editor`, and `edit-post` packages without considering the layering rule (`block-editor` is WordPress-agnostic; lower layers must not depend on higher ones).
-- Flag block attribute or `theme.json` values reaching a string operation without a type check. `block.json` types are not enforced at render time: `WP_Block_Type::prepare_attributes_for_render()` skips attributes the block does not declare, and no core block declares `style`, `layout`, `className` or `anchor`, so those arrive raw even inside a `render_callback`.
+- Flag block attribute or `theme.json` values reaching a strict string operation (`preg_match()`, `explode()`, `trim()`, `esc_url()`) without a type check, but only where the value is genuinely raw: `$block['attrs']` in a `render_block` / `render_block_data` filter, unregistered attributes, and anything nested inside `style` or `layout`. Top-level attributes reaching a `render_callback` are validated against the registered block-type schema by `WP_Block_Type::prepare_attributes_for_render()` — do not flag those. `sprintf( '%s' )`, `str_replace()`, `preg_replace()` and interpolation only warn on an array, so they are not findings.
 
 ## Writing Markdown
 
