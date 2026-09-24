@@ -6,63 +6,39 @@ on:
         branches:
             - trunk
         paths:
-            - 'packages/admin-ui/**'
-            - 'packages/components/**'
-            - 'packages/dataviews/**'
-            - 'packages/fields/**'
-            - 'packages/grid/**'
-            - 'packages/icons/**'
-            - 'packages/interface/**'
-            - 'packages/private-apis/**'
-            - 'packages/style-runtime/**'
-            - 'packages/theme/**'
-            - 'packages/ui/**'
-            - 'packages/undo-manager/**'
-            - 'packages/views/**'
-            - 'packages/widget-dashboard/**'
-            - 'packages/widget-primitives/**'
-            - 'packages/wp-build/**'
-            - 'packages/*/CHANGELOG.md'
+            - 'packages/**'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/src/**/stories/**'
-            - '!packages/*/src/**/test/**'
+            - '!packages/**/test/**'
+            - '!packages/**/tests/**'
+            - '!packages/**/__tests__/**'
+            - '!packages/**/__snapshots__/**'
+            - '!packages/**/__mocks__/**'
+            - '!packages/**/*.test.*'
+            - '!packages/**/*.spec.*'
+            - '!packages/**/*.md'
+            - '!packages/*/tsconfig*.json'
+            - '!packages/*/.*rc'
+            - '!packages/*/.*rc.*'
+            - '!packages/*/.gitignore'
+            - '!packages/*/eslint.config.*'
+            - '!packages/*/eslint-overrides.*'
+            # Keep CHANGELOG edits triggering the structure check below.
+            - 'packages/*/CHANGELOG.md'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
 jobs:
-    # Presence: The allowlisted packages listed in the matrix have stricter
-    # expectations around changes having an accompanying changelog note.
+    # Presence: Every published (non-private) package changed by a pull
+    # request must have an accompanying CHANGELOG entry citing the PR.
     presence:
-        name: Check CHANGELOG presence (${{ matrix.package }})
+        name: Check CHANGELOG presence
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        strategy:
-            fail-fast: false
-            matrix:
-                package:
-                    # Bundled packages
-                    # Keep in sync with dependency-extraction-webpack-plugin
-                    - admin-ui
-                    - dataviews
-                    - fields
-                    - grid
-                    - icons
-                    - interface
-                    - style-runtime
-                    - ui
-                    - undo-manager
-                    - views
-                    # Other packages
-                    - theme
-                    - components
-                    - private-apis
-                    - widget-dashboard
-                    - widget-primitives
-                    - wp-build
         steps:
             - name: 'Get PR commit count'
               env:
@@ -78,57 +54,94 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
-            - name: Determine if package has relevant changes
+            - name: Determine which packages have relevant changes
               id: filter
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  PACKAGE_PATH: packages/${{ matrix.package }}
               run: |
-                  # The workflow's `paths:` filter triggers on the union of all
-                  # tracked packages, so this matrix entry may run on a PR that
-                  # doesn't touch its package. Short-circuit if that's the case.
-                  relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
+                  # Changes to stories, tests (test directories, snapshots,
+                  # mocks, and *.test.* / *.spec.* files), Markdown files
+                  # (including the CHANGELOG itself), and development config
+                  # (tsconfig and ESLint config files, top-level tool rc files,
+                  # and .gitignore)
+                  # don't need an entry. Private packages aren't published to npm, so
+                  # they're skipped, as are packages removed by the PR.
+                  packages=$(git diff --name-only "$BASE_SHA"...HEAD -- 'packages/' \
+                      | grep -Ev '^packages/[^/]+/(src/(.+/)?stories/|(.+/)?(test|tests|__tests__|__snapshots__|__mocks__)/|.*\.(test|spec)\.[^/]+$|.*\.md$|tsconfig[^/]*\.json$|eslint(\.config|-overrides)\.[^/]+$|\.([^/]*rc(\.[^/]+)?|gitignore)$)' \
+                      | cut -d/ -f2 \
+                      | sort -u \
+                      | while read -r package; do
+                          manifest="packages/${package}/package.json"
+                          if [ ! -f "$manifest" ]; then
+                              echo "packages/${package} has no package.json; skipping." >&2
+                          elif [ "$(jq -r '.private // false' "$manifest")" = 'true' ]; then
+                              echo "packages/${package} is private; skipping." >&2
+                          else
+                              echo "$package"
+                          fi
+                      done)
 
-                  if [ -z "$relevant_changes" ]; then
-                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
-                      echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  if [ -z "$packages" ]; then
+                      echo "No relevant package changes; skipping CHANGELOG presence check."
                   else
-                      echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                      echo "Packages with relevant changes:"
+                      echo "$packages"
                   fi
+
+                  {
+                      echo 'packages<<EOF'
+                      echo "$packages"
+                      echo 'EOF'
+                  } >> "$GITHUB_OUTPUT"
             # This intentionally doesn't use `.github/setup-node`, because we
             # don't currently need to `npm ci` install any dependencies.
             - name: Use desired version of Node.js
-              if: steps.filter.outputs.has_changes == 'true'
+              if: steps.filter.outputs.packages != ''
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version-file: '.nvmrc'
                   package-manager-cache: false
             - name: Set up npm
-              if: steps.filter.outputs.has_changes == 'true'
+              if: steps.filter.outputs.packages != ''
               uses: ./.github/setup-npm
               with:
                   cache: false
-            - name: Check CHANGELOG cites this PR
-              if: steps.filter.outputs.has_changes == 'true'
+            - name: Check CHANGELOGs cite this PR
+              if: steps.filter.outputs.packages != ''
               env:
                   PR_NUMBER: ${{ github.event.number }}
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  PACKAGE_PATH: packages/${{ matrix.package }}
+                  PACKAGES: ${{ steps.filter.outputs.packages }}
               run: |
-                  changelog_path="${PACKAGE_PATH}/CHANGELOG.md"
-                  optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
+                  missing=()
+                  changelogs=()
+                  while read -r package; do
+                      changelog_path="packages/${package}/CHANGELOG.md"
+                      if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
+                          missing+=( "$changelog_path" )
+                      else
+                          changelogs+=( "$changelog_path" )
+                      fi
+                  done <<< "$PACKAGES"
 
-                  # Fail if the PR doesn't touch the changelog
-                  if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
-                      echo "Please add a CHANGELOG entry to $changelog_path"
+                  status=0
+
+                  if [ "${#missing[@]}" -gt 0 ]; then
+                      echo "Please add a CHANGELOG entry citing this pull request to:"
+                      printf '  %s\n' "${missing[@]}"
                       echo
-                      echo "${optional_check_notice}"
-                      exit 1
+                      echo "See https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs"
+                      echo
+                      echo "This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
+                      status=1
                   fi
 
-                  # Confirm that the CHANGELOG has a valid entry for the current PR
-                  npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+                  # Confirm that each touched CHANGELOG has a valid entry for the current PR
+                  if [ "${#changelogs[@]}" -gt 0 ]; then
+                      npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelogs[@]}" || status=1
+                  fi
+
+                  exit "$status"
 
     # Structure: For any revisions to CHANGELOGs (regardless of package),
     # validate that the contents follow the expected format.

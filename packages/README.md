@@ -269,7 +269,7 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
 
-Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
+Every pull request that changes a package published to npm must add an entry to that package's changelog citing the pull request. Changes that only touch stories, tests, Markdown files (such as `README.md` or the changelog itself), or development configuration (such as `tsconfig.json`, `.stylelintrc.mjs`, or `.gitignore`) don't need an entry, and private packages (`"private": true` in `package.json`) are exempt. Changelog entries are optional for trivial changes, such as fixing a typo in a code comment. Changes that don't affect package consumers go under an **Internal** heading.
 
 ### Changelog Entry Format
 
