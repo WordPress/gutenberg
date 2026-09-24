@@ -100,16 +100,16 @@ export default function useDragSelection() {
 					return;
 				}
 
-				// Only start multi selecting when the mouse leaves editable
-				// content. The selected block's editable is editable by
-				// inheritance from the editing host, without a contenteditable
-				// attribute of its own, so ask the element. In preview mode,
-				// allow drag selection from blocks since they are not
-				// contenteditable.
-				if (
-					! target.isContentEditable &&
-					! getSettings().isPreviewMode
-				) {
+				// Only start multi selecting when the mouse leaves a field:
+				// one editable on its own, or the selected block's, editable
+				// through the editing host without a contenteditable
+				// attribute of its own. In preview mode, allow drag selection
+				// from blocks since they are not contenteditable.
+				const isField =
+					target.contentEditable === 'true' ||
+					( target.isContentEditable &&
+						target.hasAttribute( 'data-wp-block-attribute-key' ) );
+				if ( ! isField && ! getSettings().isPreviewMode ) {
 					return;
 				}
 
