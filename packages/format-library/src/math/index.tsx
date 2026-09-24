@@ -7,12 +7,27 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { ValidatedInputControl, Link } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import type { InlineMathUIProps, FormatEditProps } from '../types';
+import type { FormatEditProps } from '../types';
+
+interface InlineMathUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeObjectAttributes: Record< string, string >;
+	contentRef: React.RefObject< HTMLElement >;
+	/**
+	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
+	 */
+	latexToMathML?: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+}
 
 const name = 'core/math';
 const title = __( 'Math' );

@@ -23,13 +23,31 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import type { LinkFormatAttributes } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
-import type {
-	InlineLinkUIProps,
-	LinkValue,
-	CSSClassesSettingProps,
-} from '../types';
+import type { CSSClassesSettingProps } from './css-classes-setting';
+
+interface LinkValue {
+	url?: string;
+	type?: string;
+	id?: string | number;
+	opensInNewTab?: boolean;
+	nofollow?: boolean;
+	title?: string;
+	cssClasses?: string;
+}
+
+interface InlineLinkUIProps {
+	isActive: boolean;
+	activeAttributes: LinkFormatAttributes;
+	value: RichTextValue;
+	onChange: ( newValue: RichTextValue ) => void;
+	onFocusOutside: () => void;
+	stopAddingLink: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	focusOnMount?: 'firstElement' | false;
+}
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
