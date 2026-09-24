@@ -186,12 +186,18 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
  * visibility) ship in the `@wordpress/fields/server-fields` script module,
  * see packages/fields/src/server-fields.ts, registered along with the field.
  *
- * The fields depend on the supports of the post type, hence it runs on
- * `gutenberg_fields_init`, at priority 0: the action fires the first time
- * the registry is read, after `init` has run and the supports are final. A
- * plugin that wants to alter the defaults with gutenberg_register_fields()
- * or gutenberg_unregister_fields() hooks the same action at the default
- * priority.
+ * The fields depend on the supports of the post type, which are not final
+ * until `init` completes: core registers its post types on `init` at
+ * priority 0, see
+ * https://github.com/WordPress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592,
+ * custom post types are usually registered at the default priority (10),
+ * and plugins add or remove supports on `init` too, with
+ * add_post_type_support() and remove_post_type_support(). Hence it runs on
+ * `gutenberg_fields_init`, which the registry fires on its first read, after
+ * `init`: while handling a REST request, or on `admin_init` when the editor
+ * script is wired up. At priority 0, so a plugin altering the defaults with
+ * gutenberg_register_fields() or gutenberg_unregister_fields() at the
+ * default priority sees them registered.
  *
  * The post types whose fields differ from the defaults derived from their
  * supports (templates, attachments) adjust them in their own step, hooked
@@ -267,22 +273,6 @@ function _gutenberg_register_posttype_fields() {
 		gutenberg_register_fields( 'postType', $post_type, $fields );
 	}
 }
-
-/**
- * Core post types are registered on `init` at priority 0,
- * see https://github.com/WordPress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592
- * Custom post types are usually registered on `init` at the default priority (10),
- * and plugins add or remove supports on `init` too, with add_post_type_support()
- * and remove_post_type_support(). The supports of a post type are not final
- * until `init` completes, so the default fields cannot derive from them during `init`.
- *
- * The registry fires `gutenberg_fields_init` on its first read, which happens
- * after `init`: while handling a REST request, or on `admin_init` when the
- * editor script is wired up. The defaults hook that action at priority 0, so
- * they derive from the final supports. A plugin altering the defaults with
- * gutenberg_register_fields() or gutenberg_unregister_fields() hooks
- * `gutenberg_fields_init` at the default priority.
- */
 add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_fields', 0 );
 
 /**
