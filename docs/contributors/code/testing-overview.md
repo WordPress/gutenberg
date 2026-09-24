@@ -581,7 +581,7 @@ To record the same diagnostics locally:
 WP_VITEST_BROWSER_TRACE=1 npm run test:unit -- --project=browser path/to/example.browser.test.jsx
 ```
 
-Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Recordings from files that pass without unhandled errors are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses each file's existing isolated browser context and does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
+Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Recordings from files that pass without unhandled errors are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses the worker's existing browser context and preserves Vitest's per-file iframe isolation. If an earlier file's recording is still active when the context is reused, it is retained before the next trace starts. Tracing does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
 
 ## End-to-end testing
 

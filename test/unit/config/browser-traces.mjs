@@ -2,7 +2,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * Record each isolated Browser Mode file and retain failures and unhandled errors.
+ * Record each Browser Mode file and retain failures and unhandled errors.
  * Per-file traces avoid copying network data for every test and using long or
  * duplicate test titles as filenames in Vitest's native per-test tracing.
  *
@@ -40,6 +40,14 @@ export function createBrowserTraceArtifacts( rootDir ) {
 	return {
 		commands: {
 			async startBrowserTrace( { context, testPath } ) {
+				// Workers reuse their context across isolated test iframes. Keep
+				// any unfinished recording before starting the next file's trace.
+				for ( const [ previousPath, previousContext ] of contexts ) {
+					if ( previousContext === context ) {
+						await finishTrace( previousPath, true );
+						break;
+					}
+				}
 				await context.tracing.start( {
 					title: path.relative( rootDir, testPath ),
 					screenshots: true,
