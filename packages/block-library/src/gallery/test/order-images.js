@@ -5,6 +5,11 @@ import {
 	sortImageBlocks,
 } from '../order-images';
 
+const NEWEST_FIRST = { orderby: 'date', order: 'desc' };
+const OLDEST_FIRST = { orderby: 'date', order: 'asc' };
+const TITLE_A_TO_Z = { orderby: 'title', order: 'asc' };
+const TITLE_Z_TO_A = { orderby: 'title', order: 'desc' };
+
 /**
  * Creates the minimal `core/image` block the helpers read: an attachment id
  * and a client ID, which defaults from the id.
@@ -55,40 +60,34 @@ describe( 'sortImageBlocks', () => {
 	it( 'sorts by date, newest first', () => {
 		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			getImageIds(
-				sortImageBlocks( blocks, ATTACHMENTS, 'date', 'desc' )
-			)
+			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, NEWEST_FIRST ) )
 		).toEqual( [ 4, 1, 3, 2 ] );
 	} );
 
 	it( 'sorts by date, oldest first', () => {
 		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' ) )
+			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, OLDEST_FIRST ) )
 		).toEqual( [ 2, 3, 1, 4 ] );
 	} );
 
 	it( 'sorts by title ascending, ignoring case and comparing numbers naturally', () => {
 		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			getImageIds(
-				sortImageBlocks( blocks, ATTACHMENTS, 'title', 'asc' )
-			)
+			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, TITLE_A_TO_Z ) )
 		).toEqual( [ 2, 1, 4, 3 ] );
 	} );
 
 	it( 'sorts by title descending', () => {
 		const blocks = createImageBlocks( 1, 2, 3, 4 );
 		expect(
-			getImageIds(
-				sortImageBlocks( blocks, ATTACHMENTS, 'title', 'desc' )
-			)
+			getImageIds( sortImageBlocks( blocks, ATTACHMENTS, TITLE_Z_TO_A ) )
 		).toEqual( [ 3, 4, 1, 2 ] );
 	} );
 
 	it( 'returns a new array containing the same block objects', () => {
 		const blocks = createImageBlocks( 1, 2 );
-		const sorted = sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' );
+		const sorted = sortImageBlocks( blocks, ATTACHMENTS, OLDEST_FIRST );
 		expect( sorted ).not.toBe( blocks );
 		expect( sorted[ 0 ] ).toBe( blocks[ 1 ] );
 		expect( sorted[ 1 ] ).toBe( blocks[ 0 ] );
@@ -102,7 +101,7 @@ describe( 'sortImageBlocks', () => {
 			createImageBlock( 2 ),
 			createImageBlock( undefined, 'external-b' ),
 		];
-		const sorted = sortImageBlocks( blocks, ATTACHMENTS, 'date', 'asc' );
+		const sorted = sortImageBlocks( blocks, ATTACHMENTS, OLDEST_FIRST );
 		expect( sorted.map( ( { clientId } ) => clientId ) ).toEqual( [
 			'block-2',
 			'block-1',
@@ -119,10 +118,10 @@ describe( 'sortImageBlocks', () => {
 		];
 		const blocks = createImageBlocks( 2, 1 );
 		expect(
-			getImageIds( sortImageBlocks( blocks, media, 'date', 'desc' ) )
+			getImageIds( sortImageBlocks( blocks, media, NEWEST_FIRST ) )
 		).toEqual( [ 2, 1 ] );
 		expect(
-			getImageIds( sortImageBlocks( blocks, media, 'title', 'asc' ) )
+			getImageIds( sortImageBlocks( blocks, media, TITLE_A_TO_Z ) )
 		).toEqual( [ 2, 1 ] );
 	} );
 
@@ -136,8 +135,7 @@ describe( 'sortImageBlocks', () => {
 				sortImageBlocks(
 					createImageBlocks( 1, 2 ),
 					media,
-					'title',
-					'asc'
+					TITLE_A_TO_Z
 				)
 			)
 		).toEqual( [ 2, 1 ] );
@@ -171,25 +169,25 @@ describe( 'getCurrentOrder', () => {
 	it( 'detects newest to oldest', () => {
 		expect(
 			getCurrentOrder( createImageBlocks( 4, 1, 3, 2 ), ATTACHMENTS )
-		).toEqual( { orderby: 'date', order: 'desc' } );
+		).toEqual( NEWEST_FIRST );
 	} );
 
 	it( 'detects oldest to newest', () => {
 		expect(
 			getCurrentOrder( createImageBlocks( 2, 3, 1, 4 ), ATTACHMENTS )
-		).toEqual( { orderby: 'date', order: 'asc' } );
+		).toEqual( OLDEST_FIRST );
 	} );
 
 	it( 'detects title A to Z', () => {
 		expect(
 			getCurrentOrder( createImageBlocks( 2, 1, 4, 3 ), ATTACHMENTS )
-		).toEqual( { orderby: 'title', order: 'asc' } );
+		).toEqual( TITLE_A_TO_Z );
 	} );
 
 	it( 'detects title Z to A', () => {
 		expect(
 			getCurrentOrder( createImageBlocks( 3, 4, 1, 2 ), ATTACHMENTS )
-		).toEqual( { orderby: 'title', order: 'desc' } );
+		).toEqual( TITLE_Z_TO_A );
 	} );
 
 	it( 'returns null for a custom order', () => {
@@ -217,7 +215,7 @@ describe( 'getCurrentOrder', () => {
 				createImageBlocks( 4, 1, 3, 2, undefined ),
 				ATTACHMENTS
 			)
-		).toEqual( { orderby: 'date', order: 'desc' } );
+		).toEqual( NEWEST_FIRST );
 	} );
 
 	describe( 'when a sequence satisfies several orders', () => {
@@ -229,28 +227,19 @@ describe( 'getCurrentOrder', () => {
 		const blocks = createImageBlocks( 1, 2 );
 
 		it( 'reports the first matching option by default', () => {
-			expect( getCurrentOrder( blocks, media ) ).toEqual( {
-				orderby: 'date',
-				order: 'asc',
-			} );
+			expect( getCurrentOrder( blocks, media ) ).toEqual( OLDEST_FIRST );
 		} );
 
 		it( 'reports the preferred order when it holds', () => {
-			expect(
-				getCurrentOrder( blocks, media, {
-					orderby: 'title',
-					order: 'asc',
-				} )
-			).toEqual( { orderby: 'title', order: 'asc' } );
+			expect( getCurrentOrder( blocks, media, TITLE_A_TO_Z ) ).toEqual(
+				TITLE_A_TO_Z
+			);
 		} );
 
 		it( 'ignores the preferred order when it no longer holds', () => {
-			expect(
-				getCurrentOrder( blocks, media, {
-					orderby: 'title',
-					order: 'desc',
-				} )
-			).toEqual( { orderby: 'date', order: 'asc' } );
+			expect( getCurrentOrder( blocks, media, TITLE_Z_TO_A ) ).toEqual(
+				OLDEST_FIRST
+			);
 		} );
 	} );
 } );

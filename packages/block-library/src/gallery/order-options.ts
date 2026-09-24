@@ -9,6 +9,29 @@ export type Order = {
 };
 
 /**
+ * The composite `"orderby/order"` select value for an order. A select needs one
+ * string per option, so this format exists only at the select boundary; the
+ * rest of the feature passes `Order` objects.
+ *
+ * @param order The order.
+ * @return The select value.
+ */
+export function toOrderValue( order: Order ): string {
+	return `${ order.orderby }/${ order.order }`;
+}
+
+/**
+ * Parses a composite `"orderby/order"` select value back into an order.
+ *
+ * @param value The select value.
+ * @return The order.
+ */
+export function parseOrderValue( value: string ): Order {
+	const [ orderby, order ] = value.split( '/' );
+	return { orderby, order };
+}
+
+/**
  * Ordering options offered for gallery images. Each value is a composite
  * `"orderby/order"` string. For a dynamic source these map to the matching
  * `/wp/v2/media` collection params; for a static gallery the same orders are

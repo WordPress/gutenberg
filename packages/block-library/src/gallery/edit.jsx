@@ -327,7 +327,7 @@ export default function GalleryEdit( props ) {
 	// The order the static images are in, derived rather than stored so the
 	// "Order by" control reads honestly after images are dragged around. The
 	// last order applied from the control is only a tie-break for detection
-	// (see `getCurrentOrder`), so it's local state, never an attribute.
+	// (see `getCurrentOrder`), so it's local state, rather than an attribute.
 	const [ lastAppliedOrder, setLastAppliedOrder ] = useState( null );
 	const currentOrder = useMemo(
 		() => getCurrentOrder( innerBlockImages, imageData, lastAppliedOrder ),
@@ -573,17 +573,16 @@ export default function GalleryEdit( props ) {
 
 	// Reorders the inner image blocks in place. Left persistent on purpose so
 	// the sort is a single undoable step.
-	function sortImages( { orderby, order } ) {
+	function sortImages( order ) {
 		replaceInnerBlocks(
 			clientId,
 			sortImageBlocks(
 				getBlock( clientId ).innerBlocks,
 				imageData,
-				orderby,
 				order
 			)
 		);
-		setLastAppliedOrder( { orderby, order } );
+		setLastAppliedOrder( order );
 	}
 
 	function onUploadError( message ) {
@@ -997,8 +996,10 @@ export default function GalleryEdit( props ) {
 						>
 							{ isDynamic ? (
 								<SourceOrderControl
-									orderby={ dynamic.sourceOrderby }
-									order={ dynamic.sourceOrder }
+									order={ {
+										orderby: dynamic.sourceOrderby,
+										order: dynamic.sourceOrder,
+									} }
 									isRandom={ !! randomOrder }
 									onChange={ ( { orderby, order } ) =>
 										dynamic.setSourceOrder( orderby, order )
