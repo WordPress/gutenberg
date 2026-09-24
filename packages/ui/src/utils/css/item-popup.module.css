@@ -182,8 +182,6 @@
 		.item-icon {
 			display: flex;
 			align-items: center;
-			justify-content: center;
-			flex-shrink: 0;
 			height: var(--wpds-typography-line-height-sm);
 			pointer-events: none;
 		}
@@ -197,7 +195,6 @@
 			flex-direction: column;
 			gap: 2px;
 			min-width: 0;
-			flex: 1;
 		}
 
 		.item-label {
