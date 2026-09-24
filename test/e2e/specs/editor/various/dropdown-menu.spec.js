@@ -62,5 +62,26 @@ test.describe( 'Dropdown Menu', () => {
 			// Expect the last menu item to still be focused.
 			await expect( menuItems.last() ).toBeFocused();
 		} );
+
+		await test.step( 'opens a submenu with the right arrow and closes it with the left arrow', async () => {
+			const appearance = menu.getByRole( 'menuitem', {
+				name: 'Appearance',
+				exact: true,
+			} );
+			const submenu = page.getByRole( 'menu', { name: 'Appearance' } );
+
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( appearance ).toBeFocused();
+
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( submenu ).toBeVisible();
+			await expect(
+				submenu.getByRole( 'menuitemcheckbox' ).first()
+			).toBeFocused();
+
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( submenu ).toBeHidden();
+			await expect( appearance ).toBeFocused();
+		} );
 	} );
 } );

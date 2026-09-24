@@ -1,7 +1,7 @@
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { brush, drawerRight, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { keyboardShortcut } from '@wordpress/keycodes';
@@ -10,9 +10,8 @@ import { Menu } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
 import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';
-import { toMenuItems } from './more-menu-group';
 import MoreMenuPreferenceItem from './more-menu-preference-item';
-import MoreMenuSubmenu from './more-menu-submenu';
+import MoreMenuSubmenu, { toMenuItems } from './more-menu-submenu';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -70,10 +69,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 			>
 				<Menu.Group>
 					<Menu.GroupLabel>{ _x( 'View', 'noun' ) }</Menu.GroupLabel>
-					<MoreMenuSubmenu
-						icon={ brush }
-						label={ __( 'Appearance' ) }
-					>
+					<MoreMenuSubmenu label={ __( 'Appearance' ) }>
 						<MoreMenuPreferenceItem
 							scope="core"
 							name="fixedToolbar"
@@ -123,10 +119,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 						fillProps={ { as: MoreMenuItem } }
 					>
 						{ ( items ) => (
-							<MoreMenuSubmenu
-								icon={ drawerRight }
-								label={ __( 'Panels' ) }
-							>
+							<MoreMenuSubmenu label={ __( 'Panels' ) }>
 								{ toMenuItems( items ) }
 							</MoreMenuSubmenu>
 						) }
