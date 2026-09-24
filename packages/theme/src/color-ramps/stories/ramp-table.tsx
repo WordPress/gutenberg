@@ -1,4 +1,5 @@
 import { forwardRef } from '@wordpress/element';
+import { toGamut } from 'colorjs.io/fn';
 import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
@@ -113,6 +114,12 @@ export function hasColorWarningForRamp(
 
 function isSeedAdjusted( seed: string, generatedAnchor: string ) {
 	return getColorString( seed ) !== getColorString( generatedAnchor );
+}
+
+function getSeedLabelColor( seed: string ) {
+	// CSS clips out-of-range RGB channels before painting the seed background.
+	const renderedSeed = toGamut( seed, { space: 'srgb', method: 'clip' } );
+	return getContrast( renderedSeed, '#000' ) >= 4.5 ? '#000' : '#fff';
 }
 
 function ColorSample( {
@@ -275,13 +282,9 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												? '3px dashed currentColor'
 												: '',
 											outlineOffset: '-3px',
-											color:
-												getContrast(
-													seed.value,
-													'#000'
-												) >= 4.5
-													? '#000'
-													: '#fff',
+											color: getSeedLabelColor(
+												seed.value
+											),
 										} }
 									>
 										{ isSeedAdjusted(
