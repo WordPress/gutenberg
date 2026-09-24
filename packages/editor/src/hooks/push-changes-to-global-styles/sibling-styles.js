@@ -4,6 +4,7 @@ import setNestedValue from '../../utils/set-nested-value';
 import {
 	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
 	getBlockStyleValue,
+	getValueFromObjectPath,
 } from './style-paths';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -63,6 +64,45 @@ export function isEqualStyleValue( a, b ) {
 // more than the row covers.
 const BORDER_SHORTHAND_KEYS = [ 'width', 'style', 'color' ];
 
+const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+/**
+ * One property of a border row as the block currently has it.
+ *
+ * The all-sides row writes each side as well as the shorthand, so a block that
+ * only holds per-side values still has a border the row overwrites. Those are
+ * collapsed the way the modal displays a per-side border: a value is kept only
+ * when every side that sets one agrees.
+ *
+ * @param {Object}   attributes  Block attributes.
+ * @param {string[]} primaryPath The row's style path.
+ * @param {string}   key         A border property (`width`, `style`, `color`).
+ *
+ * @return {*} The value, or `undefined` when the block sets none.
+ */
+function getBorderPropertyValue( attributes, primaryPath, key ) {
+	// Read through `getBlockStyleValue` so a preset border color held in the
+	// `borderColor` attribute counts as the block's current color.
+	const flatValue = getBlockStyleValue( attributes, [ ...primaryPath, key ] );
+
+	// A side row (`border.top`) has no sides of its own to collapse.
+	if ( flatValue !== undefined || primaryPath.length > 1 ) {
+		return flatValue;
+	}
+
+	const setSides = BORDER_SIDES.filter( ( side ) =>
+		getValueFromObjectPath( attributes?.style, [ ...primaryPath, side ] )
+	);
+	const sideValues = setSides.map( ( side ) =>
+		getBlockStyleValue( attributes, [ ...primaryPath, side, key ] )
+	);
+
+	return sideValues.length &&
+		sideValues.every( ( value ) => value === sideValues[ 0 ] )
+		? sideValues[ 0 ]
+		: undefined;
+}
+
 /**
  * A block's current value for a change row, shaped like the row's `newValue` so
  * the "Current" and "New" columns read the same way.
@@ -93,12 +133,11 @@ function getRowCurrentValue( row, attributes ) {
 		if ( ! writtenProperties.has( key ) ) {
 			continue;
 		}
-		// Read through `getBlockStyleValue` so a preset border color held in
-		// the `borderColor` attribute counts as the sibling's current color.
-		const value = getBlockStyleValue( attributes, [
-			...row.primaryPath,
-			key,
-		] );
+		const value = getBorderPropertyValue(
+			attributes,
+			row.primaryPath,
+			key
+		);
 		if ( value !== undefined ) {
 			border[ key ] = value;
 			hasValue = true;

@@ -291,6 +291,66 @@ describe( 'getSiblingCurrentValue', () => {
 		} );
 	} );
 
+	it( 'collapses a per-side border the row will overwrite', () => {
+		const borderRow = getChangesToPush(
+			[ 'borderColor', 'borderWidth', 'borderStyle' ],
+			{
+				style: {
+					border: { color: '#c00', width: '2px', style: 'solid' },
+				},
+			},
+			undefined
+		).find( ( row ) => row.id === 'border' );
+
+		const perSide = ( clientId, color ) => ( {
+			clientId,
+			attributes: {
+				style: {
+					border: Object.fromEntries(
+						[ 'top', 'right', 'bottom', 'left' ].map( ( side ) => [
+							side,
+							{ color, width: '1px', style: 'dashed' },
+						] )
+					),
+				},
+			},
+		} );
+
+		// The row writes each side as well as the shorthand, so a sibling
+		// holding only per-side values has a border it overwrites.
+		expect(
+			getSiblingCurrentValue( borderRow, [
+				perSide( 'a', '#111' ),
+				perSide( 'b', '#111' ),
+			] )
+		).toEqual( {
+			value: { color: '#111', width: '1px', style: 'dashed' },
+			varies: false,
+		} );
+
+		// Sides that disagree can't be shown as one shorthand value.
+		const mixedSides = {
+			clientId: 'a',
+			attributes: {
+				style: {
+					border: {
+						top: { color: '#111', width: '1px', style: 'dashed' },
+						bottom: {
+							color: '#222',
+							width: '1px',
+							style: 'dashed',
+						},
+					},
+				},
+			},
+		};
+
+		expect( getSiblingCurrentValue( borderRow, [ mixedSides ] ) ).toEqual( {
+			value: { width: '1px', style: 'dashed' },
+			varies: false,
+		} );
+	} );
+
 	it( 'reports that the value varies when only the link hover colour differs', () => {
 		const linkAttributes = {
 			style: {
