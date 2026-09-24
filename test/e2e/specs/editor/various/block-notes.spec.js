@@ -1140,6 +1140,52 @@ test.describe( 'Block Notes', () => {
 			).toHaveCount( 0 );
 		} );
 
+		test( 'editing a note after toggling a reaction keeps its text', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing edit after reaction' },
+				comment: 'Original note text',
+			} );
+
+			// Toggling invalidates the notes list, whose edit-context refetch
+			// can land after the single-note refetch and mask the bug. Hold the
+			// single-note refetch back so it is the last write to the cache.
+			const singleNote = /\/wp\/v2\/comments\/\d+([?&]|$)/;
+			await page.route(
+				( url ) => singleNote.test( decodeURIComponent( url.href ) ),
+				async ( route ) => {
+					if ( route.request().method() !== 'GET' ) {
+						return route.fallback();
+					}
+					const response = await route.fetch();
+					await new Promise( ( resolve ) =>
+						setTimeout( resolve, 1000 )
+					);
+					await route.fulfill( { response } );
+				}
+			);
+			const refetch = page.waitForResponse(
+				( response ) =>
+					response.request().method() === 'GET' &&
+					singleNote.test( decodeURIComponent( response.url() ) )
+			);
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await refetch;
+			await expect(
+				page.getByRole( 'button', { name: /Heart/ } )
+			).toContainText( '1' );
+
+			// The post-toggle refetch must not replace the cached note's
+			// edit-context `content.raw`, which seeds the edit form.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'Edit note' } )
+			).toHaveText( 'Original note text' );
+		} );
+
 		test( 'can remove own emoji reaction by clicking it', async ( {
 			page,
 			blockNoteUtils,
