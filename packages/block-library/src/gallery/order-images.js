@@ -1,4 +1,4 @@
-import { ORDER_OPTIONS } from './order-options';
+import { ORDER_OPTIONS, parseOrderValue } from './order-options';
 
 /**
  * Returns the value an image block is ordered by, or `undefined` when it has no
@@ -48,14 +48,13 @@ export function hasSortableImages( blocks, media ) {
 /**
  * Whether sorting `blocks` by the given order would leave them as they are.
  *
- * @param {Array}  blocks  The gallery's `core/image` inner blocks.
- * @param {Array}  media   Attachment records for the gallery's images.
- * @param {string} orderby `date` or `title`.
- * @param {string} order   `asc` or `desc`.
+ * @param {Array}  blocks The gallery's `core/image` inner blocks.
+ * @param {Array}  media  Attachment records for the gallery's images.
+ * @param {Object} order  The `{ orderby, order }` to check.
  * @return {boolean} Whether the blocks are already in that order.
  */
-function isInOrder( blocks, media, orderby, order ) {
-	return sortImageBlocks( blocks, media, orderby, order ).every(
+function isInOrder( blocks, media, order ) {
+	return sortImageBlocks( blocks, media, order ).every(
 		( block, index ) => block === blocks[ index ]
 	);
 }
@@ -92,13 +91,14 @@ function compareKeys( a, b, orderby ) {
  * their relative order (`Array.prototype.sort` is stable), so re-applying the
  * current order is a no-op.
  *
- * @param {Array}  blocks  The gallery's `core/image` inner blocks.
- * @param {Array}  media   Attachment records for the gallery's images.
- * @param {string} orderby `date` or `title`.
- * @param {string} order   `asc` or `desc`.
+ * @param {Array}  blocks        The gallery's `core/image` inner blocks.
+ * @param {Array}  media         Attachment records for the gallery's images.
+ * @param {Object} order         The order to apply.
+ * @param {string} order.orderby `date` or `title`.
+ * @param {string} order.order   `asc` or `desc`.
  * @return {Array} A new array holding the same block objects, sorted.
  */
-export function sortImageBlocks( blocks, media, orderby, order ) {
+export function sortImageBlocks( blocks, media, { orderby, order } ) {
 	const direction = order === 'desc' ? -1 : 1;
 	const keys = new Map(
 		blocks.map( ( block ) => [
@@ -144,17 +144,14 @@ export function getCurrentOrder( blocks, media, preferredOrder = null ) {
 		return null;
 	}
 
-	if (
-		preferredOrder &&
-		isInOrder( blocks, media, preferredOrder.orderby, preferredOrder.order )
-	) {
+	if ( preferredOrder && isInOrder( blocks, media, preferredOrder ) ) {
 		return preferredOrder;
 	}
 
 	for ( const { value } of ORDER_OPTIONS ) {
-		const [ orderby, order ] = value.split( '/' );
-		if ( isInOrder( blocks, media, orderby, order ) ) {
-			return { orderby, order };
+		const order = parseOrderValue( value );
+		if ( isInOrder( blocks, media, order ) ) {
+			return order;
 		}
 	}
 

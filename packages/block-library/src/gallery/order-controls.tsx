@@ -1,19 +1,17 @@
 import { __ } from '@wordpress/i18n';
 import { SelectControl as WCSelectControl } from '@wordpress/components';
-import { ORDER_OPTIONS, RANDOM_OPTION, RANDOM_ORDER } from './order-options';
+import {
+	ORDER_OPTIONS,
+	RANDOM_OPTION,
+	RANDOM_ORDER,
+	parseOrderValue,
+	toOrderValue,
+} from './order-options';
 import type { Order } from './order-options';
 
 // Both controls below are a single "Order by" `SelectControl`, mirroring the
 // Query Loop block's `OrderControl`. They differ in what choosing an option
 // *means*, not in how they look.
-
-/**
- * Splits a composite `"orderby/order"` select value.
- */
-function toOrder( value: string ): Order {
-	const [ orderby, order ] = value.split( '/' );
-	return { orderby, order };
-}
 
 /**
  * Help text for the control while "Random" is selected. It's the one order the
@@ -29,10 +27,8 @@ function getOrderHelp( isRandom: boolean ): string | undefined {
 const SOURCE_ORDER_OPTIONS = [ ...ORDER_OPTIONS, RANDOM_OPTION ];
 
 type SourceOrderControlProps = {
-	/** Stored `orderby` value. */
-	orderby: string;
-	/** Stored `order` value (`asc`/`desc`). */
-	order: string;
+	/** The stored query order. */
+	order: Order;
 	/** Whether the gallery's `randomOrder` attribute is set. */
 	isRandom: boolean;
 	/** Called with `{ orderby, order }` to update the query. */
@@ -49,7 +45,6 @@ type SourceOrderControlProps = {
  * while it's set the control shows it instead of the query order.
  */
 export function SourceOrderControl( {
-	orderby,
 	order,
 	isRandom,
 	onChange,
@@ -58,7 +53,7 @@ export function SourceOrderControl( {
 	return (
 		<WCSelectControl
 			label={ __( 'Order by' ) }
-			value={ isRandom ? RANDOM_ORDER : `${ orderby }/${ order }` }
+			value={ isRandom ? RANDOM_ORDER : toOrderValue( order ) }
 			options={ SOURCE_ORDER_OPTIONS }
 			help={ getOrderHelp( isRandom ) }
 			onChange={ ( value ) => {
@@ -69,7 +64,7 @@ export function SourceOrderControl( {
 				if ( isRandom ) {
 					onRandomChange( false );
 				}
-				onChange( toOrder( value ) );
+				onChange( parseOrderValue( value ) );
 			} }
 		/>
 	);
@@ -124,7 +119,7 @@ export function SortImagesControl( {
 	if ( isRandom ) {
 		value = RANDOM_ORDER;
 	} else if ( currentOrder ) {
-		value = `${ currentOrder.orderby }/${ currentOrder.order }`;
+		value = toOrderValue( currentOrder );
 	}
 
 	return (
@@ -142,7 +137,7 @@ export function SortImagesControl( {
 					onRandomChange( false );
 				}
 				if ( nextValue !== CUSTOM_ORDER ) {
-					onSort( toOrder( nextValue ) );
+					onSort( parseOrderValue( nextValue ) );
 				}
 			} }
 		/>
