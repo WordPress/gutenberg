@@ -83,32 +83,34 @@ add_action( 'init', 'register_block_core_query' );
  * reading `context.query.perPage` would see a number that doesn't match
  * what is actually rendered. This keeps the exposed context truthful.
  *
- * @since 6.9.0
+ * The context is normalized for every descendant, not only direct children,
+ * because `render_block_context` receives the context inherited from ancestors.
  *
- * @param array         $context      Prepared block context.
- * @param array         $parsed_block Block being rendered.
- * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
+ * @since 7.1.0
+ *
+ * @param array $context Prepared block context.
  * @return array Filtered block context.
  */
-function block_core_query_normalize_inherited_context( $context, $parsed_block, $parent_block ) {
-	if ( ! $parent_block instanceof WP_Block || 'core/query' !== $parent_block->name ) {
-		return $context;
-	}
-
+function block_core_query_normalize_inherited_context( $context ) {
 	if ( empty( $context['query']['inherit'] ) ) {
 		return $context;
 	}
 
 	global $wp_query;
 
-	$context['query']['perPage'] = $wp_query instanceof WP_Query
+	$per_page = $wp_query instanceof WP_Query
 		? (int) $wp_query->get( 'posts_per_page' )
-		: (int) get_option( 'posts_per_page' );
+		: 0;
+	if ( 0 === $per_page ) {
+		$per_page = (int) get_option( 'posts_per_page' );
+	}
+
+	$context['query']['perPage'] = $per_page;
 	$context['query']['offset']  = 0;
 
 	return $context;
 }
-add_filter( 'render_block_context', 'block_core_query_normalize_inherited_context', 10, 3 );
+add_filter( 'render_block_context', 'block_core_query_normalize_inherited_context' );
 
 /**
  * Traverse the tree of blocks looking for any plugin block (i.e., a block from

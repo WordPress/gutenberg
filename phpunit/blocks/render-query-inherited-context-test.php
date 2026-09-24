@@ -60,6 +60,65 @@ HTML;
 	}
 
 	/**
+	 * The normalized value must reach descendants nested deeper than the
+	 * direct children of the Query Loop.
+	 */
+	public function test_inherited_query_context_propagates_to_nested_descendants() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"query":{"inherit":true,"perPage":25,"offset":10}} -->
+		<div class="wp-block-query">
+			<!-- wp:group -->
+			<div class="wp-block-group">
+				<!-- wp:test/query-context-probe /-->
+			</div>
+			<!-- /wp:group -->
+		</div>
+		<!-- /wp:query -->
+HTML;
+
+		$wp_query     = new WP_Query( array( 'posts_per_page' => 5 ) );
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'query-context-probe' ) );
+
+		$this->assertSame( '5', $p->get_attribute( 'data-per-page' ) );
+		$this->assertSame( '0', $p->get_attribute( 'data-offset' ) );
+	}
+
+	/**
+	 * When the main query carries no `posts_per_page`, fall back to the
+	 * Reading Settings option.
+	 */
+	public function test_inherited_query_context_falls_back_to_reading_settings() {
+		global $wp_query, $wp_the_query;
+
+		update_option( 'posts_per_page', 7 );
+
+		$content = <<<HTML
+		<!-- wp:query {"query":{"inherit":true,"perPage":25,"offset":10}} -->
+		<div class="wp-block-query">
+			<!-- wp:test/query-context-probe /-->
+		</div>
+		<!-- /wp:query -->
+HTML;
+
+		$wp_query     = new WP_Query();
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'query-context-probe' ) );
+
+		$this->assertSame( '7', $p->get_attribute( 'data-per-page' ) );
+	}
+
+	/**
 	 * Non-inheriting queries build their own `WP_Query`, so their declared
 	 * `perPage`/`offset` attributes are the source of truth and must be left
 	 * untouched.
