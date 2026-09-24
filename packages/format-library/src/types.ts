@@ -66,10 +66,12 @@ export type InlineColorUIProps = Pick<
 	onClose: () => void;
 };
 
-export type ColorPickerProps = Pick< FormatEditProps, 'value' | 'onChange' > & {
+export interface ColorPickerProps {
 	name: string;
 	property: 'color' | 'backgroundColor';
-};
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+}
 
 export type InlineMathUIProps = Pick<
 	FormatEditProps,
