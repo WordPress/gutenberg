@@ -1,5 +1,5 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 
@@ -44,10 +44,34 @@ export type AutocompleteInputGroupProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export type AutocompleteItemProps = ComponentProps<
-	typeof _Autocomplete.Item
+export interface AutocompleteItemLabelProps extends ComponentProps< 'span' > {
+	/** The primary label and accessible name of an autocomplete item. */
+	children: ReactNode;
+}
+
+export interface AutocompleteItemDescriptionProps extends ComponentProps< 'span' > {
+	/** Supplementary content described by the autocomplete item. */
+	children: ReactNode;
+}
+
+type AutocompleteItemChildren =
+	| ReactElement< AutocompleteItemLabelProps >
+	| [
+			ReactElement< AutocompleteItemLabelProps >,
+			...(
+				| ReactElement< AutocompleteItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
+export type AutocompleteItemProps = Omit<
+	ComponentProps< typeof _Autocomplete.Item >,
+	'children'
 > & {
-	children?: React.ReactNode;
+	/** One direct ItemLabel, followed by zero or more ItemDescription components. */
+	children: AutocompleteItemChildren;
 };
 
 export type AutocompleteListProps = ComponentProps<

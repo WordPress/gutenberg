@@ -7,6 +7,7 @@ import type {
 
 type Item = {
 	label: string;
+	description?: string;
 	value: string;
 	disabled?: boolean;
 	creatable?: boolean;
@@ -103,7 +104,14 @@ export function SearchableResults( {
 									value={ entry }
 									disabled={ entry.disabled }
 								>
-									{ entry.label }
+									<Combobox.ItemLabel>
+										{ entry.label }
+									</Combobox.ItemLabel>
+									{ entry.description ? (
+										<Combobox.ItemDescription>
+											{ entry.description }
+										</Combobox.ItemDescription>
+									) : null }
 								</Combobox.Item>
 							);
 						} }
@@ -116,7 +124,14 @@ export function SearchableResults( {
 							value={ creatableItem }
 							disabled={ creatableItem.disabled }
 						>
-							{ creatableItem.label }
+							<Combobox.ItemLabel>
+								{ creatableItem.label }
+							</Combobox.ItemLabel>
+							{ creatableItem.description ? (
+								<Combobox.ItemDescription>
+									{ creatableItem.description }
+								</Combobox.ItemDescription>
+							) : null }
 						</Combobox.Item>
 					</Combobox.ListFooter>
 				) }

@@ -29,6 +29,10 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
+		'SearchableChipSelectControl.ItemLabel':
+			SearchableChipSelectControl.ItemLabel,
+		'SearchableChipSelectControl.ItemDescription':
+			SearchableChipSelectControl.ItemDescription,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,
 		'SearchableChipSelectControl.Collection':
@@ -57,6 +61,14 @@ export const Default: Story = {
 		...SearchableChipSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const WithItemDescriptions: Story = {
+	...SearchableChipSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableChipSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
 	},
 };
 
@@ -345,7 +357,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableChipSelectControl.ItemLabel>
 								</SearchableChipSelectControl.Item>
 							) }
 						</SearchableChipSelectControl.Collection>
