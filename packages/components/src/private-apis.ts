@@ -23,9 +23,9 @@ lock( privateApis, {
 	get Menu() {
 		deprecated( '`privateApis.Menu` from `@wordpress/components`', {
 			since: '7.2',
-			version: '7.4',
+			version: '7.3',
 			alternative: '`DropdownMenu` from `@wordpress/components`',
-			hint: 'You can try `Menu` from `@wordpress/ui`, but it is not yet recommended.',
+			hint: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead.',
 		} );
 		return Menu;
 	},

@@ -215,8 +215,8 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
  * after the user has interacted with an element (a button or icon) or when
  * they perform a specific action.
  *
- * Continue using `DropdownMenu` for now. You can try `Menu` from `@wordpress/ui`,
- * but it is not yet recommended.
+ * When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead.
+ * Otherwise, continue using `DropdownMenu` for now.
  *
  * Render a Dropdown Menu with a set of controls:
  *

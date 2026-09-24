@@ -22,7 +22,7 @@ const meta: Meta< typeof DropdownMenu > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Continue using for now. You can try [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui`, but it is not yet recommended.',
+			notes: 'When building for the Gutenberg repo, use [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		},
 	},
 	args: {
