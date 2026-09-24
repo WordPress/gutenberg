@@ -6,6 +6,10 @@
 
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 
+### Internal
+
+-   Remove the private `NoteIconSlotFill` API and its slot in the block settings dropdown. The "Add note" action now renders as a dedicated block toolbar button through `NoteIconToolbarSlotFill` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes

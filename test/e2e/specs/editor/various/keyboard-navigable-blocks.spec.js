@@ -267,6 +267,9 @@ class KeyboardNavigableBlocks {
 		await this.expectLabelToHaveFocus( 'More' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
+		await this.expectLabelToHaveFocus( 'Add note' );
+
+		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Options' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
