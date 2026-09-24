@@ -363,9 +363,10 @@ function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 /**
  * REST callback for the `block_reaction_summary` post field.
  *
- * Computed for single-item requests only. A collection request gets `null`
- * so a list of posts never runs one aggregate query per row; the editor
- * reads the field from the single post it edits.
+ * Computed for single-item requests only, so a list of posts never runs one
+ * aggregate query per row; the editor reads the field from the single post it
+ * edits. A collection's `null` is stripped by
+ * gutenberg_omit_block_reaction_summary_from_collections().
  *
  * @since 7.2.0
  *
@@ -410,7 +411,7 @@ function gutenberg_register_block_reaction_summary_field() {
 		array(
 			'get_callback' => 'gutenberg_get_block_reaction_summary_field',
 			'schema'       => array(
-				'description'          => __( 'Aggregated reaction counts for each block in this post, keyed by block anchor and then by emoji slug. Only computed for single-item requests.', 'gutenberg' ),
+				'description'          => __( 'Aggregated reaction counts for each block in this post, keyed by block anchor and then by emoji slug. Only present on single-item requests.', 'gutenberg' ),
 				'type'                 => array( 'object', 'null' ),
 				'context'              => array( 'edit' ),
 				'readonly'             => true,
@@ -423,3 +424,46 @@ function gutenberg_register_block_reaction_summary_field() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_reaction_summary_field' );
+
+/**
+ * Removes the uncomputed `block_reaction_summary` from collection responses.
+ *
+ * Clients cache single and collection responses in one per-record store, so
+ * a `null` placeholder from a collection would overwrite the summary already
+ * loaded for the post being edited.
+ *
+ * @since 7.2.0
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response without the placeholder field.
+ */
+function gutenberg_omit_block_reaction_summary_from_collections( $response, $post, $request ) {
+	if ( ! empty( $request['id'] ) || ! $response instanceof WP_REST_Response ) {
+		return $response;
+	}
+
+	$data = $response->get_data();
+	if ( is_array( $data ) && array_key_exists( 'block_reaction_summary', $data ) ) {
+		unset( $data['block_reaction_summary'] );
+		$response->set_data( $data );
+	}
+
+	return $response;
+}
+
+/**
+ * Hooks gutenberg_omit_block_reaction_summary_from_collections() for every
+ * REST-enabled post type that supports notes.
+ *
+ * @since 7.2.0
+ */
+function gutenberg_register_block_reaction_summary_collection_filters() {
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'names' ) as $post_type ) {
+		if ( gutenberg_post_type_supports_notes( $post_type ) ) {
+			add_filter( "rest_prepare_{$post_type}", 'gutenberg_omit_block_reaction_summary_from_collections', 10, 3 );
+		}
+	}
+}
+add_action( 'init', 'gutenberg_register_block_reaction_summary_collection_filters', 99 );
