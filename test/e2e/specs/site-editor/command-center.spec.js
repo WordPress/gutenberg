@@ -66,7 +66,8 @@ test.describe( 'Site editor command palette @site-editor-v1-only', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'custom CSS' );
 		await page.getByRole( 'option', { name: 'Open custom CSS' } ).click();
-		await expect( page.getByLabel( 'Additional CSS' ) ).toBeVisible();
+		// Expect the CSS input to be present.
+		await expect( page.getByLabel( 'CSS' ) ).toBeVisible();
 	} );
 
 	test( 'Suggestions section shows contextual commands on open', async ( {

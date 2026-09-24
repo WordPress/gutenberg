@@ -461,7 +461,10 @@ function ScreenBlock( {
 			) }
 
 			{ canEditCSS && (
-				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
+				<PanelBody
+					title={ __( 'Additional styles' ) }
+					initialOpen={ false }
+				>
 					<StylesAdvancedPanel
 						value={ style }
 						onChange={ setStyle }

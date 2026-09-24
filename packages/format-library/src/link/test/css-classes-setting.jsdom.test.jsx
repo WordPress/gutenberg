@@ -11,7 +11,7 @@ describe( 'CSSClassesSettingComponent', () => {
 			<CSSClassesSettingComponent
 				setting={ {
 					id: 'cssClasses',
-					title: 'Additional CSS class(es)',
+					title: 'CSS class(es)',
 				} }
 				value={ { cssClasses: '' } }
 				onChange={ () => {} }
@@ -20,7 +20,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 		// Checkbox should be visible
 		const checkbox = screen.getByRole( 'checkbox', {
-			name: 'Additional CSS class(es)',
+			name: 'CSS class(es)',
 		} );
 		expect( checkbox ).toBeVisible();
 
@@ -46,7 +46,7 @@ describe( 'CSSClassesSettingComponent', () => {
 			<CSSClassesSettingComponent
 				setting={ {
 					id: 'cssClasses',
-					title: 'Additional CSS class(es)',
+					title: 'CSS class(es)',
 				} }
 				value={ { cssClasses: '' } }
 				onChange={ onChange }
@@ -55,7 +55,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 		// Toggle on
 		const checkbox = screen.getByRole( 'checkbox', {
-			name: 'Additional CSS class(es)',
+			name: 'CSS class(es)',
 		} );
 		// starts collapsed
 		expect( checkbox ).toHaveAttribute( 'aria-expanded', 'false' );
@@ -92,7 +92,7 @@ describe( 'CSSClassesSettingComponent', () => {
 			<CSSClassesSettingComponent
 				setting={ {
 					id: 'cssClasses',
-					title: 'Additional CSS class(es)',
+					title: 'CSS class(es)',
 				} }
 				value={ { cssClasses: 'foo bar' } }
 				onChange={ onChange }
@@ -100,7 +100,7 @@ describe( 'CSSClassesSettingComponent', () => {
 		);
 
 		const checkbox = screen.getByRole( 'checkbox', {
-			name: 'Additional CSS class(es)',
+			name: 'CSS class(es)',
 		} );
 
 		// Initially expanded and has aria-controls

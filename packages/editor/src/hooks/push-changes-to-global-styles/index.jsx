@@ -1,7 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import {
-	InspectorAdvancedControls,
+	InspectorControls,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
@@ -556,9 +556,9 @@ function PushChangesToGlobalStyles( props ) {
 	}
 
 	return (
-		<InspectorAdvancedControls>
+		<InspectorControls group="additional-styles">
 			<PushChangesToGlobalStylesControl { ...props } />
-		</InspectorAdvancedControls>
+		</InspectorControls>
 	);
 }
 

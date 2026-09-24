@@ -1514,6 +1514,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/inspector-controls-tabs/additional-styles-panel.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

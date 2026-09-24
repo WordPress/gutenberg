@@ -34,10 +34,10 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	}
 
 	return (
-		<InspectorControls group="advanced">
+		<InspectorControls group="additional-styles">
 			<TextControl
 				autoComplete="off"
-				label={ __( 'Additional CSS class(es)' ) }
+				label={ __( 'CSS class(es)' ) }
 				value={ className || '' }
 				onChange={ ( nextValue ) => {
 					setAttributes( {
