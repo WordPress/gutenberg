@@ -92,6 +92,10 @@
 					? active.nodeName + ( active === title ? '(title)' : '' )
 					: '-' )
 		);
+		render();
+	}
+
+	function render() {
 		// Everything, so that what happens between the field attaching and
 		// the first key is visible; the oldest entries go first when the
 		// log grows past what accessibility reads back.
@@ -100,6 +104,66 @@
 				? entries.slice( 0, 30 ).concat( entries.slice( -60 ) )
 				: entries;
 		log.textContent = 'TLOG ' + shown.join( ' | ' );
+	}
+
+	// Where the time went before the editor was usable: the document's own
+	// timing and every resource it loaded, grouped by kind, plus the slowest
+	// ones by name. Times are milliseconds from the navigation start.
+	function recordTiming( win, label ) {
+		const [ nav ] = win.performance.getEntriesByType( 'navigation' );
+		const resources = win.performance.getEntriesByType( 'resource' );
+		const kinds = {};
+		for ( const entry of resources ) {
+			const kind = entry.initiatorType || '?';
+			kinds[ kind ] = kinds[ kind ] || { count: 0, ms: 0 };
+			kinds[ kind ].count += 1;
+			kinds[ kind ].ms += entry.duration;
+		}
+		const byKind = Object.entries( kinds )
+			.map(
+				( [ kind, { count, ms } ] ) =>
+					kind + '=' + count + '/' + Math.round( ms ) + 'ms'
+			)
+			.join( ' ' );
+		const slowest = resources
+			.slice()
+			.sort( ( a, b ) => b.duration - a.duration )
+			.slice( 0, 8 )
+			.map(
+				( entry ) =>
+					entry.name
+						.replace(
+							/^.*\/(wp-content|wp-includes|wp-json|wp-admin)\//,
+							'$1/'
+						)
+						.split( '?' )[ 0 ] +
+					' ' +
+					Math.round( entry.startTime ) +
+					'+' +
+					Math.round( entry.duration )
+			)
+			.join( ', ' );
+		entries.push(
+			Date.now() -
+				started +
+				' TIMING ' +
+				label +
+				( nav
+					? ' ttfb=' +
+						Math.round( nav.responseStart ) +
+						' domInteractive=' +
+						Math.round( nav.domInteractive ) +
+						' load=' +
+						Math.round( nav.loadEventEnd )
+					: '' ) +
+				' resources ' +
+				resources.length +
+				': ' +
+				byKind +
+				' slowest: ' +
+				slowest
+		);
+		render();
 	}
 
 	// Which script mutates the title's tree, and during which event: DOM
@@ -291,6 +355,8 @@
 		}
 		doc.__titleLog = true;
 		record( doc, title, 'attached' );
+		recordTiming( window, 'top' );
+		recordTiming( frame.contentWindow, 'canvas' );
 		wrapDomMethods( frame.contentWindow, doc );
 		for ( const type of [
 			'keydown',
