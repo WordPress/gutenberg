@@ -63,16 +63,11 @@ function getOwnTypeSearchOptions( type, kind ) {
  * @return {Object} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
-	// How many suggestions to show before anything is typed.
-	const perPage = 20;
-
 	const ownType = getOwnTypeSearchOptions( type, kind );
 
 	return {
-		// No `perPage`: an unscoped search cannot be paged through, so naming
-		// a number would cut results nothing could ask for again.
 		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
-		initialSuggestionsSearchOptions: { ...ownType, perPage },
+		initialSuggestionsSearchOptions: { ...ownType, perPage: 20 },
 	};
 }
 
