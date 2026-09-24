@@ -171,6 +171,16 @@ $navigation-icon-size: 24px;
 		--navigation-layout-justification-setting: space-between;
 		--navigation-layout-justify: space-between;
 	}
+
+	&.items-justified-space-around {
+		--navigation-layout-justification-setting: space-around;
+		--navigation-layout-justify: space-around;
+	}
+
+	&.items-justified-space-evenly {
+		--navigation-layout-justification-setting: space-evenly;
+		--navigation-layout-justify: space-evenly;
+	}
 }
 
 // Low specificity padding to not override global styles.

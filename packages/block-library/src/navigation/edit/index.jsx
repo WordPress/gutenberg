@@ -614,6 +614,10 @@ function Navigation( {
 				'items-justified-right': justifyContent === 'right',
 				'items-justified-space-between':
 					justifyContent === 'space-between',
+				'items-justified-space-around':
+					justifyContent === 'space-around',
+				'items-justified-space-evenly':
+					justifyContent === 'space-evenly',
 				'items-justified-left': justifyContent === 'left',
 				'items-justified-center': justifyContent === 'center',
 				'is-vertical': orientation === 'vertical',

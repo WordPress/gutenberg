@@ -277,6 +277,44 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that distributed justification values are converted to Navigation custom properties.
+	 *
+	 * @dataProvider data_distributed_justification_values
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_layout_custom_property_declarations
+	 *
+	 * @param string $justification Justification value.
+	 */
+	public function test_get_distributed_layout_custom_property_declarations( $justification ) {
+		$actual = gutenberg_block_core_navigation_get_layout_custom_property_declarations(
+			array( 'justifyContent' => $justification )
+		);
+
+		$this->assertSame(
+			array(
+				'--navigation-layout-justification-setting' => $justification,
+				'--navigation-layout-direction' => 'row',
+				'--navigation-layout-wrap'      => 'wrap',
+				'--navigation-layout-justify'   => $justification,
+				'--navigation-layout-align'     => 'center',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Data provider for distributed Navigation justification values.
+	 *
+	 * @return array
+	 */
+	public function data_distributed_justification_values() {
+		return array(
+			'space around' => array( 'space-around' ),
+			'space evenly' => array( 'space-evenly' ),
+		);
+	}
+
+	/**
 	 * Test responsive layout styles and classes on local Navigation containers.
 	 *
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
