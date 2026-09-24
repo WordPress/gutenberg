@@ -11,12 +11,6 @@ final class AutoCapitalizationTests: XCTestCase {
 	var web: XCUIElement { safari.webViews.firstMatch }
 	var keyboard: XCUIElement { safari.keyboards.firstMatch }
 
-	/// Diagnostic only: the page's own record of the events, selection and
-	/// DOM around each key in the title (test/ios/diagnostics).
-	var titleLog: XCUIElement {
-		web.descendants( matching: .any ).matching( NSPredicate( format: "label BEGINSWITH 'TLOG'" ) ).firstMatch
-	}
-
 	/// Whichever editable field has the keyboard right now. Elements are
 	/// live queries, so this follows the focus.
 	var focusedField: XCUIElement {
@@ -39,11 +33,6 @@ final class AutoCapitalizationTests: XCTestCase {
 	/// skips the unsaved changes prompt a navigation would raise. The login
 	/// cookie is on disk and survives.
 	override func tearDownWithError() throws {
-		// Diagnostic only: the page's own record of how it loaded and what
-		// it saw, whether or not the test got as far as printing it.
-		if titleLog.exists {
-			print( "TLOG-AT-END\n  " + titleLog.label.split( separator: "|" ).joined( separator: "\n  " ) )
-		}
 		safari.terminate()
 	}
 
@@ -147,14 +136,12 @@ final class AutoCapitalizationTests: XCTestCase {
 		openNewPost()
 
 		// A new post focuses its title once the editor has loaded, which on
-		// a runner takes a minute or more (see the TLOG timing entries).
+		// a runner takes a minute or more.
 		waitForFocus( on: "Add title", "The new post did not focus its title", timeout: 240 )
 		waitForKeyboard()
 		assertCapitalized( "An empty title should start capitalized" )
 
 		type( "title" )
-		// Diagnostic only: what the page saw around each key, landed or not.
-		print( "TLOG-AFTER-TITLE\n  " + titleLog.label.split( separator: "|" ).joined( separator: "\n  " ) )
 		XCTAssertEqual( focusedField.value as? String, "Title", "The keyboard should have capitalized the first letter" )
 		XCTAssertFalse( key( "shift" ).isSelected, "After a word the keyboard should be lowercase" )
 
