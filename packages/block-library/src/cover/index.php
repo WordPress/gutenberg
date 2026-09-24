@@ -130,7 +130,51 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
+	if ( ( $attributes['backgroundType'] ?? 'image' ) !== 'image' ) {
+		return $content;
+	}
+
+	$custom_sizes = null;
+
+	if ( empty( $attributes['hasParallax'] ) && empty( $attributes['isRepeated'] ) ) {
+		$min_height      = $attributes['minHeight'] ?? 430;
+		$min_height_unit = $attributes['minHeightUnit'] ?? 'px';
+
+		if ( in_array( $min_height_unit, array( 'px', 'vh', 'vw', 'em', 'rem' ), true ) ) {
+			$attachment_id = null;
+
+			if ( ! empty( $attributes['useFeaturedImage'] ) ) {
+				$attachment_id = get_post_thumbnail_id();
+			} elseif ( isset( $attributes['id'] ) ) {
+				$attachment_id = (int) $attributes['id'];
+			}
+
+			if ( $attachment_id ) {
+				$image_src = wp_get_attachment_image_src( $attachment_id, 'full' );
+
+				if ( $image_src && $image_src[2] > 0 ) {
+					$aspect_ratio = $image_src[1] / $image_src[2];
+
+					if ( 'px' === $min_height_unit ) {
+						$required_width = (int) round( (float) $min_height * $aspect_ratio );
+						$custom_sizes   = sprintf( '(max-width: %1$dpx) %1$dpx, 100vw', $required_width );
+					} else {
+						$required_width = round( (float) $min_height * $aspect_ratio, 2 );
+						$custom_sizes   = sprintf( 'max(100vw, %s%s)', $required_width, $min_height_unit );
+					}
+				}
+			}
+		}
+	}
+
+	if ( empty( $attributes['useFeaturedImage'] ) ) {
+		if ( $custom_sizes ) {
+			$processor = new WP_HTML_Tag_Processor( $content );
+			if ( $processor->next_tag( array( 'class_name' => 'wp-block-cover__image-background' ) ) ) {
+				$processor->set_attribute( 'sizes', $custom_sizes );
+				$content = $processor->get_updated_html();
+			}
+		}
 		return $content;
 	}
 
@@ -150,6 +194,10 @@ function render_block_core_cover( $attributes, $content ) {
 			'class'           => 'wp-block-cover__image-background',
 			'data-object-fit' => 'cover',
 		);
+
+		if ( $custom_sizes ) {
+			$attr['sizes'] = $custom_sizes;
+		}
 
 		if ( $object_position ) {
 			$attr['data-object-position'] = $object_position;
