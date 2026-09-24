@@ -42,12 +42,16 @@
 		{ "path": "../warning" }
 	],
 	/*
-	 * The package has no TypeScript tests, and its two stories import
-	 * components the build allowlist does not type yet, so nothing is checked.
+	 * Each excluded file imports a component the build allowlist does not
+	 * type yet. A composite project has to resolve every relative import
+	 * within its own program, so including one of these would mean adding
+	 * the whole subgraph behind it. Drop an entry once the allowlist in
+	 * `tsconfig.build.json` covers what it imports.
 	 */
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
-		"src/components/contrast-checker/stories/index.story.ts"
+		"src/components/contrast-checker/stories/index.story.ts",
+		"src/components/inspector-controls-tabs/test/advanced-controls-panel.jsdom.test.tsx"
 	]
 }

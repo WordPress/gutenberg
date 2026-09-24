@@ -2,11 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+-   `InspectorControls`: Add an `advanced-styles` group, for advanced tools that belong with a block's styles rather than its settings. The block inspector gives the Styles tab its own Advanced panel for this group, and folds the group into the Settings tab's Advanced panel when there is no Styles tab to hold it.
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Block inspector: Move the Additional CSS and Additional CSS class(es) controls from the Advanced panel in the Settings tab to the one in the Styles tab. Blocks that render a single tab keep a single Advanced panel holding every advanced tool.
 
 ### Bug Fixes
 
