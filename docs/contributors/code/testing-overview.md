@@ -19,7 +19,7 @@ When writing tests consider the following:
 
 ## JavaScript testing
 
-JavaScript unit and integration tests use [Vitest](https://vitest.dev/). Import `describe`, `test`, `expect`, hooks, and `vi` explicitly from `vitest`. Globals are disabled. Gutenberg's shared setup is internal; external projects should follow the [consumer migration guide](/packages/scripts/docs/vitest-migration.md).
+JavaScript unit and integration tests use [Vitest](https://vitest.dev/). Import `describe`, `test`, `expect`, hooks, and `vi` explicitly from `vitest`. Globals are disabled. Gutenberg's shared setup is internal; external projects should follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
 
 ### Setup and commands
 
@@ -56,7 +56,7 @@ npm run test:unit:debug -- packages/escape-html/src/test/index.ts
 
 Paths filter discovered files; `-t` filters test names. Use `--project=node`, `--project=jsdom`, or `--project=browser` to select an environment. These filters do not change the environment selected by the filename. For example, `npm run test:unit -- --project=browser` runs the Browser suite.
 
-`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. Gutenberg-owned tests run only through Vitest. External projects that keep Jest can use the public `wp-scripts test-unit-jest` adapter and follow the [consumer migration guide](/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite).
+`npm run test:unit:vitest` and its watch/update variants remain compatible aliases. Gutenberg-owned tests run only through Vitest. External projects that keep Jest can use the public `wp-scripts test-unit-jest` adapter and follow the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite).
 
 Run `npm run lint` independently for code style checks. [ESLint](https://eslint.org/) enforces JavaScript rules; `npm run typecheck` checks TypeScript and checked JavaScript, including tests and stories. `npm run build` emits declarations but does not typecheck. Run `npm run test:unit:routing` and `npm run test:unit:conventions` to check discovery, imports, and environment conventions. Configure an [editor linting integration](/docs/contributors/code/getting-started-with-code-contribution.md) for feedback while editing.
 
@@ -176,6 +176,20 @@ Avoid placing clean up code after assertions since, if any of those tests fail, 
 Vitest resets mock implementations and call history, restores spies, resets stubbed globals and environment variables, and restores real timers between tests. Configure required mock implementations in each test's setup hooks. Imported module state is not reset automatically. Reset it explicitly or use `vi.resetModules()` when a fresh module instance is required. Do not disable module isolation or enable global Vitest APIs.
 
 `wpVitest` is an explicit opt-in for jsdom suites that need hoist-safe helpers inside `vi.hoisted()`.
+
+### Expected console calls
+
+Gutenberg's internal Vitest setup fails a test when `console.error`, `console.warn`, `console.info`, or `console.log` has calls that the test did not explicitly expect. Use `toHaveErroredWith`, `toHaveWarnedWith`, `toHaveInformedWith`, or `toHaveLoggedWith` with specific arguments. Asymmetric matchers such as `expect.objectContaining` are supported.
+
+```js
+expect( console ).toHaveWarnedWith( 'The setting is deprecated.' );
+```
+
+A successful positive assertion accounts for every matching call already in the mock history, including duplicates. It leaves the history intact, so repeated assertions and separate call-count checks still work. Other calls, including a later call with the same arguments, need their own assertion. Negative assertions and failed assertions do not account for any calls.
+
+The argument-free matchers, such as `toHaveWarned()`, remain supported for compatibility and account for all calls to that method already in the history. A broad assertion can therefore still hide an unrelated call. Prefer specific arguments so only matching calls are accounted for. Standard spy assertions such as `toHaveBeenCalledWith` do not account for console calls in this helper.
+
+The check runs after the test and its cleanup hooks, so assertions in `afterEach` are supported. Clearing, resetting, or restoring a mock does not excuse unaccounted calls. Assert expected calls before clearing their history. Accounting starts fresh for each test, including after a failed check.
 
 ### Mocking dependencies
 

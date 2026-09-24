@@ -326,14 +326,25 @@ describe( 'Tooltip', () => {
 			const HOVER_OUTSIDE_ANTICIPATION = 200;
 
 			await render(
-				<Tooltip { ...props }>
+				<>
 					<button
-						onMouseEnter={ onMouseEnterMock }
-						onMouseLeave={ onMouseLeaveMock }
+						style={ {
+							position: 'fixed',
+							right: 0,
+							bottom: 0,
+						} }
 					>
-						Tooltip anchor
+						Pointer parking target
 					</button>
-				</Tooltip>
+					<Tooltip { ...props }>
+						<button
+							onMouseEnter={ onMouseEnterMock }
+							onMouseLeave={ onMouseLeaveMock }
+						>
+							Tooltip anchor
+						</button>
+					</Tooltip>
+				</>
 			);
 
 			const anchor = screen.getByRole( 'button', {
@@ -341,6 +352,13 @@ describe( 'Tooltip', () => {
 			} );
 			expect( anchor ).toBeVisible();
 
+			await userEvent.hover(
+				screen.getByRole( 'button', {
+					name: 'Pointer parking target',
+				} )
+			);
+			onMouseEnterMock.mockClear();
+			onMouseLeaveMock.mockClear();
 			// Hover over the anchor, tooltip hasn't appeared yet
 			await userEvent.hover( anchor );
 			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );

@@ -27,6 +27,17 @@ function expectCompilationError( stats ) {
 	expect( stats.toString( { errors: true, all: false } ) ).toMatchSnapshot();
 }
 
+function loadWebpackConfig( configPath, defaults ) {
+	const config = require( configPath );
+
+	return {
+		...defaults,
+		...config,
+		output: { ...defaults.output, ...config.output },
+		experiments: { ...defaults.experiments, ...config.experiments },
+	};
+}
+
 describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	'DependencyExtractionWebpackPlugin %s',
 	( moduleMode ) => {
@@ -48,7 +59,8 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 			afterEach( () => rimrafSync( outputDirectory ) );
 
 			test( 'should produce expected output', async () => {
-				const options = Object.assign(
+				const options = loadWebpackConfig(
+					path.join( testDirectory, 'webpack.config.js' ),
 					{
 						name: `${ configCase }-${ moduleMode }`,
 						target: 'web',
@@ -62,8 +74,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 						},
 						output: {},
 						experiments: {},
-					},
-					require( path.join( testDirectory, 'webpack.config.js' ) )
+					}
 				);
 				options.output.path = outputDirectory;
 
@@ -170,7 +181,8 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 		afterEach( () => rimrafSync( workingDirectory ) );
 
 		const build = async ( outputDirectory ) => {
-			const options = Object.assign(
+			const options = loadWebpackConfig(
+				path.join( fixtureDirectory, 'webpack.config.js' ),
 				{
 					name: `style-cache-group-version-${ moduleMode }`,
 					target: 'web',
@@ -184,8 +196,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 					},
 					output: {},
 					experiments: {},
-				},
-				require( path.join( fixtureDirectory, 'webpack.config.js' ) )
+				}
 			);
 			options.output.path = outputDirectory;
 

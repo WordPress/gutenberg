@@ -10,12 +10,28 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
-import type {
-	LanguageEditProps,
-	InlineLanguageUIProps,
-	LanguageFormat,
-} from '../types';
+import type { FormatEditProps } from '../types';
+
+interface LanguageFormat {
+	name: string;
+	title: string;
+	tagName: string;
+	className: null;
+	attributes: {
+		lang: string;
+		dir: string;
+	};
+	edit: ( props: FormatEditProps ) => React.ReactNode;
+}
+
+interface InlineLanguageUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	contentRef: React.RefObject< HTMLElement >;
+	onClose: () => void;
+}
 
 const name = 'core/language';
 const title = __( 'Language' );
@@ -32,7 +48,7 @@ export const language = {
 	edit: Edit,
 } satisfies LanguageFormat;
 
-function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
+function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );
