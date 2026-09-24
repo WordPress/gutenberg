@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import { MenuGroup } from '@wordpress/components';
 import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 import LinkControlSearchCreate from './search-create-button';
@@ -69,22 +69,28 @@ function LinkControlSearchResults( {
 			>
 				<MenuGroup>
 					{ shouldShowNoResults && (
-						<MenuItem
+						<div
 							{ ...( noResultsSuggestionIndex === -1
 								? {}
 								: buildSuggestionItemProps(
 										suggestions[ noResultsSuggestionIndex ],
 										noResultsSuggestionIndex
 									) ) }
-							disabled
 							role="option"
 							aria-disabled="true"
+							className={ clsx(
+								'block-editor-link-control__search-no-results',
+								{
+									'has-create-suggestion':
+										shouldShowCreateSuggestion,
+								}
+							) }
 							aria-selected={
 								noResultsSuggestionIndex === selectedSuggestion
 							}
 						>
 							{ __( 'No results found.' ) }
-						</MenuItem>
+						</div>
 					) }
 					{ suggestions.map( ( suggestion, index ) => {
 						if ( NO_RESULTS_TYPE === suggestion.type ) {

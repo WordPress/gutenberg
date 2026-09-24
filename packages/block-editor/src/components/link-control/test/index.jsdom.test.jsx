@@ -1317,6 +1317,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'aria-disabled',
 				'true'
 			);
+			expect( noResultsMessage ).not.toHaveAttribute( 'tabindex' );
 			expect(
 				within( searchResults ).getAllByRole( 'option' )[ 0 ]
 			).toBe( noResultsMessage );
