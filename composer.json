@@ -20,6 +20,9 @@
 		"allow-plugins": {
 			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "8.1"
 		}
 	},
 	"require-dev": {
@@ -33,7 +36,8 @@
 		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
-		"composer/installers": "~1.0"
+		"composer/installers": "~1.0",
+		"php": ">=5.6.20"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
