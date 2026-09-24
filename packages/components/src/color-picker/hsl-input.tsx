@@ -15,7 +15,7 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 			<InputWithSlider
 				min={ 0 }
 				max={ 359 }
-				label="Hue"
+				label="Hue (HSL H value)"
 				abbreviation="H"
 				value={ hsla.h }
 				onChange={ ( nextH: number ) => {
@@ -46,7 +46,7 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 				<InputWithSlider
 					min={ 0 }
 					max={ 100 }
-					label="Alpha"
+					label="Alpha (HSL A value)"
 					abbreviation="A"
 					value={ Math.trunc( 100 * hsla.a ) }
 					onChange={ ( nextA: number ) => {
