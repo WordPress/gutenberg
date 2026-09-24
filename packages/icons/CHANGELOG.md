@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
+
+## 17.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   A further 236 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))

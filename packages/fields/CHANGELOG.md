@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.48.0 (2026-09-23)
+
 ### Enhancements
 
 -   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
