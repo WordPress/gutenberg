@@ -4,15 +4,14 @@ import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextShortcut } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import type {
-	NonBreakingSpaceEditProps,
-	NonBreakingSpacePopoverAnchorProps,
-} from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
 
-function PopoverAnchor( { contentRef }: NonBreakingSpacePopoverAnchorProps ) {
+function PopoverAnchor( {
+	contentRef,
+}: Pick< FormatEditProps, 'contentRef' > ) {
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
@@ -33,7 +32,7 @@ export const nonBreakingSpace = {
 	title,
 	tagName: 'span',
 	className: 'non-breaking-space',
-	edit( { value, onChange, contentRef }: NonBreakingSpaceEditProps ) {
+	edit( { value, onChange, contentRef }: FormatEditProps ) {
 		function addNonBreakingSpace() {
 			onChange( insert( value, '\u00a0' ) );
 		}
