@@ -236,6 +236,52 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expectAligned( thread, noted );
 	} );
 
+	test.describe( 'Block move animation', () => {
+		// Moved blocks animate from their old position with a transform.
+		test.use( { reducedMotion: 'no-preference' } );
+
+		test( 'reorders threads when noted blocks swap', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Alpha' },
+				comment: 'Alpha note',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Bravo' },
+				comment: 'Bravo note',
+			} );
+
+			const alphaThread = getThread( page, 'Alpha note' );
+			const bravoThread = getThread( page, 'Bravo note' );
+			const alpha = getParagraph( editor, 'Alpha' );
+			const bravo = getParagraph( editor, 'Bravo' );
+			await expect( alphaThread ).toHaveClass( /is-floating/ );
+			await expect( bravoThread ).toHaveClass( /is-floating/ );
+			await editor.selectBlocks( bravo );
+
+			// The top thread aligns with its block; the other stacks below.
+			await editor.clickBlockToolbarButton( 'Move up' );
+			await expectStacked( bravo, alpha );
+			await expectAligned( bravoThread, bravo );
+			await expectStacked( bravoThread, alphaThread );
+
+			await editor.clickBlockToolbarButton( 'Move down' );
+			await expectStacked( alpha, bravo );
+			await expectAligned( alphaThread, alpha );
+			await expectStacked( alphaThread, bravoThread );
+
+			await editor.clickBlockToolbarButton( 'Move up' );
+			await expectStacked( bravo, alpha );
+			await expectAligned( bravoThread, bravo );
+			await expectStacked( bravoThread, alphaThread );
+		} );
+	} );
+
 	test( 'follows its block when content above grows', async ( {
 		editor,
 		page,
