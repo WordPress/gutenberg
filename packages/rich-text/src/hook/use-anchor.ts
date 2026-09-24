@@ -18,33 +18,32 @@ function getFormatElement(
 	tagName: string,
 	className: string
 ): HTMLElement | undefined {
-	let element = range.startContainer;
+	let node: Node = range.startContainer;
 
 	// Even if the active format is defined, the actually DOM range's start
 	// container may be outside of the format's DOM element:
 	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
 	// So at a given selection index, start with the deepest format DOM element.
 	if (
-		element.nodeType === element.TEXT_NODE &&
-		element instanceof window.Text &&
-		range.startOffset === element.length &&
-		element.nextSibling
+		node.nodeType === node.TEXT_NODE &&
+		range.startOffset === ( node as Text ).length &&
+		node.nextSibling
 	) {
-		element = element.nextSibling;
+		node = node.nextSibling;
 
-		while ( element.firstChild ) {
-			element = element.firstChild;
+		while ( node.firstChild ) {
+			node = node.firstChild;
 		}
 	}
 
-	if ( element.nodeType !== element.ELEMENT_NODE ) {
-		if ( ! element.parentElement ) {
-			return;
-		}
-		element = element.parentElement;
-	}
+	// The element may belong to another document than this module, so the
+	// node type decides, not instanceof.
+	const element =
+		node.nodeType === node.ELEMENT_NODE
+			? ( node as HTMLElement )
+			: node.parentElement;
 
-	if ( element === editableContentElement ) {
+	if ( ! element || element === editableContentElement ) {
 		return;
 	}
 
@@ -56,10 +55,6 @@ function getFormatElement(
 
 	// Element#matches will throw SyntaxError on an empty selector
 	if ( ! selector ) {
-		return;
-	}
-
-	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
 	}
 
