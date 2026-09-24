@@ -75,6 +75,7 @@
 -   Image: Percent-encode the inline SVG in the circle-mask style's `mask-image`, and drop the malformed `;utf8` media type parameter, so audit tools no longer report the data URI as an invalid `url()` value ([#82333](https://github.com/WordPress/gutenberg/pull/82333)).
 
 -   Post Excerpt: Show the "Show link on new line" and "Max number of words" settings when the block has no post to display, for example in the single post template, and next to the protected content warning ([#83494](https://github.com/WordPress/gutenberg/pull/83494)).
+-   Post Excerpt: Show the "Show link on new line" and "Max number of words" settings when the block has no post to display, for example in the single post template, or shows the protected content warning ([#83494](https://github.com/WordPress/gutenberg/pull/83494)).
 
 ### Internal
 
