@@ -74,6 +74,7 @@ export const SearchableChipSelect = forwardRef<
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
+			readOnly={ undefined }
 		>
 			<Combobox.InputGroup>
 				<Combobox.Value>
