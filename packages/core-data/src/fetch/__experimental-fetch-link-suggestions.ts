@@ -256,20 +256,15 @@ export default async function fetchLinkSuggestions(
 	//
 	// If a search is unscoped (any type), we don't want to limit it to the perPage as it might discard
 	// valid results from a lower tier (i.e. attachments). So, unscoped default searches return
-	// every title matching a word typed even if they exceed 20. If fewer than 20 titles match,
-	// we backfill the 20 to be backwards compatible with the old format. Explicitly passed
-	// perPage unscoped searches respect the perPage value.
+	// every title matching a word typed even if they exceed 20. Titles matching no word typed are
+	// left out: `/wp/v2/search` matches post content and excerpts too, with no way to narrow it.
+	// Explicitly passed perPage unscoped searches respect the perPage value.
 	const bounded = type || ! search || limit !== undefined;
-	// Find our total word matches
-	const titleMatches = sortedResults.filter(
-		( { found } ) => found > 0
-	).length;
-	// Determine total to return
-	const returnCount = bounded ? perPage : Math.max( perPage, titleMatches );
+	const kept = bounded
+		? sortedResults.slice( 0, perPage )
+		: sortedResults.filter( ( { found } ) => found > 0 );
 
-	return sortedResults
-		.slice( 0, returnCount )
-		.map( ( { result } ) => result );
+	return kept.map( ( { result } ) => result );
 }
 
 /**
