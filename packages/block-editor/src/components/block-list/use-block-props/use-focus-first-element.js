@@ -117,11 +117,10 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		// place the caret at its edge directly. Focusing it then focuses
 		// the host (see RichText), which adopts the caret.
 		if ( target.isContentEditable && target.contentEditable !== 'true' ) {
-			const range = ownerDocument.createRange();
-			range.selectNodeContents( target );
-			range.collapse( ! isReverse );
-			selection.removeAllRanges();
-			selection.addRange( range );
+			selection.collapse(
+				target,
+				isReverse ? target.childNodes.length : 0
+			);
 			target.focus();
 			return;
 		}
