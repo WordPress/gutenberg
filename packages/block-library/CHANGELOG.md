@@ -22,6 +22,7 @@
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
 -   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
+-   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 
 ### Internal
 
