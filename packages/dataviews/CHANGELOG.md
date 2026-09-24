@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DataViewsPicker` `pickerTable` layout: make the whole `table` the composite, so `aria-activedescendant` sits on the `listbox` itself and screen readers announce the row the arrow keys move to. The layout also honors `itemListLabel` and marks the listbox as `aria-multiselectable` now, and grouped data is one tab stop holding a labelled `group` per group instead of one composite per group ([#83354](https://github.com/WordPress/gutenberg/pull/83354)).
+
 ## 19.1.0 (2026-09-23)
 
 ### New Features

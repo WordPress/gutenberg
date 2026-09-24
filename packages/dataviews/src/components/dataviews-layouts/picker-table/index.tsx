@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import {
@@ -47,6 +48,7 @@ interface TableRowProps< Item > {
 	onChangeSelection: SetSelection;
 	selectionProps: SelectionProps;
 	posinset?: number;
+	isInfiniteScroll: boolean;
 }
 
 function TableColumnField< Item >( {
@@ -86,6 +88,7 @@ function TableRow< Item >( {
 	onChangeSelection,
 	selectionProps,
 	posinset,
+	isInfiniteScroll,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 
@@ -95,12 +98,7 @@ function TableRow< Item >( {
 	const elementRef = useRef< HTMLButtonElement >( null );
 
 	useIntersectionObserver( elementRef, posinset );
-	const {
-		showTitle = true,
-		showMedia = true,
-		showDescription = true,
-		infiniteScrollEnabled,
-	} = view;
+	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const handleMouseEnter = () => {
 		setIsHovered( true );
 	};
@@ -133,21 +131,21 @@ function TableRow< Item >( {
 			aria-selected={ isSelected }
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
-			role={ infiniteScrollEnabled ? 'article' : 'option' }
+			role={ isInfiniteScroll ? 'article' : 'option' }
 			onClickCapture={ selectionProps.onClickCapture }
 			onClick={ selectionProps.onClick }
 			onMouseDown={ ( event ) => {
 				if ( event.button !== 0 ) {
 					return;
 				}
-				// Pre-focus the Composite container (parent `tbody`) so that
+				// Pre-focus the Composite container (the `table`) so that
 				// when the row is focused on click, Ariakit sees the focus
 				// coming from within the Composite and uses `focusSilently`
 				// (which passes `preventScroll: true`). Without this, the
 				// first focus into the Composite scrolls the active row
 				// under the sticky table header, which also causes the click
 				// to land on a different element than the original target.
-				event.currentTarget.parentElement?.focus( {
+				event.currentTarget.closest( 'table' )?.focus( {
 					preventScroll: true,
 				} );
 				selectionProps.onMouseDown( event );
@@ -217,6 +215,50 @@ function TableRow< Item >( {
 	);
 }
 
+function TableGroup< Item >( {
+	groupName,
+	groupField,
+	showLabel = true,
+	colSpan,
+	children,
+}: {
+	groupName: string;
+	groupField: NormalizedField< Item >;
+	showLabel?: boolean;
+	colSpan: number;
+	children: ReactNode;
+} ) {
+	const headerId = useId();
+	return (
+		// The rows of every group belong to the same listbox, so the group is
+		// a `group` within it rather than a listbox of its own.
+		<tbody role="group" aria-labelledby={ headerId }>
+			<tr
+				className="dataviews-view-table__group-header-row"
+				role="presentation"
+			>
+				<td
+					id={ headerId }
+					colSpan={ colSpan }
+					className="dataviews-view-table__group-header-cell"
+					// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+					role="presentation"
+				>
+					{ showLabel
+						? sprintf(
+								// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+								__( '%1$s: %2$s' ),
+								groupField.label,
+								groupName
+							)
+						: groupName }
+				</td>
+			</tr>
+			{ children }
+		</tbody>
+	);
+}
+
 function ViewPickerTable< Item >( {
 	actions,
 	data,
@@ -238,6 +280,7 @@ function ViewPickerTable< Item >( {
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
+	const { itemListLabel } = useContext( DataViewsContext );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -250,7 +293,8 @@ function ViewPickerTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
@@ -299,6 +343,18 @@ function ViewPickerTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = getTableColumns( view, fields );
+	const tableClassName = clsx(
+		'dataviews-view-table',
+		'dataviews-view-picker-table',
+		className,
+		{
+			[ `has-${ view.layout?.density }-density` ]:
+				view.layout?.density &&
+				[ 'compact', 'comfortable' ].includes( view.layout.density ),
+		}
+	);
+	const groupHeaderColSpan =
+		columns.length + ( hasPrimaryColumn ? 1 : 0 ) + 1;
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -313,21 +369,22 @@ function ViewPickerTable< Item >( {
 
 	return (
 		<>
-			<table
-				className={ clsx(
-					'dataviews-view-table',
-					'dataviews-view-picker-table',
-					className,
-					{
-						[ `has-${ view.layout?.density }-density` ]:
-							view.layout?.density &&
-							[ 'compact', 'comfortable' ].includes(
-								view.layout.density
-							),
-					}
-				) }
+			{ /*
+			 * The `table` is the Composite element so that the role that
+			 * describes the rows sits on the same element that holds
+			 * `aria-activedescendant`. Assistive technologies only announce
+			 * the active row when those two are together.
+			 */ }
+			<Composite
+				virtualFocus
+				orientation="vertical"
+				render={ <table className={ tableClassName } /> }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
+				aria-label={ itemListLabel }
+				aria-multiselectable={
+					! isInfiniteScroll && isMultiselect ? true : undefined
+				}
 				role={ isInfiniteScroll ? 'feed' : 'listbox' }
 			>
 				<thead role="presentation">
@@ -408,36 +465,13 @@ function ViewPickerTable< Item >( {
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<Composite
+							<TableGroup
 								key={ `group-${ groupName }` }
-								virtualFocus
-								orientation="vertical"
-								render={ <tbody role="group" /> }
+								groupName={ groupName }
+								groupField={ groupField }
+								showLabel={ view.groupBy?.showLabel }
+								colSpan={ groupHeaderColSpan }
 							>
-								<tr
-									className="dataviews-view-table__group-header-row"
-									role="presentation"
-								>
-									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											1
-										}
-										className="dataviews-view-table__group-header-cell"
-										// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
-										role="presentation"
-									>
-										{ view.groupBy?.showLabel === false
-											? groupName
-											: sprintf(
-													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-													__( '%1$s: %2$s' ),
-													groupField.label,
-													groupName
-												) }
-									</td>
-								</tr>
 								{ groupItems.map( ( item, index ) => {
 									const id =
 										getItemId( item ) || index.toString();
@@ -461,18 +495,17 @@ function ViewPickerTable< Item >( {
 											selectionProps={ getSelectionProps(
 												id
 											) }
+											isInfiniteScroll={
+												isInfiniteScroll
+											}
 										/>
 									);
 								} ) }
-							</Composite>
+							</TableGroup>
 						)
 					)
 				) : (
-					<Composite
-						render={ <tbody role="presentation" /> }
-						virtualFocus
-						orientation="vertical"
-					>
+					<tbody role="presentation">
 						{ hasData &&
 							data.map( ( item, index ) => {
 								const itemId = getItemId( item );
@@ -497,12 +530,13 @@ function ViewPickerTable< Item >( {
 											id
 										) }
 										posinset={ posinset }
+										isInfiniteScroll={ isInfiniteScroll }
 									/>
 								);
 							} ) }
-					</Composite>
+					</tbody>
 				) }
-			</table>
+			</Composite>
 			<div
 				className={ clsx( {
 					'dataviews-loading': isLoading,
