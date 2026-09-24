@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 41.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
@@ -30,6 +32,7 @@
 
 ### Bug Fixes
 
+-   `BaseControl`, `CheckboxControl`, `RadioControl`, `ToggleControl`: Use the design system foreground color for labels so they stay the correct color instead of inheriting the surrounding text color ([#83318](https://github.com/WordPress/gutenberg/pull/83318)).
 -   `FocalPointPicker`: Keep a surrounding scroll container from gaining a horizontal scrollbar when the focal point sits on an edge, without clipping the handle ([#68915](https://github.com/WordPress/gutenberg/pull/68915)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
@@ -40,6 +43,7 @@
 
 ### Internal
 
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).

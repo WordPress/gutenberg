@@ -179,6 +179,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with an invalid edit function', () => {
 			const blockType = {
+					apiVersion: 3,
 					save: noop,
 					edit: {},
 					category: 'text',
@@ -228,6 +229,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without title', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -244,6 +246,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with empty titles', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -261,6 +264,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject titles which are not strings', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -329,6 +333,7 @@ describe( 'blocks', () => {
 			'should warn and default to empty object when attributes is %s',
 			( _label, value ) => {
 				registerBlockType( 'core/test-block-null-attributes', {
+					apiVersion: 3,
 					title: 'block title',
 					category: 'text',
 					save: noop,
