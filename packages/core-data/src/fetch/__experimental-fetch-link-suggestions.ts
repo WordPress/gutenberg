@@ -259,10 +259,13 @@ export default async function fetchLinkSuggestions(
 	results = results.filter( ( result ) => !! result.id );
 
 	if ( searchOptions.isInitialSuggestions || ! search ) {
-		return sortResults( results, search, preferTypes ).slice( 0, perPage );
+		return sortResults( { results, search, preferTypes } ).slice(
+			0,
+			perPage
+		);
 	}
 
-	const sortedResults = rankResults( results, search, preferTypes );
+	const sortedResults = rankResults( { results, search, preferTypes } );
 
 	// Determine how many results to return
 	//
@@ -483,6 +486,18 @@ type ScoredResult = {
 };
 
 /**
+ * What to rank, and how.
+ */
+type RankOptions = {
+	results: SearchResult[];
+	search: string;
+	/**
+	 * Result types to rank above the usual order, most wanted first.
+	 */
+	preferTypes?: TypeOrderEntry[];
+};
+
+/**
  * Work out how well each result answers the query, and order them by it.
  *
  * The scores come back attached to the results, so that deciding how many to keep can read what a
@@ -503,15 +518,16 @@ type ScoredResult = {
  * considered, so a long title is never marked down for being long, and repeating a word never
  * makes a title a better answer.
  *
- * @param results
- * @param search
- * @param preferTypes
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-function rankResults(
-	results: SearchResult[],
-	search: string,
-	preferTypes?: TypeOrderEntry[]
-): ScoredResult[] {
+function rankResults( {
+	results,
+	search,
+	preferTypes,
+}: RankOptions ): ScoredResult[] {
 	const searchTokens = tokenize( search );
 
 	const scored = results.map( ( result ) => ( {
@@ -548,16 +564,17 @@ function rankResults(
  *
  * See `rankResults` for the order this puts them in.
  *
- * @param results
- * @param search
- * @param preferTypes
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-export function sortResults(
-	results: SearchResult[],
-	search: string,
-	preferTypes?: TypeOrderEntry[]
-) {
-	return rankResults( results, search, preferTypes ).map(
+export function sortResults( {
+	results,
+	search,
+	preferTypes,
+}: RankOptions ): SearchResult[] {
+	return rankResults( { results, search, preferTypes } ).map(
 		( { result } ) => result
 	);
 }
