@@ -10,6 +10,10 @@
 
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
+### Bug Fixes
+
+-   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes
