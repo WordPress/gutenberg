@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix the `sort` field docs to describe `a` and `b` as the compared field values (as returned by `getValue`), not the items, matching the runtime and the `Field.sort` type ([#83483](https://github.com/WordPress/gutenberg/pull/83483)).
+
 ## 19.1.0 (2026-09-23)
 
 ### New Features
