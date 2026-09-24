@@ -5,10 +5,10 @@
  * @package gutenberg
  *
  * @covers ::_gutenberg_add_field_modules_to_editor_script
- * @covers ::_gutenberg_register_posttype_fields
- * @covers ::_gutenberg_register_wp_template_fields
- * @covers ::_gutenberg_register_wp_template_part_fields
- * @covers ::_gutenberg_register_attachment_fields
+ * @covers ::_gutenberg_register_posttype_supports_fields
+ * @covers ::_gutenberg_register_posttype_wp_template_fields
+ * @covers ::_gutenberg_register_posttype_wp_template_part_fields
+ * @covers ::_gutenberg_register_posttype_attachment_fields
  * @covers Gutenberg_Fields_Registry::initialize
  * @covers Gutenberg_Fields_Registry::reset
  */
@@ -301,7 +301,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( $post_type, 'author' ), 'The post type supports authors.' );
 		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The action leaves no author field.' );
 
-		_gutenberg_register_posttype_fields();
+		_gutenberg_register_posttype_supports_fields();
 		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The default author field is registered first.' );
 
 		$callback();
@@ -321,12 +321,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertNotContains( 'author', $ids, 'The action leaves no author field.' );
 		$this->assertContains( 'date', $ids, 'The action registers the media fields.' );
 
-		_gutenberg_register_posttype_fields();
+		_gutenberg_register_posttype_supports_fields();
 		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertContains( 'author', $ids, 'The default author field is registered first.' );
 		$this->assertContains( 'comment_status', $ids, 'The default comment status field is registered first.' );
 
-		_gutenberg_register_attachment_fields();
+		_gutenberg_register_posttype_attachment_fields();
 		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertNotContains( 'author', $ids );
 		$this->assertNotContains( 'comment_status', $ids );
@@ -442,8 +442,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function data_template_post_types() {
 		return array(
-			'template'      => array( 'wp_template', '_gutenberg_register_wp_template_fields' ),
-			'template part' => array( 'wp_template_part', '_gutenberg_register_wp_template_part_fields' ),
+			'template'      => array( 'wp_template', '_gutenberg_register_posttype_wp_template_fields' ),
+			'template part' => array( 'wp_template_part', '_gutenberg_register_posttype_wp_template_part_fields' ),
 		);
 	}
 }
