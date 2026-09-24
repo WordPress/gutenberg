@@ -2,15 +2,29 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
+
+## 17.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   A further 236 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+
+### New Features
+
+-   Add the `fullscreenExit`, `justifySpaceEvenly` and `reaction` icons ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 
 ### Enhancements
 
 -   Redraw a further 236 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` and `commentAuthorAvatar` drawings. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller, and several drawings in the final batch change by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
+-   `manifest.json`: The `public` field now only controls whether an icon ships to WordPress Core ([#83277](https://github.com/WordPress/gutenberg/pull/83277)).
 -   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+-   `manifest.json`: New `collections` property, listing the collections an icon is registered in once it ships to WordPress Core. It replaces the `public` property and introduces the `core-admin` collection, which is not public and holds the icons the WordPress admin interface renders. ([#83261](https://github.com/WordPress/gutenberg/pull/83261), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+-   `comment` and `plugins`: redraw for better optical balance ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+-   `brush` and `media`: redraw. `brush` becomes a wide paintbrush rather than a pencil, which the existing `pencil` icon already covers, and `media` becomes a camera with music notes so it is no longer easily confused with `image` ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
 
 ### Bug Fixes
 

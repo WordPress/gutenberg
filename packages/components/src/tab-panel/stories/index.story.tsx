@@ -4,7 +4,7 @@ import { link, more, wordpress } from '@wordpress/icons';
 import TabPanel from '..';
 
 const meta: Meta< typeof TabPanel > = {
-	title: 'Components/Containers/TabPanel',
+	title: 'Components/@wordpress-components/Containers/TabPanel',
 	id: 'components-tabpanel',
 	component: TabPanel,
 	parameters: {

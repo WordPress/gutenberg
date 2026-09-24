@@ -623,6 +623,145 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		} );
 	} );
 
+	it( 'restores the alt text and caption a save overwrote when undoing back to the previous attachment', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: 'Original alt',
+			caption: { raw: 'Original caption' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: 'Updated alt',
+			caption: { raw: 'Updated caption' },
+		};
+		const registry = createRegistry( {
+			getEditedEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 1 ? originalAttachment : undefined,
+			resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 2 ? croppedAttachment : originalAttachment,
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
+		mockMediaEditorModalSetting( openMediaEditorModal );
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: 'Original alt',
+					caption: 'Original caption',
+				},
+				setAttributes,
+			} )
+		);
+
+		await act( async () => {
+			await result.current();
+		} );
+		const onUpdate = openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate;
+		await act( async () => {
+			await onUpdate( { id: 2, url: 'cropped.jpg' } );
+		} );
+		// The media editor's Undo only reports the previous attachment.
+		await act( async () => {
+			await onUpdate( { id: 1, url: 'original.jpg' } );
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 2 );
+		expect( setAttributes ).toHaveBeenNthCalledWith( 1, {
+			id: 2,
+			url: 'cropped.jpg',
+			alt: 'Updated alt',
+			caption: 'Updated caption',
+		} );
+		expect( setAttributes ).toHaveBeenNthCalledWith( 2, {
+			id: 1,
+			url: 'original.jpg',
+			alt: 'Original alt',
+			caption: 'Original caption',
+		} );
+	} );
+
+	it( 'does not restore overwritten metadata when a later session saves back to the previous attachment', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: 'Original alt',
+			caption: { raw: 'Original caption' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: 'Updated alt',
+			caption: { raw: 'Updated caption' },
+		};
+		const registry = createRegistry( {
+			getEditedEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 1 ? originalAttachment : croppedAttachment,
+			resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 2
+					? croppedAttachment
+					: {
+							...originalAttachment,
+							alt_text: 'Server alt',
+							caption: { raw: 'Server caption' },
+						},
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
+		mockMediaEditorModalSetting( openMediaEditorModal );
+		const { result, rerender } = renderHook(
+			( { attributes } ) =>
+				useOpenImageMediaEditorModal( { attributes, setAttributes } ),
+			{
+				initialProps: {
+					attributes: {
+						id: 1,
+						url: 'original.jpg',
+						alt: 'Original alt',
+						caption: 'Original caption',
+					},
+				},
+			}
+		);
+
+		await act( async () => {
+			await result.current();
+		} );
+		await act( async () => {
+			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
+				id: 2,
+				url: 'cropped.jpg',
+			} );
+		} );
+		rerender( {
+			attributes: {
+				id: 2,
+				url: 'cropped.jpg',
+				alt: 'Updated alt',
+				caption: 'Updated caption',
+			},
+		} );
+		// Opening the modal again starts a new session, so a save in it that
+		// happens to return the block to attachment 1 is not the Undo.
+		await act( async () => {
+			await result.current();
+		} );
+		await act( async () => {
+			await openMediaEditorModal.mock.calls[ 1 ][ 0 ].onUpdate( {
+				id: 1,
+				url: 'original.jpg',
+			} );
+		} );
+
+		expect( setAttributes ).toHaveBeenLastCalledWith( {
+			id: 1,
+			url: 'original.jpg',
+			alt: 'Server alt',
+			caption: 'Server caption',
+		} );
+	} );
+
 	it( 'resolves fresh metadata when the new attachment id has an incomplete cached record', async () => {
 		const originalAttachment = {
 			id: 1,

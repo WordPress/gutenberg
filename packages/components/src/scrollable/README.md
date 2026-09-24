@@ -1,6 +1,6 @@
 # Scrollable
 
-<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
+<p class="callout callout-alert">This component is deprecated. Write your own CSS instead.</p>
 
 `Scrollable` is a layout component that puts content in a scrollable container.
 

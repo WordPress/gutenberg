@@ -229,7 +229,6 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {
-		const spy = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
 		const preventJSDOMError = ( event: ErrorEvent ) => {
 			event.preventDefault();
 		};
@@ -239,9 +238,19 @@ describe( 'WidgetDashboard.Actions', () => {
 			expect( () => render( <WidgetDashboard.Actions /> ) ).toThrow(
 				/Dashboard compound used outside a WidgetDashboard subtree/
 			);
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message:
+						'Dashboard compound used outside a WidgetDashboard subtree.',
+				} )
+			);
+			expect( console ).toHaveErroredWith(
+				expect.stringContaining(
+					'The above error occurred in the <Actions> component:'
+				)
+			);
 		} finally {
 			window.removeEventListener( 'error', preventJSDOMError );
-			spy.mockRestore();
 		}
 	} );
 } );

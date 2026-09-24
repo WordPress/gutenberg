@@ -389,7 +389,7 @@ export interface GetEntityRecord {
 			query?: GetRecordsHttpQuery
 		): Promise< EntityRecord | undefined >;
 	};
-	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
+	normalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -447,7 +447,7 @@ export const getEntityRecord = ( <
  * @param args EntityRecordArgs the selector arguments.
  * @return EntityRecordArgs the normalized arguments.
  */
-getEntityRecord.__unstableNormalizeArgs = (
+getEntityRecord.normalizeArgs = (
 	args: EntityRecordArgs
 ): EntityRecordArgs => {
 	const newArgs = [ ...args ] as EntityRecordArgs;

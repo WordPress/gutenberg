@@ -188,7 +188,6 @@ describe( 'RichTextControl', () => {
 				label="Custom id"
 				value=""
 				onChange={ () => {} }
-				// eslint-disable-next-line no-restricted-syntax
 				id="my-custom-id"
 			/>
 		);
