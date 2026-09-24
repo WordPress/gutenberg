@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after `Text` stopped rendering styles through Emotion ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
+
+### Bug Fixes
+
+-   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
+
 ## 41.0.0 (2026-09-23)
 
 ### Breaking Changes
