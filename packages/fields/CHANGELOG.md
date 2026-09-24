@@ -2,19 +2,24 @@
 
 ## Unreleased
 
+## 0.48.0 (2026-09-23)
+
 ### Enhancements
 
 -   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
 -   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
+-   Featured image field: support the `editor.MediaUpload` filter in the post summary and open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
 
 ### Bug Fixes
 
 -   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))
 -   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
 -   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+-   Featured image field: label the button that sets the image with the post type's `set_featured_image` label and title the DataViews media modal with its `featured_image` label, as the classic panel does. ([#83445](https://github.com/WordPress/gutenberg/pull/83445))
 
 ### Internal
 
+-   Featured image field: pass the stabilized `featuredImageFlow` prop to `MediaEdit` alongside the deprecated `unstableFeaturedImageFlow`, so plugins reading either name still recognize the featured image. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
 - 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
 
 ## 0.47.0 (2026-09-10)
