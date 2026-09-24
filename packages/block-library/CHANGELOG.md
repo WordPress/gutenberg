@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Post Excerpt: Show the "Show link on new line" and "Max number of words" settings when the block has no post to display, for example in the single post template, and next to the protected content warning ([#83494](https://github.com/WordPress/gutenberg/pull/83494)).
+-   Post Excerpt: Show the "Show link on new line" and "Max number of words" settings when the block has no post to display, for example in the single post template, or shows the protected content warning ([#83494](https://github.com/WordPress/gutenberg/pull/83494)).
 
 ## 11.1.0 (2026-09-23)
 
