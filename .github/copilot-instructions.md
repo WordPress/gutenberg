@@ -19,7 +19,7 @@ When reviewing pull requests:
 - Do not suggest replacing `@wordpress/data` selectors / actions with local React state — this is the project's intentional state pattern.
 - Do not suggest replacing `__()` / `_x()` / `_n()` calls with template literals — these are WordPress i18n functions.
 - Do not suggest moving code between `block-editor`, `editor`, and `edit-post` packages without considering the layering rule (`block-editor` is WordPress-agnostic; lower layers must not depend on higher ones).
-- Flag block attribute or `theme.json` values reaching a strict string operation (`preg_match()`, `explode()`, `trim()`, `esc_url()`) without a type check, but only where the value is genuinely raw: `$block['attrs']` in a `render_block` / `render_block_data` filter, unregistered attributes, and anything nested inside `style` or `layout`. Top-level attributes reaching a `render_callback` are validated against the registered block-type schema by `WP_Block_Type::prepare_attributes_for_render()` — do not flag those. `sprintf( '%s' )`, `str_replace()`, `preg_replace()` and interpolation only warn on an array, so they are not findings.
+- Flag unguarded block attribute or `theme.json` values reaching a strict string operation such as `preg_match()`, `explode()`, `trim()` or `esc_url()`, but only where the value is raw: `$block['attrs']` in render filters, unregistered attributes, and nested `style` or `layout` values. Registered top-level attributes passed to render callbacks or block-support `apply` callbacks are already schema-validated — do not flag those. `sprintf( '%s' )`, `str_replace()`, `preg_replace()` and interpolation only warn, so they are not findings.
 
 ## Writing Markdown
 
