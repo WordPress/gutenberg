@@ -3,35 +3,9 @@ import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { ORDER_OPTIONS, RANDOM_OPTION, RANDOM_ORDER } from './order-options';
 import type { Order } from './order-options';
 
-type OrderSelectProps = {
-	/** The select value: a composite `"orderby/order"`, or a special value. */
-	value: string;
-	/** Select options. */
-	options: NonNullable<
-		React.ComponentProps< typeof WCSelectControl >[ 'options' ]
-	>;
-	/** Called with the raw select value when an option is chosen. */
-	onChange: ( value: string ) => void;
-	help?: string;
-};
-
-/**
- * The "Order by" select shared by both gallery modes, mirroring the Query Loop
- * block's `OrderControl`. It only knows how to present the options; what
- * choosing one *means* belongs to the two wrappers below, which differ in kind
- * rather than in look.
- */
-function OrderSelect( { value, options, onChange, help }: OrderSelectProps ) {
-	return (
-		<WCSelectControl
-			label={ __( 'Order by' ) }
-			value={ value }
-			options={ options }
-			help={ help }
-			onChange={ onChange }
-		/>
-	);
-}
+// Both controls below are a single "Order by" `SelectControl`, mirroring the
+// Query Loop block's `OrderControl`. They differ in what choosing an option
+// *means*, not in how they look.
 
 /**
  * Splits a composite `"orderby/order"` select value.
@@ -82,7 +56,8 @@ export function SourceOrderControl( {
 	onRandomChange,
 }: SourceOrderControlProps ) {
 	return (
-		<OrderSelect
+		<WCSelectControl
+			label={ __( 'Order by' ) }
 			value={ isRandom ? RANDOM_ORDER : `${ orderby }/${ order }` }
 			options={ SOURCE_ORDER_OPTIONS }
 			help={ getOrderHelp( isRandom ) }
@@ -153,7 +128,8 @@ export function SortImagesControl( {
 	}
 
 	return (
-		<OrderSelect
+		<WCSelectControl
+			label={ __( 'Order by' ) }
 			value={ value }
 			options={ options }
 			help={ getOrderHelp( isRandom ) }
