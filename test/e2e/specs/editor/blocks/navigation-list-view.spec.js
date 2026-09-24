@@ -187,26 +187,28 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
-		// Provides test coverage for feature whereby Custom Link type
-		// should default to `Pages` when displaying the "initial suggestions"
-		// in the Link UI.
-		// See https://github.com/WordPress/gutenberg/pull/54622.
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const secondResult = await linkControl.getNthSearchResult( 1 );
-		const thirdResult = await linkControl.getNthSearchResult( 2 );
+		await test.step( 'default initial suggestions are all page type', async () => {
+			// Provides test coverage for feature whereby Custom Link type
+			// should default to `Pages` when displaying the "initial
+			// suggestions" in the Link UI.
+			// See https://github.com/WordPress/gutenberg/pull/54622.
+			const firstResult = await linkControl.getNthSearchResult( 0 );
+			const secondResult = await linkControl.getNthSearchResult( 1 );
+			const thirdResult = await linkControl.getNthSearchResult( 2 );
 
-		const firstResultType =
-			await linkControl.getSearchResultType( firstResult );
+			const firstResultType =
+				await linkControl.getSearchResultType( firstResult );
 
-		const secondResultType =
-			await linkControl.getSearchResultType( secondResult );
+			const secondResultType =
+				await linkControl.getSearchResultType( secondResult );
 
-		const thirdResultType =
-			await linkControl.getSearchResultType( thirdResult );
+			const thirdResultType =
+				await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toBe( 'Page' );
-		expect( secondResultType ).toBe( 'Page' );
-		expect( thirdResultType ).toBe( 'Page' );
+			expect( firstResultType ).toBe( 'Page' );
+			expect( secondResultType ).toBe( 'Page' );
+			expect( thirdResultType ).toBe( 'Page' );
+		} );
 
 		// Searching reaches more than pages, and pages are still listed first
 		// because the appended item is a Page Link.
