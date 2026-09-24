@@ -2819,6 +2819,49 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Scopes a style node's feature selectors, e.g. `$node['selectors']`, to a
+	 * different selector, optionally appending a pseudo-selector to each.
+	 *
+	 * Feature selectors declared in block.json target an element within the
+	 * block, e.g. `.wp-block-navigation-item__content`. A node that swaps in a
+	 * different selector for the block itself, such as a custom state, has to
+	 * bring those feature selectors along, otherwise their styles escape the
+	 * state and apply to every instance of the block.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $scope             Selector to scope the feature selectors to.
+	 * @param array  $feature_selectors Feature selectors keyed by feature, as stored
+	 *                                  in a style node's `selectors`.
+	 * @param string $pseudo_selector   Optional. Pseudo-selector to append to each
+	 *                                  scoped selector, e.g. ':hover'. Default ''.
+	 * @return array The scoped feature selectors.
+	 */
+	protected static function scope_feature_selectors( $scope, $feature_selectors, $pseudo_selector = '' ) {
+		$scoped = array();
+
+		foreach ( $feature_selectors ?? array() as $feature => $selector ) {
+			if ( is_array( $selector ) ) {
+				$scoped[ $feature ] = array();
+				foreach ( $selector as $subfeature => $subfeature_selector ) {
+					$scoped[ $feature ][ $subfeature ] = static::append_to_selector(
+						static::scope_selector( $scope, $subfeature_selector ),
+						$pseudo_selector
+					);
+				}
+				continue;
+			}
+
+			$scoped[ $feature ] = static::append_to_selector(
+				static::scope_selector( $scope, $selector ),
+				$pseudo_selector
+			);
+		}
+
+		return $scoped;
+	}
+
+	/**
 	 * Gets preset values keyed by slugs based on settings and metadata.
 	 *
 	 * <code>
@@ -3763,7 +3806,7 @@ class WP_Theme_JSON_Gutenberg {
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
-								'selectors'  => $feature_selectors,
+								'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors ),
 								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
@@ -3779,7 +3822,7 @@ class WP_Theme_JSON_Gutenberg {
 											'name'       => $name,
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
-											'selectors'  => $feature_selectors,
+											'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors, $pseudo ),
 											'elements'   => $selectors[ $name ]['elements'] ?? array(),
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,

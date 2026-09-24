@@ -8479,6 +8479,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_block_custom_states_are_processed() {
 		// Only -current styles — no base block styles — so we can assert the
 		// output uses the current-menu-item selector and not the block selector.
+		// Color is scoped to the anchor because core/navigation-link declares a
+		// `selectors.color` of `.wp-block-navigation-item__content`.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -8498,7 +8500,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content){background-color: blue;color: red;}';
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
@@ -8522,7 +8524,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content){background-color: blue;color: red;}';
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
@@ -8560,7 +8562,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}:root :where(.wp-block-navigation .current-menu-item:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .current-menu-item:focus){background-color: yellow;color: green;}';
+		$expected = ':root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content){background-color: blue;color: red;}:root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content:focus){background-color: yellow;color: green;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -8591,7 +8593,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet_bogus = $theme_json_bogus_state->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected_bogus   = ':root :where(.wp-block-navigation-link){color: black;}';
+		$expected_bogus   = ':root :where(.wp-block-navigation-item__content){color: black;}';
 		$this->assertSameCSS( $expected_bogus, $stylesheet_bogus );
 		$this->assertStringNotContainsString( '-bogus', $stylesheet_bogus );
 		$this->assertStringNotContainsString( 'yellow', $stylesheet_bogus );
