@@ -195,6 +195,7 @@ export default {
 					>
 						{ allowJustification && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-justification-item"
 								label={ __( 'Justification' ) }
 								hasValue={ hasJustificationValue }
 								onDeselect={ resetJustification }
@@ -209,6 +210,7 @@ export default {
 						) }
 						{ allowOrientation && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-orientation-item"
 								label={ __( 'Orientation' ) }
 								hasValue={ hasOrientationValue }
 								onDeselect={ resetOrientation }

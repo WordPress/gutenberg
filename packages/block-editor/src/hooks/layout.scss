@@ -18,8 +18,15 @@
 		grid-column: 1 / -1;
 
 		> * {
-			flex: 1;
 			min-width: 0;
+		}
+
+		.block-editor-hooks__flex-layout-justification-item {
+			flex: 1;
+		}
+
+		.block-editor-hooks__flex-layout-orientation-item {
+			flex: none;
 		}
 	}
 }
