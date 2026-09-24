@@ -114,10 +114,9 @@
 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-			align-items: start;
-			align-content: center;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
@@ -136,7 +135,10 @@
 			}
 
 			&:has(> .item-icon) {
+				display: grid;
 				grid-template-columns: auto minmax(0, 1fr);
+				align-items: start;
+				align-content: center;
 			}
 
 			&.is-size-small {
@@ -188,6 +190,13 @@
 
 		.item-indicator-icon {
 			translate: 0 1px;
+		}
+
+		.item-content {
+			display: flex;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
+			min-width: 0;
 		}
 
 		.item-text {

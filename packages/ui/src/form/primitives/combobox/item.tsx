@@ -34,7 +34,9 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 						size={ 24 }
 					/>
 				</span>
-				{ children }
+				<div className={ itemPopupStyles[ 'item-content' ] }>
+					{ children }
+				</div>
 			</_Combobox.Item>
 		);
 	}
