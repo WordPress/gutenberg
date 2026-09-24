@@ -110,7 +110,7 @@ const UnconnectedBorderControl = (
 						max={ 100 }
 						min={ 0 }
 						onChange={ onSliderChange }
-						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+						step={ widthUnit === 'px' ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
 					/>
