@@ -1226,6 +1226,33 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			Promise.resolve( noResults )
 		);
 	} );
+
+	it( 'should show no results without a create suggestion', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await user.type( searchInput, 'No matching content' );
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect(
+			within( searchResults ).getByRole( 'option', {
+				name: 'No results found.',
+			} )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			within( searchResults ).queryByRole( 'option', {
+				name: /^Create:/,
+			} )
+		).not.toBeInTheDocument();
+	} );
+
 	it.each( [
 		[ 'HelloWorld', 'without spaces' ],
 		[ 'Hello World', 'with spaces' ],
@@ -1290,6 +1317,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'aria-disabled',
 				'true'
 			);
+			expect(
+				within( searchResults ).getAllByRole( 'option' )[ 0 ]
+			).toBe( noResultsMessage );
+			expect(
+				within( searchResults ).getAllByRole( 'option' )[ 1 ]
+			).toBe( createButton );
 
 			// No need to wait in this test because we control the Promise
 			// resolution manually via the `resolver` reference.

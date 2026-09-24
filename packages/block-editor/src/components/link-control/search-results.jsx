@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
-import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
+import { CREATE_TYPE, LINK_ENTRY_TYPES, NO_RESULTS_TYPE } from './constants';
 
 function LinkControlSearchResults( {
 	withCreateSuggestion,
@@ -33,20 +33,24 @@ function LinkControlSearchResults( {
 		withCreateSuggestion &&
 		! isSingleDirectEntryResult &&
 		! isInitialSuggestions;
-	// If the query has a specified type, then we can skip showing them in the result. See #24839.
-	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
+	const noResultsSuggestionIndex = suggestions.findIndex(
+		( suggestion ) => suggestion.type === NO_RESULTS_TYPE
+	);
 	const hasEntitySuggestions = suggestions.some(
 		( suggestion ) =>
 			suggestion.type !== CREATE_TYPE &&
+			suggestion.type !== NO_RESULTS_TYPE &&
 			! LINK_ENTRY_TYPES.includes( suggestion.type )
 	);
 	const shouldShowNoResults =
-		withCreateSuggestion &&
-		suggestions.some( ( suggestion ) => suggestion.type === CREATE_TYPE ) &&
-		! isInitialSuggestions &&
-		! isLoading &&
-		currentInputValue?.trim() &&
-		! hasEntitySuggestions;
+		noResultsSuggestionIndex !== -1 ||
+		( withCreateSuggestion &&
+			suggestions.some(
+				( suggestion ) => suggestion.type === CREATE_TYPE
+			) &&
+			! hasEntitySuggestions );
+	// If the query has a specified type, then we can skip showing them in the result. See #24839.
+	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
 
 	const labelText = isInitialSuggestions
 		? __( 'Suggestions' )
@@ -65,11 +69,28 @@ function LinkControlSearchResults( {
 			>
 				<MenuGroup>
 					{ shouldShowNoResults && (
-						<MenuItem disabled role="option" aria-selected="false">
+						<MenuItem
+							{ ...( noResultsSuggestionIndex === -1
+								? {}
+								: buildSuggestionItemProps(
+										suggestions[ noResultsSuggestionIndex ],
+										noResultsSuggestionIndex
+									) ) }
+							disabled
+							role="option"
+							aria-disabled="true"
+							aria-selected={
+								noResultsSuggestionIndex === selectedSuggestion
+							}
+						>
 							{ __( 'No results found.' ) }
 						</MenuItem>
 					) }
 					{ suggestions.map( ( suggestion, index ) => {
+						if ( NO_RESULTS_TYPE === suggestion.type ) {
+							return null;
+						}
+
 						if (
 							shouldShowCreateSuggestion &&
 							CREATE_TYPE === suggestion.type
