@@ -279,7 +279,11 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'block_reaction_summary', $response->get_data() );
 	}
 
-	public function test_posts_collection_returns_null_block_reaction_summary() {
+	/**
+	 * Core-data shares one record cache between single and collection
+	 * responses, so a placeholder here would erase the edited post's summary.
+	 */
+	public function test_posts_collection_omits_block_reaction_summary() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 		$this->insert_block_reaction( $post_id, 'blockaaa', self::$editor_id );
@@ -292,8 +296,7 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertCount( 1, $data );
-		$this->assertArrayHasKey( 'block_reaction_summary', $data[0] );
-		$this->assertNull( $data[0]['block_reaction_summary'] );
+		$this->assertArrayNotHasKey( 'block_reaction_summary', $data[0] );
 	}
 
 	public function test_block_reaction_summary_not_registered_for_media() {
