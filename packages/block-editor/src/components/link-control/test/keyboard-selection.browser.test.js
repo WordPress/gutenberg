@@ -63,10 +63,16 @@ describe( 'LinkControl keyboard selection', () => {
 			const searchInput = screen.getByRole( 'combobox', {
 				name: 'Search or type URL',
 			} );
-			await user.type( searchInput, searchTerm );
+			// Exercise typing while results for the previous query remain visible.
+			const partialSearchTerm = searchTerm.slice( 0, -1 );
+			await user.type( searchInput, partialSearchTerm );
+			await screen.findByRole( 'listbox', {
+				name: `Search results for "${ partialSearchTerm }"`,
+			} );
+			await user.type( searchInput, searchTerm.slice( -1 ) );
 
 			await screen.findByRole( 'listbox', {
-				name: /Search results for.*/,
+				name: `Search results for "${ searchTerm }"`,
 			} );
 			const selectedOption = page.getByRole( 'option', {
 				selected: true,

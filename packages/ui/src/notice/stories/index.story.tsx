@@ -3,7 +3,8 @@ import { unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
-	title: 'Design System/Components/Notice',
+	title: 'Components/@wordpress-ui/Notice',
+	id: 'design-system-components-notice',
 	component: Notice.Root,
 	subcomponents: {
 		'Notice.Title': Notice.Title,
@@ -14,6 +15,12 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
+		docs: {
+			description: {
+				component:
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+			},
+		},
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
