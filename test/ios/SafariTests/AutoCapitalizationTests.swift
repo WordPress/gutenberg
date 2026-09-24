@@ -39,6 +39,11 @@ final class AutoCapitalizationTests: XCTestCase {
 	/// skips the unsaved changes prompt a navigation would raise. The login
 	/// cookie is on disk and survives.
 	override func tearDownWithError() throws {
+		// Diagnostic only: the page's own record of how it loaded and what
+		// it saw, whether or not the test got as far as printing it.
+		if titleLog.exists {
+			print( "TLOG-AT-END\n  " + titleLog.label.split( separator: "|" ).joined( separator: "\n  " ) )
+		}
 		safari.terminate()
 	}
 
@@ -73,11 +78,11 @@ final class AutoCapitalizationTests: XCTestCase {
 
 	/// Waits until the field with the keyboard is an empty one with this
 	/// aria-label.
-	func waitForFocus( on label: String, _ message: String ) {
+	func waitForFocus( on label: String, _ message: String, timeout: TimeInterval = 10 ) {
 		// An empty field holds nothing or the padding character.
 		let matches = NSPredicate( format: "label == %@ AND value.length < 2", label )
 		let done = XCTNSPredicateExpectation( predicate: matches, object: focusedField )
-		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: 10 ), .completed, message )
+		XCTAssertEqual( XCTWaiter.wait( for: [ done ], timeout: timeout ), .completed, message )
 	}
 
 	/// The line the caret is on: the focused field's text, or its last line
@@ -141,13 +146,9 @@ final class AutoCapitalizationTests: XCTestCase {
 	func testReturnStartsTheNextFieldCapitalized() throws {
 		openNewPost()
 
-		// A new post focuses the title. The first load on a runner is slow:
-		// PHP runs in WebAssembly and nothing is cached yet.
-		XCTAssertTrue(
-			web.textViews[ "Add title" ].waitForExistence( timeout: 240 ),
-			"The new post has no title field"
-		)
-		waitForFocus( on: "Add title", "The title is not focused" )
+		// A new post focuses its title once the editor has loaded, which on
+		// a runner takes a minute or more (see the TLOG timing entries).
+		waitForFocus( on: "Add title", "The new post did not focus its title", timeout: 240 )
 		waitForKeyboard()
 		assertCapitalized( "An empty title should start capitalized" )
 
