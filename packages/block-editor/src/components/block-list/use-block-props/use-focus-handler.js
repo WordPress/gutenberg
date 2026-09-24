@@ -74,22 +74,17 @@ export function useFocusHandler( clientId ) {
 				// builds the multi-selection from the anchor it recorded at
 				// mousedown, so this dispatch overwriting the store anchor
 				// is harmless.
-				// A block wrapper can receive focus incidentally: a click on
-				// the selected block's editable, an inert part of the editing
-				// host (not focusable itself), moves focus to the nearest
-				// focusable ancestor. Leave the selection alone when, within
-				// an engaged editing host (the wrapper is editable by
-				// inheritance), the caret sits in the selected block within
-				// this one. A caret in a deselected descendant is incidental
-				// too (a click on this block's padding), and the click
-				// selects this block.
+				// A click on the selected block's inert field can focus this
+				// wrapper instead (Firefox focuses the nearest focusable
+				// ancestor). Under an engaged editing host, a caret in the
+				// selected block within this one keeps that selection.
 				const { anchorNode } =
 					node.ownerDocument.defaultView.getSelection();
 				if (
-					node.isContentEditable &&
 					anchorNode &&
 					node.contains( anchorNode ) &&
-					isBlockSelected( getBlockClientId( anchorNode ) )
+					isBlockSelected( getBlockClientId( anchorNode ) ) &&
+					node.isContentEditable
 				) {
 					return;
 				}
