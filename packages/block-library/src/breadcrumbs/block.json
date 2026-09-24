@@ -71,7 +71,8 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
-			}
+			},
+			"textAlign": true
 		},
 		"interactivity": {
 			"clientNavigation": true
