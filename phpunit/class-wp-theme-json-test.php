@@ -8572,7 +8572,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	private function reset_blocks_metadata() {
 		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
-		$property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
 		$property->setValue( null, array() );
 	}
 
