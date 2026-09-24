@@ -92,8 +92,10 @@ function gutenberg_get_all_registered_field_modules() {
  * prerequisites depend on it. A dynamic dependency is only listed in the
  * import map; the module is fetched when it is imported.
  *
- * It runs early on `admin_init`: after `init`, so the fields and their script
- * modules are registered, and before the pages rendered outside the admin
+ * Reading the registry fires `gutenberg_fields_init`, so the fields and their
+ * script modules are registered on demand. It still has to run after `init`,
+ * for the supports the default fields derive from to be final, and it runs
+ * early on `admin_init`: before the pages rendered outside the admin
  * template, which render and exit on `admin_init` at the default priority.
  * A field registered later is not covered.
  *
@@ -184,14 +186,16 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
  * visibility) ship in the `@wordpress/fields/server-fields` script module,
  * see packages/fields/src/server-fields.ts, registered along with the field.
  *
- * The fields depend on the supports of the post type, hence it runs late on
- * `init`: after the post types registered at the default priority. A plugin
- * that wants to alter the defaults with gutenberg_register_fields() or
- * gutenberg_unregister_fields() hooks `init` at a later priority.
+ * The fields depend on the supports of the post type, hence it runs on
+ * `gutenberg_fields_init`, at priority 0: the action fires the first time
+ * the registry is read, after `init` has run and the supports are final. A
+ * plugin that wants to alter the defaults with gutenberg_register_fields()
+ * or gutenberg_unregister_fields() hooks the same action at the default
+ * priority.
  *
  * The post types whose fields differ from the defaults derived from their
  * supports (templates, attachments) adjust them in their own step, hooked
- * right after this one.
+ * to the same action at priority 1, right after this one.
  */
 function _gutenberg_register_posttype_fields() {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
@@ -265,22 +269,21 @@ function _gutenberg_register_posttype_fields() {
 }
 
 /**
- * Core post types registered on `init` at 0 priority,
- * see https://github.com/wordpress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592
- * Custom Post Types are usually registered on `init` at the default priority (10).
+ * Core post types are registered on `init` at priority 0,
+ * see https://github.com/WordPress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592
+ * Custom post types are usually registered on `init` at the default priority (10),
+ * and plugins add or remove supports on `init` too, with add_post_type_support()
+ * and remove_post_type_support(). The supports of a post type are not final
+ * until `init` completes, so the default fields cannot derive from them during `init`.
  *
- * Even though core registers/unregisters most supports at the same time as post type registration,
- * some are changed later:
- *
- * - wp_navigation removes editor support
- *   - at https://github.com/oandregal/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-admin/includes/post.php#L2639
- * 	 - hooked to edit_form_after_title (after init) https://github.com/wordpress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-admin/includes/admin-filters.php#L89
- *
- * We cannot know the final supports of a post type at the time of its registration (`register_post_type` hook),
- * so we register the fields later, on `init` at priority 99.
- *
+ * The registry fires `gutenberg_fields_init` on its first read, which happens
+ * after `init`: while handling a REST request, or on `admin_init` when the
+ * editor script is wired up. The defaults hook that action at priority 0, so
+ * they derive from the final supports. A plugin altering the defaults with
+ * gutenberg_register_fields() or gutenberg_unregister_fields() hooks
+ * `gutenberg_fields_init` at the default priority.
  */
-add_action( 'init', '_gutenberg_register_posttype_fields', 99 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_fields', 0 );
 
 /**
  * Adjusts the default fields of templates.
@@ -290,14 +293,14 @@ add_action( 'init', '_gutenberg_register_posttype_fields', 99 );
  * client-side in packages/fields/src/fields/template-author/index.tsx, which
  * reads the theme or plugin that provides them instead of the post author.
  *
- * It runs right after the default fields are registered, on `init` at
- * priority 100, so a plugin hooking `init` later still sees the final
- * defaults.
+ * It runs right after the default fields are registered, on
+ * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * the default priority sees the final defaults.
  */
 function _gutenberg_register_wp_template_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template', array( 'author' ) );
 }
-add_action( 'init', '_gutenberg_register_wp_template_fields', 100 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_fields', 9 );
 
 /**
  * Adjusts the default fields of template parts.
@@ -307,14 +310,14 @@ add_action( 'init', '_gutenberg_register_wp_template_fields', 100 );
  * client-side in packages/fields/src/fields/template-author/index.tsx, which
  * reads the theme or plugin that provides them instead of the post author.
  *
- * It runs right after the default fields are registered, on `init` at
- * priority 100, so a plugin hooking `init` later still sees the final
- * defaults.
+ * It runs right after the default fields are registered, on
+ * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * the default priority sees the final defaults.
  */
 function _gutenberg_register_wp_template_part_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template_part', array( 'author' ) );
 }
-add_action( 'init', '_gutenberg_register_wp_template_part_fields', 100 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_part_fields', 9 );
 
 /**
  * Replaces the default fields of attachments with the media fields.
@@ -326,9 +329,9 @@ add_action( 'init', '_gutenberg_register_wp_template_part_fields', 100 );
  * fields are dropped and the media fields ported to the server so far are
  * registered instead.
  *
- * It runs right after the default fields are registered, on `init` at
- * priority 100, so a plugin hooking `init` later still sees the final
- * defaults.
+ * It runs right after the default fields are registered, on
+ * `gutenberg_fields_init` at priority 1, so a plugin hooking the action at
+ * the default priority sees the final defaults.
  */
 function _gutenberg_register_attachment_fields() {
 	$post_type = get_post_type_object( 'attachment' );
@@ -355,4 +358,4 @@ function _gutenberg_register_attachment_fields() {
 		)
 	);
 }
-add_action( 'init', '_gutenberg_register_attachment_fields', 100 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_attachment_fields', 9 );
