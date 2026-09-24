@@ -308,7 +308,10 @@ final class Gutenberg_Fields_Registry {
 		 *
 		 * Register or adjust fields here. The default fields of every post
 		 * type are registered at priority 0 and adjusted at priority 9, so a
-		 * callback at the default priority sees the final defaults.
+		 * callback at the default priority sees the final defaults. The
+		 * plugin that owns a post type shapes its defaults at priority 9,
+		 * like core does for its own; a plugin extending a post type it does
+		 * not own hooks the default priority or later.
 		 *
 		 * The first read happens wherever the fields are needed: while
 		 * handling a REST request as well as on `admin_init`. A callback
