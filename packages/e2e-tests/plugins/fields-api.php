@@ -30,7 +30,10 @@
 
 /**
  * Case 1: a declarative field (`menu_order`), whose value is a property of
- * the record. No JavaScript, no styles.
+ * the record. No JavaScript, no styles. A new field can be registered on
+ * `init`: registering does not read the registry, so it does not fire
+ * `gutenberg_fields_init` early, and the default fields registered later
+ * do not touch it.
  */
 function gutenberg_test_fields_api_add_field_declarative() {
 	gutenberg_register_fields(
@@ -110,10 +113,11 @@ add_action( 'init', 'gutenberg_test_fields_api_add_field_with_script_module' );
  * given change, and the module applies to the field on top of the modules it
  * has. Hideable, so the field can be shown from the view options.
  *
- * The default fields are registered on `init` at priority 99, and a
- * registration with the id of an existing field patches it, so the function
- * hooks `init` later: a patch registered before would be patched by the
- * default definition in turn.
+ * The default fields are registered on `gutenberg_fields_init`, the action
+ * the registry fires the first time its fields are read, and a registration
+ * with the id of an existing field patches it, so the function hooks the
+ * same action at the default priority, after the defaults: a patch
+ * registered before would be patched by the default definition in turn.
  */
 function gutenberg_test_fields_api_update_field() {
 	wp_register_script_module(
@@ -149,13 +153,14 @@ function gutenberg_test_fields_api_update_field() {
 	add_action( 'site-editor-v2_init', $enqueue_style );
 	add_action( 'site-editor-v2-wp-admin_init', $enqueue_style );
 }
-add_action( 'init', 'gutenberg_test_fields_api_update_field', 200 );
+add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_update_field' );
 
 /**
  * Case 4: a substitute for a default field (`author`). Unregistering drops
  * its definition and detaches its script modules, so the registration that
- * follows is the whole field. Hooked after the default fields, registered on
- * `init` at priority 99: there is nothing to unregister before.
+ * follows is the whole field. Hooked to `gutenberg_fields_init` at the
+ * default priority, after the default fields: there is nothing to
+ * unregister before.
  */
 function gutenberg_test_fields_api_replace_field() {
 	gutenberg_unregister_fields( 'postType', 'page', array( 'author' ) );
@@ -172,7 +177,7 @@ function gutenberg_test_fields_api_replace_field() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_test_fields_api_replace_field', 200 );
+add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_replace_field' );
 
 /**
  * Case 5: a field (`subtitle`) whose value is data the plugin adds to the

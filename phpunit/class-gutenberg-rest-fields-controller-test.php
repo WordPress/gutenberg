@@ -35,14 +35,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	protected static $subscriber_id;
 
 	/**
-	 * Entities whose fields a test registered, as `[ $kind, $name ]`,
-	 * unregistered on tear down.
-	 *
-	 * @var array[]
-	 */
-	private $registered_field_entities = array();
-
-	/**
 	 * Creates shared users.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
@@ -65,24 +57,19 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Tears down each test.
 	 *
-	 * Unregistering an entity drops its default fields too, so they are
-	 * registered again afterwards.
+	 * Resetting the registry drops the fields a test registered along with
+	 * the defaults; the next read fires `gutenberg_fields_init` again and
+	 * registers the defaults anew.
 	 */
 	public function tear_down() {
-		foreach ( $this->registered_field_entities as $args ) {
-			gutenberg_unregister_fields( ...$args );
-		}
-		$this->registered_field_entities = array();
-		_gutenberg_register_posttype_fields();
-		_gutenberg_register_wp_template_fields();
-		_gutenberg_register_wp_template_part_fields();
-		_gutenberg_register_attachment_fields();
+		Gutenberg_Fields_Registry::get_instance()->reset();
 
 		parent::tear_down();
 	}
 
 	/**
-	 * Registers fields for the duration of the test.
+	 * Registers fields for the duration of the test: the registry is reset
+	 * on tear down.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
@@ -91,7 +78,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		$this->registered_field_entities[] = array( $kind, $name );
 		return gutenberg_register_fields( $kind, $name, $fields, $module );
 	}
 
