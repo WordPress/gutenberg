@@ -1,19 +1,6 @@
-type AttributeObject = Record< string, unknown >;
+import { isPlainObject } from './object';
 
-/**
- * Whether an attribute is an object, such as `style`.
- *
- * @param attribute Attribute to test.
- *
- * @return Whether the attribute is an object.
- */
-function isObjectAttribute( attribute: unknown ): attribute is AttributeObject {
-	return (
-		typeof attribute === 'object' &&
-		attribute !== null &&
-		! Array.isArray( attribute )
-	);
-}
+type AttributeObject = Record< string, unknown >;
 
 /**
  * Recursive function that computes the changes between two sets of values,
@@ -47,13 +34,13 @@ function diffValues(
 			continue;
 		}
 
-		if ( isObjectAttribute( nextValue ) ) {
+		if ( isPlainObject( nextValue ) ) {
 			// Compare the values key by key, so that a change to one of them
 			// does not affect the others. For a previous value that is not
 			// an object an empty one is used in its place, ensuring every
 			// value being added is recorded.
 			const nestedChanges = diffValues(
-				isObjectAttribute( previousValue ) ? previousValue : {},
+				isPlainObject( previousValue ) ? previousValue : {},
 				nextValue
 			);
 
@@ -62,7 +49,7 @@ function diffValues(
 			}
 		} else if (
 			nextValue === undefined &&
-			isObjectAttribute( previousValue )
+			isPlainObject( previousValue )
 		) {
 			// An object was removed. This is recorded as each of the properties
 			// that were present being set to `undefined`. When the changes are
@@ -133,13 +120,11 @@ export function getAttributeChanges(
  * @return The block's new value, or `undefined` when nothing is left of it.
  */
 function applyValueChange( blockValue: unknown, change: unknown ): unknown {
-	if ( ! isObjectAttribute( change ) ) {
+	if ( ! isPlainObject( change ) ) {
 		return change;
 	}
 
-	const newBlockValue = isObjectAttribute( blockValue )
-		? { ...blockValue }
-		: {};
+	const newBlockValue = isPlainObject( blockValue ) ? { ...blockValue } : {};
 
 	for ( const key of Object.keys( change ) ) {
 		const newValue = applyValueChange(
