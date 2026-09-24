@@ -163,6 +163,7 @@ add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
  * core's own note notification does.
  *
  * @since 7.1.0
+ * @since 7.2.0 Line breaks in the note are kept.
  *
  * @param WP_User      $user    The recipient.
  * @param WP_Comment   $comment The note that triggered the notification.
@@ -174,16 +175,14 @@ function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?
 
 	/*
 	 * The site title and the post title are escaped on the way into the database,
-	 * and note content is stored as HTML. Both are reversed once here for the
-	 * plain text arena of emails. Decoding a second time would go too far and
-	 * resolve entities the author meant to be read literally. Tags are stripped
-	 * before decoding, so escaped text such as "&lt;code&gt;" survives as text
-	 * rather than being read as a tag and dropped.
+	 * and are reversed once here for the plain text arena of emails. Decoding a
+	 * second time would go too far and resolve entities the author meant to be
+	 * read literally.
 	 */
 	$blogname    = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 	$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 	$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
-	$content     = wp_specialchars_decode( wp_strip_all_tags( $comment->comment_content ) );
+	$content     = gutenberg_get_note_plain_text( $comment->comment_content );
 
 	/*
 	 * The rest of the message is composed for the recipient, and so is the editor
