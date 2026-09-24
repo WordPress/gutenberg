@@ -11,6 +11,7 @@ function Edit( {
 	onFocus,
 	value,
 	forwardedRef,
+	editableContentElement,
 	settings,
 	isVisible,
 } ) {
@@ -60,6 +61,7 @@ function Edit( {
 			onChange={ onChange }
 			onFocus={ onFocus }
 			contentRef={ forwardedRef }
+			editableContentElement={ editableContentElement }
 			context={ context }
 		/>
 	);

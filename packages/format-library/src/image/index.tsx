@@ -32,7 +32,7 @@ interface InlineImageUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	activeObjectAttributes: ImageFormatAttributes;
-	contentRef: React.RefObject< HTMLElement >;
+	editableContentElement: HTMLElement | null;
 }
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -79,7 +79,7 @@ function InlineUI( {
 	value,
 	onChange,
 	activeObjectAttributes,
-	contentRef,
+	editableContentElement,
 }: InlineImageUIProps ) {
 	const style = activeObjectAttributes.style;
 	const alt = activeObjectAttributes.alt;
@@ -89,8 +89,7 @@ function InlineUI( {
 	const [ editedAlt, setEditedAlt ] = useState( alt );
 	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
-		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current,
+		editableContentElement,
 		settings: image,
 	} );
 
@@ -182,7 +181,7 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
-	contentRef,
+	editableContentElement,
 }: FormatEditProps ) {
 	return (
 		<MediaUploadCheck>
@@ -230,7 +229,7 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					activeObjectAttributes={ activeObjectAttributes }
-					contentRef={ contentRef }
+					editableContentElement={ editableContentElement }
 				/>
 			) }
 		</MediaUploadCheck>

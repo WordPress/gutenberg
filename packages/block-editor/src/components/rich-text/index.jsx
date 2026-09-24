@@ -491,6 +491,7 @@ function RichTextWrapper(
 								onFocus={ onFocus }
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
+								editableContentElement={ anchorElement }
 							/>
 						</Popover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>

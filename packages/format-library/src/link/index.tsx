@@ -38,7 +38,7 @@ function Edit( {
 	value,
 	onChange,
 	onFocus,
-	contentRef,
+	editableContentElement,
 	isVisible = true,
 }: FormatEditProps ) {
 	const [ addingLink, setAddingLink ] = useState( false );
@@ -56,7 +56,6 @@ function Edit( {
 	}, [ isActive ] );
 
 	useLayoutEffect( () => {
-		const editableContentElement = contentRef.current;
 		if ( ! editableContentElement ) {
 			return;
 		}
@@ -90,7 +89,7 @@ function Edit( {
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
 		};
-	}, [ contentRef, isActive ] );
+	}, [ editableContentElement, isActive ] );
 
 	function addLink( target?: HTMLElement ) {
 		const text = getTextContent( slice( value ) );
@@ -218,7 +217,7 @@ function Edit( {
 					}
 					value={ value }
 					onChange={ onChange }
-					contentRef={ contentRef }
+					editableContentElement={ editableContentElement }
 					focusOnMount={ shouldAutoFocus ? 'firstElement' : false }
 				/>
 			) }

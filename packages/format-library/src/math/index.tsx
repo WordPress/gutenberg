@@ -19,7 +19,7 @@ interface InlineMathUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	activeObjectAttributes: Record< string, string >;
-	contentRef: React.RefObject< HTMLElement >;
+	editableContentElement: HTMLElement | null;
 	/**
 	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
 	 */
@@ -36,7 +36,7 @@ function InlineUI( {
 	value,
 	onChange,
 	activeObjectAttributes,
-	contentRef,
+	editableContentElement,
 	latexToMathML,
 }: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
@@ -46,8 +46,7 @@ function InlineUI( {
 	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
-		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current,
+		editableContentElement,
 		settings: math,
 	} );
 
@@ -133,7 +132,7 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
-	contentRef,
+	editableContentElement,
 }: FormatEditProps ) {
 	const [ latexToMathML, setLatexToMathML ] =
 		useState<
@@ -197,7 +196,7 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					activeObjectAttributes={ activeObjectAttributes }
-					contentRef={ contentRef }
+					editableContentElement={ editableContentElement }
 					latexToMathML={ latexToMathML }
 				/>
 			) }

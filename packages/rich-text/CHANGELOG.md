@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useAnchor`: return an anchor that is measured whenever the popover asks for it, so the popover follows the selection and the format element without the hook listening to selection and focus events. It no longer returns the format element itself ([#83475](https://github.com/WordPress/gutenberg/pull/83475)).
+
 ## 7.56.0 (2026-09-23)
 
 ### Bug Fixes
