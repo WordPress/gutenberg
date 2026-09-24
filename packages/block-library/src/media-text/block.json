@@ -4,7 +4,7 @@
 	"name": "core/media-text",
 	"title": "Media & Text",
 	"category": "media",
-	"description": "Set media and words side-by-side for a richer layout.",
+	"description": "Sets media and words side-by-side for a richer layout.",
 	"keywords": [ "image", "video" ],
 	"textdomain": "default",
 	"attributes": {

@@ -5,7 +5,7 @@
 	"title": "Query Total",
 	"category": "theme",
 	"ancestor": [ "core/query" ],
-	"description": "Display the total number of results in a query.",
+	"description": "Displays the total number of results in a query.",
 	"textdomain": "default",
 	"attributes": {
 		"displayType": {

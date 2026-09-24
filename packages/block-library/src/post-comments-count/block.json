@@ -4,7 +4,7 @@
 	"name": "core/post-comments-count",
 	"title": "Comments Count",
 	"category": "theme",
-	"description": "Display a post's comments count.",
+	"description": "Displays a post's comments count.",
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"example": {

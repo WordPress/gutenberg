@@ -4,7 +4,7 @@
 	"name": "core/spacer",
 	"title": "Spacer",
 	"category": "design",
-	"description": "Add white space between blocks and customize its height.",
+	"description": "Adds a white space between blocks and customize its height.",
 	"textdomain": "default",
 	"attributes": {
 		"height": {

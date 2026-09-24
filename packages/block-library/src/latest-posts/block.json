@@ -4,7 +4,7 @@
 	"name": "core/latest-posts",
 	"title": "Latest Posts",
 	"category": "widgets",
-	"description": "Display a list of your most recent posts.",
+	"description": "Displays a list of your most recent posts.",
 	"keywords": [ "recent posts" ],
 	"textdomain": "default",
 	"attributes": {

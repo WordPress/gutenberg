@@ -4,7 +4,7 @@
 	"name": "core/site-logo",
 	"title": "Site Logo",
 	"category": "theme",
-	"description": "Display an image to represent this site. Update this block and the changes apply everywhere.",
+	"description": "Displays an image to represent this site. Update this block and the changes apply everywhere.",
 	"textdomain": "default",
 	"attributes": {
 		"width": {

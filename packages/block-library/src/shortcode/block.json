@@ -4,7 +4,7 @@
 	"name": "core/shortcode",
 	"title": "Shortcode",
 	"category": "widgets",
-	"description": "Insert additional custom elements with a WordPress shortcode.",
+	"description": "Inserts additional custom elements with a WordPress shortcode.",
 	"textdomain": "default",
 	"attributes": {
 		"text": {

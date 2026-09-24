@@ -4,7 +4,7 @@
 	"name": "core/group",
 	"title": "Group",
 	"category": "design",
-	"description": "Gather blocks in a layout container.",
+	"description": "Gathers blocks in a layout container.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
 	"attributes": {
