@@ -11,7 +11,7 @@ import {
 } from '@wordpress/data';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import MediaEdit, { MediaEditWithFilteredPicker } from '../index';
+import MediaEdit, { MediaEditControl } from '../index';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
@@ -71,17 +71,14 @@ describe( 'MediaEdit', () => {
 					);
 				}
 		);
-		const mediaUploadProps = {
-			featuredImageFlow: true,
-			mode: 'browse',
-		};
 		const { rerender } = render(
 			<RegistryProvider value={ createTestRegistry() }>
-				<MediaEdit
+				<MediaEditControl
 					data={ { featured_media: 0 } }
 					field={ field }
 					onChange={ () => {} }
-					mediaUploadProps={ mediaUploadProps }
+					featuredImageFlow
+					pickerTitle="Choose a cover"
 				/>
 			</RegistryProvider>
 		);
@@ -92,11 +89,13 @@ describe( 'MediaEdit', () => {
 
 		rerender(
 			<RegistryProvider value={ createTestRegistry() }>
-				<MediaEditWithFilteredPicker
+				<MediaEditControl
 					data={ { featured_media: 0 } }
 					field={ field }
 					onChange={ () => {} }
-					mediaUploadProps={ mediaUploadProps }
+					isPickerFiltered
+					featuredImageFlow
+					pickerTitle="Choose a cover"
 				/>
 			</RegistryProvider>
 		);
@@ -105,10 +104,10 @@ describe( 'MediaEdit', () => {
 		).toBeInTheDocument();
 		expect( received.at( -1 ) ).toMatchObject( {
 			featuredImageFlow: true,
-			mode: 'browse',
+			unstableFeaturedImageFlow: true,
 			allowedTypes: [ 'image' ],
 			multiple: false,
-			title: 'Featured Image',
+			title: 'Choose a cover',
 		} );
 		expect(
 			screen.getByRole( 'button', { name: 'Set featured image' } )

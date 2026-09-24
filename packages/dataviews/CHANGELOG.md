@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.1.0 (2026-09-23)
+
 ### New Features
 
 -   Let a picker compose its footer from its parts: `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, the new `DataViewsPicker.PageSelect`, `DataViewsPicker.PageNavigation` and `DataViewsPicker.Actions` sub-components are the parts to put inside them, and each takes a `className` ([#83281](https://github.com/WordPress/gutenberg/pull/83281)).
