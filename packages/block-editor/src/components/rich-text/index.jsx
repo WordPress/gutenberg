@@ -43,6 +43,7 @@ const {
 	useRichText,
 	KeyboardShortcutContext,
 	InputEventContext,
+	EditableContentElementContext,
 	RichTextShortcut,
 	RichTextInputEvent,
 } = unlock( richTextPrivateApis );
@@ -477,7 +478,7 @@ function RichTextWrapper(
 
 	const TagName = tagName;
 	return (
-		<>
+		<EditableContentElementContext.Provider value={ anchorElement }>
 			{ isSelected && (
 				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<InputEventContext.Provider value={ inputEvents }>
@@ -491,7 +492,6 @@ function RichTextWrapper(
 								onFocus={ onFocus }
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
-								editableContentElement={ anchorElement }
 							/>
 						</Popover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>
@@ -563,7 +563,7 @@ function RichTextWrapper(
 				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
-		</>
+		</EditableContentElementContext.Provider>
 	);
 }
 

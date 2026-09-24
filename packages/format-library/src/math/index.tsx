@@ -19,7 +19,6 @@ interface InlineMathUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	activeObjectAttributes: Record< string, string >;
-	editableContentElement: HTMLElement | null;
 	/**
 	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
 	 */
@@ -36,7 +35,6 @@ function InlineUI( {
 	value,
 	onChange,
 	activeObjectAttributes,
-	editableContentElement,
 	latexToMathML,
 }: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
@@ -46,7 +44,6 @@ function InlineUI( {
 	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings: math,
 	} );
 
@@ -132,7 +129,6 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
-	editableContentElement,
 }: FormatEditProps ) {
 	const [ latexToMathML, setLatexToMathML ] =
 		useState<
@@ -196,7 +192,6 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					activeObjectAttributes={ activeObjectAttributes }
-					editableContentElement={ editableContentElement }
 					latexToMathML={ latexToMathML }
 				/>
 			) }

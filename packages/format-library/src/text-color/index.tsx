@@ -63,7 +63,7 @@ function TextColorEdit( {
 	onChange,
 	isActive,
 	activeAttributes,
-	editableContentElement,
+	contentRef,
 }: FormatEditProps ) {
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
@@ -73,10 +73,10 @@ function TextColorEdit( {
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
-				editableContentElement,
+				contentRef.current,
 				getActiveColors( value, name, colors )
 			),
-		[ editableContentElement, value, colors ]
+		[ contentRef, value, colors ]
 	);
 
 	const hasColorsToChoose = !! colors.length || allowCustomControl;
@@ -114,7 +114,6 @@ function TextColorEdit( {
 					onClose={ () => setIsAddingColor( false ) }
 					value={ value }
 					onChange={ onChange }
-					editableContentElement={ editableContentElement }
 				/>
 			) }
 		</>

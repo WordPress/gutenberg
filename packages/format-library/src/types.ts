@@ -17,10 +17,6 @@ export interface FormatEditProps {
 	onFocus: () => void;
 	contentRef: React.RefObject< HTMLElement >;
 	/**
-	 * The element containing the editable content, once it is mounted.
-	 */
-	editableContentElement: HTMLElement | null;
-	/**
 	 * The block context values the format asked for through `usesContext`.
 	 */
 	context: Record< string, unknown >;

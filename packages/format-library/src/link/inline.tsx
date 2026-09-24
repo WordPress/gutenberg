@@ -45,7 +45,6 @@ interface InlineLinkUIProps {
 	onChange: ( newValue: RichTextValue ) => void;
 	onFocusOutside: () => void;
 	stopAddingLink: () => void;
-	editableContentElement: HTMLElement | null;
 	focusOnMount?: 'firstElement' | false;
 }
 
@@ -79,7 +78,6 @@ function InlineLinkUI( {
 	onChange,
 	onFocusOutside,
 	stopAddingLink,
-	editableContentElement,
 	focusOnMount,
 }: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
@@ -284,7 +282,6 @@ function InlineLinkUI( {
 	}
 
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings,
 	} );
 

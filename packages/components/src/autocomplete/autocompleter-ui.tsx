@@ -86,9 +86,7 @@ export function AutocompleterUI( {
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 	const [ items ] = useItems( filterValue );
-	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-	} );
+	const popoverAnchor = useAnchor();
 
 	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
 	const popoverRef = useRef< HTMLElement >( null );

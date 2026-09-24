@@ -468,8 +468,8 @@ This hook, to be used in a format type's Edit component, returns an anchor for t
 
 _Parameters_
 
-- _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
-- _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+- _obj_ `{ editableContentElement?: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+- _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content. Defaults to the element of the surrounding rich text field.
 - _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_

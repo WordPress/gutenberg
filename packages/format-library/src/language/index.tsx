@@ -29,7 +29,6 @@ interface LanguageFormat {
 interface InlineLanguageUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
-	editableContentElement: HTMLElement | null;
 	onClose: () => void;
 }
 
@@ -48,12 +47,7 @@ export const language = {
 	edit: Edit,
 } satisfies LanguageFormat;
 
-function Edit( {
-	isActive,
-	value,
-	onChange,
-	editableContentElement,
-}: FormatEditProps ) {
+function Edit( { isActive, value, onChange }: FormatEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );
@@ -80,7 +74,6 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					onClose={ togglePopover }
-					editableContentElement={ editableContentElement }
 				/>
 			) }
 		</>
@@ -89,12 +82,10 @@ function Edit( {
 
 function InlineLanguageUI( {
 	value,
-	editableContentElement,
 	onChange,
 	onClose,
 }: InlineLanguageUIProps ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings: language,
 	} );
 

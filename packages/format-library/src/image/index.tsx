@@ -32,7 +32,6 @@ interface InlineImageUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	activeObjectAttributes: ImageFormatAttributes;
-	editableContentElement: HTMLElement | null;
 }
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -79,7 +78,6 @@ function InlineUI( {
 	value,
 	onChange,
 	activeObjectAttributes,
-	editableContentElement,
 }: InlineImageUIProps ) {
 	const style = activeObjectAttributes.style;
 	const alt = activeObjectAttributes.alt;
@@ -89,7 +87,6 @@ function InlineUI( {
 	const [ editedAlt, setEditedAlt ] = useState( alt );
 	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings: image,
 	} );
 
@@ -181,7 +178,6 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
-	editableContentElement,
 }: FormatEditProps ) {
 	return (
 		<MediaUploadCheck>
@@ -229,7 +225,6 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					activeObjectAttributes={ activeObjectAttributes }
-					editableContentElement={ editableContentElement }
 				/>
 			) }
 		</MediaUploadCheck>

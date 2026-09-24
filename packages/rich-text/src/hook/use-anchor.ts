@@ -1,6 +1,7 @@
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import type { WPFormat } from '../register-format-type';
+import { EditableContentElementContext } from '../contexts';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -89,17 +90,22 @@ interface VirtualAnchorElement {
  * passing it to the `Popover` component via the `anchor` prop.
  *
  * @param obj                        Named parameters.
- * @param obj.editableContentElement The element containing the editable content.
+ * @param obj.editableContentElement The element containing the editable content. Defaults to the element of the surrounding rich text field.
  * @param obj.settings               The format type's settings.
  * @return                           The anchor.
  */
 export function useAnchor( {
-	editableContentElement,
+	editableContentElement: editableContentElementProp,
 	settings,
 }: {
-	editableContentElement: HTMLElement | null;
+	editableContentElement?: HTMLElement | null;
 	settings?: WPFormat;
-} ): VirtualAnchorElement | undefined {
+} = {} ): VirtualAnchorElement | undefined {
+	const editableContentElementContext = useContext(
+		EditableContentElementContext
+	);
+	const editableContentElement =
+		editableContentElementProp ?? editableContentElementContext;
 	const tagName = settings?.tagName ?? '';
 	const className = settings?.className ?? '';
 

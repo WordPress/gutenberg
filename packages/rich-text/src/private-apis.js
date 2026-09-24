@@ -1,6 +1,10 @@
 import { lock } from './lock-unlock';
 import { useRichText } from './hook';
-import { KeyboardShortcutContext, InputEventContext } from './contexts';
+import {
+	KeyboardShortcutContext,
+	InputEventContext,
+	EditableContentElementContext,
+} from './contexts';
 import { RichTextShortcut } from './keyboard-shortcut';
 import { RichTextInputEvent } from './input-event';
 import { shortcutsListener, inputEventsListener } from './event-listeners';
@@ -15,6 +19,7 @@ lock( privateApis, {
 	useRichText,
 	KeyboardShortcutContext,
 	InputEventContext,
+	EditableContentElementContext,
 	RichTextShortcut,
 	RichTextInputEvent,
 	shortcutsListener,

@@ -34,7 +34,6 @@ interface InlineColorUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	onClose: () => void;
-	editableContentElement: HTMLElement | null;
 }
 
 interface ColorPickerProps {
@@ -200,10 +199,8 @@ export default function InlineColorUI( {
 	value,
 	onChange,
 	onClose,
-	editableContentElement,
 }: InlineColorUIProps ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings,
 	} );
 

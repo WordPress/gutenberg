@@ -9,11 +9,8 @@ import type { FormatEditProps } from '../types';
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
 
-function PopoverAnchor( {
-	editableContentElement,
-}: Pick< FormatEditProps, 'editableContentElement' > ) {
+function PopoverAnchor() {
 	const popoverAnchor = useAnchor( {
-		editableContentElement,
 		settings: nonBreakingSpace,
 	} );
 
@@ -31,7 +28,7 @@ export const nonBreakingSpace = {
 	title,
 	tagName: 'span',
 	className: 'non-breaking-space',
-	edit( { value, onChange, editableContentElement }: FormatEditProps ) {
+	edit( { value, onChange }: FormatEditProps ) {
 		function addNonBreakingSpace() {
 			onChange( insert( value, '\u00a0' ) );
 		}
@@ -48,11 +45,7 @@ export const nonBreakingSpace = {
 					character=" "
 					onUse={ addNonBreakingSpace }
 				/>
-				{ selectedValue === '\u00a0' && (
-					<PopoverAnchor
-						editableContentElement={ editableContentElement }
-					/>
-				) }
+				{ selectedValue === '\u00a0' && <PopoverAnchor /> }
 			</>
 		);
 	},
