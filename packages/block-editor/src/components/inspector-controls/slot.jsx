@@ -1,26 +1,14 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
-import deprecated from '@wordpress/deprecated';
 import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 function InspectorControlsSlot(
-	{ __experimentalGroup, group = 'default', label, fillProps, ...props },
+	{ group = 'default', label, fillProps, ...props },
 	ref
 ) {
-	if ( __experimentalGroup ) {
-		deprecated(
-			'`__experimentalGroup` property in `InspectorControlsSlot`',
-			{
-				since: '6.2',
-				version: '6.4',
-				alternative: '`group`',
-			}
-		);
-		group = __experimentalGroup;
-	}
 	const slotFill = groups[ group ];
 	const fills = useSlotFills( slotFill?.name );
 
