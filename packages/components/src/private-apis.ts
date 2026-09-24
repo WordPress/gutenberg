@@ -11,6 +11,7 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { useSlotFillsForNames } from './slot-fill/bubbles-virtually/use-slot-fills';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -21,6 +22,7 @@ lock( privateApis, {
 	Menu,
 	Badge,
 	useDrag,
+	useSlotFillsForNames,
 	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
