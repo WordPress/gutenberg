@@ -301,7 +301,7 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 		);
 
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
-			base_convert( $match[4], 16, 10 ) / 255
+			absint( base_convert( $match[4], 16, 10 ) ) / 255
 		);
 
 		return $rgb;
@@ -333,7 +333,7 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 		);
 
 		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
-			base_convert( $match[4] . $match[4], 16, 10 ) / 255
+			absint( base_convert( $match[4] . $match[4], 16, 10 ) ) / 255
 		);
 
 		return $rgb;
