@@ -261,30 +261,21 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	results = sortResults( results, search, preferTypes );
+	const sortedResults = rankResults( results, search, preferTypes );
 
-	// A search narrowed to one type is a single request, so `perPage` bounds it and `page` pages
-	// through it. With nothing typed there is no search to answer, so those results are a preview
-	// and there is nothing in them to lose by cutting. And a caller that named a number gets it.
-	if ( type || ! search || limit !== undefined ) {
-		return results.slice( 0, perPage );
-	}
-
-	// An unscoped search merges four requests and cannot be paginated coherently — a result's
-	// place is not known until every request has been ranked, and `page` applies to each request
-	// separately — so a result cut here is one nothing could ask for again.
+	// Determine how many results to return
 	//
-	// A title holding every word that was typed answers the search and is never cut, however many
-	// there are. They sort first, so they are the front of the list, and the rest fill whatever
-	// room is left.
-	const searchTokens = tokenize( search );
-	const answers = results.filter(
-		( result ) =>
-			countWordsFound( result.title, searchTokens ) ===
-			searchTokens.length
-	).length;
+	// If a search is unscoped (any type), we don't want to limit it to the perPage as it might discard
+	// valid results from a lower tier (i.e. attachments). So, unscoped default searches return
+	// every title matching a word typed even if they exceed 20. Titles matching no word typed are
+	// left out: `/wp/v2/search` matches post content and excerpts too, with no way to narrow it.
+	// Explicitly passed perPage unscoped searches respect the perPage value.
+	const bounded = type || ! search || limit !== undefined;
+	const kept = bounded
+		? sortedResults.slice( 0, perPage )
+		: sortedResults.filter( ( { found } ) => found > 0 );
 
-	return results.slice( 0, Math.max( perPage, answers ) );
+	return kept.map( ( { result } ) => result );
 }
 
 /**
@@ -435,11 +426,17 @@ function countWordsFound( title: string, searchTokens: string[] ): number {
  * title is not a worse answer for having more words in it, and saying the same word twice does not
  * make it a better one.
  *
+ * Example scoring for title "Caterpillars are great"
+ *   cat                = 2.5    3 characters of the 12 in "caterpillars"
+ *   cater              = 4.17   5 of the 12
+ *   caterpillars       = 10     the whole word
+ *   great caterpillars = 10     whole word match
+ *
  * @param title
  * @param searchTokens
  *
- * @return 10 when every word typed is in the title whole, less as fewer are and as the words they
- *         were found in leave more out.
+ * @return 10 when every word typed is in the title whole, less relative to the number of
+ *         characters of a matched word.
  */
 function getCoverage( title: string, searchTokens: string[] ): number {
 	if ( ! title || ! searchTokens.length ) {
@@ -466,8 +463,35 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 	return ( covered / searchTokens.length ) * 10;
 }
 
+type ScoredResult = {
+	result: SearchResult;
+	/**
+	 * How many of the words typed the title holds.
+	 */
+	found: number;
+	/**
+	 * Whether the title holds what was typed as one string.
+	 */
+	contains: boolean;
+	/**
+	 * Whether the title begins with what was typed.
+	 */
+	begins: boolean;
+	/**
+	 * Where the result's type sits in the wanted order, the most wanted highest.
+	 */
+	type: number;
+	/**
+	 * How much of the search the title covers.
+	 */
+	score: number;
+};
+
 /**
- * Sort search results by relevance to the given query.
+ * Work out how well each result answers the query, and order them by it.
+ *
+ * The scores come back attached to the results, so that deciding how many to keep can read what a
+ * result matched instead of working it out a second time.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
@@ -488,14 +512,14 @@ function getCoverage( title: string, searchTokens: string[] ): number {
  * @param search
  * @param preferTypes
  */
-export function sortResults(
+function rankResults(
 	results: SearchResult[],
 	search: string,
 	preferTypes?: TypeOrderEntry[]
-) {
+): ScoredResult[] {
 	const searchTokens = tokenize( search );
 
-	const ranked = results.map( ( result ) => ( {
+	const scored = results.map( ( result ) => ( {
 		result,
 		found: countWordsFound( result.title, searchTokens ),
 		...getTitleMatch( result.title, search ),
@@ -503,7 +527,7 @@ export function sortResults(
 		score: getCoverage( result.title, searchTokens ),
 	} ) );
 
-	ranked.sort(
+	scored.sort(
 		( a, b ) =>
 			// How much of the search the title holds at all, before anything else: a title with
 			// every word typed answers it, whatever its type and wherever those words sit.
@@ -517,7 +541,26 @@ export function sortResults(
 			b.score - a.score
 	);
 
-	return ranked.map( ( { result } ) => result );
+	return scored;
+}
+
+/**
+ * Sort search results by relevance to the given query.
+ *
+ * See `rankResults` for the order this puts them in.
+ *
+ * @param results
+ * @param search
+ * @param preferTypes
+ */
+export function sortResults(
+	results: SearchResult[],
+	search: string,
+	preferTypes?: TypeOrderEntry[]
+) {
+	return rankResults( results, search, preferTypes ).map(
+		( { result } ) => result
+	);
 }
 
 /**

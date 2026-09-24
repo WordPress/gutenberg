@@ -1,4 +1,5 @@
 import { Component } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components -- The fallback UI renders outside the editor's notice system.
 import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
@@ -17,6 +18,15 @@ function getContent() {
 		// application.
 		return select( editorStore ).getEditedPostContent();
 	} catch {}
+}
+
+function getErrorNotice() {
+	return {
+		title: __( 'The editor has crashed' ),
+		description: __(
+			'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
+		),
+	};
 }
 
 // A boundary catches whatever was thrown, which is not always an `Error`.
@@ -139,6 +149,8 @@ class ErrorBoundary extends Component {
 	}
 
 	componentDidCatch( error, errorInfo ) {
+		const { title, description } = getErrorNotice();
+		speak( `${ title }. ${ description }`, 'assertive' );
 		this.setState( { componentStack: errorInfo?.componentStack } );
 		doAction( 'editor.ErrorBoundary.errorLogged', error, errorInfo );
 	}
@@ -154,6 +166,8 @@ class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
+		const { title, description } = getErrorNotice();
+
 		return (
 			<Stack
 				className="editor-error-boundary"
@@ -161,14 +175,8 @@ class ErrorBoundary extends Component {
 				gap="lg"
 			>
 				<Notice.Root intent="error">
-					<Notice.Title>
-						{ __( 'The editor has crashed' ) }
-					</Notice.Title>
-					<Notice.Description>
-						{ __(
-							'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
-						) }
-					</Notice.Description>
+					<Notice.Title>{ title }</Notice.Title>
+					<Notice.Description>{ description }</Notice.Description>
 					<Notice.Actions>
 						{ canCopyContent && (
 							<CopyButton text={ getContent }>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.0 (2026-09-23)
+
 ### Bug Fixes
 
 -   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option, ranking the types it names above the usual order and leaving everything else in place behind them. An entry is a search type, covering all of it, or a search type with one subtype, covering only that subtype, so a caller can lead with categories without listing every other type ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).

@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Switch } from '../';
 
 const meta: Meta< typeof Switch > = {
-	title: 'Design System/Components/Form/Primitives/Switch',
+	title: 'Components/@wordpress-ui/Form/Primitives/Switch',
+	id: 'design-system-components-form-primitives-switch',
 	component: Switch,
 	parameters: {
 		componentStatus: {

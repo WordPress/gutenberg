@@ -141,6 +141,36 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					} ) )
 				);
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post':
+				return Promise.resolve( [
+					...Array.from( { length: 5 }, ( _, index ) => ( {
+						id: 900 + index,
+						title: `Tea Leaves ${ index }`,
+						url: `http://wordpress.local/tea-leaves-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+					// Holds neither word; WordPress matched a body.
+					...Array.from( { length: 10 }, ( _, index ) => ( {
+						id: 950 + index,
+						title: `Unrelated ${ index }`,
+						url: `http://wordpress.local/unrelated-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+				] );
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=term':
+				return Promise.resolve(
+					// Holds "leaves" but not "tea".
+					Array.from( { length: 20 }, ( _, index ) => ( {
+						id: 1000 + index,
+						title: `Leaves ${ index }`,
+						url: `http://wordpress.local/leaves-${ index }/`,
+						type: 'category',
+					} ) )
+				);
+			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post-format':
+			case '/wp/v2/media?search=tea%20leaves&per_page=20':
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
 			case '/wp/v2/media?search=few%20notes&per_page=20':
 			case '/wp/v2/search?search=many&per_page=20&type=post-format':
@@ -323,13 +353,6 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'unscoped searches are not limited by the per page limit and return all results', () => {
-		// No number named, so the default of 20 is what a page holds rather
-		// than what was asked for: all 25 titles holding the word come back.
-		return fetchLinkSuggestions( 'many', {} ).then( ( suggestions ) =>
-			expect( suggestions ).toHaveLength( 25 )
-		);
-	} );
 
 	it( 'returns no more than the caller asked for', () => {
 		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
@@ -337,11 +360,10 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'fills the page with the titles that answer the search least well, last', () => {
-		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
-		// neither. The 5 answers come first and are never cut, then the 5
-		// partial matches, then 10 of the rest fill the room left by a limit
-		// of 20.
+	it( 'leaves out titles holding nothing that was typed, ordered by best matches first', () => {
+		// 5 titles hold both words typed and 5 hold one of them. The 30
+		// holding neither were matched on a body, so they are not offered at
+		// all, and the whole-word matches come before the partial ones.
 		const startsWith = ( titles, prefix ) =>
 			titles.every( ( title ) => title.startsWith( prefix ) );
 
@@ -349,16 +371,30 @@ describe( 'fetchLinkSuggestions', () => {
 			( suggestions ) => {
 				const titles = suggestions.map( ( { title } ) => title );
 
-				expect( titles ).toHaveLength( 20 );
+				expect( titles ).toHaveLength( 10 );
 				expect( startsWith( titles.slice( 0, 5 ), 'Few Notes' ) ).toBe(
 					true
 				);
-				expect( startsWith( titles.slice( 5, 10 ), 'Notes' ) ).toBe(
-					true
-				);
-				expect( startsWith( titles.slice( 10 ), 'Unrelated' ) ).toBe(
-					true
-				);
+				expect( startsWith( titles.slice( 5 ), 'Notes' ) ).toBe( true );
+			}
+		);
+	} );
+
+	it( 'keeps every title matching a word typed, past the per page limit on default searches', () => {
+		// 5 titles hold both words typed and 20 hold one of them, so 25 match
+		// and none of them can be cut, though the limit is 20. The 10 holding
+		// neither word are what the cut takes.
+		const countStartingWith = ( titles, prefix ) =>
+			titles.filter( ( title ) => title.startsWith( prefix ) ).length;
+
+		return fetchLinkSuggestions( 'tea leaves', {} ).then(
+			( suggestions ) => {
+				const titles = suggestions.map( ( { title } ) => title );
+
+				expect( titles ).toHaveLength( 25 );
+				expect( countStartingWith( titles, 'Tea Leaves' ) ).toBe( 5 );
+				expect( countStartingWith( titles, 'Leaves' ) ).toBe( 20 );
+				expect( countStartingWith( titles, 'Unrelated' ) ).toBe( 0 );
 			}
 		);
 	} );
