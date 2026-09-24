@@ -147,7 +147,6 @@ const vitestTests = new Set(
 // Retain only the public Jest adapter, legacy E2E/reporting packages, and the
 // runner-neutral jest-dom rules and Jest lint rules for legacy consumers.
 const retainedJestInfrastructure = [
-	'dependency:packages/e2e-tests/package.json:peerDependencies.jest',
 	'dependency:packages/eslint-plugin/package.json:dependencies.eslint-plugin-jest',
 	'dependency:packages/report-flaky-tests/package.json:dependencies.@jest/test-result',
 	'dependency:packages/report-flaky-tests/package.json:dependencies.jest-message-util',
