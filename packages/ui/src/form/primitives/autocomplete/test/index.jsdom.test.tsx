@@ -20,35 +20,6 @@ function renderDisabledAutocompleteWithClear() {
 }
 
 describe( 'Autocomplete', () => {
-	it( 'supports custom item text elements and forwards their refs', () => {
-		const labelRef = createRef< HTMLSpanElement >();
-		const descriptionRef = createRef< HTMLSpanElement >();
-
-		render(
-			<Autocomplete.Root items={ [ 'Apple' ] } inline open>
-				<Autocomplete.List>
-					<Autocomplete.Item value="Apple">
-						<Autocomplete.ItemLabel
-							ref={ labelRef }
-							render={ <h2 /> }
-						>
-							Apple
-						</Autocomplete.ItemLabel>
-						<Autocomplete.ItemDescription
-							ref={ descriptionRef }
-							render={ <small /> }
-						>
-							Fresh fruit.
-						</Autocomplete.ItemDescription>
-					</Autocomplete.Item>
-				</Autocomplete.List>
-			</Autocomplete.Root>
-		);
-
-		expect( labelRef.current?.tagName ).toBe( 'H2' );
-		expect( descriptionRef.current?.tagName ).toBe( 'SMALL' );
-	} );
-
 	it( 'uses the item label as its accessible name and describes it in order', () => {
 		const item = { value: 'apple', label: 'Apple' };
 

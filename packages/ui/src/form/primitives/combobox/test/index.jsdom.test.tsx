@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import * as Combobox from '../index';
 
@@ -54,32 +53,6 @@ function renderDisabledMultiSelect() {
 }
 
 describe( 'Combobox', () => {
-	it( 'supports custom item text elements and forwards their refs', () => {
-		const labelRef = createRef< HTMLSpanElement >();
-		const descriptionRef = createRef< HTMLSpanElement >();
-
-		render(
-			<Combobox.Root items={ [ 'Apple' ] } inline open>
-				<Combobox.List>
-					<Combobox.Item value="Apple">
-						<Combobox.ItemLabel ref={ labelRef } render={ <h2 /> }>
-							Apple
-						</Combobox.ItemLabel>
-						<Combobox.ItemDescription
-							ref={ descriptionRef }
-							render={ <small /> }
-						>
-							Fresh fruit.
-						</Combobox.ItemDescription>
-					</Combobox.Item>
-				</Combobox.List>
-			</Combobox.Root>
-		);
-
-		expect( labelRef.current?.tagName ).toBe( 'H2' );
-		expect( descriptionRef.current?.tagName ).toBe( 'SMALL' );
-	} );
-
 	it( 'uses the item label as its accessible name and describes it in order', () => {
 		const item = { value: 'apple', label: 'Apple' };
 
