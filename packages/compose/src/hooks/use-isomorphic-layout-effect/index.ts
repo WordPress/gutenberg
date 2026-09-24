@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**

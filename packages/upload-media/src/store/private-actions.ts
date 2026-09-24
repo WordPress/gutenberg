@@ -1,26 +1,19 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import {
 	cloneFile,
 	convertBlobToFile,
+	getFileBasename,
 	isAnimatedGif,
+	isHeicFile,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
+import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
 	exceedsClientProcessingMemory,
@@ -29,7 +22,7 @@ import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
-import { measure } from './utils/debug-logger';
+import { debug, measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -41,6 +34,8 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	isConversionTimeoutError,
+	isSizeLimitConversionError,
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
@@ -113,8 +108,8 @@ type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
@@ -297,6 +292,26 @@ export function processItem( id: QueueItemId ) {
 			return;
 		}
 
+		/*
+		 * The item already has an operation in flight, so leave it alone:
+		 * several callers dispatch processItem for an item that may still be
+		 * running (resumeQueue walks the whole queue, a finishing child
+		 * sideload pings its parent, a freed concurrency slot kicks the
+		 * pending items). Without this, the same handler would run twice and
+		 * both runs would finish the operation, shifting two steps off the
+		 * pipeline and silently skipping one of them. The running handler
+		 * calls finishOperation when it is done, which picks the pipeline
+		 * back up.
+		 *
+		 * Items parked in PendingRetry keep currentOperation set — it is what
+		 * keeps them out of the concurrency pools while they wait out the
+		 * backoff — but retrying clears it (see the RetryItem reducer case),
+		 * so a retry is not blocked here.
+		 */
+		if ( item.currentOperation ) {
+			return;
+		}
+
 		const {
 			attachment,
 			onChange,
@@ -440,6 +455,10 @@ export function processItem( id: QueueItemId ) {
 			id,
 			operation,
 		} );
+
+		debug(
+			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+		);
 
 		switch ( operation ) {
 			case OperationType.Prepare:
@@ -765,9 +784,9 @@ export function prepareItem( id: QueueItemId ) {
 		// a companion file of this same attachment after upload (see
 		// generateThumbnails) — like the HEIC original — not as a separate
 		// media library attachment. It is recorded in attachment metadata; the
-		// editor then switches the block to the Video block's GIF variation
-		// playing that companion (see
-		// packages/block-library/src/image/animated-gif-converter.js).
+		// editor offers switching the block to the Video block's GIF variation
+		// playing that companion via a block transform (see
+		// packages/block-library/src/image/transforms.js).
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
@@ -826,11 +845,30 @@ export function prepareItem( id: QueueItemId ) {
 
 		let heicJpeg: File | null = null;
 
-		const isImage = file.type.startsWith( 'image/' );
-		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
-			file.type
-		);
-		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+		// A HEIC photo can arrive with a .jpg or .png name, which is all the
+		// browser has to go on when it types the file, so this goes by content.
+		const isHeic = await isHeicFile( file );
+		const isMisnamedHeic =
+			isHeic && ! HEIC_MIME_TYPES.includes( file.type );
+
+		const isImage = file.type.startsWith( 'image/' ) || isHeic;
+
+		// A misnamed HEIC file claims a vips-processable type. vips cannot
+		// decode HEIC, and taking that branch is what strands the upload.
+		const isVipsSupported =
+			! isHeic && CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( file.type );
+
+		/*
+		 * Re-label a misnamed file so the rest of the pipeline sees HEIC: the
+		 * WebCodecs decoder is configured from `File.type`, and the untouched
+		 * original is sideloaded under its own name once the attachment exists.
+		 */
+		const heicFile = isMisnamedHeic
+			? new File( [ file ], `${ getFileBasename( file.name ) }.heic`, {
+					type: HEIC_MIME_TYPES[ 0 ],
+					lastModified: file.lastModified,
+				} )
+			: file;
 
 		// Gate very large images out of client-side processing. wasm-vips is
 		// capped at 1 GiB of memory, so high-megapixel images, especially
@@ -850,7 +888,7 @@ export function prepareItem( id: QueueItemId ) {
 		// images routed to the server: the gain map is only preserved by the
 		// client-side resize path, and the probe runs wasm-vips, which the
 		// large-image gate above is specifically meant to avoid.
-		if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
+		if ( file.type === 'image/jpeg' && ! isHeic && ! tooLargeForClient ) {
 			operations.push( OperationType.DetectUltraHdr );
 		}
 
@@ -883,17 +921,31 @@ export function prepareItem( id: QueueItemId ) {
 			// This matches iOS behavior where HEIC is converted on the fly.
 			try {
 				heicJpeg = await canvasConvertToJpeg(
-					file,
+					heicFile,
 					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
 				);
-			} catch {
+			} catch ( error ) {
+				/*
+				 * Only the dead end where nothing could decode the file is
+				 * about codec support. A decode that was attempted and
+				 * failed, or a canvas that could not be created, says
+				 * nothing about the browser, and sending the user off to
+				 * install a different one would not help.
+				 */
+				const unsupported = error instanceof HeicUnsupportedError;
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						code: unsupported
+							? ErrorCode.HEIC_DECODE_ERROR
+							: ErrorCode.IMAGE_TRANSCODING_ERROR,
+						message: unsupported
+							? getHeicUnsupportedMessage()
+							: __(
+									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
+								),
 						file,
+						cause: error instanceof Error ? error : undefined,
 					} )
 				);
 				return;
@@ -930,7 +982,7 @@ export function prepareItem( id: QueueItemId ) {
 			updates = {
 				file: heicJpeg,
 				sourceFile: heicJpeg,
-				originalHeicFile: item.file,
+				originalHeicFile: heicFile,
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: ! vipsAvailable,
@@ -1033,6 +1085,11 @@ export function uploadItem( id: QueueItemId ) {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			// The queue's own items drive upload progress UI and save
+			// locking; without this, consumers that track uploads themselves
+			// (e.g. the editor's progress snackbar) would count this file a
+			// second time.
+			isTransportOnly: true,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					finishUpload( attachment );
@@ -1134,16 +1191,24 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix,
-				args.quality
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1301,13 +1366,21 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1385,7 +1458,11 @@ export function transcodeGifItem(
 			const file = await convertGifToVideo(
 				item.id,
 				gifFile,
-				outputMimeType
+				outputMimeType,
+				{
+					timeout: args?.timeout,
+					maxTotalPixels: args?.maxTotalPixels,
+				}
 			);
 
 			// Hand the transcoded video to the next Upload op as the
@@ -1433,9 +1510,41 @@ export function transcodeGifItem(
 			// create an `animated_video` meta entry pointing at the GIF
 			// itself — meaningless.
 			if ( isUnsupportedConversionError( error ) ) {
+				/*
+				 * A GIF skipped for exceeding the total-pixel budget is a
+				 * graceful outcome like any other unsupported conversion,
+				 * but worth a SCRIPT_DEBUG diagnostic so developers testing
+				 * large GIFs understand why no companion video was produced.
+				 */
+				if ( isSizeLimitConversionError( error ) ) {
+					debug(
+						`Skipping GIF to video conversion: ${
+							error instanceof Error ? error.message : error
+						}`
+					);
+				}
 				dispatch.cancelItem(
 					id,
 					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
+				return;
+			}
+			/*
+			 * The conversion ran past the allowed time and was abandoned:
+			 * the GIF attachment stands alone, which is exactly what the
+			 * user uploaded. SCRIPT_DEBUG diagnostic only, no user-facing
+			 * error.
+			 */
+			if ( isConversionTimeoutError( error ) ) {
+				debug(
+					`GIF to video conversion timed out; keeping the original GIF only: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion timed out' ),
 					true
 				);
 				return;
@@ -1546,47 +1655,75 @@ export function generateThumbnails( id: QueueItemId ) {
 			 */
 		}
 
-		// Check if image needs rotation.
-		// If exif_orientation is not 1, the image needs rotation.
-		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
+		// Determine the EXIF orientation. For JPEG/TIFF the server reads it and
+		// libvips auto-rotates the sub-sizes from EXIF. For AVIF/HEIF libheif/
+		// libvips only auto-rotate from a native `irot` transform, never from
+		// EXIF, so those sub-sizes must be rotated explicitly. Read the EXIF
+		// orientation on the client for those formats and treat it as the
+		// source of truth: `getUnappliedExifOrientation` returns 1 when an
+		// `irot` transform is present (already handled on decode), otherwise
+		// the EXIF orientation that nothing else applies.
+		// See https://github.com/WordPress/gutenberg/issues/79383.
+		let exifOrientation = attachment.exif_orientation || 1;
+		const sourceType = item.sourceFile.type;
+		const isHeifFamily =
+			sourceType === 'image/avif' || sourceType === 'image/heif';
+
+		let needsClientRotation = false;
+		if ( isHeifFamily ) {
+			exifOrientation = getUnappliedExifOrientation(
+				await item.sourceFile.arrayBuffer()
+			);
+			// libvips will not auto-rotate these sub-sizes, so they must be
+			// generated from an explicitly rotated source rather than the
+			// original file.
+			needsClientRotation = exifOrientation !== 1;
+		}
+
+		// Rotate the source once and reuse it for the sideloaded "original"
+		// (original_image metadata) and, for the client-rotation case, as the
+		// thumbnail/scaled source. Images that were scaled
+		// (bigImageSizeThreshold) are already rotated by vips, so the original
+		// is skipped for them, matching WordPress core.
+		let rotatedSource: File | undefined;
 		{
 			const needsRotation =
-				attachment.exif_orientation &&
-				attachment.exif_orientation !== 1 &&
-				! item.file.name.includes( '-scaled' );
+				exifOrientation !== 1 && ! item.file.name.includes( '-scaled' );
 
-			// If rotation is needed for a non-scaled image, sideload the rotated version.
-			// This matches WordPress core's behavior of creating a -rotated version.
-			if ( needsRotation && attachment.id ) {
+			if ( ( needsRotation || needsClientRotation ) && attachment.id ) {
 				try {
-					const rotatedFile = await vipsRotateImage(
+					rotatedSource = await vipsRotateImage(
 						item.id,
 						item.sourceFile,
-						attachment.exif_orientation as number,
+						exifOrientation,
 						item.abortController?.signal
 					);
-
-					// Sideload the rotated file as the "original" to set original_image metadata.
-					// The server will store this in $metadata['original_image'].
-					dispatch.addSideloadItem( {
-						file: rotatedFile,
-						batchId: uuidv4(),
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: 'original',
-							convert_format: false,
-						},
-						operations: [ OperationType.Upload ],
-					} );
 				} catch {
 					// If rotation fails, continue with thumbnail generation.
-					// Thumbnails will still be rotated correctly by vips.
+					// Thumbnails will still be rotated correctly by vips for
+					// server-readable formats.
 					// eslint-disable-next-line no-console
 					console.warn(
 						'Failed to rotate image, continuing with thumbnails'
 					);
 				}
+			}
+
+			// Sideload the rotated file as the "original" to set
+			// original_image metadata; the server stores it in
+			// $metadata['original_image'].
+			if ( needsRotation && rotatedSource && attachment.id ) {
+				dispatch.addSideloadItem( {
+					file: rotatedSource,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'original',
+						convert_format: false,
+					},
+					operations: [ OperationType.Upload ],
+				} );
 			}
 		}
 
@@ -1600,7 +1737,10 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			const thumbnailSource = item.sourceFile;
+			const thumbnailSource =
+				needsClientRotation && rotatedSource
+					? rotatedSource
+					: item.sourceFile;
 			const file = attachment.filename
 				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;
@@ -1833,9 +1973,31 @@ export function finalizeItem( id: QueueItemId ) {
 					updates.attachment = updatedAttachment;
 				}
 			} catch ( error ) {
-				// Log but don't fail the upload if finalization fails.
+				// Log the underlying failure so it is visible in every
+				// environment; `apiFetch` may reject with a plain object
+				// rather than an Error, and the user-facing notice below is
+				// deliberately generic.
 				// eslint-disable-next-line no-console
 				console.warn( 'Media finalization failed:', error );
+
+				// Finalize is the server's commit point: it writes the
+				// attachment metadata (responsive sub-sizes and the final
+				// `-scaled` file reference). If it fails, none of that was
+				// saved, so the upload is NOT complete. Reporting success
+				// would let the editor keep — and autosave — a block whose
+				// attachment is missing its registered sizes (so the front
+				// end cannot build a srcset) and whose file references are
+				// inconsistent. Fail the item instead so the error surfaces
+				// to the user rather than showing "upload complete".
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.MEDIA_FINALIZE_ERROR,
+						message: __( 'Could not finalize the upload.' ),
+						file: item.file,
+					} )
+				);
+				return;
 			}
 		}
 

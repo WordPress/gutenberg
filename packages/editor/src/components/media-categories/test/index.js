@@ -1,25 +1,21 @@
-/**
- * WordPress dependencies
- */
-import { dispatch, resolveSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import getInserterMediaCategories from '..';
 
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
-	resolveSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	dispatch: vi.fn(),
+	resolveSelect: vi.fn(),
+	select: vi.fn(),
+	subscribe: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: 'core',
 } ) );
 
 describe( 'getInserterMediaCategories', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'does not include attached images for non-numeric post IDs', () => {
@@ -35,7 +31,7 @@ describe( 'getInserterMediaCategories', () => {
 	} );
 
 	it( 'fetches images attached to the current post', async () => {
-		const getEntityRecords = jest.fn().mockResolvedValue( [
+		const getEntityRecords = vi.fn().mockResolvedValue( [
 			{
 				id: 10,
 				source_url: 'https://example.com/image.jpg',
@@ -53,6 +49,12 @@ describe( 'getInserterMediaCategories', () => {
 			},
 		] );
 		resolveSelect.mockReturnValue( { getEntityRecords } );
+		const getEntityRecordsTotalItems = vi.fn().mockReturnValue( 1 );
+		const getEntityRecordsTotalPages = vi.fn().mockReturnValue( 1 );
+		select.mockReturnValue( {
+			getEntityRecordsTotalItems,
+			getEntityRecordsTotalPages,
+		} );
 
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
 			42,
@@ -60,29 +62,45 @@ describe( 'getInserterMediaCategories', () => {
 		);
 		const results = await attachedImagesCategory.fetch( { per_page: 20 } );
 
+		const expectedQuery = {
+			per_page: 20,
+			media_type: 'image',
+			parent: 42,
+			orderBy: 'date',
+		};
 		expect( getEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
-			{
-				per_page: 20,
-				media_type: 'image',
-				parent: 42,
-				orderBy: 'date',
-			}
+			expectedQuery
 		);
-		expect( results ).toEqual( [
-			expect.objectContaining( {
-				id: 10,
-				url: 'https://example.com/image.jpg',
-				previewUrl: 'https://example.com/image-medium.jpg',
-				alt: 'Alt text',
-				caption: 'Caption',
-			} ),
-		] );
+		// Totals are read with the same final query so their cache key matches.
+		expect( getEntityRecordsTotalItems ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expectedQuery
+		);
+		expect( getEntityRecordsTotalPages ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expectedQuery
+		);
+		expect( results ).toEqual( {
+			mediaItems: [
+				expect.objectContaining( {
+					id: 10,
+					url: 'https://example.com/image.jpg',
+					previewUrl: 'https://example.com/image-medium.jpg',
+					alt: 'Alt text',
+					caption: 'Caption',
+				} ),
+			],
+			totalItems: 1,
+			totalPages: 1,
+		} );
 	} );
 
 	it( 'attaches and detaches attachment records', async () => {
-		const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+		const saveEntityRecord = vi.fn().mockResolvedValue( {} );
 		dispatch.mockReturnValue( { saveEntityRecord } );
 
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
@@ -175,6 +193,115 @@ describe( 'getInserterMediaCategories', () => {
 			expect.anything()
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 5 );
+	} );
+
+	it( 'refetches on the resolved -> unresolved edge and unsubscribes', () => {
+		let listener;
+		const unsubscribe = vi.fn();
+		subscribe.mockImplementation( ( cb ) => {
+			listener = cb;
+			return unsubscribe;
+		} );
+		// Starts resolved: the grid has already fetched this query.
+		let resolved = true;
+		const hasFinishedResolution = vi
+			.fn()
+			.mockImplementation( () => resolved );
+		select.mockReturnValue( { hasFinishedResolution } );
+
+		const [ attachedImagesCategory ] = getInserterMediaCategories(
+			42,
+			'Post'
+		);
+		const onChange = vi.fn();
+		const returnedUnsubscribe = attachedImagesCategory.subscribe(
+			onChange,
+			{ per_page: 20 }
+		);
+
+		// The watched query args must match what `fetch`/`coreMediaFetch`
+		// resolves, since `invalidateResolution` keys on deep argument equality.
+		expect( hasFinishedResolution ).toHaveBeenCalledWith(
+			'getEntityRecords',
+			[
+				'postType',
+				'attachment',
+				{
+					per_page: 20,
+					media_type: 'image',
+					parent: 42,
+					orderBy: 'date',
+				},
+			]
+		);
+
+		// Invalidation (resolved -> unresolved) triggers a single refetch.
+		resolved = false;
+		listener();
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+		// Still unresolved: no new edge, so no extra refetch.
+		listener();
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+		// Refetch resolves it again (unresolved -> resolved): still no refetch,
+		// so there's no loop.
+		resolved = true;
+		listener();
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+		// A subsequent invalidation fires again.
+		resolved = false;
+		listener();
+		expect( onChange ).toHaveBeenCalledTimes( 2 );
+
+		expect( returnedUnsubscribe ).toBe( unsubscribe );
+	} );
+
+	it( 'subscribes plain core-media categories and opts external sources out', () => {
+		let listener;
+		subscribe.mockImplementation( ( cb ) => {
+			listener = cb;
+			return vi.fn();
+		} );
+		let resolved = true;
+		const hasFinishedResolution = vi
+			.fn()
+			.mockImplementation( () => resolved );
+		select.mockReturnValue( { hasFinishedResolution } );
+
+		const categories = getInserterMediaCategories( 42, 'Post' );
+		const images = categories.find(
+			( category ) => category.name === 'images'
+		);
+		const openverse = categories.find(
+			( category ) => category.name === 'openverse'
+		);
+
+		const onChange = vi.fn();
+		images.subscribe( onChange, { per_page: 20 } );
+
+		// The Images source watches its own query (no `parent`) and still
+		// refetches on invalidation, since uploads land in the attachment cache.
+		expect( hasFinishedResolution ).toHaveBeenCalledWith(
+			'getEntityRecords',
+			[
+				'postType',
+				'attachment',
+				{
+					per_page: 20,
+					media_type: 'image',
+					orderBy: 'date',
+				},
+			]
+		);
+		resolved = false;
+		listener();
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+		// Openverse is an external resource, not core-data-backed, so it exposes
+		// no `subscribe` and the panel leaves it alone.
+		expect( openverse.subscribe ).toBeUndefined();
 	} );
 
 	it( 'words the empty state from the post type label', () => {

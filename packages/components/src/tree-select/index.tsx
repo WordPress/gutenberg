@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
 
@@ -93,8 +86,6 @@ export function TreeSelect( props: TreeSelectProps ) {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
-			__shouldNotWarnDeprecated36pxSize
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
 			{ ...restProps }

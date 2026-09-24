@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem } from '../context';
 import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -34,7 +27,7 @@ export function useSurface(
 				'--wp-components-surface-background-size-dotted': `${
 					backgroundSize - 1
 				}px`,
-		  }
+			}
 		: style;
 
 	return {

@@ -1,22 +1,12 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
-	FlexItem,
-	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
-	__experimentalVStack as VStack,
 	ColorIndicator,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import type { Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import { Stack } from '@wordpress/ui';
 import { Subtitle } from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
@@ -63,14 +53,18 @@ function Palette( { name }: PaletteProps ) {
 		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
 
 	return (
-		<VStack spacing={ 3 }>
+		<Stack direction="column" gap="md">
 			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path={ screenPath }>
-					<HStack direction="row">
+					<Stack
+						direction="row"
+						justify="space-between"
+						align="center"
+					>
 						{ colors.length > 0 ? (
-							<>
-								<ZStack isLayered={ false } offset={ -8 }>
+							<Stack direction="row" align="center" gap="sm">
+								<div className="global-styles-ui__palette-preview">
 									{ colors
 										.slice( 0, 5 )
 										.map( ( { color }, index ) => (
@@ -82,19 +76,17 @@ function Palette( { name }: PaletteProps ) {
 												/>
 											</ColorIndicatorWrapper>
 										) ) }
-								</ZStack>
-								<FlexItem isBlock>
-									{ __( 'Edit palette' ) }
-								</FlexItem>
-							</>
+								</div>
+								<span>{ __( 'Edit palette' ) }</span>
+							</Stack>
 						) : (
-							<FlexItem>{ __( 'Add colors' ) }</FlexItem>
+							<span>{ __( 'Add colors' ) }</span>
 						) }
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
-					</HStack>
+					</Stack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-		</VStack>
+		</Stack>
 	);
 }
 

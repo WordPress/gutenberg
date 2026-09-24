@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../components-no-missing-40px-size-prop';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -22,18 +25,18 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<Button __next40pxDefaultSize />
 			`,
 		},
-		// Component with __next40pxDefaultSize={true}
-		{
-			code: `
-				import { InputControl } from '@wordpress/components';
-				<InputControl __next40pxDefaultSize={true} />
-			`,
-		},
 		// Component with non-default size prop
 		{
 			code: `
 				import { Button } from '@wordpress/components';
 				<Button size="small" />
+			`,
+		},
+		// SelectControl no longer requires __next40pxDefaultSize
+		{
+			code: `
+				import { SelectControl } from '@wordpress/components';
+				<SelectControl />
 			`,
 		},
 		// Component with size="compact"
@@ -96,7 +99,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					CustomSelectControl,
 					InputControl,
 					NumberControl,
 					RangeControl,
@@ -104,12 +106,11 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					ToggleGroupControl,
 				} from '@wordpress/components';
 				<>
-					<CustomSelectControl __next40pxDefaultSize />
 					<FormTokenField />
-					<InputControl __next40pxDefaultSize />
-					<NumberControl __next40pxDefaultSize />
+					<InputControl />
+					<NumberControl />
 					<RangeControl />
-					<SelectControl __next40pxDefaultSize />
+					<SelectControl />
 					<ToggleGroupControl />
 				</>
 			`,
@@ -129,29 +130,16 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				},
 			],
 		},
-		// InputControl without __next40pxDefaultSize
-		{
-			code: `
-				import { InputControl } from '@wordpress/components';
-				<InputControl value={value} onChange={onChange} />
-			`,
-			errors: [
-				{
-					messageId: 'missingProp',
-					data: { component: 'InputControl' },
-				},
-			],
-		},
 		// Component with __next40pxDefaultSize={false}
 		{
 			code: `
-				import { SelectControl } from '@wordpress/components';
-				<SelectControl __next40pxDefaultSize={false} />
+				import { Button } from '@wordpress/components';
+				<Button __next40pxDefaultSize={false} />
 			`,
 			errors: [
 				{
 					messageId: 'missingProp',
-					data: { component: 'SelectControl' },
+					data: { component: 'Button' },
 				},
 			],
 		},
@@ -165,35 +153,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				{
 					messageId: 'missingProp',
 					data: { component: 'Button' },
-				},
-			],
-		},
-		// Aliased import without __next40pxDefaultSize
-		{
-			code: `
-				import { InputControl as MyInputControl } from '@wordpress/components';
-				<MyInputControl />
-			`,
-			errors: [
-				{
-					messageId: 'missingProp',
-					data: { component: 'InputControl' },
-				},
-			],
-		},
-		// Multiple components, some invalid
-		{
-			code: `
-				import { Button, InputControl } from '@wordpress/components';
-				<>
-					<Button __next40pxDefaultSize />
-					<InputControl />
-				</>
-			`,
-			errors: [
-				{
-					messageId: 'missingProp',
-					data: { component: 'InputControl' },
 				},
 			],
 		},
@@ -211,10 +170,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					messageId: 'missingProp',
 					data: { component: 'Button' },
 				},
-				{
-					messageId: 'missingProp',
-					data: { component: 'SelectControl' },
-				},
 			],
 		},
 		// Relative import with checkLocalImports enabled
@@ -228,20 +183,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				{
 					messageId: 'missingProp',
 					data: { component: 'Button' },
-				},
-			],
-		},
-		// Default import from input-control path with checkLocalImports enabled
-		{
-			code: `
-				import InputControl from '../input-control';
-				<InputControl />
-			`,
-			options: [ { checkLocalImports: true } ],
-			errors: [
-				{
-					messageId: 'missingProp',
-					data: { component: 'InputControl' },
 				},
 			],
 		},
@@ -266,7 +207,7 @@ ruleTester.run(
 			{
 				code: `
 				import InputControl from './input-control';
-				<InputControl __next40pxDefaultSize />
+				<InputControl />
 			`,
 				options: [ { checkLocalImports: true } ],
 			},

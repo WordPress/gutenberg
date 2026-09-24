@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const createNavigationOverlay = async ( {
@@ -88,6 +85,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 
 			await page
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -144,6 +142,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -184,6 +183,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -235,6 +235,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();

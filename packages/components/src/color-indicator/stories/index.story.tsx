@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ColorIndicator from '..';
 
 const meta: Meta< typeof ColorIndicator > = {
 	tags: [ 'manifest' ],
 	component: ColorIndicator,
-	title: 'Components/Selection & Input/Color/ColorIndicator',
+	title: 'Components/@wordpress-components/Selection & Input/Color/ColorIndicator',
 	id: 'components-colorindicator',
 	argTypes: {
 		colorValue: {

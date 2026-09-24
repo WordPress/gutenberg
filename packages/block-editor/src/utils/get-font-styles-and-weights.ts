@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { formatFontStyle } from './format-font-style';
 import { formatFontWeight } from './format-font-weight';
 import type {
@@ -180,7 +173,7 @@ export function getFontStylesAndWeights(
 							_x( '%1$s %2$s', 'font' ),
 							weightName ?? '',
 							styleName ?? ''
-					  );
+						);
 
 			combinedStyleAndWeightOptions.push( {
 				key: `${ styleValue }-${ weightValue }`,

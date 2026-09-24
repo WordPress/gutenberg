@@ -1,15 +1,12 @@
-/**
- * Internal dependencies
- */
 import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { Commands } from './components/commands';
-import { LayoutSettings } from './components/layout-settings';
 import { NoWidgetsState } from './components/no-widgets-state';
 import { ResetConfirmation } from './components/reset-confirmation';
 import { WidgetChrome } from './components/widget-chrome';
 import { WidgetInserter } from './components/widget-inserter';
+import { WidgetDashboardPolicy } from './components/dashboard-policy';
 import { WidgetSettings } from './components/widget-settings';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
@@ -48,10 +45,14 @@ import type { WidgetDashboardProps } from './types';
  *
  * Children compose the dashboard's triggers and chrome: `Actions`,
  * `Widgets`, `Commands`, `NoWidgetsState`. The targets they open (the
- * widget inserter, the layout and widget settings editors, the reset
- * confirmation) are mounted by the engine and driven by shared UI state, so
- * a trigger works wherever it is composed without a matching target in the
- * tree. Omitting `children` renders the default arrangement.
+ * widget inserter, the widget settings editor, the reset confirmation) are
+ * mounted by the engine and driven by shared UI state, so a trigger works
+ * wherever it is composed without a matching target in the tree. Omitting
+ * `children` renders the default arrangement.
+ *
+ * `Policy` mounts above one or several dashboards and governs what users
+ * may do on them; every compound asks the resolved policy through the
+ * internal context.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -64,7 +65,6 @@ export const WidgetDashboard = Object.assign(
 		onEditChange,
 		resolveWidgetModule,
 		gridSettings,
-		onGridSettingsChange,
 		children,
 	}: WidgetDashboardProps ) {
 		return (
@@ -78,7 +78,6 @@ export const WidgetDashboard = Object.assign(
 				onEditChange={ onEditChange }
 				resolveWidgetModule={ resolveWidgetModule }
 				gridSettings={ gridSettings }
-				onGridSettingsChange={ onGridSettingsChange }
 			>
 				<WidgetDashboardUIProvider>
 					{ children ?? (
@@ -91,12 +90,18 @@ export const WidgetDashboard = Object.assign(
 					) }
 
 					<WidgetInserter />
-					<LayoutSettings />
 					<WidgetSettings />
 					<ResetConfirmation />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, WidgetChrome, NoWidgetsState, Commands }
+	{
+		Actions,
+		Widgets,
+		WidgetChrome,
+		NoWidgetsState,
+		Commands,
+		Policy: WidgetDashboardPolicy,
+	}
 );

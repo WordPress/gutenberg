@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarItemProps } from './types';
 

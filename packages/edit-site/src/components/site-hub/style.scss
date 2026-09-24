@@ -3,18 +3,13 @@
 .edit-site-site-hub {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: $grid-unit-10;
-	margin-right: $grid-unit-15;
+	padding-left: $grid-unit-20;
 	height: $header-height;
 }
 
-.edit-site-site-hub__view-mode-toggle-container {
-	height: $header-height;
-	width: $header-height;
-	flex-shrink: 0;
-
-	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
-		background: transparent;
+.edit-site-site-hub__back-button {
+	&:hover:not(:disabled, [aria-disabled="true"]),
+	&:active:not(:disabled, [aria-disabled="true"]) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 }

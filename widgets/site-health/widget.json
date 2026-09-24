@@ -2,7 +2,35 @@
 	"name": "core/site-health",
 	"title": "Site Health Status",
 	"description": "Shows an overview of your site health and any issues that need attention.",
+	"help": {
+		"content": "Results come from your site's latest health checks.",
+		"links": [ { "label": "Visit Site Health", "href": "site-health.php" } ]
+	},
+	"icon": "core/shield",
 	"category": "site",
 	"presentation": "framed",
-	"textdomain": "default"
+	"textdomain": "default",
+	"actions": [
+		{
+			"id": "site-health-details",
+			"label": "Details",
+			"icon": "core/chart-bar",
+			"relevance": "high",
+			"href": "admin.php?page=dashboard-wp-admin&p=/site-health"
+		},
+		{
+			"id": "site-health-status",
+			"label": "Status",
+			"icon": "dashboard-widgets/seen",
+			"relevance": "low",
+			"href": "site-health.php"
+		},
+		{
+			"id": "site-health-info",
+			"label": "Info",
+			"icon": "core/info",
+			"relevance": "low",
+			"href": "site-health.php?tab=debug"
+		}
+	]
 }

@@ -1,8 +1,8 @@
-import { useMemo, useRef } from '@wordpress/element';
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
-import { ThemeContext } from './context';
-import { useThemeProviderStyles } from './use-theme-provider-styles';
-import { type ThemeProviderProps } from './types';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEvent, useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { ThemeContext } from './context.ts';
+import { useThemeProviderStyles } from './use-theme-provider-styles.ts';
+import { type ThemeProviderProps } from './types.ts';
 import styles from './style.module.css';
 
 // Dev-only: count active root providers per document so we can warn when more
@@ -21,14 +21,17 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
+	onColorWarnings,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
-		color,
-		cursor,
-		cornerRadius,
-	} );
+	const { themeProviderStyles, resolvedSettings, colorWarnings } =
+		useThemeProviderStyles( {
+			color,
+			cursor,
+			cornerRadius,
+		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
+	const onColorWarningsEvent = useEvent( onColorWarnings );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -39,12 +42,17 @@ export const ThemeProvider = ( {
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	// For root providers, mirror the wrapper's custom properties onto the
-	// document element of the wrapper's own document (which may be an iframe)
-	// so they reach portals and content rendered outside the React subtree.
-	// `html` is shared, so set/remove individual properties (restoring any
-	// prior value) rather than assigning a whole style object. Preset settings
-	// like `cornerRadius` are forwarded by the prebuilt CSS instead.
+	useEffect( () => {
+		if ( colorWarnings !== undefined ) {
+			onColorWarningsEvent( colorWarnings );
+		}
+	}, [ colorWarnings, onColorWarningsEvent ] );
+
+	// For root providers, mirror the wrapper's custom properties and preset
+	// attributes onto the document element of the wrapper's own document
+	// (which may be an iframe) so they reach portals and content rendered
+	// outside the React subtree. `html` is shared, so restore prior values on
+	// cleanup rather than replacing its complete style or attribute state.
 	useIsomorphicLayoutEffect( () => {
 		if ( ! isRoot ) {
 			return;
@@ -66,8 +74,25 @@ export const ThemeProvider = ( {
 			rootProviderCountByDocument.set( doc, active + 1 );
 		}
 
-		const previous = new Map< string, string >();
+		const previous = new Map< string, { value: string; priority: string } >(
+			Array.from( root.style, ( key ) => [
+				key,
+				{
+					value: root.style.getPropertyValue( key ),
+					priority: root.style.getPropertyPriority( key ),
+				},
+			] )
+		);
 		const applied: string[] = [];
+		const previousRootProvider = root.getAttribute(
+			'data-wpds-root-provider'
+		);
+		const previousCornerRadius = root.getAttribute(
+			'data-wpds-corner-radius'
+		);
+
+		root.setAttribute( 'data-wpds-root-provider', 'true' );
+		root.setAttribute( 'data-wpds-corner-radius', cornerRadiusPreset );
 
 		for ( const [ rawKey, rawValue ] of Object.entries(
 			themeProviderStyles
@@ -79,7 +104,6 @@ export const ThemeProvider = ( {
 			) {
 				continue;
 			}
-			previous.set( rawKey, root.style.getPropertyValue( rawKey ) );
 			root.style.setProperty( rawKey, String( rawValue ) );
 			applied.push( rawKey );
 		}
@@ -95,22 +119,46 @@ export const ThemeProvider = ( {
 			}
 
 			for ( const key of applied ) {
-				const prev = previous.get( key );
-				if ( prev ) {
-					root.style.setProperty( key, prev );
+				const previousProperty = previous.get( key );
+				if ( previousProperty ) {
+					// An empty string removes the declaration; a space restores
+					// an existing custom property with an empty value.
+					root.style.setProperty(
+						key,
+						previousProperty.value || ' ',
+						previousProperty.priority
+					);
 				} else {
 					root.style.removeProperty( key );
 				}
 			}
+
+			if ( previousRootProvider === null ) {
+				root.removeAttribute( 'data-wpds-root-provider' );
+			} else {
+				root.setAttribute(
+					'data-wpds-root-provider',
+					previousRootProvider
+				);
+			}
+
+			if ( previousCornerRadius === null ) {
+				root.removeAttribute( 'data-wpds-corner-radius' );
+			} else {
+				root.setAttribute(
+					'data-wpds-corner-radius',
+					previousCornerRadius
+				);
+			}
 		};
-	}, [ isRoot, themeProviderStyles ] );
+	}, [ cornerRadiusPreset, isRoot, themeProviderStyles ] );
 
 	return (
 		<div
 			ref={ wrapperRef }
 			data-wpds-root-provider={ isRoot || undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
-			className={ styles.root }
+			className={ styles.wrapper }
 			style={ themeProviderStyles }
 		>
 			<ThemeContext.Provider value={ contextValue }>

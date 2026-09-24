@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { GridOverlayRenderProps } from './types';
 import styles from './grid-overlay.module.css';
 
@@ -48,7 +37,7 @@ export function GridOverlay( {
 		...( showRows
 			? ( {
 					'--wp-grid-overlay-row-height': `${ rowHeight }px`,
-			  } as React.CSSProperties )
+				} as React.CSSProperties )
 			: {} ),
 	};
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useId } from '@wordpress/element';
 import { ThemeProvider } from '../theme-provider';
-import wpdsTokens from '../prebuilt/js/design-tokens.mjs';
+import wpdsTokens from '../../prebuilt/js/design-tokens.mjs';
 
 const wpdsColorTokens = wpdsTokens.filter( ( name ) =>
 	name.startsWith( '--wpds-color' )
@@ -47,6 +47,7 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 					} }
 				>
 					<span
+						aria-hidden="true"
 						style={ {
 							backgroundColor: `var(${ name })`,
 							border: '1px solid var(--wpds-color-stroke-surface-neutral)',
@@ -54,7 +55,6 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 							aspectRatio: '2/1',
 							display: 'block',
 						} }
-						aria-label={ name }
 					></span>
 					<code>{ name }</code>
 				</li>

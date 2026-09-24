@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useReducer } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResolutionTool from '..';
 
 export default {
-	title: 'BlockEditor/ResolutionControl',
+	id: 'blockeditor-resolutioncontrol',
+	title: 'Editor/Block Editor/ResolutionControl',
 	component: ResolutionTool,
 	tags: [ 'status-private' ],
 	parameters: {
