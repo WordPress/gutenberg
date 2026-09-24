@@ -59,6 +59,7 @@ describe( 'blocks', () => {
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
+		setGroupingBlockName( undefined );
 
 		// Reset deprecation logging to ensure we properly track warnings.
 		for ( const key in logged ) {
