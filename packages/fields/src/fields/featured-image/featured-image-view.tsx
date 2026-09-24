@@ -27,6 +27,10 @@ export const FeaturedImageView = ( {
 				sizes={ config?.sizes || '100vw' }
 			/>
 		);
+	}else{
+		return(
+			<span className="fields-controls__featured-image-no-image"></span>
+		)
 	}
 
 	return <span className="fields-controls__featured-image-placeholder" />;
