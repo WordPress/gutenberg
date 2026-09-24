@@ -566,7 +566,46 @@ export const getPreviousRevision = createRegistrySelector(
 				postId,
 				buildRevisionsPageQuery( revisionKey, page + 1 )
 			);
-			return nextPageRevisions?.[ 0 ] ?? null;
+			if ( nextPageRevisions?.[ 0 ] ) {
+				return nextPageRevisions[ 0 ];
+			}
+		}
+
+		// Get the current revision object.
+		const currentRevision =
+			revisions[ currentIndex ] ??
+			select( coreStore ).getRevision(
+				'postType',
+				postType,
+				postId,
+				currentRevisionId,
+				{ context: 'edit' }
+			);
+
+		if ( currentRevision?.slug?.includes( 'autosave' ) ) {
+			const currentPost = getCurrentPost( state );
+			if ( currentPost && currentPost.id ) {
+				// Fall back to comparing against the saved post.
+				// Normalize post details to match the revision schema for comparisons.
+				return {
+					...currentPost,
+					title: {
+						raw: currentPost.title?.raw ?? currentPost.title ?? '',
+					},
+					excerpt: {
+						raw:
+							currentPost.excerpt?.raw ??
+							currentPost.excerpt ??
+							'',
+					},
+					content: {
+						raw:
+							currentPost.content?.raw ??
+							currentPost.content ??
+							'',
+					},
+				};
+			}
 		}
 
 		return null;

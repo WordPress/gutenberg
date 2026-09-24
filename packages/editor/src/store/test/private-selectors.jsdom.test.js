@@ -5,7 +5,9 @@ import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
+	getPreviousRevision,
 } from '../private-selectors';
+import { getCurrentPost } from '../selectors';
 import { lock } from '../../lock-unlock';
 
 describe( 'getPostBlocksByName', () => {
@@ -148,6 +150,54 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 		const state = { postType: 'book', postId: 123 };
 
 		expect( isCollaborationEnabledForCurrentPost( state ) ).toBe( false );
+	} );
+} );
+
+describe( 'getPreviousRevision', () => {
+	it( 'falls back to current post when current revision is an autosave or the only revision in collection', () => {
+		const state = {
+			revisionId: 15,
+			revisionPage: 1,
+			postId: 1,
+			postType: 'post',
+		};
+
+		const entityRecord = {
+			id: 1,
+			type: 'post',
+			title: 'Hello world!',
+			content:
+				'<!-- wp:paragraph --><p>Base content</p><!-- /wp:paragraph -->',
+			excerpt: '',
+		};
+
+		const registry = {
+			select: ( store ) => {
+				if ( store === coreStore ) {
+					return {
+						getEntityConfig: () => ( { revisionKey: 'id' } ),
+						getRevisions: () => [
+							{ id: 15, slug: '1-autosave-v1' },
+						],
+						getRawEntityRecord: () => entityRecord,
+					};
+				}
+				return {};
+			},
+		};
+
+		getPreviousRevision.registry = registry;
+		getCurrentPost.registry = registry;
+
+		const result = getPreviousRevision( state );
+		expect( result ).toEqual( {
+			...entityRecord,
+			title: { raw: 'Hello world!' },
+			content: {
+				raw: '<!-- wp:paragraph --><p>Base content</p><!-- /wp:paragraph -->',
+			},
+			excerpt: { raw: '' },
+		} );
 	} );
 } );
 
