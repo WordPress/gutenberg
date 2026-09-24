@@ -19,6 +19,7 @@ When reviewing pull requests:
 - Do not suggest replacing `@wordpress/data` selectors / actions with local React state — this is the project's intentional state pattern.
 - Do not suggest replacing `__()` / `_x()` / `_n()` calls with template literals — these are WordPress i18n functions.
 - Do not suggest moving code between `block-editor`, `editor`, and `edit-post` packages without considering the layering rule (`block-editor` is WordPress-agnostic; lower layers must not depend on higher ones).
+- Flag block attribute or `theme.json` values used in string operations without a type check, but only on the raw paths: `render_block` / `render_block_data` filters, and values nested inside object-typed attributes such as `style` and `layout`. Attributes reaching a `render_callback` or a `WP_Block_Supports` `apply` callback are already validated against the `block.json` schema by `WP_Block_Type::prepare_attributes_for_render()` — do not flag those.
 
 ## Writing Markdown
 

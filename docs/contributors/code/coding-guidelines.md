@@ -816,6 +816,37 @@ The easiest way to use PHPCS is [local environment](/docs/contributors/code/gett
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
 
+### Block attributes and global styles values are untrusted input
+
+The attribute types declared in `block.json` and the `theme.json` schema describe intent. Neither is enforced at render time for content that was hand-edited, imported, or produced by a generator, so a value whose PHP type is wrong can reach the front end. Passing an array where a string is expected is a fatal `TypeError`, not a warning.
+
+WordPress validates attributes against the `block.json` schema in two places, and only these two:
+
+-   `WP_Block::__get( 'attributes' )`, so the `$attributes` passed to a block's `render_callback` is validated.
+-   `WP_Block_Supports::apply_block_supports()`, so the `$block_attributes` passed to an `apply` callback registered through `WP_Block_Supports::register()` is validated.
+
+Both call `WP_Block_Type::prepare_attributes_for_render()`, which unsets any attribute that fails validation and restores its `block.json` `default` if it has one.
+
+Every other path reads the value raw. Check the type before any string operation when reading:
+
+-   `$block['attrs']` or `$parsed_block['attrs']` inside a `render_block` or `render_block_data` filter. These run on the parsed block, before a `WP_Block` exists. Most of `lib/block-supports/` is on this path.
+-   Anything nested inside an attribute declared as an object or an array, such as `style` and `layout`. Validation only descends into properties that the schema declares, and these declare none, so `style.typography.fontFamily` can be any shape at all.
+-   `theme.json` and global styles values. Sanitization drops keys that are not in the schema; it does not check the type of a leaf value.
+
+Treat a wrong type as if the value were absent:
+
+```php
+$tag_name = $block['attrs']['tagName'] ?? '';
+
+if ( ! is_string( $tag_name ) ) {
+	return $block_content;
+}
+```
+
+Use `is_string()` where only a string is meaningful, or `is_scalar()` with an explicit cast where a number is also valid. Both patterns are already in the codebase: `gutenberg_apply_anchor_support()` in `lib/block-supports/anchor.php`, `gutenberg_is_explicit_aspect_ratio_value()` in `lib/block-supports/dimensions.php`, and `gutenberg_sanitize_block_gap_value()` in `lib/block-supports/layout.php`.
+
+Do not add a shared helper for this under `packages/block-library/src/`. Those files are synced to WordPress Core, and the `Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses` rule in `phpcs.xml.dist` blocks `gutenberg_`-prefixed names there. The check belongs inline.
+
 ## GitHub Actions workflow files
 
 GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
