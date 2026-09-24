@@ -59,7 +59,9 @@ cat "$PLAYGROUND_LOG"
 # also shows whether the plugin replaces core's bundles, which it only
 # does when its build exists.
 step "Loading the editor once"
-if ! EDITOR_HTML=$( curl -sS --fail "$WP_BASE_URL/wp-admin/post-new.php" ); then
+# Playground logs the request in through a redirect, so cookies must be
+# kept between the hops: -b "" holds them in memory.
+if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
 	echo "The editor did not load from $WP_BASE_URL"
 	exit 1
 fi
@@ -70,7 +72,13 @@ fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
+# Playground logs a browser in once and remembers that in a cookie, which
+# outlives the server: start Safari without cookies from an earlier run.
 xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
+SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
+if [[ -n "$SAFARI_DATA" && -d "$SAFARI_DATA" ]]; then
+	rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
+fi
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
