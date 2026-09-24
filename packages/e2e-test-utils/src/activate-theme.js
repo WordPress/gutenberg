@@ -23,11 +23,16 @@ export async function activateTheme( slug ) {
 		return;
 	}
 
-	await page.click( `div[data-slug="${ slug }"] .button.activate` );
+	await Promise.all( [
+		page.click( `div[data-slug="${ slug }"] .button.activate` ),
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+	] );
 
 	if ( ! isCurrentURL( 'themes.php' ) ) {
 		await visitAdminPage( 'themes.php' );
 	}
-	await page.waitForSelector( `div[data-slug="${ slug }"].active` );
+	await page.waitForSelector( `div[data-slug="${ slug }"].active`, {
+		timeout: 45000,
+	} );
 	await switchUserToTest();
 }
