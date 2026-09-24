@@ -2,7 +2,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const PLUGIN_SLUG = 'gutenberg-test-fields-api';
 
-// 200 words per minute, see packages/e2e-tests/plugins/fields-api/page-fields.js.
+// 200 words per minute, see packages/e2e-tests/plugins/fields-api/reading-time.js.
 const words = ( count ) => Array( count ).fill( 'word' ).join( ' ' );
 const PAGES = [
 	{
@@ -144,13 +144,13 @@ test.describe( 'Fields API', () => {
 		);
 	} );
 
-	test( 'patches a default field', async ( { admin, page } ) => {
+	test( 'updates a default field', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'page' } );
-		// The patch makes the field hideable, hence showable.
+		// The update field makes it hideable, hence showable.
 		await showFieldsInTable( page, [ 'Comments' ] );
 		const table = page.getByRole( 'table' );
 
-		// The patched field keeps its label and elements, and renders with
+		// The field keeps its label and elements, and renders with
 		// the plugin's render.
 		const commentStatus = ( row ) =>
 			row.locator( '.gutenberg-test-comment-status' );
@@ -161,7 +161,7 @@ test.describe( 'Fields API', () => {
 		await expect( commentStatus( emptyPage ) ).toHaveText( 'Closed' );
 		await expect( commentStatus( emptyPage ) ).toHaveClass( /is-closed/ );
 
-		// The patch makes the field sortable.
+		// The update makes the field sortable.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
 		await expect(
 			page
@@ -171,12 +171,12 @@ test.describe( 'Fields API', () => {
 		await page.keyboard.press( 'Escape' );
 	} );
 
-	test( 'substitutes a default field', async ( { admin, page } ) => {
+	test( 'replaces a default field', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'page' } );
 		await showFieldsInTable( page, [] );
 		const table = page.getByRole( 'table' );
 
-		// The substitute is a plain integer: without the default render, it
+		// The new field is a plain integer: without the default render, it
 		// shows the user id the record holds, under its new label.
 		await expect(
 			table.getByRole( 'columnheader', { name: /Author/ } )
@@ -187,7 +187,7 @@ test.describe( 'Fields API', () => {
 		).toHaveText( String( authorId ) );
 	} );
 
-	test( 'shows the substituted field in the Quick Edit form', async ( {
+	test( 'shows the replaced field in the Quick Edit form', async ( {
 		admin,
 		page,
 	} ) => {
@@ -203,7 +203,7 @@ test.describe( 'Fields API', () => {
 		);
 		await expect( quickEditModal ).toBeVisible();
 
-		// The substituted field offers the control of its new type.
+		// The replaced field offers the control of its new type.
 		await quickEditModal
 			.getByRole( 'button', { name: 'Edit Written by' } )
 			.click();
