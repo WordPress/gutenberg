@@ -17,6 +17,12 @@
  * gutenberg_register_fields() validates the definitions before registering
  * them.
  *
+ * The registry is filled lazily: the first time its fields are read, after
+ * `init` has run, it fires the `gutenberg_fields_init` action, on which the
+ * default fields of every post type and the fields of plugins are registered.
+ * Registering does not fire the action; reading does, and only once. This
+ * mirrors how rest_get_server() fires `rest_api_init` on its first use.
+ *
  * @since 7.2.0
  *
  * @access private
@@ -38,6 +44,14 @@ final class Gutenberg_Fields_Registry {
 	 * @var array<string, array<string, string[]>>
 	 */
 	private $field_modules = array();
+
+	/**
+	 * Whether the `gutenberg_fields_init` action has fired since the registry
+	 * was created or last reset.
+	 *
+	 * @var bool
+	 */
+	private $initialized = false;
 
 	/**
 	 * The singleton instance.
@@ -147,6 +161,10 @@ final class Gutenberg_Fields_Registry {
 	 * Unregistering every field resets the entity: registered fields, script
 	 * modules, and removals.
 	 *
+	 * Unregistering reads the registered fields, so it fires the
+	 * `gutenberg_fields_init` action if it has not fired yet. Call it on that
+	 * action or later, once the default fields are registered.
+	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
 	 * @param string        $name The entity name (e.g. `page`).
 	 * @param string[]|null $ids  The ids of the fields to unregister. Default
@@ -206,6 +224,7 @@ final class Gutenberg_Fields_Registry {
 	 * @return array[] The list of field definitions, in registration order.
 	 */
 	public function get_registered( $kind, $name ) {
+		$this->initialize();
 		return array_values( $this->fields[ $this->get_entity_key( $kind, $name ) ] ?? array() );
 	}
 
@@ -216,6 +235,7 @@ final class Gutenberg_Fields_Registry {
 	 *                                `{$kind}/{$name}`.
 	 */
 	public function get_all_registered() {
+		$this->initialize();
 		return array_map( 'array_values', $this->fields );
 	}
 
@@ -229,6 +249,7 @@ final class Gutenberg_Fields_Registry {
 	 *                                 registration order.
 	 */
 	public function get_registered_field_modules( $kind, $name ) {
+		$this->initialize();
 		return $this->field_modules[ $this->get_entity_key( $kind, $name ) ] ?? array();
 	}
 
@@ -239,7 +260,61 @@ final class Gutenberg_Fields_Registry {
 	 *                                 `{$kind}/{$name}`.
 	 */
 	public function get_all_registered_field_modules() {
+		$this->initialize();
 		return array_map( 'array_keys', $this->field_modules );
+	}
+
+	/**
+	 * Empties the registry, so the next read fires the `gutenberg_fields_init`
+	 * action again and registers the fields anew.
+	 *
+	 * Intended for tests.
+	 */
+	public function reset() {
+		$this->fields        = array();
+		$this->field_modules = array();
+		$this->initialized   = false;
+	}
+
+	/**
+	 * Fires the `gutenberg_fields_init` action the first time the registry is
+	 * read.
+	 *
+	 * The default fields of a post type derive from its supports, which are
+	 * not final until `init` has run: core registers its post types on `init`
+	 * at priority 0, plugins theirs at the default priority, and supports are
+	 * added and removed on `init` too. Reading before then registers the
+	 * defaults from incomplete supports, and a later read does not fix them.
+	 */
+	private function initialize() {
+		if ( $this->initialized ) {
+			return;
+		}
+
+		if ( ! did_action( 'init' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'The registered fields were read before the `init` action finished. Post types and their supports are not final until then, so read the fields on `init` or later.', 'gutenberg' ),
+				'7.2.0'
+			);
+		}
+
+		// Set before firing, so a callback reading the registry to inspect
+		// the fields it patches does not fire the action again.
+		$this->initialized = true;
+
+		/**
+		 * Fires the first time the registered fields are read, after `init`.
+		 *
+		 * Register or adjust fields here. The default fields of every post
+		 * type are registered at priority 0 and adjusted at priority 1, so a
+		 * callback at the default priority sees the final defaults.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param Gutenberg_Fields_Registry $registry The registry being read.
+		 */
+		do_action( 'gutenberg_fields_init', $this );
 	}
 
 	/**
