@@ -2215,6 +2215,7 @@ test.describe( 'Block Notes', () => {
 
 		test( 'a block with reactions but no note is listed and selects its block', async ( {
 			editor,
+			page,
 			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
@@ -2233,9 +2234,24 @@ test.describe( 'Block Notes', () => {
 				.first();
 			await expect( reactedBlock ).not.toHaveClass( /is-selected/ );
 
-			await blockNoteUtils.blockReactionsEntry( 'Paragraph' ).click();
+			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
+			await entry.click();
 
+			// Selecting the block must not sync the entry back out of the
+			// selection just because the block carries no note.
 			await expect( reactedBlock ).toHaveClass( /is-selected/ );
+			await expect( entry ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// The keyboard path goes through the same block transition.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+				.click();
+			await expect( entry ).toHaveAttribute( 'aria-expanded', 'false' );
+			await entry.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( reactedBlock ).toHaveClass( /is-selected/ );
+			await expect( entry ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
 		test( 'the toolbar reaction button is keyboard accessible', async ( {
