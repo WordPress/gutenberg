@@ -103,6 +103,42 @@ describe( 'getAttributeChanges', () => {
 			},
 		} );
 	} );
+
+	it( 'records the removal of each value of an object nested within an attribute', () => {
+		expect(
+			getAttributeChanges(
+				{
+					style: {
+						border: {
+							top: '5px',
+							left: { min: '5px', max: '10px' },
+						},
+					},
+				},
+				{ style: { border: { top: '5px' } } }
+			)
+		).toStrictEqual( {
+			style: { border: { left: { min: undefined, max: undefined } } },
+		} );
+	} );
+
+	it( 'records a shorthand that replaces an object, rather than the removal of the values it held', () => {
+		expect(
+			getAttributeChanges(
+				{
+					style: {
+						border: {
+							top: '5px',
+							left: '5px',
+							right: '5px',
+							bottom: '10px',
+						},
+					},
+				},
+				{ style: { border: '5px' } }
+			)
+		).toEqual( { style: { border: '5px' } } );
+	} );
 } );
 
 describe( 'applyAttributeChanges', () => {
@@ -180,6 +216,15 @@ describe( 'applyAttributeChanges', () => {
 				{ style: { typography: { fontSize: undefined } } }
 			)
 		).toStrictEqual( { style: undefined } );
+	} );
+
+	it( 'replaces the per-side values a block holds with a shorthand', () => {
+		expect(
+			applyAttributeChanges(
+				{ style: { border: { top: '2px', bottom: '8px' } } },
+				{ style: { border: '5px' } }
+			)
+		).toEqual( { style: { border: '5px' } } );
 	} );
 
 	it( 'keeps the branches a removal does not mention', () => {
