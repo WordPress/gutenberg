@@ -158,13 +158,16 @@ export default function PostExcerptEditor( props ) {
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'The content is currently protected and does not have the available excerpt.'
-					) }
-				</Warning>
-			</div>
+			<>
+				{ inspectorControls }
+				<div { ...blockProps }>
+					<Warning>
+						{ __(
+							'The content is currently protected and does not have the available excerpt.'
+						) }
+					</Warning>
+				</div>
+			</>
 		);
 	}
 	const readMoreLink = (
