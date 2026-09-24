@@ -91,21 +91,17 @@ export default function useClickSelection() {
 					clickedClientId !== startClientId &&
 					canHostEditableRoot( clickedClientId )
 				) {
-					// Selecting the block turns its editable element into an
-					// inert part of the editing host. Make the DOM reflect
-					// that before the browser acts on this mousedown: the
-					// default action then places the caret into content
-					// editable through the host, and focuses the host,
-					// natively. Left to the re-render, the flip lands
-					// mid-click, after the browser placed the caret in the
-					// editable element, destroying both the caret and focus.
+					// Selecting the block makes its field inert under the
+					// engaged wrapper. Left to the re-render, that lands
+					// mid-click, after the browser placed the caret and focus
+					// in the field, and drops both. Do it now, so the default
+					// action places the caret through the host instead.
 					const editable = event.target.closest(
 						'[contenteditable="true"]'
 					);
 
 					if (
 						editable &&
-						editable !== node &&
 						getBlockClientId( editable ) === clickedClientId
 					) {
 						setContentEditableWrapper( node, true );
