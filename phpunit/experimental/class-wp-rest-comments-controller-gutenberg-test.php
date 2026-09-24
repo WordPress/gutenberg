@@ -1018,6 +1018,51 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertEmpty( $data['reaction_summary'] );
 	}
 
+	/**
+	 * The batch prefetch must cover the notes on the requested page, not the
+	 * first page, or every note falls back to its own summary queries.
+	 */
+	public function test_second_page_of_notes_keeps_reaction_summary_queries_bounded() {
+		wp_set_current_user( self::$editor_id );
+		$post_id  = self::factory()->post->create();
+		$note_ids = array();
+		for ( $i = 0; $i < 4; $i++ ) {
+			$note_ids[] = $this->create_note( $post_id, self::$editor_id );
+		}
+		foreach ( $note_ids as $note_id ) {
+			$this->create_reaction( $post_id, $note_id, self::$editor_id );
+		}
+
+		$summary_queries = 0;
+		$count_queries   = static function ( $query ) use ( &$summary_queries ) {
+			if ( str_contains( $query, "comment_type = 'reaction'" ) ) {
+				++$summary_queries;
+			}
+			return $query;
+		};
+		add_filter( 'query', $count_queries );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'post', $post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'status', 'all' );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'per_page', 2 );
+		$request->set_param( 'page', 2 );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'query', $count_queries );
+
+		$data = $response->get_data();
+		$this->assertCount( 2, $data );
+		foreach ( $data as $note ) {
+			$this->assertSame( 1, $note['reaction_summary']['heart']['count'] );
+			$this->assertTrue( $note['reaction_summary']['heart']['reacted'] );
+		}
+		// One counts query and one current-user query for the whole page.
+		$this->assertSame( 2, $summary_queries );
+	}
+
 	public function test_notes_and_reactions_excluded_from_comment_count() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();

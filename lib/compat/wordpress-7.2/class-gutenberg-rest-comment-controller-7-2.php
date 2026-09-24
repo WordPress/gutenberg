@@ -793,51 +793,34 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	public function get_items( $request ) {
 		$fields = $this->get_fields_for_response( $request );
 
-		// Pre-fetch reaction summaries when requesting notes with reaction_summary field.
+		// Pre-fetch reaction summaries for the notes the parent query actually
+		// returns, so pagination, ordering, and `rest_comment_query` filters
+		// all apply. The filter removes itself after the first query.
+		$prefetch = null;
 		if (
 			! empty( $request['type'] ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )
 		) {
-			// Run the same query logic as parent to get the comment IDs.
-			$registered         = $this->get_collection_params();
-			$parameter_mappings = array(
-				'author'         => 'author__in',
-				'author_email'   => 'author_email',
-				'author_exclude' => 'author__not_in',
-				'exclude'        => 'comment__not_in',
-				'include'        => 'comment__in',
-				'offset'         => 'offset',
-				'order'          => 'order',
-				'parent'         => 'parent__in',
-				'parent_exclude' => 'parent__not_in',
-				'per_page'       => 'number',
-				'post'           => 'post__in',
-				'search'         => 'search',
-				'status'         => 'status',
-				'type'           => 'type',
-			);
-
-			$prepared_args = array();
-			foreach ( $parameter_mappings as $api_param => $wp_param ) {
-				if ( isset( $registered[ $api_param ], $request[ $api_param ] ) ) {
-					$prepared_args[ $wp_param ] = $request[ $api_param ];
+			$prefetch = function ( $comments ) use ( &$prefetch ) {
+				remove_filter( 'the_comments', $prefetch );
+				$note_ids = array();
+				foreach ( (array) $comments as $comment ) {
+					if ( $comment instanceof WP_Comment && 'note' === $comment->comment_type ) {
+						$note_ids[] = (int) $comment->comment_ID;
+					}
 				}
-			}
-
-			// Only fetch IDs for the pre-fetch query.
-			$prepared_args['fields'] = 'ids';
-
-			$query    = new WP_Comment_Query();
-			$note_ids = $query->query( $prepared_args );
-
-			if ( ! empty( $note_ids ) ) {
-				$this->prefetch_reaction_summaries( array_map( 'intval', $note_ids ) );
-			}
+				$this->prefetch_reaction_summaries( $note_ids );
+				return $comments;
+			};
+			add_filter( 'the_comments', $prefetch );
 		}
 
 		$response = parent::get_items( $request );
 
+		if ( $prefetch ) {
+			remove_filter( 'the_comments', $prefetch );
+		}
 		$this->reaction_summaries = null;
 
 		return $response;

@@ -15,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -681,12 +682,25 @@ export function useNoteActions( reactionsMap = {} ) {
 			// `receiveEntityRecords` with no `query` arg updates the
 			// per-record cache, which the list selector reads through by ID
 			// — so the LIST view picks up the fresh `reaction_summary`
-			// without re-fetching every other note on the post.
+			// without re-fetching every other note on the post. Only the
+			// summary is requested and merged, so the view-context response
+			// can't replace the cached edit-context fields like
+			// `content.raw`, which seeds the edit form.
 			try {
 				const refreshed = await apiFetch( {
-					path: `/wp/v2/comments/${ commentId }`,
+					path: addQueryArgs( `/wp/v2/comments/${ commentId }`, {
+						_fields: 'id,reaction_summary',
+					} ),
 				} );
-				receiveEntityRecords( 'root', 'comment', [ refreshed ] );
+				const latest = getEntityRecord( 'root', 'comment', commentId );
+				if ( latest ) {
+					receiveEntityRecords( 'root', 'comment', [
+						{
+							...latest,
+							reaction_summary: refreshed.reaction_summary,
+						},
+					] );
+				}
 			} catch {
 				// The toggle itself succeeded and the local delta above
 				// already keeps this note's reactions consistent, so there
