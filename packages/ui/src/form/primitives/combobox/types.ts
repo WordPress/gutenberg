@@ -1,5 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
@@ -59,8 +59,34 @@ export type ComboboxInputGroupProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
-	children?: React.ReactNode;
+export interface ComboboxItemLabelProps extends ComponentProps< 'span' > {
+	/** The primary label and accessible name of a combobox item. */
+	children: ReactNode;
+}
+
+export interface ComboboxItemDescriptionProps extends ComponentProps< 'span' > {
+	/** Supplementary content described by the combobox item. */
+	children: ReactNode;
+}
+
+type ComboboxItemChildren =
+	| ReactElement< ComboboxItemLabelProps >
+	| [
+			ReactElement< ComboboxItemLabelProps >,
+			...(
+				| ReactElement< ComboboxItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
+export type ComboboxItemProps = Omit<
+	ComponentProps< typeof _Combobox.Item >,
+	'children'
+> & {
+	/** One direct ItemLabel, followed by zero or more ItemDescription components. */
+	children: ComboboxItemChildren;
 	/**
 	 * The variant of the item.
 	 *

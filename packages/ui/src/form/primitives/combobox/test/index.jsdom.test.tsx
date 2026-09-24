@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { createRef } from '@wordpress/element';
+import type { ComponentType, ReactNode } from 'react';
 import * as Combobox from '../index';
 
 const ITEMS = [
@@ -38,7 +40,9 @@ function renderDisabledMultiSelect() {
 						<Combobox.Collection>
 							{ ( item ) => (
 								<Combobox.Item key={ item.id } value={ item }>
-									{ item.value }
+									<Combobox.ItemLabel>
+										{ item.value }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -50,6 +54,75 @@ function renderDisabledMultiSelect() {
 }
 
 describe( 'Combobox', () => {
+	it( 'supports custom item text elements and forwards their refs', () => {
+		const labelRef = createRef< HTMLSpanElement >();
+		const descriptionRef = createRef< HTMLSpanElement >();
+
+		render(
+			<Combobox.Root items={ [ 'Apple' ] } inline open>
+				<Combobox.List>
+					<Combobox.Item value="Apple">
+						<Combobox.ItemLabel ref={ labelRef } render={ <h2 /> }>
+							Apple
+						</Combobox.ItemLabel>
+						<Combobox.ItemDescription
+							ref={ descriptionRef }
+							render={ <small /> }
+						>
+							Fresh fruit.
+						</Combobox.ItemDescription>
+					</Combobox.Item>
+				</Combobox.List>
+			</Combobox.Root>
+		);
+
+		expect( labelRef.current?.tagName ).toBe( 'H2' );
+		expect( descriptionRef.current?.tagName ).toBe( 'SMALL' );
+	} );
+
+	it( 'uses the item label as its accessible name and describes it in order', () => {
+		const item = { value: 'apple', label: 'Apple' };
+
+		render(
+			<Combobox.Root items={ [ item ] } inline open>
+				<Combobox.List>
+					<Combobox.Item value={ item }>
+						<Combobox.ItemLabel>Apple</Combobox.ItemLabel>
+						<Combobox.ItemDescription>
+							Fresh fruit.
+						</Combobox.ItemDescription>
+						<Combobox.ItemDescription>
+							In stock.
+						</Combobox.ItemDescription>
+					</Combobox.Item>
+				</Combobox.List>
+			</Combobox.Root>
+		);
+
+		const option = screen.getByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription(
+			'Fresh fruit. In stock.'
+		);
+	} );
+
+	it( 'requires an ItemLabel as the first direct child', () => {
+		const InvalidItem = Combobox.Item as ComponentType< {
+			value: string;
+			children?: ReactNode;
+		} >;
+
+		expect( () =>
+			render(
+				<Combobox.Root items={ [ 'Apple' ] } inline open>
+					<Combobox.List>
+						<InvalidItem value="Apple">Apple</InvalidItem>
+					</Combobox.List>
+				</Combobox.Root>
+			)
+		).toThrow( 'Combobox.ItemLabel must be the first direct child' );
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'renders a default trigger placeholder when no value is selected', () => {
 		render(
 			<Combobox.Root items={ ITEMS }>

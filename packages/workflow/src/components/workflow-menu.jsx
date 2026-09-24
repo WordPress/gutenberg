@@ -254,12 +254,12 @@ export function WorkflowMenu() {
 												handleExecuteAbility( item )
 											}
 										>
-											<span className="workflows-workflow-menu__item-label">
+											<Autocomplete.ItemLabel className="workflows-workflow-menu__item-label">
 												<TextHighlight
 													text={ item.label }
 													highlight={ search }
 												/>
-											</span>
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>

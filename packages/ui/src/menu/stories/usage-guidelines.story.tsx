@@ -86,7 +86,9 @@ export const AutocompleteForSearchableCommands: Story = {
 									key={ command.id }
 									value={ command }
 								>
-									{ command.value }
+									<Autocomplete.ItemLabel>
+										{ command.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>

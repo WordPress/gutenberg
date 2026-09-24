@@ -2,8 +2,14 @@ import { SearchableSelectControl as _SearchableSelectControl } from './searchabl
 import { Group } from '../primitives/combobox/group';
 import { GroupLabel } from '../primitives/combobox/group-label';
 import { Item } from '../primitives/searchable-select/item';
+import { ItemDescription } from '../primitives/combobox/item-description';
+import { ItemLabel } from '../primitives/combobox/item-label';
 import { Collection } from '../primitives/combobox/collection';
 import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
+
+Item.displayName = 'SearchableSelectControl.Item';
+ItemLabel.displayName = 'SearchableSelectControl.ItemLabel';
+ItemDescription.displayName = 'SearchableSelectControl.ItemDescription';
 
 /**
  * A complete searchable select field with integrated label and description.
@@ -14,6 +20,8 @@ export const SearchableSelectControl = Object.assign(
 		Group,
 		GroupLabel,
 		Item,
+		ItemLabel,
+		ItemDescription,
 		Collection,
 		useFilteredItems,
 	}

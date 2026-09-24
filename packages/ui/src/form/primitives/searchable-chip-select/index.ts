@@ -1,4 +1,6 @@
 import { Item } from '../combobox/item';
+import { ItemDescription } from '../combobox/item-description';
+import { ItemLabel } from '../combobox/item-label';
 import { ChipWithRemove } from '../combobox/chip-with-remove';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
@@ -7,6 +9,8 @@ import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableChipSelect as _SearchableChipSelect } from './searchable-chip-select';
 
 Item.displayName = 'SearchableChipSelect.Item';
+ItemLabel.displayName = 'SearchableChipSelect.ItemLabel';
+ItemDescription.displayName = 'SearchableChipSelect.ItemDescription';
 ChipWithRemove.displayName = 'SearchableChipSelect.ChipWithRemove';
 Group.displayName = 'SearchableChipSelect.Group';
 GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
@@ -19,6 +23,8 @@ GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
  */
 export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	Item,
+	ItemLabel,
+	ItemDescription,
 	ChipWithRemove,
 	Group,
 	GroupLabel,

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { createRef } from '@wordpress/element';
@@ -15,6 +15,35 @@ const mockedWarning = vi.mocked( warning );
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
+	} );
+
+	it( 'describes default items without adding the description to a chip', async () => {
+		await render(
+			<SearchableChipSelect
+				aria-label="Fruit"
+				items={ [
+					{
+						value: 'apple',
+						label: 'Apple',
+						description: 'Fresh fruit.',
+					},
+				] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		);
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		const chip = within( screen.getByRole( 'toolbar' ) ).getByText(
+			'Apple'
+		);
+		expect( chip ).toBeVisible();
+		expect( chip ).toHaveTextContent( 'Apple' );
+		expect( chip ).not.toHaveTextContent( 'Fresh fruit.' );
 	} );
 
 	it( 'forwards ref to the search input', async () => {
@@ -114,7 +143,9 @@ describe( 'SearchableChipSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelect.ItemLabel>
+										{ item.label }
+									</SearchableChipSelect.ItemLabel>
 								</SearchableChipSelect.Item>
 							) }
 						</SearchableChipSelect.Collection>
@@ -155,7 +186,9 @@ describe( 'SearchableChipSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelect.ItemLabel>
+										{ item.label }
+									</SearchableChipSelect.ItemLabel>
 								</SearchableChipSelect.Item>
 							) }
 						</SearchableChipSelect.Collection>
@@ -237,7 +270,9 @@ describe( 'SearchableChipSelect', () => {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
 						</SearchableChipSelect.Item>
 					) }
 				/>
@@ -285,7 +320,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>
@@ -339,7 +376,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>
@@ -495,7 +534,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>
