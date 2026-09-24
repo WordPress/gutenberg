@@ -52,7 +52,7 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	);
 
 	return (
-		<InspectorControls group="advanced">
+		<InspectorControls group="advanced-styles">
 			<AdvancedPanel
 				value={ style }
 				onChange={ onChange }
