@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Document that a custom `sort` receives the field values returned by `getValue`, not the items ([#83483](https://github.com/WordPress/gutenberg/pull/83483)).
+
 ## 19.1.0 (2026-09-23)
 
 ### New Features
