@@ -4,7 +4,7 @@ on:
         types: [labeled, unlabeled, ready_for_review, review_requested]
 jobs:
     type-related-labels:
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.event.pull_request.state == 'open' }}
         permissions:
             pull-requests: write
