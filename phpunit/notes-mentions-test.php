@@ -206,6 +206,21 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_send_note_notification
+	 */
+	public function test_email_keeps_the_note_line_breaks(): void {
+		$note = $this->insert_note(
+			'Fix the intro.<br>Then ping ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+
+		gutenberg_notify_note_mentions( $note );
+
+		$this->assertCount( 1, $this->sent );
+		$this->assertStringContainsString( "Fix the intro.\nThen ping @User", $this->sent[0]['message'] );
+	}
+
+	/**
 	 * @covers ::gutenberg_notify_note_mentions
 	 */
 	public function test_author_is_not_notified_about_their_own_note(): void {

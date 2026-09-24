@@ -3,7 +3,8 @@
  * Tests for the post author's note notification email.
  *
  * `wp_notify_postauthor()` places the note content in its plain text email as
- * stored, and the plugin reduces it to its text on `comment_notification_text`.
+ * stored, and the plugin replaces it with its plain text on
+ * `comment_notification_text`.
  *
  * @group notes
  */
@@ -33,35 +34,17 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 
 	/**
 	 * Sets up shared fixtures.
-	 */
-	public static function wpSetUpBeforeClass(): void {
-		self::$post_author = self::create_user( 'editor' );
-		self::$commenter   = self::create_user( 'editor' );
-
-		$post = self::factory()->post->create_and_get( array( 'post_author' => self::$post_author->ID ) );
-		if ( ! $post instanceof WP_Post ) {
-			throw new Exception( 'Expected WP_Post' );
-		}
-		self::$post = $post;
-	}
-
-	/**
-	 * Creates a user with the given role.
 	 *
-	 * @param string $role Role to assign.
-	 * @return WP_User The created user.
+	 * @param WP_UnitTest_Factory $factory Factory.
 	 */
-	private static function create_user( string $role ): WP_User {
-		$user = self::factory()->user->create_and_get( array( 'role' => $role ) );
-		if ( ! $user instanceof WP_User ) {
-			throw new Exception( 'Expected WP_User' );
-		}
-		return $user;
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
+		self::$post_author = $factory->user->create_and_get( array( 'role' => 'editor' ) );
+		self::$commenter   = $factory->user->create_and_get( array( 'role' => 'editor' ) );
+		self::$post        = $factory->post->create_and_get( array( 'post_author' => self::$post_author->ID ) );
 	}
 
 	public function set_up(): void {
 		parent::set_up();
-		$this->sent = array();
 		// Short-circuit wp_mail() and record what would have been sent.
 		add_filter( 'pre_wp_mail', array( $this, 'capture_mail' ), 10, 2 );
 	}
@@ -100,24 +83,51 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 				'comment_author_email' => self::$commenter->user_email,
 			)
 		);
-		assert( is_int( $comment_id ) );
+		$this->assertIsInt( $comment_id );
 		return $comment_id;
+	}
+
+	/**
+	 * Notifies the post author about a comment and returns the message they receive.
+	 *
+	 * @param string $content Comment content, as stored.
+	 * @param string $type    Comment type.
+	 * @return string The email message.
+	 */
+	private function notify_post_author( string $content, string $type = 'comment' ): string {
+		$this->assertTrue( wp_notify_postauthor( $this->insert_comment( $content, $type ) ) );
+		$this->assertCount( 1, $this->sent );
+		$this->assertSame( array( self::$post_author->user_email ), $this->sent[0]['to'] );
+
+		return $this->sent[0]['message'];
 	}
 
 	/**
 	 * @covers ::gutenberg_strip_note_markup_from_notification_text
 	 */
 	public function test_note_email_drops_the_markup_around_a_mention(): void {
-		$note_id = $this->insert_comment(
-			'Hi <span class="wp-note-mention user-7">@Reviewer</span>, please check the intro.',
-			'note'
-		);
+		$message = $this->notify_post_author( 'Hi <span class="wp-note-mention user-7">@Reviewer</span>, please check the intro.', 'note' );
 
-		$this->assertTrue( wp_notify_postauthor( $note_id ) );
-		$this->assertCount( 1, $this->sent );
-		$this->assertSame( array( self::$post_author->user_email ), $this->sent[0]['to'] );
-		$this->assertStringContainsString( "Note: \r\nHi @Reviewer, please check the intro.", $this->sent[0]['message'] );
-		$this->assertStringNotContainsString( '<span', $this->sent[0]['message'] );
+		$this->assertStringContainsString( "Note: \r\nHi @Reviewer, please check the intro.", $message );
+		$this->assertStringNotContainsString( '<span', $message );
+	}
+
+	/**
+	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 */
+	public function test_note_email_keeps_the_line_breaks(): void {
+		$message = $this->notify_post_author( 'Fix the intro.<br>Then publish.', 'note' );
+
+		$this->assertStringContainsString( "Note: \r\nFix the intro.\nThen publish.", $message );
+	}
+
+	/**
+	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 */
+	public function test_note_email_drops_the_inline_formatting_markup(): void {
+		$message = $this->notify_post_author( 'A <strong>bold</strong> <a href="https://example.com/">link</a> and <code>code</code>.', 'note' );
+
+		$this->assertStringContainsString( "Note: \r\nA bold link and code.", $message );
 	}
 
 	/**
@@ -126,12 +136,20 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	 * @covers ::gutenberg_strip_note_markup_from_notification_text
 	 */
 	public function test_note_email_keeps_escaped_text(): void {
-		$note_id = $this->insert_comment( 'Rename &lt;code&gt; to &lt;kbd&gt; here.', 'note' );
+		$message = $this->notify_post_author( 'Rename &lt;code&gt; to &lt;kbd&gt; here.', 'note' );
 
-		wp_notify_postauthor( $note_id );
+		$this->assertStringContainsString( 'Rename <code> to <kbd> here.', $message );
+	}
 
-		$this->assertCount( 1, $this->sent );
-		$this->assertStringContainsString( 'Rename <code> to <kbd> here.', $this->sent[0]['message'] );
+	/**
+	 * A note without content marks a thread as resolved or reopened, which the email says.
+	 *
+	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 */
+	public function test_note_email_keeps_the_wording_for_an_empty_note(): void {
+		$message = $this->notify_post_author( '', 'note' );
+
+		$this->assertStringContainsString( "Note: \r\nresolved/reopened", $message );
 	}
 
 	/**
@@ -140,17 +158,30 @@ class Tests_Notes_Post_Author_Notification extends WP_UnitTestCase {
 	 * @covers ::gutenberg_strip_note_markup_from_notification_text
 	 */
 	public function test_comment_email_leaves_the_content_as_is(): void {
-		$comment_id = $this->insert_comment( 'A <strong>bold</strong> <a href="https://example.com/">claim</a>.' );
+		$message = $this->notify_post_author( 'A <strong>bold</strong> <a href="https://example.com/">claim</a>.' );
 
-		wp_notify_postauthor( $comment_id );
-
-		$this->assertCount( 1, $this->sent );
-		$this->assertStringContainsString( 'A <strong>bold</strong> <a href="https://example.com/">claim</a>.', $this->sent[0]['message'] );
+		$this->assertStringContainsString( 'A <strong>bold</strong> <a href="https://example.com/">claim</a>.', $message );
 	}
 
 	/**
-	 * A WordPress version that reduces the note content to its text itself composes a
-	 * message without the stored markup, which the filter must leave unchanged.
+	 * The stored content is replaced wherever WordPress places it, with the tags
+	 * stripped before the entities are decoded.
+	 *
+	 * @covers ::gutenberg_strip_note_markup_from_notification_text
+	 */
+	public function test_filter_replaces_the_stored_content_with_its_plain_text(): void {
+		$note_id = $this->insert_comment( 'Hi <span class="wp-note-mention user-7">@Reviewer</span>,<br>rename &lt;code&gt; here.', 'note' );
+		$message = "Note: \r\nHi <span class=\"wp-note-mention user-7\">@Reviewer</span>,<br>rename <code> here.\r\n";
+
+		$this->assertSame(
+			"Note: \r\nHi @Reviewer,\nrename <code> here.\r\n",
+			gutenberg_strip_note_markup_from_notification_text( $message, $note_id )
+		);
+	}
+
+	/**
+	 * A WordPress version that places the plain text itself composes a message
+	 * without the stored content, which the filter must leave unchanged.
 	 *
 	 * @covers ::gutenberg_strip_note_markup_from_notification_text
 	 */
