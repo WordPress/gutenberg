@@ -59,13 +59,20 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftURL = null;
 
-		test( 'Setup the test page', async ( { page, admin, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
-			await perfUtils.saveDraft();
+		test( 'Setup the test page', async ( {
+			page,
+			admin,
+			requestUtils,
+			perfUtils,
+		} ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const draft = await requestUtils.createPage( {
+				content,
+				status: 'draft',
+			} );
 
 			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
+				postId: draft.id,
 				postType: 'page',
 			} );
 
@@ -114,16 +121,18 @@ test.describe( 'Site Editor Performance', () => {
 		test( 'Setup the test post', async ( {
 			page,
 			admin,
-			editor,
+			requestUtils,
 			perfUtils,
 		} ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await perfUtils.saveDraft();
+			const content = await perfUtils.loadContentForLargePost();
+			const draft = await requestUtils.createPage( {
+				content:
+					content + `<!-- wp:paragraph --><!-- /wp:paragraph -->`,
+				status: 'draft',
+			} );
 
 			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
+				postId: draft.id,
 				postType: 'page',
 			} );
 
