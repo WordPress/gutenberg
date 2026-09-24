@@ -6,6 +6,15 @@ import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
 
+function getErrorNotice() {
+	return {
+		title: __( 'The editor has crashed' ),
+		description: __(
+			'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
+		),
+	};
+}
+
 // A boundary catches whatever was thrown, which is not always an `Error`.
 function getErrorName( error ) {
 	return ( error instanceof Error && error.name ) || 'Error';
@@ -126,12 +135,8 @@ export default class ErrorBoundary extends Component {
 	}
 
 	componentDidCatch( error, errorInfo ) {
-		speak(
-			__(
-				'The editor has crashed. An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
-			),
-			'assertive'
-		);
+		const { title, description } = getErrorNotice();
+		speak( `${ title }. ${ description }`, 'assertive' );
 		this.setState( { componentStack: errorInfo?.componentStack } );
 		doAction( 'editor.ErrorBoundary.errorLogged', error, errorInfo );
 	}
@@ -146,6 +151,8 @@ export default class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
+		const { title, description } = getErrorNotice();
+
 		return (
 			<Stack
 				className="customize-widgets-error-boundary"
@@ -153,14 +160,8 @@ export default class ErrorBoundary extends Component {
 				gap="lg"
 			>
 				<Notice.Root intent="error">
-					<Notice.Title>
-						{ __( 'The editor has crashed' ) }
-					</Notice.Title>
-					<Notice.Description>
-						{ __(
-							'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
-						) }
-					</Notice.Description>
+					<Notice.Title>{ title }</Notice.Title>
+					<Notice.Description>{ description }</Notice.Description>
 					<Notice.Actions>
 						<CopyButton
 							variant="solid"
