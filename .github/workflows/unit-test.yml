@@ -5,8 +5,10 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
     # Allow manually triggering the workflow.
     workflow_dispatch:
 
@@ -202,7 +204,7 @@ jobs:
                   # dimension so flakiness.io keeps a separate history per Node
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
-              run: npm run test:unit:date -- --maxWorkers="$(nproc)"
+              run: npm run test:unit:date
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version

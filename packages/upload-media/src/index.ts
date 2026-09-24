@@ -15,6 +15,7 @@ export {
 	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
 } from './feature-detection';
+export { isHeicFile } from './utils';
 
 export type { ImageFormat } from './store/types';
 export type { FeatureDetectionResult } from './feature-detection';
