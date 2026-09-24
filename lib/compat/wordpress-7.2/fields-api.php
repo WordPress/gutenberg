@@ -151,32 +151,6 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
 
 /**
- * Whether a post type supports editor notes.
- *
- * Notes are declared as an argument of the `editor` support, e.g.
- * `'supports' => array( 'editor' => array( 'notes' => true ) )`, which
- * WordPress stores as a list of argument arrays.
- *
- * @param string $post_type The post type.
- * @return bool Whether the post type supports editor notes.
- */
-function _gutenberg_posttype_supports_notes( $post_type ) {
-	$supports = get_all_post_type_supports( $post_type );
-
-	if ( ! isset( $supports['editor'] ) || ! is_array( $supports['editor'] ) ) {
-		return false;
-	}
-
-	foreach ( $supports['editor'] as $args ) {
-		if ( is_array( $args ) && ! empty( $args['notes'] ) ) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-/**
  * Registers the default fields of every post type exposed in the REST API.
  *
  * These are the fields ported to the server so far; the editor still derives
@@ -255,7 +229,12 @@ function _gutenberg_register_posttype_supports_fields() {
 			);
 		}
 
-		if ( _gutenberg_posttype_supports_notes( $post_type ) ) {
+		// Notes are declared as an argument of the `editor` support, e.g.
+		// `'supports' => array( 'editor' => array( 'notes' => true ) )`, which
+		// WordPress stores as a list of argument arrays. A bare `editor`
+		// support is stored as `true`, hence the array check.
+		$editor_args = get_all_post_type_supports( $post_type )['editor'] ?? null;
+		if ( is_array( $editor_args ) && array_filter( array_column( $editor_args, 'notes' ) ) ) {
 			// packages/fields/src/fields/notes/index.tsx
 			$fields[] = array(
 				'id'            => 'notesCount',
