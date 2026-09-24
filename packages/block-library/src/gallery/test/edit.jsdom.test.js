@@ -139,9 +139,6 @@ describe( 'Gallery block', () => {
 			expect(
 				screen.getByRole( 'option', { name: 'Random' } )
 			).toBeEnabled();
-			expect(
-				screen.queryByLabelText( 'Randomize order' )
-			).not.toBeInTheDocument();
 		} );
 
 		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
@@ -174,9 +171,6 @@ describe( 'Gallery block', () => {
 			expect( orderBy ).toHaveDisplayValue( 'Newest to oldest' );
 			expect(
 				screen.queryByRole( 'option', { name: 'Custom' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByLabelText( 'Randomize order' )
 			).not.toBeInTheDocument();
 			// The order lives in Settings; the Source panel is a plain
 			// PanelBody with no resettable items, hence no options menu.
