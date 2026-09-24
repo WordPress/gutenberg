@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `pasteHandler`: remove non-breaking spaces and every trailing line break from the end of pasted lines ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+-   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
 
 ## 16.1.0 (2026-09-23)
 

@@ -285,25 +285,37 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should remove non-breaking spaces at the end of pasted lines', () => {
+	it( 'should replace non-breaking spaces at the edges of pasted text', () => {
 		const filtered = pasteHandler( {
-			HTML: '<p>a&nbsp;</p><p>b&nbsp;<br>c&nbsp;d</p>',
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;c&nbsp;d</p>',
 			mode: 'AUTO',
 		} )
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<p>a</p><p>b<br>c&nbsp;d</p>' );
+		expect( filtered ).toBe( '<p>a <a href="#">b</a> c&nbsp;d</p>' );
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should remove non-breaking spaces at the end of inline pasted text', () => {
+	it( 'should remove non-breaking spaces at the end of pasted lines', () => {
 		const filtered = pasteHandler( {
-			HTML: 'a&nbsp;',
+			HTML: '<p>a&nbsp;</p><p>b&nbsp;<br>c</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a</p><p>b<br>c</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should replace non-breaking spaces at the edges of inline pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a&nbsp;<strong>b</strong>&nbsp;',
 			mode: 'INLINE',
 		} );
 
-		expect( filtered ).toBe( 'a' );
+		expect( filtered ).toBe( 'a <strong>b</strong>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -320,14 +332,14 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should keep non-breaking spaces at the end of lines in raw handling', () => {
+	it( 'should keep non-breaking spaces in raw handling', () => {
 		const filtered = rawHandler( {
-			HTML: '<p>a&nbsp;</p>',
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>',
 		} )
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe( '<p>a&nbsp;</p>' );
+		expect( filtered ).toBe( '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>' );
 	} );
 
 	it( 'should normalize decomposed characters', () => {

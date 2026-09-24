@@ -1,12 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Blocks raw handling > pasteHandler > apple 1`] = `"<strong>This is a</strong> title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:"`;
+exports[`Blocks raw handling > pasteHandler > apple 1`] = `"<strong>This is a</strong> title<br><br><br><strong>This is a <em>heading</em></strong><br><br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org">link</a>.<br><br><br>A<br>Bulleted<br>Indented<br>List<br><br><br>One<br>Two<br>Three<br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br>An image:<br>"`;
 
 exports[`Blocks raw handling > pasteHandler > classic 1`] = `"First paragraph<br><br>Second paragraph<br>Third paragraph<br>Fourth paragraph<br>Fifth paragraph<br>Sixth paragraph"`;
 
 exports[`Blocks raw handling > pasteHandler > evernote 1`] = `"This is a <em>paragraph</em>.<br><br><br>This is a <a href="https://w.org">link</a>.<br><br><br>An<br>Unordered<br>Indented<br>List<br><br><br>One<br>Two<br>Indented<br>Three<br><br><br><br><br><br><br>One<br>Two<br>Three<br>Four<br>Five<br>Six<br><img src="data:image/jpeg;base64,###">"`;
 
-exports[`Blocks raw handling > pasteHandler > google-docs 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184">"`;
+exports[`Blocks raw handling > pasteHandler > google-docs 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br>"`;
 
 exports[`Blocks raw handling > pasteHandler > google-docs-link-spacing 1`] = `"This is a paragraph with a <a href="https://example.com/one">link in the middle</a> of the sentence, and it ends with <a href="https://example.com/two">another link</a> before the final words."`;
 
@@ -14,11 +14,11 @@ exports[`Blocks raw handling > pasteHandler > google-docs-list-only 1`] = `"My f
 
 exports[`Blocks raw handling > pasteHandler > google-docs-table 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
 
-exports[`Blocks raw handling > pasteHandler > google-docs-table-with-colspan 1`] = `"<br><br>Test colspan"`;
+exports[`Blocks raw handling > pasteHandler > google-docs-table-with-colspan 1`] = `"<br><br>Test colspan<br><br>"`;
 
 exports[`Blocks raw handling > pasteHandler > google-docs-table-with-comments 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
 
-exports[`Blocks raw handling > pasteHandler > google-docs-table-with-rowspan 1`] = `"<br><br>Test rowspan"`;
+exports[`Blocks raw handling > pasteHandler > google-docs-table-with-rowspan 1`] = `"<br><br>Test rowspan<br><br>"`;
 
 exports[`Blocks raw handling > pasteHandler > google-docs-with-comments 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href="https://w.org/">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src="https://lh4.googleusercontent.com/ID" width="544" height="184"><br><br>"`;
 
@@ -32,13 +32,13 @@ exports[`Blocks raw handling > pasteHandler > markdown 1`] = `"This is a heading
 
 exports[`Blocks raw handling > pasteHandler > mixed-content 1`] = `"Some heading<br><br>Content we need to preserve"`;
 
-exports[`Blocks raw handling > pasteHandler > ms-word 1`] = `"This is a title<br><br>This is a subtitle<br><br>This is a heading level 1<br><br>This is a heading level 2<br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org/">link</a>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br>An image:<br><br><img width="451" height="338" src="file:LOW-RES.png"><br><a href="#anchor">This is an anchor link</a> that leads to the next paragraph.<br><a id="anchor">This is the paragraph with the anchor.</a><br><a href="#nowhere">This is an anchor link</a> that leads nowhere.<br><a>This is a paragraph with an anchor with no link pointing to it.</a><br>This is a reference to a footnote<a href="#_ftn1" id="_ftnref1">[1]</a>.<br>This is a reference to an endnote<a href="#_edn1" id="_ednref1">[i]</a>.<br><br><br><a href="#_ftnref1" id="_ftn1">[1]</a> This is a footnote.<br><br><br><a href="#_ednref1" id="_edn1">[i]</a> This is an endnote."`;
+exports[`Blocks raw handling > pasteHandler > ms-word 1`] = `"This is a title<br><br>This is a subtitle<br><br>This is a heading level 1<br><br>This is a heading level 2<br><br>This is a <strong>paragraph</strong> with a <a href="https://w.org/">link</a>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br>&nbsp;<br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br>An image:<br><br><img width="451" height="338" src="file:LOW-RES.png"><br><a href="#anchor">This is an anchor link</a> that leads to the next paragraph.<br><a id="anchor">This is the paragraph with the anchor.</a><br><a href="#nowhere">This is an anchor link</a> that leads nowhere.<br><a>This is a paragraph with an anchor with no link pointing to it.</a><br>This is a reference to a footnote<a href="#_ftn1" id="_ftnref1">[1]</a>.<br>This is a reference to an endnote<a href="#_edn1" id="_ednref1">[i]</a>.<br><br><br><a href="#_ftnref1" id="_ftn1">[1]</a> This is a footnote.<br><br><br><a href="#_ednref1" id="_edn1">[i]</a> This is an endnote."`;
 
-exports[`Blocks raw handling > pasteHandler > ms-word-list 1`] = `"<a>This is a headline?</a><br>This is a text:<br>One<br>Two<br>Three<br><a>Lorem Ipsum.</a>"`;
+exports[`Blocks raw handling > pasteHandler > ms-word-list 1`] = `"<a>This is a headline?</a><br>This is a text:<br>One<br>Two<br>Three<br><a>Lorem Ipsum.</a><br>"`;
 
 exports[`Blocks raw handling > pasteHandler > ms-word-online 1`] = `"This is a <em>heading</em><br>This is a <strong>paragraph</strong> with a <a href="https://w.org/" target="_blank" rel="noopener">link</a>.<br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br>An image:<br><img src="data:image/jpeg;base64,###">"`;
 
-exports[`Blocks raw handling > pasteHandler > ms-word-styled 1`] = `"<br><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit</strong><br><br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
+exports[`Blocks raw handling > pasteHandler > ms-word-styled 1`] = `"<br><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;</strong><br><br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
 
 exports[`Blocks raw handling > pasteHandler > nested-divs 1`] = `"First paragraph<br><br>Second paragraph<br>Third paragraph<br>Fourth paragraph<br>Fifth paragraph<br>Sixth paragraph"`;
 
@@ -76,9 +76,9 @@ exports[`Blocks raw handling > pasteHandler > should strip windows data 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Blocks raw handling > pasteHandler > slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
+exports[`Blocks raw handling > pasteHandler > slack-paragraphs 1`] = `"test with <a target="_blank" href="http://w.org/" rel="noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
 
-exports[`Blocks raw handling > pasteHandler > slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a>."`;
+exports[`Blocks raw handling > pasteHandler > slack-quote 1`] = `"Test with <a target="_blank" href="http://w.org/" rel="noopener">link</a>."`;
 
 exports[`Blocks raw handling > pasteHandler > two-images 1`] = `"<img src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137"> <img src="http://localhost/wp-content/uploads/2018/01/Dec-05-2017-17-52-09-9-300x248.gif" alt="" width="300" height="248">"`;
 

@@ -20,9 +20,10 @@ import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
+import nonBreakingSpaceCorrector from './non-breaking-space-corrector';
 import htmlFormattingRemover from './html-formatting-remover';
 import formatSpaceCorrector from './format-space-corrector';
-import trailingWhitespaceRemover from './trailing-whitespace-remover';
+import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
@@ -57,9 +58,10 @@ function filterInlineHTML( HTML: string ): string {
 	);
 
 	HTML = deepFilterHTML( HTML, [
+		nonBreakingSpaceCorrector,
 		htmlFormattingRemover,
 		formatSpaceCorrector,
-		trailingWhitespaceRemover,
+		brRemover,
 	] );
 
 	// Allows us to ask for this information when we get a report.
@@ -225,9 +227,10 @@ export function pasteHandler( {
 			piece = deepFilterHTML(
 				piece,
 				[
+					nonBreakingSpaceCorrector,
 					htmlFormattingRemover,
 					formatSpaceCorrector,
-					trailingWhitespaceRemover,
+					brRemover,
 					emptyParagraphRemover,
 				],
 				blockContentSchema
