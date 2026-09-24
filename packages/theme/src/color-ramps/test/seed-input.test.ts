@@ -25,9 +25,8 @@ const REJECTED_SEEDS = [
 	'color(display-p3 1 0 0)',
 	'rgb(NaN 0 0)',
 	'rgb(infinity 0 0)',
-	'rgb(none 0 0)',
-	'rgb(0 none 0)',
-	'rgb(0 0 none)',
+	'rgb(1e999 0 0)',
+	'rgb(none infinity 0)',
 	'rgb(0 0 0 / none)',
 	'',
 	'not-a-color',
@@ -43,6 +42,18 @@ function testSeedColorContract( build: ( seed: string ) => unknown ) {
 	it.each( REJECTED_SEEDS )( 'rejects unsupported seed %p', ( seed ) => {
 		expect( () => build( seed ) ).toThrow();
 	} );
+
+	it.each( [
+		[ 'rgb(none 88 233)', 'rgb(0 88 233)' ],
+		[ 'rgb(56 none 233)', 'rgb(56 0 233)' ],
+		[ 'rgb(56 88 none)', 'rgb(56 88 0)' ],
+		[ 'rgb(none none none)', 'rgb(0 0 0)' ],
+	] )(
+		'builds the same ramp for missing-channel seed %p as for %p',
+		( seed, zeroSeed ) => {
+			expect( build( seed ) ).toEqual( build( zeroSeed ) );
+		}
+	);
 
 	it( 'rejects non-sRGB color spaces even when the color space is registered', () => {
 		// Registering OKLCH would otherwise make `oklch(...)` strings parse.

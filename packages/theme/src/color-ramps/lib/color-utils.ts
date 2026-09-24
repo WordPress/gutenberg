@@ -91,6 +91,7 @@ function getContrastFromLuminances( first: number, second: number ): number {
  * Parse a seed-color string and assert that it has finite sRGB coordinates and
  * is fully opaque (hex, `rgb()`/`rgba()`, or a CSS named color), throwing
  * otherwise.
+ * Missing RGB channels (`none`) resolve to zero.
  *
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
  * registered.
@@ -123,15 +124,17 @@ export function parseSeedColor( seed: string ): ReturnType< typeof parse > {
 		);
 	}
 
-	if (
-		! coords.every(
-			( coordinate ) =>
-				typeof coordinate === 'number' && Number.isFinite( coordinate )
-		)
-	) {
-		throw new Error(
-			`Unsupported seed color "${ seed }": expected every RGB channel to be a finite number.`
-		);
+	for ( const [ index, coordinate ] of coords.entries() ) {
+		if ( coordinate === null ) {
+			coords[ index ] = 0;
+		} else if (
+			typeof coordinate !== 'number' ||
+			! Number.isFinite( coordinate )
+		) {
+			throw new Error(
+				`Unsupported seed color "${ seed }": expected every RGB channel to be a finite number.`
+			);
+		}
 	}
 
 	if ( alpha !== 1 ) {
