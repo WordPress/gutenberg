@@ -266,14 +266,19 @@ function _gutenberg_register_posttype_fields() {
 
 /**
  * Core post types registered on `init` at 0 priority,
- * see https://github.com/oandregal/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592
+ * see https://github.com/wordpress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592
  * Custom Post Types are usually registered on `init` at the default priority (10).
  *
  * Even though core registers/unregisters most supports at the same time as post type registration,
- * some are changed later, see https://github.com/oandregal/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-admin/includes/admin-filters.php#L89
+ * some are changed later:
  *
- * Alternatively, we could have registered the fields upon post type registration (`register_post_type` hook),
- * but we risk not having the right supports (because they are registered/unregistered later).
+ * - wp_navigation removes editor support
+ *   - at https://github.com/oandregal/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-admin/includes/post.php#L2639
+ * 	 - hooked to edit_form_after_title (after init) https://github.com/wordpress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-admin/includes/admin-filters.php#L89
+ *
+ * We cannot know the final supports of a post type at the time of its registration (`register_post_type` hook),
+ * so we register the fields later, on `init` at priority 99.
+ *
  */
 add_action( 'init', '_gutenberg_register_posttype_fields', 99 );
 
