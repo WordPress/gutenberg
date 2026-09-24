@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	useState,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useSyncExternalStore,
@@ -15,7 +16,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
@@ -612,77 +612,68 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
 }
 
+const subscribeNoop = () => () => {};
+
 export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
 } ) {
-	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
 
-	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
+	// Only floating mode needs measurements; without a subscriber the store
+	// drops its observer.
+	const { heights, anchorRects, canvas } = useSyncExternalStore(
+		isFloating ? store.subscribe : subscribeNoop,
+		store.getSnapshot
+	);
+
+	// Moving blocks shifts anchors without resizing anything or re-registering.
+	useLayoutEffect( () => {
+		store.requestMeasure();
+	}, [ store, threads ] );
+
+	// Derived during render, so a resize reaches the screen in the same paint.
+	const notePositions = useMemo(
+		() =>
+			calculateNotePositions( {
+				threads,
+				selectedNoteId,
+				blockRects: anchorRects,
+				heights,
+			} ).positions,
+		[ threads, selectedNoteId, anchorRects, heights ]
+	);
 
 	// Notes are positioned in canvas content-space; CSS inherits
-	// `--canvas-scroll` to translate each thread in sync with the canvas.
-	useEffect( () => {
-		if ( ! isFloating || ! sidebarRef?.current ) {
+	// `--canvas-scroll` to translate each thread in sync with the canvas,
+	// so scrolling never re-renders. A layout effect, so the offset is in
+	// place before the first positions paint.
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel || ! canvas ) {
 			return;
 		}
-
-		const panel = sidebarRef.current;
-		const blockEl = store.getFirstBlockElement();
-		// Climb to the block-list root so nested scroll containers
-		// (e.g. a Group with overflow:auto) don't shadow the canvas.
-		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
-		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
 
 		const applyScroll = () => {
 			panel.style.setProperty(
 				'--canvas-scroll',
-				`${ -( canvas?.scrollTop ?? 0 ) }px`
+				`${ -canvas.scrollTop }px`
 			);
 		};
-
-		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		let rafId;
-		const schedule = () => {
-			window.cancelAnimationFrame( rafId );
-			rafId = window.requestAnimationFrame( () => {
-				const result = calculateNotePositions( {
-					threads,
-					selectedNoteId,
-					blockRects: store.getAnchorRects(),
-					heights,
-					scrollTop: canvas?.scrollTop ?? 0,
-				} );
-
-				setNotePositions( result.positions );
-				applyScroll();
-			} );
-		};
-
-		schedule();
-
-		// Anchors are read from the DOM, so editing, adding or removing any
-		// block leaves the threads after it stale.
-		const contentObserver = new window.ResizeObserver( schedule );
-		if ( rootEl ) {
-			contentObserver.observe( rootEl );
-		}
+		applyScroll();
 
 		// Root scrolling elements (documentElement/body) don't fire scroll
 		// on themselves; capture on the window catches them in either canvas.
-		const view = canvas?.ownerDocument?.defaultView;
+		const view = canvas.ownerDocument.defaultView;
 		const listenerOptions = { passive: true, capture: true };
-		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
-
+		view.addEventListener( 'scroll', applyScroll, listenerOptions );
 		return () => {
-			window.cancelAnimationFrame( rafId );
-			contentObserver.disconnect();
-			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+			view.removeEventListener( 'scroll', applyScroll, listenerOptions );
+			panel.style.removeProperty( '--canvas-scroll' );
 		};
-	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+	}, [ sidebarRef, isFloating, canvas ] );
 
 	return {
 		notePositions,
