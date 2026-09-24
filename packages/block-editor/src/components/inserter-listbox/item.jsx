@@ -13,11 +13,18 @@ function InserterListboxItem(
 			// over Button's `isFocusable`. The latter was shown to
 			// cause an issue with tab order in the inserter list.
 			accessibleWhenDisabled
+			// Manage the roving tab index below. Otherwise every item
+			// re-renders to update it once the items have registered.
+			tabbable
+			// Without an explicit type, every item re-renders after mount
+			// once Ariakit detects the native button.
+			type="button"
 			{ ...props }
 			render={ ( htmlProps ) => {
 				const propsWithTabIndex = {
 					...htmlProps,
-					tabIndex: isFirst ? 0 : htmlProps.tabIndex,
+					tabIndex:
+						isFirst || htmlProps[ 'data-active-item' ] ? 0 : -1,
 				};
 				if ( Component ) {
 					return (
