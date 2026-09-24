@@ -31,9 +31,13 @@ type SourceOrderControlProps = {
 	order: Order;
 	/** Whether the gallery's `randomOrder` attribute is set. */
 	isRandom: boolean;
-	/** Called with `{ orderby, order }` to update the query. */
+	/**
+	 * Called with `{ orderby, order }` to update the query. Choosing an order
+	 * also turns "Random" off; the handler owns that so both writes land in one
+	 * undo level.
+	 */
 	onChange: ( order: Order ) => void;
-	/** Called to set or clear the `randomOrder` attribute. */
+	/** Called to set the `randomOrder` attribute. */
 	onRandomChange: ( isRandom: boolean ) => void;
 };
 
@@ -61,9 +65,6 @@ export function SourceOrderControl( {
 					onRandomChange( true );
 					return;
 				}
-				if ( isRandom ) {
-					onRandomChange( false );
-				}
 				onChange( parseOrderValue( value ) );
 			} }
 		/>
@@ -79,7 +80,10 @@ type SortImagesControlProps = {
 	isRandom: boolean;
 	/** Whether the sort orders can be applied (false while media resolves). */
 	canSort: boolean;
-	/** Called with `{ orderby, order }` to sort the images. */
+	/**
+	 * Called with `{ orderby, order }` to sort the images. Sorting also turns
+	 * "Random" off; the handler owns that so both writes land in one undo level.
+	 */
 	onSort: ( order: Order ) => void;
 	/** Called to set or clear the `randomOrder` attribute. */
 	onRandomChange: ( isRandom: boolean ) => void;
@@ -133,12 +137,15 @@ export function SortImagesControl( {
 					onRandomChange( true );
 					return;
 				}
-				if ( isRandom ) {
-					onRandomChange( false );
+				if ( nextValue === CUSTOM_ORDER ) {
+					// Custom means the editor order, so this only turns
+					// Random off, and only when it's on.
+					if ( isRandom ) {
+						onRandomChange( false );
+					}
+					return;
 				}
-				if ( nextValue !== CUSTOM_ORDER ) {
-					onSort( parseOrderValue( nextValue ) );
-				}
+				onSort( parseOrderValue( nextValue ) );
 			} }
 		/>
 	);
