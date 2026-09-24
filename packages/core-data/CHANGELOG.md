@@ -10,11 +10,14 @@
 
 -   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).
 
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment). An unscoped search given no `perPage` returns every title holding each word typed rather than cutting the merged results, which cannot be paged through, so no matching result is lost ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+
 ## 8.1.0 (2026-09-23)
 
 ### Bug Fixes
 
--   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment). An unscoped search given no `perPage` returns every title holding each word typed rather than cutting the merged results, which cannot be paged through, so no matching result is lost ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
 -   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
 -   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
