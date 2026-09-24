@@ -41,6 +41,17 @@ function toOrder( value: string ): Order {
 	return { orderby, order };
 }
 
+/**
+ * Help text for the control while "Random" is selected. It's the one order the
+ * editor can't show (the shuffle happens on the front end), so say so; the
+ * other orders are self-evident from the canvas and get no help.
+ */
+function getOrderHelp( isRandom: boolean ): string | undefined {
+	return isRandom
+		? __( 'Images are shown in a random order each time the page loads.' )
+		: undefined;
+}
+
 const SOURCE_ORDER_OPTIONS = [ ...ORDER_OPTIONS, RANDOM_OPTION ];
 
 type SourceOrderControlProps = {
@@ -57,7 +68,7 @@ type SourceOrderControlProps = {
 };
 
 /**
- * Ordering control for a dynamic gallery, shown in the Source panel. The
+ * Ordering control for a dynamic gallery, shown in the Settings panel. The
  * chosen order is a *setting*: it's stored in the source's query and re-applied
  * every time the source resolves. "Random" is stored separately (the
  * `randomOrder` attribute) and overrides the query order on the front end, so
@@ -74,6 +85,7 @@ export function SourceOrderControl( {
 		<OrderSelect
 			value={ isRandom ? RANDOM_ORDER : `${ orderby }/${ order }` }
 			options={ SOURCE_ORDER_OPTIONS }
+			help={ getOrderHelp( isRandom ) }
 			onChange={ ( value ) => {
 				if ( value === RANDOM_ORDER ) {
 					onRandomChange( true );
@@ -144,15 +156,7 @@ export function SortImagesControl( {
 		<OrderSelect
 			value={ value }
 			options={ options }
-			help={
-				isRandom
-					? __(
-							'Images are shown in a random order each time the page loads.'
-						)
-					: __(
-							'Sorts the images now. You can still drag them into a different order.'
-						)
-			}
+			help={ getOrderHelp( isRandom ) }
 			onChange={ ( nextValue ) => {
 				if ( nextValue === RANDOM_ORDER ) {
 					onRandomChange( true );
