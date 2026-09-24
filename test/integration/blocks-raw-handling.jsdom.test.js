@@ -319,6 +319,17 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should paste a lone non-breaking space', () => {
+		const filtered = pasteHandler( {
+			HTML: '&nbsp;',
+			plainText: '\u00a0',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( '&nbsp;' );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'should remove non-breaking spaces at the end of pasted plain text lines', () => {
 		const filtered = pasteHandler( {
 			HTML: '',

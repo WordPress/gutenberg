@@ -27,6 +27,20 @@ describe( 'nonBreakingSpaceCorrector', () => {
 		).toBe( '<p> a </p>' );
 	} );
 
+	it( 'should keep non-breaking spaces that are all there is', () => {
+		expect(
+			deepFilterHTML( '<p>&nbsp;</p>', [ nonBreakingSpaceCorrector ] )
+		).toBe( '<p>&nbsp;</p>' );
+	} );
+
+	it( 'should replace non-breaking spaces between elements', () => {
+		expect(
+			deepFilterHTML( '<p><a href="#">a</a>&nbsp;<a href="#">b</a></p>', [
+				nonBreakingSpaceCorrector,
+			] )
+		).toBe( '<p><a href="#">a</a> <a href="#">b</a></p>' );
+	} );
+
 	it( 'should keep non-breaking spaces inside text', () => {
 		expect(
 			deepFilterHTML( '<p>a&nbsp;b</p>', [ nonBreakingSpaceCorrector ] )
