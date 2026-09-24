@@ -1,16 +1,16 @@
 import { useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-import { store as blockEditorStore } from '../../store';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
+// A field is editable on its own, or through the editing host while its
+// block is selected (no contenteditable attribute of its own then).
+const editableSelector =
+	'[contenteditable="true"],[data-wp-block-attribute-key]';
 
 export function useTypewriter() {
-	const { getSelectedBlockClientId, getBlockOrder, getBlockParents } =
-		useSelect( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
@@ -105,15 +105,15 @@ export function useTypewriter() {
 					( defaultView.innerHeight - scrollContainerY );
 
 			// If the scroll position is at the start, the caret is in the last
-			// block, and it is positioned within the initial trigger percentage
-			// of the page, do not scroll the page.
+			// editable element, and it is positioned within the initial
+			// trigger percentage of the page, do not scroll the page.
 			// The typewriter effect should not kick in until an empty page has been
 			// filled with the initial trigger percentage or the user scrolls
 			// intentionally down.
 			if (
 				scrollY === 0 &&
 				relativeScrollPosition < initialTriggerPercentage &&
-				isInLastBlock()
+				isLastEditableNode()
 			) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
@@ -178,37 +178,36 @@ export function useTypewriter() {
 		}
 
 		/**
-		 * Checks if the current situation is eligible for scroll:
-		 * - The component must contain the selection.
-		 * - The selection must be within editable content.
+		 * Returns the editable element containing the selection, if any.
 		 */
-		function isSelectionEligibleForScroll() {
+		function getSelectionEditableElement() {
 			const { anchorNode } = defaultView.getSelection();
 
 			if ( ! anchorNode || ! node.contains( anchorNode ) ) {
-				return false;
+				return null;
 			}
 
 			const element =
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			return !! element?.isContentEditable;
+			const editable = element?.closest( editableSelector );
+			return editable?.isContentEditable ? editable : null;
 		}
 
 		/**
-		 * Whether the selected block is, or is inside, the last root block.
+		 * Checks if the current situation is eligible for scroll:
+		 * - The component must contain the selection.
+		 * - The selection must be within editable content.
 		 */
-		function isInLastBlock() {
-			const clientId = getSelectedBlockClientId();
+		function isSelectionEligibleForScroll() {
+			return !! getSelectionEditableElement();
+		}
 
-			if ( ! clientId ) {
-				return false;
-			}
-
-			const [ topLevelClientId = clientId ] = getBlockParents( clientId );
-			const order = getBlockOrder();
-			return order[ order.length - 1 ] === topLevelClientId;
+		function isLastEditableNode() {
+			const editableNodes = node.querySelectorAll( editableSelector );
+			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
+			return lastEditableNode === getSelectionEditableElement();
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
