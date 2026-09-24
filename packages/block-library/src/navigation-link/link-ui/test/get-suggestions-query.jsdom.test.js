@@ -28,6 +28,15 @@ describe( 'getSuggestionsQuery', () => {
 	);
 
 	it.each( LINK_TYPES )(
+		'ranks the %s link’s own type above the usual order',
+		( type, kind, expected ) => {
+			expect( getSuggestionsQuery( type, kind ).preferTypes ).toEqual( [
+				expected.subtype ? expected : expected.type,
+			] );
+		}
+	);
+
+	it.each( LINK_TYPES )(
 		'suggests the %s link’s own type before anything is typed',
 		( type, kind, expected ) => {
 			expect(

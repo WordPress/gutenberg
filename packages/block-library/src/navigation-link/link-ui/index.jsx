@@ -23,12 +23,12 @@ import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
- * Given the Link block's type attribute, return the search params describing
- * that one entity type.
+ * Given the Link block's type attribute, return the query params for that one
+ * entity type.
  *
  * @param {string} type Link block's type attribute.
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type: string, subtype?: string }} Entity search params.
+ * @return {{ type: string, subtype?: string }} Search query params.
  */
 function getOwnTypeSearchOptions( type, kind ) {
 	switch ( type ) {
@@ -48,8 +48,8 @@ function getOwnTypeSearchOptions( type, kind ) {
 			if ( kind === 'post-type' ) {
 				return { type: 'post', subtype: type };
 			}
-			// A custom link is bound to no entity, so it has no type of its
-			// own to suggest. Pages are the most likely thing to be linked.
+			// for custom link which has no type
+			// always show pages as initial suggestions
 			return { type: 'post', subtype: 'page' };
 	}
 }
@@ -57,14 +57,6 @@ function getOwnTypeSearchOptions( type, kind ) {
 /**
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
- *
- * A typed search is deliberately unscoped, so that every entity type is
- * reachable from one search box. Adding anything but a page to a Navigation
- * otherwise means leaving the search box, picking a block type, and typing
- * again.
- *
- * The block's own type still decides the suggestions shown before anything is
- * typed, which is what makes a Page Link open on a list of pages.
  *
  * @param {string} type Link block's type attribute.
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
@@ -77,12 +69,8 @@ export function getSuggestionsQuery( type, kind ) {
 	const ownType = getOwnTypeSearchOptions( type, kind );
 
 	return {
-		// No `perPage`. A typed search covers every type at once and cannot be
-		// paged through, so naming a number would cut results that nothing
-		// could ask for again.
-		//
-		// The link's own type leads, and everything else keeps its usual place
-		// behind it, so a Category Link lists categories first.
+		// No `perPage`: an unscoped search cannot be paged through, so naming
+		// a number would cut results nothing could ask for again.
 		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
 		initialSuggestionsSearchOptions: { ...ownType, perPage },
 	};

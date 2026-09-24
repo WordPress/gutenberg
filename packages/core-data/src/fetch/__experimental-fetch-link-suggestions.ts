@@ -29,10 +29,6 @@ export type SearchOptions = {
 	 * Result types to rank above the usual order, most wanted first. Everything
 	 * left out keeps its usual place behind them.
 	 *
-	 * An entry is a search type, covering everything of that type, or a search
-	 * type with one subtype, covering only that subtype. A caller that edits
-	 * one kind of link leads with that kind:
-	 *
 	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
 	 */
 	preferTypes?: TypeOrderEntry[];
@@ -317,12 +313,8 @@ function getTitleMatch(
 }
 
 /**
- * A position in a type order.
- *
- * Either a search type, which covers everything of that type, or a search type with one subtype,
- * which covers only that subtype. Naming a subtype lets it outrank the rest of its type, while a
- * plain search type catches every subtype at once — including custom post types and taxonomies,
- * which no caller can be expected to list.
+ * A position in a type order: a search type, covering everything of that type, or a search type
+ * with one subtype, covering only that subtype.
  */
 export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
 
@@ -338,7 +330,7 @@ export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
  * whether a page is a better answer than a post, and ranking by search type means every custom
  * post type counts as content and every custom taxonomy counts as a taxonomy without being named.
  */
-const TYPE_ORDER: TypeOrderEntry[] = [
+const TYPE_ORDER: SearchType[] = [
 	'post',
 	'term',
 	'post-format',
@@ -383,21 +375,19 @@ function getTypeWeight(
 	result: SearchResult,
 	preferTypes: TypeOrderEntry[] = []
 ): number {
-	const covers = ( entry: TypeOrderEntry ) => {
-		const searchType = getSearchType( result );
+	const searchType = getSearchType( result );
 
-		return typeof entry === 'string'
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		typeof entry === 'string'
 			? entry === searchType
-			: entry.type === searchType && entry.subtype === result.type;
-	};
-
-	const preferred = preferTypes.findIndex( covers );
+			: entry.type === searchType && entry.subtype === result.type
+	);
 
 	if ( preferred !== -1 ) {
 		return TYPE_ORDER.length + ( preferTypes.length - preferred );
 	}
 
-	return TYPE_ORDER.length - TYPE_ORDER.findIndex( covers );
+	return TYPE_ORDER.length - TYPE_ORDER.indexOf( searchType );
 }
 
 /**
