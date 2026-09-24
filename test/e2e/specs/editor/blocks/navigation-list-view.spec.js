@@ -137,6 +137,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 	test( `can add new menu items`, async ( {
 		page,
+		pageUtils,
 		editor,
 		requestUtils,
 		linkControl,
@@ -210,48 +211,76 @@ test.describe( 'Navigation block - List view editing', () => {
 			expect( thirdResultType ).toBe( 'Page' );
 		} );
 
-		// Searching reaches more than pages, and pages are still listed first
-		// because the appended item is a Page Link.
-		// See https://github.com/WordPress/gutenberg/issues/77072.
-		await page.keyboard.type( 'Test', { delay: 50 } );
+		await test.step( 'search from default link returns best page type matches first', async () => {
+			// Search for a string that is the start of a page title
+			await page.keyboard.type( 'Test', { delay: 50 } );
 
-		const searchedResults = await linkControl.getSearchResults();
+			const searchedResults = await linkControl.getSearchResults();
 
-		// The initial suggestions are pages, so wait for a result that can only
-		// come from the typed search before asserting on the order.
-		await expect(
-			searchedResults.filter( { hasText: 'Test Post 1' } )
-		).toBeVisible();
+			// The initial suggestions are pages, so wait for a result that can only
+			// come from the typed search before asserting on the order.
+			await expect(
+				searchedResults.filter( { hasText: 'Test Post 1' } )
+			).toBeVisible();
 
-		expect(
-			await linkControl.getSearchResultType( searchedResults.first() )
-		).toBe( 'Page' );
+			// The appended item is a Page Link, so first results should be pages
+			const types = await Promise.all(
+				[ 0, 1, 2 ].map( async ( index ) =>
+					linkControl.getSearchResultType(
+						await linkControl.getNthSearchResult( index )
+					)
+				)
+			);
+			expect( types ).toEqual( [ 'Page', 'Page', 'Page' ] );
+		} );
 
-		// Taxonomy terms are reachable from the same search field.
-		await linkUIInput.fill( '' );
-		await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+		await test.step( 'can find taxonomy results via default link search', async () => {
+			// Replace the search text with a category name.
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
 
-		const categoryResult = ( await linkControl.getSearchResults() ).filter(
-			{ hasText: DEFAULT_CATEGORY_NAME }
-		);
-		await expect( categoryResult ).toBeVisible();
-		expect( await linkControl.getSearchResultType( categoryResult ) ).toBe(
-			'Category'
-		);
+			const searchedResults = await linkControl.getSearchResults();
+			const categoryResult = searchedResults.filter( {
+				hasText: DEFAULT_CATEGORY_NAME,
+			} );
 
-		// Create the link.
-		await categoryResult.click();
+			await expect( categoryResult ).toBeVisible();
 
-		// Check the new menu item was inserted at the end of the existing menu.
-		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: DEFAULT_CATEGORY_NAME,
-				} )
-				.filter( {
-					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
-				} )
-		).toBeVisible();
+			// Nothing else on the site holds the word, so the term leads.
+			expect(
+				await linkControl.getSearchResultType( searchedResults.first() )
+			).toBe( 'Category' );
+		} );
+
+		await test.step( 'can create a taxonomy result via default link search', async () => {
+			// select it with the keyboard
+			await pageUtils.pressKeys( 'ArrowDown' );
+
+			const categoryResult = (
+				await linkControl.getSearchResults()
+			).filter( { hasText: DEFAULT_CATEGORY_NAME } );
+
+			// URLInput is a combobox: focus stays on the input and the
+			// highlighted option carries `aria-selected`.
+			await expect( categoryResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
+			// Submit the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check the new menu item was inserted at the end of the existing menu.
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: DEFAULT_CATEGORY_NAME,
+					} )
+					.filter( {
+						hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
+					} )
+			).toBeVisible();
+		} );
 	} );
 
 	test( `can remove menu items`, async ( { page, editor, requestUtils } ) => {
