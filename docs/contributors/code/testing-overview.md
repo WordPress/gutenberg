@@ -64,7 +64,16 @@ Run `npm run lint` independently for code style checks. [ESLint](https://eslint.
 
 `npm run test:unit:routing` compares live Vitest discovery with the repository's test-file patterns. Each discovered test must belong to exactly one project, selected by its filename. The check rejects missing tests, duplicate ownership, per-file environment overrides, and obsolete Jest runner infrastructure. It does not depend on a fixed test count or migration metadata. The required `All` CI check runs it.
 
-`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure. `npm run test:unit:vitest:shuffled` shuffles files and tests inside each file with the fixed seed `80855`.
+`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure.
+
+`npm run test:unit:vitest:shuffled` shuffles files and tests inside each file. CI uses `GITHUB_RUN_NUMBER` as the seed across all Node/jsdom shards and the Chromium job. Each new workflow run uses a different seed; rerunning that workflow keeps the same seed. Each job logs its seed and a reproduction command. Use the same checkout and Node.js version when reproducing a failure.
+
+Locally, Vitest chooses a seed from the current time unless you pass `--sequence.seed`. Supply the seed from a CI log to reproduce its ordering, retaining the project and shard arguments shown there. For example:
+
+```sh
+npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=node --project=jsdom --shard=1/4
+npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=browser
+```
 
 #### Public tooling consumers
 
