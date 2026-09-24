@@ -2662,8 +2662,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 			return [ ...blockTypeInserterItems, ...patternInserterItems ];
 		},
 		( state, rootClientId ) => [
-			getBlockTypes(),
-			getBlockVariationsRaw(),
+			getBlockTypeInserterItems( state ),
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 			state.blocks.order,
 			state.preferences.insertUsage,
