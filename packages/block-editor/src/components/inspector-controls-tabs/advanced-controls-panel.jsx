@@ -7,17 +7,41 @@ import {
 	default as InspectorControls,
 	InspectorAdvancedControls,
 } from '../inspector-controls';
-import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
+import groups, {
+	PrivateInspectorControlsAllowedBlocks,
+} from '../inspector-controls/groups';
 
-const AdvancedControls = ( { initialOpen = false } ) => {
+/**
+ * Renders the "Advanced" panel for the block inspector.
+ *
+ * Advanced controls are split across two slot groups so that each inspector tab
+ * can show the tools that belong to it: `advanced` for settings tools such as
+ * the HTML anchor, and `advanced-styles` for styling tools such as Additional
+ * CSS. When the inspector has both a Settings and a Styles tab, each tab
+ * renders its own panel. When there is no Styles tab, a single panel renders
+ * both groups so that no control is dropped.
+ *
+ * @param {Object}  props                      Component props.
+ * @param {boolean} props.initialOpen          Whether the panel starts expanded.
+ * @param {boolean} props.showSettingsControls Whether to render the `advanced` group.
+ * @param {boolean} props.showStylesControls   Whether to render the `advanced-styles` group.
+ */
+const AdvancedControls = ( {
+	initialOpen = false,
+	showSettingsControls = true,
+	showStylesControls = false,
+} ) => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
+	const styleFills = useSlotFills( groups[ 'advanced-styles' ].name );
 	const privateFills = useSlotFills(
 		PrivateInspectorControlsAllowedBlocks.name
 	);
-	const hasFills = Boolean( fills && fills.length );
-	const hasPrivateFills = Boolean( privateFills && privateFills.length );
+	const hasSettingsFills =
+		showSettingsControls &&
+		( Boolean( fills?.length ) || Boolean( privateFills?.length ) );
+	const hasStyleFills = showStylesControls && Boolean( styleFills?.length );
 
-	if ( ! hasFills && ! hasPrivateFills ) {
+	if ( ! hasSettingsFills && ! hasStyleFills ) {
 		return null;
 	}
 
@@ -27,8 +51,15 @@ const AdvancedControls = ( { initialOpen = false } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ initialOpen }
 		>
-			<InspectorControls.Slot group="advanced" />
-			<PrivateInspectorControlsAllowedBlocks.Slot />
+			{ showSettingsControls && (
+				<InspectorControls.Slot group="advanced" />
+			) }
+			{ showStylesControls && (
+				<InspectorControls.Slot group="advanced-styles" />
+			) }
+			{ showSettingsControls && (
+				<PrivateInspectorControlsAllowedBlocks.Slot />
+			) }
 		</PanelBody>
 	);
 };

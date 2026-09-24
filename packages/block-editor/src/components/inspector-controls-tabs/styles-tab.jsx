@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import AdvancedControls from './advanced-controls-panel';
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import PositionControls from './position-controls-panel';
@@ -101,6 +102,7 @@ const StylesTab = ( {
 	hasBlockStyles,
 	isSectionBlock,
 	contentClientIds,
+	showAdvancedControls = false,
 } ) => {
 	return (
 		<>
@@ -155,6 +157,16 @@ const StylesTab = ( {
 					<PositionControls />
 					<InspectorControls.Slot group="styles" />
 				</>
+			) }
+			{ /* Section blocks are excluded from the panels above but still
+			     expose advanced styling tools such as Additional CSS. */ }
+			{ showAdvancedControls && (
+				<div>
+					<AdvancedControls
+						showSettingsControls={ false }
+						showStylesControls
+					/>
+				</div>
 			) }
 		</>
 	);

@@ -82,7 +82,9 @@ function StyleInspectorSlots( {
 			) }
 			{ showAdvancedControls && (
 				<div>
-					<AdvancedControls />
+					{ /* There are no tabs to divide the advanced tools
+					     between, so a single panel holds all of them. */ }
+					<AdvancedControls showStylesControls />
 				</div>
 			) }
 		</>
