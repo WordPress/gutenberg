@@ -360,11 +360,10 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'returns at least 20 results even if not all have a word match in the title, ordered by best matches first', () => {
-		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
-		// neither. The 5 answers come first and are never cut, then the 5
-		// partial matches, then 10 of the rest fill the room left by a limit
-		// of 20.
+	it( 'leaves out titles holding nothing that was typed, ordered by best matches first', () => {
+		// 5 titles hold both words typed and 5 hold one of them. The 30
+		// holding neither were matched on a body, so they are not offered at
+		// all, and the whole-word matches come before the partial ones.
 		const startsWith = ( titles, prefix ) =>
 			titles.every( ( title ) => title.startsWith( prefix ) );
 
@@ -372,16 +371,11 @@ describe( 'fetchLinkSuggestions', () => {
 			( suggestions ) => {
 				const titles = suggestions.map( ( { title } ) => title );
 
-				expect( titles ).toHaveLength( 20 );
+				expect( titles ).toHaveLength( 10 );
 				expect( startsWith( titles.slice( 0, 5 ), 'Few Notes' ) ).toBe(
 					true
 				);
-				expect( startsWith( titles.slice( 5, 10 ), 'Notes' ) ).toBe(
-					true
-				);
-				expect( startsWith( titles.slice( 10 ), 'Unrelated' ) ).toBe(
-					true
-				);
+				expect( startsWith( titles.slice( 5 ), 'Notes' ) ).toBe( true );
 			}
 		);
 	} );
