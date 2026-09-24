@@ -17,16 +17,6 @@ export type Order = {
  * isn't a valid REST `orderby` value, so the editor preview couldn't reproduce
  * it (see `dynamic-source.js`).
  */
-/**
- * The "Random" order. Unlike the orders above it isn't an `orderby`: it is the
- * gallery's `randomOrder` attribute, applied only on the front end by shuffling
- * the rendered images (see `index.php`), so the editor keeps showing the
- * underlying order. Offered as the last option of both modes' "Order by"
- * control, since it overrides whatever other order is in place.
- */
-export const RANDOM_ORDER = 'random';
-export const RANDOM_OPTION = { label: __( 'Random' ), value: RANDOM_ORDER };
-
 export const ORDER_OPTIONS = [
 	{ label: __( 'Newest to oldest' ), value: 'date/desc' },
 	{ label: __( 'Oldest to newest' ), value: 'date/asc' },
@@ -41,3 +31,13 @@ export const ORDER_OPTIONS = [
 		value: 'title/desc',
 	},
 ];
+
+/**
+ * The "Random" order. Unlike the orders above it isn't an `orderby`: it is the
+ * gallery's `randomOrder` attribute, applied only on the front end by shuffling
+ * the rendered images (see `index.php`), so the editor keeps showing the
+ * underlying order. Offered as the last option of both modes' "Order by"
+ * control, since it overrides whatever other order is in place.
+ */
+export const RANDOM_ORDER = 'random';
+export const RANDOM_OPTION = { label: __( 'Random' ), value: RANDOM_ORDER };
