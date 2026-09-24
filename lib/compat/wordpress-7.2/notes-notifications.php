@@ -11,15 +11,18 @@
  *
  * An @mention is stored as `<span class="wp-note-mention user-N">@Name</span>`.
  * The chip is unwrapped, opener and closer, so the name stays and the markup
- * goes. Everything else in the content is left as it is.
+ * goes. Whether a `<span>` is a chip is read from its class names, so
+ * `wp-note-mention` inside another class name or in the text does not count.
  *
- * The `<span>` openers and closers are delimited the way wp_strip_all_tags()
- * delimits a tag, and WP_HTML_Tag_Processor reads the class names of each
- * opener: it is the tag, not the string, that says whether a span is a chip, so
- * `wp-note-mention` inside another class name or in the text does not count. A
- * nesting stack pairs each chip opener with its own closer, and a closer without
- * an opener is left as it is, since note content is user-editable and not
- * guaranteed to be well formed.
+ * The content is parsed by the WP_HTML_Processor and written back token
+ * by token without the chips, the way WP_HTML_Processor::serialize() writes a
+ * document, as the HTML API has no public way to remove a tag. The rest of the
+ * content therefore comes back normalized rather than byte for byte: tag names
+ * in lower case, attributes double quoted, an unclosed tag closed and a stray
+ * closer dropped. Text is written back with only `&`, `<` and `>` as entities,
+ * which wp_specialchars_decode() turns back into the text the author typed.
+ * Content the processor cannot parse to the end is returned as stored, chips
+ * included, rather than cut short.
  *
  * @since 7.2.0
  *
@@ -31,37 +34,51 @@ function gutenberg_unwrap_note_mentions( string $content ): string {
 		return $content;
 	}
 
-	/*
-	 * Every `<span>` opener and closer, in document order, with its offset. The
-	 * Tag Processor can read a tag but neither remove one nor say where in the
-	 * string it sits, so the tags are located here and only their class names
-	 * are read through it.
-	 */
-	if ( ! preg_match_all( '#<(/?)span(?=[\s/>])[^>]*>#i', $content, $span_tags, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+	$processor = WP_HTML_Processor::create_fragment( $content );
+	if ( null === $processor ) {
 		return $content;
 	}
 
+	/*
+	 * A stack of the open `<span>` elements, true for a chip, pairs each chip
+	 * opener with its own closer: the processor visits the closers in nesting
+	 * order and closes an unclosed element itself at the end.
+	 */
 	$span_stack = array();
 	$unwrapped  = '';
-	$copied_to  = 0;
-	foreach ( $span_tags as $span_tag ) {
-		list( $tag, $at ) = $span_tag[0];
+	while ( $processor->next_token() ) {
+		if ( 'SPAN' === $processor->get_tag() ) {
+			if ( $processor->is_tag_closer() ) {
+				$is_mention = array_pop( $span_stack );
+			} else {
+				$is_mention   = true === $processor->has_class( 'wp-note-mention' );
+				$span_stack[] = $is_mention;
+			}
 
-		if ( '/' === $span_tag[1][0] ) {
-			$is_mention = array_pop( $span_stack );
-		} else {
-			$opener       = new WP_HTML_Tag_Processor( $tag );
-			$is_mention   = $opener->next_tag() && $opener->has_class( 'wp-note-mention' );
-			$span_stack[] = $is_mention;
+			if ( true === $is_mention ) {
+				continue;
+			}
 		}
 
-		if ( true === $is_mention ) {
-			$unwrapped .= substr( $content, $copied_to, $at - $copied_to );
-			$copied_to  = $at + strlen( $tag );
+		if ( '#text' === $processor->get_token_type() ) {
+			/*
+			 * The processor's own serialization also turns the quotes into
+			 * entities, which wp_specialchars_decode() leaves as they are, so
+			 * they would show up as entities in the email.
+			 */
+			$unwrapped .= htmlspecialchars( $processor->get_modifiable_text(), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8' );
+			continue;
 		}
+
+		$unwrapped .= $processor->serialize_token();
 	}
 
-	return $unwrapped . substr( $content, $copied_to );
+	// Cut short by markup the processor does not support, or by an incomplete tag.
+	if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+		return $content;
+	}
+
+	return $unwrapped;
 }
 
 /**
