@@ -342,6 +342,7 @@ HTML;
 		);
 
 		$expected_bindings_metadata = array(
+			'visibility'  => array( 'source' => 'core/pattern-overrides' ),
 			'myAttribute' => array( 'source' => 'core/pattern-overrides' ),
 		);
 		$this->assertSame(
@@ -802,7 +803,8 @@ HTML;
 		);
 
 		$expected_bindings_metadata = array(
-			'content' => array( 'source' => 'core/pattern-overrides' ),
+			'content'    => array( 'source' => 'core/pattern-overrides' ),
+			'visibility' => array( 'source' => 'core/pattern-overrides' ),
 		);
 		$this->assertSame(
 			$expected_bindings_metadata,
