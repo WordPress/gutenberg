@@ -1898,6 +1898,76 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	test( 'can change open in new tab from the Link UI popover', async ( {
+		admin,
+		editor,
+		navigation,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"wordpress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menu.id,
+			},
+		} );
+
+		const navLinkBlock = navigation
+			.getNavBlock()
+			.getByRole( 'document', { name: 'Block: Custom Link' } );
+		await expect( navLinkBlock ).toBeVisible();
+
+		await editor.openDocumentSettingsSidebar();
+		await editor.selectBlocks( navLinkBlock );
+
+		const sidebarCheckbox = navigation
+			.getContentControls()
+			.getByRole( 'checkbox', { name: 'Open in new tab' } );
+		await expect( sidebarCheckbox ).not.toBeChecked();
+
+		const linkPopover = navigation.getLinkPopover();
+		const popoverCheckbox = linkPopover.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		await test.step( 'Check open in new tab and apply', async () => {
+			await pageUtils.pressKeys( 'primary+k' );
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await linkPopover
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+
+			await popoverCheckbox.check();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).toBeChecked();
+		} );
+
+		await test.step( 'Uncheck open in new tab and apply', async () => {
+			// The Advanced settings stay expanded, as the editor persists
+			// their open state.
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await expect( popoverCheckbox ).toBeChecked();
+
+			await popoverCheckbox.uncheck();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).not.toBeChecked();
+		} );
+	} );
+
 	test.describe( 'Navigation Link Inspector Link Editing', () => {
 		let testPage1;
 
