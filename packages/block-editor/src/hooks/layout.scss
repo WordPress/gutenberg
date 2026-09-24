@@ -37,8 +37,15 @@
 	gap: $grid-unit-10;
 
 	.block-editor-hooks__flex-layout-justification-trigger {
-		justify-content: space-between;
 		width: 100%;
+	}
+
+	.block-editor-hooks__flex-layout-justification-label {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-align: start;
+		text-overflow: ellipsis;
 	}
 }
 

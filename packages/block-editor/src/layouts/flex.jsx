@@ -580,7 +580,9 @@ function FlexLayoutJustifyContentControl( {
 						/>
 					}
 				>
-					{ selectedOption.label }
+					<span className="block-editor-hooks__flex-layout-justification-label">
+						{ selectedOption.label }
+					</span>
 				</Menu.Trigger>
 				<Menu.Popup
 					positioner={
