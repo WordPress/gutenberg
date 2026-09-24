@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution".
+
 ## 27.0.0 (2026-09-23)
 
 ### Breaking Changes
