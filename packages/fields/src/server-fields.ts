@@ -3,7 +3,7 @@
  * on the server.
  *
  * The serializable part of these fields (id, type, label, elements, filter
- * operators…) is declared in PHP, see `_gutenberg_register_posttype_fields()`
+ * operators…) is declared in PHP, see `_gutenberg_register_posttype_supports_fields()`
  * in `lib/compat/wordpress-7.2/fields-api.php`, and reaches the editor through
  * the `wp/v2/fields` REST route. What cannot be serialized (callbacks and
  * components) ships here: the editor imports this module on demand and merges

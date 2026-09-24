@@ -160,7 +160,7 @@ add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
  * @param string $post_type The post type.
  * @return bool Whether the post type supports editor notes.
  */
-function _gutenberg_post_type_supports_notes( $post_type ) {
+function _gutenberg_posttype_supports_notes( $post_type ) {
 	$supports = get_all_post_type_supports( $post_type );
 
 	if ( ! isset( $supports['editor'] ) || ! is_array( $supports['editor'] ) ) {
@@ -203,7 +203,7 @@ function _gutenberg_post_type_supports_notes( $post_type ) {
  * supports (templates, attachments) adjust them in their own step, hooked
  * to the same action at priority 9, right after this one.
  */
-function _gutenberg_register_posttype_fields() {
+function _gutenberg_register_posttype_supports_fields() {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 	foreach ( $post_types as $post_type ) {
 		if ( post_type_supports( $post_type, 'author' ) ) {
@@ -255,7 +255,7 @@ function _gutenberg_register_posttype_fields() {
 			);
 		}
 
-		if ( _gutenberg_post_type_supports_notes( $post_type ) ) {
+		if ( _gutenberg_posttype_supports_notes( $post_type ) ) {
 			// packages/fields/src/fields/notes/index.tsx
 			$fields[] = array(
 				'id'            => 'notesCount',
@@ -273,7 +273,7 @@ function _gutenberg_register_posttype_fields() {
 		gutenberg_register_fields( 'postType', $post_type, $fields );
 	}
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_fields', 0 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_supports_fields', 0 );
 
 /**
  * Adjusts the default fields of templates.
@@ -287,10 +287,10 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_fields', 0 );
  * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
-function _gutenberg_register_wp_template_fields() {
+function _gutenberg_register_posttype_wp_template_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template', array( 'author' ) );
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_fields', 9 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
 
 /**
  * Adjusts the default fields of template parts.
@@ -304,10 +304,10 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_fields', 9
  * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
-function _gutenberg_register_wp_template_part_fields() {
+function _gutenberg_register_posttype_wp_template_part_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template_part', array( 'author' ) );
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_part_fields', 9 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );
 
 /**
  * Replaces the default fields of attachments with the media fields.
@@ -323,7 +323,7 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_wp_template_part_field
  * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
-function _gutenberg_register_attachment_fields() {
+function _gutenberg_register_posttype_attachment_fields() {
 	$post_type = get_post_type_object( 'attachment' );
 	if ( ! $post_type || ! $post_type->show_in_rest ) {
 		return;
@@ -348,4 +348,4 @@ function _gutenberg_register_attachment_fields() {
 		)
 	);
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_attachment_fields', 9 );
+add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_attachment_fields', 9 );
