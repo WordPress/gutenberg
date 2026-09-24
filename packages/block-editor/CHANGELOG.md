@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add a `showBlockBoundaries` setting that displays outlines around blocks in the editor canvas ([#69388](https://github.com/WordPress/gutenberg/pull/69388)).
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 
 ### Bug Fixes

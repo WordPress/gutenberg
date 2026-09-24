@@ -108,4 +108,15 @@ describe( 'EditPostPreferencesModal', () => {
 			} )
 		).toBeInTheDocument();
 	} );
+
+	it( 'shows the block boundaries control in Appearance preferences', async () => {
+		const user = setupActiveModal();
+		await user.click( screen.getByRole( 'tab', { name: 'Appearance' } ) );
+
+		expect(
+			await screen.findByRole( 'checkbox', {
+				name: 'Show block boundaries',
+			} )
+		).toBeInTheDocument();
+	} );
 } );

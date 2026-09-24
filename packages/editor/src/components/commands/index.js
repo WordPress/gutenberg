@@ -84,7 +84,7 @@ const getEditorCommandLoader = () =>
 			showBlockBreadcrumbs,
 			isDistractionFree,
 			isFocusMode,
-			isBoundaryMode,
+			showBlockBoundaries,
 			isPreviewMode,
 			isViewable,
 			isPublished,
@@ -114,7 +114,7 @@ const getEditorCommandLoader = () =>
 				showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
-				isBoundaryMode: get( 'core', 'boundaryMode' ),
+				showBlockBoundaries: get( 'core', 'showBlockBoundaries' ),
 				isPreviewMode: getSettings().isPreviewMode,
 				isViewable: postType?.viewable ?? false,
 				isPublished: isCurrentPostPublished(),
@@ -207,13 +207,14 @@ const getEditorCommandLoader = () =>
 		} );
 
 		commands.push( {
-			name: 'core/toggle-boundary-mode',
-			label: isBoundaryMode
-				? __( 'Disable boundary mode' )
-				: __( 'Enable boundary mode' ),
+			name: 'core/toggle-block-boundaries',
+			label: showBlockBoundaries
+				? __( 'Hide block boundaries' )
+				: __( 'Show block boundaries' ),
 			icon: grid,
+			category: 'command',
 			callback: ( { close } ) => {
-				toggle( 'core', 'boundaryMode' );
+				toggle( 'core', 'showBlockBoundaries' );
 				close();
 			},
 		} );
