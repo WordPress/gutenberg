@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
@@ -48,7 +37,7 @@ function defaultRenderSelectedValue(
 					// translators: %d: number of items selected (it will always be 2 or more items)
 					_n( '%d item selected', '%d items selected', value.length ),
 					value.length
-			  );
+				);
 	}
 
 	return value;

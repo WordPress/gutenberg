@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 export const FeaturedImageView = ( {

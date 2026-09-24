@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Pattern Overrides', () => {
@@ -59,7 +56,7 @@ test.describe( 'Pattern Overrides', () => {
 				.click();
 
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 			await page.keyboard.type( 'This paragraph can be edited' );
 			await page.keyboard.press( 'Enter' );
@@ -398,6 +395,48 @@ test.describe( 'Pattern Overrides', () => {
 					.getByRole( 'button', { name: 'Move down' } )
 			).toBeHidden();
 		} );
+	} );
+
+	test( 'the parent block selector of a block with overrides selects the pattern', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Test Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"Editable Paragraph","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Editable paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		await editor.selectBlocks( paragraph );
+		await editor.showBlockToolbar();
+
+		const parentSelector = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Select parent block' } );
+		await expect( parentSelector ).toBeVisible();
+
+		await parentSelector.click();
+
+		await expect( patternBlock ).toHaveClass( /is-selected/ );
 	} );
 
 	test.describe( 'block editing modes', () => {

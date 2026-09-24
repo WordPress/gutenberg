@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -11,10 +8,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {
@@ -59,22 +52,27 @@ export const createTemplate =
 					template: savedTemplate.slug,
 				}
 			);
+		const { defaultRenderingMode, renderingMode } =
+			select.getEditorSettings();
 		registry
 			.dispatch( noticesStore )
 			.createSuccessNotice(
 				__( "Custom template created. You're in template mode now." ),
 				{
 					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Go back' ),
-							onClick: () =>
-								dispatch.setRenderingMode(
-									select.getEditorSettings()
-										.defaultRenderingMode
-								),
-						},
-					],
+					// An editor with a fixed rendering mode has no other mode
+					// to go back to, so the action is not offered.
+					actions: renderingMode
+						? []
+						: [
+								{
+									label: __( 'Back' ),
+									onClick: () =>
+										dispatch.setRenderingMode(
+											defaultRenderingMode
+										),
+								},
+							],
 				}
 			);
 		return savedTemplate;
@@ -306,12 +304,12 @@ export const removeTemplates =
 							/* translators: %s: The template/part's name. */
 							__( '"%s" reset.' ),
 							decodeEntities( title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: The template/part's name. */
 							_x( '"%s" deleted.', 'template part' ),
 							decodeEntities( title )
-					  );
+						);
 			} else {
 				successMessage = isResetting
 					? __( 'Items reset.' )
@@ -359,14 +357,14 @@ export const removeTemplates =
 									'An error occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  )
+							)
 						: sprintf(
 								/* translators: %s: an error message */
 								__(
 									'An error occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
-						  );
+							);
 				} else {
 					errorMessage = isResetting
 						? sprintf(
@@ -375,14 +373,14 @@ export const removeTemplates =
 									'Some errors occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  )
+							)
 						: sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
 									'Some errors occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
-						  );
+							);
 				}
 			}
 			registry
@@ -542,6 +540,115 @@ export const setRevisionPage =
 		} );
 	};
 
+function createRevisionsLoadFailedNotice( registry ) {
+	registry
+		.dispatch( noticesStore )
+		.createNotice( 'warning', __( 'Revisions could not be loaded.' ), {
+			type: 'snackbar',
+			id: 'editor-revisions-load-failed',
+		} );
+}
+
+/**
+ * Open a revision from a shared URL and select the page that contains it.
+ *
+ * @param {number} revisionId The revision ID to open.
+ */
+export const openRevision =
+	( revisionId ) =>
+	async ( { dispatch, select, registry } ) => {
+		// Set the revision before loading its page so the canvas and slider
+		// can show loading states.
+		dispatch.setCurrentRevisionId( revisionId );
+
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		// Fetch all IDs in the slider's order so the revision's index points
+		// to the right page.
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions( 'postType', postType, postId, {
+				per_page: -1,
+				context: 'edit',
+				orderby: 'date',
+				order: 'desc',
+				_fields: revisionKey,
+			} );
+
+		// Ignore stale results if the user navigated during the request.
+		if ( select.getCurrentRevisionId() !== revisionId ) {
+			return;
+		}
+
+		// core-data swallows request errors, so a missing result means the
+		// request failed. Keep the selection so a reload can try again.
+		if ( ! revisions ) {
+			createRevisionsLoadFailedNotice( registry );
+			return;
+		}
+
+		const index = revisions.findIndex(
+			( revision ) => revision[ revisionKey ] === revisionId
+		);
+		if ( index === -1 ) {
+			// Autosaves can be missing from the collection when revisions are
+			// disabled. Fetch the record directly so a request failure is not
+			// mistaken for a 404.
+			let revision;
+			try {
+				revision = await apiFetch( {
+					path: addQueryArgs(
+						entityConfig.getRevisionsUrl( postId, revisionId ),
+						{ context: 'edit' }
+					),
+				} );
+			} catch ( error ) {
+				if ( select.getCurrentRevisionId() !== revisionId ) {
+					return;
+				}
+				if ( error?.data?.status !== 404 ) {
+					createRevisionsLoadFailedNotice( registry );
+					return;
+				}
+
+				dispatch.setCurrentRevisionId( null );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'warning', __( 'Invalid revision ID.' ), {
+						type: 'snackbar',
+						id: 'editor-revision-invalid',
+					} );
+				return;
+			}
+
+			if ( select.getCurrentRevisionId() !== revisionId ) {
+				return;
+			}
+			if ( ! revision ) {
+				createRevisionsLoadFailedNotice( registry );
+				return;
+			}
+			await registry
+				.dispatch( coreStore )
+				.receiveRevisions( 'postType', postType, postId, revision, {
+					context: 'edit',
+				} );
+			return;
+		}
+
+		const page = Math.floor( index / select.getRevisionsPerPage() ) + 1;
+		if ( page !== select.getRevisionPage() ) {
+			// `setRevisionPage()` would replace the deep-linked revision with
+			// the newest revision on the page.
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+		}
+	};
+
 /**
  * Set whether the revision diff highlighting is shown.
  *
@@ -587,8 +694,8 @@ export const restoreRevision =
 						'modified',
 						'author',
 						'meta',
-						'title.raw',
-						'excerpt.raw',
+						'title',
+						'excerpt',
 						'content.raw',
 						revisionKey,
 					] ),

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-fit';
 
 interface InlineFitOptions {

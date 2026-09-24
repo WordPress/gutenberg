@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * Internal dependencies
- */
-const docgen = require( '../lib' );
-
 const optionator = require( 'optionator' )( {
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
 	options: [
@@ -55,6 +49,7 @@ const optionator = require( 'optionator' )( {
 		},
 	],
 } );
+const docgen = require( '../lib' );
 
 const options = optionator.parseArgv( process.argv );
 process.exit( docgen( options._[ 0 ], options ) );

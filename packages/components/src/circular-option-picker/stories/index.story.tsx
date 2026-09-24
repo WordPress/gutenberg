@@ -1,14 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
@@ -17,7 +8,7 @@ const CircularOptionPickerStoryContext = createContext< {
 } >( {} );
 
 const meta: Meta< typeof CircularOptionPicker > = {
-	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/CircularOptionPicker',
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
@@ -116,10 +107,10 @@ Default.args = {
 	options: <DefaultOptions />,
 };
 
-export const AsButtons = Template.bind( {} );
-AsButtons.args = {
+export const AsToggleButtons = Template.bind( {} );
+AsToggleButtons.args = {
 	...Default.args,
-	asButtons: true,
+	presentation: 'toggle-buttons',
 };
 
 export const WithLoopingDisabled = Template.bind( {} );

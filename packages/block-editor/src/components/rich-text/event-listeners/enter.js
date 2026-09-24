@@ -1,37 +1,91 @@
-/**
- * WordPress dependencies
- */
-import { ENTER } from '@wordpress/keycodes';
 import {
 	insert,
 	remove,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
-	function onKeyDownDeprecated( event ) {
-		if ( event.keyCode !== ENTER ) {
+	// Enter is handled on beforeinput: the input type tells a paragraph
+	// break from a line break. The iOS keyboard sends Return with the
+	// shift key down while it shows capitals, so the key event cannot.
+	function onBeforeInput( event ) {
+		const { inputType } = event;
+		if (
+			inputType !== 'insertParagraph' &&
+			inputType !== 'insertLineBreak'
+		) {
 			return;
 		}
 
-		const { onReplace, onSplit } = props.current;
+		const {
+			onReplace,
+			onSplit,
+			supportsSplitting,
+			disableLineBreaks,
+			onChange,
+			getValue,
+			onSplitAtDoubleLineEnd,
+			registry,
+			onSplitAtEnd,
+		} = props.current;
+		// The rendered value can lag the record: the capture phase listener
+		// that syncs the selection runs on this event, and a re-render with
+		// the new selection has not happened yet.
+		const value = getValue();
+		const { text, start, end } = value;
 
-		if ( onReplace && onSplit ) {
+		// Flagged for the writing flow, which handles the event otherwise.
+		if ( inputType === 'insertParagraph' && onReplace && onSplit ) {
 			event.__deprecatedOnSplit = true;
+		}
+
+		if ( inputType === 'insertLineBreak' ) {
+			if ( ! disableLineBreaks ) {
+				event.preventDefault();
+				onChange( insert( value, '\n' ) );
+			}
+		} else if ( onSplitAtEnd && start === end && end === text.length ) {
+			event.preventDefault();
+			onSplitAtEnd();
+		} else if (
+			! supportsSplitting &&
+			! ( onReplace && onSplit ) &&
+			! disableLineBreaks &&
+			! event.defaultPrevented
+		) {
+			event.preventDefault();
+			if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				start === end &&
+				end === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				registry.batch( () => {
+					const _value = { ...value };
+					_value.start = _value.end - 2;
+					onChange( remove( _value ) );
+					onSplitAtDoubleLineEnd();
+				} );
+			} else {
+				onChange( insert( value, '\n' ) );
+			}
 		}
 	}
 
-	function onKeyDown( event ) {
-		if ( event.defaultPrevented ) {
+	function onDefaultBeforeInput( event ) {
+		if (
+			event.defaultPrevented ||
+			( event.inputType !== 'insertParagraph' &&
+				event.inputType !== 'insertLineBreak' )
+		) {
 			return;
 		}
 
@@ -42,68 +96,28 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		const {
-			value,
-			onChange,
-			disableLineBreaks,
-			onSplitAtEnd,
-			onSplitAtDoubleLineEnd,
-			registry,
-		} = props.current;
-
 		event.preventDefault();
-
-		const { text, start, end } = value;
-
-		if ( event.shiftKey ) {
-			if ( ! disableLineBreaks ) {
-				onChange( insert( value, '\n' ) );
-			}
-		} else if ( onSplitAtEnd && start === end && end === text.length ) {
-			onSplitAtEnd();
-		} else if (
-			// For some blocks it's desirable to split at the end of the
-			// block when there are two line breaks at the end of the
-			// block, so triple Enter exits the block.
-			onSplitAtDoubleLineEnd &&
-			start === end &&
-			end === text.length &&
-			text.slice( -2 ) === '\n\n'
-		) {
-			registry.batch( () => {
-				const _value = { ...value };
-				_value.start = _value.end - 2;
-				onChange( remove( _value ) );
-				onSplitAtDoubleLineEnd();
-			} );
-		} else if ( ! disableLineBreaks ) {
-			onChange( insert( value, '\n' ) );
-		}
 	}
 
 	const { defaultView } = element.ownerDocument;
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeKeyDown = subscribeDelegatedListener(
+	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
 		defaultView,
-		'keydown',
-		onKeyDown
+		'beforeinput',
+		onDefaultBeforeInput
 	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
-	// handlers, matching the timing of the previous raw element listener.
-	const unsubscribeKeyDownDeprecated = subscribeOwnedListener(
+	// handlers.
+	const unsubscribeBeforeInput = subscribeOwnedListener(
 		element,
-		'keydown',
-		onKeyDownDeprecated,
+		'beforeinput',
+		onBeforeInput,
 		true
 	);
 	return () => {
-		unsubscribeKeyDown();
-		unsubscribeKeyDownDeprecated();
+		unsubscribeDefaultBeforeInput();
+		unsubscribeBeforeInput();
 	};
 };

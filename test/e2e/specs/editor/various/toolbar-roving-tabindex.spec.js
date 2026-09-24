@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -62,7 +59,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
 		await ToolbarRovingTabindexUtils.focusBlockToolbar();
-		await page.click( `role=button[name="Select parent block: List"i]` );
+		await page
+			.getByRole( 'button', { name: 'Select parent block: List' } )
+			.click();
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: List',
@@ -91,9 +90,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Table' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			// ArrowRight from Group enters the table cell directly,
-			// not the Table block wrapper.
-			'Body cell text',
+			'Block: Table',
 			'Table'
 		);
 
@@ -175,8 +172,12 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
-		await this.page.click( `role=button[name="${ currentBlockTitle }"i]` );
-		await this.page.click( `role=menuitem[name="Group"]` );
+		await this.page
+			.getByRole( 'button', { name: currentBlockTitle, exact: true } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Group', exact: true } )
+			.click();
 	}
 
 	async testGroupKeyboardNavigation(
@@ -195,6 +196,9 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
+		await this.page.keyboard.press( 'ArrowRight' );
+		// The parent selector segment also hosts the inserter.
+		await this.expectLabelToHaveFocus( 'Add block' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}

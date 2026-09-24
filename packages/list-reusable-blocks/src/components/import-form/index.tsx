@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button, Notice } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import importReusableBlock from '../../utils/import';
 import type { ImportFormProps, ReusableBlock } from '../../utils/types';
 

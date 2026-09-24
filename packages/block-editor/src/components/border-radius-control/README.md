@@ -5,9 +5,6 @@
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 

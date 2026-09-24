@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const { realpathSync } = require( 'fs' );
 const { exec } = require( 'child_process' );
@@ -12,16 +9,8 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * WordPress dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
-
-/**
- * Internal dependencies
- */
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
@@ -91,7 +80,7 @@ const cssLoaders = [
 										],
 									} ),
 								} ),
-						  ]
+							]
 						: postcssPlugins,
 				},
 			} ),
@@ -120,7 +109,16 @@ const baseConfig = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
+		extensions: [
+			'.jsx',
+			'.mjs',
+			'.cjs',
+			'.ts',
+			'.tsx',
+			'.mts',
+			'.cts',
+			'...',
+		],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -164,7 +162,7 @@ const baseConfig = {
 	module: {
 		rules: [
 			{
-				test: /\.m?(j|t)sx?$/,
+				test: /\.[cm]?(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -182,15 +180,11 @@ const baseConfig = {
 								babelrc: false,
 								configFile: false,
 								presets: [
-									require.resolve(
-										'@wordpress/babel-preset-default'
-									),
+									require.resolve( '@wordpress/babel-preset-default' ),
 								],
 								plugins: [
 									hasReactFastRefresh &&
-										require.resolve(
-											'react-refresh/babel'
-										),
+										require.resolve( 'react-refresh/babel' ),
 								].filter( Boolean ),
 							} ),
 						},
@@ -213,6 +207,9 @@ const baseConfig = {
 						loader: require.resolve( 'sass-loader' ),
 						options: {
 							sourceMap: ! isProduction,
+							sassOptions: {
+								charset: false,
+							},
 						},
 					},
 				],
@@ -266,7 +263,7 @@ if ( ! isProduction ) {
 // Add source-map-loader if devtool is set, whether in dev mode or not.
 if ( baseConfig.devtool ) {
 	baseConfig.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
+		test: /\.[cm]?(j|t)sx?$/,
 		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
@@ -311,12 +308,13 @@ const scriptConfig = {
 				proxy: [
 					{
 						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},
 					},
 				],
-		  },
+			},
 
 	plugins: [
 		new webpack.DefinePlugin( {
@@ -415,7 +413,7 @@ const scriptConfig = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+		// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 		new MiniCSSExtractPlugin( {
 			filename: '[name].css',
 		} ),
@@ -498,7 +496,7 @@ if ( hasExperimentalModulesFlag ) {
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+			// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 			// generated, and the default externals set.

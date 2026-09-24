@@ -1,16 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontFamilyControl from '..';
 
 export default {
 	component: FontFamilyControl,
-	title: 'BlockEditor/FontFamilyControl',
+	id: 'blockeditor-fontfamilycontrol',
+	title: 'Editor/Block Editor/FontFamilyControl',
 };
 
 export const Default = {

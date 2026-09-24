@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Hiding', () => {
@@ -52,11 +49,11 @@ test.describe( 'Block Hiding', () => {
 		// Open the settings sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Verify the block inspector shows "Block is hidden".
+		// Verify the block inspector shows "Hidden".
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Block is hidden' )
+				.getByText( 'Hidden', { exact: true } )
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".
@@ -225,11 +222,11 @@ test.describe( 'Block Hiding', () => {
 		// Open the settings sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Verify the block inspector shows "Block is hidden on Mobile".
+		// Verify the block inspector shows "Hidden on Mobile".
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Block is hidden on Mobile' )
+				.getByText( 'Hidden on Mobile' )
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".

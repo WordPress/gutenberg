@@ -1,18 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Tooltip } from './styles/range-control-styles';
-
 import type { TooltipProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Shortcut from '../';
 
 const meta: Meta< typeof Shortcut > = {
 	tags: [ 'manifest' ],
 	component: Shortcut,
-	title: 'Components/Utilities/Shortcut',
+	title: 'Components/@wordpress-components/Utilities/Shortcut',
 	id: 'components-shortcut',
 	parameters: {
 		controls: {

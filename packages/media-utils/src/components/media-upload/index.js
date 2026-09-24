@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
 const DEFAULT_EMPTY_GALLERY = [];
@@ -277,6 +271,27 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
+		this.stopUndoRedoPropagation =
+			this.stopUndoRedoPropagation.bind( this );
+	}
+
+	stopUndoRedoPropagation( event ) {
+		if ( ! event.metaKey && ! event.ctrlKey ) {
+			return;
+		}
+
+		// Undo is primary+z, redo is primary+shift+z with a primary+y alias on
+		// non-Apple platforms. Matching both characters covers every variant
+		// without needing to know the platform here.
+		const character = event.key?.toLowerCase();
+		if ( character !== 'z' && character !== 'y' ) {
+			return;
+		}
+
+		// Only stop the editor from acting on the keystroke. The event still
+		// reaches the focused field, so native text undo keeps working inside
+		// the modal's inputs.
+		event.stopPropagation();
 	}
 
 	initializeListeners() {
@@ -412,7 +427,20 @@ class MediaUpload extends Component {
 	}
 
 	componentWillUnmount() {
+		this.detachUndoRedoGuard();
+		this.frame?.close();
+		this.frame?.modal?.remove();
 		this.frame?.remove();
+	}
+
+	detachUndoRedoGuard() {
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.removeEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 	}
 
 	onUpdate( selections ) {
@@ -446,6 +474,14 @@ class MediaUpload extends Component {
 		const { wp } = window;
 		const { value } = this.props;
 		this.updateCollection();
+
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.addEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 
 		//Handle active tab in media model on model open.
 		if ( this.props.mode ) {
@@ -483,6 +519,7 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
+		this.detachUndoRedoGuard();
 
 		if ( onClose ) {
 			onClose();
@@ -529,9 +566,24 @@ class MediaUpload extends Component {
 	openModal() {
 		const {
 			gallery = false,
-			unstableFeaturedImageFlow = false,
+			featuredImageFlow,
+			unstableFeaturedImageFlow,
 			modalClass,
 		} = this.props;
+
+		if (
+			unstableFeaturedImageFlow !== undefined &&
+			featuredImageFlow === undefined
+		) {
+			deprecated(
+				'wp.mediaUtils.MediaUpload unstableFeaturedImageFlow prop',
+				{
+					since: '7.2',
+					alternative: 'featuredImageFlow',
+					version: '7.4',
+				}
+			);
+		}
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
@@ -543,7 +595,7 @@ class MediaUpload extends Component {
 			this.frame.$el.addClass( modalClass );
 		}
 
-		if ( unstableFeaturedImageFlow ) {
+		if ( featuredImageFlow ?? unstableFeaturedImageFlow ) {
 			this.buildAndSetFeatureImageFrame();
 		}
 		this.initializeListeners();

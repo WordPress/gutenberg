@@ -2,7 +2,7 @@
 /**
  * Plugin-specific style state alias back compatibility.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 /**

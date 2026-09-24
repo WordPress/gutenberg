@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
@@ -842,7 +839,7 @@ export const specWithRegistration = [
 		endPath: [ 0, 0, 1 ],
 		value: {
 			formats: [ [ math, mi ] ],
-			replacements: [],
+			replacements: [ , ],
 			text: 'x',
 		},
 	},

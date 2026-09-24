@@ -1,6 +1,5 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactElement, ReactNode } from 'react';
-
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
@@ -16,11 +15,10 @@ export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
  */
 export type ConfirmResult = void | { close?: boolean; error?: string };
 
-export interface RootProps
-	extends Pick<
-		_AlertDialog.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen'
-	> {
+export interface RootProps extends Pick<
+	_AlertDialog.Root.Props,
+	'open' | 'onOpenChange' | 'defaultOpen'
+> {
 	/**
 	 * The content to be rendered inside the component. Typically includes
 	 * `AlertDialog.Trigger` and `AlertDialog.Popup`.
@@ -54,15 +52,21 @@ export interface RootProps
 	onConfirm?: () => ConfirmResult | Promise< ConfirmResult >;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that AlertDialog does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _AlertDialog.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
+	extends
+		ComponentProps< 'div' >,
 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * Optional portal element, typically `<AlertDialog.Portal />` with
