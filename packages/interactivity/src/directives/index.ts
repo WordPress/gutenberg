@@ -11,6 +11,7 @@ import './context';
 import './each';
 import './ignore';
 import './init';
+import './input';
 import './on';
 import './router-region';
 import './run';
