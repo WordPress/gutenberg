@@ -54,40 +54,28 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_declar
 
 /**
  * Case 2: a field (`reading_time`) whose value and render come from a script
- * module, styled by a stylesheet. The module is registered, not enqueued:
- * Gutenberg adds the modules of the registered fields to the import map of
- * the editor pages. A stylesheet cannot ride along with a script module, so
- * the function enqueues it on every screen where the field can show. On the
- * editor pages, `gutenberg_fields_init` fires early on `admin_init`, when
- * Gutenberg reads the registry to build the import map, so the enqueue
- * actions below are in place before those screens render.
+ * module, styled by a stylesheet. Two functions:
+ *
+ * - The assets, on `init` like any plugin asset. The module is registered,
+ *   not enqueued: Gutenberg adds the modules of the registered fields to the
+ *   import map of the editor pages. A stylesheet cannot ride along with a
+ *   script module, so the function enqueues it on every screen where the
+ *   field can show.
+ * - The field, on `gutenberg_fields_init`. The action fires whenever the
+ *   registry is first read, during REST requests too, so its callback
+ *   registers the field and nothing else.
  *
  * The module also exports a complete `word_count` field, id and label
  * included, that no `gutenberg_register_fields()` call names. A module only
  * augments the fields it was registered with, so the entry is ignored and
  * the field is not registered.
  */
-function gutenberg_test_fields_api_add_field_with_script_module() {
+function gutenberg_test_fields_api_register_reading_time_assets() {
 	wp_register_script_module(
 		'gutenberg-test-fields-api/reading-time',
 		plugins_url( 'fields-api/reading-time.js', __FILE__ ),
 		array(),
 		filemtime( __DIR__ . '/fields-api/reading-time.js' )
-	);
-	gutenberg_register_fields(
-		'postType',
-		'page',
-		array(
-			array(
-				'id'            => 'reading_time',
-				'type'          => 'integer',
-				'label'         => 'Reading time',
-				'enableSorting' => false,
-				'filterBy'      => false,
-				'readOnly'      => true,
-			),
-		),
-		'gutenberg-test-fields-api/reading-time'
 	);
 
 	wp_register_style(
@@ -108,6 +96,25 @@ function gutenberg_test_fields_api_add_field_with_script_module() {
 	// The extensible site editor rendered inside the wp-admin chrome.
 	add_action( 'site-editor-v2-wp-admin_init', $enqueue_style );
 }
+add_action( 'init', 'gutenberg_test_fields_api_register_reading_time_assets' );
+
+function gutenberg_test_fields_api_add_field_with_script_module() {
+	gutenberg_register_fields(
+		'postType',
+		'page',
+		array(
+			array(
+				'id'            => 'reading_time',
+				'type'          => 'integer',
+				'label'         => 'Reading time',
+				'enableSorting' => false,
+				'filterBy'      => false,
+				'readOnly'      => true,
+			),
+		),
+		'gutenberg-test-fields-api/reading-time'
+	);
+}
 add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_script_module' );
 
 /**
@@ -118,26 +125,15 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_s
  * A registration with the id of an existing field patches it, so the patch
  * must come after the default fields, registered on `gutenberg_fields_init`
  * at priority 0: the default priority does. A patch registered before would
- * be patched by the default definition in turn.
+ * be patched by the default definition in turn. The assets go on `init`,
+ * split from the field as in case 2.
  */
-function gutenberg_test_fields_api_update_field() {
+function gutenberg_test_fields_api_register_comment_status_assets() {
 	wp_register_script_module(
 		'gutenberg-test-fields-api/comment-status',
 		plugins_url( 'fields-api/comment-status.js', __FILE__ ),
 		array(),
 		filemtime( __DIR__ . '/fields-api/comment-status.js' )
-	);
-	gutenberg_register_fields(
-		'postType',
-		'page',
-		array(
-			array(
-				'id'            => 'comment_status',
-				'enableSorting' => true,
-				'enableHiding'  => true,
-			),
-		),
-		'gutenberg-test-fields-api/comment-status'
 	);
 
 	wp_register_style(
@@ -153,6 +149,22 @@ function gutenberg_test_fields_api_update_field() {
 	add_action( 'enqueue_block_editor_assets', $enqueue_style );
 	add_action( 'site-editor-v2_init', $enqueue_style );
 	add_action( 'site-editor-v2-wp-admin_init', $enqueue_style );
+}
+add_action( 'init', 'gutenberg_test_fields_api_register_comment_status_assets' );
+
+function gutenberg_test_fields_api_update_field() {
+	gutenberg_register_fields(
+		'postType',
+		'page',
+		array(
+			array(
+				'id'            => 'comment_status',
+				'enableSorting' => true,
+				'enableHiding'  => true,
+			),
+		),
+		'gutenberg-test-fields-api/comment-status'
+	);
 }
 add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_update_field' );
 
