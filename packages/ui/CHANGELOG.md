@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes
@@ -11,7 +15,6 @@
 
 ### New Features
 
--   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 -   Add `RadioGroupControl` component. ([#83143](https://github.com/WordPress/gutenberg/pull/83143))
 -   Add `SwitchControl` component. ([#83146](https://github.com/WordPress/gutenberg/pull/83146))
 -   Add `Switch` form primitive ([#83039](https://github.com/WordPress/gutenberg/pull/83039)).
