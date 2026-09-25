@@ -136,10 +136,6 @@ export type AutocompleterUIProps = {
 	 */
 	reset: ( event: Event ) => void;
 	/**
-	 * A ref containing the editable element.
-	 */
-	contentRef: ContentRef;
-	/**
 	 * The editable element, once the hook's `ref` has been attached to it. The
 	 * popover is anchored to it.
 	 */

@@ -4543,11 +4543,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
-		"react-hooks/refs": {
-			"count": 4
-		}
-	},
 	"packages/components/src/autocomplete/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1

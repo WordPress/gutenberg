@@ -339,7 +339,6 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
-				contentRef={ contentRef }
 				contentElement={ contentElement }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
