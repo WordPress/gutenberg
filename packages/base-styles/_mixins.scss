@@ -24,55 +24,58 @@
 @mixin heading-small() {
 	@include _text-heading();
 	font-size: variables.$font-size-x-small;
-	line-height: variables.$font-line-height-x-small;
+	// Unit-less line-height per the WordPress CSS Coding Standards, computed
+	// from the corresponding font-line-height-* token so the rendered line
+	// height in pixels is unchanged.
+	line-height: math.div(variables.$font-line-height-x-small, variables.$font-size-x-small);
 }
 
 @mixin heading-medium() {
 	@include _text-heading();
 	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	line-height: math.div(variables.$font-line-height-small, variables.$font-size-medium);
 }
 
 @mixin heading-large() {
 	@include _text-heading();
 	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-small;
+	line-height: math.div(variables.$font-line-height-small, variables.$font-size-large);
 }
 
 @mixin heading-x-large() {
 	@include _text-heading();
 	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-medium;
+	line-height: math.div(variables.$font-line-height-medium, variables.$font-size-x-large);
 }
 
 @mixin heading-2x-large() {
 	@include _text-heading();
 	font-size: variables.$font-size-2x-large;
-	line-height: variables.$font-line-height-2x-large;
+	line-height: math.div(variables.$font-line-height-2x-large, variables.$font-size-2x-large);
 }
 
 @mixin body-small() {
 	@include _text-body();
 	font-size: variables.$font-size-small;
-	line-height: variables.$font-line-height-x-small;
+	line-height: math.div(variables.$font-line-height-x-small, variables.$font-size-small);
 }
 
 @mixin body-medium() {
 	@include _text-body();
 	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	line-height: math.div(variables.$font-line-height-small, variables.$font-size-medium);
 }
 
 @mixin body-large() {
 	@include _text-body();
 	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-medium;
+	line-height: math.div(variables.$font-line-height-medium, variables.$font-size-large);
 }
 
 @mixin body-x-large() {
 	@include _text-body();
 	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-x-large;
+	line-height: math.div(variables.$font-line-height-x-large, variables.$font-size-x-large);
 }
 
 /**
