@@ -101,6 +101,8 @@ const BLOCK_EDITOR_SETTINGS = [
 const {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	globalStylesBaseDataKey,
+	globalStylesUserDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,
@@ -263,8 +265,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStyles();
+	const {
+		merged: mergedGlobalStyles,
+		base: baseGlobalStyles,
+		user: userGlobalStyles,
+	} = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
+	const globalStylesBaseData = baseGlobalStyles?.styles ?? EMPTY_OBJECT;
+	const globalStylesUserData = userGlobalStyles?.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
 	const settingsBlockPatterns =
@@ -363,6 +371,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			[ globalStylesBaseDataKey ]: globalStylesBaseData,
+			[ globalStylesUserDataKey ]: globalStylesUserData,
 			allImageSizes,
 			bigImageSizeThreshold,
 			imageStripMeta,
@@ -480,6 +490,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
+		globalStylesBaseData,
+		globalStylesUserData,
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,

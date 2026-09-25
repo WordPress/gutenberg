@@ -1,5 +1,10 @@
 export const globalStylesDataKey = Symbol( 'globalStylesDataKey' );
 export const globalStylesLinksDataKey = Symbol( 'globalStylesLinks' );
+// The two halves `globalStylesDataKey` is merged from: the theme's styles
+// (with WordPress defaults) and the changes made on the site in Styles.
+// Only tools that explain where a value comes from need them apart.
+export const globalStylesBaseDataKey = Symbol( 'globalStylesBaseData' );
+export const globalStylesUserDataKey = Symbol( 'globalStylesUserData' );
 export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const userPatternCategoriesSelectKey = Symbol(

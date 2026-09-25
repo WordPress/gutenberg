@@ -1,0 +1,13 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// The inspector brings its own frame for List View; the popover is the
+// frame here.
+.editor-style-inspector-popover .components-popover__content {
+	width: 320px;
+
+	.block-editor-style-inspector {
+		margin: 0;
+		border: 0;
+		border-radius: 0;
+	}
+}

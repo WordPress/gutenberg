@@ -42,6 +42,8 @@ import {
 	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	globalStylesBaseDataKey,
+	globalStylesUserDataKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
@@ -60,7 +62,11 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
+import StyleInspector, {
+	isStyleInspectorEnabled,
+} from './components/style-inspector';
 import NoteIconSlotFill from './components/collab/note-icon-slot';
+import BlockStylesMenuItemsSlotFill from './components/block-settings-menu/block-styles-menu-items-slot';
 import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
@@ -111,6 +117,8 @@ lock( privateApis, {
 	DimensionsTool,
 	ResolutionTool,
 	TabbedSidebar,
+	StyleInspector,
+	isStyleInspectorEnabled,
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
@@ -118,6 +126,8 @@ lock( privateApis, {
 	useZoomOut,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	globalStylesBaseDataKey,
+	globalStylesUserDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateInserterLibrary,
@@ -131,6 +141,7 @@ lock( privateApis, {
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	NoteIconSlotFill,
+	BlockStylesMenuItemsSlotFill,
 	NoteIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
