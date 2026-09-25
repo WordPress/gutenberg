@@ -10,6 +10,7 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
@@ -861,6 +862,37 @@ describe( 'Popover', () => {
 		// Chrome render it blurry.
 		await waitFor( () =>
 			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' )
+		);
+	} );
+
+	it( 'drops the transform hint when the popover moves into a slot without repositioning', async () => {
+		const Test = ( { hasSlot }: { hasSlot: boolean } ) => (
+			<SlotFillProvider>
+				<Popover animate={ false } data-testid="popover-element">
+					Inside popover
+				</Popover>
+				{ hasSlot && <Popover.Slot /> }
+			</SlotFillProvider>
+		);
+		const { rerender } = await render( <Test hasSlot={ false } /> );
+
+		const inlinePopover = screen.getByTestId( 'popover-element' );
+		await waitFor( () =>
+			expect( getComputedStyle( inlinePopover ).willChange ).toBe(
+				'auto'
+			)
+		);
+
+		// Mounting the slot swaps in a new floating element at the same
+		// coordinates, and that one has to lose the hint too.
+		await rerender( <Test hasSlot /> );
+
+		const slottedPopover = screen.getByTestId( 'popover-element' );
+		expect( slottedPopover ).not.toBe( inlinePopover );
+		await waitFor( () =>
+			expect( getComputedStyle( slottedPopover ).willChange ).toBe(
+				'auto'
+			)
 		);
 	} );
 

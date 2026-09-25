@@ -337,6 +337,8 @@ const UnforwardedPopover = (
 		y,
 		// Object with "regular" refs to both "reference" and "floating"
 		refs,
+		// The "reference" and "floating" DOM elements
+		elements,
 		// Type of CSS position property to use (absolute or fixed)
 		strategy,
 		update,
@@ -411,7 +413,9 @@ const UnforwardedPopover = (
 	// Keep the `will-change: transform` hint on only while the popover is
 	// actually moving. Leaving it on for good keeps the popover on its own
 	// compositing layer, which Chrome can render blurry, while never hinting
-	// makes the popover repaint on every scroll frame (see #46187).
+	// makes the popover repaint on every scroll frame (see #46187). The
+	// floating element can also be swapped without moving, e.g. when a
+	// `Popover.Slot` mounts, so a new element restarts the timer too.
 	useLayoutEffect( () => {
 		const popoverElement = popoverElementRef.current;
 		if ( ! popoverElement ) {
@@ -425,7 +429,7 @@ const UnforwardedPopover = (
 		}, WILL_CHANGE_IDLE_TIMEOUT );
 
 		return () => clearTimeout( timeoutId );
-	}, [ x, y ] );
+	}, [ x, y, elements.floating ] );
 
 	const style = isExpanded
 		? undefined
