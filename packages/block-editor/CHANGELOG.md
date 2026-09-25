@@ -5,6 +5,7 @@
 ### Internal
 
 -   Remove the `crossorigin` MutationObserver. Under `Document-Isolation-Policy: isolate-and-credentialless` cross-origin resources load without the attribute, and adding it broke any resource served without CORS headers ([#82614](https://github.com/WordPress/gutenberg/pull/82614)).
+-   Use unit-less `line-height` values in the Inserter panel dropdown per the WordPress CSS Coding Standards, disabling the rule where a fixed pixel value is used to match a control's height ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### New Features
 

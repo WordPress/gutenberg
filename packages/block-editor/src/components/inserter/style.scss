@@ -168,6 +168,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
 	height: 36px;
+	// stylelint-disable-next-line declaration-property-unit-allowed-list -- Matches the fixed 36px control height above to vertically center the selected option's text, rather than following font metrics.
 	line-height: 36px;
 }
 
