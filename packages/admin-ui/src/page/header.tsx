@@ -3,7 +3,8 @@ import { Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
 import type { NavigationConfig } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
-import type { PageComponents } from './types';
+import PageBreadcrumbs from './breadcrumbs';
+import type { PageBreadcrumbItem, PageComponents } from './types';
 import styles from './style.module.css';
 
 export default function Header( {
@@ -19,7 +20,7 @@ export default function Header( {
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
-	breadcrumbs?: React.ReactNode;
+	breadcrumbs?: PageBreadcrumbItem[];
 	badges?: React.ReactNode;
 	visual?: React.ReactNode;
 	title?: React.ReactNode;
@@ -76,7 +77,9 @@ export default function Header( {
 							{ title }
 						</Text>
 					) }
-					{ breadcrumbs }
+					{ !! breadcrumbs?.length && (
+						<PageBreadcrumbs items={ breadcrumbs } />
+					) }
 					{ badges }
 				</Stack>
 				{ actions && (
