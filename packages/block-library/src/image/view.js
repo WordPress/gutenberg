@@ -622,6 +622,9 @@ const { state, actions, callbacks } = store(
 				// plugins can wrap it, so it uses the container the button is
 				// positioned against rather than the image's parent element.
 				const figure = ref.closest( '.wp-lightbox-container' );
+				if ( ! figure ) {
+					return;
+				}
 				const figureWidth = figure.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
