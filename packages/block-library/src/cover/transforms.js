@@ -119,7 +119,7 @@ const transforms = {
 									...style?.color,
 									background: undefined,
 									gradient: undefined,
-							  }
+								}
 							: undefined,
 					} ),
 				};
@@ -234,7 +234,7 @@ const transforms = {
 											attributes?.customOverlayColor,
 										gradient: attributes?.customGradient,
 										...attributes?.style?.color,
-								  }
+									}
 								: undefined,
 					} ),
 				};
@@ -280,7 +280,7 @@ const transforms = {
 													?.style?.color,
 												...groupAttributes?.style
 													?.color,
-										  }
+											}
 										: undefined,
 							} ),
 						},

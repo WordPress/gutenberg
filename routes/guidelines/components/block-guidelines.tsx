@@ -176,21 +176,6 @@ export default function BlockGuidelines( {
 	);
 
 	useEffect( () => {
-		const lastPage = Math.max( paginationInfo.totalPages, 1 );
-
-		if ( view.page && view.page > lastPage ) {
-			setView( ( currentView ) =>
-				currentView.page && currentView.page > lastPage
-					? {
-							...currentView,
-							page: lastPage,
-					  }
-					: currentView
-			);
-		}
-	}, [ paginationInfo.totalPages, view.page ] );
-
-	useEffect( () => {
 		if ( shouldFocusAddButton ) {
 			addButtonRef.current?.focus();
 			setShouldFocusAddButton( false );

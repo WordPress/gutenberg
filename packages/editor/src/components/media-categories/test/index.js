@@ -1,20 +1,21 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import getInserterMediaCategories from '..';
 
-jest.mock( '@wordpress/data', () => ( {
-	dispatch: jest.fn(),
-	resolveSelect: jest.fn(),
-	select: jest.fn(),
-	subscribe: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	dispatch: vi.fn(),
+	resolveSelect: vi.fn(),
+	select: vi.fn(),
+	subscribe: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: 'core',
 } ) );
 
 describe( 'getInserterMediaCategories', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'does not include attached images for non-numeric post IDs', () => {
@@ -30,7 +31,7 @@ describe( 'getInserterMediaCategories', () => {
 	} );
 
 	it( 'fetches images attached to the current post', async () => {
-		const getEntityRecords = jest.fn().mockResolvedValue( [
+		const getEntityRecords = vi.fn().mockResolvedValue( [
 			{
 				id: 10,
 				source_url: 'https://example.com/image.jpg',
@@ -48,8 +49,8 @@ describe( 'getInserterMediaCategories', () => {
 			},
 		] );
 		resolveSelect.mockReturnValue( { getEntityRecords } );
-		const getEntityRecordsTotalItems = jest.fn().mockReturnValue( 1 );
-		const getEntityRecordsTotalPages = jest.fn().mockReturnValue( 1 );
+		const getEntityRecordsTotalItems = vi.fn().mockReturnValue( 1 );
+		const getEntityRecordsTotalPages = vi.fn().mockReturnValue( 1 );
 		select.mockReturnValue( {
 			getEntityRecordsTotalItems,
 			getEntityRecordsTotalPages,
@@ -99,7 +100,7 @@ describe( 'getInserterMediaCategories', () => {
 	} );
 
 	it( 'attaches and detaches attachment records', async () => {
-		const saveEntityRecord = jest.fn().mockResolvedValue( {} );
+		const saveEntityRecord = vi.fn().mockResolvedValue( {} );
 		dispatch.mockReturnValue( { saveEntityRecord } );
 
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
@@ -196,14 +197,14 @@ describe( 'getInserterMediaCategories', () => {
 
 	it( 'refetches on the resolved -> unresolved edge and unsubscribes', () => {
 		let listener;
-		const unsubscribe = jest.fn();
+		const unsubscribe = vi.fn();
 		subscribe.mockImplementation( ( cb ) => {
 			listener = cb;
 			return unsubscribe;
 		} );
 		// Starts resolved: the grid has already fetched this query.
 		let resolved = true;
-		const hasFinishedResolution = jest
+		const hasFinishedResolution = vi
 			.fn()
 			.mockImplementation( () => resolved );
 		select.mockReturnValue( { hasFinishedResolution } );
@@ -212,7 +213,7 @@ describe( 'getInserterMediaCategories', () => {
 			42,
 			'Post'
 		);
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const returnedUnsubscribe = attachedImagesCategory.subscribe(
 			onChange,
 			{ per_page: 20 }
@@ -261,10 +262,10 @@ describe( 'getInserterMediaCategories', () => {
 		let listener;
 		subscribe.mockImplementation( ( cb ) => {
 			listener = cb;
-			return jest.fn();
+			return vi.fn();
 		} );
 		let resolved = true;
-		const hasFinishedResolution = jest
+		const hasFinishedResolution = vi
 			.fn()
 			.mockImplementation( () => resolved );
 		select.mockReturnValue( { hasFinishedResolution } );
@@ -277,7 +278,7 @@ describe( 'getInserterMediaCategories', () => {
 			( category ) => category.name === 'openverse'
 		);
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		images.subscribe( onChange, { per_page: 20 } );
 
 		// The Images source watches its own query (no `parent`) and still

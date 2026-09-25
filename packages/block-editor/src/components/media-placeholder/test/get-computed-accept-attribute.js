@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getComputedAcceptAttribute } from '../utils';
 
 describe( 'getComputedAcceptAttribute', () => {

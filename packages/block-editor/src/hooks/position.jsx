@@ -3,37 +3,42 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useId, useMemo } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
+import { useMemo } from '@wordpress/element';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject, useStyleOverride } from './utils';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	setStyleForState,
+} from './block-style-state';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 
 const DEFAULT_OPTION = {
-	key: 'default',
 	value: '',
 	label: __( 'Default' ),
 };
 
 const STICKY_OPTION = {
-	key: 'sticky',
 	value: 'sticky',
 	label: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	hint: __(
+	description: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
 
 const FIXED_OPTION = {
-	key: 'fixed',
 	value: 'fixed',
 	label: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	hint: __( 'The block will not move when the page is scrolled.' ),
+	description: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -72,6 +77,94 @@ export function getPositionCSS( { selector, style } ) {
 	output += `}`;
 
 	return output;
+}
+
+/**
+ * Get calculated position CSS for responsive viewport states.
+ *
+ * Viewport states inherit any values they do not set from the default
+ * viewport's position configuration. Generated rules are wrapped in the
+ * matching breakpoint media query.
+ *
+ * @param {Object} props                  Component props.
+ * @param {string} props.selector         Selector to use.
+ * @param {Object} props.style            Style object.
+ * @param {Object} props.viewportSettings Viewport breakpoint settings.
+ * @return {string} The generated CSS rules.
+ */
+export function getResponsivePositionCSS( {
+	selector,
+	style,
+	viewportSettings,
+} ) {
+	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
+		.map( ( [ viewport, mediaQuery ] ) => {
+			const viewportPosition = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.position;
+
+			if ( ! viewportPosition ) {
+				return '';
+			}
+
+			const css = getPositionCSS( {
+				selector,
+				style: {
+					position: { ...style?.position, ...viewportPosition },
+				},
+			} );
+
+			if ( css ) {
+				return `${ mediaQuery }{${ css }}`;
+			}
+
+			// The viewport state clears the position type inherited from the
+			// default state. The default state's `position` declaration isn't
+			// itself wrapped in a media query, so without an explicit reset it
+			// would still apply at this breakpoint.
+			if ( VALID_POSITION_TYPES.includes( style?.position?.type ) ) {
+				return `${ mediaQuery }{${ selector }{position: static;}}`;
+			}
+
+			return '';
+		} )
+		.filter( Boolean )
+		.join( '' );
+}
+
+/**
+ * Returns the position types used across the default and responsive viewport
+ * states of a style object.
+ *
+ * @param {Object} style            Style object.
+ * @param {Object} viewportSettings Viewport breakpoint settings.
+ * @return {string[]} Position types, in default-then-viewport order.
+ */
+function getPositionTypes( style, viewportSettings ) {
+	const types = new Set();
+
+	if ( VALID_POSITION_TYPES.includes( style?.position?.type ) ) {
+		types.add( style.position.type );
+	}
+
+	Object.keys( getResponsiveMediaQueries( viewportSettings ) ).forEach(
+		( viewport ) => {
+			const viewportPosition = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.position;
+			const type = viewportPosition
+				? { ...style?.position, ...viewportPosition }.type
+				: undefined;
+
+			if ( VALID_POSITION_TYPES.includes( type ) ) {
+				types.add( type );
+			}
+		}
+	);
+
+	return [ ...types ];
 }
 
 /**
@@ -190,16 +283,35 @@ export function PositionPanelPure( {
 } ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
-	const value = style?.position?.type;
 
-	const { firstParentClientId } = useSelect(
+	const { firstParentClientId, selectedState } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
 			const parents = getBlockParents( clientId );
-			return { firstParentClientId: parents[ parents.length - 1 ] };
+			return {
+				firstParentClientId: parents[ parents.length - 1 ],
+				selectedState: getSelectedBlockStyleState( clientId ),
+			};
 		},
 		[ clientId ]
 	);
+
+	// Position styles only support viewport states; pseudo states don't apply.
+	const isViewportState =
+		selectedState?.viewport &&
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport &&
+		( ! selectedState.pseudo ||
+			selectedState.pseudo === DEFAULT_BLOCK_STYLE_STATE.pseudo );
+	const stateStyle = isViewportState
+		? getStyleForState( style, selectedState )
+		: undefined;
+	// Viewport states inherit the default viewport's position type.
+	const value = isViewportState
+		? ( stateStyle?.position?.type ?? style?.position?.type )
+		: style?.position?.type;
 
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 	const stickyHelpText =
@@ -210,7 +322,7 @@ export function PositionPanelPure( {
 						'The block will stick to the scrollable area of the parent %s block.'
 					),
 					blockInformation.title
-			  )
+				)
 			: null;
 
 	const options = useMemo( () => {
@@ -232,6 +344,25 @@ export function PositionPanelPure( {
 		// In the future, it could be useful to allow for an offset value.
 		const placementValue = '0px';
 
+		if ( isViewportState ) {
+			const newStateStyle = {
+				...stateStyle,
+				position: {
+					...stateStyle?.position,
+					type: next,
+					top:
+						next === 'sticky' || next === 'fixed'
+							? placementValue
+							: undefined,
+				},
+			};
+
+			setAttributes( {
+				style: setStyleForState( style, selectedState, newStateStyle ),
+			} );
+			return;
+		}
+
 		const newStyle = {
 			...style,
 			position: {
@@ -252,7 +383,6 @@ export function PositionPanelPure( {
 	const selectedOption = value
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
-	const hintIdPrefix = useId();
 
 	// Only display position controls if there is at least one option to choose from.
 	return options.length > 1 ? (
@@ -261,39 +391,13 @@ export function PositionPanelPure( {
 				label={ __( 'Position' ) }
 				hideLabelFromVision
 				description={ stickyHelpText }
+				popupWidth="anchor"
 				items={ options }
 				value={ selectedOption }
 				onValueChange={ ( selectedItem ) => {
 					onChangeType( selectedItem.value );
 				} }
-			>
-				{ options.map( ( option ) => {
-					const hintId = option.hint
-						? `${ hintIdPrefix }-${ option.key }`
-						: undefined;
-
-					return (
-						<SelectControl.Item
-							key={ option.key }
-							value={ option }
-							label={ option.label }
-							className="block-editor-hooks__position-control-item"
-							aria-describedby={ hintId }
-						>
-							<div>{ option.label }</div>
-							{ option.hint && (
-								<div
-									id={ hintId }
-									className="block-editor-hooks__position-control-item-hint"
-									aria-hidden="true"
-								>
-									{ option.hint }
-								</div>
-							) }
-						</SelectControl.Item>
-					);
-				} ) }
-			</SelectControl>
+			/>
 		</InspectorControls>
 	) : null;
 }
@@ -323,28 +427,41 @@ function useBlockProps( { name, style } ) {
 	);
 	const isPositionDisabled = useIsPositionDisabled( { name } );
 	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
+	const [ viewportSettings ] = useSettings( 'viewport' );
 
 	const id = useInstanceId( POSITION_BLOCK_PROPS_REFERENCE );
 
 	// Higher specificity to override defaults in editor UI.
 	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
 
-	// Get CSS string for the current position values.
+	// Get CSS string for the current position values, including any
+	// responsive viewport state values.
 	let css;
 	if ( allowPositionStyles ) {
-		css =
+		css = [
 			getPositionCSS( {
 				selector: positionSelector,
 				style,
-			} ) || '';
+			} ) || '',
+			getResponsivePositionCSS( {
+				selector: positionSelector,
+				style,
+				viewportSettings,
+			} ),
+		].join( '' );
 	}
 
-	// Attach a `wp-container-` id-based class name.
-	const className = clsx( {
-		[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-		[ `is-position-${ style?.position?.type }` ]:
-			allowPositionStyles && !! css && !! style?.position?.type,
-	} );
+	// Attach a `wp-container-` id-based class name, plus an `is-position-*`
+	// class for each position type used across the default and viewport
+	// states, matching the frontend output.
+	const className = clsx(
+		allowPositionStyles && !! css ? `wp-container-${ id }` : undefined,
+		allowPositionStyles && !! css
+			? getPositionTypes( style, viewportSettings ).map(
+					( type ) => `is-position-${ type }`
+				)
+			: undefined
+	);
 
 	useStyleOverride( { css } );
 

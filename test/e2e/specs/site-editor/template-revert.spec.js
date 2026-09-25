@@ -22,7 +22,11 @@ test.describe( 'Template Revert', () => {
 
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -107,9 +111,12 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await admin.visitSiteEditor();
 
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the header toolbar', async ( {
@@ -209,9 +216,12 @@ test.describe( 'Template Revert', () => {
 		} );
 		await admin.visitSiteEditor();
 
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
 	} );
 } );
 
@@ -246,8 +256,28 @@ class TemplateRevertUtils {
 	}
 
 	async getCurrentSiteEditorContent() {
-		return this.page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).getEditedPostContent()
-		);
+		// Serialize the block list rather than reading the edited entity's
+		// content: right after a load the latter still holds the raw REST
+		// string, which can differ from a serialization round-trip. Then wait
+		// until the serialization is stable, so a capture cannot race the
+		// block mount effects that normalize attributes (e.g. the Query
+		// block's `excludeCurrent`) and consecutive captures compare like
+		// for like.
+		return this.page.evaluate( async () => {
+			const read = () =>
+				window.wp.blocks.serialize(
+					window.wp.data.select( 'core/block-editor' ).getBlocks()
+				);
+			let previous = read();
+			for ( let i = 0; i < 20; i++ ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+				const next = read();
+				if ( next === previous ) {
+					return next;
+				}
+				previous = next;
+			}
+			return previous;
+		} );
 	}
 }

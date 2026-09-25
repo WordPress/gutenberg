@@ -124,7 +124,7 @@ export default function NavigationLinkEdit( {
 				: getBlockParentsByBlockName(
 						clientId,
 						'core/navigation'
-				  )[ 0 ];
+					)[ 0 ];
 
 			// Get the immediate parent - if it's a submenu, use it; otherwise use the navigation block
 			const parentBlockId =

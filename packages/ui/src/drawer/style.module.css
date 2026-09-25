@@ -167,7 +167,7 @@
 
 				top: 0;
 				bottom: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				left: 0;
 				width: var(--popup-size);
 				max-width: calc(100vw - var(--viewport-inset));
@@ -186,7 +186,7 @@
 
 				top: 0;
 				bottom: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				right: 0;
 				width: var(--popup-size);
 				max-width: calc(100vw - var(--viewport-inset));
@@ -204,9 +204,9 @@
 				--stretch-size: calc(100dvh - var(--viewport-inset));
 
 				bottom: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				left: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				right: 0;
 				height: var(--popup-size);
 				max-height: calc(100dvh - var(--viewport-inset));
@@ -224,9 +224,9 @@
 				--stretch-size: calc(100dvh - var(--viewport-inset));
 
 				top: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				left: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical positioning needed for slide-in animation direction */
 				right: 0;
 				height: var(--popup-size);
 				max-height: calc(100dvh - var(--viewport-inset));
@@ -321,12 +321,12 @@
 		 * the scroll container carries the padding instead.
 		 */
 		.popup[data-swipe-direction="left"] .content {
-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+			/* stylelint-disable-next-line logical-css/require-logical-properties -- physical to match the physical popup anchoring */
 			padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
 		}
 
 		.popup[data-swipe-direction="right"] .content {
-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+			/* stylelint-disable-next-line logical-css/require-logical-properties -- physical to match the physical popup anchoring */
 			padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
 		}
 

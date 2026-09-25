@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
+import { Spinner } from '../../../spinner';
+import { Stack } from '../../../stack';
+import { VisuallyHidden } from '../../../visually-hidden';
 import { SearchableChipSelectControl } from '../';
 import {
 	GROUPED_ITEMS,
@@ -12,17 +15,15 @@ import * as SearchableChipSelectStories from '../../primitives/searchable-chip-s
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableChipSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableChipSelectControl',
+	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableChipSelectControl { ...args } />,
 	subcomponents: {
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
@@ -35,6 +36,7 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 	},
 	argTypes: {
 		items: { control: false },
+		value: { control: false },
 		onValueChange: { action: fn() },
 	},
 	parameters: {
@@ -113,19 +115,23 @@ export const WithDisabledOption: Story = {
 
 /**
  * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * It renders in the list footer, not the main list, when it is in the
+ * filtered items. Handle the creation of the item in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
 		...Default.args,
+		items: ITEMS,
+		value: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 	},
 	render: function Template( args ) {
+		const {
+			items = ITEMS,
+			value: initialValue = [ ITEMS[ 0 ], ITEMS[ 1 ] ],
+			...restArgs
+		} = args;
 		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< typeof ITEMS >( [
-			ITEMS[ 0 ],
-			ITEMS[ 1 ],
-		] );
+		const [ value, setValue ] = useState( initialValue );
 		const creatableItem = {
 			value: '__create__',
 			label:
@@ -135,12 +141,12 @@ export const Creatable: Story = {
 
 		return (
 			<SearchableChipSelectControl
-				{ ...args }
-				items={ [ ...ITEMS, creatableItem ] }
+				{ ...restArgs }
+				items={ [ ...( items as FixtureItem[] ), creatableItem ] }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
 				value={ value }
-				onValueChange={ ( values: typeof ITEMS, event ) => {
+				onValueChange={ ( values, event ) => {
 					if (
 						values.some(
 							( item ) => item.value === creatableItem.value
@@ -179,6 +185,71 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
+function HiddenResultCount() {
+	const count =
+		SearchableChipSelectControl.useFilteredItems<
+			( typeof ITEMS )[ number ]
+		>().length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
+	);
+}
+
+/**
+ * Loads the item list asynchronously. `statusContent` shows loading, then
+ * a visually hidden result count. Pass `emptyContent={ null }` while
+ * loading so Empty does not claim there are no results.
+ */
+export const AsyncItems: Story = {
+	args: {
+		label: 'Label',
+		description: 'This is a description.',
+	},
+	render: function Template( args ) {
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< typeof ITEMS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				statusContent={
+					loading ? (
+						<Stack direction="row" gap="sm" align="center">
+							<Spinner />
+							Loading…
+						</Stack>
+					) : (
+						<HiddenResultCount />
+					)
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( open ) => {
+					if ( ! open ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setLoading( false );
+					}, 500 );
+				} }
+			/>
+		);
+	},
+};
+
 export const WithoutClearButton: Story = {
 	...SearchableChipSelectStories.WithoutClearButton,
 	args: {
@@ -209,7 +280,8 @@ export const Grouped: Story = {
 
 /**
  * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
+ * `items` as a creatable-only group. Handle the creation of the item in
+ * `onValueChange`.
  */
 export const GroupedCreatable: Story = {
 	args: {
@@ -281,5 +353,23 @@ export const GroupedCreatable: Story = {
 				) }
 			/>
 		);
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor.
+ *
+ * This example uses `sm`, allowing the popup to extend beyond the narrow anchor width.
+ */
+export const PopupWidth: Story = {
+	...Creatable,
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		...Creatable.args,
+		label: 'Tags',
+		popupWidth: 'sm',
+		items: longLabelPopupItems,
+		value: [ longLabelPopupItems[ 0 ] ],
 	},
 };

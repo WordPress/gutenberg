@@ -1,5 +1,6 @@
 import type {
 	DragPreviewRenderProps,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -68,11 +69,10 @@ export type DashboardLanesLayoutItem = {
  * - Both together: `columns` caps the count, `minColumnWidth` enforces
  *   a per-tile width floor that can reduce the count below the cap.
  */
-export interface DashboardLanesProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardLanesProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */
@@ -186,4 +186,10 @@ export interface DashboardLanesProps
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
+	 */
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }

@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-09-23)
+
+### New Features
+
+-   `HostLink`: an anchor that mounts the host router's link for a target
+    `links.match` recognizes, and a plain anchor otherwise, including for a
+    `download` or a `_blank` target. Composes through the `render` prop of a
+    UI link ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+-   `WidgetModuleRecord.attributes`: a record carries the attribute schema
+    `widget.json` declares, as `WidgetAttributeRecord[]`; `useWidgetTypes`
+    merges it by `id` over the module's entries, the record winning a shared
+    key and `isValid` merging rule by rule
+    ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+### Documentation
+
+-   Add a `WithHostLink` story: the same action declarations routed through
+    `HostLink` against a demo router, with a toggle that removes the `links`
+    capability ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+
+## 0.7.0 (2026-09-10)
+
+### Documentation
+
+-   `WidgetHostLinks.match`: the in-app route it returns carries the
+    route's query when the href has one; docblock, README, Storybook page
+    and seam diagram say so
+    ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+-   `WidgetAction.download`: any value but `false` downloads; `true` or `''`
+    keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features

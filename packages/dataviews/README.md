@@ -218,7 +218,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, `pickerActivity`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -264,7 +264,7 @@ Properties:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
--   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for the columns listed in `fields`, keyed by field id. The `align` property accepts `'start'`, `'center'`, or `'end'`. Neither layout applies these styles to the primary column (the one that renders `titleField`, `mediaField`, and `descriptionField`). In the `table` layout, that column is the flexible one: the table sizes every other column to fit its content and gives the primary column whatever width is left, so a `width` or `maxWidth` set on it would not be honored by the browser's table layout, and long titles are truncated instead. When the `table` view has no primary column, the last column in `fields` takes the leftover width in the same way. The `pickerTable` layout lets the browser share the width among all columns, but it does not apply the styles to the primary column either.
 -   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
@@ -436,7 +436,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, and `pickerActivity`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -622,13 +622,13 @@ The component behaves differently to a regular `DataViews` component in the foll
 
 There are also a few differences in the implementation:
 
--   Only the `pickerGrid` and `pickerTable` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid` and `table` layouts respectively.
+-   Only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid`, `table`, and `activity` layouts respectively.
 -   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
 -   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
 -   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
 -   Only the `callback` style of action is supported. `RenderModal` is unsupported.
--   The `isEligible` callback for actions is unsupported.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible, and the callback receives only the eligible items.
 -   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
 
 Example:
@@ -689,7 +689,7 @@ Same as `DataViews`. The fields describe the visible items for each record in th
 
 #### `view`: `Object`
 
-Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` and `pickerTable` layout types are supported.
+Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported.
 
 #### `onChangeView`: `function`
 
@@ -702,7 +702,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 **Important differences from `DataViews`:**
 
 -   Only `callback` style actions are supported. `RenderModal` is unsupported.
--   The `isEligible` callback for actions is unsupported.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible; the callback receives only the eligible items.
 -   The `isPrimary` option is used to render a `primary` variant of `Button`.
 -   To implement multi-selection, ensure all actions have `supportsBulk: true`. For single selection use `supportsBulk: false`.
 
@@ -724,7 +724,7 @@ Same as `DataViews`. Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-Limits the available layouts. Only `pickerGrid` and `pickerTable` are supported for `DataViewsPicker`.
+Limits the available layouts. Only `pickerGrid`, `pickerTable`, and `pickerActivity` are supported for `DataViewsPicker`.
 
 Example:
 
@@ -773,7 +773,18 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition.
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar`, `DataViewsPicker.Actions`, `DataViewsPicker.PageSelect` and `DataViewsPicker.PageNavigation`, the page select and the previous/next buttons on their own. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
+
+```jsx
+<DataViewsPicker.Footer>
+	<DataViewsPicker.Pagination>
+		<DataViewsPicker.PageSelect />
+	</DataViewsPicker.Pagination>
+	<DataViewsPicker.Actions />
+</DataViewsPicker.Footer>
+```
+
+Placing a composed footer is the consumer's business, so each of those parts takes a `className` too, as `DataViews.Layout` does, and a footer can be laid out from the consumer's own stylesheet without wrapping its parts in extra elements.
 
 **Unsupported properties:**
 
@@ -1653,11 +1664,42 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 
 ### `readOnly`
 
-Boolean indicating that the field is not editable. Fields that are not editable use the `render` function to display their value in Edit contexts.
+Boolean indicating that the field doesn't have an Edit  be rendered as read-only in Edit contexts. Read-only fields use the `render` function instead of their `Edit` component to display their value (e.g., in DataForm). This is different from disabled fields (see `isDisabled`) that still render their Edit component but are situationally disabled.
 
 -   Type: `boolean`.
 -   Optional.
 -   Defaults to `false`.
+
+### `isDisabled`
+
+Whether the field should be disabled in Edit contexts (e.g., DataForm). Unlike read-only fields (see `readOnly`), disabled fields have an Edit component, but the control is situationally disabled.
+
+-   Type: `boolean` or `function`.
+-   Optional.
+-   Args
+    -   `item`: the data to be processed
+    -   `field`: the field definition
+-   Returns a `boolean` indicating if the field should be disabled (`true`) or not (`false`).
+
+This can be useful to disable fields based on the state of other fields. For example, a `password` field can be disabled depending on the value of the `status` field:
+
+```js
+{
+ id: 'status',
+ type: 'text',
+ label: 'Status',
+ elements: [
+  { value: 'public', label: 'Public' },
+  { value: 'private', label: 'Private' },
+ ],
+},
+{
+ id: 'password',
+ type: 'password',
+ label: 'Password',
+ isDisabled: ( { item } ) => item.status === 'private',
+},
+```
 
 ### `sort`
 
@@ -1678,8 +1720,8 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
--   `a`: the first item to compare
--   `b`: the second item to compare
+-   `a`: the value of the field (as returned by `getValue`) for the first item to compare
+-   `b`: the value of the field (as returned by `getValue`) for the second item to compare
 -   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:
@@ -1993,7 +2035,7 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll` ];
+		operators: [ `isAny`, `isNone` ];
 	}
 }
 ```
@@ -2033,15 +2075,15 @@ Valid operators per field type:
 -   color: `is`, `isNot`, `isAny`, `isNone`.
 -   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
 -   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   media: none.
--   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`.
 -   password: none.
--   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
--   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   telephone: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   time: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `between`.
--   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`.
 -   fields with no type: any operator.
 
 `time` shares the ordering operators with `date` and `datetime`, which compare temporal values generically: a date or datetime compares by its position on the calendar, a time by its position within the day. Comparisons are precision-insensitive, so a filter for `'09:00'` matches a stored `'09:00:00'`.
@@ -2200,6 +2242,7 @@ For example:
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
 -   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `showPlaceholderIfEmpty`: boolean. Optional. `false` by default. Whether the summary shows the field's `placeholder` instead of its `render` output when the field's value is `undefined`, `null`, or an empty string.
 -   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)

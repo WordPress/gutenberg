@@ -19,10 +19,9 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -69,9 +68,18 @@ test.describe( 'Page List', () => {
 					const TEST_IMAGE_FILE_PATH =
 						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
+					// The media modal opens on the "Media Library" tab once
+					// the library has items (e.g. after a previous upload),
+					// so make sure the upload tab is the active one.
+					await mediaLibrary
+						.getByRole( 'tab', { name: 'Upload files' } )
+						.click();
+
+					const selectFiles =
+						mediaLibrary.getByText( 'Select files' );
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
-					await mediaLibrary.getByText( 'Select files' ).click();
+					await selectFiles.click();
 					const fileChooser = await fileChooserPromise;
 					await fileChooser.setFiles( TEST_IMAGE_FILE_PATH );
 					await mediaLibrary
@@ -81,7 +89,10 @@ test.describe( 'Page List', () => {
 						} );
 
 					await mediaLibrary
-						.getByRole( 'button', { name: 'Select', exact: true } )
+						.getByRole( 'button', {
+							name: 'Set featured image',
+							exact: true,
+						} )
 						.click();
 				},
 				assertInitialState: async ( page ) => {
@@ -242,7 +253,9 @@ test.describe( 'Page List', () => {
 					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
-							name: /http:\/\/localhost:8889\//,
+							// The permalink preview, on whatever host the
+							// test site runs.
+							name: /^https?:\/\/[^/]+\//,
 						} )
 					).toBeVisible();
 				},
@@ -343,8 +356,7 @@ test.describe( 'Page List', () => {
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
@@ -476,17 +488,22 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.describe( 'Field trigger', () => {
-			const getStatusField = ( page ) => {
+			const getStatusField = async ( page ) => {
 				const editButton = page.getByRole( 'button', {
 					name: 'Edit Status',
 				} );
-				return { editButton, row: editButton.locator( '..' ) };
+				const row = editButton.locator( '..' );
+				// The raw mouse clicks below use the row's bounding box, so
+				// wait for it to stop moving first — the extensible site
+				// editor's quick edit surface animates in.
+				await row.hover();
+				return { editButton, row };
 			};
 
 			test( 'opens the flyout when clicking anywhere on the row', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = getStatusField( page );
+				const { editButton, row } = await getStatusField( page );
 				const box = await row.boundingBox();
 
 				// Click the value area, away from the edit button.
@@ -507,7 +524,7 @@ test.describe( 'Page List', () => {
 			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = getStatusField( page );
+				const { editButton, row } = await getStatusField( page );
 				const box = await row.boundingBox();
 				await page.mouse.click(
 					box.x + box.width * 0.5,
@@ -535,7 +552,7 @@ test.describe( 'Page List', () => {
 			test( 'keeps the flyout usable after double-clicking a field row', async ( {
 				page,
 			} ) => {
-				const { row } = getStatusField( page );
+				const { row } = await getStatusField( page );
 				const box = await row.boundingBox();
 				const x = box.x + box.width * 0.5;
 				const y = box.y + box.height / 2;
@@ -558,6 +575,42 @@ test.describe( 'Page List', () => {
 					'true'
 				);
 			} );
+		} );
+	} );
+
+	test.describe( 'Bulk Quick Edit', () => {
+		test( 'shows the bulk-editable fields for the selected pages', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			const table = page.getByRole( 'table' );
+			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			// The extensible site editor keeps the selection in the URL, so
+			// the checkbox only flips once the route has re-rendered.
+			await expect(
+				table.getByRole( 'checkbox', { name: 'Deselect all' } )
+			).toBeChecked();
+			await page
+				.locator( '.dataviews-bulk-actions-footer__container' )
+				.getByRole( 'button', { name: 'Quick Edit' } )
+				.click();
+
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			await expect( modal ).toContainText(
+				'Changes will be applied to all selected pages.'
+			);
+			for ( const name of [
+				'Edit Status',
+				'Edit Date',
+				'Edit Author',
+				'Edit Discussion',
+			] ) {
+				await expect(
+					modal.getByRole( 'button', { name } )
+				).toBeVisible();
+			}
 		} );
 	} );
 
@@ -590,8 +643,7 @@ test.describe( 'Page List', () => {
 			admin,
 			page,
 		} ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 

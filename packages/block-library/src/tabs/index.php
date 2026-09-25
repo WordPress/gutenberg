@@ -104,7 +104,8 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 			)
 		)
 	);
-	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.onTabsInit' );
+	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.activateTabByHash' );
+	$tag_processor->set_attribute( 'data-wp-on-window--hashchange', 'callbacks.activateTabByHash' );
 	$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
 
 	$output = $tag_processor->get_updated_html();

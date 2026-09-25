@@ -1,10 +1,11 @@
 import { forwardRef } from '@wordpress/element';
+import { toGamut } from 'colorjs.io/fn';
 import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
 import colorTokenAliases from '../../prebuilt/ts/color-tokens';
-import { getColorString } from '../lib/color-utils';
+import { getColorString, getContrast } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -34,6 +35,7 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 ];
 
 type RampTableProps = {
+	label: string;
 	ramps: {
 		name: ThemeProviderColorRampName;
 		seed: {
@@ -114,18 +116,46 @@ function isSeedAdjusted( seed: string, generatedAnchor: string ) {
 	return getColorString( seed ) !== getColorString( generatedAnchor );
 }
 
+function getSeedLabelColor( seed: string ) {
+	// CSS clips out-of-range RGB channels before painting the seed background.
+	const renderedSeed = toGamut( seed, { space: 'srgb', method: 'clip' } );
+	return getContrast( renderedSeed, '#000' ) >= 4.5 ? '#000' : '#fff';
+}
+
+function ColorSample( {
+	foreground,
+	background,
+	ramp,
+}: {
+	foreground: keyof Ramp;
+	background: keyof Ramp;
+	ramp: Record< keyof Ramp, string >;
+} ) {
+	const label = `${ foreground }: ${ ramp[ foreground ] } on ${ background }: ${ ramp[ background ] }`;
+	return (
+		<span
+			role="img"
+			aria-label={ label }
+			data-color-contrast-sample
+			title={ label }
+			style={ {
+				color: ramp[ foreground ],
+			} }
+		>
+			Aa
+		</span>
+	);
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { ramps, warnings = [] }, forwardedRef ) {
+	function RampTable( { label, ramps, warnings = [] }, forwardedRef ) {
 		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
 			isSeedAdjusted( seed.value, ramp[ seed.name ] )
 		);
 		const hasAnyColorWarning = warnings.length > 0;
 
 		return (
-			<div
-				style={ { width: '100%', overflowX: 'scroll' } }
-				ref={ forwardedRef }
-			>
+			<div style={ { minWidth: 0 } }>
 				{ hasAdjustedSeed || hasAnyColorWarning ? (
 					<p style={ { marginBlock: '0 0.5rem' } }>
 						<strong>Markers:</strong>{ ' ' }
@@ -135,7 +165,13 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 					</p>
 				) : null }
 				<div
+					role="region"
+					aria-label={ `${ label } color ramps` }
+					tabIndex={ 0 }
+					ref={ forwardedRef }
 					style={ {
+						width: '100%',
+						overflowX: 'auto',
 						display: 'grid',
 						gridTemplateColumns: `repeat(${ RAMP_TOKENS_ORDER.length }, minmax(max-content, 1fr))`,
 						fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -151,7 +187,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								fontSize: 11,
 								fontWeight:
 									'var(--wpds-typography-font-weight-emphasis)',
-								color: ramps[ 0 ].ramp.fgSurface4,
+								color: 'inherit',
 							} }
 						>
 							{ abbr }
@@ -246,10 +282,9 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												? '3px dashed currentColor'
 												: '',
 											outlineOffset: '-3px',
-											color:
-												tokenName === 'surface2'
-													? ramp.fgSurface4
-													: ramp.fgFill,
+											color: getSeedLabelColor(
+												seed.value
+											),
 										} }
 									>
 										{ isSeedAdjusted(
@@ -279,62 +314,48 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									>
 										{ tokenName === 'surface3' ? (
 											<>
-												<span
-													style={ {
-														color: ramp.fgSurface1,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface2,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface3,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface4,
-													} }
-												>
-													Aa
-												</span>
+												<ColorSample
+													foreground="fgSurface1"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface2"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface3"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface4"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
 											</>
 										) : null }
 										{ tokenName === 'bgFill1' ? (
-											<span
-												style={ {
-													color: ramp.fgFill,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFill"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillInverted1' ? (
-											<span
-												style={ {
-													color: ramp.fgFillInverted,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillInverted"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillDark' ? (
-											<span
-												style={ {
-													color: ramp.fgFillDark,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillDark"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 									</span>
 								) : null }
@@ -342,6 +363,34 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 						) )
 					) }
 				</div>
+				<details>
+					<summary>Color values</summary>
+					<p>
+						The surface3 text samples show fgSurface1 through
+						fgSurface4 in order. The bgFill1, bgFillInverted1, and
+						bgFillDark text samples show fgFill, fgFillInverted, and
+						fgFillDark, respectively.
+					</p>
+					{ ramps.map( ( { name, ramp } ) => (
+						<table key={ name }>
+							<caption>{ name } ramp</caption>
+							<thead>
+								<tr>
+									<th scope="col">Step</th>
+									<th scope="col">Color</th>
+								</tr>
+							</thead>
+							<tbody>
+								{ RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
+									<tr key={ tokenName }>
+										<th scope="row">{ tokenName }</th>
+										<td>{ ramp[ tokenName ] }</td>
+									</tr>
+								) ) }
+							</tbody>
+						</table>
+					) ) }
+				</details>
 			</div>
 		);
 	}

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import conservativeMapItem from '../conservative-map-item';
 
 describe( 'conservativeMapItem', () => {

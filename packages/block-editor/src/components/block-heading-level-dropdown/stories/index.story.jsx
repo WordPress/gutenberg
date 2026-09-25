@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import HeadingLevelDropdown from '../';
 
 const meta = {
-	title: 'BlockEditor/HeadingLevelDropdown',
+	id: 'blockeditor-headingleveldropdown',
+	title: 'Editor/Block Editor/HeadingLevelDropdown',
 	component: HeadingLevelDropdown,
 	parameters: {
 		docs: {

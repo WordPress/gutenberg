@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { createElement } from '../react';
 import { isEmptyElement } from '../utils';
 

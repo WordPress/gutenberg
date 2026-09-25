@@ -22,7 +22,8 @@
 	"exports": {
 		"./react": "./react.js",
 		"./react-dom": "./react-dom.js",
-		"./react-jsx-runtime": "./react-jsx-runtime.js"
+		"./react-jsx-runtime": "./react-jsx-runtime.js",
+		"./package.json": "./package.json"
 	},
 	"dependencies": {
 		"react": "^18.3.1",

@@ -1,45 +1,35 @@
-import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock, switchToBlockType } from '@wordpress/blocks';
-import useOutdentListItem from './use-outdent-list-item';
+import { outdentListItems, getOutdentTarget } from '../utils';
 
 export default function useMerge( clientId, onMerge ) {
 	const registry = useRegistry();
-	const {
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-		getBlockOrder,
-		getBlockRootClientId,
-		getBlockName,
-		getBlock,
-	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition, removeBlock, insertBlocks } =
-		useDispatch( blockEditorStore );
-	const outdentListItem = useOutdentListItem();
-
-	function getTrailingId( id ) {
-		const order = getBlockOrder( id );
-
-		if ( ! order.length ) {
-			return id;
-		}
-
-		return getTrailingId( order[ order.length - 1 ] );
-	}
-
-	function getParentListItemId( id ) {
-		const listId = getBlockRootClientId( id );
-		const parentListItemId = getBlockRootClientId( listId );
-		if ( ! parentListItemId ) {
-			return;
-		}
-		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) {
-			return;
-		}
-		return parentListItemId;
-	}
 
 	return ( forward ) => {
+		const select = registry.select( blockEditorStore );
+		const {
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+			getBlockOrder,
+			getBlockIndex,
+			getBlockRootClientId,
+			getBlockName,
+			getBlock,
+		} = select;
+		const { mergeBlocks, moveBlocksToPosition, removeBlock, insertBlocks } =
+			registry.dispatch( blockEditorStore );
+
+		function getTrailingId( id ) {
+			const order = getBlockOrder( id );
+
+			if ( ! order.length ) {
+				return id;
+			}
+
+			return getTrailingId( order[ order.length - 1 ] );
+		}
+
 		function mergeWithNested( clientIdA, clientIdB ) {
 			registry.batch( () => {
 				// When merging a sub list item with a higher next list item, we
@@ -60,6 +50,18 @@ export default function useMerge( clientId, onMerge ) {
 							clientIdB,
 							clientIdA
 						);
+					} else if (
+						getOutdentTarget( select, clientIdB ) === clientIdA
+					) {
+						// Merging into the parent item's own line: the
+						// children take the item's place in its list, one
+						// level up, since their line moved there.
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientId ),
+							nestedListClientId,
+							getBlockRootClientId( clientIdB ),
+							getBlockIndex( clientIdB ) + 1
+						);
 					} else {
 						moveBlocksToPosition(
 							getBlockOrder( nestedListClientId ),
@@ -68,7 +70,13 @@ export default function useMerge( clientId, onMerge ) {
 						);
 					}
 				}
+				const listId = getBlockRootClientId( clientIdB );
 				mergeBlocks( clientIdA, clientIdB );
+				// Merging the last item of a nested list into its parent
+				// line leaves the list block empty.
+				if ( ! getBlockOrder( listId ).length ) {
+					removeBlock( listId, false );
+				}
 			} );
 		}
 
@@ -85,7 +93,7 @@ export default function useMerge( clientId, onMerge ) {
 				while (
 					! ( nextBlockClientId = getNextBlockClientId( listItemId ) )
 				) {
-					const parentLi = getParentListItemId( listItemId );
+					const parentLi = getOutdentTarget( select, listItemId );
 					if ( ! parentLi ) {
 						break;
 					}
@@ -126,22 +134,22 @@ export default function useMerge( clientId, onMerge ) {
 						}
 					}
 				}
-			} else if ( getParentListItemId( nextBlockClientId ) ) {
-				outdentListItem( nextBlockClientId );
 			} else {
 				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
-			// Merging is only done from the top level. For lowel levels, the
-			// list item is outdented instead.
-			if ( getParentListItemId( clientId ) ) {
-				outdentListItem( clientId );
-				return;
-			}
+			// Merge into the previous line: the trailing item of the
+			// previous sibling, or the parent item's own line for a first
+			// child.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
 				mergeWithNested( trailingId, clientId );
+				return;
+			}
+			const parentListItemId = getOutdentTarget( select, clientId );
+			if ( parentListItemId ) {
+				mergeWithNested( parentListItemId, clientId );
 				return;
 			}
 
@@ -151,7 +159,10 @@ export default function useMerge( clientId, onMerge ) {
 				blockOrder.length > 0
 			) {
 				registry.batch( () => {
-					outdentListItem( getBlockOrder( blockOrder[ 0 ] ) );
+					outdentListItems(
+						registry,
+						getBlockOrder( blockOrder[ 0 ] )
+					);
 					removeBlock( clientId, true );
 				} );
 			} else {

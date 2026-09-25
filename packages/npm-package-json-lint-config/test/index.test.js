@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import config from '../';
 
 describe( 'npm-package-json-lint config tests', () => {

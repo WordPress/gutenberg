@@ -113,7 +113,7 @@ export function WidgetAttributes( {
 									...( instance.attributes as object ),
 									...edits,
 								},
-						  }
+							}
 						: instance
 				)
 			);

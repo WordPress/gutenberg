@@ -34,8 +34,6 @@ function formatTestErrorMessage( flakyTestResult: FlakyTestResult ) {
 	}
 }
 
-const FLAKY_TESTS_REPORT_COMMENT_TOKEN = `flaky-tests-report-comment`;
-
 function renderReportedTest( {
 	testTitle,
 	testPath,
@@ -60,26 +58,14 @@ ${ errorMessage }
 </details>`;
 }
 
-function renderReportComment( {
+function renderReport( {
 	reportedTests,
-	runURL,
-	commitSHA,
 }: {
 	reportedTests: ReportedFlakyTest[];
-	runURL: string;
-	commitSHA: string;
 } ) {
-	return `<!-- ${ FLAKY_TESTS_REPORT_COMMENT_TOKEN } -->
-**Flaky tests detected in ${ commitSHA }.**
-Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
+	return `Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
-🔍  Workflow run URL: ${ runURL }
-📝  Reported tests:
 ${ reportedTests.map( renderReportedTest ).join( '\n' ) }`;
 }
 
-function isReportComment( body: string ) {
-	return body.startsWith( `<!-- ${ FLAKY_TESTS_REPORT_COMMENT_TOKEN } -->` );
-}
-
-export { formatTestErrorMessage, renderReportComment, isReportComment };
+export { formatTestErrorMessage, renderReport };

@@ -6,7 +6,9 @@ const wpExternals = {
 		build.onResolve(
 			{ filter: /^@wordpress\/(data|hooks|i18n|date)(\/|$)/ },
 			( args ) => {
-				// Don't bundle WordPress signleton packages
+				// Don't bundle WordPress singleton packages. Keep the list in
+				// sync with `SINGLETONS` in
+				// `tools/validation/check-private-apis.mjs`.
 				return { path: args.path, external: true };
 			}
 		);

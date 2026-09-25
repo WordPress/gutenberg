@@ -111,10 +111,10 @@ function ConnectorsPage() {
 								{ isFileModDisabled
 									? __(
 											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-									  )
+										)
 									: __(
 											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									  ) }
+										) }
 							</Notice.Description>
 						</Notice.Root>
 					) }
@@ -173,7 +173,7 @@ function ConnectorsPage() {
 					</VStack>
 				) }
 				{ canInstallPlugins && ! isFileModDisabled && (
-					<p>
+					<p className="connectors-page__help-text">
 						{ createInterpolateElement(
 							__(
 								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'

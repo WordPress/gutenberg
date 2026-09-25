@@ -1,22 +1,21 @@
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
+	getResolvedValue,
 	getStyle,
 	setStyle,
 	getSetting,
 	setSetting,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type { StyleVariation, Color } from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	StyleVariation,
+} from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
-
-// Enable colord's a11y plugin.
-extend( [ a11yPlugin ] );
 
 /**
  * Hook to get and set style values with memoization.
@@ -247,40 +246,37 @@ export function useColorVariations(): StyleVariation[] {
 }
 
 /**
- * Hook to randomize theme colors using color rotation.
+ * Resolves `ref` pointers and theme-relative (`file:./…`) URLs in a style
+ * object's `background` sub-tree, for display. The Global Styles screens
+ * render inside the package's own public `BlockEditorProvider`, which strips
+ * the Symbol-keyed settings the background panel would otherwise resolve
+ * these against, so the screens resolve them before passing styles down.
  *
- * @param blockName The name of the block, if applicable.
- * @return Array containing the randomize function if feature is enabled, empty array otherwise.
+ * @param style A style object whose `background` values may contain `ref`
+ *              pointers or theme-relative URLs.
+ * @return The style object with its `background` values resolved.
  */
-export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
-	const [ themeColors, setThemeColors ] = useSetting< Color[] >(
-		'color.palette.theme',
-		blockName
-	);
-
-	const randomizeColors = useCallback( () => {
-		if ( ! themeColors || ! themeColors.length ) {
-			return;
+export function useStyleWithResolvedBackground(
+	style: GlobalStylesConfig[ 'styles' ]
+) {
+	const { merged } = useContext( GlobalStylesContext );
+	return useMemo( () => {
+		if ( ! style?.background ) {
+			return style;
 		}
-
-		const randomRotationValue = Math.floor( Math.random() * 225 );
-
-		const newColors = themeColors.map( ( colorObject ) => {
-			const { color } = colorObject;
-			const newColor = colord( color )
-				.rotate( randomRotationValue )
-				.toHex();
-
-			return {
-				...colorObject,
-				color: newColor,
-			};
-		} );
-
-		setThemeColors( newColors );
-	}, [ themeColors, setThemeColors ] );
-
-	return ( window as any ).__experimentalEnableColorRandomizer
-		? [ randomizeColors ]
-		: [];
+		const tree = { styles: merged?.styles, _links: merged?._links };
+		const background: Record< string, any > = {};
+		for ( const [ key, value ] of Object.entries(
+			style.background as Record< string, any >
+		) ) {
+			// getResolvedValue writes the resolved URL onto the object it is
+			// given: pass a copy so the context config keeps its
+			// theme-relative path.
+			background[ key ] = getResolvedValue(
+				value && typeof value === 'object' ? { ...value } : value,
+				tree
+			);
+		}
+		return { ...style, background };
+	}, [ style, merged ] );
 }

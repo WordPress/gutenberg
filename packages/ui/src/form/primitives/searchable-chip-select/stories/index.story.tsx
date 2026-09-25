@@ -10,13 +10,9 @@ import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableChipSelect { ...args } />,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
@@ -44,12 +40,14 @@ export const Default: Story = {
 	args: {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
+		'aria-label': 'Fruit',
 	},
 };
 
 /**
  * To customize what is rendered inside the chips, pass a
  * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * The chip is named from its content. Pass `aria-label` when that content is not a usable name.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.
@@ -100,6 +98,7 @@ export const WithCustomEmptyContent: Story = {
  */
 export const Grouped: Story = {
 	args: {
+		'aria-label': 'Fruit',
 		items: GROUPED_ITEMS,
 		children: ( group: FixtureGroup ) => (
 			<SearchableChipSelect.Group

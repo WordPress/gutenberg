@@ -1,5 +1,5 @@
 import * as Y from 'yjs';
-import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LOCAL_EDITOR_ORIGIN } from '../config';
 import { createUndoManager } from '../undo-manager';
 
@@ -17,9 +17,9 @@ describe( 'SyncUndoManager', () => {
 			doc,
 			map: doc.getMap( 'record' ),
 			handlers: {
-				addUndoMeta: jest.fn(),
-				onUndoStackChange: jest.fn(),
-				restoreUndoMeta: jest.fn(),
+				addUndoMeta: vi.fn(),
+				onUndoStackChange: vi.fn(),
+				restoreUndoMeta: vi.fn(),
 			},
 		};
 	}

@@ -276,6 +276,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', 'textIndent' ],
 		useEngine: true,
 	},
+	textShadow: {
+		value: [ 'typography', 'textShadow' ],
+		support: [ 'typography', 'textShadow' ],
+		useEngine: true,
+	},
 	writingMode: {
 		value: [ 'typography', 'writingMode' ],
 		support: [ 'typography', '__experimentalWritingMode' ],

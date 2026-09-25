@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { formatFontStyle } from '../format-font-style';
 
 describe( 'formatFontStyle', () => {

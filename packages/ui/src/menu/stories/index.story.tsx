@@ -12,11 +12,11 @@ import {
 	displayShortcut,
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
-import { Icon } from '../../icon';
 import * as Menu from '../';
 
 const meta: Meta< typeof Menu.Root > = {
-	title: 'Design System/Components/Menu',
+	title: 'Components/@wordpress-ui/Menu',
+	id: 'design-system-components-menu',
 	component: Menu.Root,
 	subcomponents: {
 		'Menu.Trigger': Menu.Trigger,
@@ -26,6 +26,7 @@ const meta: Meta< typeof Menu.Root > = {
 		'Menu.Item': Menu.Item,
 		'Menu.ItemLabel': Menu.ItemLabel,
 		'Menu.ItemDescription': Menu.ItemDescription,
+		'Menu.PrefixIcon': Menu.PrefixIcon,
 		'Menu.LinkItem': Menu.LinkItem,
 		'Menu.CheckboxItem': Menu.CheckboxItem,
 		'Menu.RadioGroup': Menu.RadioGroup,
@@ -95,14 +96,14 @@ export const Default: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item prefix={ <Icon icon={ archive } /> }>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
 						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
 					</Menu.Item>
-					<Menu.Item prefix={ <Icon icon={ archive } /> }>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
 						<Menu.ItemLabel>Archive</Menu.ItemLabel>
 					</Menu.Item>
 					<Menu.Item
-						prefix={ <Icon icon={ archive } /> }
+						prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						shortcut={ SHORTCUTS.save }
 						suffix="Draft"
 					>
@@ -149,7 +150,7 @@ export const Default: Story = {
 						<Menu.GroupLabel>View</Menu.GroupLabel>
 						<Menu.RadioItem
 							value="list"
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						>
 							<Menu.ItemLabel>List</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -158,7 +159,7 @@ export const Default: Story = {
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="grid"
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						>
 							<Menu.ItemLabel>Grid</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -182,7 +183,11 @@ export const Default: Story = {
 								<Menu.Item>
 									<Menu.ItemLabel>Favorites</Menu.ItemLabel>
 								</Menu.Item>
-								<Menu.Item prefix={ <Icon icon={ archive } /> }>
+								<Menu.Item
+									prefix={
+										<Menu.PrefixIcon icon={ archive } />
+									}
+								>
 									<Menu.ItemLabel>Archive</Menu.ItemLabel>
 								</Menu.Item>
 								<Menu.SubmenuRoot>
@@ -231,6 +236,7 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
+						target="wordpress-developer-resources"
 						shortcut={ SHORTCUTS.developerResources }
 						suffix="Docs"
 					>
@@ -263,6 +269,9 @@ export const RichItems: Story = {
 					<Menu.Item>
 						<Menu.ItemLabel>Label</Menu.ItemLabel>
 						<Menu.ItemDescription>Help text</Menu.ItemDescription>
+						<Menu.ItemDescription>
+							Additional context
+						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item>
 						<Menu.ItemLabel>
@@ -275,7 +284,7 @@ export const RichItems: Story = {
 						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item
-						prefix={ <Icon icon={ archive } /> }
+						prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						shortcut={ SHORTCUTS.save }
 						suffix="Modified"
 					>
@@ -305,14 +314,16 @@ export const GroupedItems: Story = {
 				<Menu.Popup>
 					<Menu.Group>
 						<Menu.GroupLabel>File</Menu.GroupLabel>
-						<Menu.Item prefix={ <Icon icon={ create } /> }>
+						<Menu.Item
+							prefix={ <Menu.PrefixIcon icon={ create } /> }
+						>
 							<Menu.ItemLabel>New draft</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Create a new draft document.
 							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 							shortcut={ SHORTCUTS.save }
 						>
 							<Menu.ItemLabel>Save</Menu.ItemLabel>
@@ -328,7 +339,7 @@ export const GroupedItems: Story = {
 					<Menu.Group>
 						<Menu.GroupLabel>Organize</Menu.GroupLabel>
 						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 							shortcut={ SHORTCUTS.move }
 							suffix="3"
 						>
@@ -338,7 +349,7 @@ export const GroupedItems: Story = {
 							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 							suffix="12"
 						>
 							<Menu.ItemLabel>Archive</Menu.ItemLabel>
@@ -439,7 +450,7 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ archived }
 							onCheckedChange={ setArchived }
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						>
 							<Menu.ItemLabel>Archived</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -449,7 +460,7 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ shared }
 							onCheckedChange={ setShared }
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 							shortcut={ SHORTCUTS.shared }
 						>
 							<Menu.ItemLabel>Shared</Menu.ItemLabel>
@@ -480,19 +491,19 @@ export const RadioItems: Story = {
 						<Menu.GroupLabel>Alignment</Menu.GroupLabel>
 						<Menu.RadioItem
 							value="left"
-							prefix={ <Icon icon={ alignLeft } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignLeft } /> }
 						>
 							<Menu.ItemLabel>Left</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="center"
-							prefix={ <Icon icon={ alignCenter } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignCenter } /> }
 						>
 							<Menu.ItemLabel>Center</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="right"
-							prefix={ <Icon icon={ alignRight } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignRight } /> }
 						>
 							<Menu.ItemLabel>Right</Menu.ItemLabel>
 						</Menu.RadioItem>

@@ -94,7 +94,7 @@ function FontSize() {
 						label: __( 'Delete' ),
 						onClick: () => setIsDeleteOpen( true ),
 					},
-			  ]
+				]
 			: [];
 
 	return (

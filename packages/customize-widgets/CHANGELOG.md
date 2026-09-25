@@ -2,8 +2,26 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 5.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+-   Use `aria-disabled` for the Undo and Redo buttons of the document tools so they stay focusable when there is nothing to undo or redo, and make the focus style of all the document tools buttons visible ([#82412](https://github.com/WordPress/gutenberg/pull/82412)).
+
+## 5.55.0 (2026-09-10)
+
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
+
 ### Internal
 
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 

@@ -53,6 +53,13 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+
+	/**
+	 * The rendering mode the canvas stays in, for routes that show the site
+	 * rather than one piece of content. Resolved from the post type and the
+	 * user's preference when omitted.
+	 */
+	renderingMode?: 'post-only' | 'template-locked';
 }
 
 /**

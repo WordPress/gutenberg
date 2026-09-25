@@ -75,7 +75,10 @@ test.describe( 'Global styles variations', () => {
 		} );
 		await siteEditorStyleVariations.browseStyles();
 		await page.getByRole( 'button', { name: 'pink' } ).click();
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 
 		await expect(
@@ -84,7 +87,10 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Typography' } ).click();
 		await page.getByRole( 'button', { name: 'Text', exact: true } ).click();
 
@@ -111,7 +117,10 @@ test.describe( 'Global styles variations', () => {
 		} );
 		await siteEditorStyleVariations.browseStyles();
 		await page.getByRole( 'button', { name: 'yellow' } ).click();
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 
 		await expect(
@@ -120,7 +129,10 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Typography' } ).click();
 		await page.getByRole( 'button', { name: 'Text', exact: true } ).click();
 
@@ -147,7 +159,10 @@ test.describe( 'Global styles variations', () => {
 		} );
 		await siteEditorStyleVariations.browseStyles();
 		await page.getByRole( 'button', { name: 'pink' } ).click();
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await page.getByRole( 'button', { name: 'Colors' } ).click();
 		await page.getByRole( 'button', { name: 'Edit palette' } ).click();
 

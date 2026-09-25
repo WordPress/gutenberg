@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useState } from '@wordpress/element';
 import styles from '../style.module.scss';
 import {
@@ -23,6 +24,8 @@ export function useBorderBoxControl(
 		onChange,
 		enableAlpha = false,
 		enableStyle = true,
+		hideLabelFromVision,
+		label,
 		value,
 		__experimentalIsRenderedInSidebar = false,
 		// Deprecated props, no longer used.
@@ -30,6 +33,11 @@ export function useBorderBoxControl(
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
+
+	// A visible label gives the control a header row to place the linked/
+	// unlinked toggle in, alongside that label. Without one the toggle stays
+	// inside the input wrapper, positioned absolutely.
+	const hasVisibleLabel = !! label && ! hideLabelFromVision;
 
 	const mixedBorders = hasMixedBorders( value );
 	const splitBorders = hasSplitBorders( value );
@@ -99,13 +107,23 @@ export function useBorderBoxControl(
 		}
 	};
 
-	const linkedControlClassName = styles[ 'linked-border-control' ];
+	// The linked control reserves an inline-end gutter for the absolutely
+	// positioned toggle. Once the toggle moves up into the header row that
+	// gutter only shortens the input, so drop it.
+	const linkedControlClassName = clsx( styles[ 'linked-border-control' ], {
+		[ styles[ 'linked-border-control-full-width' ] ]: hasVisibleLabel,
+	} );
 	const wrapperClassName = styles.wrapper;
+	const headerClassName = styles.header;
 
 	return {
 		...otherProps,
 		className,
 		colors,
+		hasVisibleLabel,
+		headerClassName,
+		hideLabelFromVision,
+		label,
 		disableUnits: mixedBorders && ! hasWidthValue,
 		enableAlpha,
 		enableStyle,

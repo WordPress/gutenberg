@@ -73,19 +73,10 @@ function getFormFieldsToValidate< Item >(
 				return null;
 			}
 
-			const fieldDef = fieldsMap.get( formField.id );
-			if ( fieldDef ) {
-				const [ normalizedField ] = normalizeFields< Item >( [
-					fieldDef,
-				] );
-
-				return {
-					id: formField.id,
-					children: processedChildren,
-					field: normalizedField,
-				} satisfies FormFieldToValidate< Item >;
-			}
-
+			// A combined form field is a layout container, not a field:
+			// its id is never resolved against the field definitions, so
+			// no validation rules are attached to it. Only its children
+			// are validated.
 			return {
 				id: formField.id,
 				children: processedChildren,

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Circle, SVG } from '@wordpress/primitives';
 import { Icon } from '../icon';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
@@ -34,20 +35,25 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const {
+			contentChildren,
+			contentContextValue,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		return (
 			<_Menu.RadioItem
 				ref={ ref }
 				{ ...itemAriaProps }
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles.item,
 					className
@@ -71,7 +77,7 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 						shortcutDescriptionId={ shortcutDescriptionId }
 						suffix={ suffix }
 					>
-						{ children }
+						{ contentChildren }
 					</ItemContent>
 				</MenuItemContentContext.Provider>
 			</_Menu.RadioItem>

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { autop, removep } from '../';
 
 test( 'empty string', () => {

@@ -234,7 +234,7 @@ function GridGroup< Item >( {
 							__( '%1$s: %2$s' ),
 							groupField.label,
 							groupName
-					  )
+						)
 					: groupName }
 			</h3>
 			{ children }

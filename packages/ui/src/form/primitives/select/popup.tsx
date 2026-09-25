@@ -5,27 +5,32 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
+import styles from './style.module.css';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(
-		{ className, portal, positioner, children, ...restProps },
+		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
 		const popupContent = (
 			<_Select.Popup
 				ref={ ref }
-				className={ clsx( itemPopupStyles.popup, className ) }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( width ),
+					className
+				) }
 				{ ...restProps }
 			>
-				<_Select.List className={ itemPopupStyles.list }>
-					<div
-						className={
-							itemPopupStyles[ 'list-scrollable-container' ]
-						}
-					>
-						{ children }
-					</div>
+				<_Select.List
+					className={ clsx(
+						itemPopupStyles[ 'list-chrome' ],
+						styles.list
+					) }
+				>
+					{ children }
 				</_Select.List>
 			</_Select.Popup>
 		);

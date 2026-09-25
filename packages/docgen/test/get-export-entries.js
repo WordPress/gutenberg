@@ -1,5 +1,6 @@
-const engine = require( '../lib/engine' );
-const getExportEntries = require( '../lib/get-export-entries' );
+import { describe, expect, it } from 'vitest';
+import engine from '../lib/engine';
+import getExportEntries from '../lib/get-export-entries';
 
 /**
  * Parses sample code into testable structure.

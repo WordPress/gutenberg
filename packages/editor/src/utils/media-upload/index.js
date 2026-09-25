@@ -7,6 +7,7 @@ import { store as editorStore } from '../../store';
 import {
 	addFiles as trackStart,
 	advance as trackAdvance,
+	advanceFailed as trackFailure,
 } from '../../components/upload-progress-snackbar/tracker';
 
 const noop = () => {};
@@ -141,8 +142,10 @@ export default function mediaUpload( {
 		onError: ( { message } ) => {
 			if ( ! isTransportOnly ) {
 				clearSaveLock();
-				// Failed files still count as "done" for the snackbar.
-				trackAdvance( 1 );
+				// Failed files still count as "done" for the snackbar, but are
+				// tallied so it doesn't report a batch that failed outright as
+				// an upload that completed.
+				trackFailure( 1 );
 			}
 			onError( message );
 		},

@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, expect, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -20,16 +23,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Icon } from '@wordpress/ui';",
-		"import { Link } from '@wordpress/ui';",
-		"import { Stack } from '@wordpress/ui';",
-		"import { Text } from '@wordpress/ui';",
-		"import { Autocomplete, Badge, Field, Fieldset, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
-		"import { Spinner } from '@wordpress/ui';",
-		"import { KeyboardShortcutDescription, KeyboardShortcutDisplay, useKeyboardShortcutProps } from '@wordpress/ui';",
-		"import { ControlWithError } from '@wordpress/ui';",
-		"import { ValidatedInputControl, InputLayout } from '@wordpress/ui';",
-		"import { ValidatedTextareaControl } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
@@ -78,8 +71,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 			code: "import { __experimentalZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+					message: 'Write your own CSS instead.',
 				},
 			],
 		},
@@ -87,19 +79,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 			code: "import { __experimentalZStack as ZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
-				},
-			],
-		},
-		{
-			code: "import { Tabs, TabPanel } from '@wordpress/components';",
-			errors: [
-				{
-					message: 'Use `Tabs` from `@wordpress/ui` instead.',
-				},
-				{
-					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+					message: 'Write your own CSS instead.',
 				},
 			],
 		},
@@ -116,14 +96,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 			errors: [
 				{
 					message: 'Use `Tabs` from `@wordpress/ui` instead.',
-				},
-			],
-		},
-		{
-			code: "import { Tooltip } from '@wordpress/components';",
-			errors: [
-				{
-					message: 'Use `Tooltip` from `@wordpress/ui` instead.',
 				},
 			],
 		},

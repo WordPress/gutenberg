@@ -40,7 +40,7 @@
 		input,
 		a {
 			font-family: system-ui;
-			font-weight: normal;
+			font-weight: 400;
 			color: $black;
 		}
 		input[type="text"],
@@ -68,7 +68,7 @@
 			margin: 0;
 			width: 100%;
 			font-size: $default-font-size;
-			font-weight: normal;
+			font-weight: 400;
 			line-height: 1;
 			min-height: 30px;
 			padding-left: $grid-unit-10;

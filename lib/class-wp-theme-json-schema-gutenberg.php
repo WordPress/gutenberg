@@ -105,7 +105,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $old     Data to migrate.
+	 * @param array  $old    Data to migrate.
 	 * @param string $origin What source of data this object represents.
 	 *                       One of 'blocks', 'default', 'theme', or 'custom'.
 	 * @return array Data with defaultFontSizes set to false.
@@ -219,7 +219,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * @since 5.9.0
 	 *
 	 * @param array $settings Reference to the current settings array.
-	 * @param array $path Path to the property to be removed.
+	 * @param array $path     Path to the property to be removed.
 	 */
 	private static function unset_setting_by_path( &$settings, $path ) {
 		$tmp_settings = &$settings; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
