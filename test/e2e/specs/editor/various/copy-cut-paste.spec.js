@@ -279,13 +279,37 @@ test.describe( 'Copy/cut/paste', () => {
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
-		await editor.insertBlock( { name: 'core/spacer' } );
-		await page.keyboard.press( 'Enter' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'middle' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'B block' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 3 );
 		await pageUtils.pressKeys( 'primary+c' );
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
@@ -346,13 +370,37 @@ test.describe( 'Copy/cut/paste', () => {
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
-		await editor.insertBlock( { name: 'core/spacer' } );
-		await page.keyboard.press( 'Enter' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'middle' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'B block' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 3 );
 		await pageUtils.pressKeys( 'primary+x' );
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
