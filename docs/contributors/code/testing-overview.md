@@ -64,7 +64,18 @@ Run `npm run lint` independently for code style checks. [ESLint](https://eslint.
 
 `npm run test:unit:routing` compares live Vitest discovery with the repository's test-file patterns. Each discovered test must belong to exactly one project, selected by its filename. The check rejects missing tests, duplicate ownership, per-file environment overrides, and obsolete Jest runner infrastructure. It does not depend on a fixed test count or migration metadata. The required `All` CI check runs it.
 
-`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure. `npm run test:unit:vitest:shuffled` shuffles files with the fixed seed `80855`. It does not shuffle tests inside each file.
+`npm run test:unit:conventions` checks explicit Vitest imports, workspace dependencies, the TypeScript test graph, environment conventions, and isolation defaults. Keep the existing Node 24/26 matrix, four Node/jsdom shards per runtime, one Chromium job on Node 24, timezone checks, and Storybook smoke coverage when changing test infrastructure.
+
+`npm run test:unit:vitest:shuffled` shuffles files and tests inside each file. CI uses `GITHUB_RUN_NUMBER` as the seed across all Node/jsdom shards and the Chromium job. Each new workflow run uses a different seed; rerunning that workflow keeps the same seed. Each job logs its seed and a reproduction command. Use the same checkout and Node.js version when reproducing a failure.
+
+Locally, Vitest chooses a seed from the current time unless you pass `--sequence.seed`. Supply the seed from a CI log to reproduce its ordering, retaining the project and shard arguments shown there. For example:
+
+```sh
+npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=node --project=jsdom --shard=1/4
+npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=browser
+```
+
+A new seed can expose an existing test-order dependency on an unrelated pull request. When this happens, reproduce the failure with the logged seed and fix the shared state or missing setup and cleanup. Do not push an unrelated change just to get a different seed. If a fix cannot be made promptly, report the failure with its seed, commit, Node.js version, project, and shard, and agree on a temporary quarantine with the maintainers. Keep any quarantine limited to the affected test and link a tracking issue for the fix and removal of the quarantine. Rerun the original failing seed to verify the fix.
 
 #### Public tooling consumers
 
@@ -554,6 +565,34 @@ npm run test:unit:watch -- path/to/example.browser.test.jsx --browser.headless=f
 ```
 
 Use the browser's debugger for browser code; the Node inspector command targets Node workers.
+
+### Browser Mode failure artifacts
+
+The **JavaScript Browser (Chromium, Node.js 24)** job in the **Unit Tests** workflow uploads failure screenshots. Download the `vitest-browser-failures` artifact from the workflow run's summary page within three days of the run. The artifact is only uploaded when the job fails and files exist; a failure before browser tests start might have no artifact.
+
+Tracing is off by default. For a focused diagnostic run, select **Run workflow**, choose the failing branch, and enter one repository-relative `*.browser.test.*` file in **browser-trace-file**. The Browser job runs that file with Playwright tracing and retains its trace if the file fails or raises an unhandled browser error. Other jobs keep their usual scope. This is a separate diagnostic run, so its result does not establish that the full Browser suite passes.
+
+The artifact preserves these directories relative to the local `test-results/` directory:
+
+- `vitest-attachments/failure-screenshots/`: automatic failure screenshots.
+- `vitest-browser-screenshots/`: screenshots taken with Browser Mode's screenshot API, if present.
+- `vitest-browser-traces/`: `.trace.zip` archives for failed files, preserving their repository-relative paths.
+
+Test output identifies the files for each failure. Open PNG screenshots with an image viewer. To inspect a trace, use an absolute path to the extracted ZIP:
+
+```sh
+npm exec --no --workspace @wordpress/unit-tests -- playwright show-trace /absolute/path/to/example.trace.zip
+```
+
+The [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer) shows recorded Playwright actions, DOM snapshots, screenshots, and network activity. Each archive covers one test file, including its setup and teardown. Use the test failure output to identify the relevant actions; JavaScript assertions are not recorded as Playwright actions.
+
+To record the same diagnostics locally:
+
+```sh
+WP_VITEST_BROWSER_TRACE=1 npm run test:unit -- --project=browser path/to/example.browser.test.jsx
+```
+
+Omit `WP_VITEST_BROWSER_TRACE` to measure the same run without tracing. Tracing adds runtime and temporary disk usage even for passing files. Recordings from files that pass without unhandled errors are discarded without exporting a ZIP. Each traced run clears the previous trace output; screenshots from earlier local failures can remain. Tracing uses the worker's existing browser context and preserves Vitest's per-file iframe isolation. If an earlier file's recording is still active when the context is reused, it is retained before the next trace starts. Tracing does not add retries. Do not combine it with Vitest's `--browser.trace` option, which controls a separate tracing implementation.
 
 ## End-to-end testing
 

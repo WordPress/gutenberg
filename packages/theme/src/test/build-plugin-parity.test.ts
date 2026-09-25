@@ -14,6 +14,7 @@ import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs'
 import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
 import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
 import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
@@ -37,10 +38,7 @@ type EsbuildOnLoad = (
 	| null
 	| undefined;
 
-type ViteTransform = (
-	code: string,
-	id: string
-) => { code: string; map: null } | null;
+type ViteTransform = typeof transformDsTokenFallbacks;
 
 function getEsbuildHook(): {
 	options: OnLoadOptions;
@@ -175,9 +173,7 @@ describe( 'design token fallback build plugin parity', () => {
 		const source = await readFile( emptyFallbackJsFixture, 'utf8' );
 		const result = getViteTransform()( source, emptyFallbackJsFixture );
 
-		expect( result?.code ).toContain(
-			'gap: var(--wpds-dimension-gap-sm,);'
-		);
+		expect( result ).toBeNull();
 	} );
 
 	it( 'keeps esbuild and Vite source-text transforms aligned', async () => {
@@ -187,8 +183,10 @@ describe( 'design token fallback build plugin parity', () => {
 		} as OnLoadArgs );
 		const viteResult = getViteTransform()( source, validJsFixture );
 
-		expect( esbuildResult?.loader ).toBe( 'tsx' );
-		expect( esbuildResult?.contents ).toBe( viteResult?.code );
+		expect( esbuildResult?.loader ).toBe( 'ts' );
+		expect( esbuildResult?.contents ).toBe(
+			`${ viteResult?.code }\n//# sourceMappingURL=${ viteResult?.map.toUrl() }`
+		);
 		expect( viteResult?.code ).toMatchSnapshot();
 	} );
 

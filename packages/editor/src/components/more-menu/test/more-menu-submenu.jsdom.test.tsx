@@ -8,7 +8,7 @@ import { forwardRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import MoreMenuItem from '../more-menu-item';
-import MoreMenuGroup from '../more-menu-group';
+import MoreMenuSubmenu, { toMenuItems } from '../more-menu-submenu';
 
 // `MenuItem` renders a `Button`, which turns into a link given an address.
 // Neither of them declares `href` among its props.
@@ -20,9 +20,7 @@ function renderMenu( children: ReactNode ) {
 	return render(
 		<Menu.Root>
 			<Menu.Trigger>Options</Menu.Trigger>
-			<Menu.Popup>
-				<MoreMenuGroup label="Panels">{ children }</MoreMenuGroup>
-			</Menu.Popup>
+			<Menu.Popup>{ children }</Menu.Popup>
 		</Menu.Root>
 	);
 }
@@ -32,12 +30,39 @@ async function openMenu( user: UserEvent ) {
 	await screen.findByRole( 'menu' );
 }
 
-describe( 'MoreMenuGroup', () => {
+describe( 'MoreMenuSubmenu', () => {
+	it( 'opens its items from a labelled menu item', async () => {
+		const user = userEvent.setup();
+
+		renderMenu(
+			<MoreMenuSubmenu label="Panels">
+				{ toMenuItems( <MenuItem>Legacy item</MenuItem> ) }
+			</MoreMenuSubmenu>
+		);
+		await openMenu( user );
+
+		const trigger = screen.getByRole( 'menuitem', { name: 'Panels' } );
+		expect( trigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
+		expect(
+			screen.queryByRole( 'menuitem', { name: 'Legacy item' } )
+		).not.toBeInTheDocument();
+
+		await user.click( trigger );
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'Legacy item' } )
+		).toBeVisible();
+	} );
+} );
+
+describe( 'toMenuItems', () => {
 	it( 'adopts legacy menu items as menu items', async () => {
 		const user = userEvent.setup();
 		const onClick = vi.fn();
 
-		renderMenu( <MenuItem onClick={ onClick }>Legacy item</MenuItem> );
+		renderMenu(
+			toMenuItems( <MenuItem onClick={ onClick }>Legacy item</MenuItem> )
+		);
 		await openMenu( user );
 
 		const item = screen.getByRole( 'menuitem', { name: 'Legacy item' } );
@@ -53,7 +78,9 @@ describe( 'MoreMenuGroup', () => {
 		const user = userEvent.setup();
 
 		renderMenu(
-			<MenuItem info="Legacy description">Legacy item</MenuItem>
+			toMenuItems(
+				<MenuItem info="Legacy description">Legacy item</MenuItem>
+			)
 		);
 		await openMenu( user );
 
@@ -68,9 +95,11 @@ describe( 'MoreMenuGroup', () => {
 		const user = userEvent.setup();
 
 		renderMenu(
-			<LinkMenuItem href="https://wordpress.org">
-				Legacy link
-			</LinkMenuItem>
+			toMenuItems(
+				<LinkMenuItem href="https://wordpress.org">
+					Legacy link
+				</LinkMenuItem>
+			)
 		);
 		await openMenu( user );
 
@@ -82,7 +111,9 @@ describe( 'MoreMenuGroup', () => {
 	it( 'adopts a legacy link item of an empty address as a link item', async () => {
 		const user = userEvent.setup();
 
-		renderMenu( <LinkMenuItem href="">Legacy link</LinkMenuItem> );
+		renderMenu(
+			toMenuItems( <LinkMenuItem href="">Legacy link</LinkMenuItem> )
+		);
 		await openMenu( user );
 
 		expect(
@@ -94,10 +125,12 @@ describe( 'MoreMenuGroup', () => {
 		const user = userEvent.setup();
 		const NothingMenuItem = forwardRef( () => null );
 
-		renderMenu( [
-			<NothingMenuItem key="nothing" />,
-			<MenuItem key="legacy">Legacy item</MenuItem>,
-		] );
+		renderMenu(
+			toMenuItems( [
+				<NothingMenuItem key="nothing" />,
+				<MenuItem key="legacy">Legacy item</MenuItem>,
+			] )
+		);
 		await openMenu( user );
 
 		await user.keyboard( '{ArrowDown}' );
@@ -109,7 +142,7 @@ describe( 'MoreMenuGroup', () => {
 	it( 'leaves more menu items alone', async () => {
 		const user = userEvent.setup();
 
-		renderMenu( <MoreMenuItem>Plugin item</MoreMenuItem> );
+		renderMenu( toMenuItems( <MoreMenuItem>Plugin item</MoreMenuItem> ) );
 		await openMenu( user );
 
 		expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 1 );
