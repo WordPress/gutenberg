@@ -40,15 +40,37 @@ const previewPaginationNumbers = ( midSize ) => {
 	return <>{ paginationItems }</>;
 };
 
+/*
+ * On the front end the letters are derived from the titles the query actually
+ * matches, which the editor cannot know without running the query. Previewing
+ * the full alphabet keeps this in line with the synthetic page numbers above,
+ * and shows how much room the widest case takes up.
+ */
+const previewPaginationLetters = () => (
+	<>
+		{ createPaginationItem( __( 'All' ), 'span', 'current' ) }
+		{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+			.split( '' )
+			.map( ( letter ) => createPaginationItem( letter ) ) }
+	</>
+);
+
 export default function QueryPaginationNumbersEdit( {
 	attributes,
 	setAttributes,
+	context: { useAlphabeticalPagination },
 } ) {
 	const { midSize } = attributes;
-	const paginationNumbers = previewPaginationNumbers(
-		parseInt( midSize, 10 )
-	);
+	const paginationNumbers = useAlphabeticalPagination
+		? previewPaginationLetters()
+		: previewPaginationNumbers( parseInt( midSize, 10 ) );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockProps = useBlockProps();
+
+	// "Number of links" has no meaning when the block renders letters.
+	if ( useAlphabeticalPagination ) {
+		return <div { ...blockProps }>{ paginationNumbers }</div>;
+	}
 
 	return (
 		<>
@@ -82,7 +104,7 @@ export default function QueryPaginationNumbersEdit( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			<div { ...useBlockProps() }>{ paginationNumbers }</div>
+			<div { ...blockProps }>{ paginationNumbers }</div>
 		</>
 	);
 }
