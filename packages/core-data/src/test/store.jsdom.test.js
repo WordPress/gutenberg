@@ -241,6 +241,11 @@ describe( 'clearEntityRecordEdits', () => {
 		const select = registry.select( coreDataStore );
 
 		dispatch.receiveEntityRecords( 'postType', 'post', post );
+		dispatch.finishResolution( 'getEntityRecord', [
+			'postType',
+			'post',
+			post.id,
+		] );
 		dispatch.editEntityRecord( 'postType', 'post', post.id, {
 			slug: 'updated-slug',
 		} );
