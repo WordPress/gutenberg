@@ -26,9 +26,9 @@
  * The registry exists once `init` has run, see get_instance(), and is
  * filled lazily: the first time its fields are read it fires the
  * `fields_api_init` action, on which the default fields of every
- * post type and the fields of plugins are registered. Registering does not
- * fire the action; reading does, and only once. This mirrors how
- * rest_get_server() fires `rest_api_init` on its first use.
+ * post type and the fields of plugins are registered. Reading fires the
+ * action once; a read during `init` is refused, see initialize(). This
+ * mirrors how rest_get_server() fires `rest_api_init` on its first use.
  *
  * Once the action has fired the registry does not change: every reader of
  * a request, the REST controller as well as the import map of the editor
@@ -323,10 +323,24 @@ final class Gutenberg_Fields_Registry {
 	 *
 	 * The registry only exists once `init` has run, see get_instance(), so
 	 * the post types and the supports the default fields derive from are
-	 * final by the time the action fires.
+	 * final by the time the action fires. `init` counts as run from its
+	 * first callback on, though, so a read from an `init` callback would
+	 * fire the action while post types are still being registered and
+	 * snapshot incomplete defaults, for good: the action fires once. Such a
+	 * read is refused and returns nothing; the next read after `init` fires
+	 * the action.
 	 */
 	private function initialize() {
 		if ( $this->initialized ) {
+			return;
+		}
+
+		if ( doing_action( 'init' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'The registered fields cannot be read during the `init` action: the post types and supports they derive from are still being registered. Read them once `init` has completed, or hook `fields_api_init`.', 'gutenberg' ),
+				'7.2.0'
+			);
 			return;
 		}
 
