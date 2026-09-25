@@ -326,10 +326,6 @@ describe( 'useEntityBinding', () => {
 		} );
 
 		it( 'handles invalid kind gracefully in createBinding', () => {
-			const consoleSpy = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			const attributes = {
 				metadata: {},
 				id: null,
@@ -347,15 +343,13 @@ describe( 'useEntityBinding', () => {
 				result.current.createBinding();
 			} );
 
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Failed to create entity binding:',
 				expect.stringContaining( 'Invalid kind "invalid-kind"' )
 			);
 
 			// Should not call updateBlockBindings when validation fails
 			expect( mockUpdateBlockBindings ).not.toHaveBeenCalled();
-
-			consoleSpy.mockRestore();
 		} );
 	} );
 } );
