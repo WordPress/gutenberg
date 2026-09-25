@@ -42,7 +42,7 @@ function gutenberg_get_something_useful() {
 }
 ```
 
-When porting new functions into Core, the function must be renamed to use the `wp_` prefix for functions or a `WP_` prefix for classes.
+When porting new functions into Core, the function must be renamed to use the `wp_` prefix for functions or a `WP_` prefix for classes. The exception is [public registration functions](#public-registration-functions), which keep the name Core uses from the start.
 
 ```php
 /**
@@ -110,6 +110,29 @@ if ( class_exists( 'WP_A_Stable_Class' ) ) {
 ```
 
 When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
+
+#### Public registration functions
+
+The `wp_` prefix does not apply to public registration functions, the functions plugin and theme authors call to register or unregister block types, patterns, styles, bindings sources or templates. Core names these without a prefix (`register_block_type()`, `register_block_pattern()`, `register_block_style()`, `register_block_bindings_source()`, `register_block_template()`), and a function that joins that family has to follow the same convention. Its name is what extenders write in their code, so it cannot be renamed when the function is merged into Core: it must be declared with its final name from the start, wrapped in a `function_exists()` check as described in [Avoiding duplicate declarations](#avoiding-duplicate-declarations).
+
+```php
+if ( ! function_exists( 'register_block_template' ) ) {
+	/**
+	 * Registers a block template.
+	 *
+	 * @param string       $template_name Template name in the form of `plugin_uri//template_name`.
+	 * @param array|string $args          Optional. Array or string of arguments for registering a block template.
+	 * @return WP_Block_Template|WP_Error The registered template object on success, WP_Error object on failure.
+	 */
+	function register_block_template( $template_name, $args = array() ) {
+		return WP_Block_Templates_Registry::get_instance()->register( $template_name, $args );
+	}
+}
+```
+
+The block template registration API was first added to the plugin as `wp_register_block_template()`, following the rules above, and had to be renamed to `register_block_template()` before it shipped in WordPress 6.7, with a deprecated alias left behind in the plugin. See the discussion in [#61577](https://github.com/WordPress/gutenberg/pull/61577#issuecomment-2391640435) and the rename in [#65958](https://github.com/WordPress/gutenberg/pull/65958).
+
+The exception is about matching the existing Core API, not about registration functions in general. Other registration APIs in Core do use the prefix, for example `wp_register_script_module()` and `wp_register_font_collection()`, so check the naming of the closest existing Core function before choosing a name. Internal callbacks that register something, like the `wp_register_navigation_cpt()` example further down, are not public API and follow the general rules.
 
 #### When not to use plugin-specific prefixes/suffixes
 
