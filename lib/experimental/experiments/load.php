@@ -141,8 +141,13 @@ function gutenberg_initialize_experiments_settings() {
 			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
 			'show_in_rest' => array(
 				'schema' => array(
-					'type'       => 'object',
-					'properties' => $properties,
+					'type'                 => 'object',
+					// Experiment properties must always be boolean.
+					'properties'           => $properties,
+					// Allow stale keys left behind by removed experiments without invalidating the entire option.
+					'additionalProperties' => array(
+						'type' => 'boolean',
+					),
 				),
 			),
 			'default'      => array(),
