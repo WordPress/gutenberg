@@ -17,10 +17,10 @@
  * registry its callbacks receive, and only there: register() and
  * unregister() refuse to run while the action is not firing.
  *
- * The registry exists once `init` has run, see get_instance(), and is
- * filled lazily: the first time its fields are read it fires the
- * `fields_api_init` action, on which the default fields of every
- * post type and the fields of plugins are registered.
+ * The registry is filled lazily: the first time its fields are read, it
+ * fires the `fields_api_init` action, on which the default fields of every
+ * post type and the fields of plugins are registered. A read before `init`
+ * has completed is refused, see initialize().
  *
  * Once the action has fired the registry does not change: every reader of
  * a request, the REST controller as well as the import map of the editor
@@ -64,31 +64,11 @@ final class Gutenberg_Fields_Registry {
 	private static $instance = null;
 
 	/**
-	 * Returns the singleton instance, or null before the `init` action has
-	 * run.
+	 * Returns the singleton instance.
 	 *
-	 * The registry holds the fields of post types, and post types are not
-	 * known until `init` has run: core registers its own on `init` at
-	 * priority 0, plugins theirs at the default priority, and supports are
-	 * added and removed on `init` too. The default fields of a post type
-	 * derive from its supports, so a registry available earlier would let a
-	 * plugin register a field for a post type that does not exist yet, or
-	 * patch a default field before it is known whether the post type gets
-	 * it.
-	 *
-	 * @return Gutenberg_Fields_Registry|null The registry, or null when `init`
-	 *                                        has not run yet.
+	 * @return Gutenberg_Fields_Registry The registry.
 	 */
 	public static function get_instance() {
-		if ( ! did_action( 'init' ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'The fields registry is not available before the `init` action has run: post types and their supports, which the fields belong to, are registered on `init`.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return null;
-		}
-
 		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
@@ -310,19 +290,26 @@ final class Gutenberg_Fields_Registry {
 	 * Fires the `fields_api_init` action the first time the registry
 	 * is read.
 	 *
-	 * The registry only exists once `init` has run, see get_instance(), so
-	 * the post types and the supports the default fields derive from are
-	 * final by the time the action fires.
+	 * The read is refused until `init` has completed. The registry holds the
+	 * fields of post types, and post types are not known until then: core
+	 * registers its own on `init` at priority 0, plugins theirs at the default
+	 * priority, and supports are added and removed on `init` too. The default
+	 * fields of a post type derive from its supports, and the action fires
+	 * once, so a read before or during `init` would fix the defaults from the
+	 * post types registered so far for the rest of the request.
+	 *
+	 * did_action() is true from the first `init` callback on, hence the
+	 * doing_action() check for the reads made while it runs.
 	 */
 	private function initialize() {
 		if ( $this->initialized ) {
 			return;
 		}
 
-		if ( doing_action( 'init' ) ) {
+		if ( ! did_action( 'init' ) || doing_action( 'init' ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'The registered fields cannot be read during the `init` action: the post types and supports they derive from are still being registered. Read them once `init` has completed, or hook `fields_api_init`.', 'gutenberg' ),
+				__( 'The registered fields cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `fields_api_init`.', 'gutenberg' ),
 				'7.2.0'
 			);
 			return;

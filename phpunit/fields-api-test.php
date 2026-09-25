@@ -533,10 +533,39 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A read during `init` is refused and returns nothing, without firing
-	 * the action: the post types the defaults derive from are still being
-	 * registered, and the action fires once. The next read after `init`
-	 * fires it.
+	 * A read before `init` is refused and returns nothing, without firing
+	 * the action: the post types the defaults derive from are registered on
+	 * `init`, and the action fires once. The next read after `init` fires it.
+	 */
+	public function test_reading_before_init_does_not_fire_the_action() {
+		global $wp_actions;
+
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::initialize' );
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
+		$fired = did_action( 'fields_api_init' );
+
+		// did_action() counts the times a hook fired: forget `init` fired, as
+		// before it runs.
+		$did_init = $wp_actions['init'];
+		unset( $wp_actions['init'] );
+		try {
+			$this->assertFalse( (bool) did_action( 'init' ) );
+			$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'page' ) );
+			$this->assertSame( array(), gutenberg_get_all_registered_field_modules() );
+			$this->assertSame( $fired, did_action( 'fields_api_init' ), 'A read before `init` does not fire the action.' );
+		} finally {
+			$wp_actions['init'] = $did_init;
+		}
+
+		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
+		$this->assertSame( $fired + 1, did_action( 'fields_api_init' ) );
+	}
+
+	/**
+	 * A read during `init` is refused too: did_action() is true from the
+	 * first `init` callback on, while the post types are still being
+	 * registered. The next read after `init` fires the action.
 	 */
 	public function test_reading_during_init_does_not_fire_the_action() {
 		global $wp_current_filter;
