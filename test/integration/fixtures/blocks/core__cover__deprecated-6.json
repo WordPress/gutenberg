@@ -43,9 +43,12 @@
 				"y": "0.40"
 			},
 			"isRepeated": false,
-			"minHeight": 48,
-			"minHeightUnit": "vw",
 			"align": "full",
+			"style": {
+				"dimensions": {
+					"minHeight": "48vw"
+				}
+			},
 			"tagName": "div"
 		},
 		"innerBlocks": [

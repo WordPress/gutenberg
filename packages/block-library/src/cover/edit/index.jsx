@@ -8,7 +8,12 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	SandBox,
+	Spinner,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+} from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
@@ -49,7 +54,9 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
+const { openMediaEditorModalKey, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -100,8 +107,7 @@ function CoverEdit( {
 		hasParallax,
 		isDark,
 		isRepeated,
-		minHeight,
-		minHeightUnit,
+		style,
 		alt,
 		allowedBlocks,
 		templateLock,
@@ -473,23 +479,18 @@ function CoverEdit( {
 	const hasNonContentControls = blockEditingMode === 'default';
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
+	const minHeight = style?.dimensions?.minHeight;
 	const resizableBoxDimensions = useMemo( () => {
+		const [ quantity, unit ] = parseQuantityAndUnitFromRawValue(
+			minHeight ?? ''
+		);
 		return {
-			height: minHeightUnit === 'px' && minHeight ? minHeight : 'auto',
+			height: unit === 'px' && quantity ? quantity : 'auto',
 			width: 'auto',
 		};
-	}, [ minHeight, minHeightUnit ] );
-
-	const minHeightWithUnit =
-		minHeight && minHeightUnit
-			? `${ minHeight }${ minHeightUnit }`
-			: minHeight;
+	}, [ minHeight ] );
 
 	const isImgElement = ! ( hasParallax || isRepeated );
-
-	const style = {
-		minHeight: minHeightWithUnit || undefined,
-	};
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
@@ -713,24 +714,33 @@ function CoverEdit( {
 		/>
 	);
 
+	const setMinHeight = ( value ) => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				dimensions: {
+					...style?.dimensions,
+					minHeight: value === undefined ? undefined : `${ value }px`,
+				},
+			} ),
+		} );
+	};
+
 	const resizableCoverProps = {
 		className: 'block-library-cover__resize-container',
 		clientId,
 		height,
-		minHeight: minHeightWithUnit,
+		minHeight,
 		onResizeStart: () => {
-			setAttributes( { minHeightUnit: 'px' } );
 			toggleSelection( false );
 		},
-		onResize: ( value ) => {
-			setAttributes( { minHeight: value } );
-		},
+		onResize: setMinHeight,
 		onResizeStop: ( newMinHeight ) => {
 			toggleSelection( true );
-			setAttributes( { minHeight: newMinHeight } );
+			setMinHeight( newMinHeight );
 		},
 		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
-		showHandle: ! attributes.style?.dimensions?.aspectRatio,
+		showHandle: ! style?.dimensions?.aspectRatio,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -746,10 +756,6 @@ function CoverEdit( {
 				<TagName
 					{ ...blockProps }
 					className={ clsx( 'is-placeholder', blockProps.className ) }
-					style={ {
-						...blockProps.style,
-						minHeight: minHeightWithUnit || undefined,
-					} }
 				>
 					{ resizeListener }
 					<CoverPlaceholder
@@ -796,7 +802,6 @@ function CoverEdit( {
 			<TagName
 				{ ...blockProps }
 				className={ clsx( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				{ resizeListener }

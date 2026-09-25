@@ -239,7 +239,9 @@ test.describe( 'Cover', () => {
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		await expect(
-			coverBlockEditorSettings.getByLabel( 'Minimum height' )
+			coverBlockEditorSettings.getByRole( 'spinbutton', {
+				name: 'Minimum height',
+			} )
 		).toHaveValue( '' );
 
 		// There is no accessible locator for the draggable block resize edge,

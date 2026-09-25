@@ -13,6 +13,7 @@ import { compose } from '@wordpress/compose';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	getPositionClassName,
 	isContentPositionCenter,
 	dimRatioToClass,
@@ -53,6 +54,37 @@ function migrateTag( attributes ) {
 	}
 	return {
 		...attributes,
+	};
+}
+
+/**
+ * Moves the `minHeight`/`minHeightUnit` attribute pair to the `dimensions`
+ * block support, which stores a single CSS value and can hold a preset
+ * reference such as `var:preset|dimension|full`.
+ *
+ * Used in deprecations: v4-v15.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Migrated block attributes.
+ */
+function migrateMinHeight( attributes ) {
+	const { minHeight, minHeightUnit, ...newAttributes } = attributes;
+
+	if ( ! minHeight ) {
+		return newAttributes;
+	}
+
+	return {
+		...newAttributes,
+		style: {
+			...newAttributes.style,
+			dimensions: {
+				...newAttributes.style?.dimensions,
+				// Former versions rendered a unitless value through React,
+				// which appended `px`.
+				minHeight: `${ minHeight }${ minHeightUnit || 'px' }`,
+			},
+		},
 	};
 }
 
@@ -258,6 +290,221 @@ const v14BlockSupports = {
 	},
 };
 
+const v15BlockAttributes = {
+	...v14BlockAttributes,
+	templateLock: {
+		type: [ 'string', 'boolean' ],
+		enum: [ 'all', 'insert', 'contentOnly', false ],
+	},
+	poster: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'video',
+		attribute: 'poster',
+	},
+	allowedVideoProviders: {
+		type: 'array',
+		default: [
+			'youtube',
+			'vimeo',
+			'videopress',
+			'animoto',
+			'tiktok',
+			'wordpress-tv',
+		],
+	},
+};
+
+const v15BlockSupports = {
+	...v14BlockSupports,
+	__experimentalOnEnter: true,
+	color: {
+		heading: true,
+		text: true,
+		background: false,
+		__experimentalSkipSerialization: [ 'gradients' ],
+		enableContrastChecker: false,
+	},
+	filter: {
+		duotone: true,
+	},
+	allowedBlocks: true,
+};
+
+// Deprecation for blocks that store the minimum height in the `minHeight` and
+// `minHeightUnit` attributes rather than in the `dimensions` block support.
+const v15 = {
+	attributes: v15BlockAttributes,
+	supports: v15BlockSupports,
+	isEligible( { minHeight, minHeightUnit } ) {
+		return minHeight !== undefined || minHeightUnit !== undefined;
+	},
+	migrate: migrateMinHeight,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			useFeaturedImage,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+			tagName: Tag,
+			sizeSlug,
+			poster,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight =
+			minHeightProp && minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+		const isEmbedVideoBackground =
+			EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				  ? mediaPosition(focalPoint)
+				  : undefined;
+
+		const backgroundImage = url ? `url(${ url })` : undefined;
+
+		const backgroundPosition = mediaPosition( focalPoint );
+
+		const classes = clsx(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const imgClasses = clsx(
+			'wp-block-cover__image-background',
+			id ? `wp-image-${ id }` : null,
+			{
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+			}
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
+				{ ! useFeaturedImage &&
+					isImageBackground &&
+					url &&
+					( isImgElement ? (
+						<img
+							className={ imgClasses }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) : (
+						<div
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
+							className={ imgClasses }
+							style={ { backgroundPosition, backgroundImage } }
+						/>
+					) ) }
+				{ isVideoBackground && url && (
+					<video
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						poster={ poster }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				{ isEmbedVideoBackground && url && (
+					<figure
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'wp-block-cover__embed-background',
+							'wp-block-embed'
+						) }
+					>
+						<div className="wp-block-embed__wrapper">{ url }</div>
+					</figure>
+				) }
+
+				<span
+					aria-hidden="true"
+					className={ clsx(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</Tag>
+		);
+	},
+};
+
 // Deprecation for blocks that have z-index.
 const v14 = {
 	attributes: v14BlockAttributes,
@@ -409,6 +656,7 @@ const v14 = {
 			</Tag>
 		);
 	},
+	migrate: migrateMinHeight,
 };
 
 // Deprecation for blocks that does not have the aria-label when the image background is fixed or repeated.
@@ -559,6 +807,7 @@ const v13 = {
 			</Tag>
 		);
 	},
+	migrate: migrateMinHeight,
 };
 
 // Deprecation for blocks to prevent auto overlay color from overriding previously set values.
@@ -572,12 +821,10 @@ const v12 = {
 			attributes.isUserOverlayColor === undefined
 		);
 	},
-	migrate( attributes ) {
-		return {
-			...attributes,
-			isUserOverlayColor: true,
-		};
-	},
+	migrate: compose( migrateMinHeight, ( attributes ) => ( {
+		...attributes,
+		isUserOverlayColor: true,
+	} ) ),
 	save( { attributes } ) {
 		const {
 			backgroundType,
@@ -871,7 +1118,7 @@ const v11 = {
 			</div>
 		);
 	},
-	migrate: migrateTag,
+	migrate: compose( migrateMinHeight, migrateTag ),
 };
 
 // Deprecation for blocks that renders fixed background as background from the main block container.
@@ -1008,7 +1255,7 @@ const v10 = {
 			</div>
 		);
 	},
-	migrate: migrateTag,
+	migrate: compose( migrateMinHeight, migrateTag ),
 };
 
 // Deprecation for blocks with `minHeightUnit` set but no `minHeight`.
@@ -1140,7 +1387,7 @@ const v9 = {
 			</div>
 		);
 	},
-	migrate: migrateTag,
+	migrate: compose( migrateMinHeight, migrateTag ),
 };
 
 // v8: deprecated to remove duplicated gradient classes and swap `wp-block-cover__gradient-background` for `wp-block-cover__background`.
@@ -1267,7 +1514,7 @@ const v8 = {
 			</div>
 		);
 	},
-	migrate: migrateTag,
+	migrate: compose( migrateMinHeight, migrateTag ),
 };
 
 const v7 = {
@@ -1416,7 +1663,7 @@ const v7 = {
 			</div>
 		);
 	},
-	migrate: compose( migrateDimRatio, migrateTag ),
+	migrate: compose( migrateMinHeight, migrateDimRatio, migrateTag ),
 };
 
 const v6 = {
@@ -1549,7 +1796,7 @@ const v6 = {
 			</div>
 		);
 	},
-	migrate: compose( migrateDimRatio, migrateTag ),
+	migrate: compose( migrateMinHeight, migrateDimRatio, migrateTag ),
 };
 
 const v5 = {
@@ -1646,7 +1893,7 @@ const v5 = {
 			</div>
 		);
 	},
-	migrate: compose( migrateDimRatio, migrateTag ),
+	migrate: compose( migrateMinHeight, migrateDimRatio, migrateTag ),
 };
 
 const v4 = {
@@ -1743,7 +1990,7 @@ const v4 = {
 			</div>
 		);
 	},
-	migrate: compose( migrateDimRatio, migrateTag ),
+	migrate: compose( migrateMinHeight, migrateDimRatio, migrateTag ),
 };
 
 const v3 = {
@@ -2003,4 +2250,20 @@ const v1 = {
 	},
 };
 
-export default [ v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
+export default [
+	v15,
+	v14,
+	v13,
+	v12,
+	v11,
+	v10,
+	v9,
+	v8,
+	v7,
+	v6,
+	v5,
+	v4,
+	v3,
+	v2,
+	v1,
+];
