@@ -1,15 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-// Registers the core format types (bold, italic, link, …) as a side effect so
-// the `richtext` control's keyboard shortcuts (⌘B / ⌘I / ⌘K) and the inline
-// link popover can be exercised in the story.
-import '@wordpress/format-library';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type {
 	CardLayout,
@@ -31,6 +20,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -38,7 +28,6 @@ type SamplePost = {
 	comment_status?: string;
 	ping_status?: boolean;
 	longDescription?: string;
-	summary?: string;
 	origin?: string;
 	destination?: string;
 	flight_status?: string;
@@ -151,6 +140,12 @@ const fields: Field< SamplePost >[] = [
 		readOnly: true,
 	},
 	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
+		readOnly: true,
+	},
+	{
 		id: 'tags',
 		label: 'Tags',
 		type: 'array',
@@ -192,21 +187,6 @@ const fields: Field< SamplePost >[] = [
 		Edit: {
 			control: 'textarea',
 			rows: 5,
-		},
-	},
-	{
-		id: 'summary',
-		label: 'Summary',
-		type: 'text',
-		placeholder: 'Add a summary — try ⌘B, ⌘I, ⌘K or `code`',
-		Edit: {
-			control: 'richtext',
-			allowedFormats: [
-				'core/bold',
-				'core/italic',
-				'core/link',
-				'core/code',
-			],
 		},
 	},
 	{
@@ -326,7 +306,7 @@ const getLayoutFromStoryArgs = ( {
 			type: 'card',
 		};
 		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
+			// @ts-expect-error `cardLayout` is narrowed to the member whose `withHeader` can only be `true`.
 			cardLayout.withHeader = withHeader;
 		}
 		layout = cardLayout;
@@ -356,10 +336,9 @@ const LayoutRegularComponent = ( {
 		can_comment: false,
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
-		summary:
-			'A <strong>bold</strong> summary with <em>emphasis</em> and <code>code</code>.',
 	} );
 
 	// Make fields disabled when control is set to disabled.
@@ -395,10 +374,10 @@ const LayoutRegularComponent = ( {
 				'birthdate',
 				'filesize',
 				'dimensions',
+				'file_type',
 				'tags',
 				'description',
 				'longDescription',
-				'summary',
 			],
 		} ),
 		[ labelPosition ]

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
 
 // Em dash shown when a value isn't set.

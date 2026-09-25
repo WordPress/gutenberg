@@ -1,6 +1,5 @@
 import { flushSync } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-
 import { warnCompat } from './warn-compat';
 
 const internalsKey = '_reactInternals';

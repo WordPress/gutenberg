@@ -1,19 +1,13 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
 import type { StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';
 
 const meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},

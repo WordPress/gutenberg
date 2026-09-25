@@ -1,16 +1,8 @@
 if ( globalThis.SCRIPT_DEBUG ) {
 	await import( 'preact/debug' );
 }
-
-/**
- * External dependencies
- */
 import { h, cloneElement, render } from 'preact';
 import { batch, effect } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import './directives'; // Registers all the core directives.
 import { routerRegions } from './directives/router-region';
 import {

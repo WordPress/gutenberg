@@ -1,40 +1,73 @@
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useRef } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDebounce, useEvent } from '@wordpress/compose';
+
+const TYPING_TIMEOUT = 1000;
 
 /**
- * Internal dependencies
+ * Classifies the change between two snapshots of the value.
+ *
+ * @param {Object} previous Previous snapshot.
+ * @param {Object} next     Next snapshot.
+ *
+ * @return {'none'|'typing'|'discrete'} The change type.
  */
-import { store as blockEditorStore } from '../../store';
+function getChangeType( previous, next ) {
+	if (
+		previous.html === next.html &&
+		previous.hasActiveFormats === next.hasActiveFormats
+	) {
+		return 'none';
+	}
 
-export function useMarkPersistent( { html, value } ) {
-	const previousTextRef = useRef();
+	return previous.text === next.text ? 'discrete' : 'typing';
+}
+
+export function useMarkPersistent( { html, value, onMarkPersistent } ) {
+	const { text } = value;
 	const hasActiveFormats = !! value.activeFormats?.length;
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
+	const previousRef = useRef();
+	// Stable, so a new callback doesn't reset the debounce.
+	const markPersistent = useEvent( onMarkPersistent );
+	// Don't create an undo level for every character. Create one after a
+	// second of no input.
+	const markPersistentDebounced = useDebounce(
+		markPersistent,
+		TYPING_TIMEOUT
+	);
 
 	// Must be set synchronously to make sure it applies to the last change.
 	useLayoutEffect( () => {
+		const previous = previousRef.current;
+		const next = { html, text, hasActiveFormats };
+
 		// Ignore mount.
-		if ( ! previousTextRef.current ) {
-			previousTextRef.current = value.text;
+		if ( ! previous ) {
+			previousRef.current = next;
 			return;
 		}
 
-		// Text input, so don't create an undo level for every character.
-		// Create an undo level after 1 second of no input.
-		if ( previousTextRef.current !== value.text ) {
-			const timeout = window.setTimeout( () => {
-				__unstableMarkLastChangeAsPersistent();
-			}, 1000 );
-			previousTextRef.current = value.text;
-			return () => {
-				window.clearTimeout( timeout );
-			};
+		// Effects can re-run without a change, e.g. in strict mode. Keep the
+		// last handled snapshot, so html lagging behind the text (e.g. a
+		// debounced `setAttributes`) still counts as typing.
+		const changeType = getChangeType( previous, next );
+		if ( changeType === 'none' ) {
+			return;
 		}
 
-		__unstableMarkLastChangeAsPersistent();
-	}, [ html, hasActiveFormats ] );
+		previousRef.current = next;
+
+		if ( changeType === 'typing' ) {
+			markPersistentDebounced();
+			return;
+		}
+
+		markPersistentDebounced.cancel();
+		markPersistent();
+	}, [
+		html,
+		text,
+		hasActiveFormats,
+		markPersistent,
+		markPersistentDebounced,
+	] );
 }

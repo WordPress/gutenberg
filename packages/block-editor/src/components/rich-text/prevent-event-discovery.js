@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { insert } from '@wordpress/rich-text';
 
 export function preventEventDiscovery( value ) {

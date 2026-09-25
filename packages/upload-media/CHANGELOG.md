@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 0.41.0 (2026-09-23)
+
+### New Features
+
+-   Add the `isHeicFile` export, which recognizes a HEIC/HEIF image from its file header rather than from the MIME type the browser infers from the file name ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+
+### Bug Fixes
+
+-   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck, and abandon a stalled `ImageDecoder` decode after a timeout instead of hanging the upload ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
+-   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
+### Internal
+
+-   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
+-   Remove unused dependency `@wordpress/preferences` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.39.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.38.0 (2026-08-12)
+
+### Enhancements
+
+-   The error shown when a HEIC file cannot be converted now explains the failure in terms of the browser and operating system in use, and points at the browsers that do decode HEIC there, since HEIC decoding depends on OS-provided codecs. Exposed as the new `getHeicUnsupportedMessage` and `getHeicConversionAdvice` exports ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
+### Bug Fixes
+
+-   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
+## 0.37.0 (2026-07-29)
+
 ### Breaking Changes
 
 -   `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
@@ -13,7 +53,6 @@
 
 ### Bug Fixes
 
--   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
 -   `cancelItem` no longer awaits the best-effort worker cancellation calls. A busy vips worker is synchronously blocked inside a wasm call and cannot answer the cancellation RPC until every operation already queued in the worker finishes, which for a large animated GIF left cancelled items stuck in the queue - and the parent attachment unfinalized - for minutes ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
 -   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 

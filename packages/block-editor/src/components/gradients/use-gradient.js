@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditContext } from '../block-edit';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';

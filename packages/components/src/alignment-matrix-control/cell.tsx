@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import { Composite } from '../composite';
 import Tooltip from '../tooltip';
 import { VisuallyHidden } from '../visually-hidden';
-
-/**
- * Internal dependencies
- */
 import { ALIGNMENT_LABEL } from './utils';
 import type { AlignmentMatrixControlCellProps } from './types';
 import type { WordPressComponentProps } from '../context';

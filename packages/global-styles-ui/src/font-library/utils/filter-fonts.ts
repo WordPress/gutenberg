@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { CollectionFontFamily } from '@wordpress/core-data';
 
 /**

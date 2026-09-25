@@ -1,13 +1,5 @@
-/**
- * External dependencies
- */
 import deepmerge from 'deepmerge';
-// @ts-ignore - is-plain-object doesn't have proper types
 import { isPlainObject } from 'is-plain-object';
-
-/**
- * Internal dependencies
- */
 import type { GlobalStylesConfig } from '../types';
 import { normalizeStyleStateAliases } from '../style-state-back-compat';
 

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
 
@@ -448,7 +441,7 @@ export default function useBlockSync( {
 							? restoreSelectionIds(
 									selectionInfo,
 									idMappingRef.current
-							  )
+								)
 							: selectionInfo;
 
 						pendingChangesRef.current.outgoing.push(
@@ -483,12 +476,12 @@ export default function useBlockSync( {
 						const isOurs = clientId
 							? idMappingRef.current.internalToExternal.has(
 									newSelectionStart.clientId
-							  )
+								)
 							: ! getBlockParents(
 									newSelectionStart.clientId
-							  ).some( ( parentId ) =>
+								).some( ( parentId ) =>
 									areInnerBlocksControlled( parentId )
-							  );
+								);
 
 						if ( isOurs ) {
 							const selectionInfo = {
@@ -502,7 +495,7 @@ export default function useBlockSync( {
 									? restoreSelectionIds(
 											selectionInfo,
 											idMappingRef.current
-									  )
+										)
 									: selectionInfo
 							);
 						}

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
@@ -20,6 +13,11 @@ const BlockStyleStateContext = createContext( DEFAULT_BLOCK_STYLE_STATE );
 
 export const BlockStyleStateProvider = BlockStyleStateContext.Provider;
 
+/**
+ * Returns the current block style state.
+ *
+ * @return {Object} The current block style state.
+ */
 export function useBlockStyleState() {
 	return useContext( BlockStyleStateContext );
 }
@@ -78,6 +76,19 @@ function getStyleStatePath( selectedState ) {
 	);
 }
 
+/**
+ * Returns the style object for the selected block style state.
+ *
+ * @param {Object} style         The block style object.
+ * @param {Object} selectedState Selected block style state.
+ * @return {Object} The style object for the selected state, if found.
+ *
+ * @example
+ * ```js
+ * const state = { viewport: '@mobile' };
+ * const stateStyle = getStyleForState( attributes.style, state ) || {};
+ * ```
+ */
 export function getStyleForState( style, selectedState ) {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
@@ -86,6 +97,26 @@ export function getStyleForState( style, selectedState ) {
 	return getValueFromObjectPath( style, path );
 }
 
+/**
+ * Returns a style object with the selected block style state updated.
+ *
+ * @param {Object} style         The block style object.
+ * @param {Object} selectedState Selected block style state.
+ * @param {Object} newStyle      New style for the selected state.
+ * @return {Object} The updated style object.
+ *
+ * @example
+ * ```js
+ * const state = { viewport: '@mobile' };
+ * const stateStyle = getStyleForState( attributes.style, state ) || {};
+ * setAttributes( {
+ * 	style: setStyleForState( attributes.style, state, {
+ * 		...stateStyle,
+ * 		dimensions: { ...stateStyle.dimensions, minHeight: '50vh' },
+ * 	} ),
+ * } );
+ * ```
+ */
 export function setStyleForState( style, selectedState, newStyle ) {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {

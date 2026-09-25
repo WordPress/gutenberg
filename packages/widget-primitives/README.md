@@ -53,18 +53,35 @@ Error handling and chrome stay with the host, which wraps the lazy render in a `
 
 It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
+### `HostLink`
+
+It's how a consumer mounts a link target, and the only piece of the seam most consumers touch: the host's `Link` when `match` recognizes the target, a plain anchor otherwise. A target that opens a new document never routes, which it reads off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
+
+It takes `href` plus anchor props and composes through the `render` prop of a UI link, which merges its own anchor props in.
+
+### `WidgetHostProvider` / `useWidgetHost`
+
+It's the seam itself: the embedding application provides what only it knows as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
+
+The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it.
+
+Applications mount the provider. `useWidgetHost` reads the bag directly, for a capability no component covers yet or an answer a consumer needs before it renders.
+
+`HostLink` reaches the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+
 ### Contract types
 
-`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
+`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`, and `WidgetAttributeRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts. `WidgetAttributeRecord` is an attribute as `widget.json` declares it: the JSON-expressible subset of a DataViews `Field`.
 
 ### `WidgetAttributeField< Item >`
 
-It's an authoring helper: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
-Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may promote to a prominent surface.
+It's an authoring helper for a `widget.ts` entry: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
+Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
+`useWidgetTypes` merges such an entry by `id` over the one `widget.json` declares, so the module only carries what JSON cannot express; `isValid` merges rule by rule, so a module `custom` validator survives the JSON rules.
 
 ### `WidgetAction`
 
-It's a declarative verb a widget type exposes: an envelope (`id`, `label`) plus exactly one fulfillment, named by the key carrying it.
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`, optional `icon` and `relevance`) plus exactly one fulfillment, named by the key carrying it.
 Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
 `data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 

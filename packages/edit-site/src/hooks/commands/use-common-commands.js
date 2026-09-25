@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
@@ -13,10 +10,6 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -139,8 +132,10 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 								transition: 'canvas-mode-edit-transition',
 							} );
 						}
-						openGeneralSidebar( 'edit-site/global-styles' );
+						// Select revisions before opening the sidebar, which
+						// resets its navigation as it opens.
 						setStylesPath( '/revisions' );
+						openGeneralSidebar( 'edit-site/global-styles' );
 					},
 				},
 			];

@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers } from '@wordpress/data';
-/**
- * Internal dependencies
- */
 import type { StoreState, WPPreferencesPersistenceLayer } from './types';
 import type { AvailableActions } from './actions';
 

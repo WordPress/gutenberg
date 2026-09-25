@@ -1,11 +1,14 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preferences', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so the dismissed-sidebar preference
+		// doesn't leak into other tests that expect it open by default.
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'remembers sidebar dismissal between sessions', async ( {

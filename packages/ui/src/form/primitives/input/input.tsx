@@ -7,6 +7,11 @@ import styles from './style.module.css';
 import type { InputProps } from './types';
 import { InputLayout } from '../input-layout';
 
+/**
+ * A low-level primitive for an input field.
+ *
+ * Prefer `InputControl` when using with a standard label and description.
+ */
 export const Input = forwardRef< HTMLElement, InputProps >( function Input(
 	{ className, size = 'default', prefix, suffix, style, ...restProps },
 	ref

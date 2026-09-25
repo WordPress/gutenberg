@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs, hasQueryArg } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import type { APIFetchMiddleware } from '../types';
 
 const userLocaleMiddleware: APIFetchMiddleware = ( options, next ) => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import OverridesPanel from './components/overrides-panel';
 import {

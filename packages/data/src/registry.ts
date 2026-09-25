@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
@@ -27,6 +20,15 @@ function getStoreName( storeNameOrDescriptor: StoreNameOrDescriptor ): string {
 }
 
 /**
+ * A listener subscribed to a store that the registry doesn't have yet. It stays
+ * dormant until the store is registered.
+ */
+interface PendingListener {
+	listener: () => void;
+	unsubscribe?: () => void;
+}
+
+/**
  * Creates a new store registry, given an optional object of initial store
  * configurations.
  *
@@ -42,12 +44,71 @@ export function createRegistry(
 	const stores: Record< string, InternalStoreInstance > = {};
 	const emitter = createEmitter();
 	let listeningStores: Set< string > | null = null;
+	// Listeners waiting for their store to be registered.
+	const pendingListeners = new Map< string, Set< PendingListener > >();
 
 	/**
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
 		emitter.emit();
+	}
+
+	/**
+	 * Parks a listener that subscribed to a store that is not registered yet.
+	 * `connectPendingListeners` attaches it to the store once it's registered.
+	 *
+	 * @param storeName Store name.
+	 * @param listener  Listener function.
+	 *
+	 * @return Unsubscribe function.
+	 */
+	function subscribePending(
+		storeName: string,
+		listener: () => void
+	): () => void {
+		const pending: PendingListener = { listener };
+
+		let listeners = pendingListeners.get( storeName );
+		if ( ! listeners ) {
+			listeners = new Set();
+			pendingListeners.set( storeName, listeners );
+		}
+		listeners.add( pending );
+
+		return () => {
+			pending.unsubscribe?.();
+			// Remove the listener from the pending set.
+			const stillPending = pendingListeners.get( storeName );
+			if ( stillPending ) {
+				stillPending.delete( pending );
+				if ( stillPending.size === 0 ) {
+					pendingListeners.delete( storeName );
+				}
+			}
+		};
+	}
+
+	/**
+	 * Attaches the listeners that subscribed to a store before it existed to the
+	 * store that has just been registered.
+	 *
+	 * @param name  Store name.
+	 * @param store The newly registered store.
+	 */
+	function connectPendingListeners(
+		name: string,
+		store: InternalStoreInstance
+	) {
+		const listeners = pendingListeners.get( name );
+		if ( ! listeners ) {
+			return;
+		}
+
+		pendingListeners.delete( name );
+		for ( const pending of listeners ) {
+			pending.unsubscribe = store.subscribe( pending.listener );
+		}
 	}
 
 	/**
@@ -77,10 +138,10 @@ export function createRegistry(
 
 		// Trying to access a store that hasn't been registered,
 		// this is a pattern rarely used but seen in some places.
-		// We fallback to global `subscribe` here for backward-compatibility for now.
+		// We create a "pending" listener and wire it up on store registration.
 		// See https://github.com/WordPress/gutenberg/pull/27466 for more info.
 		if ( ! parent ) {
-			return emitter.subscribe( listener );
+			return subscribePending( storeName, listener );
 		}
 
 		return parent.subscribe( listener, storeNameOrDescriptor );
@@ -233,24 +294,12 @@ export function createRegistry(
 		// get paused, that way, when resumed we should be able to call all these
 		// pending listeners.
 		store.emitter = createEmitter();
-		const currentSubscribe = store.subscribe;
-		store.subscribe = ( listener: () => void ) => {
-			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
-			const unsubscribeFromStore = currentSubscribe( () => {
-				if ( store.emitter.isPaused ) {
-					store.emitter.emit();
-					return;
-				}
-				listener();
-			} );
-
-			return () => {
-				unsubscribeFromStore?.();
-				unsubscribeFromEmitter?.();
-			};
-		};
+		store.subscribe( () => store.emitter.emit() );
+		store.subscribe = ( listener: () => void ) =>
+			store.emitter.subscribe( listener );
 		stores[ name ] = store;
 		store.subscribe( globalListener );
+		connectPendingListeners( name, store );
 
 		// Copy private actions and selectors from the parent store.
 		if ( parent ) {

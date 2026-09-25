@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { layout } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 import { getTemplatePartIcon } from './get-template-part-icon';
 const EMPTY_OBJECT = {};
 

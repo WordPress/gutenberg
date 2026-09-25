@@ -1,7 +1,7 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+// Whether the run targets the extensible site editor (v2).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 test.use( {
 	blockTemplateRegistrationUtils: async ( { editor, page }, use ) => {
@@ -49,7 +49,12 @@ test.describe( 'Block template registration', () => {
 		);
 		await expect( page.getByText( 'Plugin Template' ) ).toBeVisible();
 		await expect(
-			page.getByText( 'A template registered by a plugin.' )
+			// The v2 grid also renders the description in a hidden
+			// accessible-description node, so match the visible one.
+			page
+				.getByText( 'A template registered by a plugin.' )
+				.filter( { visible: true } )
+				.first()
 		).toBeVisible();
 		await expect( page.getByText( 'AuthorGutenberg' ) ).toBeVisible();
 
@@ -89,7 +94,10 @@ test.describe( 'Block template registration', () => {
 		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
-		await expect( savedButton ).toBeVisible();
+		if ( ! isSiteEditorV2 ) {
+			// Only the classic editor shows the save hub on list screens.
+			await expect( savedButton ).toBeVisible();
+		}
 		await page.goto( '/?cat=1' );
 		await expect(
 			page.getByText( 'Content edited template.' )
@@ -109,6 +117,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -136,6 +145,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -163,9 +173,14 @@ test.describe( 'Block template registration', () => {
 		).toBeHidden();
 		// Verify the template description fall backs to the plugin registered description.
 		await expect(
-			page.getByText(
-				'A custom template registered by a plugin and overridden by a theme.'
-			)
+			page
+				.getByText(
+					'A custom template registered by a plugin and overridden by a theme.'
+				)
+				// The v2 grid also renders the description in a hidden
+				// accessible-description node, so match the visible one.
+				.filter( { visible: true } )
+				.first()
 		).toBeVisible();
 		// Verify the theme template shows the theme name as the author.
 		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
@@ -221,7 +236,10 @@ test.describe( 'Block template registration', () => {
 		await page.getByRole( 'button', { name: 'Delete' } ).click();
 
 		await expect( deletedNotice ).toBeVisible();
-		await expect( savedButton ).toBeVisible();
+		if ( ! isSiteEditorV2 ) {
+			// Only the classic editor shows the save hub on list screens.
+			await expect( savedButton ).toBeVisible();
+		}
 
 		// Expect template to no longer appear in the Site Editor.
 		await expect( page.getByLabel( 'Actions' ) ).toBeHidden();
@@ -323,6 +341,8 @@ test.describe( 'Block template registration', () => {
 		await page
 			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
 			.click();
+		// The Actions button lives in the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
@@ -358,16 +378,27 @@ class BlockTemplateRegistrationUtils {
 
 	async searchForTemplate( searchTerm ) {
 		const searchResults = this.page.getByLabel( 'Actions' );
+		// The list is fetched client-side after the route loads, which can
+		// take a while on slower CI runners.
 		await expect
-			.poll( async () => await searchResults.count() )
+			.poll( async () => await searchResults.count(), {
+				timeout: 15_000,
+			} )
 			.toBeGreaterThan( 0 );
 		const initialSearchResultsCount = await searchResults.count();
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );
 		await expect
 			.poll( async () => await searchResults.count() )
 			.toBeLessThanOrEqual( initialSearchResultsCount );
+		// Normalise the URL before matching: the extensible site editor nests
+		// the route query inside the `p` param (encoding it a second time) and
+		// encodes spaces as `+`.
 		await expect
-			.poll( async () => this.page.url() )
-			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
+			.poll( async () =>
+				decodeURIComponent(
+					decodeURIComponent( this.page.url() )
+				).replace( /\+/g, ' ' )
+			)
+			.toContain( `search=${ searchTerm }` );
 	}
 }

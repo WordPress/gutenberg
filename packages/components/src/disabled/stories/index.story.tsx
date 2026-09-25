@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
@@ -19,7 +8,7 @@ import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Utilities/Disabled',
+	title: 'Components/@wordpress-components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,
 	argTypes: {

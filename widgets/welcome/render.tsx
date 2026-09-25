@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
@@ -29,7 +22,7 @@ export default function WelcomeBanner() {
 				),
 				ctaUrl: '/wp-admin/customize.php',
 				ctaLabel: __( 'Open the Customizer' ),
-		  }
+			}
 		: {
 				icon: layout,
 				title: __( 'Customize your entire site with block themes' ),
@@ -38,7 +31,7 @@ export default function WelcomeBanner() {
 				),
 				ctaUrl: '/wp-admin/site-editor.php',
 				ctaLabel: __( 'Open site editor' ),
-		  };
+			};
 
 	const stylesFeature = isClassicTheme
 		? {
@@ -49,7 +42,7 @@ export default function WelcomeBanner() {
 				),
 				ctaUrl: 'https://wordpress.org/documentation/article/block-themes/',
 				ctaLabel: __( 'Learn about block themes' ),
-		  }
+			}
 		: {
 				icon: stylesIcon,
 				title: __( 'Switch up your site’s look & feel with Styles' ),
@@ -58,7 +51,7 @@ export default function WelcomeBanner() {
 				),
 				ctaUrl: '/wp-admin/site-editor.php?p=%2Fstyles',
 				ctaLabel: __( 'Edit styles' ),
-		  };
+			};
 
 	return (
 		<Stack className={ styles.root } direction="column" gap="lg">

@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import gradientParser from 'gradient-parser';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_GRADIENT,
 	HORIZONTAL_GRADIENT_ORIENTATION,

@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { getContrastWarning } from '../components/contrast-checker';
-
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedValue( node, property ) {
@@ -164,7 +156,7 @@ export default function useBlockColorContrastWarning( {
 				linkColor: checkLinkColor ? colors.linkColor : undefined,
 				messageOverride,
 				enableAlphaChecker: true,
-		  } )
+			} )
 		: null;
 
 	// The popover Notice that displays this warning is muted

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import DataViewsPagination, {
 	hasPaginationControls,
@@ -55,7 +44,7 @@ export default function DataViewsFooter() {
 	return (
 		<div
 			className="dataviews-footer"
-			// @ts-ignore
+			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 			inert={ isRefreshing ? 'true' : undefined }
 		>
 			<Stack

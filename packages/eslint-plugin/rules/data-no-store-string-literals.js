@@ -61,7 +61,7 @@ function collectAllNodesFromCallbackFunctions( context, node ) {
 						context.sourceCode.getDeclaredVariables(
 							parent.arguments[ 0 ]
 						)
-				  )
+					)
 				: acc,
 		[]
 	);

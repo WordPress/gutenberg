@@ -1,9 +1,5 @@
-/**
- * External dependencies
- */
 import EquivalentKeyMap from 'equivalent-key-map';
 import type { Reducer } from 'redux';
-
 import type {
 	startResolution,
 	finishResolution,
@@ -15,10 +11,6 @@ import type {
 	invalidateResolutionForStore,
 	invalidateResolutionForStoreSelector,
 } from './actions';
-
-/**
- * Internal dependencies
- */
 import { keyedReducer } from '../keyed-reducer';
 import { selectorArgsToStateKey } from './utils';
 

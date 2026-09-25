@@ -12,17 +12,17 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 ```
 collab-sidebar/
 ├── README.md                       this file
-├── index.js                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
-├── notes.js                        Notes - coordinator (outer Stack, actions, keyboard nav)
-├── note-thread.js                  NoteThread - per-thread (selection, floating registration, reply form)
-├── note.js                         Note - per-card state (edit/delete mode, menu, dialog)
-├── note-card.js                    NoteCard - presentational shell (byline + actions slot + children)
-├── note-byline.js                  NoteByline - avatar + name + relative date
-├── note-form.js                    NoteForm - rich text input + submit/cancel
-├── add-note.js                     AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.js           AddNoteMenuItem - block-toolbar "Add note" trigger
-├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars
-├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
+├── index.jsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
+├── notes.jsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
+├── note-thread.jsx                  NoteThread - per-thread (selection, floating registration, reply form)
+├── note.jsx                         Note - per-card state (edit/delete mode, menu, dialog)
+├── note-card.jsx                    NoteCard - presentational shell (byline + actions slot + children)
+├── note-byline.jsx                  NoteByline - avatar + name + relative date
+├── note-form.jsx                    NoteForm - rich text input + submit/cancel
+├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
+├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
+├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
@@ -36,12 +36,12 @@ collab-sidebar/
 ## Component hierarchy
 
 ```
-NotesSidebarContainer (index.js)         - gates on post type support
- └── NotesSidebar (index.js)             - owns sidebarRef + useNoteThreads + sidebar registration
+NotesSidebarContainer (index.jsx)         - gates on post type support
+ └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.js)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
+      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>

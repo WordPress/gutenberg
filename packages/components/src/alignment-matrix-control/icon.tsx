@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Rect, SVG } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import { ALIGNMENTS, getAlignmentIndex } from './utils';
 import type { AlignmentMatrixControlIconProps } from './types';
 import type { WordPressComponentProps } from '../context';

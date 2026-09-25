@@ -101,6 +101,8 @@ There are four aspects to configure for each entity (and screen):
 - `view_list`: the preconfigured views displayed in the sidebar (e.g. "All", "Published", "Drafts", etc.)
 - `form`: the DataForm configuration used for the Quick Edit form (e.g. which fields are displayed in the form and their order)
 
+See the [View Configuration Reference](/docs/reference-guides/view-config-reference.md) for a description of every property.
+
 Each filter callback receives a `Gutenberg_View_Config_Data` object with the config for the given entity, which it can change by calling its methods (see below) and **return the object**.
 
 For example, update the view config for the Pages screen by hooking into this filter:
@@ -114,6 +116,10 @@ function example_filter_page_view_config( $data ) {
 add_filter( 'get_entity_view_config_posttype_page', 'example_filter_page_view_config' );
 ```
 
+### Filter priority
+
+Hook the callback at the default priority (`10`) or later. Priorities below `10` are reserved for WordPress Core, which uses them to build the configuration a screen starts from. A callback registered earlier than that runs before Core has finished assembling the config, so its changes are overwritten.
+
 ### Update entries with `merge`
 
 Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the current view config for the entity. To update the given configuration, call its `merge( $patch, $version )` method where:
@@ -122,6 +128,8 @@ Filter callbacks receive a `Gutenberg_View_Config_Data` object that encodes the 
 - `$version`, an integer, is the version of the data being merged. It should be `1` for now.
 
 For example, the following filter callback is applied to the _Pages_ screen. It makes the default view type a grid, sorts the grid by ascending title, and makes the `date` field visible (in addition to the existing fields). It also appends `my_custom_field` to the Quick Edit `form`, keeping the form's existing fields (note that registering a field from the server is not yet possible).
+
+Entries merged into a list are always appended to the end of it; choosing where a new entry lands is not supported yet.
 
 ```php
 function example_filter_page_view_config( $data ) {

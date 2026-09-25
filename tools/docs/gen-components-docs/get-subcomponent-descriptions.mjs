@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import fs from 'node:fs/promises';
 import babel from '@babel/core';
 import { parse as commentParser } from 'comment-parser';
@@ -27,16 +24,12 @@ export async function getDescriptionsForSubcomponents(
 		.flatMap( ( node ) => node.declaration?.declarations )
 		.find( ( node ) => node?.id.name === mainComponentName );
 
-	if (
-		! (
-			// If the main component export has `Object.assign( ... )`
-			(
-				mainComponent?.init?.type === 'CallExpression' &&
-				mainComponent?.init?.callee?.object?.name === 'Object' &&
-				mainComponent?.init?.callee?.property?.name === 'assign'
-			)
-		)
-	) {
+	if ( ! (
+		// If the main component export has `Object.assign( ... )`
+		mainComponent?.init?.type === 'CallExpression' &&
+		mainComponent?.init?.callee?.object?.name === 'Object' &&
+		mainComponent?.init?.callee?.property?.name === 'assign'
+	) ) {
 		return;
 	}
 

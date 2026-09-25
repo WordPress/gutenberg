@@ -1,21 +1,9 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Promisified dependencies
- */
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Internal dependencies
- */
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
@@ -62,7 +50,7 @@ class PlaygroundRuntime {
 	 * @return {Promise<boolean>} True if Playground CLI is available.
 	 */
 	async isAvailable() {
-		// npx will fetch it if not installed locally
+		// @wp-playground/cli is a dependency of this package, so it is installed.
 		return true;
 	}
 
@@ -188,9 +176,8 @@ class PlaygroundRuntime {
 		// Resolve the CLI binary directly so that it is found even when
 		// the package is nested inside workspace node_modules (where npx
 		// cannot discover it).
-		const cliPackageJson = require.resolve(
-			'@wp-playground/cli/package.json'
-		);
+		const cliPackageJson =
+			require.resolve( '@wp-playground/cli/package.json' );
 		const cliEntryPoint = path.join(
 			path.dirname( cliPackageJson ),
 			'wp-playground.js'

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { useRouter } from '@tanstack/react-router';
 export {
 	Link,
@@ -22,10 +19,6 @@ export type {
 	ToOptions,
 	UseNavigateResult,
 } from '@tanstack/react-router';
-
-/**
- * Internal dependencies
- */
 export { privateApis } from './private-apis';
 
 /**

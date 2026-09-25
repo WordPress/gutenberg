@@ -5,16 +5,8 @@
  * into the vips package output as a compact UTF-8 binary string that is
  * decoded back to a `Uint8Array` at runtime (rather than a base64 data URL).
  */
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const buildModulePath = path.resolve(

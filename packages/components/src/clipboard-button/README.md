@@ -1,8 +1,6 @@
 # ClipboardButton
 
-<div class="callout callout-alert">
-This component is deprecated. Please use the `useCopyToClipboard` hook from the `@wordpress/compose` package instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Please use the `useCopyToClipboard` hook from the `@wordpress/compose` package instead.</p>
 
 With a clipboard button, users copy text (or other elements) with a single click or tap.
 

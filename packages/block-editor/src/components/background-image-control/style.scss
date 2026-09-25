@@ -170,11 +170,13 @@
 
 .block-editor-global-styles-background-panel__media-replace-popover {
 	.components-popover__content {
-		// width of block-editor-global-styles-background-panel__dropdown-content-wrapper minus padding.
-		width: 226px;
+		// Sized by the widest child: the URL field (LinkControl min-width),
+		// with the menu items stretching to match.
+		width: auto;
 	}
 
-	.components-button {
+	// Scoped to menu items so the URL field's buttons keep their own padding.
+	.components-menu-item__button.components-button {
 		padding: 0 $grid-unit-10;
 	}
 

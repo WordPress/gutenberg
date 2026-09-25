@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	insert,
 	isCollapsed,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 

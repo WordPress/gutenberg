@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { BorderControl } from '..';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
-	title: 'Components/BorderControl',
+	id: 'components-bordercontrol',
+	title: 'Components/@wordpress-components/BorderControl',
 	component: BorderControl,
 	argTypes: {
 		onChange: {

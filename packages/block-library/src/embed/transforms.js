@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { isURL, getFilename } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import metadata from './block.json';
 import {
 	findMoreSuitableBlock,

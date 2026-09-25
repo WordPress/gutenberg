@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { RichText } from '@wordpress/block-editor';
 import {
 	createBlock,
@@ -197,7 +194,7 @@ const transforms = {
 							createBlock( 'core/paragraph', {
 								content: citation,
 							} ),
-					  ];
+						];
 			},
 		},
 		{
@@ -214,7 +211,7 @@ const transforms = {
 								createBlock( 'core/paragraph', {
 									content: citation,
 								} ),
-						  ]
+							]
 				),
 		},
 	],
@@ -226,7 +223,7 @@ const transforms = {
 					createBlock( 'core/paragraph', {
 						content: citation,
 					} ),
-			  ],
+				],
 };
 
 export default transforms;

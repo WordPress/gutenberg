@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -14,7 +11,7 @@ import {
 	Flex,
 	Notice,
 	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -26,10 +23,6 @@ import type {
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
@@ -105,7 +98,8 @@ function InstalledFonts() {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 	const editedFontFamilies =
 		globalStyles?.edits?.settings?.typography?.fontFamilies;
@@ -133,7 +127,7 @@ function InstalledFonts() {
 					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
 					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		  )
+			)
 		: [];
 
 	const customFontFamilyId =
@@ -225,7 +219,7 @@ function InstalledFonts() {
 		? getFontFacesActivated(
 				libraryFontSelected.slug,
 				libraryFontSelected.source
-		  ).length
+			).length
 		: 0;
 
 	const selectedFontsCount =
@@ -455,7 +449,7 @@ function InstalledFonts() {
 							</WCText>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
-								<CheckboxControl
+								<WCCheckboxControl
 									className="font-library__select-all"
 									label={ __( 'Select all' ) }
 									checked={ isSelectAllChecked }

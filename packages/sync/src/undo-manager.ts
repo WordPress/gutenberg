@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
-
-/**
- * WordPress dependencies
- */
 import type { HistoryRecord } from '@wordpress/undo-manager';
-
-/**
- * Internal dependencies
- */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
 import type {

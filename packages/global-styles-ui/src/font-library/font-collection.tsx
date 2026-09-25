@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -16,13 +13,13 @@ import {
 	Navigator,
 	__experimentalHeading as Heading,
 	Notice,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Flex,
 	Button,
 	DropdownMenu,
 	SearchControl,
 	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
@@ -40,10 +37,6 @@ import type {
 	FontFamily,
 	CollectionFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
@@ -126,8 +119,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const collectionFonts = useMemo(
 		() =>
 			( selectedCollection?.font_families as
-				| CollectionFontFamily[]
-				| undefined ) ?? [],
+				CollectionFontFamily[] | undefined ) ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
@@ -158,8 +150,11 @@ function FontCollection( { slug }: { slug: string } ) {
 		setPage( 1 );
 	};
 
-	// @ts-expect-error
-	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+	const debouncedUpdateSearchInput = debounce(
+		// @ts-expect-error `debounce` expects a `(...args: unknown[]) => unknown` callback.
+		handleUpdateSearchInput,
+		300
+	);
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
@@ -174,7 +169,7 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	const selectFontCount =
 		fontsToInstall.length > 0
-			? fontsToInstall[ 0 ]?.fontFace?.length ?? 0
+			? ( fontsToInstall[ 0 ]?.fontFace?.length ?? 0 )
 			: 0;
 
 	// Check if any fonts are selected.
@@ -314,7 +309,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -328,7 +323,7 @@ function FontCollection( { slug }: { slug: string } ) {
 												{ category.name }
 											</option>
 										) ) }
-								</SelectControl>
+								</WCSelectControl>
 							</HStack>
 
 							<Spacer margin={ 4 } />
@@ -423,7 +418,7 @@ function FontCollection( { slug }: { slug: string } ) {
 								{ __( 'Select font variants to install.' ) }
 							</WCText>
 							<Spacer margin={ 4 } />
-							<CheckboxControl
+							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
 								checked={ isSelectAllChecked }
@@ -518,7 +513,7 @@ function FontCollection( { slug }: { slug: string } ) {
 										div: <div aria-hidden />,
 										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<SelectControl
+											<WCSelectControl
 												aria-label={ __(
 													'Current page'
 												) }

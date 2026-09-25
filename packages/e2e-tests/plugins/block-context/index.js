@@ -18,12 +18,13 @@
 
 		category: 'text',
 
+		template: [ [ 'gutenberg/test-context-consumer', {} ] ],
+		templateInsertUpdatesSelection: true,
+
 		edit: function Edit( { attributes, setAttributes } ) {
 			const blockProps = useBlockProps();
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
-				template: [ [ 'gutenberg/test-context-consumer', {} ] ],
 				templateLock: 'all',
-				templateInsertUpdatesSelection: true,
 			} );
 			return el(
 				'div',

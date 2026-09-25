@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
 
 export default {

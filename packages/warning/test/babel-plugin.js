@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import { transform } from '@babel/core';
-
-/**
- * Internal dependencies
- */
-import babelPlugin from '../babel-plugin';
+import { describe, expect, it } from 'vitest';
+import babelPlugin from '../babel-plugin.cjs';
 
 function join( ...strings ) {
 	return strings.join( '\n' );

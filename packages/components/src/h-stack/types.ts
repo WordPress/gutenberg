@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { FlexProps } from '../flex/types';
 
 export type HStackAlignment =

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { RawHTML, useEffect, renderToString } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
 import type { DeprecatedButtonProps } from '../button/types';

@@ -1,12 +1,12 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"types": [ "node" ]
+		"types": [ "node", "gutenberg-vitest-test-env" ]
 	},
-	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }

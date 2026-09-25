@@ -1,6 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import { getComponents } from '../data';
-import { formatComponents } from '../format';
+import { getComponents } from '../data.ts';
+import { formatComponents } from '../format.ts';
 
 /**
  * Register the get_components tool.

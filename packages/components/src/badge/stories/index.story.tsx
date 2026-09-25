@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Badge from '..';
 
 const meta: Meta< typeof Badge > = {
 	component: Badge,
-	title: 'Components/Containers/Badge',
+	title: 'Components/@wordpress-components/Containers/Badge',
 	id: 'components-badge',
 	tags: [ 'status-private' ],
 	parameters: {

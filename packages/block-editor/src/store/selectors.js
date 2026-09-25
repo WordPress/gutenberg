@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	getBlockTypes,
@@ -17,10 +14,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -30,11 +23,11 @@ import {
 	getParsedPattern,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -45,6 +38,8 @@ import {
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
 	getClientIdsTree,
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleStateViewport,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -1313,8 +1308,39 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selectionStart.clientId === clientId;
+	// Both sides are `undefined` when nothing is selected and the caller
+	// passes an optional client ID.
+	return !! clientId && selectionStart.clientId === clientId;
 }
+
+/**
+ * Returns the ancestors of the current selection, as a set. A block is not its
+ * own ancestor, so the selected blocks themselves are not in the set.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Set<string>} Client IDs of the ancestors of the selection.
+ */
+const getSelectedBlockAncestors = createSelector(
+	( state ) => {
+		const ancestors = new Set();
+
+		for ( const clientId of getSelectedBlockClientIds( state ) ) {
+			let current = clientId;
+			while ( ( current = state.blocks.parents.get( current ) ) ) {
+				// An earlier block already walked the rest of this chain.
+				if ( ancestors.has( current ) ) {
+					break;
+				}
+
+				ancestors.add( current );
+			}
+		}
+
+		return ancestors;
+	},
+	( state ) => getSelectedBlockClientIds.getDependants( state )
+);
 
 /**
  * Returns true if one of the block's inner blocks is selected.
@@ -1326,18 +1352,19 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+	if ( ! clientId ) {
+		return false;
+	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
 	if ( ! selectedBlockClientIds.length ) {
 		return false;
 	}
 
 	if ( deep ) {
-		return selectedBlockClientIds.some( ( id ) =>
-			// Pass true because we don't care about order and it's more
-			// performant.
-			getBlockParents( state, id, true ).includes( clientId )
-		);
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
+		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
 	return selectedBlockClientIds.some(
@@ -2424,7 +2451,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					? {
 							src: symbol,
 							foreground: 'var(--wp-block-synced-color)',
-					  }
+						}
 					: symbol;
 				const userPattern = mapUserPattern( reusableBlock );
 				const { time, count = 0 } =
@@ -2480,30 +2507,48 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
-				const { getClosestAllowedInsertionPoint } = unlock(
-					select( STORE_NAME )
+				// Unmemoized checks: the memoized ones search their cache entry
+				// by entry, and each block type adds one, so they slow down as
+				// the list grows.
+				const fallbackRoots = getFallbackInsertionRoots(
+					state,
+					rootClientId
 				);
-				blockTypeInserterItems = blockTypeInserterItems
-					.filter(
-						( blockType ) =>
-							isBlockVisibleInTheInserter(
-								state,
-								blockType,
-								rootClientId
-							) &&
-							getClosestAllowedInsertionPoint(
-								blockType.name,
-								rootClientId
-							) !== null
-					)
-					.map( ( blockType ) => ( {
-						...blockType,
-						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+				const allowedItems = [];
+				for ( const blockType of blockTypeInserterItems ) {
+					if (
+						! isBlockVisibleInTheInserter(
 							state,
 							blockType,
 							rootClientId
-						),
-					} ) );
+						)
+					) {
+						continue;
+					}
+					const isAllowedInCurrentRoot =
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						);
+					if (
+						! isAllowedInCurrentRoot &&
+						! fallbackRoots.some( ( id ) =>
+							canInsertBlockTypeUnmemoized(
+								state,
+								blockType.name,
+								id
+							)
+						)
+					) {
+						continue;
+					}
+					allowedItems.push( {
+						...blockType,
+						isAllowedInCurrentRoot,
+					} );
+				}
+				blockTypeInserterItems = allowedItems;
 			}
 
 			const items = blockTypeInserterItems.reduce(
@@ -2735,15 +2780,14 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param    {Object}         state            Editor state.
- * @param    {?string}        rootClientId     Optional root client ID of block list.
+ * @param    {Object}  state        Editor state.
+ * @param    {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined} The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
- * @property {string}         name             The type of block.
- * @property {?Object}        attributes       Attributes to pass to the newly created block.
- * @property {?Array<string>} attributesToCopy Attributes to be copied from adjacent blocks when inserted.
+ * @property {string}  name         The type of block.
+ * @property {?Object} attributes   Attributes to pass to the newly created block.
  */
 export function getDirectInsertBlock( state, rootClientId = null ) {
 	if ( ! rootClientId ) {
@@ -2841,12 +2885,12 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 								: isBlockVisibleInTheInserter(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 						)
 				);
 
@@ -3502,4 +3546,49 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 		}
 	);
 	return getEditedContentOnlySection( state );
+}
+
+/**
+ * Returns the selected style state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Object} The selected block style state.
+ */
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? ( state.selectedBlockStyleState.value ??
+					DEFAULT_BLOCK_STYLE_STATE )
+				: DEFAULT_BLOCK_STYLE_STATE;
+
+		return {
+			...perBlockState,
+			// The viewport is tracked globally, so inject it here. This way
+			// consumers receive a single combined state object instead of
+			// merging the global viewport themselves, and selectors derived
+			// from this stay consistent.
+			viewport: getStyleStateViewport( state ),
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedBlockStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
 }

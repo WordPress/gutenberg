@@ -9,5 +9,5 @@ export type AvatarGroupProps = {
 	/**
 	 * Avatar elements to display in the group.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 };

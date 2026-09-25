@@ -1,13 +1,11 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
-
 import {
 	createContext,
 	createPortal,
 	useContext,
 	useState,
 } from '@wordpress/element';
-
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
 import { Spacer } from '../../spacer';
 
@@ -33,7 +31,7 @@ function IframePortal( { children }: { children: ReactNode } ) {
 const meta: Meta< typeof Slot > = {
 	tags: [ 'manifest' ],
 	component: Slot,
-	title: 'Components/Utilities/SlotFill',
+	title: 'Components/@wordpress-components/Utilities/SlotFill',
 	id: 'components-slotfill',
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {

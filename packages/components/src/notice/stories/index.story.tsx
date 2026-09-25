@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Notice from '..';
 import Button from '../../button';
 import NoticeList from '../list';
@@ -19,7 +8,7 @@ import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Feedback/Notice',
+	title: 'Components/@wordpress-components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
 	subcomponents: { NoticeList },

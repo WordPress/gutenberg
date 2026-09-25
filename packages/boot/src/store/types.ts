@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ComponentType } from 'react';
 
 /**
@@ -56,11 +53,32 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+
 	/**
-	 * Optional edit link for click-to-edit navigation.
-	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 * The rendering mode the canvas stays in, for routes that show the site
+	 * rather than one piece of content. Resolved from the post type and the
+	 * user's preference when omitted.
 	 */
-	editLink?: string;
+	renderingMode?: 'post-only' | 'template-locked';
+}
+
+/**
+ * The routes an entity of a given post type is edited and listed at.
+ *
+ * Registered by the application rather than known here, so the shell holds no
+ * knowledge of any particular page's URLs.
+ */
+export interface EntityLinks {
+	/**
+	 * Path the entities of this post type are listed at.
+	 */
+	list?: string;
+
+	/**
+	 * Path an entity of this post type is edited at. `{id}` is replaced with
+	 * the encoded entity ID.
+	 */
+	edit?: string;
 }
 
 /**
@@ -106,6 +124,25 @@ export interface RouteConfig {
 	 * ```
 	 */
 	inspector?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+
+	/**
+	 * Function that determines whether to show the stage.
+	 * When not defined, defaults to true (always show stage if component exists).
+	 * When it returns false, the stage is hidden even if a stage component is
+	 * exported, leaving the canvas to fill the surfaces area.
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   stage: async () => {
+	 *     // Only show the stage when there is something to edit
+	 *     const theme = await resolveSelect( coreStore ).getCurrentTheme();
+	 *     return !! theme?.is_block_theme;
+	 *   },
+	 * };
+	 * ```
+	 */
+	stage?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
 
 	/**
 	 * Function that returns the document title for the route.
@@ -164,4 +201,5 @@ export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
 	dashboardLink?: string;
+	entityLinks: Record< string, EntityLinks >;
 }

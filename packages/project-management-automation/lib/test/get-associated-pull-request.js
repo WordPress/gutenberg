@@ -1,9 +1,7 @@
-/**
- * Internal dependencies
- */
-import getAssociatedPullRequest from '../get-associated-pull-request';
+import { describe, expect, it } from 'vitest';
+import getAssociatedPullRequest from '../get-associated-pull-request.js';
 
-/** @typedef {import('../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull

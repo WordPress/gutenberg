@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ViewportState, ViewportAction } from './types';
 
 export const DEFAULT_VIEWPORT_STATE: ViewportState = {

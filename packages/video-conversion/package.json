@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/video-conversion",
-	"version": "0.2.0",
+	"version": "0.7.0",
 	"description": "Client-side video conversion for WordPress. Currently converts animated GIFs to MP4/WebM via WebCodecs.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,8 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",
@@ -56,6 +55,9 @@
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
 		"mediabunny": "^1.45.2"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

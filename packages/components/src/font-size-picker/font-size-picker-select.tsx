@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
@@ -83,7 +76,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 						: fontSizes.find(
 								( fontSize ) =>
 									fontSize.slug === selectedItem.key
-						  );
+							);
 
 				onChange( selectedItem.value, matchingFontSize );
 			} }

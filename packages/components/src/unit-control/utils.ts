@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WPUnitControlUnit } from './types';
 
 const allUnits: Record< string, WPUnitControlUnit > = {
@@ -378,7 +371,7 @@ export function filterUnitsWithSettings(
 	return Array.isArray( availableUnits )
 		? availableUnits.filter( ( unit ) =>
 				allowedUnitValues.includes( unit.value )
-		  )
+			)
 		: [];
 }
 

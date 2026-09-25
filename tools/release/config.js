@@ -13,7 +13,6 @@ const gitRepoOwner = 'WordPress';
  * @property {string} githubRepositoryOwner   GitHub Repository Owner.
  * @property {string} githubRepositoryName    GitHub Repository Name.
  * @property {string} pluginEntryPoint        Plugin Entry Point File.
- * @property {string} buildZipCommand         Build Plugin ZIP command.
  * @property {string} githubRepositoryURL     GitHub Repository URL.
  * @property {string} wpRepositoryReleasesURL WordPress Repository Tags URL.
  * @property {string} gitRepositoryURL        Git Repository URL.
@@ -31,7 +30,6 @@ const config = {
 	githubRepositoryOwner: gitRepoOwner,
 	githubRepositoryName: 'gutenberg',
 	pluginEntryPoint: 'gutenberg.php',
-	buildZipCommand: '/bin/bash bin/build-plugin-zip.sh',
 	githubRepositoryURL: 'https://github.com/' + gitRepoOwner + '/gutenberg/',
 	wpRepositoryReleasesURL: 'https://github.com/WordPress/gutenberg/releases/',
 	gitRepositoryURL: 'https://github.com/' + gitRepoOwner + '/gutenberg.git',

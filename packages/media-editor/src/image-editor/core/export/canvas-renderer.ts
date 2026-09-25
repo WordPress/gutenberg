@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
 

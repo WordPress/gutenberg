@@ -1,15 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useRef, useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import { useResizeObserver } from '../use-resize-observer';
 
 export type ObservedSize = {

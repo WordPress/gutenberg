@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { confirm } = require( '@inquirer/prompts' );
-
-/**
- * Internal dependencies
- */
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, detectRuntime } = require( '../runtime' );

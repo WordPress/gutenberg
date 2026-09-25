@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	getCustomValueFromPreset,
 	isValuePreset,
