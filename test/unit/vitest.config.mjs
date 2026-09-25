@@ -1,10 +1,10 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPlaywrightProvider } from './config/playwright-provider.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -226,7 +226,7 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: createPlaywrightProvider(),
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'

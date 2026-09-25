@@ -4561,16 +4561,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/card/get-padding-by-size.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/card/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/color-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4588,11 +4578,6 @@
 	},
 	"packages/components/src/custom-gradient-picker/index.tsx": {
 		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -4715,16 +4700,6 @@
 		}
 	},
 	"packages/components/src/tabs/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/text/hook.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/text/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}

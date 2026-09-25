@@ -1119,7 +1119,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1212,7 +1211,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
