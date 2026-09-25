@@ -33,6 +33,10 @@
 
 -   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks.
+
 ### Enhancements
 
 -   Navigation Link: emit `@wordpress/ui` `Badge` intents for the link preview badges, replacing the private `@wordpress/components` `Badge` vocabulary. Draft, Scheduled and Pending previously shared one `warning` intent; Draft and Pending now read as `low` and Scheduled as `informational` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
