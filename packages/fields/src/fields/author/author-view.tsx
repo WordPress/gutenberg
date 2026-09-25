@@ -26,6 +26,10 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				return null;
 			}
 			const { getEntityRecords } = select( coreStore );
+			// Query the collection with `who: 'authors'` instead of calling
+			// `getEntityRecord`, because the single user endpoint denies
+			// access to authors without published posts for users who can't
+			// list users. See https://core.trac.wordpress.org/ticket/56429.
 			return (
 				getEntityRecords< User >( 'root', 'user', {
 					include: [ authorId ],
