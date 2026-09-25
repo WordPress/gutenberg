@@ -49,48 +49,58 @@ const MAX_HEADING_LEVEL = 6;
  * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
  * so no line would match and the body would be left half demoted.
  */
-const HEADING = /^( {0,3})(#{1,6})(\s.*|)$/s;
+const HEADING = /^( {0,3})(#{1,6})([ \t].*|)$/s;
 /* A fence opens on three or more backticks or tildes, indented at most three. */
 const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
 
 /**
  * Tracks whether a line falls inside a fenced code block.
  *
- * Toggling on every fence-looking line is not enough: a fence closes only on
- * the character it opened with, repeated at least as many times, and a
- * backtick fence's info string may not itself contain a backtick.
+ * A fence closes only on the character it opened with, repeated at least as
+ * many times.
  *
- * @return A function reporting whether each line handed to it is fenced.
+ * @return A tracker fed one line at a time, in order.
  */
 function fenceTracker() {
 	let open: string | undefined;
 
-	return ( line: string ): boolean => {
-		const match = line.match( FENCE );
+	return {
+		/**
+		 * @param line The next line of the body.
+		 * @return Whether it is fenced, its delimiters included.
+		 */
+		track( line: string ): boolean {
+			const match = line.match( FENCE );
 
-		if ( ! match ) {
-			return open !== undefined;
-		}
-
-		const [ , marker, info ] = match;
-
-		if ( open === undefined ) {
-			if ( marker.startsWith( '`' ) && info.includes( '`' ) ) {
-				return false;
+			if ( ! match ) {
+				return open !== undefined;
 			}
-			open = marker;
+
+			const [ , marker, info ] = match;
+
+			if ( open === undefined ) {
+				if ( marker.startsWith( '`' ) && info.includes( '`' ) ) {
+					return false;
+				}
+				open = marker;
+				return true;
+			}
+
+			if (
+				marker[ 0 ] === open[ 0 ] &&
+				marker.length >= open.length &&
+				info.trim() === ''
+			) {
+				open = undefined;
+			}
+
 			return true;
-		}
+		},
 
-		if (
-			marker[ 0 ] === open[ 0 ] &&
-			marker.length >= open.length &&
-			info.trim() === ''
-		) {
-			open = undefined;
-		}
-
-		return true;
+		/** The marker of a fence still waiting to be closed. */
+		get openMarker() {
+			return open;
+		},
 	};
 }
 
@@ -107,11 +117,11 @@ function fenceTracker() {
 export function demoteHeadings( body: string ): string {
 	const lines = body.split( '\n' );
 
-	let isFenced = fenceTracker();
+	let fences = fenceTracker();
 	let shallowest = MAX_HEADING_LEVEL;
 
 	for ( const line of lines ) {
-		const level = isFenced( line )
+		const level = fences.track( line )
 			? undefined
 			: line.match( HEADING )?.[ 2 ].length;
 
@@ -126,11 +136,11 @@ export function demoteHeadings( body: string ): string {
 		return body;
 	}
 
-	isFenced = fenceTracker();
+	fences = fenceTracker();
 
 	return lines
 		.map( ( line ) => {
-			if ( isFenced( line ) ) {
+			if ( fences.track( line ) ) {
 				return line;
 			}
 
@@ -231,8 +241,13 @@ function truncate(
 function closeOpenBlocks( body: string ): string {
 	const closing = [];
 
-	if ( ( body.match( /^```/gm ) ?? [] ).length % 2 !== 0 ) {
-		closing.push( '```' );
+	/* Closes with the marker that opened, not always three backticks. */
+	const fences = fenceTracker();
+	for ( const line of body.split( '\n' ) ) {
+		fences.track( line );
+	}
+	if ( fences.openMarker ) {
+		closing.push( fences.openMarker );
 	}
 
 	const open = ( body.match( /<details>/g ) ?? [] ).length;
