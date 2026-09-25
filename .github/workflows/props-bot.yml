@@ -36,7 +36,8 @@ concurrency:
     # branch tip, the same value for every issue and pull request in the
     # repository, so one comment anywhere would cancel every other run.
     group: ${{ github.workflow }}-${{ github.event.number || github.event.issue.number || github.event.pull_request.number || github.run_id }}
-    cancel-in-progress: true
+    # An unrelated label event would otherwise cancel a queued props update.
+    cancel-in-progress: ${{ github.event.action != 'labeled' || github.event.label.name == 'props-bot' }}
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -130,12 +131,22 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
+            - name: Render the props list
+              env:
+                  # Through the environment, never interpolated into the script.
+                  BODY: ${{ needs.props-bot.outputs.comment-body }}
+              run: |
+                  mkdir -p pr-meta
+
+                  # Drop the intro: it is what the standalone props bot
+                  # searches for, and it would find this comment.
+                  printf '%s' "$BODY" | sed '1{/^The following accounts have interacted/d}' > pr-meta/body.md
+
             - uses: ./tools/pr-meta
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: props
-                  body: ${{ needs.props-bot.outputs.comment-body }}
-                  # The list is gathered before this job takes the lock, so two
-                  # runs can queue out of order. `run_number` increments with
-                  # every run of this workflow, so the newer list wins.
-                  generation: ${{ github.run_number }}
+                  body-path: pr-meta/body.md
+                  # The action comes from the default branch, which need not
+                  # yet know where each of the four events carries this.
+                  pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
