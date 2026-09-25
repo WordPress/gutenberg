@@ -6,6 +6,7 @@
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 -   `build`, `start` and `lint-pkg-json`: Resolve the default browserslist and npm-package-json-lint configs when dependencies are not hoisted to the project root (npm `install-strategy=linked`, pnpm). `lint-pkg-json` now defaults to `config/npmpackagejsonlint.js`; `config/npmpackagejsonlint.json` stays for projects that reference it ([#83902](https://github.com/WordPress/gutenberg/pull/83902)).
+-   `lint-js`, `lint-style`, `lint-md-docs`, `lint-pkg-json` and `format`: a file passed right after `--fix` or `--require-pragma` is now treated as a file instead of that flag's value, so only the listed files get processed ([#30466](https://github.com/WordPress/gutenberg/issues/30466)).
 
 ## 36.0.0 (2026-09-23)
 

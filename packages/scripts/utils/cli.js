@@ -14,7 +14,9 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+// Flags that never take a value, so `--fix file.js` isn't read as `--fix=file.js`.
+const getFileArgsFromCLI = () =>
+	minimist( getArgsFromCLI(), { boolean: [ 'fix', 'require-pragma' ] } )._;
 
 const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();

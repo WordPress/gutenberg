@@ -26,6 +26,7 @@ const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
 let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 const {
 	hasArgInCLI,
+	hasFileArgInCLI,
 	hasProjectFile,
 	getWebpackArgs,
 	spawnScript,
@@ -63,6 +64,24 @@ describe( 'utils', () => {
 			expect( hasArgInCLI( '-a' ) ).toBe( true );
 			expect( hasArgInCLI( '--b' ) ).toBe( true );
 			expect( hasArgInCLI( '--config' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'hasFileArgInCLI', () => {
+		afterAll( () => {
+			getArgsFromCLIMock.mockReset();
+		} );
+
+		test( 'should treat a file after --fix as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--fix', 'style.scss' ] );
+
+			expect( hasFileArgInCLI() ).toBe( true );
+		} );
+
+		test( 'should not treat the value of --config as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--config', 'custom.json' ] );
+
+			expect( hasFileArgInCLI() ).toBe( false );
 		} );
 	} );
 
