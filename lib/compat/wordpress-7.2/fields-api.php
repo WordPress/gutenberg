@@ -92,7 +92,7 @@ function gutenberg_get_all_registered_field_modules() {
  * prerequisites depend on it. A dynamic dependency is only listed in the
  * import map; the module is fetched when it is imported.
  *
- * Reading the registry fires `gutenberg_fields_init`, so the fields and their
+ * Reading the registry fires `gutenberg_fields_api_init`, so the fields and their
  * script modules are registered on demand. It still has to run after `init`,
  * for the supports the default fields derive from to be final, and it runs
  * early on `admin_init`: before the pages rendered outside the admin
@@ -167,7 +167,7 @@ add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
  * custom post types are usually registered at the default priority (10),
  * and plugins add or remove supports on `init` too, with
  * add_post_type_support() and remove_post_type_support(). Hence it runs on
- * `gutenberg_fields_init`, which the registry fires on its first read, after
+ * `gutenberg_fields_api_init`, which the registry fires on its first read, after
  * `init`: while handling a REST request, or on `admin_init` when the editor
  * script is wired up. At priority 0, so a plugin altering the defaults with
  * gutenberg_register_fields() or gutenberg_unregister_fields() at the
@@ -252,7 +252,7 @@ function _gutenberg_register_posttype_supports_fields() {
 		gutenberg_register_fields( 'postType', $post_type, $fields );
 	}
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_supports_fields', 0 );
+add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_supports_fields', 0 );
 
 /**
  * Adjusts the default fields of templates.
@@ -263,13 +263,13 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_supports_fiel
  * reads the theme or plugin that provides them instead of the post author.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
+ * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_posttype_wp_template_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template', array( 'author' ) );
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
+add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
 
 /**
  * Adjusts the default fields of template parts.
@@ -280,13 +280,13 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_f
  * reads the theme or plugin that provides them instead of the post author.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
+ * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_posttype_wp_template_part_fields() {
 	gutenberg_unregister_fields( 'postType', 'wp_template_part', array( 'author' ) );
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );
+add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );
 
 /**
  * Replaces the default fields of attachments with the media fields.
@@ -299,7 +299,7 @@ add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_wp_template_p
  * registered instead.
  *
  * It runs right after the default fields are registered, on
- * `gutenberg_fields_init` at priority 9, so a plugin hooking the action at
+ * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
  */
 function _gutenberg_register_posttype_attachment_fields() {
@@ -327,4 +327,4 @@ function _gutenberg_register_posttype_attachment_fields() {
 		)
 	);
 }
-add_action( 'gutenberg_fields_init', '_gutenberg_register_posttype_attachment_fields', 9 );
+add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_attachment_fields', 9 );

@@ -18,7 +18,7 @@
  * them.
  *
  * The registry is filled lazily: the first time its fields are read, after
- * `init` has run, it fires the `gutenberg_fields_init` action, on which the
+ * `init` has run, it fires the `gutenberg_fields_api_init` action, on which the
  * default fields of every post type and the fields of plugins are registered.
  * Registering does not fire the action; reading does, and only once. This
  * mirrors how rest_get_server() fires `rest_api_init` on its first use.
@@ -46,7 +46,7 @@ final class Gutenberg_Fields_Registry {
 	private $field_modules = array();
 
 	/**
-	 * Whether the `gutenberg_fields_init` action has fired since the registry
+	 * Whether the `gutenberg_fields_api_init` action has fired since the registry
 	 * was created or last reset.
 	 *
 	 * @var bool
@@ -162,7 +162,7 @@ final class Gutenberg_Fields_Registry {
 	 * modules, and removals.
 	 *
 	 * Unregistering reads the registered fields, so it fires the
-	 * `gutenberg_fields_init` action if it has not fired yet. Call it on that
+	 * `gutenberg_fields_api_init` action if it has not fired yet. Call it on that
 	 * action or later, once the default fields are registered.
 	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
@@ -265,7 +265,7 @@ final class Gutenberg_Fields_Registry {
 	}
 
 	/**
-	 * Empties the registry, so the next read fires the `gutenberg_fields_init`
+	 * Empties the registry, so the next read fires the `gutenberg_fields_api_init`
 	 * action again and registers the fields anew.
 	 *
 	 * Intended for tests.
@@ -277,7 +277,7 @@ final class Gutenberg_Fields_Registry {
 	}
 
 	/**
-	 * Fires the `gutenberg_fields_init` action the first time the registry is
+	 * Fires the `gutenberg_fields_api_init` action the first time the registry is
 	 * read.
 	 *
 	 * The default fields of a post type derive from its supports, which are
@@ -322,7 +322,7 @@ final class Gutenberg_Fields_Registry {
 		 *
 		 * @param Gutenberg_Fields_Registry $registry The registry being read.
 		 */
-		do_action( 'gutenberg_fields_init', $this );
+		do_action( 'gutenberg_fields_api_init', $this );
 	}
 
 	/**
