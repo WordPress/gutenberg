@@ -10,6 +10,8 @@
 
 -   Require Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` and update the bundled `markdownlint-cli` from `^0.31.1` to `^0.49.1`, which moves `markdownlint` from 0.25 to 0.41. `lint-md-docs` now runs the rules added since then (MD051 through MD060) by default, so projects may see new reports. The `header` rule aliases (for example `header-increment`) no longer work in configuration files; use the `heading` names ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
 
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead. Note that `resolveConfig` also searches ancestor directories and the global config directory (`~/.config/stylelint`), so a project with no local config may now pick up an unrelated config found there instead of the bundled default ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
+
 ### Enhancements
 
 -   `check-engines`: Check only the tools listed in `engines`, instead of always passing `--node` and `--npm`. Without an `engines` field in the project, it now checks only the Node.js version ([#83326](https://github.com/WordPress/gutenberg/pull/83326)).
