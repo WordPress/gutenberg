@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Include viewport and pseudo style states in global styles save confirmation labels, grouping each block/element once with its state labels (e.g. Default, Mobile, Tablet), and export `getGlobalStylesChangeGroups` and `getGlobalStylesChangeGroupSummary` so UIs can render structured change summaries ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ## 1.23.0 (2026-09-23)
 
 ### New Features
