@@ -3,7 +3,8 @@ import { Radio } from '../../radio';
 import { RadioGroup } from '../';
 
 const meta: Meta< typeof RadioGroup > = {
-	title: 'Design System/Components/Form/Primitives/RadioGroup',
+	title: 'Components/@wordpress-ui/Form/Primitives/RadioGroup',
+	id: 'design-system-components-form-primitives-radiogroup',
 	component: RadioGroup,
 	parameters: {
 		componentStatus: {

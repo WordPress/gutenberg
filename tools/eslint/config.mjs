@@ -7,7 +7,6 @@ import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import {
@@ -19,7 +18,7 @@ const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 const gutenbergStorybookPlugin = {
 	rules: {
-		'no-build-style-imports': require( '../../storybook/eslint/no-build-style-imports.js' ),
+		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
 	},
 };
 const vitestTestsByProject = getVitestTestsByProject(
@@ -514,7 +513,7 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: React src + storybook — stylesheet and component rules.
+	// Override: React src + storybook — component rules.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -523,9 +522,20 @@ export default dedupePlugins( [
 			`storybook/stories/**/*.${ SCRIPT_EXT }`,
 		],
 		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
+		},
+	},
+
+	// Override: React src — non-module stylesheet imports.
+	{
+		files: [
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+		],
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
 	},
 
@@ -574,28 +584,124 @@ export default dedupePlugins( [
 			...vitestTestPatterns,
 		],
 	} ) ),
-	// The Jest plugin also supports Vitest. Keep these active rules until the
-	// separate suite-wide migration to the public Vitest lint configuration.
-	{
-		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
-		files: vitestTestPatterns,
-		settings: {
-			jest: {
-				globalPackage: 'vitest',
-			},
-		},
+	// Use the public Vitest baseline for suites and shared unit-test helpers.
+	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+		...config,
+		files: [
+			...vitestTestPatterns,
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+			`test/unit/config/**/*.${ SCRIPT_EXT }`,
+			'packages/block-serialization-spec-parser/shared-tests.js',
+		],
+		ignores: [
+			'test/e2e/**',
+			'test/performance/**',
+			'test/storybook-playwright/**',
+			'test/ai-development/**',
+			'**/fixtures/**',
+		],
 		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			// Preserve existing test patterns while changing runners. These rules
-			// newly flag valid patterns once the globals are imported from Vitest.
-			'jest/no-conditional-expect': 'off',
-			// Jest release deprecations do not apply to Vitest.
-			'jest/no-deprecated-functions': 'off',
-			'jest/valid-describe-callback': 'off',
-			'jest/valid-expect-in-promise': 'off',
-			'jest/valid-title': 'off',
+			...config.rules,
+			// Preserve the existing warning while assertion coverage is reviewed in
+			// step 2: https://github.com/WordPress/gutenberg/issues/83089
+			'vitest/expect-expect': 'warn',
+			// Conditional assertions need the separate test review in step 2.
+			'vitest/no-conditional-expect': 'off',
+			// Callback factories, Promise.all/returned assertions and generated titles
+			// need compatibility checks in step 3 of the same issue.
+			'vitest/valid-describe-callback': 'off',
+			'vitest/valid-expect-in-promise': 'off',
+			'vitest/valid-title': 'off',
+			// These checks were enabled by Jest's baseline but are not recommended
+			// Vitest rules. Keep their existing enforcement during the switch.
+			'vitest/no-alias-methods': 'error',
+			'vitest/no-done-callback': 'error',
+			'vitest/no-test-prefixes': 'error',
+			// Vitest has no no-jasmine-globals equivalent.
+			'no-restricted-globals': [
+				'error',
+				{
+					name: 'jasmine',
+					message: 'Use the vi and expect APIs from Vitest instead.',
+				},
+				{
+					name: 'spyOn',
+					message: 'Use vi.spyOn() from Vitest instead.',
+				},
+				{
+					name: 'spyOnProperty',
+					message:
+						'Use vi.spyOn() from Vitest with a get or set accessor instead.',
+				},
+				{
+					name: 'fail',
+					message: 'Use expect.fail() from Vitest instead.',
+				},
+				{
+					name: 'pending',
+					message:
+						'Use the Vitest test context skip() method instead.',
+				},
+			],
+		},
+	} ) ),
+	{
+		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
+		rules: {
+			// The parser helper already passed these checks under its own Jest
+			// override. Keep that stricter baseline while suites await steps 2 and 3.
+			'vitest/no-conditional-expect': 'error',
+			'vitest/valid-describe-callback': 'error',
+			'vitest/valid-expect-in-promise': 'error',
+			'vitest/valid-title': 'error',
 		},
 	},
+	{
+		files: [ 'test/unit/config/console.vitest.js' ],
+		rules: {
+			// aroundEach receives an awaited runTest callback. The deprecated rule
+			// mistakes it for a done callback; reassess in #83089 step 3.
+			'vitest/no-done-callback': 'off',
+		},
+	},
+	// Recognize only the assertion helpers used by these files. Avoid a global
+	// expect* wildcard, which would also accept unrelated function calls.
+	...[
+		[
+			'packages/components/src/flex/test/index.browser.test.tsx',
+			[ 'expectCustomProperty' ],
+		],
+		[
+			'packages/components/src/spacer/test/index.browser.test.tsx',
+			[ 'expectCustomProperties' ],
+		],
+		[
+			'packages/components/src/form-token-field/test/index.jsdom.test.tsx',
+			[
+				'expectTokensToBeInTheDocument',
+				'expectTokensNotToBeInTheDocument',
+				'expectEscapedProperly',
+				'expectVisibleSuggestionsToBe',
+			],
+		],
+		[
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			[ 'expectPlaceholderState' ],
+		],
+		[
+			'test/unit/scripts/test/vitest-policy-rules.test.js',
+			[ 'expectValid', 'expectViolation' ],
+		],
+	].map( ( [ file, helpers ] ) => ( {
+		files: [ file ],
+		rules: {
+			'vitest/expect-expect': [
+				'warn',
+				{ assertFunctionNames: [ 'expect', 'assert', ...helpers ] },
+			],
+		},
+	} ) ),
 
 	// This compilation fixture is transformed as source, not run as a test.
 	{
@@ -728,8 +834,7 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
-	// Flag side-effect imports of package build-style stylesheets so they
-	// load through package-styles/config.js. The production stylesheet
+	// Reject non-module stylesheet imports. The production stylesheet
 	// import rule does not apply; Storybook loads package CSS through
 	// package-styles/config.js, not the enqueue path.
 	{
@@ -740,7 +845,7 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-			'gutenberg-storybook/no-build-style-imports': 'error',
+			'gutenberg-storybook/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
@@ -1045,20 +1150,6 @@ export default dedupePlugins( [
 	},
 
 	// --- Merged package-level configs ---
-
-	// From packages/block-serialization-spec-parser/.eslintrc.json:
-	// Add test-unit config for shared-tests.js with jest/no-export off.
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	},
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			'jest/no-deprecated-functions': 'off',
-			'jest/no-export': 'off',
-		},
-	},
 
 	// From packages/dependency-extraction-webpack-plugin/lib/.eslintrc.json:
 	// Add Node.js globals for the lib directory.

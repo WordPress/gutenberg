@@ -2,11 +2,15 @@
 
 ## Unreleased
 
+## 10.56.0 (2026-09-23)
+
 ### Enhancements
 
 -   Optimized store listener registration and execution ([#82842](https://github.com/WordPress/gutenberg/pull/82842)).
 -   Resolvers can define `getResolutionArgs` to derive the resolution arguments from the selector arguments, letting several selector calls share a single resolution ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
 -   Stabilize the `__unstableNormalizeArgs` selector property as `normalizeArgs`. The old name still works ([#83067](https://github.com/WordPress/gutenberg/pull/83067)).
+-   Optimized `registry.subscribe` behavior when the subscribed store doesn't yet exist ([#83346](https://github.com/WordPress/gutenberg/pull/83346)).
+-   `useSelect`: async-mode subscribers share a single store subscription per store and are notified at idle time instead of inside the dispatch ([#82821](https://github.com/WordPress/gutenberg/pull/82821)).
 
 ## 10.55.0 (2026-09-10)
 

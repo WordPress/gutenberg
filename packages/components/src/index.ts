@@ -158,7 +158,7 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { Spacer as __experimentalSpacer } from './spacer';
-export { Scrollable as __experimentalScrollable } from './scrollable';
+export { default as __experimentalScrollable } from './scrollable/deprecated';
 export { default as Spinner } from './spinner';
 export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';

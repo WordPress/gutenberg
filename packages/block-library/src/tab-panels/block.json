@@ -16,10 +16,20 @@
 			"background": true,
 			"text": true,
 			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
+			}
+		},
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
 			}
 		},
 		"shadow": true,
@@ -28,7 +38,13 @@
 		},
 		"typography": {
 			"fontSize": true,
-			"__experimentalFontFamily": true
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true
 		},
 		"__experimentalBorder": {
 			"radius": true,
