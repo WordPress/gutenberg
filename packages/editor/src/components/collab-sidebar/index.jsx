@@ -20,6 +20,7 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import { useReattachOrphanedNotes } from './use-reattach-orphaned-notes';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -61,7 +62,8 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const { notes, unresolvedNotes, hasResolved } = useNoteThreads( postId );
+	useReattachOrphanedNotes( notes, hasResolved );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;

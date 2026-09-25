@@ -1,8 +1,8 @@
+import type { Page } from '@playwright/test';
 import {
 	test,
 	expect,
 	type Editor,
-	type Page,
 	type RequestUtils,
 } from '@wordpress/e2e-test-utils-playwright';
 
@@ -41,9 +41,11 @@ async function addNote( editor: Editor, page: Page, content: string ) {
 	).toBeVisible();
 }
 
-async function getFirstBlockNoteIds( editor: Editor ) {
+async function getFirstBlockNoteIds( editor: Editor ): Promise< number[] > {
 	const [ block ] = await editor.getBlocks();
-	return block?.attributes?.metadata?.noteId ?? [];
+	const metadata = block?.attributes?.metadata as
+		{ noteId?: number[] } | undefined;
+	return metadata?.noteId ?? [];
 }
 
 /**
@@ -79,7 +81,8 @@ function createNote( requestUtils: RequestUtils, postId: number ) {
 	} );
 }
 
-const PARAGRAPH = '<!-- wp:paragraph --><p>Keep me attached</p><!-- /wp:paragraph -->';
+const PARAGRAPH =
+	'<!-- wp:paragraph --><p>Keep me attached</p><!-- /wp:paragraph -->';
 
 function paragraphWithNote( noteId: number ) {
 	return `<!-- wp:paragraph {"metadata":{"noteId":[${ noteId }]}} --><p>Keep me attached</p><!-- /wp:paragraph -->`;
@@ -127,8 +130,10 @@ test.describe( 'Block Notes: unsaved note anchors', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Keep me attached' },
 		} );
+		// Adding the note autosaves the draft, which persists the anchor.
+		const autosaveAfterAdd = waitForAutosave( page );
 		await addNote( editor, page, 'Note to delete' );
-		await editor.saveDraft();
+		await autosaveAfterAdd;
 
 		// Saving collapses the thread, which hides its actions.
 		const thread = page
