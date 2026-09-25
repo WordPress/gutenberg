@@ -1,4 +1,7 @@
 .page {
+	--admin-ui-page-padding-inline: var(--wpds-dimension-padding-2xl);
+	--admin-ui-page-padding-block: var(--wpds-dimension-padding-lg);
+
 	display: flex;
 	height: 100%;
 	background-color: var(--wpds-color-background-surface-neutral);
@@ -10,7 +13,7 @@
 }
 
 .header {
-	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	padding: var(--admin-ui-page-padding-block) var(--admin-ui-page-padding-inline);
 	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	background: var(--wpds-color-background-surface-neutral-strong);
 	position: sticky;
@@ -81,6 +84,26 @@ truncates instead of overflowing the page horizontally. */
 	flex-direction: column;
 
 	&.has-padding {
-		padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+		padding: var(--admin-ui-page-padding-block) var(--admin-ui-page-padding-inline);
 	}
+}
+
+/*
+ * Neutralizes `.content.has-padding`'s inline padding. Only meaningful when
+ * `hasPadding` is set — there is no padding to cancel otherwise.
+ */
+.full-bleed {
+	box-sizing: border-box;
+}
+
+.content.has-padding > .full-bleed {
+	margin-inline: calc(-1 * var(--admin-ui-page-padding-inline));
+	width: calc(100% + 2 * var(--admin-ui-page-padding-inline));
+}
+
+.narrow {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 680px;
+	margin-inline: auto;
 }
