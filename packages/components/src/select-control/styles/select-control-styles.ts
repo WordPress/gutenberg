@@ -7,8 +7,10 @@ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper'
 import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
 import InputBase from '../../input-control/input-base';
 
-interface SelectProps
-	extends Pick< SelectControlProps, 'disabled' | 'multiple' | 'variant' > {
+interface SelectProps extends Pick<
+	SelectControlProps,
+	'disabled' | 'multiple' | 'variant'
+> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -94,7 +96,7 @@ const sizePaddings = ( { multiple, selectSize = 'default' }: SelectProps ) => {
 			? {
 					paddingTop: selectedPadding,
 					paddingBottom: selectedPadding,
-			  }
+				}
 			: {} ),
 	} );
 };
@@ -147,10 +149,6 @@ export const Select = styled.select< SelectProps >`
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
-
-	path {
-		fill: currentColor;
-	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(

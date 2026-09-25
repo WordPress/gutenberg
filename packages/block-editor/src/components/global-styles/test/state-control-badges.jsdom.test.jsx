@@ -1,8 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import StateControlBadges from '../state-control-badges';
 
-jest.mock( '@wordpress/ui', () => {
-	const actual = jest.requireActual( '@wordpress/ui' );
+vi.mock( import( '@wordpress/ui' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 
 	return {
 		...actual,

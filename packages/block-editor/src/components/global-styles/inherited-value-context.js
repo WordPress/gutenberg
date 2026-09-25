@@ -11,12 +11,8 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import { isGlobalStylesInheritanceEnabled } from './inheritance';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
-
-// Undefined so the panels fall back to their `inheritedValue = value` default.
-const NO_RESOLVED_STYLE = { value: undefined, sources: undefined };
 
 /**
  * Reads the Global Styles payload and returns it as a `GlobalStylesConfig`
@@ -225,7 +221,7 @@ function useVariationAndElements( blockName, className ) {
  *
  * Before the `globalStylesDataKey` payload settles (hydration) or when
  * `blockName` is missing, the hook returns empty value and source objects, so
- * each panel's `inheritedValue = value` default preserves pre-feature behavior.
+ * each panel reads no inherited value and renders its local value alone.
  *
  * @param {?string} blockName       Selected block name (e.g. `core/heading`).
  * @param {?string} className       Block `className` used to detect an applied variation.
@@ -240,10 +236,6 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const globalStyles = useRawGlobalStyles();
 
 	return useMemo( () => {
-		// Skip the cascade merge entirely when the experiment is off.
-		if ( ! isGlobalStylesInheritanceEnabled() ) {
-			return NO_RESOLVED_STYLE;
-		}
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}

@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
@@ -10,7 +11,7 @@ import { ActionItem } from '@wordpress/interface';
  * @param {string}                [props.href]                          When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
  * @param {Function}              [props.onClick]                       The callback function to be executed when the user clicks the menu item.
- * @param {...*}                  [props.other]                         Any additional props are passed through to the underlying MenuItem component.
+ * @param {...*}                  [props.other]                         Any additional props are passed through to the underlying menu item component, except for `as`, which is deprecated and ignored.
  *
  * @example
  * ```jsx
@@ -39,11 +40,22 @@ import { ActionItem } from '@wordpress/interface';
  */
 export default function PluginPreviewMenuItem( props ) {
 	const context = usePluginContext();
+	// The menu renders the item itself, so `as` is dropped rather than
+	// forwarded.
+	const { as, ...itemProps } = props;
+
+	if ( as ) {
+		deprecated( 'The `as` prop of wp.editor.PluginPreviewMenuItem', {
+			since: '7.2',
+			hint: 'The menu renders the item itself. The prop is ignored.',
+		} );
+	}
+
 	return (
 		<ActionItem
 			name="core/plugin-preview-menu"
-			icon={ props.icon || context.icon }
-			{ ...props }
+			icon={ itemProps.icon || context.icon }
+			{ ...itemProps }
 		/>
 	);
 }

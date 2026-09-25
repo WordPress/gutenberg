@@ -8,7 +8,7 @@ export const DEFAULT_BLOCK = {
 
 export const PRIORITIZED_INSERTER_BLOCKS = [
 	'core/navigation-link/page',
-	'core/navigation-link',
+	'core/navigation-link/custom-link',
 ];
 
 // These parameters must be kept aligned with those in

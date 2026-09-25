@@ -24,15 +24,16 @@ describe( 'getTestEnvironmentName', () => {
 } );
 
 describe( 'getVitestTestsByProject', () => {
-	it( 'routes new Node tests to Vitest without migration metadata', () => {
+	it( 'routes every new test to Vitest without migration metadata', () => {
 		expect(
-			getVitestTestsByProject(
-				[ 'example.test.ts', 'example.jsdom.test.tsx' ],
-				{ vitest: { directories: [], files: [] } }
-			)
+			getVitestTestsByProject( [
+				'example.test.ts',
+				'example.jsdom.test.tsx',
+				'example.browser.test.js',
+			] )
 		).toEqual( {
-			browser: [],
-			jsdom: [],
+			browser: [ 'example.browser.test.js' ],
+			jsdom: [ 'example.jsdom.test.tsx' ],
 			node: [ 'example.test.ts' ],
 		} );
 	} );

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
@@ -26,22 +27,22 @@ describe( 'DropdownMenu', () => {
 			{
 				title: 'Up',
 				icon: arrowUp,
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 			},
 			{
 				title: 'Right',
 				icon: arrowRight,
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 			},
 			{
 				title: 'Down',
 				icon: arrowDown,
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 			},
 			{
 				title: 'Left',
 				icon: arrowLeft,
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 			},
 		];
 

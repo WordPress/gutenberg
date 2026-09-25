@@ -3,7 +3,8 @@ import FontFamilyControl from '..';
 
 export default {
 	component: FontFamilyControl,
-	title: 'BlockEditor/FontFamilyControl',
+	id: 'blockeditor-fontfamilycontrol',
+	title: 'Editor/Block Editor/FontFamilyControl',
 };
 
 export const Default = {

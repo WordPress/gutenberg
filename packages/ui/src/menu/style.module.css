@@ -46,9 +46,11 @@
 		}
 
 		.list {
+			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-sm);
+
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
@@ -130,7 +132,10 @@
 				[content-end] var(--wp-ui-menu-item-padding-inline)
 				[item-padding-end];
 			gap: 0;
-			align-items: center;
+			/* Keep leading content at the top of the content row. */
+			align-items: start;
+			/* Center a single line without shifting wrapped content. */
+			align-content: center;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);
@@ -159,8 +164,13 @@
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none;
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: var(--wpds-border-width-xs) solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
 				}
 			}
 
@@ -187,19 +197,23 @@
 
 		.item-selection-indicator {
 			grid-column: selection-start / selection-end;
-			align-self: center;
 			justify-self: center;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			width: var(--wp-ui-menu-selection-indicator-size);
-			height: var(--wp-ui-menu-selection-indicator-size);
+			height: var(--_wp-ui-menu-item-label-line-height);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			pointer-events: none;
 
 			&[data-unchecked] {
 				opacity: 0;
 			}
+		}
+
+		.checkbox-selection-icon {
+			/* Optical alignment with the item label. */
+			translate: 0 1px;
 		}
 
 		.radio-selection-icon {
@@ -218,8 +232,17 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+		.prefix-icon {
+			flex-shrink: 0;
+			/* Center a known-size icon on a label line at the top of the row. */
+			align-self: flex-start;
+			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
+		}
+
 		.item-content {
 			grid-column: content-start / content-end;
+			/* Include the height of leading content when centering these slots. */
+			align-self: stretch;
 			/* Everything after the prefix is laid out independently per item. */
 			display: grid;
 			grid-template-columns:
@@ -245,10 +268,12 @@
 
 		.item-label {
 			--_gcd-heading-color: currentColor;
+			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 
 		.item-description {

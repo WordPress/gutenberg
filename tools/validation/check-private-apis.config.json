@@ -27,11 +27,6 @@
 			"via": "packages/patterns/src/index.js"
 		},
 		{
-			"comment": "Unlocks private APIs of @wordpress/components. Remove when the unlocked surface goes public.",
-			"package": "fields",
-			"via": "packages/components/src/private-apis.ts"
-		},
-		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
 			"package": "fields",
 			"via": "packages/fields/src/lock-unlock.ts"
@@ -145,11 +140,6 @@
 			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
 			"package": "widget-dashboard",
 			"via": "packages/ui/src/utils/theme-provider.ts"
-		},
-		{
-			"comment": "Unlocks private APIs of @wordpress/components (see its actions-menu component). Remove when the unlocked components go public.",
-			"package": "widget-dashboard",
-			"via": "packages/components/src/private-apis.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/commands, whose store and private surface use private APIs. Remove when commands no longer does or the dependency is dropped.",

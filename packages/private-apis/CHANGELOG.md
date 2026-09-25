@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.56.0 (2026-09-23)
+
+## 1.55.0 (2026-09-10)
+
 ### Bug fixes
 
 -   Restore `@wordpress/dataviews` in the list of core modules allowed to use private APIs. DataViews copies published to npm before the private API cleanup opt in at module load, so plugin bundles embedding them throw without the entry. [#82221](https://github.com/WordPress/gutenberg/pull/82221)

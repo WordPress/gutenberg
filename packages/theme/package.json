@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "2.0.0",
+	"version": "2.2.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,8 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0",
-		"npm": ">=10.2.3"
+		"node": "^20.19.0 || >=22.13.0"
 	},
 	"files": [
 		"build-module",
@@ -82,33 +81,40 @@
 		"prebuilt/css/design-tokens.css"
 	],
 	"dependencies": {
+		"@babel/parser": "^7.28.6",
+		"@babel/types": "^7.29.7",
+		"@jridgewell/remapping": "^2.3.5",
+		"@jridgewell/trace-mapping": "^0.3.31",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.7.1",
+		"magic-string": "^0.30.21",
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
+		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
 		"@terrazzo/parser": "^2.7.1",
 		"@terrazzo/plugin-css": "^2.7.1",
 		"@terrazzo/token-tools": "^2.7.1",
-		"@testing-library/dom": "^10.4.1",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/react": "^16.3.2",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
-		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39",
+		"@types/node": "^24.13.3",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
-		"esbuild-esm-loader": "^0.3.3",
 		"lightningcss": "^1.33.0",
-		"prettier": "npm:wp-prettier@^3.0.3",
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"source-map": "^0.6.1",
 		"storybook": "^10.5.3",
 		"stylelint": "^17.14.1",
-		"vitest": "^4.1.10"
+		"vite": "^8.2.2",
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
@@ -144,9 +150,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
-		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
-		"build": "npm run build:tokens && npm run build:default-ramps",
+		"build:default-ramps": "node bin/generate-default-ramps/index.ts",
+		"build:tokens": "node bin/generate-primitive-tokens/index.ts && node bin/build-design-tokens/index.ts",
+		"build": "npm run build:default-ramps && npm run build:tokens",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
 		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}

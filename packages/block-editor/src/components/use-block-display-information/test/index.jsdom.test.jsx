@@ -1,14 +1,18 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import useBlockDisplayInformation from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( value ) => ( {
-		registerPrivateActions: jest.fn(),
-		registerPrivateSelectors: jest.fn(),
+		registerPrivateActions: vi.fn(),
+		registerPrivateSelectors: vi.fn(),
 		...value,
 	} ),
 } ) );
@@ -64,12 +68,12 @@ function setupUseSelect( {
 
 describe( 'useBlockDisplayInformation', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'displays pattern information for a pattern section that is not being edited', () => {
 		setupUseSelect();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
 
@@ -85,7 +89,7 @@ describe( 'useBlockDisplayInformation', () => {
 
 	it( 'displays block information for a pattern section that is being edited', () => {
 		setupUseSelect( { isSectionBlock: false } );
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
 
@@ -109,7 +113,7 @@ describe( 'useBlockDisplayInformation', () => {
 			},
 			isSectionBlock: false,
 		} );
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
 
@@ -127,7 +131,7 @@ describe( 'useBlockDisplayInformation', () => {
 		setupUseSelect( {
 			isSectionBlock: false,
 		} );
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
 
@@ -152,7 +156,7 @@ describe( 'useBlockDisplayInformation', () => {
 				description: 'A template part.',
 			},
 		} );
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <TestComponent onChange={ onChange } /> );
 

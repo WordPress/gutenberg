@@ -758,7 +758,7 @@ export default function LatestPostsEdit( {
 									!! titleTrimmed
 										? {
 												__html: titleTrimmed,
-										  }
+											}
 										: undefined
 								}
 								onClick={ showRedirectionPreventedNotice }

@@ -1,4 +1,10 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
+
+afterEach( () => {
+	Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+} );
 
 describe( 'getNamedNodeMapAsObject', () => {
 	it( 'should return an object of node attributes', () => {
@@ -48,6 +54,7 @@ describe( 'fromDOM', () => {
 		expect( () => {
 			fromDOM( document.createDocumentFragment() );
 		} ).toThrow( TypeError );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should return an equivalent block node, including children', () => {

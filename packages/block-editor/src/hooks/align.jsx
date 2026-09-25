@@ -6,7 +6,9 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { BlockControls, BlockAlignmentControl } from '../components';
-import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
+import useAvailableAlignments, {
+	useAlignmentMenu,
+} from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
@@ -110,11 +112,15 @@ function BlockEditAlignmentToolbarControlsPure( {
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
-	const validAlignments = useAvailableAlignments(
-		blockAllowedAlignments
-	).map( ( { name } ) => name );
+	const { enabled } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
-	if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
+	/*
+	 * Only render when some alignment actually works. Many blocks — Paragraph,
+	 * Heading, List, Group among them — support nothing but wide and full, so
+	 * in a layout offering neither, a control made only of unavailable options
+	 * would sit on the toolbar unable to change anything.
+	 */
+	if ( ! enabled.length || blockEditingMode !== 'default' ) {
 		return null;
 	}
 
@@ -134,7 +140,14 @@ function BlockEditAlignmentToolbarControlsPure( {
 			<BlockAlignmentControl
 				value={ align }
 				onChange={ updateAlignment }
-				controls={ validAlignments }
+				/*
+				 * Pass the alignments the block itself supports rather than the
+				 * ones the current layout leaves available. The control filters
+				 * them again, but keeping the unfiltered list lets it tell the
+				 * difference between an alignment this block never had and one a
+				 * parent layout has taken away.
+				 */
+				controls={ blockAllowedAlignments }
 			/>
 		</BlockControls>
 	);

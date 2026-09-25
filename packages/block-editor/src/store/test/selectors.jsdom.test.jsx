@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import {
 	registerBlockType,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -9,6 +19,7 @@ import {
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
+import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
@@ -72,6 +83,8 @@ const {
 	getBlockEditingMode,
 	canRemoveBlock,
 	canMoveBlock,
+	getSelectedBlockStyleState,
+	hasSelectedBlockStyleState,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -4645,64 +4658,67 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getActiveBlockIdByBlockName', () => {
-		const state = {
-			selection: {
-				selectionStart: {
-					clientId: 'client-id-04',
+		let state;
+		beforeEach( () => {
+			state = {
+				selection: {
+					selectionStart: {
+						clientId: 'client-id-04',
+					},
+					selectionEnd: {
+						clientId: 'client-id-04',
+					},
 				},
-				selectionEnd: {
-					clientId: 'client-id-04',
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							'client-id-01': '',
+							'client-id-02': 'client-id-01',
+							'client-id-03': 'client-id-02',
+							'client-id-04': 'client-id-03',
+							'client-id-05': 'client-id-03',
+						} )
+					),
+					byClientId: new Map(
+						Object.entries( {
+							'client-id-01': {
+								clientId: 'client-id-01',
+								name: 'core/columns',
+							},
+							'client-id-02': {
+								clientId: 'client-id-02',
+								name: 'core/navigation',
+							},
+							'client-id-03': {
+								clientId: 'client-id-03',
+								name: 'core/navigation-link',
+							},
+							'client-id-04': {
+								clientId: 'client-id-04',
+								name: 'core/navigation-link',
+							},
+							'client-id-05': {
+								clientId: 'client-id-05',
+								name: 'core/navigation-link',
+							},
+						} )
+					),
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+						'client-id-05': {},
+					},
+					order: new Map(
+						Object.entries( {
+							'client-id-03': [ 'client-id-04', 'client-id-05' ],
+						} )
+					),
+					controlledInnerBlocks: new Set(),
 				},
-			},
-			blocks: {
-				parents: new Map(
-					Object.entries( {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-03',
-					} )
-				),
-				byClientId: new Map(
-					Object.entries( {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/columns',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/navigation',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation-link',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
-					} )
-				),
-				cache: {
-					'client-id-01': {},
-					'client-id-02': {},
-					'client-id-03': {},
-					'client-id-04': {},
-					'client-id-05': {},
-				},
-				order: new Map(
-					Object.entries( {
-						'client-id-03': [ 'client-id-04', 'client-id-05' ],
-					} )
-				),
-				controlledInnerBlocks: new Set(),
-			},
-		};
+			};
+		} );
 		it( 'Should return first active matching block (including self) when single block selected', () => {
 			expect(
 				getActiveBlockIdByBlockNames( state, [
@@ -5301,6 +5317,17 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 } );
 
 describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5326,10 +5353,21 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5350,7 +5388,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5378,6 +5416,7 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 
@@ -5389,8 +5428,8 @@ describe( 'getBlockEditingMode', () => {
 		derivedBlockEditingModes: new Map(),
 	};
 
-	const hasContentRoleAttribute = jest.fn( () => false );
-	const get = jest.fn( () => 'edit' );
+	const hasContentRoleAttribute = vi.fn( () => false );
+	const get = vi.fn( () => 'edit' );
 
 	const mockedSelectors = { get };
 
@@ -5399,7 +5438,7 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => mockedSelectors ),
+		select: vi.fn( () => mockedSelectors ),
 	};
 
 	it( 'should return default by default', () => {
@@ -5504,6 +5543,124 @@ describe( 'getBlockEditingMode', () => {
 					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
 				)
 			).toBe( 'contentOnly' );
+		} );
+	} );
+
+	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when the block has no selected state', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the per-block pseudo with the global viewport', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: '@mobile',
+				pseudo: ':hover',
+			} );
+		} );
+
+		it( 'returns default pseudo when the selected state has no value', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the global viewport even when another block holds the per-block state', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: '@mobile',
+				pseudo: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'hasSelectedBlockStyleState', () => {
+		it( 'returns false when the block has no selected state', () => {
+			const state = {};
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns false when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when a global viewport state is selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: 'default' },
+				},
+			};
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when a pseudo state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
+			const state = {
+				styleStateViewport: '@mobile',
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );

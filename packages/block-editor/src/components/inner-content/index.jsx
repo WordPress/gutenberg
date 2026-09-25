@@ -104,7 +104,7 @@ export default function InnerContent( { clientId } ) {
 							</AsyncModeProvider>,
 							slots[ index ],
 							childClientId
-					  )
+						)
 					: null
 			) }
 		</LayoutProvider>

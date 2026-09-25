@@ -1,6 +1,12 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { parse } from 'hpq';
 import { renderToString } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import * as sources from '../matchers';
+
+afterEach( () => {
+	Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+} );
 
 describe( 'matchers', () => {
 	describe( 'children()', () => {
@@ -38,6 +44,7 @@ describe( 'matchers', () => {
 				'<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, sources.node() );
 
+			expect( console ).toHaveWarned();
 			expect( renderToString( match ) ).toBe( `<body>${ html }</body>` );
 		} );
 	} );

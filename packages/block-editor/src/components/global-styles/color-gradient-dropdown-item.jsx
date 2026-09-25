@@ -1,28 +1,21 @@
 import clsx from 'clsx';
 import {
-	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	ColorIndicator,
-	Flex,
-	FlexItem,
 	Dropdown,
 	Button,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
+import { Stack, Tabs } from '@wordpress/ui';
 import ColorGradientControl from '../colors-gradients/control';
-import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 /**
  * @typedef {Object} DropdownContentProps
@@ -62,22 +55,22 @@ function DropdownContent( {
 					/>
 				) }
 				{ tabs.length > 1 && (
-					<Tabs defaultTabId={ defaultTabId }>
-						<Tabs.TabList>
+					<Tabs.Root defaultValue={ defaultTabId }>
+						<Tabs.List>
 							{ tabs.map( ( tab ) => (
-								<Tabs.Tab key={ tab.key } tabId={ tab.key }>
+								<Tabs.Tab key={ tab.key } value={ tab.key }>
 									{ tab.label }
 								</Tabs.Tab>
 							) ) }
-						</Tabs.TabList>
+						</Tabs.List>
 
 						{ tabs.map( ( tab ) => {
 							const { key: tabKey, ...restTabProps } = tab;
 							return (
-								<Tabs.TabPanel
+								<Tabs.Panel
 									key={ tabKey }
-									tabId={ tabKey }
-									focusable={ false }
+									value={ tabKey }
+									tabIndex={ -1 }
 								>
 									<ColorGradientTab
 										key={ tabKey }
@@ -87,10 +80,10 @@ function DropdownContent( {
 										}
 										contrastWarning={ contrastWarning }
 									/>
-								</Tabs.TabPanel>
+								</Tabs.Panel>
 							);
 						} ) }
-					</Tabs>
+					</Tabs.Root>
 				) }
 			</div>
 		</DropdownContentWrapper>
@@ -104,18 +97,22 @@ const popoverProps = {
 };
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
-	<HStack justify="flex-start">
-		<ZStack isLayered={ false } offset={ -8 }>
+	<Stack
+		className="block-editor-panel-color-gradient-settings__labeled-indicators"
+		direction="row"
+		align="center"
+		justify="flex-start"
+		gap="sm"
+	>
+		<div className="block-editor-panel-color-gradient-settings__color-indicators">
 			{ indicators.map( ( indicator, index ) => (
-				<Flex key={ index } expanded={ false }>
-					<ColorIndicator colorValue={ indicator } />
-				</Flex>
+				<ColorIndicator key={ index } colorValue={ indicator } />
 			) ) }
-		</ZStack>
-		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
+		</div>
+		<span className="block-editor-panel-color-gradient-settings__color-name">
 			{ label }
-		</FlexItem>
-	</HStack>
+		</span>
+	</Stack>
 );
 
 function ColorGradientTab( {
@@ -180,7 +177,7 @@ function ColorGradientTab( {
 							spokenMessage: null,
 							className:
 								'block-editor-panel-color-gradient-settings__contrast-notice',
-					  }
+						}
 					: undefined
 			}
 		/>
@@ -203,7 +200,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );

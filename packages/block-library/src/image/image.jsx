@@ -6,7 +6,7 @@ import {
 	Spinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -73,7 +73,6 @@ import { evalAspectRatio, mediaPosition } from './utils';
 
 const {
 	DimensionsTool,
-	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
@@ -316,7 +315,11 @@ export default function Image( {
 		setOffsetTop( imageElement?.offsetTop ?? 0 );
 	}, [ imageElement ] );
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
-	const { allowResize = true } = context;
+	const { allowResize = true, imageCrop = false } = context;
+	// Only a cropped gallery (flex layout) controls the image height via its
+	// own CSS. Grid galleries and standalone images keep the baseline
+	// `height: auto` so a theme can't squish them.
+	const isCroppedGalleryImage = imageCrop && parentLayoutType === 'flex';
 
 	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
@@ -327,7 +330,7 @@ export default function Image( {
 							'attachment',
 							id,
 							{ context: 'view' }
-					  )
+						)
 					: null;
 
 			// Check if the attachment resolution failed with a specific error.
@@ -344,7 +347,7 @@ export default function Image( {
 								id,
 								{ context: 'view' },
 							]
-					  )
+						)
 					: null;
 
 			return {
@@ -662,20 +665,23 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const selectedStyleState = useSelect(
+	const { selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
-				return undefined;
+				return {
+					selectedStyleState: undefined,
+					hasSelectedStyleState: false,
+				};
 			}
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
-			return getSelectedBlockStyleState( clientId );
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
+			return {
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
 		},
 		[ clientId, isSingleSelected ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,
@@ -833,7 +839,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							altBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
@@ -847,7 +853,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							titleBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 			};
 		},
@@ -888,9 +894,6 @@ export default function Image( {
 			</BlockControls>
 		</>
 	);
-
-	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
 
 	const controls = (
 		<>
@@ -960,7 +963,7 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && isSingleSelected && (
+			{ isSingleSelected && (
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
@@ -1042,7 +1045,7 @@ export default function Image( {
 									setAttributes( { isDecorative: false } )
 								}
 							>
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }
@@ -1155,7 +1158,7 @@ export default function Image( {
 						'This image has been marked as decorative; its file name is %s'
 					),
 					filename
-			  )
+				)
 			: __( 'This image has been marked as decorative.' );
 	} else if ( alt ) {
 		defaultedAlt = alt;
@@ -1208,7 +1211,7 @@ export default function Image( {
 										height:
 											pixelSize.height +
 											resizeDelta.height,
-								  }
+									}
 								: ( () => {
 										const style = {};
 										if ( width === 'auto' ) {
@@ -1222,20 +1225,26 @@ export default function Image( {
 													? `${ width }px`
 													: width;
 										}
-										if (
-											height === 'auto' ||
-											height === undefined ||
-											height === null
-										) {
+										if ( height === 'auto' ) {
 											style.height = 'auto';
-										} else {
+										} else if (
+											height !== undefined &&
+											height !== null
+										) {
 											style.height =
 												typeof height === 'number'
 													? `${ height }px`
 													: height;
+										} else if ( ! isCroppedGalleryImage ) {
+											// Default to `height: auto` so a
+											// theme that sets an explicit height
+											// on images can't squish them. Inside
+											// a cropped gallery the gallery's own
+											// CSS controls the height instead.
+											style.height = 'auto';
 										}
 										return style;
-								  } )() ),
+									} )() ),
 							objectFit: scale,
 							objectPosition:
 								focalPoint && scale

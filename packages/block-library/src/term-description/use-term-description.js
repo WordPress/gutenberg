@@ -53,7 +53,7 @@ function useTemplateBasedTermData() {
 					'postType',
 					'wp_template',
 					templateId
-			  )?.slug
+				)?.slug
 			: null;
 	}, [] );
 

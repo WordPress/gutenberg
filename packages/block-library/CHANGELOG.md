@@ -4,19 +4,67 @@
 
 ### Enhancements
 
--   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
--   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 
 ### Bug Fixes
 
+-   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
+
+## 11.1.0 (2026-09-23)
+
+### Enhancements
+
+-   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
+-   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
+-   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
+-   Icon: Don't render icons from non-public icon collections on the front end, since they aren't available in the editor anyway ([#82774](https://github.com/WordPress/gutenberg/pull/82774)).
+
+### Bug Fixes
+
+-   Image: The resize box no longer takes the pointer from the image while the block is selected, so the image has its context menu and is the source of a drag by it; the resize handles are unaffected ([#72983](https://github.com/WordPress/gutenberg/pull/72983)).
+-   Navigation: Stop the flyout `min-width` from applying to always-open submenus. Hovering, focusing or selecting an item in a vertical menu with submenus set to always show forced its inline submenu to at least 200px and made the menu re-wrap ([#83142](https://github.com/WordPress/gutenberg/pull/83142)).
+-   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
+-   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
+-   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
+-   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
+-   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
+-   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
+-   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
+
+### Internal
+
+-   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
+
+## 11.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
+
+### Enhancements
+
+-   Navigation Link: emit `@wordpress/ui` `Badge` intents for the link preview badges, replacing the private `@wordpress/components` `Badge` vocabulary. Draft, Scheduled and Pending previously shared one `warning` intent; Draft and Pending now read as `low` and Scheduled as `informational` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
+-   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
+-   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
+-   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
+-   Gallery: Support viewport-specific aspect ratios, in every Gallery layout and in dynamic galleries. ([#82233](https://github.com/WordPress/gutenberg/pull/82233))
+
+### Bug Fixes
+
+-   Navigation: Give the block appender an explicit width so it renders square, matching the appender in other container blocks ([#82718](https://github.com/WordPress/gutenberg/pull/82718)).
+-   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
+-   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
+-   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
 -   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
 -   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
--   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
+-   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
+-   Query, Post Template: Treat a `query` attribute that omits `postType` as querying posts, matching `build_query_vars_from_query_block()` ([#82465](https://github.com/WordPress/gutenberg/pull/82465)).
 
 ### Internal
 
+-   Search: Keep the editor's button icon fill-based and separate from `@wordpress/icons` so it matches the PHP renderer and existing theme `fill` styles. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
 -   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
@@ -41,10 +89,12 @@
 
 ### Bug Fixes
 
+-   Audio: Explain in the Autoplay help text that browsers block audio until a visitor interacts with the page ([#69978](https://github.com/WordPress/gutenberg/pull/69978)).
 -   Cover: Use the new toggle-button presentation for the placeholder overlay color palette ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Playlist: Prevent track selector fallback values from triggering `useSelect` stability warnings.
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.

@@ -76,7 +76,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 						: fontSizes.find(
 								( fontSize ) =>
 									fontSize.slug === selectedItem.key
-						  );
+							);
 
 				onChange( selectedItem.value, matchingFontSize );
 			} }

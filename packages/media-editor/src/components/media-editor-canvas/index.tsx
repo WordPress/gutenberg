@@ -14,6 +14,11 @@ export interface MediaEditorCanvasProps {
 	onGestureStart?: () => void;
 	/** Fires when a canvas cropper gesture ends. */
 	onGestureEnd?: () => void;
+	/**
+	 * Disable crop interaction on the canvas. Set while the edit is saving,
+	 * so a drag cannot change the crop after the request was built.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -28,11 +33,13 @@ export interface MediaEditorCanvasProps {
  * @param props.isPlacementActive
  * @param props.onGestureStart
  * @param props.onGestureEnd
+ * @param props.disabled
  */
 export default function MediaEditorCanvas( {
 	isPlacementActive = false,
 	onGestureStart,
 	onGestureEnd,
+	disabled = false,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useMediaEditor();
@@ -159,6 +166,7 @@ export default function MediaEditorCanvas( {
 					isPlacementActive={ isPlacementActive }
 					onGestureStart={ handleGestureStart }
 					onGestureEnd={ handleGestureEnd }
+					disabled={ disabled }
 				/>
 			</div>
 		</div>

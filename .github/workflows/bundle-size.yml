@@ -7,6 +7,8 @@ on:
             - '**.js'
             - '**.ts'
             - '**.tsx'
+            - '**.mts'
+            - '**.cts'
             - '**.cjs'
             - '**.mjs'
             - '**.css'
@@ -64,7 +66,7 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
-                  cache: npm
+                  package-manager-cache: false
 
             - name: Set up npm
               uses: ./.github/setup-npm

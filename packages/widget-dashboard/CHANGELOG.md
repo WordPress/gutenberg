@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 0.8.0 (2026-09-23)
+
+### Enhancements
+
+-   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
+    Card's `--wpds-dimension-padding-2xl`, and the header/body gap follows it;
+    `--wp-widget-dashboard-tile-padding` still overrides both
+    ([#82961](https://github.com/WordPress/gutenberg/pull/82961)).
+-   Show the selected widget width in its options menu and add an ellipsis to
+    the reset action that opens a confirmation dialog ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+-   Widget header: a title the row clips is shown in full in the header
+    infotip, which now also opens on hover and appears for a clipped title
+    even when the widget declares no help note
+    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
+
+### Internal
+
+-   Disable `custom-property-pattern` for this package so private `--_wp-*` tokens remain allowed ([#83075](https://github.com/WordPress/gutenberg/pull/83075)).
+-   Route link actions through `HostLink` from `@wordpress/widget-primitives`,
+    replacing the per-surface host link gating and `getActionRoute`
+    ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+-   Use UI Spinner and remove the direct Components dependency ([#82837](https://github.com/WordPress/gutenberg/pull/82837)).
+-   Migrate dashboard menus from the private Components API to the public
+    `@wordpress/ui` Menu ([#81929](https://github.com/WordPress/gutenberg/pull/81929)).
+-   Run rendered Widget Dashboard tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 0.7.0 (2026-09-10)
+
 ### New Features
 
 -   `WidgetDashboard.Policy`: a provider that governs the dashboards below
@@ -30,11 +62,24 @@
     nothing, and the wp-admin dashboard pins it where it reads its stored
     settings, so preferences persisted by the removed Columns control stay
     inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+-   The staging layer enforces the policy on every instance operation,
+    whichever trigger staged the mutation: a denied `move` holds the
+    instance's index, a denied `resize` keeps its spans, a denied `edit`
+    keeps its attributes, and a new instance of a rejected type is
+    dropped ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
+
+### Documentation
+
+-   Policy contract: instance operations carry `widgetType` only while
+    the type is registered; a gone plugin or a failed load leaves it
+    absent, so locks keyed on the type do not fire
+    ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
 
 ### Bug Fixes
 

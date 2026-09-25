@@ -1,10 +1,12 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-jest.mock( '@wordpress/api-fetch' );
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
+
+vi.mock( '@wordpress/api-fetch' );
 
 describe( 'useResourcePermissions', () => {
 	let registry;

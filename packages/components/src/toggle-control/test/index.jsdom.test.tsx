@@ -1,5 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import ToggleControl from '..';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ToggleControl', () => {
 	it( 'should label the toggle', () => {
@@ -11,7 +14,7 @@ describe( 'ToggleControl', () => {
 	} );
 
 	it( 'triggers change callback with boolean', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <ToggleControl label="My toggle" onChange={ onChange } /> );
 

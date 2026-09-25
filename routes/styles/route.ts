@@ -57,6 +57,9 @@ export const route = {
 		}
 		return {
 			isPreview: true,
+			// Styling the site means styling the template around it, so it is
+			// shown even when the canvas resolves to a static front page.
+			renderingMode: 'template-locked' as const,
 		};
 	},
 };

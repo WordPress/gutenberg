@@ -6,8 +6,9 @@ import { mapMarker } from '@wordpress/icons';
 import {
 	Autocomplete,
 	Button,
+	Field,
 	IconButton,
-	InputControl,
+	Input,
 	InputLayout,
 	Stack,
 } from '@wordpress/ui';
@@ -229,42 +230,49 @@ export function LocationPicker( {
 						}
 					} }
 				>
-					<Autocomplete.Input
-						id={ locationInputId }
-						className={ styles[ 'location-input' ] }
-						render={
-							<InputControl
-								autoComplete="off"
-								label={ __( 'City' ) }
-								hideLabelFromVision={ hideLabelFromVision }
-								size="compact"
-								description={
-									showDescription
-										? __(
-												'Select a city to view upcoming events.'
-										  )
-										: undefined
+					<Field.Root>
+						<Field.Label hideFromVision={ hideLabelFromVision }>
+							{ __( 'City' ) }
+						</Field.Label>
+						<Autocomplete.InputGroup>
+							<Autocomplete.Input
+								id={ locationInputId }
+								className={ styles[ 'location-input' ] }
+								render={
+									<Input
+										autoComplete="off"
+										size="compact"
+										onValueChange={ () => {} }
+										suffix={
+											<InputLayout.Slot padding="minimal">
+												<Autocomplete.Clear />
+												<IconButton
+													icon={ mapMarker }
+													label={ __(
+														'Use current location'
+													) }
+													onClick={
+														fillCityFromGeolocation
+													}
+													disabled={ isLocatingCity }
+													size="small"
+													variant="minimal"
+												/>
+											</InputLayout.Slot>
+										}
+									/>
 								}
-								onValueChange={ () => {} }
-								suffix={
-									<InputLayout.Slot padding="minimal">
-										<Autocomplete.Clear />
-										<IconButton
-											icon={ mapMarker }
-											label={ __(
-												'Use current location'
-											) }
-											onClick={ fillCityFromGeolocation }
-											disabled={ isLocatingCity }
-											size="small"
-											variant="minimal"
-										/>
-									</InputLayout.Slot>
-								}
+								placeholder={ __( 'Select city…' ) }
 							/>
-						}
-						placeholder={ __( 'Select city…' ) }
-					/>
+						</Autocomplete.InputGroup>
+						{ showDescription && (
+							<Field.Description>
+								{ __(
+									'Select a city to view upcoming events.'
+								) }
+							</Field.Description>
+						) }
+					</Field.Root>
 					{ locationOptions.length > 0 && (
 						<Autocomplete.Popup>
 							<Autocomplete.List>

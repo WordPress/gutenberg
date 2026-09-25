@@ -1,0 +1,73 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"paths": {
+			"@wordpress/commands": [
+				"../typings/untyped-packages/wordpress-commands.d.ts"
+			],
+			"@wordpress/block-editor": [
+				"../typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/block-library": [
+				"../typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/patterns": [
+				"../typings/untyped-packages/any-module.d.ts"
+			]
+		},
+		"checkJs": true,
+		"allowSyntheticDefaultImports": true,
+		"jsx": "preserve",
+		"target": "esnext",
+		"module": "preserve",
+		"lib": [ "DOM", "DOM.Iterable", "ESNext" ],
+		"declaration": true,
+		"declarationMap": true,
+		"composite": true,
+		"emitDeclarationOnly": true,
+		"isolatedModules": true,
+
+		"skipLibCheck": true,
+
+		/* Strict Type-Checking Options */
+		"strict": true,
+
+		/* Additional Checks */
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+
+		/* Module Resolution Options */
+		"moduleResolution": "bundler",
+
+		"resolveJsonModule": true,
+
+		/*
+		 * `../typings` is this workspace's own. `@types` packages are not:
+		 * a hoisted install puts them at the repo root, a linked one puts
+		 * them in the workspace that declared them. Both are listed because
+		 * TypeScript skips a type root that does not exist, so the preset
+		 * serves either layout.
+		 */
+		"typeRoots": [
+			"../typings",
+			"${configDir}/node_modules/@types",
+			"../../../node_modules/@types"
+		],
+		"types": [],
+
+		"rootDir": "${configDir}/src",
+		"declarationDir": "${configDir}/build-types"
+	},
+	"include": [ "${configDir}/src" ],
+	"exclude": [
+		"${configDir}/**/benchmark",
+		"${configDir}/build-*/**",
+		"${configDir}/build/**",
+		"${configDir}/**/test/**",
+		"${configDir}/**/tests/**",
+		"${configDir}/**/__tests__/**",
+		"${configDir}/**/stories/**",
+		"${configDir}/**/*.story.*"
+	]
+}

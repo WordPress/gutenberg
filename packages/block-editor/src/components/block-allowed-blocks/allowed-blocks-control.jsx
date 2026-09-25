@@ -36,7 +36,7 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 			? filteredBlockTypes
 			: filteredBlockTypes.filter( ( blockType ) =>
 					selectedBlockNames.includes( blockType.name )
-			  );
+				);
 
 	return (
 		<div className="block-editor-block-allowed-blocks-control">

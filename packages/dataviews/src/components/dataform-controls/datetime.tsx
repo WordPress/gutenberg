@@ -12,6 +12,7 @@ import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import getCalendarLocale from './utils/get-calendar-locale';
+import getTimezoneDescription from './utils/get-timezone-description';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 
 const formatDateTime = ( value?: string ): string => {
@@ -179,6 +180,7 @@ function CalendarDateTimeControl< Item >( {
 					value={ formatDateTime( value ) }
 					onValueChange={ handleManualDateTimeChange }
 					disabled={ disabled }
+					description={ getTimezoneDescription() }
 					min={
 						minConstraint
 							? formatDateTime( minConstraint )

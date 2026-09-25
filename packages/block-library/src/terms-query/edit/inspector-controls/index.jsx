@@ -137,7 +137,7 @@ export default function TermsQueryInspectorControls( {
 								hasIncludeFilter
 									? __(
 											'When specific terms are selected, the order is based on their selection order.'
-									  )
+										)
 									: undefined
 							}
 						/>
@@ -199,7 +199,7 @@ export default function TermsQueryInspectorControls( {
 									hasIncludeFilter
 										? __(
 												'When specific terms are selected, only those are displayed.'
-										  )
+											)
 										: undefined
 								}
 							/>

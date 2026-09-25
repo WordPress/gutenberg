@@ -98,7 +98,7 @@ export function useTypewriter() {
 			const relativeScrollPosition = windowScroll
 				? caretRect.top / defaultView.innerHeight
 				: ( caretRect.top - scrollContainerY ) /
-				  ( defaultView.innerHeight - scrollContainerY );
+					( defaultView.innerHeight - scrollContainerY );
 
 			// If the scroll position is at the start, the active editable element
 			// is the last one, and the caret is positioned within the initial

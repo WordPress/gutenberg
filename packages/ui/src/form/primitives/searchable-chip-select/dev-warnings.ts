@@ -3,6 +3,8 @@ import type { ComboboxCollectionProps } from '../combobox/types';
 import {
 	findCreatableItems,
 	hasGroupedItems,
+	isCreatableItem,
+	isItemGroup,
 	type Item,
 	type ItemGroup,
 } from './types';
@@ -26,6 +28,24 @@ export function warnSearchableChipSelectProps(
 	if ( hasGroupedItems( items ) && ! children ) {
 		warning(
 			'SearchableChipSelect: grouped `items` require a `children` renderer. See the `Grouped` story for an example.'
+		);
+	}
+
+	let hasMixedCreatableGroup = false;
+	for ( const entry of items ) {
+		if (
+			isItemGroup( entry ) &&
+			entry.items.some( isCreatableItem ) &&
+			entry.items.some( ( item ) => ! isCreatableItem( item ) )
+		) {
+			hasMixedCreatableGroup = true;
+			break;
+		}
+	}
+
+	if ( hasMixedCreatableGroup ) {
+		warning(
+			'SearchableChipSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
 		);
 	}
 }

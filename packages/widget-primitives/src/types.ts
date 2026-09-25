@@ -9,6 +9,7 @@
  * `example`, and `setAttributes`.
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
+import type { Field } from '@wordpress/dataviews';
 import type { ResolvableField } from './field-types';
 
 /**
@@ -154,6 +155,34 @@ export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
 };
 
 /**
+ * Wire form of a widget attribute, as carried by a `WidgetModuleRecord`:
+ * the JSON-expressible subset of a DataViews `Field`. `Edit` is a control
+ * name or config, never a component; `isValid` carries no `custom` rule;
+ * `isDisabled` is a boolean, never a callback.
+ */
+export type WidgetAttributeRecord< Item = unknown > = Omit<
+	WidgetAttribute< Item >,
+	| 'Edit'
+	| 'isValid'
+	| 'header'
+	| 'description'
+	| 'render'
+	| 'sort'
+	| 'isVisible'
+	| 'isDisabled'
+	| 'getValue'
+	| 'setValue'
+	| 'getElements'
+	| 'getValueFormatted'
+> & {
+	header?: string;
+	description?: string;
+	isDisabled?: boolean;
+	Edit?: Exclude< NonNullable< Field< Item >[ 'Edit' ] >, Function >;
+	isValid?: Omit< NonNullable< Field< Item >[ 'isValid' ] >, 'custom' >;
+};
+
+/**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
@@ -265,8 +294,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
  * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
  * resolves them into this camelCase shape.
  */
-export interface WidgetType< Item = unknown >
-	extends WidgetTypeMetadata< Item > {
+export interface WidgetType<
+	Item = unknown,
+> extends WidgetTypeMetadata< Item > {
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time, produced from the conventional `render.*` entry point.
@@ -315,15 +345,17 @@ export type ResolveWidgetModule = (
  * stands.
  */
 type WidgetModuleRecordOverrides = {
-	[ K in keyof Pick<
-		WidgetTypeMetadata,
-		| 'title'
-		| 'description'
-		| 'help'
-		| 'category'
-		| 'presentation'
-		| 'keywords'
-	> ]?: WidgetTypeMetadata[ K ] | null;
+	[
+		K in keyof Pick<
+			WidgetTypeMetadata,
+			| 'title'
+			| 'description'
+			| 'help'
+			| 'category'
+			| 'presentation'
+			| 'keywords'
+		>
+	]?: WidgetTypeMetadata[ K ] | null;
 };
 
 /**
@@ -358,4 +390,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's actions stand.
 	 */
 	actions?: WidgetActionRecord[] | null;
+
+	/**
+	 * Attribute schema in wire form. `null`/absent means the module's
+	 * attributes stand; otherwise entries merge with the module's by `id`.
+	 */
+	attributes?: WidgetAttributeRecord[] | null;
 }

@@ -1,3 +1,12 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import type { CropperState } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import {
@@ -14,18 +23,18 @@ import {
  */
 function createMockContext() {
 	return {
-		setTransform: jest.fn(),
-		translate: jest.fn(),
-		rotate: jest.fn(),
-		scale: jest.fn(),
-		drawImage: jest.fn(),
-		getImageData: jest.fn(),
-		putImageData: jest.fn(),
-		beginPath: jest.fn(),
-		closePath: jest.fn(),
-		moveTo: jest.fn(),
-		lineTo: jest.fn(),
-		clip: jest.fn(),
+		setTransform: vi.fn(),
+		translate: vi.fn(),
+		rotate: vi.fn(),
+		scale: vi.fn(),
+		drawImage: vi.fn(),
+		getImageData: vi.fn(),
+		putImageData: vi.fn(),
+		beginPath: vi.fn(),
+		closePath: vi.fn(),
+		moveTo: vi.fn(),
+		lineTo: vi.fn(),
+		clip: vi.fn(),
 	};
 }
 
@@ -38,9 +47,9 @@ function createMockCanvas( ctx: ReturnType< typeof createMockContext > ) {
 	const canvas = {
 		width: 0,
 		height: 0,
-		getContext: jest.fn().mockReturnValue( ctx ),
-		toBlob: jest.fn(),
-		toDataURL: jest.fn().mockReturnValue( 'data:image/png;base64,abc' ),
+		getContext: vi.fn().mockReturnValue( ctx ),
+		toBlob: vi.fn(),
+		toDataURL: vi.fn().mockReturnValue( 'data:image/png;base64,abc' ),
 	};
 	return canvas as unknown as HTMLCanvasElement;
 }
@@ -68,7 +77,7 @@ function createTestState( overrides?: Partial< CropperState > ): CropperState {
 describe( 'loadImage', () => {
 	it( 'should create an image element with crossOrigin set', async () => {
 		const mockImage = {
-			addEventListener: jest.fn(),
+			addEventListener: vi.fn(),
 			set crossOrigin( value: string ) {
 				this._crossOrigin = value;
 			},
@@ -94,7 +103,9 @@ describe( 'loadImage', () => {
 
 		// Replace global Image constructor.
 		const originalImage = global.Image;
-		global.Image = jest.fn( () => mockImage ) as unknown as typeof Image;
+		global.Image = vi.fn( function Image() {
+			return mockImage;
+		} ) as unknown as typeof Image;
 
 		try {
 			const result = await loadImage( 'https://example.com/test.jpg' );
@@ -117,7 +128,7 @@ describe( 'loadImage', () => {
 	it( 'should reject when the image fails to load', async () => {
 		const loadError = new Error( 'Network error' );
 		const mockImage = {
-			addEventListener: jest.fn(),
+			addEventListener: vi.fn(),
 			set crossOrigin( _value: string ) {},
 			set src( _value: string ) {
 				// Simulate error on next tick.
@@ -131,7 +142,9 @@ describe( 'loadImage', () => {
 		};
 
 		const originalImage = global.Image;
-		global.Image = jest.fn( () => mockImage ) as unknown as typeof Image;
+		global.Image = vi.fn( function Image() {
+			return mockImage;
+		} ) as unknown as typeof Image;
 
 		try {
 			await expect(
@@ -152,7 +165,7 @@ describe( 'renderToCanvas', () => {
 		canvasCount = 0;
 
 		// Mock document.createElement to return our mock canvases.
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					canvasCount++;
@@ -166,7 +179,7 @@ describe( 'renderToCanvas', () => {
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'should call setTransform and drawImage', () => {
@@ -211,8 +224,8 @@ describe( 'renderToCanvas', () => {
 		} );
 		const mockCtxNoFlip = createMockContext();
 		const canvasCountRef = { value: 0 };
-		jest.restoreAllMocks();
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.restoreAllMocks();
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					canvasCountRef.value++;
@@ -252,8 +265,8 @@ describe( 'renderToCanvas', () => {
 		const mockCtxRotated = createMockContext();
 		const mockCtxNormal = createMockContext();
 		const canvasCountRef = { value: 0 };
-		jest.restoreAllMocks();
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.restoreAllMocks();
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					canvasCountRef.value++;
@@ -287,7 +300,7 @@ describe( 'canvasToBlob', () => {
 	it( 'should call canvas.toBlob with the correct arguments', async () => {
 		const mockBlob = new Blob( [ 'test' ], { type: 'image/png' } );
 		const mockCanvas = {
-			toBlob: jest.fn( ( callback: BlobCallback ) => {
+			toBlob: vi.fn( ( callback: BlobCallback ) => {
 				callback( mockBlob );
 			} ),
 		} as unknown as HTMLCanvasElement;
@@ -305,7 +318,7 @@ describe( 'canvasToBlob', () => {
 	it( 'should use default mime type and quality when not specified', async () => {
 		const mockBlob = new Blob( [ 'test' ], { type: 'image/png' } );
 		const mockCanvas = {
-			toBlob: jest.fn( ( callback: BlobCallback ) => {
+			toBlob: vi.fn( ( callback: BlobCallback ) => {
 				callback( mockBlob );
 			} ),
 		} as unknown as HTMLCanvasElement;
@@ -321,7 +334,7 @@ describe( 'canvasToBlob', () => {
 
 	it( 'should reject when toBlob returns null', async () => {
 		const mockCanvas = {
-			toBlob: jest.fn( ( callback: BlobCallback ) => {
+			toBlob: vi.fn( ( callback: BlobCallback ) => {
 				callback( null );
 			} ),
 		} as unknown as HTMLCanvasElement;
@@ -335,9 +348,7 @@ describe( 'canvasToBlob', () => {
 describe( 'canvasToDataURL', () => {
 	it( 'should call canvas.toDataURL with correct arguments', () => {
 		const mockCanvas = {
-			toDataURL: jest
-				.fn()
-				.mockReturnValue( 'data:image/jpeg;base64,abc' ),
+			toDataURL: vi.fn().mockReturnValue( 'data:image/jpeg;base64,abc' ),
 		} as unknown as HTMLCanvasElement;
 
 		const result = canvasToDataURL( mockCanvas, 'image/jpeg', 0.85 );
@@ -351,7 +362,7 @@ describe( 'canvasToDataURL', () => {
 
 	it( 'should use default mime type and quality when not specified', () => {
 		const mockCanvas = {
-			toDataURL: jest.fn().mockReturnValue( 'data:image/png;base64,xyz' ),
+			toDataURL: vi.fn().mockReturnValue( 'data:image/png;base64,xyz' ),
 		} as unknown as HTMLCanvasElement;
 
 		canvasToDataURL( mockCanvas );
@@ -373,7 +384,7 @@ describe( 'exportCroppedImage', () => {
 		const mockImage = {
 			naturalWidth: 800,
 			naturalHeight: 600,
-			addEventListener: jest.fn(),
+			addEventListener: vi.fn(),
 			_crossOrigin: '',
 			set crossOrigin( value: string ) {
 				this._crossOrigin = value;
@@ -395,16 +406,18 @@ describe( 'exportCroppedImage', () => {
 				return this._src;
 			},
 		};
-		global.Image = jest.fn( () => mockImage ) as unknown as typeof Image;
+		global.Image = vi.fn( function Image() {
+			return mockImage;
+		} ) as unknown as typeof Image;
 
 		// Mock document.createElement for renderToCanvas.
 		const mockBlob = new Blob( [ 'test' ], { type: 'image/png' } );
 		const mockCtx = createMockContext();
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					const canvas = createMockCanvas( mockCtx );
-					( canvas as any ).toBlob = jest.fn(
+					( canvas as any ).toBlob = vi.fn(
 						( callback: BlobCallback ) => {
 							callback( mockBlob );
 						}
@@ -418,7 +431,7 @@ describe( 'exportCroppedImage', () => {
 
 	afterEach( () => {
 		global.Image = originalImage;
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'should chain loadImage, renderToCanvas, and canvasToBlob', async () => {
@@ -436,7 +449,7 @@ describe( 'exportCroppedImage', () => {
 	it( 'throws when image fails to load', async () => {
 		// Override Image to simulate a load error.
 		const errorImage = {
-			addEventListener: jest.fn(),
+			addEventListener: vi.fn(),
 			set crossOrigin( _value: string ) {},
 			set src( _value: string ) {
 				const errorHandler = this.addEventListener.mock.calls.find(
@@ -447,7 +460,9 @@ describe( 'exportCroppedImage', () => {
 				}
 			},
 		};
-		global.Image = jest.fn( () => errorImage ) as unknown as typeof Image;
+		global.Image = vi.fn( function Image() {
+			return errorImage;
+		} ) as unknown as typeof Image;
 
 		const state = createTestState();
 		await expect(
@@ -459,22 +474,20 @@ describe( 'exportCroppedImage', () => {
 		// Mock Image to resolve (simulating a successful load even from
 		// a tainted source — the browser doesn't flag the load itself,
 		// only the later toBlob call).
-		global.Image = jest.fn( () => {
+		global.Image = vi.fn( function Image() {
 			const img: {
-				addEventListener: jest.Mock;
+				addEventListener: Mock;
 				crossOrigin: string;
 				src: string;
 				naturalWidth: number;
 				naturalHeight: number;
 			} = {
-				addEventListener: jest.fn(
-					( event: string, fn: () => void ) => {
-						if ( event === 'load' ) {
-							// Fire load synchronously after src is set.
-							queueMicrotask( fn );
-						}
+				addEventListener: vi.fn( ( event: string, fn: () => void ) => {
+					if ( event === 'load' ) {
+						// Fire load synchronously after src is set.
+						queueMicrotask( fn );
 					}
-				),
+				} ),
 				crossOrigin: '',
 				src: '',
 				naturalWidth: 800,
@@ -487,18 +500,18 @@ describe( 'exportCroppedImage', () => {
 		const corsCanvas = {
 			width: 0,
 			height: 0,
-			getContext: jest.fn( () => ( {
-				setTransform: jest.fn(),
-				drawImage: jest.fn(),
+			getContext: vi.fn( () => ( {
+				setTransform: vi.fn(),
+				drawImage: vi.fn(),
 			} ) ),
-			toBlob: jest.fn( () => {
+			toBlob: vi.fn( () => {
 				throw new DOMException(
 					'Tainted canvases may not be exported',
 					'SecurityError'
 				);
 			} ),
 		};
-		jest.spyOn( document, 'createElement' ).mockImplementation( ( (
+		vi.spyOn( document, 'createElement' ).mockImplementation( ( (
 			tag: string
 		) => {
 			if ( tag === 'canvas' ) {
@@ -515,7 +528,7 @@ describe( 'exportCroppedImage', () => {
 			)
 		).rejects.toMatchObject( { name: 'SecurityError' } );
 
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'throws descriptive error when canvas context is unavailable', () => {
@@ -523,9 +536,9 @@ describe( 'exportCroppedImage', () => {
 		const noCtxCanvas = {
 			width: 0,
 			height: 0,
-			getContext: jest.fn( () => null ),
+			getContext: vi.fn( () => null ),
 		};
-		jest.spyOn( document, 'createElement' ).mockImplementation( ( (
+		vi.spyOn( document, 'createElement' ).mockImplementation( ( (
 			tag: string
 		) => {
 			if ( tag === 'canvas' ) {
@@ -544,7 +557,7 @@ describe( 'exportCroppedImage', () => {
 			/2D context/i
 		);
 
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 } );
 
@@ -553,7 +566,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 
 	function setupMockCanvas() {
 		mockCtx = createMockContext();
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					return createMockCanvas(
@@ -566,7 +579,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 	}
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'identity state (no rotation, no zoom, full crop) should produce a 1:1 mapping', () => {
@@ -652,7 +665,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		const [ a1, , , d1 ] = mockCtx.setTransform.mock.calls[ 0 ];
 
 		// Reset for zoom=2.
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 		setupMockCanvas();
 		const stateZ2 = createTestState( {
 			rotation: 0,
@@ -688,7 +701,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		const [ aNoFlip ] = mockCtx.setTransform.mock.calls[ 0 ];
 
 		// Reset for horizontal flip.
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 		setupMockCanvas();
 		const stateFlip = createTestState( {
 			rotation: 0,
@@ -716,7 +729,7 @@ describe( 'applyToCanvas — export matrix verification', () => {
 		mockCtx = createMockContext();
 		canvasWidths = [];
 		canvasHeights = [];
-		jest.spyOn( document, 'createElement' ).mockImplementation(
+		vi.spyOn( document, 'createElement' ).mockImplementation(
 			( tag: string ) => {
 				if ( tag === 'canvas' ) {
 					const canvas = createMockCanvas( mockCtx );
@@ -747,7 +760,7 @@ describe( 'applyToCanvas — export matrix verification', () => {
 	}
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'should create a canvas with correct dimensions and call setTransform', () => {

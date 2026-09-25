@@ -84,6 +84,9 @@ jobs:
                   section: labels
                   body-path: pr-meta/body.md
 
+            # Opening or reopening only reports the warning above, since a
+            # pull request needs time to be labelled. These are the events the
+            # workflow enforced on before it also ran on opened and reopened.
             - name: Require exactly one type label
-              if: ${{ steps.check.outputs.ok != 'true' }}
+              if: ${{ steps.check.outputs.ok != 'true' && contains( fromJSON( '["labeled", "unlabeled", "ready_for_review", "review_requested"]' ), github.event.action ) }}
               run: exit 1

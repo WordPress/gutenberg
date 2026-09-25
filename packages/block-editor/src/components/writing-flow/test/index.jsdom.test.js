@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { isNavigationCandidate } from '../use-arrow-nav';
 

@@ -66,9 +66,19 @@
 
 .centered-border-control {
 	grid-column: span 2;
-	margin: 0 auto;
+
+	/* Same raised specificity as `.linked-border-control`: BorderControl's own
+	   `margin: 0` is registered after this stylesheet, so at equal specificity
+	   it would win and drop the control out of the centre of the row. */
+	&#{&} {
+		margin: 0 auto;
+	}
 }
 
 .right-border-control {
-	margin-inline-start: auto;
+	/* Physical `margin: 0` and logical `margin-inline-start` cascade together,
+	   so this needs the same specificity boost as the centred control. */
+	&#{&} {
+		margin-inline-start: auto;
+	}
 }

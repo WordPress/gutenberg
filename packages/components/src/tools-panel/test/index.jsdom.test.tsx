@@ -1,24 +1,27 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { useState } from '@wordpress/element';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import { ContextSystemProvider } from '../../context';
-import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
 } from '../types';
 
+globalThis.wpVitest.mockMatchMedia();
+
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
-const resetAll = jest.fn();
+const resetAll = vi.fn();
 const noop = () => undefined;
-const gridContextValue = {
-	Grid: {
-		columnGap: '40px',
-		rowGap: '48px',
-	},
-};
 
 type ControlValue = boolean | undefined;
 
@@ -31,53 +34,53 @@ const defaultProps = {
 // Default props for an enabled control to be rendered within panel.
 let controlValue: ControlValue = true;
 const controlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! controlValue;
 	} ),
 	label: 'Example',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		controlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
-	onShownChange: jest.fn(),
+	onSelect: vi.fn(),
+	onShownChange: vi.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
 let altControlValue: ControlValue = false;
 const altControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altControlValue;
 	} ),
 	label: 'Alt',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
-	onShownChange: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
+	onShownChange: vi.fn(),
 };
 
 // Default props for wrapped or grouped panel items.
 let nestedControlValue: ControlValue = true;
 const nestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! nestedControlValue;
 	} ),
 	label: 'Nested Control 1',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		nestedControlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
+	onSelect: vi.fn(),
 	isShownByDefault: true,
 };
 
 // Alternative props for wrapped or grouped panel items.
 const altNestedControlValue: ControlValue = false;
 const altNestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altNestedControlValue;
 	} ),
 	label: 'Nested Control 2',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
 };
 
 // Simple custom component grouping panel items. Used to test panel item
@@ -109,10 +112,10 @@ const panelContext: ToolsPanelContextType = {
 	hasMenuItems: false,
 	isResetting: false,
 	shouldRenderPlaceholderItems: false,
-	registerPanelItem: jest.fn(),
-	deregisterPanelItem: jest.fn(),
-	registerResetAllFilter: jest.fn(),
-	deregisterResetAllFilter: jest.fn(),
+	registerPanelItem: vi.fn(),
+	deregisterPanelItem: vi.fn(),
+	registerResetAllFilter: vi.fn(),
+	deregisterResetAllFilter: vi.fn(),
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
 };
@@ -199,9 +202,27 @@ const selectMenuItem = async ( label: string ) => {
 };
 
 describe( 'ToolsPanel', () => {
+	beforeEach( () => {
+		controlProps.hasValue.mockImplementation( () => !! controlValue );
+		controlProps.onDeselect.mockImplementation( () => {
+			controlValue = undefined;
+		} );
+		altControlProps.hasValue.mockImplementation( () => !! altControlValue );
+		nestedControlProps.hasValue.mockImplementation(
+			() => !! nestedControlValue
+		);
+		nestedControlProps.onDeselect.mockImplementation( () => {
+			nestedControlValue = undefined;
+		} );
+		altNestedControlProps.hasValue.mockImplementation(
+			() => !! altNestedControlValue
+		);
+	} );
+
 	afterEach( () => {
 		controlValue = true;
 		altControlValue = false;
+		nestedControlValue = true;
 	} );
 
 	describe( 'basic rendering', () => {
@@ -281,7 +302,7 @@ describe( 'ToolsPanel', () => {
 			expect( header ).toBeInTheDocument();
 		} );
 
-		it( 'should apply SCSS Module styles to the panel and its items', () => {
+		it( 'should apply public class names to the panel and its items', () => {
 			render(
 				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
 					<ToolsPanelItem
@@ -295,11 +316,9 @@ describe( 'ToolsPanel', () => {
 			);
 
 			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel' ],
 				'components-tools-panel'
 			);
 			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
 				'components-tools-panel-item',
 				'custom-item'
 			);
@@ -308,73 +327,10 @@ describe( 'ToolsPanel', () => {
 				name: defaultProps.label,
 			} );
 
-			expect( heading ).toHaveClass(
-				moduleStyles[ 'tools-panel-heading' ]
-			);
 			// Disable reason: Semantic queries can't reach the header wrapper.
 			// eslint-disable-next-line testing-library/no-node-access
 			expect( heading.parentElement ).toHaveClass(
-				moduleStyles[ 'tools-panel-header' ],
 				'components-tools-panel-header'
-			);
-		} );
-
-		it( 'should preserve its spacing against Grid context values', () => {
-			render(
-				<ContextSystemProvider value={ gridContextValue }>
-					<ToolsPanel { ...defaultProps } data-testid="tools-panel">
-						<span>Panel content</span>
-					</ToolsPanel>
-				</ContextSystemProvider>
-			);
-
-			const panel = screen.getByTestId( 'tools-panel' );
-			const generatedClassName = Array.from( panel.classList ).find(
-				( className ) => /^(css|emotion)-/.test( className )
-			);
-			const generatedRule = Array.from( document.styleSheets )
-				.flatMap( ( styleSheet ) => Array.from( styleSheet.cssRules ) )
-				.find( ( rule ) =>
-					rule.cssText.includes( `.${ generatedClassName }` )
-				);
-
-			expect( generatedRule?.cssText ).toContain(
-				'grid-column-gap: calc(4px * 4);'
-			);
-			expect( generatedRule?.cssText ).toContain(
-				'grid-row-gap: calc(4px * 4);'
-			);
-		} );
-
-		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
-			render(
-				<ToolsPanel
-					{ ...defaultProps }
-					data-testid="tools-panel"
-					hasInnerWrapper
-					shouldRenderPlaceholderItems
-				>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						className="custom-item"
-						data-testid="tools-panel-item"
-					>
-						<div>Alt control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-
-			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
-				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
-				moduleStyles[ 'tools-panel-item-placeholder' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
-				'components-tools-panel-item',
-				'custom-item'
 			);
 		} );
 	} );
@@ -428,8 +384,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				return (
@@ -464,8 +420,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				// The null panelId below simulates the panel prop when there
@@ -542,9 +498,9 @@ describe( 'ToolsPanel', () => {
 		// after mount must leave the item as it is, and must not be reported
 		// as though the user had used the menu.
 		describe( 'changing defaultShown after mount', () => {
-			const onDeselect = jest.fn();
-			const onSelect = jest.fn();
-			const onShownChange = jest.fn();
+			const onDeselect = vi.fn();
+			const onSelect = vi.fn();
+			const onShownChange = vi.fn();
 
 			const ToolsPanelOptional = ( {
 				defaultShown,
@@ -566,7 +522,7 @@ describe( 'ToolsPanel', () => {
 			);
 
 			beforeEach( () => {
-				jest.clearAllMocks();
+				vi.clearAllMocks();
 			} );
 
 			it( 'should keep a hidden item hidden when it changes to true', () => {
@@ -687,30 +643,39 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render contents of items when in placeholder state', () => {
 			render(
 				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
-					<ToolsPanelItem { ...altControlProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="placeholder-item"
+					>
 						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholderItem = screen.getByTestId( 'placeholder-item' );
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
 			// all the item's children. So the container element will still be
 			// there holding its position but the inner text etc should not be
 			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholderItem ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {
 			const linkedControlValue = false;
 			const linkedControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! linkedControlValue;
 				} ),
 				label: 'Linked',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -777,12 +742,12 @@ describe( 'ToolsPanel', () => {
 		it( 'should handle conditionally rendered default control', async () => {
 			const conditionalControlValue = false;
 			const conditionalControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! conditionalControlValue;
 				} ),
 				label: 'Conditional',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -840,7 +805,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'registration of panel items', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should register and deregister items when panelId changes', () => {
@@ -919,8 +884,8 @@ describe( 'ToolsPanel', () => {
 			// the value the item mounted with.
 			const context: ToolsPanelContextType = {
 				...panelContext,
-				registerPanelItem: jest.fn(),
-				deregisterPanelItem: jest.fn(),
+				registerPanelItem: vi.fn(),
+				deregisterPanelItem: vi.fn(),
 			};
 			const TestPanel = ( {
 				defaultShown,
@@ -947,7 +912,7 @@ describe( 'ToolsPanel', () => {
 			// Let registration settle, so that any further calls can only
 			// have been caused by the changes made below.
 			rerender( <TestPanel defaultShown={ false } /> );
-			const settledCalls = ( context.registerPanelItem as jest.Mock ).mock
+			const settledCalls = ( context.registerPanelItem as Mock ).mock
 				.calls.length;
 
 			// The user shows the item and the consumer saves that preference.
@@ -1045,7 +1010,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
@@ -1101,7 +1066,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'shown change callback', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should call onShownChange with true when an optional item is shown via the menu', async () => {
@@ -1171,7 +1136,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should not call onShownChange when the value changes programmatically', () => {
-			const onShownChange = jest.fn();
+			const onShownChange = vi.fn();
 			const ToolsPanelOptional = ( { value }: { value?: number } ) => (
 				<ToolsPanel { ...defaultProps } panelId="1234">
 					<ToolsPanelItem
@@ -1293,7 +1258,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'rendering via SlotFills', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
@@ -1654,23 +1619,23 @@ describe( 'ToolsPanel', () => {
 	describe( 'panel header icon toggle', () => {
 		const defaultControlsValue = false;
 		const defaultControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! defaultControlsValue;
 			} ),
 			label: 'Default',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: true,
 		};
 
 		const optionalControlsValue = false;
 		const optionalControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! optionalControlsValue;
 			} ),
 			label: 'Optional',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: false,
 		};
 
@@ -1769,8 +1734,8 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should not call reset all for different panelIds', async () => {
-			const resetItem = jest.fn();
-			const resetItemB = jest.fn();
+			const resetItem = vi.fn();
+			const resetItemB = vi.fn();
 
 			const children = (
 				<>

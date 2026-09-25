@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type VipsFactory from 'wasm-vips';
 import { getUltraHdrInfo, resizeImage } from '../';
 
@@ -70,8 +70,12 @@ vi.mock( import( 'wasm-vips' ), () => ( {
 } ) );
 
 describe( 'UltraHDR helpers', () => {
-	afterEach( () => {
-		vi.clearAllMocks();
+	beforeEach( () => {
+		mockNewFromBuffer.mockImplementation( () => new MockImage() );
+		mockThumbnailBuffer.mockImplementation( () => new MockImage() );
+		mockWriteToBuffer.mockImplementation( () => ( {
+			buffer: new ArrayBuffer( 0 ),
+		} ) );
 	} );
 
 	describe( 'getUltraHdrInfo', () => {

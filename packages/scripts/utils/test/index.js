@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import {
 	afterAll,
 	afterEach,
-	beforeAll,
 	beforeEach,
 	describe,
 	expect,
@@ -20,27 +19,25 @@ const getArgsFromCLIMock = vi.spyOn( processUtils, 'getArgsFromCLI' );
 const exitMock = vi.spyOn( processUtils, 'exit' );
 const packageUtils = require( '../package' );
 const getPackagePathMock = vi.spyOn( packageUtils, 'getPackagePath' );
-const hasPackagePropMock = vi.spyOn( packageUtils, 'hasPackageProp' );
 const fileUtils = require( '../file' );
 const hasProjectFileMock = vi.spyOn( fileUtils, 'hasProjectFile' );
 const fromProjectRootMock = vi.spyOn( fileUtils, 'fromProjectRoot' );
 const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
-const crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 const {
 	hasArgInCLI,
 	hasProjectFile,
-	getJestOverrideConfigFile,
 	getWebpackArgs,
 	spawnScript,
 } = require( '../' );
 
-afterAll( () => {
-	vi.restoreAllMocks();
+beforeEach( () => {
+	crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 } );
 
 describe( 'utils', () => {
 	describe( 'hasArgInCLI', () => {
-		beforeAll( () => {
+		beforeEach( () => {
 			getArgsFromCLIMock.mockReturnValue( [
 				'-a',
 				'--b',
@@ -83,84 +80,6 @@ describe( 'utils', () => {
 		} );
 	} );
 
-	describe( 'getJestOverrideConfigFile', () => {
-		beforeEach( () => {
-			getArgsFromCLIMock.mockReturnValue( [] );
-			hasPackagePropMock.mockReturnValue( false );
-			hasProjectFileMock.mockReturnValue( false );
-			fromProjectRootMock.mockImplementation(
-				( filePath ) => '/p/' + filePath
-			);
-			fromConfigRootMock.mockImplementation(
-				( filePath ) => '/c/' + filePath
-			);
-		} );
-
-		afterEach( () => {
-			getArgsFromCLIMock.mockReset();
-			hasPackagePropMock.mockReset();
-			hasProjectFileMock.mockReset();
-			fromProjectRootMock.mockReset();
-			fromConfigRootMock.mockReset();
-		} );
-
-		it( 'should return undefined if --config flag is present', () => {
-			getArgsFromCLIMock.mockReturnValue( [ '--config=test' ] );
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe( undefined );
-		} );
-
-		it( 'should return undefined if -c flag is present', () => {
-			getArgsFromCLIMock.mockReturnValue( [ '-c=test' ] );
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe( undefined );
-		} );
-
-		it( 'should return variant project configuration if present', () => {
-			hasProjectFileMock.mockImplementation(
-				( file ) => file === 'jest-e2e.config.js'
-			);
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe(
-				'/p/jest-e2e.config.js'
-			);
-		} );
-
-		it( 'should return undefined if jest.config.js available', () => {
-			hasProjectFileMock.mockImplementation(
-				( file ) => file === 'jest.config.js'
-			);
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe( undefined );
-		} );
-
-		it( 'should return undefined if jest.config.json available', () => {
-			hasProjectFileMock.mockImplementation(
-				( file ) => file === 'jest.config.json'
-			);
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe( undefined );
-		} );
-
-		it( 'should return undefined if jest package directive specified', () => {
-			hasPackagePropMock.mockImplementation(
-				( prop ) => prop === 'jest'
-			);
-
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe( undefined );
-		} );
-
-		it( 'should return default configuration if nothing available', () => {
-			expect( getJestOverrideConfigFile( 'e2e' ) ).toBe(
-				'/c/jest-e2e.config.js'
-			);
-
-			expect( getJestOverrideConfigFile( 'unit' ) ).toBe(
-				'/c/jest-unit.config.js'
-			);
-		} );
-	} );
-
 	describe( 'getWebpackArgs', () => {
 		beforeEach( () => {
 			hasProjectFileMock.mockReturnValue( false );
@@ -199,7 +118,7 @@ describe( 'utils', () => {
 	describe( 'spawnScript', () => {
 		const scriptName = 'test-unit-js';
 
-		beforeAll( () => {
+		beforeEach( () => {
 			exitMock.mockImplementation( ( code ) => {
 				throw new Error( `Exit code: ${ code }.` );
 			} );

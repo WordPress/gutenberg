@@ -1,24 +1,31 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import withGlobalEvents from '../';
 import Listener from '../listener';
 
-jest.mock( '../listener', () => {
-	const ActualListener = jest.requireActual( '../listener' ).default;
+vi.mock( import( '../listener' ), async ( importOriginal ) => {
+	const { default: ActualListener } = await importOriginal();
 
-	return class extends ActualListener {
-		constructor() {
-			super( ...arguments );
+	return {
+		default: class extends ActualListener {
+			constructor() {
+				super( ...arguments );
 
-			this.constructor._instance = this;
+				this.constructor._instance = this;
 
-			jest.spyOn( this, 'add' );
-			jest.spyOn( this, 'remove' );
-		}
+				vi.spyOn( this, 'add' );
+				vi.spyOn( this, 'remove' );
+			}
+		},
 	};
 } );
 
 describe( 'withGlobalEvents', () => {
+	const DEPRECATION_MESSAGE =
+		'wp.compose.withGlobalEvents is deprecated since version 5.7. Please use useEffect instead.';
+
 	class OriginalComponent extends Component {
 		handleResize( event ) {
 			this.props.onResize( event );
@@ -30,12 +37,16 @@ describe( 'withGlobalEvents', () => {
 		}
 	}
 
-	beforeAll( () => {
-		jest.spyOn( OriginalComponent.prototype, 'handleResize' );
+	beforeEach( () => {
+		vi.spyOn( OriginalComponent.prototype, 'handleResize' );
+		if ( Listener._instance ) {
+			vi.spyOn( Listener._instance, 'add' );
+			vi.spyOn( Listener._instance, 'remove' );
+		}
 	} );
 
-	beforeEach( () => {
-		jest.clearAllMocks();
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( 'renders with original component', () => {
@@ -56,6 +67,7 @@ describe( 'withGlobalEvents', () => {
 
 		render( <EnhancedComponent ref={ () => {} }>Hello</EnhancedComponent> );
 
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 		expect( Listener._instance.add ).toHaveBeenCalledWith(
 			'resize',
 			// If not `undefined`, then we consider handlers were properly bound to the wrapper component.
@@ -67,13 +79,14 @@ describe( 'withGlobalEvents', () => {
 		const EnhancedComponent = withGlobalEvents( {
 			resize: 'handleResize',
 		} )( OriginalComponent );
-		const onResize = jest.fn();
+		const onResize = vi.fn();
 
 		render(
 			<EnhancedComponent ref={ () => {} } onResize={ onResize }>
 				Hello
 			</EnhancedComponent>
 		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 
 		const event = { type: 'resize' };
 

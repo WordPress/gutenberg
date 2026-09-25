@@ -157,7 +157,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 							[ getAnimateClassName( {
 								type: 'loading',
 							} ) ]: isSaving,
-					  } )
+						} )
 					: undefined
 			}
 			onClick={ isDisabled ? undefined : () => savePost() }

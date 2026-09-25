@@ -43,8 +43,7 @@ function Edit( {
 	}
 
 	const activeFormat = getActiveFormat( value, name ) as
-		| ActiveFormat
-		| undefined;
+		ActiveFormat | undefined;
 	const isActive = activeFormat !== undefined;
 	const activeObject = getActiveObject( value ) as ActiveFormat | undefined;
 	const isObjectActive =

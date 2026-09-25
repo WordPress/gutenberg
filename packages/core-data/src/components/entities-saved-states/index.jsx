@@ -200,7 +200,7 @@ export function EntitiesSavedStatesExtensible( {
 										dirtyEntityRecords.length
 									),
 									{ strong: <strong /> }
-							  )
+								)
 							: selectItemsToSaveDescription }
 					</p>
 				</div>

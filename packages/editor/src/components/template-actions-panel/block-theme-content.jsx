@@ -77,11 +77,11 @@ export default function TemplateActionsPanelContent() {
 	const notificationAction = hasGoBack
 		? [
 				{
-					label: __( 'Go back' ),
+					label: __( 'Back' ),
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
-		  ]
+			]
 		: undefined;
 
 	const mayShowTemplateEditNotice = () => {
@@ -158,24 +158,24 @@ export default function TemplateActionsPanelContent() {
 			>
 				<VStack>
 					{ renderPreview() }
-					<HStack>
-						{ onNavigateToEntityRecord && (
-							<Button
-								className="editor-template-actions-panel__action"
-								__next40pxDefaultSize
-								variant="secondary"
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: template.id,
-										postType: 'wp_template',
-									} );
-									mayShowTemplateEditNotice();
-								} }
-							>
-								{ __( 'Edit' ) }
-							</Button>
-						) }
-						{ canCreateTemplate && (
+					{ canCreateTemplate && (
+						<HStack>
+							{ onNavigateToEntityRecord && (
+								<Button
+									className="editor-template-actions-panel__action"
+									__next40pxDefaultSize
+									variant="secondary"
+									onClick={ () => {
+										onNavigateToEntityRecord( {
+											postId: template.id,
+											postType: 'wp_template',
+										} );
+										mayShowTemplateEditNotice();
+									} }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							) }
 							<Button
 								className="editor-template-actions-panel__action"
 								__next40pxDefaultSize
@@ -184,8 +184,8 @@ export default function TemplateActionsPanelContent() {
 							>
 								{ __( 'Create new' ) }
 							</Button>
-						) }
-					</HStack>
+						</HStack>
+					) }
 				</VStack>
 			</PanelBody>
 			{ isCreateModalOpen && (

@@ -23,11 +23,11 @@ _Usage_
 
 _Parameters_
 
--   postType `string`
+- postType `string`
 
 _Returns_
 
--   `EntityRecord | undefined`: Record.
+- `EntityRecord | undefined`: Record.
 
 ### getPostTypes
 
@@ -47,11 +47,11 @@ _Usage_
 
 _Parameters_
 
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `EntityRecord[] | null`: Records.
+- `EntityRecord[] | null`: Records.
 
 ### getTaxonomy
 
@@ -71,11 +71,11 @@ _Usage_
 
 _Parameters_
 
--   taxonomy `string`
+- taxonomy `string`
 
 _Returns_
 
--   `EntityRecord | undefined`: Record.
+- `EntityRecord | undefined`: Record.
 
 ### getTaxonomies
 
@@ -95,11 +95,11 @@ _Usage_
 
 _Parameters_
 
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `EntityRecord[] | null`: Records.
+- `EntityRecord[] | null`: Records.
 
 ## Other Selectors
 
@@ -115,14 +115,14 @@ Calling this may trigger an OPTIONS request to the REST API via the `canUser()` 
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }` or REST base as a string - `media`.
--   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
+- _state_ `State`: Data state.
+- _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
+- _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }` or REST base as a string - `media`.
+- _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
--   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+- `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 ### canUserEditEntityRecord
 
@@ -134,14 +134,14 @@ Calling this may trigger an OPTIONS request to the REST API via the `canUser()` 
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record's id.
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Record's id.
 
 _Returns_
 
--   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
+- `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 ### getAuthors
 
@@ -151,12 +151,12 @@ Returns all available authors.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
+- _state_ `State`: Data state.
+- _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
 
 _Returns_
 
--   `ET.User[]`: Authors list.
+- `ET.User[]`: Authors list.
 
 ### getAutosave
 
@@ -164,14 +164,14 @@ Returns the autosave for the post and author.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `EntityRecordKey`: The id of the parent post.
--   _authorId_ `EntityRecordKey`: The id of the author.
+- _state_ `State`: State tree.
+- _postType_ `string`: The type of the parent post.
+- _postId_ `EntityRecordKey`: The id of the parent post.
+- _authorId_ `EntityRecordKey`: The id of the author.
 
 _Returns_
 
--   `EntityRecord | undefined`: The autosave for the post and author.
+- `EntityRecord | undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
@@ -181,13 +181,13 @@ May return multiple autosaves since the backend stores one autosave per author f
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `EntityRecordKey`: The id of the parent post.
+- _state_ `State`: State tree.
+- _postType_ `string`: The type of the parent post.
+- _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
--   `Array< any > | undefined`: An array of autosaves for the post, or undefined if there is none.
+- `Array< any > | undefined`: An array of autosaves for the post, or undefined if there is none.
 
 ### getBlockPatternCategories
 
@@ -195,11 +195,11 @@ Retrieve the list of registered block pattern categories.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `Array< any >`: Block pattern category list.
+- `Array< any >`: Block pattern category list.
 
 ### getBlockPatterns
 
@@ -207,11 +207,11 @@ Retrieve the list of registered block patterns.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `Array< any >`: Block pattern list.
+- `Array< any >`: Block pattern list.
 
 ### getCurrentTheme
 
@@ -219,11 +219,11 @@ Return the current theme.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `any`: The current theme.
+- `any`: The current theme.
 
 ### getCurrentThemeGlobalStylesRevisions
 
@@ -233,11 +233,11 @@ Returns the revisions of the current global styles theme.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `Array< object > | null`: The current global styles.
+- `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -245,11 +245,11 @@ Returns the current user.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `ET.User< 'view' >`: Current user object.
+- `ET.User< 'view' >`: Current user object.
 
 ### getDefaultTemplateId
 
@@ -257,12 +257,12 @@ Returns the default template use to render a given query.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _query_ `TemplateQuery`: Query.
+- _state_ `State`: Data state.
+- _query_ `TemplateQuery`: Query.
 
 _Returns_
 
--   `string`: The default template id for the given query.
+- `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 
@@ -270,14 +270,14 @@ Returns the specified entity record, merged with its edits.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `ET.Updatable< EntityRecord > | false`: The entity record, merged with its edits.
+- `ET.Updatable< EntityRecord > | false`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -285,12 +285,12 @@ Returns the embed preview for the given URL.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _url_ `string`: Embedded URL.
+- _state_ `State`: Data state.
+- _url_ `string`: Embedded URL.
 
 _Returns_
 
--   `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+- `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
 
 ### getEntitiesByKind
 
@@ -300,12 +300,12 @@ Returns the loaded entities for the given kind.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
 
 _Returns_
 
--   `Array< any >`: Array of entities with config matching kind.
+- `Array< any >`: Array of entities with config matching kind.
 
 ### getEntitiesConfig
 
@@ -313,12 +313,12 @@ Returns the loaded entities for the given kind.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
 
 _Returns_
 
--   `Array< any >`: Array of entities with config matching kind.
+- `Array< any >`: Array of entities with config matching kind.
 
 ### getEntity
 
@@ -328,13 +328,13 @@ Returns the entity config given its kind and name.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
 
 _Returns_
 
--   `any`: Entity config
+- `any`: Entity config
 
 ### getEntityConfig
 
@@ -342,13 +342,13 @@ Returns the entity config given its kind and name.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
 
 _Returns_
 
--   `any`: Entity config
+- `any`: Entity config
 
 ### getEntityRecord
 
@@ -356,15 +356,15 @@ Returns the Entity's record object by key. Returns `null` if the value is not ye
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
--   `EntityRecord | undefined`: Record.
+- `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -372,14 +372,14 @@ Returns the specified entity record's edits.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `Optional< any >`: The entity record's edits.
+- `Optional< any >`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
@@ -389,14 +389,14 @@ Transient edits don't create an undo level, and are not considered for change de
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `Optional< any >`: The entity record's non transient edits.
+- `Optional< any >`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -404,14 +404,14 @@ Returns the Entity's records.
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `EntityRecord[] | null`: Records.
+- `EntityRecord[] | null`: Records.
 
 ### getEntityRecordsTotalItems
 
@@ -419,14 +419,14 @@ Returns the Entity's total available records for a given query (ignoring paginat
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `number | null`: number | null.
+- `number | null`: number | null.
 
 ### getEntityRecordsTotalPages
 
@@ -434,14 +434,14 @@ Returns the number of available pages for the given query.
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `number | null`: number | null.
+- `number | null`: number | null.
 
 ### getLastEntityDeleteError
 
@@ -449,14 +449,14 @@ Returns the specified entity record's last delete error.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `any`: The entity record's save error.
+- `any`: The entity record's save error.
 
 ### getLastEntitySaveError
 
@@ -464,14 +464,14 @@ Returns the specified entity record's last save error.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `any`: The entity record's save error.
+- `any`: The entity record's save error.
 
 ### getRawEntityRecord
 
@@ -479,14 +479,14 @@ Returns the entity's record object by key, with its attributes mapped to their r
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `EntityRecord | undefined`: Object with the entity's raw attributes.
+- `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
 
@@ -496,11 +496,11 @@ Returns the next edit from the current undo offset for the entity records edits 
 
 _Parameters_
 
--   _state_ `State`: State tree.
+- _state_ `State`: State tree.
 
 _Returns_
 
--   `Optional< any >`: The edit.
+- `Optional< any >`: The edit.
 
 ### getReferenceByDistinctEdits
 
@@ -515,11 +515,11 @@ _Usage_
 
 _Parameters_
 
--   _state_ Editor state.
+- _state_ Editor state.
 
 _Returns_
 
--   A value whose reference will change only when an edit occurs.
+- A value whose reference will change only when an edit occurs.
 
 ### getRevision
 
@@ -527,16 +527,16 @@ Returns a single, specific revision of a parent entity.
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
--   _revisionKey_ `EntityRecordKey`: The revision's key.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+- _revisionKey_ `EntityRecordKey`: The revision's key.
+- _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
 
 _Returns_
 
--   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+- `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
 
 ### getRevisions
 
@@ -544,15 +544,15 @@ Returns an entity's revisions.
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+- _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
--   `RevisionRecord[] | null`: Record.
+- `RevisionRecord[] | null`: Record.
 
 ### getThemeSupports
 
@@ -560,11 +560,11 @@ Return theme supports data in the index.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `any`: Index data.
+- `any`: Index data.
 
 ### getUndoEdit
 
@@ -574,11 +574,11 @@ Returns the previous edit from the current undo offset for the entity records ed
 
 _Parameters_
 
--   _state_ `State`: State tree.
+- _state_ `State`: State tree.
 
 _Returns_
 
--   `Optional< any >`: The edit.
+- `Optional< any >`: The edit.
 
 ### getUserPatternCategories
 
@@ -586,11 +586,11 @@ Retrieve the registered user pattern categories.
 
 _Parameters_
 
--   _state_ `State`: Data state.
+- _state_ `State`: Data state.
 
 _Returns_
 
--   `Array< UserPatternCategory >`: User patterns category array.
+- `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 
@@ -598,12 +598,12 @@ Returns all the users returned by a query ID.
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _queryID_ `string`: Query ID.
+- _state_ `State`: Data state.
+- _queryID_ `string`: Query ID.
 
 _Returns_
 
--   `ET.User< 'edit' >[]`: Users list.
+- `ET.User< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
@@ -611,14 +611,14 @@ Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `boolean`: Whether the entity record has edits or not.
+- `boolean`: Whether the entity record has edits or not.
 
 ### hasEntityRecord
 
@@ -628,15 +628,15 @@ Note: This action does not trigger a request for the entity record from the API 
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
--   _query_ `GetRecordsHttpQuery`: Optional query.
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _query_ `GetRecordsHttpQuery`: Optional query.
 
 _Returns_
 
--   `boolean`: Whether an entity record has been received.
+- `boolean`: Whether an entity record has been received.
 
 ### hasEntityRecords
 
@@ -644,14 +644,14 @@ Returns true if records have been received for the given set of parameters, or f
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   `boolean`: Whether entity records have been received.
+- `boolean`: Whether entity records have been received.
 
 ### hasFetchedAutosaves
 
@@ -659,13 +659,13 @@ Returns true if the REST request for autosaves has completed.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `EntityRecordKey`: The id of the parent post.
+- _state_ `State`: State tree.
+- _postType_ `string`: The type of the parent post.
+- _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
--   `boolean`: True if the REST request was completed. False otherwise.
+- `boolean`: True if the REST request was completed. False otherwise.
 
 ### hasRedo
 
@@ -673,11 +673,11 @@ Returns true if there is a next edit from the current undo offset for the entity
 
 _Parameters_
 
--   _state_ `State`: State tree.
+- _state_ `State`: State tree.
 
 _Returns_
 
--   `boolean`: Whether there is a next edit or not.
+- `boolean`: Whether there is a next edit or not.
 
 ### hasRevision
 
@@ -687,16 +687,16 @@ Note: This does not trigger a request for the revision from the API if it's not 
 
 _Parameters_
 
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordKey_ `EntityRecordKey`: The key of the entity record whose revision you want to check.
--   _revisionKey_ `EntityRecordKey`: The revision's key.
--   _query_ `GetRecordsHttpQuery`: Optional query.
+- _state_ `State`: State tree
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordKey_ `EntityRecordKey`: The key of the entity record whose revision you want to check.
+- _revisionKey_ `EntityRecordKey`: The revision's key.
+- _query_ `GetRecordsHttpQuery`: Optional query.
 
 _Returns_
 
--   `boolean`: Whether a revision has been received.
+- `boolean`: Whether a revision has been received.
 
 ### hasUndo
 
@@ -704,11 +704,11 @@ Returns true if there is a previous edit from the current undo offset for the en
 
 _Parameters_
 
--   _state_ `State`: State tree.
+- _state_ `State`: State tree.
 
 _Returns_
 
--   `boolean`: Whether there is a previous edit or not.
+- `boolean`: Whether there is a previous edit or not.
 
 ### isAutosavingEntityRecord
 
@@ -716,14 +716,14 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `boolean`: Whether the entity record is autosaving or not.
+- `boolean`: Whether the entity record is autosaving or not.
 
 ### isDeletingEntityRecord
 
@@ -731,14 +731,14 @@ Returns true if the specified entity record is deleting, and false otherwise.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `boolean`: Whether the entity record is deleting or not.
+- `boolean`: Whether the entity record is deleting or not.
 
 ### isPreviewEmbedFallback
 
@@ -748,12 +748,12 @@ WordPress can be configured to return a simple link to a URL if it is not embedd
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _url_ `string`: Embedded URL.
+- _state_ `State`: Data state.
+- _url_ `string`: Embedded URL.
 
 _Returns_
 
--   `boolean`: Is the preview for the URL an oEmbed link fallback.
+- `boolean`: Is the preview for the URL an oEmbed link fallback.
 
 ### isRequestingEmbedPreview
 
@@ -761,12 +761,12 @@ Returns true if a request is in progress for embed preview data, or false otherw
 
 _Parameters_
 
--   _state_ `State`: Data state.
--   _url_ `string`: URL the preview would be for.
+- _state_ `State`: Data state.
+- _url_ `string`: URL the preview would be for.
 
 _Returns_
 
--   `boolean`: Whether a request is in progress for an embed preview.
+- `boolean`: Whether a request is in progress for an embed preview.
 
 ### isSavingEntityRecord
 
@@ -774,14 +774,14 @@ Returns true if the specified entity record is saving, and false otherwise.
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
+- _state_ `State`: State tree.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
--   `boolean`: Whether the entity record is saving or not.
+- `boolean`: Whether the entity record is saving or not.
 
 <!-- END TOKEN(Autogenerated selectors|../../../packages/core-data/src/selectors.ts) -->
 
@@ -795,11 +795,11 @@ Returns an action object used in adding new entities.
 
 _Parameters_
 
--   _entities_ `Array`: Entities received.
+- _entities_ `Array`: Entities received.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### clearEntityRecordEdits
 
@@ -807,13 +807,13 @@ Action triggered to clear all edits from an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _recordId_ `[number|string]`: Is omitted for keyless entities.
+- _kind_ `string`: Kind of the entity.
+- _name_ `string`: Name of the entity.
+- _recordId_ `[number|string]`: Is omitted for keyless entities.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### deleteEntityRecord
 
@@ -821,13 +821,13 @@ Action triggered to delete an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the deleted entity.
--   _name_ `string`: Name of the deleted entity.
--   _recordId_ `number|string`: Record ID of the deleted entity.
--   _query_ `?Object`: Special query parameters for the DELETE API call.
--   _options_ `[Object]`: Delete options.
--   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+- _kind_ `string`: Kind of the deleted entity.
+- _name_ `string`: Name of the deleted entity.
+- _recordId_ `number|string`: Record ID of the deleted entity.
+- _query_ `?Object`: Special query parameters for the DELETE API call.
+- _options_ `[Object]`: Delete options.
+- _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+- _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### editEntityRecord
 
@@ -835,17 +835,17 @@ Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the edited entity record.
--   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number|string|undefined`: Pass `undefined` for keyless entities.
--   _edits_ `Object`: The edits.
--   _options_ `Object`: Options for the edit.
--   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
--   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
+- _kind_ `string`: Kind of the edited entity record.
+- _name_ `string`: Name of the edited entity record.
+- _recordId_ `number|string|undefined`: Pass `undefined` for keyless entities.
+- _edits_ `Object`: The edits.
+- _options_ `Object`: Options for the edit.
+- _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+- _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### receiveDefaultTemplateId
 
@@ -853,12 +853,12 @@ Returns an action object used to set the template for a given query.
 
 _Parameters_
 
--   _query_ `Object`: The lookup query.
--   _templateId_ `string`: The resolved template id.
+- _query_ `Object`: The lookup query.
+- _templateId_ `string`: The resolved template id.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### receiveEntityRecords
 
@@ -866,17 +866,17 @@ Returns an action object used in signalling that entity records have been receiv
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity record.
--   _name_ `string`: Name of the received entity record.
--   _records_ `Array|Object`: Records received.
--   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches.
--   _edits_ `?Object`: Edits to reset.
--   _meta_ `?Object`: Meta information about pagination.
+- _kind_ `string`: Kind of the received entity record.
+- _name_ `string`: Name of the received entity record.
+- _records_ `Array|Object`: Records received.
+- _query_ `?Object`: Query Object.
+- _invalidateCache_ `?boolean`: Should invalidate query caches.
+- _edits_ `?Object`: Edits to reset.
+- _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### receiveNavigationFallbackId
 
@@ -884,11 +884,11 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 
 _Parameters_
 
--   _fallbackId_ `integer`: the id of the fallback Navigation Menu
+- _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### receiveRevisions
 
@@ -896,13 +896,13 @@ Action triggered to receive revision items.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity record revisions.
--   _name_ `string`: Name of the received entity record revisions.
--   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
--   _records_ `Array|Object`: Revisions received.
--   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches.
--   _meta_ `?Object`: Meta information about pagination.
+- _kind_ `string`: Kind of the received entity record revisions.
+- _name_ `string`: Name of the received entity record revisions.
+- _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+- _records_ `Array|Object`: Revisions received.
+- _query_ `?Object`: Query Object.
+- _invalidateCache_ `?boolean`: Should invalidate query caches.
+- _meta_ `?Object`: Meta information about pagination.
 
 ### receiveThemeSupports
 
@@ -912,7 +912,7 @@ Returns an action object used in signalling that the index has been received.
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### receiveUploadPermissions
 
@@ -922,11 +922,11 @@ Returns an action object used in signalling that Upload permissions have been re
 
 _Parameters_
 
--   _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
+- _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
 
 _Returns_
 
--   `Object`: Action object.
+- `Object`: Action object.
 
 ### redo
 
@@ -938,10 +938,10 @@ Action triggered to save an entity record's edits.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _recordId_ `[number|string]`: Is omitted for keyless entities.
--   _options_ `[Object]`: Saving options.
+- _kind_ `string`: Kind of the entity.
+- _name_ `string`: Name of the entity.
+- _recordId_ `[number|string]`: Is omitted for keyless entities.
+- _options_ `[Object]`: Saving options.
 
 ### saveEntityRecord
 
@@ -949,13 +949,13 @@ Action triggered to save an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity.
--   _name_ `string`: Name of the received entity.
--   _record_ `Object`: Record to be saved.
--   _options_ `Object`: Saving options.
--   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
--   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+- _kind_ `string`: Kind of the received entity.
+- _name_ `string`: Name of the received entity.
+- _record_ `Object`: Record to be saved.
+- _options_ `Object`: Saving options.
+- _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+- _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+- _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 

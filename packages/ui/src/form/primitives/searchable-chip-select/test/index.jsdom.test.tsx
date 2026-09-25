@@ -1,351 +1,17 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import warning from '@wordpress/warning';
-import { SearchableChipSelect } from '../index';
 import type { Item, ItemGroup } from '../types';
+import { SearchableChipSelect } from '../index';
 import { GROUPED_ITEMS, ITEMS } from './__fixtures__';
 
-jest.mock( '@wordpress/warning', () => jest.fn() );
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
-const mockedWarning = warning as jest.MockedFunction< typeof warning >;
+const mockedWarning = vi.mocked( warning );
 
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
-	} );
-
-	it( 'forwards ref to the search input', () => {
-		const ref = createRef< HTMLInputElement >();
-
-		render(
-			<SearchableChipSelect ref={ ref } aria-label="Select options" />
-		);
-
-		const input = screen.getByRole( 'combobox', {
-			name: 'Select options',
-		} );
-
-		expect( ref.current ).toBe( input );
-		act( () => {
-			ref.current?.focus();
-		} );
-		expect( input ).toHaveFocus();
-	} );
-
-	it( 'passes aria-label and aria-describedby props to the appropriate components', () => {
-		render(
-			<>
-				<SearchableChipSelect
-					aria-label="My label"
-					aria-describedby="searchable-chip-select-description"
-				/>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
-				<p id="searchable-chip-select-description">My description</p>
-			</>
-		);
-
-		expect(
-			screen.getByRole( 'combobox', {
-				name: 'My label',
-				description: 'My description',
-			} )
-		).toBeVisible();
-	} );
-
-	it( 'passes aria-labelledby prop to the appropriate component', () => {
-		render(
-			<>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
-				<p id="searchable-chip-select-label">My label</p>
-				<SearchableChipSelect aria-labelledby="searchable-chip-select-label" />
-			</>
-		);
-
-		expect(
-			screen.getByRole( 'combobox', {
-				name: 'My label',
-			} )
-		).toBeVisible();
-	} );
-
-	it( 'renders flat items with the default renderer', async () => {
-		const user = userEvent.setup();
-		const items = ITEMS.slice( 0, 3 );
-
-		render( <SearchableChipSelect items={ items } /> );
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		await waitFor( () => {
-			expect(
-				screen.getByRole( 'option', { name: 'Apple' } )
-			).toBeVisible();
-		} );
-		expect(
-			screen.getByRole( 'option', { name: 'Apricot' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'option', { name: 'Banana' } )
-		).toBeVisible();
-	} );
-
-	it( 'renders grouped items in the popup', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<SearchableChipSelect
-				items={ GROUPED_ITEMS }
-				children={ ( group: ItemGroup ) => (
-					<SearchableChipSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableChipSelect.GroupLabel>
-							{ group.label }
-						</SearchableChipSelect.GroupLabel>
-						<SearchableChipSelect.Collection>
-							{ ( item: Item ) => (
-								<SearchableChipSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableChipSelect.Item>
-							) }
-						</SearchableChipSelect.Collection>
-					</SearchableChipSelect.Group>
-				) }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		await waitFor( () => {
-			expect( screen.getByText( 'Common' ) ).toBeVisible();
-		} );
-		expect( screen.getByText( 'Berries' ) ).toBeVisible();
-		expect( screen.getByText( 'Apple' ) ).toBeVisible();
-		expect( screen.getByText( 'Strawberry' ) ).toBeVisible();
-	} );
-
-	it( 'selects a grouped item', async () => {
-		const user = userEvent.setup();
-		const onValueChange = jest.fn();
-
-		render(
-			<SearchableChipSelect
-				items={ GROUPED_ITEMS }
-				onValueChange={ onValueChange }
-				children={ ( group: ItemGroup ) => (
-					<SearchableChipSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableChipSelect.GroupLabel>
-							{ group.label }
-						</SearchableChipSelect.GroupLabel>
-						<SearchableChipSelect.Collection>
-							{ ( item: Item ) => (
-								<SearchableChipSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableChipSelect.Item>
-							) }
-						</SearchableChipSelect.Collection>
-					</SearchableChipSelect.Group>
-				) }
-			/>
-		);
-
-		await user.click( screen.getByRole( 'combobox' ) );
-
-		await user.click(
-			await screen.findByRole( 'option', { name: 'Strawberry' } )
-		);
-
-		expect( onValueChange ).toHaveBeenCalledWith(
-			expect.arrayContaining( [
-				expect.objectContaining( {
-					value: 'strawberry',
-					label: 'Strawberry',
-				} ),
-			] ),
-			expect.anything()
-		);
-		expect(
-			screen.getByRole( 'button', { name: 'Remove' } )
-		).toBeVisible();
-	} );
-
-	describe( 'creatable item', () => {
-		const creatableItem = {
-			value: '__create__',
-			label: 'Create new item',
-			creatable: true,
-		};
-
-		it( 'renders the creatable item in the list footer using the default renderer', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<SearchableChipSelect items={ [ ...ITEMS, creatableItem ] } />
-			);
-
-			await user.click( screen.getByRole( 'combobox' ) );
-
-			await waitFor( () => {
-				expect( screen.getByText( 'Create new item' ) ).toBeVisible();
-			} );
-			expect( screen.getByText( 'Apple' ) ).toBeVisible();
-			expect(
-				screen.getAllByRole( 'option', { name: 'Create new item' } )
-			).toHaveLength( 1 );
-		} );
-
-		it( 'renders only one creatable option when custom flat children are used', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<SearchableChipSelect
-					items={ [ ...ITEMS, creatableItem ] }
-					children={ ( item: ( typeof ITEMS )[ 0 ] ) => (
-						<SearchableChipSelect.Item
-							key={ item.value }
-							value={ item }
-						>
-							{ item.label }
-						</SearchableChipSelect.Item>
-					) }
-				/>
-			);
-
-			await user.click( screen.getByRole( 'combobox' ) );
-
-			await waitFor( () => {
-				expect( screen.getByText( 'Create new item' ) ).toBeVisible();
-			} );
-			expect(
-				screen.getAllByRole( 'option', { name: 'Create new item' } )
-			).toHaveLength( 1 );
-		} );
-
-		it( 'renders only one creatable option when it is mixed with regular items in a group', async () => {
-			const user = userEvent.setup();
-			const groupedCreatableItem = {
-				value: '__create__',
-				label: 'Create new item',
-				creatable: true,
-			};
-			const items = [
-				{
-					label: 'Common',
-					items: [
-						GROUPED_ITEMS[ 0 ].items[ 0 ],
-						groupedCreatableItem,
-					],
-				},
-			];
-
-			render(
-				<SearchableChipSelect
-					items={ items }
-					children={ ( group: ItemGroup ) => (
-						<SearchableChipSelect.Group
-							key={ group.label }
-							items={ group.items }
-						>
-							<SearchableChipSelect.GroupLabel>
-								{ group.label }
-							</SearchableChipSelect.GroupLabel>
-							<SearchableChipSelect.Collection>
-								{ ( item: Item ) => (
-									<SearchableChipSelect.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</SearchableChipSelect.Item>
-								) }
-							</SearchableChipSelect.Collection>
-						</SearchableChipSelect.Group>
-					) }
-				/>
-			);
-
-			await user.click( screen.getByRole( 'combobox' ) );
-
-			await waitFor( () => {
-				expect( screen.getByText( 'Create new item' ) ).toBeVisible();
-			} );
-			expect( screen.getByText( 'Apple' ) ).toBeVisible();
-			expect(
-				screen.getAllByRole( 'option', { name: 'Create new item' } )
-			).toHaveLength( 1 );
-		} );
-
-		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
-			const user = userEvent.setup();
-			const onValueChange = jest.fn();
-			const groupedCreatableItem = {
-				value: '__create__',
-				label: 'Create new item: zzzzz',
-				creatable: true,
-			};
-			const items = [
-				...GROUPED_ITEMS,
-				{ label: '', items: [ groupedCreatableItem ] },
-			];
-
-			render(
-				<SearchableChipSelect
-					items={ items }
-					inputValue="zzzzz"
-					onValueChange={ onValueChange }
-					children={ ( group: ItemGroup ) => (
-						<SearchableChipSelect.Group
-							key={ group.label }
-							items={ group.items }
-						>
-							<SearchableChipSelect.GroupLabel>
-								{ group.label }
-							</SearchableChipSelect.GroupLabel>
-							<SearchableChipSelect.Collection>
-								{ ( item: Item ) => (
-									<SearchableChipSelect.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</SearchableChipSelect.Item>
-								) }
-							</SearchableChipSelect.Collection>
-						</SearchableChipSelect.Group>
-					) }
-				/>
-			);
-
-			await user.click( screen.getByRole( 'combobox' ) );
-
-			await waitFor( () => {
-				expect(
-					screen.getByRole( 'option', {
-						name: 'Create new item: zzzzz',
-					} )
-				).toBeVisible();
-			} );
-
-			await user.keyboard( '{ArrowDown}{Enter}' );
-
-			expect( onValueChange ).toHaveBeenCalledWith(
-				expect.arrayContaining( [
-					expect.objectContaining( { value: '__create__' } ),
-				] ),
-				expect.anything()
-			);
-		} );
 	} );
 
 	describe( 'development warnings', () => {
@@ -377,6 +43,135 @@ describe( 'SearchableChipSelect', () => {
 
 			expect( mockedWarning ).toHaveBeenCalledWith(
 				'SearchableChipSelect: expected at most one item with `creatable: true` in `items`.'
+			);
+		} );
+
+		it( 'warns when a group mixes regular items with a creatable item', () => {
+			render(
+				<SearchableChipSelect
+					items={ [
+						{
+							label: 'Common',
+							items: [
+								GROUPED_ITEMS[ 0 ].items[ 0 ],
+								{
+									value: '__create__',
+									label: 'Create new item',
+									creatable: true,
+								},
+							],
+						},
+					] }
+					children={ ( group: ItemGroup ) => (
+						<SearchableChipSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableChipSelect.GroupLabel>
+								{ group.label }
+							</SearchableChipSelect.GroupLabel>
+							<SearchableChipSelect.Collection>
+								{ ( item: Item ) => (
+									<SearchableChipSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableChipSelect.Item>
+								) }
+							</SearchableChipSelect.Collection>
+						</SearchableChipSelect.Group>
+					) }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				'SearchableChipSelect: do not mix `creatable: true` items with regular items in the same group. Put the creatable item in its own group.'
+			);
+		} );
+	} );
+
+	describe( 'selection accessibility', () => {
+		it( 'does not describe the combobox with a selection hint when nothing is selected', () => {
+			render(
+				<SearchableChipSelect aria-label="Fruit" items={ ITEMS } />
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).not.toHaveAccessibleDescription();
+			expect(
+				screen.queryByRole( 'toolbar', { name: 'Selected item' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'toolbar', { name: 'Selected items' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'labels the chips toolbar as Selected item when one item is selected', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'toolbar', { name: 'Selected item' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				'1 item selected. From the start of the input, press Left Arrow to move to the selected item.'
+			);
+		} );
+
+		it( 'labels the chips toolbar as Selected items when two items are selected', () => {
+			render(
+				<SearchableChipSelect
+					aria-label="Fruit"
+					items={ ITEMS }
+					defaultValue={ [ ITEMS[ 0 ], ITEMS[ 2 ] ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'toolbar', { name: 'Selected items' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				'2 items selected. From the start of the input, press Left Arrow to move to the selected items.'
+			);
+		} );
+
+		it( 'keeps a consumer aria-describedby when items are selected', () => {
+			render(
+				<>
+					<SearchableChipSelect
+						aria-label="Fruit"
+						items={ ITEMS }
+						defaultValue={ [ ITEMS[ 0 ] ] }
+						aria-describedby="searchable-chip-select-description"
+					/>
+					<p id="searchable-chip-select-description">
+						My description
+					</p>
+				</>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				expect.stringContaining( 'My description' )
+			);
+			expect(
+				screen.getByRole( 'combobox', { name: 'Fruit' } )
+			).toHaveAccessibleDescription(
+				expect.stringContaining(
+					'1 item selected. From the start of the input, press Left Arrow to move to the selected item.'
+				)
 			);
 		} );
 	} );

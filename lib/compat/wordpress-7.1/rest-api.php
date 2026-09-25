@@ -80,15 +80,6 @@ function gutenberg_allow_null_modified_wp_template_field() {
 add_action( 'rest_api_init', 'gutenberg_allow_null_modified_wp_template_field' );
 
 /**
- * Registers the Icon Collections Registry REST API routes.
- */
-function gutenberg_register_icon_collections_controller_endpoints() {
-	$icon_collections_controller = new WP_REST_Icon_Collections_Controller();
-	$icon_collections_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_icon_collections_controller_endpoints' );
-
-/**
  * Overrides the REST controller for the attachment post type to add support
  * for filtering by multiple media types.
  *

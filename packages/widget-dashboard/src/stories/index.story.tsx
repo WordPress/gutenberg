@@ -4,14 +4,6 @@ import type {
 	ComponentPropsWithoutRef,
 	ComponentType,
 } from 'react';
-// Form controls and the command palette read these stylesheets, normally
-// enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/commands/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
 import { CommandMenu } from '@wordpress/commands';
 import {
@@ -314,13 +306,19 @@ const goalProgressWidgetType: WidgetType = {
 };
 
 // What `import( widget.renderModule )` resolves to in a real host.
-const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => ( {
-	default: ( moduleId === goalProgressWidgetType.renderModule
-		? GoalProgressWidget
-		: TrafficSnapshotWidget ) as ComponentType<
-		WidgetRenderProps< unknown >
-	>,
-} );
+const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
+	let component: ComponentType< WidgetRenderProps< unknown > >;
+	if ( moduleId === goalProgressWidgetType.renderModule ) {
+		component = GoalProgressWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	} else {
+		component = TrafficSnapshotWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	}
+	return { default: component };
+};
 
 // The snapshot type at two widths, plus a one-column goal tile whose
 // attributes are all promoted, so the header presentations can be compared
@@ -347,7 +345,8 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground',
+	id: 'widget-dashboard-playground',
+	title: 'Widgets/Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -909,7 +908,7 @@ function GridSettingsStory( {
 						model,
 						columns,
 						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
-				  },
+					},
 		[ model, columns, flowTolerance, rowHeight ]
 	);
 

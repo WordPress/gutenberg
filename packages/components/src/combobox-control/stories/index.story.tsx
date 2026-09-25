@@ -25,7 +25,7 @@ const countries = [
 
 const meta: Meta< typeof ComboboxControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/ComboboxControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/ComboboxControl',
 	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {

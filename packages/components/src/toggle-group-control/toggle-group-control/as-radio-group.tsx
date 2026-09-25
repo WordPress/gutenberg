@@ -21,6 +21,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
+		disabled,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -47,7 +48,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	const wrappedOnChangeProp = onChangeProp
 		? ( v: string | number | null ) => {
 				onChangeProp( v ?? undefined );
-		  }
+			}
 		: undefined;
 
 	const radio = Ariakit.useRadioStore( {
@@ -78,6 +79,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			// @ts-expect-error - This is wrong and we should fix it.
 			setValue,
 			setSelectedElement,
+			disabled: Boolean( disabled ),
 		} ),
 		[
 			baseId,
@@ -86,6 +88,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			selectedValue,
 			setSelectedElement,
 			setValue,
+			disabled,
 		]
 	);
 
@@ -98,6 +101,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
+				disabled={ disabled || undefined }
 			>
 				{ children }
 			</Ariakit.RadioGroup>

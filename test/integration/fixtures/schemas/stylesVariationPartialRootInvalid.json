@@ -1,0 +1,8 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"blockTypes": [ "core/button" ],
+	"styles": {
+		"invalidAdditionalProperty": true
+	}
+}

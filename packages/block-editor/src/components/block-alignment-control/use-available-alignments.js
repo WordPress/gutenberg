@@ -1,11 +1,38 @@
 import { useSelect } from '@wordpress/data';
 import { useLayout } from '../block-list/layout';
+import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
 const EMPTY_ARRAY = [];
 const DEFAULT_CONTROLS = [ 'none', 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
+
+function useAlignmentSettings( isNoneOnly ) {
+	return useSelect(
+		( select ) => {
+			// If `isNoneOnly` is true, we'll be returning early because there is
+			// nothing to filter on an empty array. We won't need the info from
+			// the `useSelect` but we must call it anyway because Rules of Hooks.
+			// So the callback returns early to avoid block editor subscription.
+			if ( isNoneOnly ) {
+				return {
+					wideControlsEnabled: false,
+					themeSupportsLayout: false,
+					isBlockBasedTheme: false,
+				};
+			}
+
+			const settings = select( blockEditorStore ).getSettings();
+			return {
+				wideControlsEnabled: settings.alignWide ?? false,
+				themeSupportsLayout: settings.supportsLayout,
+				isBlockBasedTheme: settings.__unstableIsBlockBasedTheme,
+			};
+		},
+		[ isNoneOnly ]
+	);
+}
 
 export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	// Always add the `none` option if not exists.
@@ -14,32 +41,34 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	}
 	const isNoneOnly = controls.length === 1 && controls[ 0 ] === 'none';
 
-	const [ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme ] =
-		useSelect(
-			( select ) => {
-				// If `isNoneOnly` is true, we'll be returning early because there is
-				// nothing to filter on an empty array. We won't need the info from
-				// the `useSelect` but we must call it anyway because Rules of Hooks.
-				// So the callback returns early to avoid block editor subscription.
-				if ( isNoneOnly ) {
-					return [ false, false, false ];
-				}
-
-				const settings = select( blockEditorStore ).getSettings();
-				return [
-					settings.alignWide ?? false,
-					settings.supportsLayout,
-					settings.__unstableIsBlockBasedTheme,
-				];
-			},
-			[ isNoneOnly ]
-		);
+	const settings = useAlignmentSettings( isNoneOnly );
 	const layout = useLayout();
 
 	if ( isNoneOnly ) {
 		return EMPTY_ARRAY;
 	}
 
+	return getAvailableAlignments( controls, layout, settings );
+}
+
+/**
+ * The store-free part of `useAvailableAlignments`, so the same rules can be
+ * evaluated against more than one layout without a subscription for each.
+ *
+ * @param {string[]} controls                     Alignments the block supports, including `none`.
+ * @param {Object}   layout                       Layout to evaluate against.
+ * @param {Object}   settings                     Editor settings from `useAlignmentSettings`.
+ * @param {boolean}  settings.wideControlsEnabled Whether the theme enables wide alignments.
+ * @param {boolean}  settings.themeSupportsLayout Whether the theme supports the layout config.
+ * @param {boolean}  settings.isBlockBasedTheme   Whether the theme is block based.
+ *
+ * @return {Object[]} The alignments the layout offers.
+ */
+function getAvailableAlignments(
+	controls,
+	layout,
+	{ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme }
+) {
 	const layoutType = getLayoutType( layout?.type );
 
 	if ( themeSupportsLayout ) {
@@ -84,4 +113,61 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	}
 
 	return alignments;
+}
+
+/**
+ * Returns the alignments a block supports, split into the ones the parent
+ * layout offers (`enabled`) and the wide alignments it does not (`unavailable`).
+ *
+ * An alignment is only `unavailable` when the block supports it, the theme
+ * offers it at the root, and the parent layout does not. The theme check is
+ * measured against the global layout settings, so a theme that sets no wide
+ * size, or no layout at all, is curating its own options rather than
+ * withholding them. Flex and Grid parents never offer alignments to anything,
+ * so under those both lists are empty.
+ *
+ * @param {string[]} controls Alignments the block supports.
+ *
+ * @return {{enabled: Object[], unavailable: string[]}} The split alignments.
+ */
+export function useAlignmentMenu( controls = DEFAULT_CONTROLS ) {
+	// Always add the `none` option if not exists.
+	if ( ! controls.includes( 'none' ) ) {
+		controls = [ 'none', ...controls ];
+	}
+	const isNoneOnly = controls.length === 1 && controls[ 0 ] === 'none';
+
+	const settings = useAlignmentSettings( isNoneOnly );
+	const layout = useLayout();
+	const [ globalLayout ] = useSettings( 'layout' );
+
+	if ( isNoneOnly ) {
+		return { enabled: EMPTY_ARRAY, unavailable: EMPTY_ARRAY };
+	}
+
+	const enabled = getAvailableAlignments( controls, layout, settings );
+	const layoutOffersAlignments = !! getAvailableAlignments(
+		DEFAULT_CONTROLS,
+		layout,
+		settings
+	).length;
+
+	if ( ! layoutOffersAlignments ) {
+		return { enabled, unavailable: EMPTY_ARRAY };
+	}
+
+	const themeNames = getAvailableAlignments(
+		DEFAULT_CONTROLS,
+		{ ...globalLayout, type: 'constrained' },
+		settings
+	).map( ( { name } ) => name );
+	const enabledNames = enabled.map( ( { name } ) => name );
+	const unavailable = controls.filter(
+		( name ) =>
+			WIDE_CONTROLS.includes( name ) &&
+			themeNames.includes( name ) &&
+			! enabledNames.includes( name )
+	);
+
+	return { enabled, unavailable };
 }
