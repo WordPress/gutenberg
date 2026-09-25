@@ -455,7 +455,9 @@ mark.wp-note {
 	display: flex;
 	align-items: center;
 	gap: var(--emoji-picker-gap);
-	padding: var(--emoji-picker-padding) var(--emoji-picker-padding) 0;
+	// The bottom padding keeps the scrolling grid, and the heading stuck
+	// to its top, clear of the input's focus ring.
+	padding: var(--emoji-picker-padding) var(--emoji-picker-padding) var(--wpds-dimension-padding-sm);
 	// Stretch to the grid's width rather than widening the picker.
 	contain: inline-size;
 }
@@ -525,7 +527,9 @@ mark.wp-note {
 	// The list sits in the viewport, not a popup, so drop the popup
 	// list's grid slots and let it grow to its content.
 	display: block;
-	padding-block: var(--emoji-picker-padding);
+	// Together with the search row's bottom padding, the first heading sits
+	// the full padding below the input.
+	padding-block: calc(var(--emoji-picker-padding) - var(--wpds-dimension-padding-sm)) var(--emoji-picker-padding);
 }
 
 .editor-collab-sidebar-panel__picker-group + .editor-collab-sidebar-panel__picker-group {
