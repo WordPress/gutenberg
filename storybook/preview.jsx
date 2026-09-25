@@ -116,6 +116,7 @@ export const parameters = {
 				'Design System',
 				[
 					'Introduction',
+					'Contributing',
 					'Foundations',
 					'Tokens',
 					'Theme',

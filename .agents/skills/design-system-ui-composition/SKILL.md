@@ -65,5 +65,7 @@ Report unresolved setup or parity evidence as blocked rather than silently
 omitting it.
 
 If no public API meets the need, document the unmet behaviour and affected
-consumers. Route package work to `design-system-contribution` in a local
-Gutenberg checkout; otherwise request an upstream Design System change.
+consumers, and stop to ask the user before working around it. Route
+package work to `design-system-contribution` in a local Gutenberg checkout;
+otherwise draft an upstream issue for the user to submit, following
+[Contributing to the Design System](../../../storybook/stories/design-system/contributing.md).
