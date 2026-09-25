@@ -7,12 +7,27 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { ValidatedInputControl } from '@wordpress/ui';
+import { ValidatedInputControl, Link } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import type { InlineMathUIProps, EditMathProps } from '../types';
+import type { FormatEditProps } from '../types';
+
+interface InlineMathUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeObjectAttributes: Record< string, string >;
+	contentRef: React.RefObject< HTMLElement >;
+	/**
+	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
+	 */
+	latexToMathML?: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+}
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -20,12 +35,12 @@ const title = __( 'Math' );
 function InlineUI( {
 	value,
 	onChange,
-	activeAttributes,
+	activeObjectAttributes,
 	contentRef,
 	latexToMathML,
 }: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
-		activeAttributes?.[ 'data-latex' ] || ''
+		activeObjectAttributes[ 'data-latex' ] || ''
 	);
 	const [ error, setError ] = useState< string | null >( null );
 	const formRef = useRef< HTMLFormElement >( null );
@@ -84,21 +99,29 @@ function InlineUI( {
 		>
 			<form
 				ref={ formRef }
-				style={ { minWidth: '300px', padding: '4px' } }
+				style={ { minWidth: '300px', padding: '16px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
 				<ValidatedInputControl
-					hideLabelFromVision
 					label={ __( 'LaTeX math syntax' ) }
 					value={ latex }
 					customValidity={
 						error ? { type: 'invalid', message: error } : undefined
 					}
 					onValueChange={ handleLatexChange }
-					placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+					placeholder={ __( 'e.g., x^2, \\frac{a}{b}, \\sqrt{x}' ) }
 					autoComplete="off"
 					className="block-editor-format-toolbar__math-input"
 				/>
+				<Link
+					openInNewTab
+					className="block-editor-format-toolbar__math-learn-more"
+					href={ __(
+						'https://wordpress.org/documentation/article/math-block/'
+					) }
+				>
+					{ __( 'Learn more about LaTeX syntax' ) }
+				</Link>
 			</form>
 		</Popover>
 	);
@@ -111,7 +134,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditMathProps ) {
+}: FormatEditProps ) {
 	const [ latexToMathML, setLatexToMathML ] =
 		useState<
 			( latex: string, options?: { displayMode?: boolean } ) => string
@@ -131,7 +154,7 @@ function Edit( {
 			// the button toggles back to the exact text it was created from.
 			// Keep the restored text selected so it can be edited or
 			// re-marked right away.
-			const latex = activeObjectAttributes?.[ 'data-latex' ] || '';
+			const latex = activeObjectAttributes[ 'data-latex' ] || '';
 			newValue = insert( value, latex );
 			newValue.start = newValue.end - latex.length;
 		} else {
@@ -173,7 +196,7 @@ function Edit( {
 				<InlineUI
 					value={ value }
 					onChange={ onChange }
-					activeAttributes={ activeObjectAttributes }
+					activeObjectAttributes={ activeObjectAttributes }
 					contentRef={ contentRef }
 					latexToMathML={ latexToMathML }
 				/>

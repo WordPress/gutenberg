@@ -40,7 +40,7 @@ function useGlobalStylesUserConfig() {
 						kind: 'root',
 						name: 'globalStyles',
 						id: _globalStylesId,
-				  } )
+					} )
 				: null;
 
 			if (
@@ -88,13 +88,13 @@ function useGlobalStylesUserConfig() {
 								'root',
 								'globalStyles',
 								_globalStylesId,
-						  ] )
+							] )
 						: hasFinishedResolution( 'getEntityRecord', [
 								'root',
 								'globalStyles',
 								_globalStylesId,
 								{ context: 'view' },
-						  ] );
+							] );
 				} else {
 					hasResolved = true;
 				}

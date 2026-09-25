@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import styled from '@emotion/styled';
 import type {
@@ -12,7 +13,7 @@ import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';
 
-jest.mock( '@wordpress/warning', () => jest.fn() );
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 const View = styled.div``;
 
@@ -41,7 +42,7 @@ function TestComponentWithQuote(
 
 describe( 'props', () => {
 	test( 'should not warn when rerendered without a value', () => {
-		jest.mocked( warn ).mockClear();
+		vi.mocked( warn ).mockClear();
 
 		const { rerender } = render(
 			<ContextSystemProvider>
@@ -60,13 +61,19 @@ describe( 'props', () => {
 
 	test( 'should render correctly', () => {
 		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
-		const { container } = render(
+		render(
 			<ContextSystemProvider>
-				<ConnectedComponent />
+				<ConnectedComponent data-testid="component" />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByTestId( 'component' ) ).toHaveClass(
+			'components-component'
+		);
+		expect( screen.getByTestId( 'component' ) ).toHaveAttribute(
+			'data-wp-component',
+			'Component'
+		);
 	} );
 
 	test( 'should render context props', () => {
@@ -81,13 +88,12 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<ContextSystemProvider value={ contextValue }>
 				<ConnectedComponent />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
 	} );
 
@@ -105,7 +111,7 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<>
 				<ContextSystemProvider value={ contextValue }>
 					<ConnectedComponent
@@ -115,8 +121,6 @@ describe( 'props', () => {
 				</ContextSystemProvider>
 			</>
 		);
-
-		expect( container ).toMatchSnapshot();
 
 		const element = screen.getByText( 'Code is Poetry' );
 		expect( element ).toBeVisible();

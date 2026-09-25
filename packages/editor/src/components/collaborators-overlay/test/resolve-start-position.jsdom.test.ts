@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
@@ -19,7 +20,7 @@ const RESOLVED: ResolvedSelection = {
 
 describe( 'resolveStartPosition', () => {
 	it( 'returns null when there is no selection', () => {
-		const resolveSelection = jest.fn();
+		const resolveSelection = vi.fn();
 
 		expect(
 			resolveStartPosition( undefined, resolveSelection )
@@ -32,7 +33,7 @@ describe( 'resolveStartPosition', () => {
 			type: SelectionType.Cursor,
 			cursorPosition: {},
 		} as any;
-		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
+		const resolveSelection = vi.fn().mockReturnValue( RESOLVED );
 
 		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
@@ -45,7 +46,7 @@ describe( 'resolveStartPosition', () => {
 			type: SelectionType.WholeBlock,
 			blockPosition: {},
 		} as any;
-		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
+		const resolveSelection = vi.fn().mockReturnValue( RESOLVED );
 
 		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
@@ -60,7 +61,7 @@ describe( 'resolveStartPosition', () => {
 			cursorStartPosition,
 			cursorEndPosition: { marker: 'end' },
 		} as any;
-		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
+		const resolveSelection = vi.fn().mockReturnValue( RESOLVED );
 
 		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
@@ -81,7 +82,7 @@ describe( 'resolveStartPosition', () => {
 			startEndpoint,
 			endEndpoint: { type: SelectionType.WholeBlock, blockPosition: {} },
 		} as any;
-		const resolveSelection = jest.fn().mockReturnValue( RESOLVED );
+		const resolveSelection = vi.fn().mockReturnValue( RESOLVED );
 
 		expect( resolveStartPosition( selection, resolveSelection ) ).toBe(
 			RESOLVED
@@ -91,7 +92,7 @@ describe( 'resolveStartPosition', () => {
 
 	it( 'returns null for a None selection without calling the resolver', () => {
 		const selection = { type: SelectionType.None } as any;
-		const resolveSelection = jest.fn();
+		const resolveSelection = vi.fn();
 
 		expect(
 			resolveStartPosition( selection, resolveSelection )
@@ -104,7 +105,7 @@ describe( 'resolveStartPosition', () => {
 			type: SelectionType.Cursor,
 			cursorPosition: {},
 		} as any;
-		const resolveSelection = jest.fn().mockImplementation( () => {
+		const resolveSelection = vi.fn().mockImplementation( () => {
 			throw new Error( 'stale position' );
 		} );
 

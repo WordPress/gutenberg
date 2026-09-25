@@ -235,7 +235,7 @@ type AttachmentFileDetails< C extends Context > = C extends 'view' | 'edit'
 			filename?: string | null;
 			/** Attachment file size in bytes, or null when unavailable. */
 			filesize?: number | null;
-	  }
+		}
 	: Record< never, never >;
 
 type AttachmentEditDetails< C extends Context > = C extends 'edit'
@@ -251,7 +251,7 @@ type AttachmentEditDetails< C extends Context > = C extends 'edit'
 				default: number;
 				sizes: Record< string, number >;
 			};
-	  }
+		}
 	: Record< never, never >;
 
 export type Attachment< C extends Context = 'edit' > = OmitNevers<

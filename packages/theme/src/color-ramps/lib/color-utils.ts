@@ -9,6 +9,7 @@ import {
 	getLuminance,
 	sRGB,
 	OKLCH,
+	type ColorObject,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
@@ -87,16 +88,19 @@ function getContrastFromLuminances( first: number, second: number ): number {
 }
 
 /**
- * Assert that a seed-color string is sRGB-parseable and fully opaque (hex,
- * `rgb()`/`rgba()`, or a CSS named color), throwing otherwise.
+ * Parse a seed-color string and assert that it has finite sRGB coordinates and
+ * is fully opaque (hex, `rgb()`/`rgba()`, or a CSS named color), throwing
+ * otherwise.
+ * Missing RGB channels (`none`) resolve to zero.
  *
  * Rejection is deterministic regardless of which `ColorSpace`s are globally
  * registered.
  *
- * @param seed The seed-color string to validate.
- * @throws If `seed` is not an sRGB-parseable, fully opaque string.
+ * @param  seed The seed-color string to validate.
+ * @return The parsed seed color.
+ * @throws {Error} If `seed` is not an sRGB-parseable, fully opaque string with finite channels.
  */
-export function assertValidSeedColor( seed: string ): void {
+export function parseSeedColor( seed: string ): ReturnType< typeof parse > {
 	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
 		ColorSpace.register( space )
 	);
@@ -110,7 +114,7 @@ export function assertValidSeedColor( seed: string ): void {
 		);
 	}
 
-	const { alpha = 1, spaceId } = parsedColor;
+	const { alpha = 1, coords, spaceId } = parsedColor;
 
 	if (
 		! ALLOWED_SEED_COLOR_SPACES.some( ( space ) => space.id === spaceId )
@@ -120,18 +124,32 @@ export function assertValidSeedColor( seed: string ): void {
 		);
 	}
 
+	for ( const [ index, coordinate ] of coords.entries() ) {
+		if ( coordinate === null ) {
+			coords[ index ] = 0;
+		} else if (
+			typeof coordinate !== 'number' ||
+			! Number.isFinite( coordinate )
+		) {
+			throw new Error(
+				`Unsupported seed color "${ seed }": expected every RGB channel to be a finite number.`
+			);
+		}
+	}
+
 	if ( alpha !== 1 ) {
 		throw new Error(
 			`Unsupported seed color "${ seed }": expected a fully opaque color.`
 		);
 	}
+
+	return parsedColor;
 }
 
 /**
  * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
- * @param c A `PlainColorObject`, or an sRGB-parseable string.
+ * @param c A color object.
  */
-export function clampToGamut( c: string | PlainColorObject ) {
-	ColorSpace.register( sRGB );
+export function clampToGamut( c: ColorObject ) {
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

@@ -5,7 +5,8 @@ import { InputControl } from '../../../input-control';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ControlWithError > = {
-	title: 'Design System/Components/Form/Primitives/ControlWithError',
+	title: 'Components/@wordpress-ui/Form/Primitives/ControlWithError',
+	id: 'design-system-components-form-primitives-controlwitherror',
 	component: ControlWithError,
 	argTypes: {
 		children: { control: false },
@@ -70,7 +71,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 				getValidityTarget={ () => inputRef.current }

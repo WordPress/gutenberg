@@ -709,9 +709,9 @@ export interface BlockDeprecation<
 	NewAttributes extends Record< string, unknown > = Record< string, unknown >,
 	OldAttributes extends Record< string, unknown > = Record< string, unknown >,
 > extends Pick<
-		BlockType< OldAttributes >,
-		'attributes' | 'save' | 'supports'
-	> {
+	BlockType< OldAttributes >,
+	'attributes' | 'save' | 'supports'
+> {
 	/**
 	 * A function which, given the attributes and inner blocks of the
 	 * parsed block, returns true if the deprecation can handle the

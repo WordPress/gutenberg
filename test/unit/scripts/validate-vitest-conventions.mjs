@@ -8,7 +8,7 @@ import {
 } from 'node:fs';
 import { createRequire, isBuiltin } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { globSync } from 'glob';
 import typescript from 'typescript';
 import {
@@ -21,6 +21,8 @@ import { resolveTypeRoots } from './resolve-type-roots.mjs';
 import {
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
+	validateVitestCleanupConfig,
+	validateVitestShuffleScripts,
 } from './test-infrastructure-policy.mjs';
 import {
 	validateVitestPolicy,
@@ -32,12 +34,6 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const require = createRequire( import.meta.url );
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
 const policyExceptions = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
@@ -45,8 +41,7 @@ const policyExceptions = JSON.parse(
 	)
 );
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	migration
+	discoverTestFiles( ROOT_DIR )
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const vitestTestSet = new Set( vitestTests );
@@ -54,11 +49,14 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
-		cwd: ROOT_DIR,
-		nodir: true,
-	} ),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...globSync(
+		'test/unit/config/**/*.vitest*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
+		{
+			cwd: ROOT_DIR,
+			nodir: true,
+		}
+	),
+	...globSync( 'test/unit/scripts/*.{mjs,mts}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
@@ -138,9 +136,16 @@ const rootPackageJson = JSON.parse(
 const unitTestPackageJson = JSON.parse(
 	readFileSync( path.join( ROOT_DIR, 'test/unit/package.json' ), 'utf8' )
 );
+const vitestConfig = (
+	await import(
+		pathToFileURL( path.join( ROOT_DIR, 'test/unit/vitest.config.mjs' ) )
+	)
+).default;
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
-	...validateRoutingScripts( rootPackageJson, unitTestPackageJson )
+	...validateRoutingScripts( rootPackageJson, unitTestPackageJson ),
+	...validateVitestCleanupConfig( vitestConfig ),
+	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson )
 );
 
 const vitestVersions = new Map();
@@ -213,14 +218,14 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
 }
 
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
-		( file ) => /\.tsx?$/.test( file )
+		( file ) => /\.[cm]?tsx?$/.test( file )
 	);
 	if ( ! projectTypescriptTests.length ) {
 		continue;
@@ -265,6 +270,19 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			temporaryDirectory,
 			'compatibility.d.ts'
 		);
+		const setupTypeFiles = [];
+		if ( projectName === 'browser' ) {
+			setupTypeFiles.push(
+				path.join( ROOT_DIR, 'test/unit/config/browser.vitest.js' )
+			);
+		} else if ( projectName === 'jsdom' ) {
+			setupTypeFiles.push(
+				path.join(
+					ROOT_DIR,
+					'test/unit/config/testing-library.vitest.js'
+				)
+			);
+		}
 		const typecheckConfig = {
 			extends: baseConfigPath,
 			compilerOptions: {
@@ -278,25 +296,17 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				noEmit: true,
 				rootDir: ROOT_DIR,
 				typeRoots: [
-					path.join( ROOT_DIR, 'typings' ),
-					path.join( ROOT_DIR, 'test/unit/typings' ),
+					path.join( ROOT_DIR, 'tools/monorepo/typings' ),
 					...resolveTypeRoots(
 						[ ...commonTypes, 'node' ],
 						( specifier ) => require.resolve( specifier )
 					),
 				],
-				types:
-					projectName === 'jsdom'
-						? [
-								...commonTypes,
-								...( needsNodeTypes ? [ 'node' ] : [] ),
-								'gutenberg-vitest-test-env',
-						  ]
-						: [
-								...commonTypes,
-								'node',
-								'gutenberg-vitest-test-env',
-						  ],
+				types: [
+					...commonTypes,
+					...( needsNodeTypes ? [ 'node' ] : [] ),
+					'gutenberg-vitest-test-env',
+				],
 			},
 			// Package configs often include every source, story, and test file.
 			// This validator owns an exact routed-test set, so do not inherit
@@ -312,14 +322,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			} ) ),
 			files: [
 				compatibilityTypesPath,
-				...( projectName === 'jsdom'
-					? [
-							path.join(
-								ROOT_DIR,
-								'test/unit/config/testing-library.vitest.js'
-							),
-					  ]
-					: [] ),
+				...setupTypeFiles,
 				...typescriptTests.map( ( file ) =>
 					path.join( ROOT_DIR, file )
 				),

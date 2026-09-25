@@ -20,8 +20,7 @@ export default function useRouteTitle() {
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const routeTitle = ( currentMatch?.loaderData as any )?.title as
-		| string
-		| undefined;
+		string | undefined;
 
 	const siteTitle = useSelect(
 		( select ) =>

@@ -12,7 +12,8 @@ import type {
 } from '../../shared/types';
 
 const meta: Meta< typeof DashboardGrid > = {
-	title: 'Grid/DashboardGrid',
+	id: 'grid-dashboardgrid',
+	title: 'Widgets/Grid/DashboardGrid',
 	component: DashboardGrid,
 	tags: [ 'status-experimental' ],
 	args: {
@@ -576,7 +577,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'fill' ? undefined : 'fill',
-						  }
+							}
 						: tile
 				)
 			);
@@ -590,7 +591,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'full' ? undefined : 'full',
-						  }
+							}
 						: tile
 				)
 			);
@@ -731,7 +732,7 @@ export const SizeLimits: Story = {
 								...tile,
 								width:
 									tile.width === 'fill' ? undefined : 'fill',
-						  }
+							}
 						: tile
 				)
 			);
@@ -745,7 +746,7 @@ export const SizeLimits: Story = {
 								...tile,
 								width:
 									tile.width === 'full' ? undefined : 'full',
-						  }
+							}
 						: tile
 				)
 			);

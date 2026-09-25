@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { Component, Suspense } from '@wordpress/element';
 import {
 	createRegistry,
@@ -148,10 +149,21 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		render( <App /> );
-		const label = await screen.findByLabelText( 'error' );
-		expect( label ).toHaveTextContent( 'resolution failed' );
-		expect( console ).toHaveErrored();
+		// React rethrows render errors as window `error` events in dev.
+		const onError = vi.fn( ( event ) => event.preventDefault() );
+		window.addEventListener( 'error', onError );
+
+		try {
+			render( <App /> );
+			const label = await screen.findByLabelText( 'error' );
+			expect( label ).toHaveTextContent( 'resolution failed' );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { error: 'resolution failed' } )
+			);
+			expect( console ).toHaveErrored();
+		} finally {
+			window.removeEventListener( 'error', onError );
+		}
 	} );
 
 	it( 'independent resolutions do not cause unrelated rerenders', async () => {
@@ -187,7 +199,7 @@ describe( 'useSuspenseSelect', () => {
 		const registry = createRegistry();
 		registry.register( store );
 
-		const FastUI = jest.fn( () => {
+		const FastUI = vi.fn( () => {
 			const data = useSuspenseSelect(
 				( select ) => select( store ).getData( 'fast' ),
 				[]
@@ -195,7 +207,7 @@ describe( 'useSuspenseSelect', () => {
 			return <div aria-label="fast loaded">{ data }</div>;
 		} );
 
-		const SlowUI = jest.fn( () => {
+		const SlowUI = vi.fn( () => {
 			const data = useSuspenseSelect(
 				( select ) => select( store ).getData( 'slow' ),
 				[]

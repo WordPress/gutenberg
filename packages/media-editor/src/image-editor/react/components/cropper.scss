@@ -6,6 +6,11 @@
 // reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
+// Geometry, not text direction: the camera and `stencil-math.ts` address
+// this canvas in physical pixels, and JS sets the image's `left` inline.
+// Mirrored, `nw` would resize the right edge and the image would pin to the
+// stage edge. ResizableBox ignores its own handle offsets for the same reason.
+/*!rtl:begin:ignore*/
 .wp-media-editor-image-editor {
 	position: relative;
 	overflow: hidden;
@@ -251,3 +256,4 @@ $handle-touch-target-size: 44px;
 	}
 
 }
+/*!rtl:end:ignore*/

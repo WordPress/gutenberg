@@ -21,10 +21,10 @@ export default function registerLegacyWidgetVariations( settings ) {
 						? {
 								idBase: widgetType.id,
 								instance: {},
-						  }
+							}
 						: {
 								id: widgetType.id,
-						  },
+							},
 				} ) )
 			);
 		}

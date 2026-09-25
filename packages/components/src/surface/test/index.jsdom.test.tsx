@@ -1,15 +1,25 @@
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { logged } from '@wordpress/deprecated';
 import { Surface } from '../index';
 
-// Checking for deprecation warnings before other tests because the `deprecated`
-// utility only fires a console.warn the first time a component is rendered.
+const DEPRECATION_MESSAGE =
+	'wp.components.__experimentalSurface is deprecated since version 7.2 and will be removed in version 7.4.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
+
 describe( 'Shows a deprecation warning', () => {
 	test( 'Surface', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		render( <Surface>Surface</Surface> );
 
-		expect( console ).toHaveWarnedWith(
-			'wp.components.__experimentalSurface is deprecated since version 7.2 and will be removed in version 7.4.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 

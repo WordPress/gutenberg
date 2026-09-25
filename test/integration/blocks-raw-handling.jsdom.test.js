@@ -1,14 +1,23 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	createBlock,
+	getBlockTypes,
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
 	registerBlockType,
 	serialize,
+	unregisterBlockType,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import '../../packages/editor/src/hooks';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 
 function readFile( filePath ) {
 	return fs.existsSync( filePath )
@@ -16,101 +25,99 @@ function readFile( filePath ) {
 		: '';
 }
 
-describe( 'Blocks raw handling', () => {
-	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
-		registerCoreBlocks();
-		registerBlockType( 'test/gallery', {
-			apiVersion: 3,
-			title: 'Test Gallery',
-			category: 'text',
-			attributes: {
-				ids: {
-					type: 'array',
-					default: [],
+beforeAll( () => {
+	registerCoreBlocks();
+	registerBlockType( 'test/gallery', {
+		apiVersion: 3,
+		title: 'Test Gallery',
+		category: 'text',
+		attributes: {
+			ids: {
+				type: 'array',
+				default: [],
+			},
+		},
+		transforms: {
+			from: [
+				{
+					type: 'shortcode',
+					tag: 'gallery',
+					isMatch( { named: { ids } } ) {
+						return ids.indexOf( 42 ) > -1;
+					},
+					attributes: {
+						ids: {
+							type: 'array',
+							shortcode: ( { named: { ids } } ) =>
+								ids
+									.split( ',' )
+									.map( ( id ) => parseInt( id, 10 ) ),
+						},
+					},
+					priority: 9,
 				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'shortcode',
-						tag: 'gallery',
-						isMatch( { named: { ids } } ) {
-							return ids.indexOf( 42 ) > -1;
-						},
-						attributes: {
-							ids: {
-								type: 'array',
-								shortcode: ( { named: { ids } } ) =>
-									ids
-										.split( ',' )
-										.map( ( id ) => parseInt( id, 10 ) ),
-							},
-						},
-						priority: 9,
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/non-inline-block', {
-			apiVersion: 3,
-			title: 'Test Non Inline Block',
-			category: 'text',
-			supports: {
-				pasteTextInline: false,
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return (
-								'words to live by' === node.textContent.trim()
-							);
-						},
-						transform: () => {
-							return createBlock( 'core/embed', {
-								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-							} );
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/transform-to-multiple-blocks', {
-			apiVersion: 3,
-			title: 'Test Transform to Multiple Blocks',
-			category: 'text',
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
-						},
-						transform: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.map( ( chunk ) =>
-									createBlock( 'core/paragraph', {
-										content: chunk.substring( 1 ),
-									} )
-								);
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
+			],
+		},
+		save: () => null,
 	} );
 
+	registerBlockType( 'test/non-inline-block', {
+		apiVersion: 3,
+		title: 'Test Non Inline Block',
+		category: 'text',
+		supports: {
+			pasteTextInline: false,
+		},
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return 'words to live by' === node.textContent.trim();
+					},
+					transform: () => {
+						return createBlock( 'core/embed', {
+							url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+						} );
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+
+	registerBlockType( 'test/transform-to-multiple-blocks', {
+		apiVersion: 3,
+		title: 'Test Transform to Multiple Blocks',
+		category: 'text',
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return node.textContent
+							.split( ' ' )
+							.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+					},
+					transform: ( node ) => {
+						return node.textContent.split( ' ' ).map( ( chunk ) =>
+							createBlock( 'core/paragraph', {
+								content: chunk.substring( 1 ),
+							} )
+						);
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+} );
+
+afterAll( () => {
+	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+} );
+
+describe( 'Blocks raw handling', () => {
 	it( 'should filter inline content', () => {
 		const filtered = pasteHandler( {
 			HTML: '<h2><em>test</em></h2>',
@@ -445,23 +452,22 @@ describe( 'Blocks raw handling', () => {
 			'slack-paragraphs',
 			'mixed-content',
 		].forEach( ( type ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-in.html`
 					)
 				);
 				const plainText = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-in.txt`
 					)
 				);
 				const output = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-out.html`
 					)
 				);
@@ -498,7 +504,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should remove extra blank lines', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					currentDirectory,
 					'fixtures/documents/google-docs-blank-lines.html'
 				)
 			);
@@ -508,7 +514,7 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should strip windows data', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/documents/windows.html' )
+				path.join( currentDirectory, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -517,7 +523,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should strip HTML formatting space from inline text', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					currentDirectory,
 					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
@@ -530,14 +536,20 @@ describe( 'Blocks raw handling', () => {
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/wordpress-convert.html' )
+			path.join(
+				currentDirectory,
+				'fixtures/documents/wordpress-convert.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/shortcode-caption.html' )
+			path.join(
+				currentDirectory,
+				'fixtures/documents/shortcode-caption.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -545,7 +557,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/shortcode-caption-with-link.html'
 			)
 		);
@@ -555,7 +567,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/shortcode-caption-with-caption-link.html'
 			)
 		);
@@ -565,7 +577,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/list-with-attributes.html'
 			)
 		);

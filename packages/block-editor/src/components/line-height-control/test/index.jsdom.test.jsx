@@ -1,8 +1,11 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import LineHeightControl from '../';
 import { BASE_DEFAULT_VALUE, SPIN_FACTOR, STEP } from '../utils';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const SPIN = STEP * SPIN_FACTOR;
 

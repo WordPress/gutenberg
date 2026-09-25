@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
-	title: 'Design System/Components/Form/Primitives/Select',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Select',
+	id: 'design-system-components-form-primitives-select',
 	component: Select.Root,
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,
@@ -12,12 +14,13 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Group': Select.Group,
 		'Select.GroupLabel': Select.GroupLabel,
 		'Select.Item': Select.Item,
+		'Select.ItemLabel': Select.ItemLabel,
+		'Select.ItemDescription': Select.ItemDescription,
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -38,7 +41,7 @@ export const Default: Story = {
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -54,7 +57,7 @@ export const Compact: Story = {
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -86,7 +89,9 @@ export const Minimal: Story = {
 						value={ `${ index + 1 }` }
 						size="small"
 					>
-						{ `${ index + 1 }` }
+						<Select.ItemLabel>{ `${
+							index + 1
+						}` }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -138,7 +143,9 @@ export const Grouped: Story = {
 						<Select.GroupLabel>{ group.label }</Select.GroupLabel>
 						{ group.items.map( ( item ) => (
 							<Select.Item key={ item.value } value={ item }>
-								{ item.label }
+								<Select.ItemLabel>
+									{ item.label }
+								</Select.ItemLabel>
 							</Select.Item>
 						) ) }
 					</Select.Group>
@@ -164,7 +171,7 @@ export const WithCustomPlaceholder: Story = {
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -195,7 +202,7 @@ export const WithNullValueOption: Story = {
 						key={ item.value ?? 'null' }
 						value={ item.value }
 					>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -217,7 +224,7 @@ export const Labeling: Story = {
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -247,13 +254,35 @@ export const WithOverflow: Story = {
 			<Select.Popup key="popup">
 				{ overflowItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
 		],
 
 		defaultValue: overflowItems[ 0 ],
+	},
+};
+
+const longListItems = Array.from( { length: 30 }, ( _, index ) => ( {
+	value: `item-${ index + 1 }`,
+	label: `Item ${ index + 1 }`,
+} ) );
+
+export const WithLongList: Story = {
+	args: {
+		items: longListItems,
+		defaultValue: longListItems[ 17 ],
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ longListItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+			</Select.Popup>,
+		],
 	},
 };
 
@@ -265,7 +294,7 @@ export const Disabled: Story = {
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -300,7 +329,7 @@ export const WithDisabledItem: Story = {
 						value={ item }
 						disabled={ item.disabled }
 					>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
@@ -322,8 +351,8 @@ const customOptions = [
 ];
 
 /**
- * For custom needs, a `Select.Trigger` can take a custom render function as its children,
- * while `Select.Item` can take arbitrary content as children.
+ * For custom needs, a `Select.Trigger` can take a custom render function as its
+ * children. Put custom item content inside `Select.ItemLabel`.
  */
 export const WithCustomTriggerAndItem: Story = {
 	args: {
@@ -354,13 +383,49 @@ export const WithCustomTriggerAndItem: Story = {
 			<Select.Popup key="popup">
 				{ customOptions.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,
 		],
 
 		defaultValue: customOptions[ 0 ],
+	},
+};
+
+const stockItems = [
+	{
+		value: 'apple',
+		label: 'Apple',
+		description: '99 in stock. Ships in two to three business days.',
+	},
+	{
+		value: 'banana',
+		label: 'Banana',
+		description: '12 in stock. Restock expected next week.',
+	},
+];
+
+/**
+ * Use `Select.ItemDescription` for supplementary text that should be
+ * announced as a description rather than part of the item name.
+ */
+export const WithItemDescription: Story = {
+	args: {
+		items: stockItems,
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ stockItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+						<Select.ItemDescription>
+							{ item.description }
+						</Select.ItemDescription>
+					</Select.Item>
+				) ) }
+			</Select.Popup>,
+		],
 	},
 };
 
@@ -396,7 +461,7 @@ export const WithCustomZIndex: Story = {
 			>
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
-						{ item.label }
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 			</Select.Popup>,

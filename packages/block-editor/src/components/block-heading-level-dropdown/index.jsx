@@ -55,7 +55,7 @@ export default function HeadingLevelDropdown( {
 									// translators: %d: heading level e.g: "1", "2", "3"
 									__( 'Heading %d' ),
 									targetLevel
-							  ),
+								),
 					isActive,
 					onClick() {
 						onChange( targetLevel );

@@ -70,7 +70,7 @@ export function WithDesignSystemTheme(
 								outline:
 									'1px dashed var(--wpds-color-stroke-surface-neutral)',
 								outlineOffset: '2px',
-						  }
+							}
 						: undefined
 				}
 			>

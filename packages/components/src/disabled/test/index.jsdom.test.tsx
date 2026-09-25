@@ -1,3 +1,4 @@
+import { describe, expect, it, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Disabled from '../';
@@ -65,6 +66,31 @@ describe( 'Disabled', () => {
 		expect( screen.getByTestId( 'disabled-wrapper' ) ).not.toHaveAttribute(
 			'inert'
 		);
+	} );
+
+	it( 'keeps the consumer className and toggles only the disabled classes', () => {
+		const MaybeDisable = ( { isDisabled = true } ) => (
+			<Disabled
+				isDisabled={ isDisabled }
+				className="my-wrapper"
+				data-testid="disabled-wrapper"
+			>
+				<Form />
+			</Disabled>
+		);
+
+		const { rerender } = render( <MaybeDisable /> );
+
+		const wrapper = screen.getByTestId( 'disabled-wrapper' );
+		expect( wrapper ).toHaveClass( 'my-wrapper' );
+		expect( wrapper ).toHaveClass( 'components-disabled' );
+		expect( wrapper ).toHaveClass( styles.disabled );
+
+		rerender( <MaybeDisable isDisabled={ false } /> );
+
+		expect( wrapper ).toHaveClass( 'my-wrapper' );
+		expect( wrapper ).not.toHaveClass( 'components-disabled' );
+		expect( wrapper ).not.toHaveClass( styles.disabled );
 	} );
 
 	it( 'should preserve input values when toggling the isDisabled prop', async () => {

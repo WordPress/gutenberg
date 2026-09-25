@@ -1,3 +1,12 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
 import { Y } from '@wordpress/sync';
 import { resolveSelect } from '@wordpress/data';
 import {
@@ -9,8 +18,9 @@ import { areCollaboratorInfosEqual } from '../utils';
 import type { BaseState, CollaboratorInfo } from '../types';
 
 // Mock WordPress data
-jest.mock( '@wordpress/data', () => ( {
-	resolveSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	resolveSelect: vi.fn(),
 } ) );
 
 // Mock window.navigator.userAgent
@@ -38,7 +48,7 @@ describe( 'BaseAwareness', () => {
 	let doc: Y.Doc;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		doc = new Y.Doc();
 
 		// Reset to Chrome
@@ -47,19 +57,19 @@ describe( 'BaseAwareness', () => {
 		);
 
 		// Mock Date.now for consistent timestamps
-		jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+		vi.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 
 		// Mock resolveSelect to return getCurrentUser
-		( resolveSelect as jest.Mock ).mockReturnValue( {
-			getCurrentUser: jest
+		( resolveSelect as Mock ).mockReturnValue( {
+			getCurrentUser: vi
 				.fn()
 				.mockResolvedValue( createMockCollaboratorInfo() ),
 		} );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
-		jest.restoreAllMocks();
+		vi.useRealTimers();
+		vi.restoreAllMocks();
 		doc.destroy();
 	} );
 
@@ -87,7 +97,7 @@ describe( 'BaseAwareness', () => {
 
 		test( 'publishes the resolved WordPress identity once', async () => {
 			const awareness = new BaseAwareness( doc );
-			const setLocalStateField = jest.spyOn(
+			const setLocalStateField = vi.spyOn(
 				awareness,
 				'setLocalStateField'
 			);
@@ -111,8 +121,8 @@ describe( 'BaseAwareness', () => {
 		} );
 
 		test( 'keeps the fallback identity when user resolution fails', async () => {
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getCurrentUser: jest.fn().mockRejectedValue( new Error() ),
+			( resolveSelect as Mock ).mockReturnValue( {
+				getCurrentUser: vi.fn().mockRejectedValue( new Error() ),
 			} );
 			const awareness = new BaseAwareness( doc );
 
@@ -129,8 +139,8 @@ describe( 'BaseAwareness', () => {
 		} );
 
 		test( 'keeps the fallback identity for an invalid user response', async () => {
-			( resolveSelect as jest.Mock ).mockReturnValue( {
-				getCurrentUser: jest.fn().mockResolvedValue( { id: 1 } ),
+			( resolveSelect as Mock ).mockReturnValue( {
+				getCurrentUser: vi.fn().mockResolvedValue( { id: 1 } ),
 			} );
 			const awareness = new BaseAwareness( doc );
 
@@ -168,25 +178,25 @@ describe( 'BaseAwarenessState', () => {
 	let doc: Y.Doc;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		doc = new Y.Doc();
 
 		mockUserAgent(
 			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 		);
 
-		jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+		vi.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 
-		( resolveSelect as jest.Mock ).mockReturnValue( {
-			getCurrentUser: jest
+		( resolveSelect as Mock ).mockReturnValue( {
+			getCurrentUser: vi
 				.fn()
 				.mockResolvedValue( createMockCollaboratorInfo() ),
 		} );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
-		jest.restoreAllMocks();
+		vi.useRealTimers();
+		vi.restoreAllMocks();
 		doc.destroy();
 	} );
 
@@ -285,7 +295,7 @@ describe( 'BaseAwarenessState', () => {
 			);
 
 			// Subscribe to detect updates
-			const callback = jest.fn();
+			const callback = vi.fn();
 			awareness.onStateChange( callback );
 
 			// Set same collaboratorInfo
@@ -310,7 +320,7 @@ describe( 'BaseAwarenessState', () => {
 	describe( 'state subscription', () => {
 		test( 'should notify subscribers on state change', async () => {
 			const awareness = new TestBaseAwarenessState( doc );
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			awareness.onStateChange( callback );
 			awareness.setUp();

@@ -1,14 +1,10 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deprecated from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 
-jest.mock( '@wordpress/deprecated' );
-jest.mock( '@wordpress/api-fetch' );
-
-// Use fake timers within this file.
-// logEntityDeprecation() uses setTimeout() to avoid spurious logging, so fake timers are used to
-// ensure that the deprecation warning is logged correctly.
-jest.useFakeTimers();
+vi.mock( '@wordpress/deprecated' );
+vi.mock( '@wordpress/api-fetch' );
 
 /**
  * Returns the expected arguments for the deprecated function call.
@@ -87,7 +83,7 @@ function createTestRegistry() {
 		.dispatch( coreDataStore )
 		.receiveEntityRecords( 'root', 'media', mediaRecord );
 
-	jest.runAllTimers();
+	vi.runAllTimers();
 
 	return registry;
 }
@@ -251,7 +247,15 @@ describe( 'Deprecated entity logging', () => {
 		'$name $type',
 		( { type, name, args, alternativeFunction, isShorthandSelector } ) => {
 			beforeEach( () => {
+				// logEntityDeprecation() uses setTimeout() to avoid spurious
+				// logging, so fake timers keep each test deterministic.
+				vi.useFakeTimers();
 				deprecated.mockReset();
+			} );
+
+			afterEach( async () => {
+				await Promise.resolve();
+				vi.runOnlyPendingTimers();
 			} );
 
 			it( 'logs a deprecation warning when used with deprecated entities', () => {

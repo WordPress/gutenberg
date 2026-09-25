@@ -135,10 +135,10 @@ function PosterImage( { poster, onChange } ) {
 													'The current poster image url is %s.'
 												),
 												poster
-										  )
+											)
 										: __(
 												'There is no poster image currently selected.'
-										  ) }
+											) }
 								</p>
 								{ !! poster && (
 									<Button

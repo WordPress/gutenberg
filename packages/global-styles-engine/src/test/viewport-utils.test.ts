@@ -3,6 +3,7 @@ import {
 	getResponsiveMediaQueries,
 	getViewportBreakpoints,
 	getViewportBreakpointValueInPixels,
+	getViewportMediaQueries,
 } from '../utils/viewport';
 
 describe( 'viewport utils', () => {
@@ -106,6 +107,18 @@ describe( 'viewport utils', () => {
 	} );
 
 	describe( 'getResponsiveMediaQueries', () => {
+		it( 'returns media queries from viewport settings', () => {
+			expect(
+				getViewportMediaQueries( {
+					mobile: '640px',
+					tablet: '960px',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 640px)',
+				'@tablet': '@media (640px < width <= 960px)',
+			} );
+		} );
+
 		it( 'returns custom media queries when viewport breakpoints are ordered', () => {
 			expect(
 				getResponsiveMediaQueries( {

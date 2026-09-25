@@ -18,7 +18,7 @@ export const createPattern =
 			syncType === PATTERN_SYNC_TYPES.unsynced
 				? {
 						wp_pattern_sync_status: syncType,
-				  }
+					}
 				: undefined;
 
 		const reusableBlock = {

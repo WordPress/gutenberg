@@ -506,7 +506,7 @@ export default function useListViewDropZone( {
 							? canInsertBlocks(
 									draggedBlockClientIds,
 									rootClientId
-							  )
+								)
 							: true,
 						canInsertDraggedBlocksAsChild: isBlockDrag
 							? canInsertBlocks( draggedBlockClientIds, clientId )

@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import postDataBindings from '../post-data';
 
@@ -24,7 +25,7 @@ describe( 'post-data bindings', () => {
 										modified: '2025-06-07 00:00:00',
 										link: 'https://example.com/post',
 										unknown: 'Unknown field value',
-								  }
+									}
 								: false,
 					};
 				};

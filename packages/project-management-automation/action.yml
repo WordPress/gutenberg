@@ -20,5 +20,5 @@ outputs:
             Pull request the prompt belongs to. A push payload carries no pull
             request number, so a consumer needs this one.
 runs:
-    using: node20
+    using: node24
     main: lib/index.js

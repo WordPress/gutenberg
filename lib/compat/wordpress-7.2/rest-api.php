@@ -21,8 +21,7 @@ add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoint
 /**
  * Registers the Templates and Template Parts REST API routes.
  *
- * Runs after the WordPress 7.0 filters of the same shape, so this controller
- * class wins.
+ * Replaces the core controller class so the 7.2 controller is used.
  *
  * @see Gutenberg_REST_Templates_Controller_7_2
  *

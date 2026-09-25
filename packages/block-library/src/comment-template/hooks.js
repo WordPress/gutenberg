@@ -63,7 +63,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 					post: postId,
 					per_page: perPage,
 					page,
-			  }
+				}
 			: null;
 	}, [ postId, perPage, page ] );
 };

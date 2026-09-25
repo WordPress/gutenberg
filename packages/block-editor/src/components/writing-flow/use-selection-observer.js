@@ -206,12 +206,21 @@ export default function useSelectionObserver() {
 						! isMultiSelecting()
 					) {
 						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						// Only return focus to the field if the wrapper had
+						// it. If Escape moved focus to the canvas stop in the
+						// parent document, the wrapper is only the stale
+						// active element and focus must not come back.
+						if (
+							ownerDocument.activeElement === node &&
+							ownerDocument.hasFocus()
+						) {
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}

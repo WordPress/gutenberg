@@ -1,11 +1,20 @@
+import { describe, expect, it, vi } from 'vitest';
+import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import PublishButtonLabel from '../label';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useViewportMatch: vi.fn(),
+} ) );
+
+vi.mocked( useViewportMatch ).mockReturnValue( false );
 
 describe( 'PublishButtonLabel', () => {
 	it( 'should show publishing if publishing in progress', () => {

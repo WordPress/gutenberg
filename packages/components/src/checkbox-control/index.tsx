@@ -119,6 +119,8 @@ export function CheckboxControl(
 							icon={ reset }
 							className="components-checkbox-control__indeterminate"
 							role="presentation"
+							size={ 16 }
+							viewBox="4 4 16 16"
 						/>
 					) : null }
 					{ showCheckedIcon ? (
@@ -126,6 +128,8 @@ export function CheckboxControl(
 							icon={ check }
 							className="components-checkbox-control__checked"
 							role="presentation"
+							size={ 16 }
+							viewBox="4 4 16 16"
 						/>
 					) : null }
 				</span>

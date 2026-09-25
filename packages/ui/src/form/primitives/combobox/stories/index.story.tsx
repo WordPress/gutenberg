@@ -1,4 +1,3 @@
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
@@ -13,7 +12,8 @@ import {
 } from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
-	title: 'Design System/Components/Form/Primitives/Combobox',
+	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
+	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
 		'Combobox.Trigger': Combobox.Trigger,
@@ -58,7 +58,7 @@ export const Default: Story = {
 		items: ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -92,7 +92,7 @@ export const Compact: Story = {
 				aria-label="Fruit"
 				key="trigger"
 			/>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -208,7 +208,7 @@ export const Creatable: Story = {
 				}
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -247,146 +247,97 @@ export const Creatable: Story = {
 	},
 };
 
-function getStatusChildren( {
-	loading,
-	count,
-	visibleCount,
-}: {
-	loading: boolean;
-	count: number;
-	visibleCount: boolean;
-} ) {
-	if ( loading ) {
-		return (
-			<Stack direction="row" gap="sm" align="center">
-				<Spinner />
-				Loading…
-			</Stack>
-		);
-	}
+function HiddenResultCount() {
+	const count = Combobox.useFilteredItems< FixtureItem >().length;
 
 	if ( count === 0 ) {
 		return null;
 	}
 
-	const message =
-		count === 1 ? '1 result found.' : `${ count } results found.`;
-
-	if ( visibleCount ) {
-		return message;
-	}
-
-	return <VisuallyHidden>{ message }</VisuallyHidden>;
-}
-
-function AsyncStatus( {
-	loading,
-	visibleCount,
-}: {
-	loading: boolean;
-	visibleCount: boolean;
-} ) {
-	const filteredItems = BaseCombobox.useFilteredItems< FixtureItem >();
-
 	return (
-		<Combobox.Status>
-			{ getStatusChildren( {
-				loading,
-				count: filteredItems.length,
-				visibleCount,
-			} ) }
-		</Combobox.Status>
-	);
-}
-
-function AsyncItemsTemplate( {
-	args,
-	visibleCount,
-}: {
-	args: Story[ 'args' ];
-	visibleCount: boolean;
-} ) {
-	const [ loading, setLoading ] = useState( false );
-	const [ items, setItems ] = useState< FixtureItem[] >( [] );
-	const [ value, setValue ] = useState< FixtureItem | undefined >();
-	const [ open, setOpen ] = useState( false );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
-
-	return (
-		<Combobox.Root
-			{ ...args }
-			items={ items }
-			value={ value }
-			open={ open }
-			onValueChange={ ( newValue ) => {
-				setValue(
-					( newValue ?? undefined ) as FixtureItem | undefined
-				);
-			} }
-			onOpenChange={ ( nextOpen ) => {
-				setOpen( nextOpen );
-				if ( ! nextOpen ) {
-					clearTimeout( timeoutRef.current );
-					return;
-				}
-				setLoading( true );
-				setItems( [] );
-				clearTimeout( timeoutRef.current );
-				timeoutRef.current = setTimeout( () => {
-					setItems( ITEMS );
-					setValue( ( current ) => current ?? ITEMS[ 0 ] );
-					setLoading( false );
-				}, 500 );
-			} }
-		>
-			<Combobox.Trigger aria-label="Fruit" />
-			<Combobox.Popup>
-				<div style={ inputWrapperStyle }>
-					<Combobox.Input aria-label="Search" placeholder="Search" />
-				</div>
-				<AsyncStatus
-					loading={ loading }
-					visibleCount={ visibleCount }
-				/>
-				<Combobox.Empty>
-					{ loading ? null : 'No results found.' }
-				</Combobox.Empty>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( item: FixtureItem ) => (
-								<Combobox.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</Combobox.Item>
-							) }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-				</Combobox.List>
-			</Combobox.Popup>
-		</Combobox.Root>
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
 	);
 }
 
 /**
- * Loads the item list asynchronously. Keep `Status` mounted. It shows
- * loading, then a visually hidden result count. Use `Empty` for no results.
+ * Loads the item list asynchronously. `Status` shows loading, then a
+ * visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount={ false } />;
-	},
-};
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< FixtureItem[] >( [] );
+		const [ value, setValue ] = useState< FixtureItem | undefined >();
+		const [ open, setOpen ] = useState( false );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
-/**
- * Same async pattern as `AsyncItems`, with the result count visible in the
- * popup.
- */
-export const AsyncItemsVisibleCount: Story = {
-	render: function Template( args ) {
-		return <AsyncItemsTemplate args={ args } visibleCount />;
+		return (
+			<Combobox.Root
+				{ ...args }
+				items={ items }
+				value={ value }
+				open={ open }
+				onValueChange={ ( newValue ) => {
+					setValue(
+						( newValue ?? undefined ) as FixtureItem | undefined
+					);
+				} }
+				onOpenChange={ ( nextOpen ) => {
+					setOpen( nextOpen );
+					if ( ! nextOpen ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setValue( ( current ) => current ?? ITEMS[ 0 ] );
+						setLoading( false );
+					}, 500 );
+				} }
+			>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup aria-label="Fruit">
+					<div style={ inputWrapperStyle }>
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
+					</div>
+					<Combobox.Status>
+						{ loading ? (
+							<Stack direction="row" gap="sm" align="center">
+								<Spinner />
+								Loading…
+							</Stack>
+						) : (
+							<HiddenResultCount />
+						) }
+					</Combobox.Status>
+					<Combobox.Empty>
+						{ loading ? null : 'No results found.' }
+					</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
 	},
 };
 
@@ -423,7 +374,7 @@ export const WithCustomTriggerAndItem: Story = {
 					</span>
 				) }
 			</Combobox.Trigger>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -471,7 +422,7 @@ export const Grouped: Story = {
 		items: GROUPED_ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -529,6 +480,7 @@ export const WithCustomZIndex: Story = {
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
+				aria-label="Fruit"
 				positioner={
 					<Combobox.Positioner
 						style={ {

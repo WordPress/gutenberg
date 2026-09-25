@@ -11,7 +11,7 @@ import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType, type QueueItem } from '../types';
 import { unlock } from '../../lock-unlock';
-import { UploadError } from '../../upload-error';
+import { ErrorCode, UploadError } from '../../upload-error';
 import { vipsCancelOperations, vipsResizeImage } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -23,7 +23,7 @@ vi.mock(
 			createBlobURL: vi.fn( () => 'blob:foo' ),
 			isBlobURL: vi.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 vi.mock(
@@ -42,7 +42,7 @@ vi.mock(
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
-		} ) as unknown as typeof import('../utils')
+		} ) as unknown as typeof import( '../utils' )
 );
 
 /*
@@ -414,6 +414,95 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
+
+		/**
+		 * A HEIC File Type Box, under whatever name and type the test wants.
+		 *
+		 * jsdom exposes none of the decoders canvasConvertToJpeg tries, so
+		 * reaching the HEIC path means failing to decode. The point of these
+		 * tests is that the failure is reported rather than the file uploaded.
+		 *
+		 * The box has no meta box behind it, so it fails the container parse
+		 * rather than the codec lookup, and is reported as a processing error.
+		 * `HEIC_DECODE_ERROR` is reserved for the case where no decoding
+		 * strategy exists at all.
+		 * See https://github.com/WordPress/gutenberg/issues/81123.
+		 *
+		 * @param name File name.
+		 * @param type MIME type the browser would report.
+		 */
+		function heicFileTypeBox( name: string, type: string ) {
+			const ftyp = 'ftypheic\0\0\0\0mif1miaf';
+			return new File(
+				[
+					new Uint8Array( [
+						0x00,
+						0x00,
+						0x00,
+						4 + ftyp.length,
+						...[ ...ftyp ].map( ( character ) =>
+							character.charCodeAt( 0 )
+						),
+					] ),
+				],
+				name,
+				{ type }
+			);
+		}
+
+		it( 'routes a HEIC file the browser could not type through the HEIC conversion path', async () => {
+			// Windows without the HEVC extension reports no type at all for a
+			// .heic file. Going by the type alone uploads it as-is, to a server
+			// that cannot convert it either.
+			// See https://github.com/WordPress/gutenberg/issues/81043.
+			const onError = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: heicFileTypeBox( 'IMG_1250.HEIC', '' ),
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+				} )
+			);
+		} );
+
+		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
+			// A name that makes the browser report the file as a JPEG. Taking
+			// it at its word sends undecodable bytes down the vips path, where
+			// the upload strands.
+			// See https://github.com/WordPress/gutenberg/issues/81707.
+			const onError = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: heicFileTypeBox( 'example.jpg', 'image/jpeg' ),
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+				} )
+			);
+		} );
 	} );
 
 	describe( 'concurrent sideloads', () => {
@@ -525,8 +614,7 @@ describe( 'actions', () => {
 
 		it( 'starts pending sideloads after one finishes', async () => {
 			let onSuccessCallback:
-				| ( ( subSize: Record< string, unknown > ) => void )
-				| undefined;
+				( ( subSize: Record< string, unknown > ) => void ) | undefined;
 			const mediaSideload = vi.fn( ( { onSuccess } ) => {
 				// Capture the first callback to simulate completion later.
 				if ( ! onSuccessCallback ) {
@@ -596,11 +684,6 @@ describe( 'actions', () => {
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -613,17 +696,14 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'User cancelled' ) );
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
-			expect( consoleErrorSpy ).toHaveBeenCalled();
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -639,15 +719,13 @@ describe( 'actions', () => {
 				item.id
 			);
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'removes item from queue after cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -663,7 +741,10 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'User cancelled' )
+			);
 		} );
 
 		it( 'calls onError callback when not silent', async () => {
@@ -849,9 +930,6 @@ describe( 'actions', () => {
 			};
 
 			it( 'deletes parent attachment and cancels parent for vips processing failures with no successful siblings', async () => {
-				const consoleErrorSpy = vi
-					.spyOn( console, 'error' )
-					.mockImplementation( () => {} );
 				const mediaDelete = vi.fn().mockResolvedValue( undefined );
 				const parentOnError = vi.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
@@ -891,7 +969,7 @@ describe( 'actions', () => {
 					)
 				).toBeUndefined();
 
-				consoleErrorSpy.mockRestore();
+				expect( console ).not.toHaveErrored();
 			} );
 
 			it( 'propagates the underlying error message for non-vips sideload failures', async () => {
@@ -1158,10 +1236,6 @@ describe( 'actions', () => {
 		} );
 
 		it( 'does NOT schedule retry for non-retryable errors', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -1179,14 +1253,13 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'File validation failed' )
+			);
 		} );
 
 		it( 'does NOT schedule retry when retry settings are undefined', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			// Disable retry settings.
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: undefined,
@@ -1209,7 +1282,10 @@ describe( 'actions', () => {
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
 
-			consoleErrorSpy.mockRestore();
+			expect( console ).toHaveErroredWith(
+				'Upload cancelled',
+				new Error( 'Network error' )
+			);
 		} );
 
 		it( 'clears pending retry timer on manual cancel', async () => {

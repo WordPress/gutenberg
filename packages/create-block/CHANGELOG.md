@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+## 4.99.0 (2026-09-23)
+
+## 4.98.0 (2026-09-10)
+
 ### Bug Fixes
 
+-   Remove the npm version requirement and add consumer tests for Node.js 20 and 22 ([#82657](https://github.com/WordPress/gutenberg/pull/82657)).
 -   Point the scaffolding output at the generated `env` script (`npm run env start`) instead of `npx wp-env start` ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
 
 ### Internal

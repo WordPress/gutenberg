@@ -1,3 +1,4 @@
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { dispatch, select } from '@wordpress/data';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
@@ -14,9 +15,6 @@ const UNKNOWN_FORMAT = {
 
 describe( 'registerFormatType', () => {
 	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-
 		// Register "core/unknown" format
 		dispatch( richTextStore ).addFormatTypes( UNKNOWN_FORMAT );
 	} );

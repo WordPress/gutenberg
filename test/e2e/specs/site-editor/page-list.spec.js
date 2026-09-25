@@ -89,7 +89,10 @@ test.describe( 'Page List', () => {
 						} );
 
 					await mediaLibrary
-						.getByRole( 'button', { name: 'Select', exact: true } )
+						.getByRole( 'button', {
+							name: 'Set featured image',
+							exact: true,
+						} )
 						.click();
 				},
 				assertInitialState: async ( page ) => {
@@ -572,6 +575,42 @@ test.describe( 'Page List', () => {
 					'true'
 				);
 			} );
+		} );
+	} );
+
+	test.describe( 'Bulk Quick Edit', () => {
+		test( 'shows the bulk-editable fields for the selected pages', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			const table = page.getByRole( 'table' );
+			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			// The extensible site editor keeps the selection in the URL, so
+			// the checkbox only flips once the route has re-rendered.
+			await expect(
+				table.getByRole( 'checkbox', { name: 'Deselect all' } )
+			).toBeChecked();
+			await page
+				.locator( '.dataviews-bulk-actions-footer__container' )
+				.getByRole( 'button', { name: 'Quick Edit' } )
+				.click();
+
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			await expect( modal ).toContainText(
+				'Changes will be applied to all selected pages.'
+			);
+			for ( const name of [
+				'Edit Status',
+				'Edit Date',
+				'Edit Author',
+				'Edit Discussion',
+			] ) {
+				await expect(
+					modal.getByRole( 'button', { name } )
+				).toBeVisible();
+			}
 		} );
 	} );
 

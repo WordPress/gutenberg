@@ -49,14 +49,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 7.0 compat.
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-revisions-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
-	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
@@ -85,6 +77,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-icon-collections-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
@@ -101,23 +95,9 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/connectors.php';
 require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
-
-// WordPress 7.0 compat.
-require __DIR__ . '/compat/wordpress-7.0/preload.php';
-require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
-require __DIR__ . '/compat/wordpress-7.0/blocks.php';
-require __DIR__ . '/compat/wordpress-7.0/kses.php';
-require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
-require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
-require __DIR__ . '/compat/wordpress-7.0/fonts.php';
-
-if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
-	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
-	require __DIR__ . '/compat/wordpress-7.0/default-connectors.php';
-}
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
@@ -126,6 +106,9 @@ require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
+
+// WordPress 7.2 compat.
+require __DIR__ . '/compat/wordpress-7.2/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -152,21 +135,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }
 
-// Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
-// @core-merge: do not merge the BC layer files into WordPress Core.
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-utils.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider-local.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-resolver.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
-require __DIR__ . '/experimental/font-face/bc-layer/webfonts-deprecations.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-utils.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-provider.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-webfonts.php';
-require __DIR__ . '/experimental/font-face/bc-layer/class-wp-web-fonts.php';
-
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
@@ -181,8 +149,8 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
-require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
+require __DIR__ . '/icons.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {

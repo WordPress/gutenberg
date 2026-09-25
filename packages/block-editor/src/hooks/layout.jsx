@@ -23,6 +23,7 @@ import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
+import { normalizeLegacyLayout } from '../layouts/utils';
 import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -162,9 +163,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || defaultBlockLayout || {};
+		normalizeLegacyLayout( layout ) || defaultBlockLayout || {};
 
 	const layoutClassnames = [];
 
@@ -231,14 +230,13 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
  */
 export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const { layout = {}, style = {} } = blockAttributes;
-	// Update type for blocks using legacy layouts.
-	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || {};
+	const usedLayout = normalizeLegacyLayout( layout ) || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
-	const hasBlockGapSupport = blockGapSupport !== null;
+	// Like the server's `isset()` check, an unset or `null` setting means the
+	// theme has not opted into block gap.
+	const hasBlockGapSupport =
+		blockGapSupport !== null && blockGapSupport !== undefined;
 	return fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
@@ -444,7 +442,7 @@ function LayoutPanelPure( {
 		? cleanEmptyObject( {
 				...baseLayout,
 				...stateLayout,
-		  } ) || {}
+			} ) || {}
 		: baseLayout;
 	const resetLayoutDefaults = isViewportLayoutState
 		? baseLayout
@@ -524,7 +522,7 @@ function LayoutPanelPure( {
 	const hasInheritToggleValue = () =>
 		isViewportLayoutState
 			? ( usedLayout?.type ?? 'default' ) !==
-			  ( resetLayoutDefaults?.type ?? 'default' )
+				( resetLayoutDefaults?.type ?? 'default' )
 			: layout?.type === 'constrained';
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
@@ -559,10 +557,10 @@ function LayoutPanelPure( {
 									isUsingContentWidth()
 										? __(
 												'Nested blocks use content width with options for full and wide widths.'
-										  )
+											)
 										: __(
 												'Nested blocks will fill the width of this container.'
-										  )
+											)
 								}
 							/>
 						</ToolsPanelItem>
@@ -696,14 +694,15 @@ function BlockWithLayoutStyles( {
 	const { default: defaultBlockLayout } =
 		getBlockSupport( name, layoutBlockSupportKey ) || {};
 	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || defaultBlockLayout || {};
+		normalizeLegacyLayout( layout ) || defaultBlockLayout || {};
 
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }`;
-	const hasBlockGapSupport = blockGapSupport !== null;
+	// Like the server's `isset()` check, an unset or `null` setting means the
+	// theme has not opted into block gap.
+	const hasBlockGapSupport =
+		blockGapSupport !== null && blockGapSupport !== undefined;
 
 	// Get CSS string for the current layout type.
 	// The CSS and `style` element is only output if it is not empty.
@@ -800,7 +799,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 						variationBlockGapValue = variationName
 							? globalStyles?.blocks?.[ name ]?.variations?.[
 									variationName
-							  ]?.spacing?.blockGap
+								]?.spacing?.blockGap
 							: undefined;
 					}
 

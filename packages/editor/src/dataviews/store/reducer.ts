@@ -2,11 +2,11 @@ import { combineReducers } from '@wordpress/data';
 import type { Action, Field } from '@wordpress/dataviews';
 
 type ReduxAction =
-	| ReturnType< typeof import('./private-actions').registerEntityAction >
-	| ReturnType< typeof import('./private-actions').unregisterEntityAction >
-	| ReturnType< typeof import('./private-actions').registerEntityField >
-	| ReturnType< typeof import('./private-actions').unregisterEntityField >
-	| ReturnType< typeof import('./private-actions').setIsReady >;
+	| ReturnType< typeof import( './private-actions' ).registerEntityAction >
+	| ReturnType< typeof import( './private-actions' ).unregisterEntityAction >
+	| ReturnType< typeof import( './private-actions' ).registerEntityField >
+	| ReturnType< typeof import( './private-actions' ).unregisterEntityField >
+	| ReturnType< typeof import( './private-actions' ).setIsReady >;
 
 export type ActionState = Record< string, Record< string, Action< any >[] > >;
 export type FieldsState = Record< string, Record< string, Field< any >[] > >;

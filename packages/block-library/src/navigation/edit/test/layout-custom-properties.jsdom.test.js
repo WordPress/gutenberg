@@ -1,19 +1,20 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
 import useLayoutCustomProperties from '../use-layout-custom-properties';
 
-const mockGetResponsiveMediaQueries = jest.fn();
+const mockGetResponsiveMediaQueries = vi.fn();
 
-jest.mock( '@wordpress/block-editor', () => ( {
-	useSettings: jest.fn(),
-	useStyleOverride: jest.fn(),
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
+	useSettings: vi.fn(),
+	useStyleOverride: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/global-styles-engine', () => ( {
+vi.mock( import( '@wordpress/global-styles-engine' ), () => ( {
 	privateApis: {},
 } ) );
 
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: () => ( {
 		getResponsiveMediaQueries: ( ...args ) =>
 			mockGetResponsiveMediaQueries( ...args ),
@@ -22,7 +23,7 @@ jest.mock( '../../../lock-unlock', () => ( {
 
 describe( 'Navigation layout custom properties', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		useSettings.mockReturnValue( [ { mobile: 480, tablet: 782 } ] );
 		mockGetResponsiveMediaQueries.mockReturnValue( {
 			'@tablet': '@media (480px < width <= 782px)',

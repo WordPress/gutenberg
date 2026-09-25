@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 1.23.0 (2026-09-23)
+
+### Enhancements
+
+-   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+
+### Bug Fixes
+
+-   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+-   Blocks screen: rank search results so a block whose title matches the search is listed before blocks that only match by keyword, category or description. ([#83435](https://github.com/WordPress/gutenberg/pull/83435))
+
+### Internal
+
+-   Palette preview: overlapping color dots no longer use `__experimentalZStack`, and the row uses `Stack` from `@wordpress/ui` instead of `Flex` / `HStack` / `VStack`. ([#83060](https://github.com/WordPress/gutenberg/pull/83060))
+-   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+
+## 1.22.0 (2026-09-10)
+
+### Enhancements
+
+-   Revisions: migrate the Active badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge`. ([#82560](https://github.com/WordPress/gutenberg/pull/82560))
+
 ### Bug Fixes
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
@@ -34,6 +57,7 @@
 
 ### Internal
 
+-   Remove the experimental color randomizer from the palette editor, along with the `colord` dependency it used ([#82452](https://github.com/WordPress/gutenberg/pull/82452)).
 -   Exclude the JavaScript tests and story from the build project so their declarations are not published. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
 ## 1.20.0 (2026-08-12)

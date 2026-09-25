@@ -194,7 +194,7 @@ const transforms = {
 							createBlock( 'core/paragraph', {
 								content: citation,
 							} ),
-					  ];
+						];
 			},
 		},
 		{
@@ -211,7 +211,7 @@ const transforms = {
 								createBlock( 'core/paragraph', {
 									content: citation,
 								} ),
-						  ]
+							]
 				),
 		},
 	],
@@ -223,7 +223,7 @@ const transforms = {
 					createBlock( 'core/paragraph', {
 						content: citation,
 					} ),
-			  ],
+				],
 };
 
 export default transforms;

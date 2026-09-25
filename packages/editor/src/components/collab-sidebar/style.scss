@@ -20,6 +20,7 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
+	border-left: $border-width solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .editor-collab-sidebar-panel__thread,

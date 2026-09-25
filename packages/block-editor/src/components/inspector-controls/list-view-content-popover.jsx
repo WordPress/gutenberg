@@ -27,7 +27,7 @@ function useInspectorPopoverPlacement() {
 					offset: 35,
 					resize: false,
 				},
-		  }
+			}
 		: {};
 }
 

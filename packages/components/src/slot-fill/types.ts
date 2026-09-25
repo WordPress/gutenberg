@@ -78,8 +78,7 @@ export type SlotComponentProps =
 	  } );
 
 export type FillChildren =
-	| ReactNode
-	| ( ( fillProps: FillProps ) => ReactNode );
+	ReactNode | ( ( fillProps: FillProps ) => ReactNode );
 
 export type FillComponentProps = {
 	/**

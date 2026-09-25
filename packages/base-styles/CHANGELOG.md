@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 13.2.0 (2026-09-23)
+
+### Enhancements
+
+-   `checkbox-control`: Use the design system tokens for the default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
+-   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+
+## 13.1.0 (2026-09-10)
+
 ### Internal
 
 -   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))

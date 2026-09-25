@@ -9,7 +9,7 @@ import { gotoStoryId } from '../utils';
  * @return Array of six numbers from the matrix, or null if not set.
  */
 async function readImageMatrix(
-	page: import('@playwright/test').Page
+	page: import( '@playwright/test' ).Page
 ): Promise< number[] | null > {
 	const transform = await page
 		.locator( '.wp-media-editor-image-editor__image' )

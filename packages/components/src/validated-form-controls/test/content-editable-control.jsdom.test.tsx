@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedContentEditableControl } from '../components';
@@ -21,7 +22,6 @@ describe( 'ValidatedContentEditableControl', () => {
 	// not the editable that assistive technology interacts with. This is the
 	// same pre-existing limitation as the other delegate-based controls,
 	// tracked in #76741.
-	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'should append the validation error alongside the help description', async () => {
 		const user = userEvent.setup();
 		render(

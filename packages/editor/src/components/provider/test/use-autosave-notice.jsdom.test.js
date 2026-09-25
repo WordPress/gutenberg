@@ -1,41 +1,42 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import useAutosaveNotice from '../use-autosave-notice';
 import { SNAPSHOT_STATUS_SYNC_WAIT_MS } from '../use-entity-contains-snapshot';
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useRegistry: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	useRegistry: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: 'core',
 	privateApis: {
-		entityContainsSnapshot: jest.fn(),
+		entityContainsSnapshot: vi.fn(),
 	},
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
+vi.mock( import( '@wordpress/notices' ), () => ( {
 	store: 'core/notices',
 } ) );
 
-jest.mock( '../../../store', () => ( {
+vi.mock( import( '../../../store' ), () => ( {
 	store: 'core/editor',
 } ) );
 
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( object ) => object,
 } ) );
 
 const { entityContainsSnapshot } = coreDataPrivateApis;
 
-const createWarningNotice = jest.fn();
-const setCurrentRevisionId = jest.fn();
-const isCollaborationEnabledForCurrentPost = jest.fn();
-const getEntitySyncConnectionStatus = jest.fn();
-const getEditorSettings = jest.fn();
+const createWarningNotice = vi.fn();
+const setCurrentRevisionId = vi.fn();
+const isCollaborationEnabledForCurrentPost = vi.fn();
+const getEntitySyncConnectionStatus = vi.fn();
+const getEditorSettings = vi.fn();
 
 function select( store ) {
 	if ( 'core' === store ) {
@@ -62,8 +63,8 @@ function renderAutosaveNotice( props ) {
 
 describe( 'useAutosaveNotice', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
-		jest.useFakeTimers();
+		vi.clearAllMocks();
+		vi.useFakeTimers();
 
 		useSelect.mockImplementation( ( callback ) => callback( select ) );
 		useRegistry.mockReturnValue( { select } );
@@ -82,7 +83,7 @@ describe( 'useAutosaveNotice', () => {
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'creates the notice immediately outside real-time collaboration', () => {
@@ -101,7 +102,7 @@ describe( 'useAutosaveNotice', () => {
 		renderAutosaveNotice( { settings: {} } );
 
 		act( () => {
-			jest.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
+			vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
 		} );
 
 		expect( createWarningNotice ).not.toHaveBeenCalled();
@@ -116,7 +117,7 @@ describe( 'useAutosaveNotice', () => {
 		} );
 
 		act( () => {
-			jest.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
+			vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
 		} );
 
 		expect( createWarningNotice ).not.toHaveBeenCalled();
@@ -158,7 +159,7 @@ describe( 'useAutosaveNotice', () => {
 			);
 
 			act( () => {
-				jest.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
+				vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
 			} );
 
 			expect( createWarningNotice ).not.toHaveBeenCalled();
@@ -180,7 +181,7 @@ describe( 'useAutosaveNotice', () => {
 			rerender( { post: POST, recovery: false, settings } );
 
 			act( () => {
-				jest.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
+				vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
 			} );
 
 			expect( createWarningNotice ).not.toHaveBeenCalled();
@@ -210,7 +211,7 @@ describe( 'useAutosaveNotice', () => {
 			const { rerender } = renderAutosaveNotice( { settings } );
 
 			act( () => {
-				jest.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
+				vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
 			} );
 
 			expect( createWarningNotice ).toHaveBeenCalledTimes( 1 );

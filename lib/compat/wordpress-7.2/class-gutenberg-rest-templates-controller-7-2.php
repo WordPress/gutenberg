@@ -11,9 +11,9 @@
  * checking that a theme or plugin version of the template exists.
  *
  *
- * @see Gutenberg_REST_Templates_Controller_7_0
+ * @see WP_REST_Templates_Controller
  */
-class Gutenberg_REST_Templates_Controller_7_2 extends Gutenberg_REST_Templates_Controller_7_0 {
+class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controller {
 	/**
 	 * Prepares a single template output for response.
 	 *

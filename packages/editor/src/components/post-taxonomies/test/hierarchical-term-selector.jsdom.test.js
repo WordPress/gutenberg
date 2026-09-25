@@ -1,8 +1,11 @@
+import { describe, expect, test, vi } from 'vitest';
 import {
 	sortBySelected,
 	getFilterMatcher,
 	findTerm,
 } from '../hierarchical-term-selector';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'sortBySelected', () => {
 	test( 'should not change if a term is not selected.', () => {

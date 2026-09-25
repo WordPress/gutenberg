@@ -43,6 +43,27 @@ If npm publishing fails part-way through, do not assume every target package ver
 
 Before restarting any mutating step, inspect the npm registry state for the packages listed in the failed job. Do not infer the remaining work from the package where the job stopped; retries or manual recovery attempts can leave a non-contiguous set of package versions published.
 
+First, re-run the failed workflow with the same release type. Before it prepares another release, the release tool looks for the commit and package tags saved by the failed run. If it finds them, it checks out that exact commit and resumes publication, Git metadata, or finalization from the last verified state.
+
+Prepared state is stored under a namespace for the target release branch:
+
+-   `latest` and `bugfix`: `refs/npm-release/wp-latest/*`
+-   `next`: `refs/npm-release/wp-next/*`
+-   WordPress `X.Y`: `refs/npm-release/wp-X.Y/*`
+
+Inspect all prepared releases, or one target, without changing them:
+
+```sh
+git ls-remote --refs origin 'refs/npm-release/*'
+git ls-remote --refs origin 'refs/npm-release/wp-latest/*'
+```
+
+Do not delete prepared state to bypass an unknown or incomplete release. Re-run the matching release type first. If registry, release-branch, and package-tag checks prove that the prepared release is complete or no longer needed, delete each exact ref returned by `git ls-remote` individually:
+
+```sh
+git push origin --delete '<exact-ref-from-git-ls-remote>'
+```
+
 For one package:
 
 ```sh
@@ -64,7 +85,7 @@ npm exec --no -- lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.vers
 done
 ```
 
-Resume only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. Then continue either with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+Resume manually only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. If the workflow has no prepared state to resume, continue either with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
 
 When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 
@@ -95,8 +116,8 @@ For the record, the manual process would look like the following:
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
-3. Optionally update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the corresponding branch (Example `wp/5.2`).
-4. Cherry-pick the CHANGELOG update commits, if any, into the `trunk` branch of Gutenberg.
+1. Optionally update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the corresponding branch (Example `wp/5.2`).
+2. Cherry-pick the CHANGELOG update commits, if any, into the `trunk` branch of Gutenberg.
 
 Now, the npm packages should be ready and a patch can be created and committed into the corresponding WordPress SVN branch.
 

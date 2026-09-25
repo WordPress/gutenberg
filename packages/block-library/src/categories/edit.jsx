@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
 	Placeholder,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -224,7 +224,7 @@ export default function CategoriesEdit( {
 							} }
 							isShownByDefault
 						>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Taxonomy' ) }
 								options={ taxonomies.map( ( t ) => ( {
 									label: t.name,

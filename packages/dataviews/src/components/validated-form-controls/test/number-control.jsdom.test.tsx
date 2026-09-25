@@ -1,6 +1,9 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedNumberControl } from '../number-control';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ValidatedNumberControl', () => {
 	it( 'should preserve the help description', () => {
