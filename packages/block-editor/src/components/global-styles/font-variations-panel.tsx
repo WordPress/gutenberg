@@ -63,10 +63,14 @@ export type FontVariationAxis = {
 };
 
 /**
- * Axes with a CSS property of their own. They are set through font weight,
- * width and style, not through `font-variation-settings`.
+ * The axes OpenType registers, which this panel leaves alone. Four are set
+ * through font weight, width and style. `opsz` is the fifth: `font-optical-sizing`
+ * is `auto` by default, so the browser already tracks the font size, and writing
+ * a coordinate here would pin it. Offering these in typography, `opsz` included,
+ * is the subject of #83148; what is left for this panel is the axes only
+ * `font-variation-settings` can reach.
  */
-const REGISTERED_AXES_WITH_PROPERTIES = [ 'wght', 'wdth', 'slnt', 'ital' ];
+const REGISTERED_AXES = [ 'wght', 'wdth', 'slnt', 'ital', 'opsz' ];
 
 const EMPTY_AXES: FontVariationAxis[] = [];
 
@@ -206,7 +210,7 @@ export function getFontVariationAxes(
 	} );
 
 	return [ ...capabilities.values() ].flatMap( ( axis ) => {
-		if ( REGISTERED_AXES_WITH_PROPERTIES.includes( axis.tag ) ) {
+		if ( REGISTERED_AXES.includes( axis.tag ) ) {
 			return [];
 		}
 		const { min, max } = axis;
@@ -380,7 +384,6 @@ export default function FontVariationsPanel( {
 							variations?.[ axis.tag ] !== undefined
 						}
 						onDeselect={ () => setAxisValue( axis.tag, undefined ) }
-						isShownByDefault
 						panelId={ panelId }
 					>
 						<RangeControl

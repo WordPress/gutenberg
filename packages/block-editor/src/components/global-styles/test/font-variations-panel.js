@@ -36,19 +36,20 @@ describe( 'getFontVariationAxes', () => {
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [
-			{ tag: 'opsz', name: undefined, min: 8, max: 144, default: 14 },
 			{ tag: 'GRAD', name: undefined, min: -200, max: 150, default: 0 },
 			{ tag: 'XTRA', name: undefined, min: 323, max: 603, default: 468 },
 		] );
 	} );
 
-	it( 'leaves out axes that have a CSS property of their own', () => {
-		expect(
-			getFontVariationAxes(
-				getSettings(),
-				'var:preset|font-family|roboto-flex'
-			).map( ( { tag } ) => tag )
-		).not.toContain( 'wght' );
+	it( 'leaves out the axes OpenType registers', () => {
+		const tags = getFontVariationAxes(
+			getSettings(),
+			'var:preset|font-family|roboto-flex'
+		).map( ( { tag } ) => tag );
+
+		[ 'wght', 'wdth', 'slnt', 'ital', 'opsz' ].forEach( ( registered ) => {
+			expect( tags ).not.toContain( registered );
+		} );
 	} );
 
 	it( 'resolves the font family from each value format', () => {
@@ -59,7 +60,7 @@ describe( 'getFontVariationAxes', () => {
 		].forEach( ( fontFamily ) => {
 			expect(
 				getFontVariationAxes( getSettings(), fontFamily )
-			).toHaveLength( 3 );
+			).toHaveLength( 2 );
 		} );
 	} );
 
@@ -107,14 +108,14 @@ describe( 'getFontVariationAxes with several faces', () => {
 				fontStyle: 'normal',
 				fontWeight: '100 900',
 				axes: [
-					{ tag: 'opsz', min: 8, default: 14, max: 144 },
+					{ tag: 'XTRA', min: 323, default: 468, max: 603 },
 					{ tag: 'GRAD', min: -200, default: 0, max: 150 },
 				],
 			},
 			{
 				fontStyle: 'italic',
 				fontWeight: '100 900',
-				axes: [ { tag: 'opsz', min: 8, default: 14, max: 36 } ],
+				axes: [ { tag: 'XTRA', min: 323, default: 468, max: 500 } ],
 			},
 		],
 	};
@@ -134,7 +135,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 					fontStyle: 'normal',
 				} )
 			)
-		).toEqual( [ 'opsz 8-144', 'GRAD -200-150' ] );
+		).toEqual( [ 'XTRA 323-603', 'GRAD -200-150' ] );
 		expect(
 			tags(
 				getFontVariationAxes( settings, 'Split', {
@@ -142,7 +143,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 					fontWeight: '700',
 				} )
 			)
-		).toEqual( [ 'opsz 8-36' ] );
+		).toEqual( [ 'XTRA 323-500' ] );
 	} );
 
 	it( 'intersects the faces when none matches', () => {
@@ -152,7 +153,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 					fontStyle: 'oblique',
 				} )
 			)
-		).toEqual( [ 'opsz 8-36' ] );
+		).toEqual( [ 'XTRA 323-500' ] );
 	} );
 
 	it( 'matches weight ranges and single weights', () => {
