@@ -27,29 +27,6 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
-		 * icons that `init` only registers once. Replay the registration so order-dependent
-		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
-		 * collection at once, so drop whatever survived rather than topping up.
-		 */
-		$collections_registry = WP_Icon_Collections_Registry::get_instance();
-		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
-			if ( $collections_registry->is_registered( $collection_slug ) ) {
-				$collections_registry->unregister( $collection_slug );
-			}
-		}
-		gutenberg_register_default_icon_collections();
-
-		/*
-		 * Replaying registration has to go through the Gutenberg registry, since only
-		 * it accepts the `keywords` property; the base registry rejects it and would
-		 * register no icon at all. On a normal request the `init` priority 1 override
-		 * has already done this, but the singleton is reset between suites.
-		 */
-		WP_Icons_Registry_Gutenberg::get_instance();
-		gutenberg_register_default_icons();
-
 		$collections = array(
 			'test-public'  => true,
 			'test-private' => false,

@@ -20,8 +20,33 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	private $temp_file = null;
 
+	/**
+	 * Registry instance in place before the test, restored in tear_down.
+	 *
+	 * @var WP_Icons_Registry|null
+	 */
+	private $original_registry = null;
+
 	public function set_up() {
 		parent::set_up();
+
+		/*
+		 * Start from a clean registry, keeping the instance that was in place so
+		 * `tear_down()` can put it back rather than leaving later suites with a
+		 * base registry that rejects Gutenberg-only icon properties.
+		 *
+		 * ReflectionProperty::setAccessible is:
+		 * - redundant as of 8.1.0, which made all properties accessible
+		 * - deprecated as of 8.5.0
+		 * - needed until 8.1.0, as property `instance` is private
+		 */
+		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
+		$this->original_registry = $instance_property->getValue();
+		$instance_property->setValue( null, null );
+
 		$this->registry = WP_Icons_Registry_Gutenberg::get_instance();
 		$collections    = WP_Icon_Collections_Registry::get_instance();
 		if ( ! $collections->is_registered( 'test-collection' ) ) {
@@ -31,18 +56,11 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 	public function tear_down() {
 		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
-
-		/*
-		 * ReflectionProperty::setAccessible is:
-		 * - redundant as of 8.1.0, which made all properties accessible
-		 * - deprecated as of 8.5.0
-		 * - needed until 8.1.0, as property `instance` is private
-		 */
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance_property->setAccessible( true );
 		}
-
-		$instance_property->setValue( null, null );
+		$instance_property->setValue( null, $this->original_registry );
+		$this->original_registry = null;
 
 		$collections = WP_Icon_Collections_Registry::get_instance();
 		if ( $collections->is_registered( 'test-collection' ) ) {
