@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 7.56.0 (2026-09-23)
+
 ### Bug Fixes
 
+-   `useRichText`: Show the boundary of the active format or object when the editing host around the element has focus, not only when the element itself does ([#83385](https://github.com/WordPress/gutenberg/pull/83385)).
 -   `useRichText`: apply every selection change from props, including the second of two consecutive ones, and only while the element or an editing host around it has focus. The hook no longer moves focus to the element; the consumer decides where focus goes ([#82581](https://github.com/WordPress/gutenberg/pull/82581)).
 
 ## 7.55.0 (2026-09-10)
