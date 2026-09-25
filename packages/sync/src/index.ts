@@ -111,7 +111,8 @@ export { ConnectionErrorCode } from './errors';
 /**
  * Creates the sync manager, which orchestrates the lifecycle of syncing entity
  * records: it creates Yjs documents, connects to providers, creates awareness
- * instances, and coordinates with the `core-data` store.
+ * instances, and coordinates with the `core-data` store. Exported for
+ * `@wordpress/core-data`; plugins don't need it.
  */
 export { createSyncManager } from './manager';
 
@@ -121,8 +122,8 @@ export { createSyncManager } from './manager';
 export { default as Delta } from './quill-delta/Delta';
 
 /**
- * Immediately retries the HTTP polling sync connection instead of waiting for
- * the next automatic retry.
+ * Retries the HTTP polling connection now instead of waiting for the next
+ * automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
  */
 export { retrySyncConnection } from './providers/http-polling/polling-manager';
 
