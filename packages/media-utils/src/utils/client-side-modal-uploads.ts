@@ -567,21 +567,21 @@ function handleSuccess(
 	// Register the model in Attachments.all (parity with wp-plupload.js).
 	wp.media.model.Attachment.get( attachment.id, model );
 
-	const clearUploadingState = () => {
-		[ 'file', 'loaded', 'size', 'percent' ].forEach( ( key ) =>
-			model.unset( key, { silent: true } )
-		);
-		model.set( { uploading: false } );
-	};
+	// Clear the uploading state before the refetch lands, not after. The
+	// details sidebar only re-renders when the title changes, so it has to see
+	// `uploading: false` by then or it keeps showing a progress bar. The
+	// classic uploader sets both in one call for the same reason.
+	[ 'file', 'loaded', 'size', 'percent' ].forEach( ( key ) =>
+		model.unset( key, { silent: true } )
+	);
+	model.set( { uploading: false }, { silent: true } );
 
 	model
 		.fetch()
-		.done( clearUploadingState )
 		.fail( () => {
-			// The fetch failed but the upload did not: clear the uploading
-			// state with what the pipeline returned so no tile is stuck.
-			model.set( toModelAttributes( attachment ), { silent: true } );
-			clearUploadingState();
+			// The fetch failed but the upload did not: fill the tile with what
+			// the pipeline returned so it is not left empty.
+			model.set( toModelAttributes( attachment ) );
 		} )
 		.always( () => {
 			maybeResetQueue();

@@ -327,6 +327,31 @@ describe( 'installClientSideModalUploads', () => {
 		expect( model.set ).toHaveBeenCalledWith( { id: 99 } );
 	} );
 
+	it( 'clears the uploading state before the refetch updates the tile', async () => {
+		const { Uploader, created } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+
+		bindings[ 0 ].handler( up, [ createPluploadFile() ] );
+
+		// The details sidebar re-renders only on the title change the refetch
+		// brings, so the model must no longer be uploading at that point.
+		const model = created[ 0 ];
+		const fetch = model.fetch as ReturnType< typeof vi.fn >;
+		const fetchImplementation = fetch.getMockImplementation()!;
+		let uploadingWhenFetched: unknown;
+		fetch.mockImplementation( () => {
+			uploadingWhenFetched = model.attributes.uploading;
+			return fetchImplementation();
+		} );
+
+		addItems.mock.calls[ 0 ][ 0 ].onSuccess( [ { id: 99 } ] );
+
+		expect( uploadingWhenFetched ).toBe( false );
+	} );
+
 	it( 'fills the tile from the pipeline attachment when the refetch fails', async () => {
 		const { Uploader, created } = setUpGlobals();
 		const { installClientSideModalUploads } = await loadModule();
