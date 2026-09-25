@@ -10,14 +10,15 @@
  *
  * @since 6.6.0
  *
- * @param array  $attributes The block attributes.
- * @param string $content    The block rendered content.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block rendered content.
+ * @param WP_Block $block      Optional. The block instance. Default null.
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
-function render_block_core_media_text( $attributes, $content ) {
+function render_block_core_media_text( $attributes, $content, $block = null ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
-		return $content;
+		return block_core_media_text_render_lightbox( $attributes, $content, $block );
 	}
 
 	if ( in_the_loop() ) {
@@ -122,6 +123,46 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 
 	return $content;
+}
+
+/**
+ * Adds the Image block's lightbox to the Media & Text image.
+ *
+ * @since 7.2.0
+ *
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block rendered content.
+ * @param WP_Block $block      Optional. The block instance. Default null.
+ *
+ * @return string The block markup, with the lightbox added to the image when enabled.
+ */
+function block_core_media_text_render_lightbox( $attributes, $content, $block = null ) {
+	if (
+		! $block instanceof WP_Block ||
+		'image' !== ( $attributes['mediaType'] ?? null ) ||
+		'none' !== ( $attributes['linkDestination'] ?? 'none' ) ||
+		true !== ( $attributes['lightbox']['enabled'] ?? null )
+	) {
+		return $content;
+	}
+
+	// Pass only the media figure, which is the last one when the media is on the right.
+	if ( ! preg_match_all( '/<figure class="wp-block-media-text__media">.*?<\/figure>/s', $content, $figures, PREG_OFFSET_CAPTURE ) ) {
+		return $content;
+	}
+	$has_media_on_right      = 'right' === ( $attributes['mediaPosition'] ?? null );
+	list( $figure, $offset ) = $has_media_on_right ? end( $figures[0] ) : $figures[0][0];
+
+	// Enlarges the full size attachment.
+	$lightbox_block = array( 'attrs' => array( 'id' => $attributes['mediaId'] ?? null ) );
+
+	// No Image block may have loaded these.
+	wp_enqueue_script_module( '@wordpress/block-library/image/view' );
+	wp_enqueue_style( 'wp-block-image' );
+
+	$lightbox_figure = block_core_image_render_lightbox( $figure, $lightbox_block, $block );
+
+	return substr_replace( $content, $lightbox_figure, $offset, strlen( $figure ) );
 }
 
 /**

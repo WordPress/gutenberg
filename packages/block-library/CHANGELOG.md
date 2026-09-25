@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Media & Text: Add the "Enlarge on click" option to the media link control, so the image can open in the lightbox as in the Image block. The option follows the Image block's `allowEditing` lightbox setting, but the global `enabled` default isn't inherited, so existing blocks render as before until they opt in ([#83341](https://github.com/WordPress/gutenberg/issues/83341)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
