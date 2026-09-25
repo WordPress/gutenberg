@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"type": "module",
 	"module": "./lib/build.mjs",

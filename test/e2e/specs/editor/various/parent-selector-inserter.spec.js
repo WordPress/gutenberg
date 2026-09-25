@@ -90,4 +90,40 @@ test.describe( 'Parent selector inserter', () => {
 			toolbar.locator( 'role=button[name^="Add "]' )
 		).toBeHidden();
 	} );
+
+	test( 'hides the parent selector inserter when the parent is locked against adding blocks', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		// A parent locked with templateLock: 'all' allows no blocks to be
+		// added, so the Inserter renders nothing. Without the inserter the
+		// toolbar group must not render either, or it leaves an empty group
+		// behind the parent selector.
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'constrained' },
+				templateLock: 'all',
+			},
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Text' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		await editor.showBlockToolbar();
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', {
+				name: 'Select parent block: Group',
+			} )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: /^Add / } )
+		).toBeHidden();
+	} );
 } );

@@ -295,10 +295,8 @@ function Navigation( {
 		hasSelectedStyleState,
 	} = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				hasSelectedStyleState: hasSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			const { getSettings, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			const settings = getSettings();
 
 			return {

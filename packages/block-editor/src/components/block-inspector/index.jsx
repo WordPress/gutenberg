@@ -155,6 +155,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					{ isViewportStyleState && <PositionControls /> }
 				</>
 			) }
 			{ isViewportStyleState && (

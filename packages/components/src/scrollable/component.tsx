@@ -5,7 +5,7 @@ import { View } from '../view';
 import { useScrollable } from './hook';
 import type { ScrollableProps } from './types';
 
-function UnconnectedScrollable(
+export function UnconnectedScrollable(
 	props: WordPressComponentProps< ScrollableProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
