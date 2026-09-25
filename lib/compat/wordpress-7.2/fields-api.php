@@ -26,8 +26,9 @@
  * @param string $kind The entity kind (e.g. `postType`).
  * @param string $name The entity name (e.g. `page`).
  * @return array[] The list of registered field definitions, in registration
- *                 order. Empty before the `init` action has run, when the
- *                 registry does not exist yet.
+ *                 order. Empty until the `init` action has completed: before
+ *                 it the registry does not exist, and during it a read is
+ *                 refused.
  */
 function gutenberg_get_registered_fields( $kind, $name ) {
 	$registry = Gutenberg_Fields_Registry::get_instance();
@@ -45,8 +46,9 @@ function gutenberg_get_registered_fields( $kind, $name ) {
  * @param string $name The entity name (e.g. `page`).
  * @return array<string, string[]> The ids of the fields each module applies
  *                                 to, keyed by module id, in registration
- *                                 order. Empty before the `init` action has
- *                                 run, when the registry does not exist yet.
+ *                                 order. Empty until the `init` action has
+ *                                 completed: before it the registry does not
+ *                                 exist, and during it a read is refused.
  */
 function gutenberg_get_registered_field_modules( $kind, $name ) {
 	$registry = Gutenberg_Fields_Registry::get_instance();
@@ -61,9 +63,10 @@ function gutenberg_get_registered_field_modules( $kind, $name ) {
  * Returns the ids of all script modules registered for any entity.
  *
  * @return array<string, string[]> The lists of module ids, keyed by
- *                                 `{$kind}/{$name}`. Empty before the `init`
- *                                 action has run, when the registry does not
- *                                 exist yet.
+ *                                 `{$kind}/{$name}`. Empty until the `init`
+ *                                 action has completed: before it the
+ *                                 registry does not exist, and during it a
+ *                                 read is refused.
  */
 function gutenberg_get_all_registered_field_modules() {
 	$registry = Gutenberg_Fields_Registry::get_instance();
