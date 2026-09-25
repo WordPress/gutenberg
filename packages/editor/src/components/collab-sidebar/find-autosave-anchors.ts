@@ -144,6 +144,9 @@ export function findAutosaveAnchors( {
 	blocks: Block< Attributes >[];
 } ): AutosaveAnchors {
 	const result: AutosaveAnchors = { attributesByClientId: {}, noteIds: [] };
+	// A save after the autosave wins: whatever it did to the note's block,
+	// eg. deleting it, was deliberate. Both are GMT timestamps in the same
+	// format, so they compare as strings.
 	if (
 		! orphanNoteIds.length ||
 		! autosave?.modified_gmt ||
