@@ -49,9 +49,13 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.locator( 'iframe[name="editor-canvas"]' ).waitFor();
 	} );
 
+	/*
+	 * These tests focus the search box instead of clicking it, since this branch's list
+	 * layout styles can break Chromium's hit-testing. Fixed upstream in WordPress/gutenberg#63299.
+	 */
 	test( 'Items list is reachable via TAB', async ( { page } ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -79,7 +83,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -108,7 +112,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -131,7 +135,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -172,7 +176,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
