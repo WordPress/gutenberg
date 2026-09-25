@@ -448,7 +448,6 @@ mark.wp-note {
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-sm);
 	color: var(--wpds-color-foreground-content-neutral);
-	isolation: isolate;
 }
 
 // Search field with the skin-tone toggle beside it.
@@ -510,7 +509,6 @@ mark.wp-note {
 	// Overlay scrollbars reserve nothing; classic ones get an equal gutter
 	// on both edges, so the grid stays centered either way.
 	scrollbar-gutter: stable both-edges;
-	position: relative;
 	padding-inline: var(--emoji-picker-padding);
 	// A keyboard-scrolled cell stays clear of the sticky category heading.
 	scroll-padding-block: var(--wpds-dimension-size-md) 0;
@@ -558,15 +556,13 @@ mark.wp-note {
 	contain-intrinsic-size: auto var(--emoji-picker-cell-size);
 }
 
+// The row's grid track sets the cell width; the Design System item
+// supplies the flex centering, radius, and cursor.
 .editor-collab-sidebar-panel__picker-emoji {
 	justify-content: center;
-	width: var(--emoji-picker-cell-size);
 	height: var(--emoji-picker-cell-size);
-	min-height: 0;
-	margin: 0;
 	padding: 0;
 	font-size: 24px;
-	line-height: 1;
 
 	// The highlight follows the arrow keys and the pointer while DOM
 	// focus stays in the search field.
