@@ -13,7 +13,6 @@ import {
 	layout,
 	rotateRight,
 	rotateLeft,
-	grid,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -211,7 +210,6 @@ const getEditorCommandLoader = () =>
 			label: showBlockBoundaries
 				? __( 'Hide block boundaries' )
 				: __( 'Show block boundaries' ),
-			icon: grid,
 			category: 'command',
 			callback: ( { close } ) => {
 				toggle( 'core', 'showBlockBoundaries' );

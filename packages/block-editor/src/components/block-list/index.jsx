@@ -47,6 +47,7 @@ function Root( { className, ...settings } ) {
 			getSettings,
 			isTyping,
 			hasBlockSpotlight,
+			isZoomOut,
 			getEditedContentOnlySection,
 		} = unlock( select( blockEditorStore ) );
 		const {
@@ -65,7 +66,8 @@ function Root( { className, ...settings } ) {
 			isFocusMode:
 				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
 			isPreviewMode: _isPreviewMode,
-			showBlockBoundaries: ! _isPreviewMode && _showBlockBoundaries,
+			showBlockBoundaries:
+				! _isPreviewMode && ! isZoomOut() && _showBlockBoundaries,
 			editedContentOnlySection: getEditedContentOnlySection(),
 		};
 	}, [] );

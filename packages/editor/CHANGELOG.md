@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add a preference and command to show block boundaries in the editor canvas ([#69388](https://github.com/WordPress/gutenberg/pull/69388)).
+-   Add a preference, View menu item, and command to show block boundaries in the editor canvas ([#69388](https://github.com/WordPress/gutenberg/pull/69388)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 
 ### Bug Fixes
