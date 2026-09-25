@@ -1265,6 +1265,16 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
 	} );
 
+	it( 'Keeps the combining marks of scripts that need them', () => {
+		expect( cleanForSlug( 'अलग-अलग प्रकार के प्लंबिंग ट्रैप्स' ) ).toBe(
+			'अलग-अलग-प्रकार-के-प्लंबिंग-ट्रैप्स'
+		);
+		expect( cleanForSlug( 'தமிழ் மொழி' ) ).toBe( 'தமிழ்-மொழி' );
+		expect( cleanForSlug( 'Cre\u0300me Bru\u0302le\u0301e' ) ).toBe(
+			'creme-brulee'
+		);
+	} );
+
 	it( 'Should trim multiple leading and trailing dashes', () => {
 		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
 			'is-tht-deja_vu'

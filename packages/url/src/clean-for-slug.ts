@@ -22,14 +22,17 @@ export function cleanForSlug( string: string ): string {
 	}
 	return (
 		removeAccents( string )
+			// Remove combining diacritical marks left over from decomposed Latin letters.
+			.replace( /[\u0300-\u036f]/g, '' )
 			// Convert &nbsp, &ndash, and &mdash to hyphens.
 			.replace( /(&nbsp;|&ndash;|&mdash;)/g, '-' )
 			// Convert each group of whitespace, periods, and forward slashes to a hyphen.
 			.replace( /[\s\./]+/g, '-' )
 			// Remove all HTML entities.
 			.replace( /&\S+?;/g, '' )
-			// Remove anything that's not a letter, number, underscore or hyphen.
-			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
+			// Remove anything that's not a letter, mark, number, underscore or hyphen.
+			// Marks are needed by scripts like Devanagari, Tamil and Bengali.
+			.replace( /[^\p{L}\p{M}\p{N}_-]+/gu, '' )
 			// Convert to lowercase
 			.toLowerCase()
 			// Replace multiple hyphens with a single one.
