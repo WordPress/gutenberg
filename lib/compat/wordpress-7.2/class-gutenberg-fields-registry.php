@@ -6,16 +6,20 @@
  */
 
 /**
- * Holds the fields registered for entities with gutenberg_register_fields().
+ * Holds the fields registered for entities.
  *
- * The registry maps an entity, identified by its kind and name, to three
- * things: its registered field definitions keyed by id, in registration
- * order; the script modules registered for it, each with the ids of the
- * fields it applies to; and the ids of the fields removed with
- * gutenberg_unregister_fields(), so a default field the entity derives on
- * its own stays out once removed. It only stores what it is given:
- * gutenberg_register_fields() validates the definitions before registering
- * them.
+ * The registry maps an entity, identified by its kind and name, to its
+ * registered field definitions keyed by id, in registration order, and to
+ * the script modules registered for it, each with the ids of the fields it
+ * applies to. register() validates the definitions before storing them.
+ *
+ * Fields are registered on the `gutenberg_fields_api_init` action, on the
+ * registry its callbacks receive. There is no function wrapping register()
+ * or unregister(): the action is the one place a plugin gets the instance,
+ * once the default fields are in place, the way `customize_register` hands
+ * out the WP_Customize_Manager and `wp_connectors_init` the
+ * WP_Connector_Registry. Reading goes through the functions in
+ * fields-api.php.
  *
  * The registry exists once `init` has run, see get_instance(), and is
  * filled lazily: the first time its fields are read it fires the
@@ -113,7 +117,7 @@ final class Gutenberg_Fields_Registry {
 		foreach ( array( $kind, $name ) as $argument ) {
 			if ( ! is_string( $argument ) || '' === $argument ) {
 				_doing_it_wrong(
-					__FUNCTION__,
+					__METHOD__,
 					__( 'The entity kind and the entity name must be non-empty strings.', 'gutenberg' ),
 					'7.2.0'
 				);
@@ -123,7 +127,7 @@ final class Gutenberg_Fields_Registry {
 
 		if ( null !== $script_module && ( ! is_string( $script_module ) || '' === $script_module ) ) {
 			_doing_it_wrong(
-				__FUNCTION__,
+				__METHOD__,
 				__( 'The script module must be the id of a script module.', 'gutenberg' ),
 				'7.2.0'
 			);
@@ -132,7 +136,7 @@ final class Gutenberg_Fields_Registry {
 
 		if ( ! is_array( $fields ) ) {
 			_doing_it_wrong(
-				__FUNCTION__,
+				__METHOD__,
 				__( 'The fields must be a list of field definitions.', 'gutenberg' ),
 				'7.2.0'
 			);
@@ -142,7 +146,7 @@ final class Gutenberg_Fields_Registry {
 		foreach ( $fields as $field ) {
 			if ( ! is_array( $field ) || empty( $field['id'] ) || ! is_string( $field['id'] ) ) {
 				_doing_it_wrong(
-					__FUNCTION__,
+					__METHOD__,
 					__( 'Every field definition must be an array with a non-empty string `id`.', 'gutenberg' ),
 					'7.2.0'
 				);
@@ -318,7 +322,8 @@ final class Gutenberg_Fields_Registry {
 		/**
 		 * Fires the first time the registered fields are read, after `init`.
 		 *
-		 * Register or adjust fields here. The default fields of every post
+		 * Register or adjust fields here, on `$registry`: it is the only way
+		 * to register fields. The default fields of every post
 		 * type are registered at priority 0 and adjusted at priority 9, so a
 		 * callback at the default priority sees the final defaults. The
 		 * plugin that owns a post type shapes its defaults at priority 9,

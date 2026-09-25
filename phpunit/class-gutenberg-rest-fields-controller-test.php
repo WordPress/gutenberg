@@ -78,7 +78,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		return gutenberg_register_fields( $kind, $name, $fields, $module );
+		return Gutenberg_Fields_Registry::get_instance()->register( $kind, $name, $fields, $module );
 	}
 
 	/**

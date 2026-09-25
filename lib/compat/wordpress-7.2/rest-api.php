@@ -21,7 +21,7 @@ add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoint
 /**
  * Registers the Fields REST API route.
  *
- * Exposes the fields registered on the server with gutenberg_register_fields().
+ * Exposes the fields registered on the server on the `gutenberg_fields_api_init` action.
  *
  * @see Gutenberg_REST_Fields_Controller_7_2
  */
