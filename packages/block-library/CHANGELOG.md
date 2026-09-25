@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown. The Navigation rule that makes menu items inherit their color now applies only to a Navigation block that sets a color of its own, so it no longer outranks a Navigation Link color set in Global Styles ([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
+-   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown ([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
 
 ## 11.1.0 (2026-09-23)
 
