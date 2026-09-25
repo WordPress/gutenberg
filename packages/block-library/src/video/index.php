@@ -52,8 +52,24 @@ function render_block_core_video( array $attributes, string $content ): string {
 		return $content;
 	}
 
-	$p->set_attribute( 'width', (string) $metadata['width'] );
-	$p->set_attribute( 'height', (string) $metadata['height'] );
+	/*
+	 * For videos with 90° or 270° rotation metadata (common for portrait videos recorded by
+	 * mobile devices that physically encode frames as landscape with a container-level rotation
+	 * flag), the stored width and height are the pre-rotation dimensions of the video file, not
+	 * the displayed dimensions. Swap them to get the correct displayed dimensions.
+	 *
+	 * The rotation is stored by the `gutenberg_add_video_rotation_to_metadata` filter below,
+	 * which reads it from the raw getID3 data at upload time.
+	 */
+	$width  = $metadata['width'];
+	$height = $metadata['height'];
+	if ( isset( $metadata['rotate'] ) && in_array( abs( (int) $metadata['rotate'] ), array( 90, 270 ), true ) ) {
+		$width  = $metadata['height'];
+		$height = $metadata['width'];
+	}
+
+	$p->set_attribute( 'width', (string) $width );
+	$p->set_attribute( 'height', (string) $height );
 
 	/*
 	 * The aspect-ratio style is needed due to an issue with the CSS spec: <https://github.com/w3c/csswg-drafts/issues/7524>.
@@ -64,16 +80,47 @@ function render_block_core_video( array $attributes, string $content ): string {
 	 *     }
 	 *
 	 * This is because this attr() is yet only implemented in Chromium: <https://caniuse.com/css3-attr>.
+	 *
+	 * Note: the `auto` keyword cannot be prepended here (i.e. `aspect-ratio: auto W / H`) because
+	 * for `<video>` the default object size (300×150) is always treated as the natural aspect ratio
+	 * before the video data loads. The `auto` keyword would therefore resolve to 300/150 instead
+	 * of the W/H fallback, reintroducing the CLS that this style was added to prevent.
+	 * See: <https://github.com/w3c/csswg-drafts/issues/7524>.
 	 */
 	$style = $p->get_attribute( 'style' );
 	if ( ! is_string( $style ) ) {
 		$style = '';
 	}
-	$aspect_ratio_style = sprintf( 'aspect-ratio: %d / %d;', $metadata['width'], $metadata['height'] );
+	$aspect_ratio_style = sprintf( 'aspect-ratio: %d / %d;', $width, $height );
 	$p->set_attribute( 'style', $aspect_ratio_style . $style );
 
 	return $p->get_updated_html();
 }
+
+/**
+ * Adds rotation information to video attachment metadata during upload.
+ *
+ * The core `wp_read_video_metadata()` function does not include the video rotation,
+ * but getID3 computes it from the container metadata (e.g. the QuickTime tkhd atom's
+ * transform matrix). This filter persists the rotation in the stored attachment metadata
+ * so the Video block render function can correct the aspect ratio for portrait videos
+ * that are physically encoded in landscape orientation with a rotation flag.
+ *
+ * @since 6.9.0
+ *
+ * @param array       $metadata    Filtered video metadata.
+ * @param string      $file        Path to the video file.
+ * @param string|null $file_format File format of the video, as analyzed by getID3.
+ * @param array       $data        Raw metadata from getID3.
+ * @return array Updated video metadata.
+ */
+function gutenberg_add_video_rotation_to_metadata( array $metadata, string $file, ?string $file_format, array $data ): array {
+	if ( ! isset( $metadata['rotate'] ) && ! empty( $data['video']['rotate'] ) ) {
+		$metadata['rotate'] = (int) $data['video']['rotate'];
+	}
+	return $metadata;
+}
+add_filter( 'wp_read_video_metadata', 'gutenberg_add_video_rotation_to_metadata', 10, 4 );
 
 /**
  * Registers the `core/video` block on server.
@@ -89,3 +136,4 @@ function register_block_core_video(): void {
 	);
 }
 add_action( 'init', 'register_block_core_video' );
+
