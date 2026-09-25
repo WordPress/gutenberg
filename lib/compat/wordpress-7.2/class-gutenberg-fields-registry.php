@@ -180,12 +180,10 @@ final class Gutenberg_Fields_Registry {
 	/**
 	 * Unregisters fields of an entity.
 	 *
-	 * Unregistering a field removes its registered definition, if any, drops
-	 * it from the script modules that applied to it (a module left with no
-	 * field is forgotten), and records it as removed, so a default field of
-	 * the entity with that id stays out until the entity is reset.
-	 * Unregistering every field resets the entity: registered fields, script
-	 * modules, and removals.
+	 * Unregistering a field removes its registered definition, if any, and
+	 * drops it from the script modules that applied to it (a module left with
+	 * no field is forgotten). Unregistering every field forgets the entity:
+	 * its registered fields and script modules.
 	 *
 	 * Unregistering reads the registered fields, so it fires the
 	 * `fields_api_init` action if it has not fired yet. Call it on that
