@@ -35,6 +35,7 @@ function render_block_core_search( $attributes ) {
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
 	$button              = '';
+	$mobile_button       = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
 	$color_classes       = get_color_classes_for_block_core_search( $attributes );
@@ -45,7 +46,9 @@ function render_block_core_search( $attributes ) {
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
 	// This variable is a constant and its value is always false at this moment.
 	// It is defined this way because some values depend on it, in case it changes in the future.
-	$open_by_default = false;
+	$open_by_default      = false;
+	$aria_label_expanded  = __( 'Submit Search' );
+	$aria_label_collapsed = __( 'Expand search field' );
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
@@ -135,6 +138,11 @@ function render_block_core_search( $attributes ) {
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'button-only' === $attributes['buttonPosition'] ) {
+				$mobile_button = new WP_HTML_Tag_Processor( $button->get_updated_html() );
+				$mobile_button->next_tag();
+				$mobile_button->add_class( 'wp-block-search__mobile-submit' );
+				$mobile_button->set_attribute( 'aria-label', $aria_label_expanded );
+
 				$button->set_attribute( 'data-wp-bind--aria-label', 'state.ariaLabel' );
 				$button->set_attribute( 'data-wp-bind--aria-controls', 'state.ariaControls' );
 				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.isSearchInputVisible' );
@@ -143,7 +151,7 @@ function render_block_core_search( $attributes ) {
 
 				// Adding these attributes manually is needed until the Interactivity
 				// API SSR logic is added to core.
-				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
+				$button->set_attribute( 'aria-label', $aria_label_collapsed );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
 				$button->set_attribute( 'type', 'button' );
@@ -159,11 +167,16 @@ function render_block_core_search( $attributes ) {
 	if ( $is_button_inside && ! empty( $border_color_classes ) ) {
 		$field_markup_classes[] = $border_color_classes;
 	}
+	// Keep the launch button in flow while the mobile search surface overlays it.
+	$field_contents = $input . $query_params_markup;
+	if ( $is_expandable_searchfield ) {
+		$field_contents = '<div class="wp-block-search__mobile-overlay" data-wp-style--left="context.mobileOverlayLeft" data-wp-style--background-color="context.mobileOverlayBackgroundColor">' . $field_contents . $mobile_button . '</div>';
+	}
 	$field_markup       = sprintf(
 		'<div class="%s" %s>%s</div>',
 		esc_attr( implode( ' ', $field_markup_classes ) ),
 		$inline_styles['wrapper'],
-		$input . $query_params_markup . $button
+		$field_contents . $button
 	);
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
@@ -172,9 +185,7 @@ function render_block_core_search( $attributes ) {
 
 	// If it's interactive, add the directives.
 	if ( $is_expandable_searchfield ) {
-		$aria_label_expanded  = __( 'Submit Search' );
-		$aria_label_collapsed = __( 'Expand search field' );
-		$form_context         = wp_interactivity_data_wp_context(
+		$form_context    = wp_interactivity_data_wp_context(
 			array(
 				'isSearchInputVisible' => $open_by_default,
 				'inputId'              => $input_id,
@@ -182,12 +193,13 @@ function render_block_core_search( $attributes ) {
 				'ariaLabelCollapsed'   => $aria_label_collapsed,
 			)
 		);
-		$form_directives      = '
+		$form_directives = '
 		 data-wp-interactive="core/search"
 		 ' . $form_context . '
 		 data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
 		 data-wp-on--keydown="actions.handleSearchKeydown"
 		 data-wp-on--focusout="actions.handleSearchFocusout"
+		 data-wp-on-window--resize="callbacks.resizeSearch"
 		';
 	}
 
