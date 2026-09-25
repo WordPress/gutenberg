@@ -163,12 +163,12 @@ describe( 'chunkRows', () => {
 		expect( chunkRows( [] ) ).toEqual( [] );
 	} );
 
-	it( 'splits into rows of 8 with a final partial row', () => {
+	it( 'splits into rows of 6 with a final partial row', () => {
 		const input = makeEntries( 10 );
 		const rows = chunkRows( input );
 		expect( rows ).toHaveLength( 2 );
-		expect( rows[ 0 ] ).toHaveLength( 8 );
-		expect( rows[ 1 ] ).toHaveLength( 2 );
+		expect( rows[ 0 ] ).toHaveLength( 6 );
+		expect( rows[ 1 ] ).toHaveLength( 4 );
 	} );
 
 	it( 'uses one row when input fits in a single row', () => {
@@ -320,13 +320,64 @@ describe( 'EmojiPicker search announcements', () => {
 		// While searching, results collapse into one flat grid with no
 		// category sections.
 		await user.type(
-			screen.getByRole( 'searchbox', { name: 'Search emoji' } ),
+			screen.getByRole( 'combobox', { name: 'Search emoji' } ),
 			'face'
 		);
 		await waitFor( () =>
 			expect( screen.queryByRole( 'rowgroup' ) ).not.toBeInTheDocument()
 		);
 		expect( screen.getAllByRole( 'gridcell' ) ).toHaveLength( 2 );
+	} );
+
+	it( 'keeps focus in the search field while the arrow keys move through the grid', async () => {
+		const user = userEvent.setup();
+		const onSelect = vi.fn();
+		render( <EmojiPicker onSelect={ onSelect } /> );
+
+		await screen.findAllByRole( 'gridcell' );
+		const searchbox = screen.getByRole( 'combobox', {
+			name: 'Search emoji',
+		} );
+		await waitFor( () => expect( searchbox ).toHaveFocus() );
+
+		await user.keyboard( '{ArrowDown}' );
+		await waitFor( () =>
+			expect( searchbox ).toHaveAttribute(
+				'aria-activedescendant',
+				screen.getByRole( 'gridcell', { name: 'grinning face' } ).id
+			)
+		);
+
+		await user.keyboard( '{ArrowRight}' );
+		await waitFor( () =>
+			expect( searchbox ).toHaveAttribute(
+				'aria-activedescendant',
+				screen.getByRole( 'gridcell', { name: 'beaming face' } ).id
+			)
+		);
+		expect( searchbox ).toHaveFocus();
+
+		await user.keyboard( '{Enter}' );
+		expect( onSelect ).toHaveBeenCalledWith( '😁' );
+		// Picking does not copy the emoji into the search field.
+		expect( searchbox ).toHaveValue( '' );
+	} );
+
+	it( 'picks the top search result with Enter', async () => {
+		const user = userEvent.setup();
+		const onSelect = vi.fn();
+		render( <EmojiPicker onSelect={ onSelect } /> );
+
+		await screen.findAllByRole( 'gridcell' );
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search emoji' } ),
+			'beaming'
+		);
+		await waitFor( () =>
+			expect( screen.getAllByRole( 'gridcell' ) ).toHaveLength( 1 )
+		);
+		await user.keyboard( '{Enter}' );
+		expect( onSelect ).toHaveBeenCalledWith( '😁' );
 	} );
 
 	it( 'announces result counts and the empty state as the query settles', async () => {
@@ -336,7 +387,7 @@ describe( 'EmojiPicker search announcements', () => {
 		// Wait for the dataset to load before searching.
 		await screen.findAllByRole( 'gridcell' );
 
-		const searchbox = screen.getByRole( 'searchbox', {
+		const searchbox = screen.getByRole( 'combobox', {
 			name: 'Search emoji',
 		} );
 
@@ -366,7 +417,7 @@ describe( 'EmojiPicker search announcements', () => {
 
 		await screen.findAllByRole( 'gridcell' );
 
-		const searchbox = screen.getByRole( 'searchbox', {
+		const searchbox = screen.getByRole( 'combobox', {
 			name: 'Search emoji',
 		} );
 

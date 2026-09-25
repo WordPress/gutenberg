@@ -1267,15 +1267,91 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.waitForFullPicker();
 
-			// The picker grid moves the roving tabindex with ArrowRight.
-			const firstEmoji = page.getByRole( 'gridcell' ).first();
-			await firstEmoji.focus();
+			// Focus stays in the search field while the arrow keys move a
+			// highlight through the grid, and Enter picks the highlight.
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			await expect( searchField ).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowRight' );
+			const secondEmoji = page.getByRole( 'gridcell' ).nth( 1 );
+			await expect( searchField ).toHaveAttribute(
+				'aria-activedescendant',
+				await secondEmoji.getAttribute( 'id' )
+			);
+			await expect( searchField ).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			// The selected emoji renders as a reaction pill on the note.
 			await expect(
 				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
+			).toBeVisible();
+		} );
+
+		test( 'arrow keys cross from one emoji category into the next', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing category crossing' },
+				comment: 'Category crossing',
+			} );
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			const firstCategory = page
+				.getByRole( 'grid' )
+				.getByRole( 'rowgroup' )
+				.first();
+			const firstCategoryRows = await firstCategory
+				.getByRole( 'row' )
+				.count();
+
+			// One press lands on the first row; one per row after that
+			// walks out of the first category and into the second.
+			for ( let i = 0; i <= firstCategoryRows; i++ ) {
+				await page.keyboard.press( 'ArrowDown' );
+			}
+			const activeId = await searchField.getAttribute(
+				'aria-activedescendant'
+			);
+			await expect(
+				page
+					.getByRole( 'grid' )
+					.getByRole( 'rowgroup' )
+					.nth( 1 )
+					.locator( `[id="${ activeId }"]` )
+			).toHaveCount( 1 );
+			await expect( searchField ).toBeFocused();
+		} );
+
+		test( 'Enter picks the top search result', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing Enter on search' },
+				comment: 'Enter on search',
+			} );
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			await page.keyboard.type( 'rocket' );
+			await expect(
+				page.getByRole( 'gridcell' ).first()
+			).toHaveAttribute( 'data-highlighted' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__reaction-button', {
+					hasText: '🚀',
+				} )
 			).toBeVisible();
 		} );
 
@@ -1592,7 +1668,9 @@ test.describe( 'Block Notes', () => {
 			// Add second reaction.
 			await blockNoteUtils.addReactionToComment( 'Rocket' );
 			await expect(
-				page.getByRole( 'button', { name: /Rocket/ } )
+				page.locator( '.editor-collab-sidebar-panel__reaction-button', {
+					hasText: '🚀',
+				} )
 			).toBeVisible();
 
 			// Both reactions remain visible together.
@@ -1995,33 +2073,35 @@ test.describe( 'Block Notes', () => {
 			const picker = page.locator(
 				'.editor-collab-sidebar-panel__picker'
 			);
-			// Measure a full 8-emoji row: the first row on screen is the
+			// Measure a full 6-emoji row: the first row on screen is the
 			// "Frequently used" section, which may hold fewer emoji and
 			// legitimately end short of the right edge.
-			const lastEmojiInFullRow = page
+			const fullRowEmojis = page
 				.locator( '.editor-collab-sidebar-panel__picker-row' )
 				.filter( {
 					has: page.locator(
-						'.editor-collab-sidebar-panel__picker-emoji:nth-child(8)'
+						'.editor-collab-sidebar-panel__picker-emoji:nth-child(6)'
 					),
 				} )
 				.first()
-				.locator( '.editor-collab-sidebar-panel__picker-emoji' )
-				.last();
+				.locator( '.editor-collab-sidebar-panel__picker-emoji' );
 
 			const pickerBox = await picker.boundingBox();
-			const emojiBox = await lastEmojiInFullRow.boundingBox();
-			const horizontalSlack =
-				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
+			const firstBox = await fullRowEmojis.first().boundingBox();
+			const lastBox = await fullRowEmojis.last().boundingBox();
+			const leftSlack = firstBox.x - pickerBox.x;
+			const rightSlack =
+				pickerBox.x + pickerBox.width - ( lastBox.x + lastBox.width );
 
-			// Last emoji in a full row should sit close to the picker's
-			// right edge. Tolerance allows for viewport padding (4px)
-			// plus a reserved scrollbar gutter (~17px on most
-			// platforms). Catches regressions where the picker is sized
-			// wider than the emoji grid (buttons fill only the left
-			// fraction, with a large empty band to the right — the
-			// original bug had ~145px of slack).
-			expect( horizontalSlack ).toBeLessThanOrEqual( 24 );
+			// The grid sits centered: 16px padding on each side, plus an
+			// equal scrollbar gutter on both edges where scrollbars take
+			// space. Catches the picker being sized wider than the grid
+			// (a band of empty space on the right) or the grid
+			// overflowing under the scrollbar.
+			expect( Math.abs( leftSlack - rightSlack ) ).toBeLessThanOrEqual(
+				1
+			);
+			expect( rightSlack ).toBeLessThanOrEqual( 16 + 17 );
 		} );
 
 		test.describe( 'Filtered emoji list', () => {
