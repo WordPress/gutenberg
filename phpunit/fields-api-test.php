@@ -33,9 +33,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * on tear down.
 	 */
 	private function unregister_all_field_modules() {
-		foreach ( array_keys( gutenberg_get_all_registered_field_modules() ) as $entity ) {
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		foreach ( array_keys( $registry->get_all_registered_field_modules() ) as $entity ) {
 			list( $kind, $name ) = explode( '/', $entity, 2 );
-			gutenberg_unregister_fields( $kind, $name );
+			$registry->unregister( $kind, $name );
 		}
 	}
 
@@ -67,7 +68,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		return gutenberg_register_fields( $kind, $name, $fields, $module );
+		return Gutenberg_Fields_Registry::get_instance()->register( $kind, $name, $fields, $module );
 	}
 
 	/**
@@ -332,13 +333,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * @param callable $callback  The callback adjusting its fields.
 	 */
 	public function test_templates_do_not_get_the_default_author_field( $post_type, $callback ) {
+		$registry = Gutenberg_Fields_Registry::get_instance();
 		$this->assertTrue( post_type_supports( $post_type, 'author' ), 'The post type supports authors.' );
 		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The action leaves no author field.' );
 
-		_gutenberg_register_posttype_supports_fields();
+		_gutenberg_register_posttype_supports_fields( $registry );
 		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The default author field is registered first.' );
 
-		$callback();
+		$callback( $registry );
 		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ) );
 	}
 
@@ -351,16 +353,17 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * reads once, then replays the two steps by hand.
 	 */
 	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
-		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$ids      = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertNotContains( 'author', $ids, 'The action leaves no author field.' );
 		$this->assertContains( 'date', $ids, 'The action registers the media fields.' );
 
-		_gutenberg_register_posttype_supports_fields();
+		_gutenberg_register_posttype_supports_fields( $registry );
 		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertContains( 'author', $ids, 'The default author field is registered first.' );
 		$this->assertContains( 'comment_status', $ids, 'The default comment status field is registered first.' );
 
-		_gutenberg_register_posttype_attachment_fields();
+		_gutenberg_register_posttype_attachment_fields( $registry );
 		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertNotContains( 'author', $ids );
 		$this->assertNotContains( 'comment_status', $ids );
@@ -409,12 +412,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * A plugin hooking the action at the default priority sees the final
-	 * defaults: it can patch a default field by registering it again, or
-	 * remove it.
+	 * defaults: on the registry it receives, it can patch a default field by
+	 * registering it again, or remove it.
 	 */
 	public function test_a_callback_at_the_default_priority_alters_the_defaults() {
-		$callback = static function () {
-			gutenberg_register_fields(
+		$callback = static function ( $registry ) {
+			$registry->register(
 				'postType',
 				'page',
 				array(
@@ -424,7 +427,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 					),
 				)
 			);
-			gutenberg_unregister_fields( 'postType', 'page', array( 'author' ) );
+			$registry->unregister( 'postType', 'page', array( 'author' ) );
 		};
 		add_action( 'gutenberg_fields_api_init', $callback );
 

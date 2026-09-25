@@ -12,41 +12,13 @@
  * that are JavaScript. An entity can have several modules. Each module applies to
  * the fields it was registered with, see gutenberg_get_registered_field_modules().
  *
+ * Fields are registered on the `gutenberg_fields_api_init` action, on the
+ * registry its callbacks receive, see Gutenberg_Fields_Registry::register()
+ * and Gutenberg_Fields_Registry::unregister(). The functions below read the
+ * registry.
+ *
  * @package gutenberg
  */
-
-/**
- * Registers fields for the given entity.
- *
- * @param string      $kind          The entity kind (e.g. `postType`).
- * @param string      $name          The entity name (e.g. `page`).
- * @param array[]     $fields        The list of field definitions.
- * @param string|null $script_module Optional. The id of the script module
- *                                   providing the JavaScript parts of the
- *                                   fields (e.g. `my-plugin/page-fields`),
- *                                   registered with
- *                                   wp_register_script_module().
- * @return bool Whether the fields were registered. False when an argument is
- *              invalid, in which case none of the fields is registered.
- */
-function gutenberg_register_fields( $kind, $name, $fields, $script_module = null ) {
-	return Gutenberg_Fields_Registry::get_instance()->register( $kind, $name, $fields, $script_module );
-}
-
-/**
- * Unregisters fields of the given entity.
- *
- * Without ids, the entity is reset and it no longer has any field or script modules registered.
- *
- * @param string        $kind The entity kind (e.g. `postType`).
- * @param string        $name The entity name (e.g. `page`).
- * @param string[]|null $ids  The ids of the fields to unregister. Default
- *                            null, every field of the entity.
- * @return bool Whether any field was unregistered.
- */
-function gutenberg_unregister_fields( $kind, $name, $ids = null ) {
-	return Gutenberg_Fields_Registry::get_instance()->unregister( $kind, $name, $ids );
-}
 
 /**
  * Returns the fields registered for the given entity.
@@ -191,22 +163,23 @@ add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
  * add_post_type_support() and remove_post_type_support(). Hence it runs on
  * `gutenberg_fields_api_init`, which the registry fires on its first read, after
  * `init`: while handling a REST request, or on `admin_init` when the editor
- * script is wired up. At priority 0, so a plugin altering the defaults with
- * gutenberg_register_fields() or gutenberg_unregister_fields() at the
- * default priority sees them registered.
+ * script is wired up. At priority 0, so a plugin altering the defaults on
+ * the registry at the default priority sees them registered.
  *
  * The post types whose fields differ from the defaults derived from their
  * supports (templates, attachments) adjust them in their own step, hooked
  * to the same action at priority 9, right after this one.
+ *
+ * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
-function _gutenberg_register_posttype_supports_fields() {
+function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry $registry ) {
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 	foreach ( $post_types as $post_type ) {
 		if ( post_type_supports( $post_type, 'author' ) ) {
 			// packages/fields/src/fields/author/index.tsx: `render`,
 			// `getElements`, `setValue`, and `isVisible` come from the script
 			// module.
-			gutenberg_register_fields(
+			$registry->register(
 				'postType',
 				$post_type,
 				array(
@@ -271,7 +244,7 @@ function _gutenberg_register_posttype_supports_fields() {
 			continue;
 		}
 
-		gutenberg_register_fields( 'postType', $post_type, $fields );
+		$registry->register( 'postType', $post_type, $fields );
 	}
 }
 add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_supports_fields', 0 );
@@ -287,9 +260,11 @@ add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_supports_
  * It runs right after the default fields are registered, on
  * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
+ *
+ * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
-function _gutenberg_register_posttype_wp_template_fields() {
-	gutenberg_unregister_fields( 'postType', 'wp_template', array( 'author' ) );
+function _gutenberg_register_posttype_wp_template_fields( Gutenberg_Fields_Registry $registry ) {
+	$registry->unregister( 'postType', 'wp_template', array( 'author' ) );
 }
 add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
 
@@ -304,9 +279,11 @@ add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_templa
  * It runs right after the default fields are registered, on
  * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
+ *
+ * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
-function _gutenberg_register_posttype_wp_template_part_fields() {
-	gutenberg_unregister_fields( 'postType', 'wp_template_part', array( 'author' ) );
+function _gutenberg_register_posttype_wp_template_part_fields( Gutenberg_Fields_Registry $registry ) {
+	$registry->unregister( 'postType', 'wp_template_part', array( 'author' ) );
 }
 add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );
 
@@ -323,16 +300,18 @@ add_action( 'gutenberg_fields_api_init', '_gutenberg_register_posttype_wp_templa
  * It runs right after the default fields are registered, on
  * `gutenberg_fields_api_init` at priority 9, so a plugin hooking the action at
  * the default priority sees the final defaults.
+ *
+ * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
-function _gutenberg_register_posttype_attachment_fields() {
+function _gutenberg_register_posttype_attachment_fields( Gutenberg_Fields_Registry $registry ) {
 	$post_type = get_post_type_object( 'attachment' );
 	if ( ! $post_type || ! $post_type->show_in_rest ) {
 		return;
 	}
 
 	// Remove all default fields registered for postType attachment.
-	gutenberg_unregister_fields( 'postType', 'attachment' );
-	gutenberg_register_fields(
+	$registry->unregister( 'postType', 'attachment' );
+	$registry->register(
 		'postType',
 		'attachment',
 		array(
