@@ -46,7 +46,7 @@ const { SomethingElse } = unlock( componentsPrivateApis );
 
 This rule has an object option:
 
-- `allowUseWithCaution` (default: `false`): allow `@wordpress/ui` components that are marked "Use with caution" in Storybook, such as `Button`, `Dialog` and `Menu`. These components are ready for use, but their APIs or behavior may still change. Opt in only if you can follow those changes. They are also not advised to be mixed with existing components from `@wordpress/components` in the same interface, because their visual design and behavior can differ.
+- `allowUseWithCaution` (default: `false`): allow `@wordpress/ui` components that are marked "Use with caution" in Storybook. These components are ready for use, but their APIs or behavior may still change. Opt in only if you can follow those changes. They are also not advised to be mixed with existing components from `@wordpress/components` in the same interface, because their visual design and behavior can differ.
 
 Examples of **correct** code for this rule with the `{ "allowUseWithCaution": true }` option:
 
