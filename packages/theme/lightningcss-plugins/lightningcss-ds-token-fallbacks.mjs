@@ -23,11 +23,13 @@ transform( {
 				variable.fallback &&
 				Object.hasOwn( tokenFallbacks, variable.name.ident )
 			) {
-				// Lightning CSS returns `from: null` in visited nodes but
-				// requires null specifiers to be omitted from returned nodes.
+				// Generated fallbacks reference global custom properties.
+				// Keep CSS Modules from scoping them to the consumer's file.
 				const fallback = JSON.parse(
 					JSON.stringify( variable.fallback, ( key, value ) =>
-						key === 'from' && value === null ? undefined : value
+						key === 'from' && value === null
+							? { type: 'global' }
+							: value
 					)
 				);
 				parsedFallbacks.set( variable.name.ident, fallback );

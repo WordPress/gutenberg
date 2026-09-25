@@ -143,21 +143,46 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( lightningcssResult ).toContain( expected );
 	} );
 
-	it( 'preserves from global when adding a fallback with Lightning CSS', () => {
-		const result = lightningcssTransform( {
-			filename: 'styles.module.css',
-			code: Buffer.from(
-				'.fixture { gap: var(--wpds-dimension-gap-sm from global); }'
-			),
-			cssModules: { dashedIdents: true },
-			visitor: lightningcssPlugin,
-		} );
+	it.each( [
+		{
+			property: 'gap',
+			token: '--wpds-dimension-gap-sm',
+			fallback: '8px',
+		},
+		{
+			property: 'outline-width',
+			token: '--wpds-border-width-focus',
+			fallback: 'var(--wp-admin-border-width-focus, 2px)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong',
+			fallback: 'var(--wp-admin-theme-color, #3858e9)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong-active',
+			fallback:
+				'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 93.0%, black)',
+		},
+	] )(
+		'preserves global references in $token and its fallback with Lightning CSS',
+		( { property, token, fallback } ) => {
+			const result = lightningcssTransform( {
+				filename: 'styles.module.css',
+				code: Buffer.from(
+					`.fixture { ${ property }: var(${ token } from global); }`
+				),
+				cssModules: { dashedIdents: true },
+				visitor: lightningcssPlugin,
+			} );
 
-		expect( result.code.toString() ).toContain(
-			'gap: var(--wpds-dimension-gap-sm, 8px)'
-		);
-		expect( result.references ).toEqual( {} );
-	} );
+			expect( result.code.toString() ).toContain(
+				`${ property }: var(${ token }, ${ fallback })`
+			);
+			expect( result.references ).toEqual( {} );
+		}
+	);
 
 	it( 'isolates injected fallbacks from changes by composed Lightning CSS visitors', () => {
 		const source = '.fixture { gap: var(--wpds-dimension-gap-sm); }';
