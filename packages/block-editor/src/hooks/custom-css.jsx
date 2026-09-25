@@ -176,13 +176,23 @@ function CustomCSSControl( {
 		blockType?.title
 	);
 
+	const panel = (
+		<AdvancedPanel
+			value={ stateStyle }
+			onChange={ onChange }
+			help={ cssHelpText }
+		/>
+	);
+
 	return (
 		<InspectorControls group={ isViewportState ? 'viewport' : 'advanced' }>
-			<AdvancedPanel
-				value={ stateStyle }
-				onChange={ onChange }
-				help={ cssHelpText }
-			/>
+			{ isViewportState ? (
+				<div className="block-editor-hooks-custom-css__viewport-panel">
+					{ panel }
+				</div>
+			) : (
+				panel
+			) }
 		</InspectorControls>
 	);
 }
