@@ -395,6 +395,122 @@ test.describe( 'Block Notes: floating panel', () => {
 		expect( await getReservedWidth() ).toBeGreaterThan( 0 );
 	} );
 
+	test( 'adding a note on a canvas too narrow for floating notes opens All notes', async ( {
+		editor,
+		page,
+	} ) => {
+		// The admin viewport stays above the large-viewport breakpoint, but
+		// the Settings sidebar leaves the canvas narrower than the floating
+		// panel needs, so the floating panel can't show the new-note form.
+		await page.setViewportSize( { width: 800, height: 800 } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph without notes' },
+		} );
+		await editor.openDocumentSettingsSidebar();
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+		const input = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await expect( input ).toBeVisible();
+		await expect( input ).toBeFocused();
+		await expect(
+			page.getByRole( 'region', { name: 'Notes' } )
+		).toBeHidden();
+	} );
+
+	test( 'floating note is centered in the reserved space of a canvas narrower than the editor', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.setViewportSize( { width: 1600, height: 900 } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+		} );
+		await addNote( page, editor, 'Resized canvas note' );
+
+		const settingsToggle = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Settings', exact: true } );
+		if (
+			( await settingsToggle.getAttribute( 'aria-expanded' ) ) === 'true'
+		) {
+			await settingsToggle.click();
+		}
+
+		// The tablet preview gives the canvas an explicit width and enables
+		// the resize handles. Widening it past the tablet breakpoint makes it
+		// a Desktop canvas again, still narrower than (and centered in) the
+		// editor, so its edge no longer matches the editor edge.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		const handle = page
+			.getByRole( 'separator', { name: 'Drag to resize' } )
+			.first();
+		const handleBox = await handle.boundingBox();
+		const x = handleBox.x + handleBox.width / 2;
+		const y = handleBox.y + handleBox.height / 2;
+		await page.mouse.move( x, y );
+		await page.mouse.down();
+		// The handle resizes at double the pointer distance (the canvas is
+		// centered), so this widens the canvas by 360px.
+		await page.mouse.move( x - 180, y, { steps: 10 } );
+		await page.mouse.up();
+
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		const getReservedWidth = () =>
+			editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+				const root = body.ownerDocument.documentElement;
+				return (
+					parseFloat(
+						body.ownerDocument.defaultView.getComputedStyle( root )
+							.paddingInlineEnd
+					) || 0
+				);
+			} );
+		// Space is only reserved for a Desktop canvas.
+		await expect.poll( getReservedWidth ).toBe( 280 );
+		const editorBox = await page
+			.locator( '.editor-visual-editor' )
+			.boundingBox();
+		const canvasBox = await canvas.boundingBox();
+		expect( canvasBox.x + canvasBox.width ).toBeLessThan(
+			editorBox.x + editorBox.width - 100
+		);
+
+		const thread = page.locator( '.editor-collab-sidebar-panel__thread' );
+		await expect( thread ).toBeVisible();
+		const contentEdge = await editor.canvas
+			.locator( 'body' )
+			.evaluate(
+				( body ) => body.ownerDocument.documentElement.clientWidth
+			);
+		const gapEnd = canvasBox.x + contentEdge;
+		const gapStart = gapEnd - 280;
+
+		await expect
+			.poll( async () => {
+				const threadBox = await thread.boundingBox();
+				const leftMargin = threadBox.x - gapStart;
+				const rightMargin = gapEnd - ( threadBox.x + threadBox.width );
+				return (
+					leftMargin > 0 &&
+					rightMargin > 0 &&
+					Math.abs( leftMargin - rightMargin ) < 4
+				);
+			} )
+			.toBe( true );
+	} );
+
 	test( 'floating notes do not react to the device preview', async ( {
 		editor,
 		page,
