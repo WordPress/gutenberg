@@ -665,11 +665,57 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_parent', 400 ),
 			'parent is a regular comment'  => array( 'comment', 'heart', true, 'rest_comment_invalid_parent', 400 ),
 			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
-			// Hex storage keys are the full picker's format; this limited set
-			// cannot render them back, so the API must not accept them yet.
-			'hex codepoint key'            => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
-			'hex ZWJ sequence key'         => array( 'note', '1f468-200d-1f4bb', true, 'rest_comment_invalid_reaction', 400 ),
+			// Hex storage keys are accepted (see
+			// `test_can_create_reaction_with_hex_key()`), but only when every
+			// segment is an assignable Unicode code point.
+			'hex above U+10FFFF'           => array( 'note', '110000', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex in surrogate range'       => array( 'note', 'd800', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex with a bad segment'       => array( 'note', '1f468-200d-dfff', true, 'rest_comment_invalid_reaction', 400 ),
+			'uppercase hex key'            => array( 'note', '1F44D', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'               => array( 'none', 'heart', false, 'rest_comment_login_required', 401 ),
+		);
+	}
+
+	/**
+	 * A pick from the full emoji picker that is not in the curated list is
+	 * submitted as a lowercase hex code-point sequence, which the picker
+	 * decodes back into the emoji. Those keys must round-trip through create.
+	 *
+	 * @dataProvider data_valid_reaction_hex_keys
+	 *
+	 * @param string $slug The hex storage key to submit.
+	 */
+	public function test_can_create_reaction_with_hex_key( $slug ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => $slug,
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$reaction = get_comment( $response->get_data()['id'] );
+		$this->assertSame( $slug, $reaction->comment_content );
+	}
+
+	public function data_valid_reaction_hex_keys() {
+		return array(
+			'single code point' => array( '1f44d' ),
+			'ZWJ sequence'      => array( '1f468-200d-1f4bb' ),
+			'two-digit key'     => array( 'a9' ),
 		);
 	}
 

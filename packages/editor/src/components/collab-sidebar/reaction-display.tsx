@@ -1,21 +1,20 @@
 import type { MouseEvent, ReactNode } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Dropdown } from '@wordpress/components';
-// `Button` and `IconButton` are not yet on the recommended list while the
-// Design System reviews their consistency alongside `@wordpress/components`
-// (see WordPress/gutenberg#76135). They are used here deliberately: the
-// reaction row needs the Design System's pill shape and quiet neutral
-// treatment rather than a bespoke stylesheet.
+/*
+ * `Button` is pending Design System review (WordPress/gutenberg#76135);
+ * used here for its pill shape and quiet neutral treatment.
+ */
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, IconButton, Stack, Tooltip } from '@wordpress/ui';
-import { reaction as reactionIcon } from '@wordpress/icons';
+import { Button, Stack, Tooltip } from '@wordpress/ui';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import ReactionEmojiPicker, {
+import {
+	hexKeyToEmoji,
 	buildEmojiBySlugMap,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
+import { useEmojiLabel } from './emojibase-data';
 
 interface ReactionSummaryEntry {
 	count: number;
@@ -25,7 +24,7 @@ interface ReactionSummaryEntry {
 }
 
 /**
- * The reaction summary keyed by storage slug.
+ * The reaction summary keyed by storage slug (curated slug or hex key).
  */
 type ReactionSummary = Record< string, ReactionSummaryEntry >;
 
@@ -36,12 +35,6 @@ interface ReactionComment {
 	author_name: string;
 	content: string | { raw?: string; rendered?: string };
 }
-
-// `Dropdown`'s popover is rendered in a portal anchored to <body>,
-// so it escapes the `overflow: hidden` chain on the collab sidebar
-// (`.interface-interface-skeleton__sidebar`,
-// `.editor-collab-sidebar`, `.editor-collab-sidebar-panel`).
-const POPOVER_PROPS = { placement: 'bottom-end' } as const;
 
 /**
  * Get the count of reactions for a specific slug.
@@ -99,7 +92,7 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	if ( names.length === 1 ) {
 		return sprintf(
 			/* translators: 1: user name, 2: emoji label. */
-			__( '%1$s reacted with %2$s emoji' ),
+			__( '%1$s reacted with %2$s' ),
 			names[ 0 ],
 			emojiLabel
 		);
@@ -108,7 +101,7 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	if ( names.length === 2 ) {
 		return sprintf(
 			/* translators: 1: first user name, 2: second user name, 3: emoji label. */
-			__( '%1$s and %2$s reacted with %3$s emoji' ),
+			__( '%1$s and %2$s reacted with %3$s' ),
 			names[ 0 ],
 			names[ 1 ],
 			emojiLabel
@@ -119,8 +112,8 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	return sprintf(
 		/* translators: 1: first user name, 2: second user name, 3: number of other users, 4: emoji label. */
 		_n(
-			'%1$s, %2$s, and %3$d other reacted with %4$s emoji',
-			'%1$s, %2$s, and %3$d others reacted with %4$s emoji',
+			'%1$s, %2$s, and %3$d other reacted with %4$s',
+			'%1$s, %2$s, and %3$d others reacted with %4$s',
 			othersCount
 		),
 		names[ 0 ],
@@ -177,13 +170,24 @@ async function fetchNoteReactions(
 // Module-level cache for reaction details: { "noteId:slug": string[] }
 const reactionNamesCache: Record< string, string[] > = {};
 
+/**
+ * Drop the cached reactor names for a note/slug pair, so the next tooltip
+ * refetches them.
+ *
+ * @param noteId The parent note comment ID.
+ * @param slug   The reaction slug.
+ */
+export function invalidateReactionNames( noteId: number, slug: string ): void {
+	delete reactionNamesCache[ `${ noteId }:${ slug }` ];
+}
+
 interface ReactionButtonProps {
 	noteId: number;
 	slug: string;
 	count: number;
 	isActive: boolean;
 	emoji: string;
-	emojiLabel: string;
+	emojiLabel?: string;
 	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
 }
@@ -197,7 +201,8 @@ interface ReactionButtonProps {
  * @param props.count            The reaction count.
  * @param props.isActive         Whether the current user reacted.
  * @param props.emoji            The emoji character.
- * @param props.emojiLabel       The emoji label.
+ * @param props.emojiLabel       The emoji label, if known (curated reactions
+ *                               only).
  * @param props.disabled         Whether the reaction can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
@@ -212,18 +217,29 @@ function ReactionButton( {
 	disabled = false,
 	onToggleReaction,
 }: ReactionButtonProps ) {
-	const [ tooltipText, setTooltipText ] = useState( '' );
+	const [ names, setNames ] = useState< string[] | null >( null );
 	const [ isFetching, setIsFetching ] = useState( false );
+	// Hover or keyboard focus, which gates the Emojibase fetch below.
+	const [ isReached, setIsReached ] = useState( false );
+	/*
+	 * Full-picker reactions are stored as hex keys with no curated label,
+	 * so resolve one from Emojibase; until it arrives the emoji character
+	 * stands in.
+	 */
+	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel, isReached );
+	const label = emojiLabel || resolvedLabel || emoji;
+	/*
+	 * Derived, not stored: the names and label requests race, and a stored
+	 * string would freeze whichever resolved first.
+	 */
+	const tooltipText =
+		names && names.length > 0 ? formatReactionTooltip( names, label ) : '';
 
 	const fetchReactionNames = useCallback( () => {
+		setIsReached( true );
 		const cacheKey = `${ noteId }:${ slug }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
-			setTooltipText(
-				formatReactionTooltip(
-					reactionNamesCache[ cacheKey ],
-					emojiLabel
-				)
-			);
+			setNames( reactionNamesCache[ cacheKey ] );
 			return;
 		}
 
@@ -231,6 +247,12 @@ function ReactionButton( {
 			return;
 		}
 
+		/*
+		 * A miss on a pill that already listed names means it was
+		 * invalidated; drop the stale list rather than show it against
+		 * the new count while refetching.
+		 */
+		setNames( null );
 		setIsFetching( true );
 		fetchNoteReactions( noteId )
 			.then( ( reactions ) => {
@@ -240,7 +262,7 @@ function ReactionButton( {
 					return;
 				}
 
-				const names = reactions
+				const fetchedNames = reactions
 					.filter( ( r ) => {
 						const content =
 							typeof r.content === 'object'
@@ -253,12 +275,8 @@ function ReactionButton( {
 					} )
 					.map( ( r ) => r.author_name );
 
-				reactionNamesCache[ cacheKey ] = names;
-				if ( names.length > 0 ) {
-					setTooltipText(
-						formatReactionTooltip( names, emojiLabel )
-					);
-				}
+				reactionNamesCache[ cacheKey ] = fetchedNames;
+				setNames( fetchedNames );
 			} )
 			.catch( () => {
 				// Silently fall back to count-based label.
@@ -266,12 +284,12 @@ function ReactionButton( {
 			.finally( () => {
 				setIsFetching( false );
 			} );
-	}, [ noteId, slug, emojiLabel, isFetching ] );
+	}, [ noteId, slug, isFetching ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
 		_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
-		emojiLabel,
+		label,
 		count
 	);
 
@@ -310,11 +328,8 @@ function ReactionButton( {
 									)
 									?.focus();
 							}
-							// Invalidate cached names since the reaction set
-							// is changing.
-							delete reactionNamesCache[
-								`${ noteId }:${ slug }`
-							];
+							invalidateReactionNames( noteId, slug );
+							setNames( null );
 							onToggleReaction( slug );
 						} }
 						onMouseEnter={ fetchReactionNames }
@@ -394,8 +409,8 @@ export default function ReactionDisplay( {
 						slug={ slug }
 						count={ count }
 						isActive={ isActive }
-						emoji={ entry?.emoji ?? slug }
-						emojiLabel={ entry?.label ?? slug }
+						emoji={ entry?.emoji ?? hexKeyToEmoji( slug ) }
+						emojiLabel={ entry?.label }
 						disabled={ disabled }
 						onToggleReaction={ onToggleReaction }
 					/>
@@ -403,60 +418,5 @@ export default function ReactionDisplay( {
 			} ) }
 			{ children }
 		</Stack>
-	);
-}
-
-interface AddReactionButtonProps {
-	noteId: number;
-	disabled?: boolean;
-	onToggleReaction: ( slug: string ) => void;
-}
-
-/**
- * Standalone add-reaction button with the curated emoji picker
- * dropdown (the 5-emoji quick row).
- *
- * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
- * @param props.disabled         Whether the button is disabled (e.g. on a
- *                               resolved note thread).
- * @param props.onToggleReaction Callback to toggle a reaction.
- */
-export function AddReactionButton( {
-	noteId,
-	disabled = false,
-	onToggleReaction,
-}: AddReactionButtonProps ) {
-	return (
-		<Dropdown
-			className="editor-collab-sidebar-panel__add-reaction"
-			popoverProps={ POPOVER_PROPS }
-			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
-					size="small"
-					// A plain glyph, per the design: no ring or fill at rest.
-					variant="minimal"
-					tone="neutral"
-					className="editor-collab-sidebar-panel__add-reaction-button"
-					icon={ reactionIcon }
-					label={ __( 'Add reaction' ) }
-					aria-expanded={ isOpen }
-					disabled={ disabled }
-					onClick={ onToggle }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<ReactionEmojiPicker
-					onSelect={ ( slug ) => {
-						onClose();
-						// Invalidate cached tooltip names since adding this
-						// reaction changes the set of users for the slug.
-						delete reactionNamesCache[ `${ noteId }:${ slug }` ];
-						onToggleReaction( slug );
-					} }
-				/>
-			) }
-		/>
 	);
 }
