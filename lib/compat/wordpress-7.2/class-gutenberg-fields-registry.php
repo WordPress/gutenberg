@@ -14,12 +14,14 @@
  * applies to. register() validates the definitions before storing them.
  *
  * Fields are registered on the `fields_api_init` action, on the
- * registry its callbacks receive. There is no function wrapping register()
- * or unregister(): the action is the one place a plugin gets the instance,
- * once the default fields are in place, the way `customize_register` hands
- * out the WP_Customize_Manager and `wp_connectors_init` the
- * WP_Connector_Registry. Reading goes through the functions in
- * fields-api.php.
+ * registry its callbacks receive, and only there: register() and
+ * unregister() refuse to run while the action is not firing, the way
+ * wp_register_ability() refuses outside `wp_abilities_api_init`. There is
+ * no function wrapping them: the action is the one place a plugin gets the
+ * instance, once the default fields are in place, the way
+ * `customize_register` hands out the WP_Customize_Manager and
+ * `wp_connectors_init` the WP_Connector_Registry. Reading goes through the
+ * functions in fields-api.php.
  *
  * The registry exists once `init` has run, see get_instance(), and is
  * filled lazily: the first time its fields are read it fires the
@@ -27,6 +29,10 @@
  * post type and the fields of plugins are registered. Registering does not
  * fire the action; reading does, and only once. This mirrors how
  * rest_get_server() fires `rest_api_init` on its first use.
+ *
+ * Once the action has fired the registry does not change: every reader of
+ * a request, the REST controller as well as the import map of the editor
+ * script, sees the same fields.
  *
  * @since 7.2.0
  *
@@ -111,9 +117,15 @@ final class Gutenberg_Fields_Registry {
 	 * @param array[]     $fields        The list of field definitions, each with an `id`.
 	 * @param string|null $script_module The id of the script module providing
 	 *                                   the JavaScript parts of the fields, if any.
-	 * @return bool Whether the fields were registered. False when an argument is invalid.
+	 * @return bool Whether the fields were registered. False when called
+	 *              outside the `fields_api_init` action or when an argument
+	 *              is invalid.
 	 */
 	public function register( $kind, $name, $fields, $script_module = null ) {
+		if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
+			return false;
+		}
+
 		foreach ( array( $kind, $name ) as $argument ) {
 			if ( ! is_string( $argument ) || '' === $argument ) {
 				_doing_it_wrong(
@@ -185,17 +197,22 @@ final class Gutenberg_Fields_Registry {
 	 * no field is forgotten). Unregistering every field forgets the entity:
 	 * its registered fields and script modules.
 	 *
-	 * Unregistering reads the registered fields, so it fires the
-	 * `fields_api_init` action if it has not fired yet. Call it on that
-	 * action or later, once the default fields are registered.
+	 * Like register(), it only runs on the `fields_api_init` action. The
+	 * default fields are registered at priority 0 and adjusted at priority
+	 * 9, so a callback at the default priority can unregister any of them.
 	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
 	 * @param string        $name The entity name (e.g. `page`).
 	 * @param string[]|null $ids  The ids of the fields to unregister. Default
 	 *                            null, every field of the entity.
-	 * @return bool Whether the registry changed.
+	 * @return bool Whether the registry changed. False when called outside
+	 *              the `fields_api_init` action.
 	 */
 	public function unregister( $kind, $name, $ids = null ) {
+		if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
+			return false;
+		}
+
 		if ( null !== $ids ) {
 			$present = array_column( $this->get_registered( $kind, $name ), 'id' );
 			$ids     = array_values( array_intersect( (array) $ids, $present ) );
@@ -338,6 +355,32 @@ final class Gutenberg_Fields_Registry {
 		 * @param Gutenberg_Fields_Registry $registry The registry being read.
 		 */
 		do_action( 'fields_api_init', $this );
+	}
+
+	/**
+	 * Checks that the `fields_api_init` action is firing, as register() and
+	 * unregister() require.
+	 *
+	 * Outside the action a registration would either come before the
+	 * defaults, which then merge over it, or after the fields have been read
+	 * and the import map of the editor script built from them; and
+	 * unregistering fields by id reads the registry, which would fire the
+	 * action early. Refusing keeps the registry immutable once read.
+	 *
+	 * @param string $method The calling method, for the notice.
+	 * @return bool Whether the action is firing.
+	 */
+	private function doing_fields_api_init( $method ) {
+		if ( doing_action( 'fields_api_init' ) ) {
+			return true;
+		}
+
+		_doing_it_wrong(
+			$method,
+			__( 'Fields can only be registered and unregistered on the `fields_api_init` action, on the registry it passes.', 'gutenberg' ),
+			'7.2.0'
+		);
+		return false;
 	}
 
 	/**
