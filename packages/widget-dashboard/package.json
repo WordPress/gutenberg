@@ -46,6 +46,7 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",

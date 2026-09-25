@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { getFontSize } from '../../utils/font-size';
@@ -13,6 +13,20 @@ function resolveStyle( property: 'color' | 'fontSize', value: string ) {
 	element.remove();
 	return resolved;
 }
+
+// Source SCSS expects theme tokens; the production build adds their fallbacks.
+beforeEach( () => {
+	document.documentElement.style.setProperty(
+		'--wp-components-color-gray-700',
+		'#707070'
+	);
+} );
+
+afterEach( () => {
+	document.documentElement.style.removeProperty(
+		'--wp-components-color-gray-700'
+	);
+} );
 
 describe( 'Text', () => {
 	test( 'should render correctly', async () => {
