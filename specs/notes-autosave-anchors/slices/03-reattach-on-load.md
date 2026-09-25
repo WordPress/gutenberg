@@ -6,14 +6,14 @@ When the editor opens a post that has orphaned notes and newer autosaves, notes 
 
 ## Seam
 
-- New hook `useReattachOrphanedNotes()` in `collab-sidebar/use-reattach-orphaned-notes.ts`, called next to `useNoteThreads`.
+- New hook `useReattachOrphanedNotes( notes, notesResolved )` in `collab-sidebar/use-reattach-orphaned-notes.ts`, called next to `useNoteThreads` in `NotesSidebar`. `useNoteThreads` now also returns `hasResolved`.
 - Inputs:
   - The orphan list from `useNoteThreads`. Don't compute orphans again.
   - `select( coreStore ).getAutosave( postType, postId, currentUserId )`. The current user's autosave only, fetched by the existing resolver. Never use other users' autosaves.
   - The post's `modified_gmt`.
   - The current blocks from `blockEditorStore`.
-- It waits until threads and autosaves have both resolved, then runs `findAutosaveAnchors` once, guarded by a ref.
-- For each match, it merges the id with `addNoteIdToMetadata`, plus the `inline` attribute value when there is one. All matches go through one `updateBlockAttributes` batch, preceded by `__unstableMarkNextChangeAsNotPersistent` so there's no undo level.
+- It waits until the notes and the autosave have both loaded, then runs `findAutosaveAnchors` once, guarded by a ref. It gets exactly one chance per session, even with no orphans, so a block deleted later can't have its note moved onto a duplicate.
+- It applies the matcher's patches with one `updateBlockAttributes( clientIds, attributesByClientId, { uniqueByBlock: true } )`, preceded by `__unstableMarkNextChangeAsNotPersistent` so there's no undo level.
 - If at least one note was re-attached, it shows one snackbar: "Notes reattached from an autosave." (check `docs/contributors/documentation/copy-guide.md` for the final wording).
 
 The re-attached id is a real unsaved edit, so the post becomes dirty. That's intended: the next autosave or save persists it.
@@ -26,11 +26,11 @@ The re-attached id is a real unsaved edit, so the post becomes dirty. That's int
 
 ## Verification
 
-- **E2E first**, in `block-notes.spec.js`:
+- **E2E first**, in `block-notes-unsaved-anchors.spec.ts`:
   - "re-attaches a note on a published post from the autosave".
-  - "doesn't use another user's autosave".
+  - "re-attaches a note added in the editor after a reload" (slices 01 and 03 together).
+  - Not written yet: "doesn't use another user's autosave", which needs a second user.
   - "doesn't re-attach when the block was deleted and the post saved afterwards".
-- Vitest for the hook: it runs once, doesn't run before autosaves resolve, and doesn't dispatch when there are no matches.
 - `npm run lint:js`, `npm run typecheck`.
 
 ## Must stay green

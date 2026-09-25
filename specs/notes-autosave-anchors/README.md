@@ -4,9 +4,9 @@ Spec for [#83398](https://github.com/WordPress/gutenberg/issues/83398) and [#727
 
 ## Next Agent Prompt
 
-**Status (2026-09-24):** Spec only. No code yet.
+**Status (2026-09-24):** All three slices are implemented in [#83511](https://github.com/WordPress/gutenberg/pull/83511). The e2e tests in `test/e2e/specs/editor/various/block-notes-unsaved-anchors.spec.ts` failed on trunk and pass with the change. The existing notes e2e suites still pass.
 
-**Pick up at:** [Slice 01](slices/01-autosave-after-anchor-change.md). Write the e2e test first, watch it fail on trunk, then add the fix.
+**Pick up at:** review feedback on #83511. The open questions below are still open.
 
 **Warnings:**
 
@@ -16,9 +16,10 @@ Spec for [#83398](https://github.com/WordPress/gutenberg/issues/83398) and [#727
 
 **TODO:**
 
-- [ ] Slice 01: autosave right after a note anchor is added or removed
-- [ ] Slice 02: pure matcher that finds orphaned note anchors in autosaves
-- [ ] Slice 03: re-attach orphaned notes on load
+- [x] Slice 01: autosave right after a note anchor is added or removed
+- [x] Slice 02: pure matcher that finds orphaned note anchors in autosaves
+- [x] Slice 03: re-attach orphaned notes on load
+- [ ] E2E for "doesn't use another user's autosave" (needs a second user; today it relies on core-data's `getAutosave` filtering by user)
 
 Before you end your pass, update this section: the status, the next pickup point, and the checkboxes.
 
@@ -115,4 +116,4 @@ A later option: skip the unsaved changes warning when the latest autosave alread
 ## Open questions
 
 - After re-attaching on load (slice 03), should a snackbar say so ("Notes reattached from an autosave")? Proposed: yes, one snackbar, only when at least one note was re-attached.
-- Should deleting a note also autosave, so the saved content doesn't keep an id pointing to a deleted comment? Proposed: yes, in slice 01, so create and delete behave the same way (that's what #83398 asks for).
+- Should deleting a note also autosave, so the saved content doesn't keep an id pointing to a deleted comment? Implemented as yes, so create and delete behave the same way (that's what #83398 asks for).

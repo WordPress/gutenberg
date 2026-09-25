@@ -7,9 +7,9 @@ After a top-level note is created or deleted, the editor asks for an autosave ri
 ## Seam
 
 - `useNoteActions` in `packages/editor/src/components/collab-sidebar/hooks.js`: `onCreate` (after `updateBlockAttributes`) and `onDelete` (after the marker or id is removed).
-- A small helper, `requestNoteAnchorAutosave( registry )`, in a new `collab-sidebar/autosave-anchor.ts`:
-  - Returns early unless `select( editorStore ).isEditedPostAutosaveable()`.
-  - Otherwise `dispatch( editorStore ).autosave()`. Don't await it in the UI path, and never show an error notice for it. A failed autosave behaves like trunk.
+- `autosaveNoteAnchor()`, a small closure inside `useNoteActions`:
+  - Returns early unless `isEditedPostAutosaveable()`.
+  - Otherwise calls the editor store's `autosave()`. Not awaited, and no error notice. A failed autosave behaves like trunk.
 - Replies and edits don't call it. They don't change anchors.
 
 ## What to run or see
@@ -19,9 +19,8 @@ After a top-level note is created or deleted, the editor asks for an autosave ri
 
 ## Verification
 
-- **E2E first.** Add to `test/e2e/specs/editor/various/block-notes.spec.js`: "keeps a note attached after reload without saving (author draft)". Confirm it fails on trunk before adding the fix.
+- **E2E first.** Add to `test/e2e/specs/editor/various/block-notes-unsaved-anchors.spec.ts`: "keeps a note attached after reload without saving (author draft)". Confirm it fails on trunk before adding the fix.
 - E2E: "deleting a note on a draft leaves no stale noteId after reload".
-- Vitest for the helper: it doesn't autosave when the post isn't autosaveable, and does when it is.
 - `npm run lint:js`, `npm run typecheck`.
 
 ## Must stay green

@@ -9,22 +9,24 @@ Given the orphaned note ids, the autosaves, and the current blocks, return where
 New pure module `packages/editor/src/components/collab-sidebar/find-autosave-anchors.ts`:
 
 ```ts
-type AnchorMatch = {
-	noteId: number;
-	clientId: string;
-	// Set for inline notes whose text is unchanged: the attribute value that
-	// carries the core/note marker, copied from the autosave block.
-	inline?: { attributeKey: string; value: unknown };
+type AutosaveAnchors = {
+	// Attribute changes to apply, keyed by block client id: the merged
+	// `metadata` and, for inline notes, the rich-text value with the marker.
+	attributesByClientId: Record< string, Record< string, any > >;
+	// Ids of the notes that were placed.
+	noteIds: number[];
 };
 
 function findAutosaveAnchors( args: {
 	orphanNoteIds: number[];
 	// The current user's autosave only, or undefined when there is none.
-	autosave?: { content: string; modified_gmt: string };
-	postModifiedGmt: string;
-	blocks: BlockInstance[]; // current editor blocks
-} ): AnchorMatch[];
+	autosave?: { content?: string | { raw?: string }; modified_gmt?: string };
+	postModifiedGmt?: string;
+	blocks: Block[]; // current editor blocks
+} ): AutosaveAnchors;
 ```
+
+It returns finished attribute patches rather than a list of matches, so two notes placed on the same block build on each other instead of overwriting.
 
 Rules, in order:
 
@@ -35,7 +37,7 @@ Rules, in order:
    - **Same path**: same index path, same `name`, and the same attributes once `metadata.noteId` and `core/note` markers are stripped. Use that block.
    - **Unique content**: otherwise, if exactly one current block has the same `name` and stripped attributes, use it.
    - Otherwise, no match.
-5. For inline notes, only set `inline` when the stripped text of the two attributes is identical. If it isn't, fall back to a block-level anchor, which is still better than an orphan.
+5. For inline notes, re-apply the marker at the autosave's offsets. That's safe because rule 4 already required the text to match once markers are stripped.
 6. Never return a block that already carries that note id, and never return two matches for the same note.
 
 ## What to run or see
@@ -50,7 +52,8 @@ Vitest fixtures only. This slice has no UI.
   - Duplicate identical blocks at a moved index: not matched.
   - An autosave older than the post: ignored.
   - No autosave: returns nothing.
-  - An inline note with unchanged text: `inline` set. With changed text: a block-level match only.
+  - An inline note with unchanged text: the marker is restored.
+  - Two notes placed on the same block: both ids kept.
   - A nested block (inside a group or columns): path matching works.
   - A note id not found in any autosave: not returned.
 - `npm run typecheck`.
