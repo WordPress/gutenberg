@@ -1,0 +1,8 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// The "viewport" InspectorControls group renders its fills directly, without
+// the padding a PanelBody (e.g. the "Advanced" panel) provides, so the
+// custom CSS control needs its own when shown there for a viewport state.
+.block-editor-hooks-custom-css__viewport-panel {
+	padding: $grid-unit-20;
+}
