@@ -20,18 +20,18 @@ By using a `RichTextValue` value object (referred to from here on as `value`) it
 
 Examples of rich formats include:
 
--   bold, italic, superscript (etc)
--   links
--   unordered/ordered lists
+- bold, italic, superscript (etc)
+- links
+- unordered/ordered lists
 
 ### The RichTextValue object
 
 The value object is comprised of the following:
 
--   `text` - the string of text to which rich formats are to be applied.
--   `formats` - a sparse array of the same length as `text` that is filled with [formats](https://developer.wordpress.org/block-editor/how-to-guides/format-api/) (e.g. `core/link`, `core/bold` etc.) at the positions where the text is formatted.
--   `start` - an index in the `text` representing the _start_ of the currently active selection.
--   `end` - an index in the `text` representing the _end_ of the currently active selection.
+- `text` - the string of text to which rich formats are to be applied.
+- `formats` - a sparse array of the same length as `text` that is filled with [formats](https://developer.wordpress.org/block-editor/how-to-guides/format-api/) (e.g. `core/link`, `core/bold` etc.) at the positions where the text is formatted.
+- `start` - an index in the `text` representing the _start_ of the currently active selection.
+- `end` - an index in the `text` representing the _end_ of the currently active selection.
 
 You should not attempt to create your own `value` objects. Rather you should rely on the built in methods of the `@wordpress/rich-text` package to build these for you.
 
@@ -39,8 +39,8 @@ It is important to understand how a value represents richly formatted text. Here
 
 If `text` is formatted from position 2-5 in bold (`core/bold`) and from position 2-8 with a link (`core/link`), then you'll find:
 
--   arrays within the sparse array at positions 2-5 that include the `core/bold` format
--   arrays within the sparse array at positions 2-8 that include the `core/link` format
+- arrays within the sparse array at positions 2-5 that include the `core/bold` format
+- arrays within the sparse array at positions 2-8 that include the `core/link` format
 
 Here's how that would look:
 
@@ -128,14 +128,14 @@ Apply a format object to a Rich Text value from the given `startIndex` to the gi
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _format_ `RichTextFormat`: Format to apply.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _format_ `RichTextFormat`: Format to apply.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new value with the format applied.
+- `RichTextValue`: A new value with the format applied.
 
 ### concat
 
@@ -143,11 +143,11 @@ Combine all Rich Text values into one. This is similar to `String.prototype.conc
 
 _Parameters_
 
--   _values_ `...RichTextValue`: Objects to combine.
+- _values_ `...RichTextValue`: Objects to combine.
 
 _Returns_
 
--   `RichTextValue`: A new value combining all given records.
+- `RichTextValue`: A new value combining all given records.
 
 ### create
 
@@ -169,16 +169,16 @@ As you can see, text and formatting are separated. `text` holds the text, includ
 
 _Parameters_
 
--   _$1_ `[Object]`: Optional named arguments.
--   _$1.element_ `[Element]`: Element to create value from.
--   _$1.text_ `[string]`: Text to create value from.
--   _$1.html_ `[string]`: HTML to create value from.
--   _$1.range_ `[Range]`: Range to create value from.
--   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
+- _$1_ `[Object]`: Optional named arguments.
+- _$1.element_ `[Element]`: Element to create value from.
+- _$1.text_ `[string]`: Text to create value from.
+- _$1.html_ `[string]`: HTML to create value from.
+- _$1.range_ `[Range]`: Range to create value from.
+- _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
 
--   `RichTextValue`: A rich text value.
+- `RichTextValue`: A rich text value.
 
 ### EventListenersProps
 
@@ -190,12 +190,12 @@ Gets the format object by type at the start of the selection. This can be used t
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to inspect.
--   _formatType_ `string`: Format type to look for.
+- _value_ `RichTextValue`: Value to inspect.
+- _formatType_ `string`: Format type to look for.
 
 _Returns_
 
--   `RichTextFormat|undefined`: Active format object of the specified type, or undefined.
+- `RichTextFormat|undefined`: Active format object of the specified type, or undefined.
 
 ### getActiveFormats
 
@@ -203,12 +203,12 @@ Gets the all format objects at the start of the selection.
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to inspect.
--   _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
+- _value_ `RichTextValue`: Value to inspect.
+- _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
 
 _Returns_
 
--   `RichTextFormatList`: Active format objects.
+- `RichTextFormatList`: Active format objects.
 
 ### getActiveObject
 
@@ -216,11 +216,11 @@ Gets the active object, if there is any.
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to inspect.
+- _value_ `RichTextValue`: Value to inspect.
 
 _Returns_
 
--   `RichTextFormat|void`: Active object, or undefined.
+- `RichTextFormat|void`: Active object, or undefined.
 
 ### getTextContent
 
@@ -228,11 +228,11 @@ Get the textual content of a Rich Text value. This is similar to `Element.textCo
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to use.
+- _value_ `RichTextValue`: Value to use.
 
 _Returns_
 
--   `string`: The text content.
+- `string`: The text content.
 
 ### insert
 
@@ -240,14 +240,14 @@ Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Te
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _valueToInsert_ `RichTextValue|string`: Value to insert.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _valueToInsert_ `RichTextValue|string`: Value to insert.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new value with the value inserted.
+- `RichTextValue`: A new value with the value inserted.
 
 ### insertObject
 
@@ -255,14 +255,14 @@ Insert a format as an object into a Rich Text value at the given `startIndex`. A
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _formatToInsert_ `RichTextFormat`: Format to insert as object.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _formatToInsert_ `RichTextFormat`: Format to insert as object.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new value with the object inserted.
+- `RichTextValue`: A new value with the object inserted.
 
 ### isCollapsed
 
@@ -270,13 +270,13 @@ Check if the selection of a Rich Text value is collapsed or not. Collapsed means
 
 _Parameters_
 
--   _props_ `RichTextValue`: The rich text value to check.
--   _props.start_ `RichTextValue[ 'start' ]`:
--   _props.end_ `RichTextValue[ 'end' ]`:
+- _props_ `RichTextValue`: The rich text value to check.
+- _props.start_ `RichTextValue[ 'start' ]`:
+- _props.end_ `RichTextValue[ 'end' ]`:
 
 _Returns_
 
--   `boolean | undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
+- `boolean | undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
 
 ### isEmpty
 
@@ -284,11 +284,11 @@ Check if a Rich Text value is Empty, meaning it contains no text or any objects 
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to use.
+- _value_ `RichTextValue`: Value to use.
 
 _Returns_
 
--   `boolean`: True if the value is empty, false if not.
+- `boolean`: True if the value is empty, false if not.
 
 ### join
 
@@ -296,12 +296,12 @@ Combine an array of Rich Text values into one, optionally separated by `separato
 
 _Parameters_
 
--   _values_ `Array<RichTextValue>`: An array of values to join.
--   _separator_ `[string|RichTextValue]`: Separator string or value.
+- _values_ `Array<RichTextValue>`: An array of values to join.
+- _separator_ `[string|RichTextValue]`: Separator string or value.
 
 _Returns_
 
--   `RichTextValue`: A new combined value.
+- `RichTextValue`: A new combined value.
 
 ### privateApis
 
@@ -313,12 +313,12 @@ Registers a new format provided a unique name and an object defining its behavio
 
 _Parameters_
 
--   _name_ `string`: Format name.
--   _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
+- _name_ `string`: Format name.
+- _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 
--   `WPFormat|undefined`: The format, if it has been successfully registered; otherwise `undefined`.
+- `WPFormat|undefined`: The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -326,13 +326,13 @@ Remove content from a Rich Text value between the given `startIndex` and `endInd
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new value with the content removed.
+- `RichTextValue`: A new value with the content removed.
 
 ### removeFormat
 
@@ -340,14 +340,14 @@ Remove any format object from a Rich Text value by type from the given `startInd
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _formatType_ `string`: Format type to remove.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _formatType_ `string`: Format type to remove.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new value with the format applied.
+- `RichTextValue`: A new value with the format applied.
 
 ### replace
 
@@ -355,25 +355,25 @@ Search a Rich Text value and replace the match(es) with `replacement`. This is s
 
 _Parameters_
 
--   _value_ `RichTextValue`: The value to modify.
--   _pattern_ `RegExp|string`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
--   _replacement_ `Function|string|RichTextValue`: The match or matches are replaced with the specified value, the value returned by the specified function, or the given rich text value.
+- _value_ `RichTextValue`: The value to modify.
+- _pattern_ `RegExp|string`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
+- _replacement_ `Function|string|RichTextValue`: The match or matches are replaced with the specified value, the value returned by the specified function, or the given rich text value.
 
 _Returns_
 
--   `RichTextValue`: A new value with replacements applied.
+- `RichTextValue`: A new value with replacements applied.
 
 ### RichTextData
 
 The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
 
--   Create an empty instance: `new RichTextData()`.
--   Create one from an HTML string: `RichTextData.fromHTMLString(
+- Create an empty instance: `new RichTextData()`.
+- Create one from an HTML string: `RichTextData.fromHTMLString(
 '<em>hello</em>' )`.
--   Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+- Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
 document.querySelector( 'p' ) )`.
--   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
--   Create one from a rich text value: `new RichTextData( { text: '...',
+- Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+- Create one from a rich text value: `new RichTextData( { text: '...',
 formats: [ ... ] } )`.
 
 ### RichTextFormat
@@ -390,13 +390,13 @@ Slice a Rich Text value from `startIndex` to `endIndex`. Indices are retrieved f
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _startIndex_ `[number]`: Start index.
--   _endIndex_ `[number]`: End index.
+- _value_ `RichTextValue`: Value to modify.
+- _startIndex_ `[number]`: Start index.
+- _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `RichTextValue`: A new extracted value.
+- `RichTextValue`: A new extracted value.
 
 ### split
 
@@ -404,12 +404,12 @@ Split a Rich Text value in two at the given `startIndex` and `endIndex`, or spli
 
 _Parameters_
 
--   _value_ `RichTextValue`:
--   _string_ `[number|string]`: Start index, or string at which to split.
+- _value_ `RichTextValue`:
+- _string_ `[number|string]`: Start index, or string at which to split.
 
 _Returns_
 
--   `Array<RichTextValue>|undefined`: An array of new values.
+- `Array<RichTextValue>|undefined`: An array of new values.
 
 ### store
 
@@ -417,11 +417,11 @@ Store definition for the rich-text namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 _Type_
 
--   `Object`
+- `Object`
 
 ### toggleFormat
 
@@ -429,12 +429,12 @@ Toggles a format object to a Rich Text value at the current selection.
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
--   _format_ `RichTextFormat`: Format to apply or remove.
+- _value_ `RichTextValue`: Value to modify.
+- _format_ `RichTextFormat`: Format to apply or remove.
 
 _Returns_
 
--   `RichTextValue`: A new value with the format applied or removed.
+- `RichTextValue`: A new value with the format applied or removed.
 
 ### toHTMLString
 
@@ -442,13 +442,13 @@ Create an HTML string from a Rich Text value.
 
 _Parameters_
 
--   _$1_ `Object`: Named arguments.
--   _$1.value_ `RichTextValue`: Rich text value.
--   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
+- _$1_ `Object`: Named arguments.
+- _$1.value_ `RichTextValue`: Rich text value.
+- _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 
--   `string`: HTML string.
+- `string`: HTML string.
 
 ### unregisterFormatType
 
@@ -456,11 +456,11 @@ Unregisters a format.
 
 _Parameters_
 
--   _name_ `string`: Format name.
+- _name_ `string`: Format name.
 
 _Returns_
 
--   `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+- `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
@@ -468,13 +468,13 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
--   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
--   _obj.settings_ `WPFormat`: The format type's settings.
+- _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+- _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+- _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
+- `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
 
 ### useAnchorRef
 
@@ -482,14 +482,14 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _$1_ `Object`: Named parameters.
--   _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
--   _$1.value_ `RichTextValue`: Value to check for selection.
--   _$1.settings_ `WPFormat`: The format type's settings.
+- _$1_ `Object`: Named parameters.
+- _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
+- _$1.value_ `RichTextValue`: Value to check for selection.
+- _$1.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element|Range`: The active element or selection range.
+- `Element|Range`: The active element or selection range.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

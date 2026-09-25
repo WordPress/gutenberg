@@ -131,11 +131,11 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		? _x(
 				'This block is connected.',
 				'block toolbar button label and description'
-		  )
+			)
 		: _x(
 				'These blocks are connected.',
 				'block toolbar button label and description'
-		  );
+			);
 
 	return (
 		<div className="block-editor-block-switcher__container">
@@ -199,7 +199,7 @@ export const BlockSwitcher = ( { children, clientIds, label, text } ) => {
 					clientIds.length
 				),
 				clientIds.length
-		  );
+			);
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>

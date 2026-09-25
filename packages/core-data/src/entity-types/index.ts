@@ -370,8 +370,8 @@ export type DefaultContextOf<
 type ContextsOf< Requested > = Context extends Requested
 	? Context
 	: Requested extends Context
-	? Requested
-	: Context;
+		? Requested
+		: Context;
 
 /**
  * Resolves the context a query asks for.
@@ -429,12 +429,12 @@ export type EntityRecordOfQuery<
 					Name,
 					ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
 				>
-		  >
+			>
 		: EntityRecordInContexts<
 				Kind,
 				Name,
 				ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
-		  >
+			>
 	: never;
 
 /**
@@ -445,5 +445,5 @@ export type EntityRecordOfQuery<
 type DeepPartial< T > = T extends readonly unknown[]
 	? T
 	: T extends object
-	? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
-	: T;
+		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
+		: T;

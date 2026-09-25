@@ -211,7 +211,7 @@ module.exports = {
 										);
 
 									return isValidType && isUnused;
-							  } )
+								} )
 							: [];
 
 						if ( extra.length > 0 ) {

@@ -477,7 +477,7 @@ export default function ColorPanel( {
 							elementGradient ??
 							elementBackgroundUserColor ??
 							elementBackgroundColor,
-				  ]
+					]
 				: [ elementTextUserColor ?? elementTextColor ],
 			isPlaceholder: isElementPlaceholder,
 			hasInheritedValue: hasElementInheritedValue,

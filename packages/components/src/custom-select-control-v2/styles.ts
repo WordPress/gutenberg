@@ -126,9 +126,11 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	&[data-open] {
 		@media not ( prefers-reduced-motion ) {
 			animation-name: ${ slideDown }, ${ fadeIn };
-			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			animation-duration:
+				${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
 				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			animation-timing-function:
+				${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
 				${ DROPDOWN_MOTION_CSS.FADE_EASING };
 			will-change: transform, opacity;
 		}

@@ -122,6 +122,38 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( count ).toBe( 1 );
 	} );
 
+	test( 'should highlight the active format when the canvas root is the editing host', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// With more than one block, the canvas root is the editing host and
+		// has focus, not the field.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'a' );
+
+		expect(
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement === document.body )
+		).toBe( true );
+
+		const boundary = editor.canvas.locator(
+			'[data-rich-text-format-boundary]'
+		);
+		await expect( boundary ).toHaveCount( 1 );
+		await expect( boundary ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
@@ -891,6 +923,79 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				name: 'core/paragraph',
 				attributes: { content: '<strong>1</strong>-<em>2</em>' },
 			},
+		] );
+	} );
+
+	test( 'should not focus the text when clicking the padding of a flex group', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', orientation: 'vertical' },
+				style: {
+					spacing: {
+						padding: {
+							top: '60px',
+							right: '40px',
+							bottom: '60px',
+							left: '40px',
+						},
+					},
+				},
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Outside' },
+		} );
+		await editor.canvas.getByText( 'Outside' ).click();
+
+		const group = editor.canvas.locator( '[data-type="core/group"]' );
+		const box = await group.boundingBox();
+		// Click inside the group's top padding, above the paragraph.
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+
+		await expect( group ).toBeFocused();
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/group' );
+
+		// Click the padding again while the group already has focus but is
+		// no longer selected, so the click does not move focus.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+		await expect( group ).toBeFocused();
+
+		// The paragraph must not have received the caret.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inside' },
+					},
+				],
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
 		] );
 	} );
 } );

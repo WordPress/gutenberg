@@ -23,6 +23,7 @@ import {
 	getParsedPattern,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -37,6 +38,8 @@ import {
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
 	getClientIdsTree,
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleStateViewport,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -2448,7 +2451,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					? {
 							src: symbol,
 							foreground: 'var(--wp-block-synced-color)',
-					  }
+						}
 					: symbol;
 				const userPattern = mapUserPattern( reusableBlock );
 				const { time, count = 0 } =
@@ -2504,30 +2507,48 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
-				const { getClosestAllowedInsertionPoint } = unlock(
-					select( STORE_NAME )
+				// Unmemoized checks: the memoized ones search their cache entry
+				// by entry, and each block type adds one, so they slow down as
+				// the list grows.
+				const fallbackRoots = getFallbackInsertionRoots(
+					state,
+					rootClientId
 				);
-				blockTypeInserterItems = blockTypeInserterItems
-					.filter(
-						( blockType ) =>
-							isBlockVisibleInTheInserter(
-								state,
-								blockType,
-								rootClientId
-							) &&
-							getClosestAllowedInsertionPoint(
-								blockType.name,
-								rootClientId
-							) !== null
-					)
-					.map( ( blockType ) => ( {
-						...blockType,
-						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+				const allowedItems = [];
+				for ( const blockType of blockTypeInserterItems ) {
+					if (
+						! isBlockVisibleInTheInserter(
 							state,
 							blockType,
 							rootClientId
-						),
-					} ) );
+						)
+					) {
+						continue;
+					}
+					const isAllowedInCurrentRoot =
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						);
+					if (
+						! isAllowedInCurrentRoot &&
+						! fallbackRoots.some( ( id ) =>
+							canInsertBlockTypeUnmemoized(
+								state,
+								blockType.name,
+								id
+							)
+						)
+					) {
+						continue;
+					}
+					allowedItems.push( {
+						...blockType,
+						isAllowedInCurrentRoot,
+					} );
+				}
+				blockTypeInserterItems = allowedItems;
 			}
 
 			const items = blockTypeInserterItems.reduce(
@@ -2864,12 +2885,12 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 								: isBlockVisibleInTheInserter(
 										state,
 										name,
 										rootClientId
-								  )
+									)
 						)
 				);
 
@@ -3525,4 +3546,49 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 		}
 	);
 	return getEditedContentOnlySection( state );
+}
+
+/**
+ * Returns the selected style state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Object} The selected block style state.
+ */
+export const getSelectedBlockStyleState = createSelector(
+	( state, clientId ) => {
+		const perBlockState =
+			state.selectedBlockStyleState?.clientId === clientId
+				? ( state.selectedBlockStyleState.value ??
+					DEFAULT_BLOCK_STYLE_STATE )
+				: DEFAULT_BLOCK_STYLE_STATE;
+
+		return {
+			...perBlockState,
+			// The viewport is tracked globally, so inject it here. This way
+			// consumers receive a single combined state object instead of
+			// merging the global viewport themselves, and selectors derived
+			// from this stay consistent.
+			viewport: getStyleStateViewport( state ),
+		};
+	},
+	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
+);
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedBlockStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
 }

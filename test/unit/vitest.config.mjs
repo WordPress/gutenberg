@@ -1,11 +1,10 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPlaywrightProvider } from './config/playwright-provider.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -22,16 +21,7 @@ const isolationSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/isolation.vitest.js'
 );
-const testMigration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
-const vitestTests = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	testMigration
-);
+const vitestTests = getVitestTestsByProject( discoverTestFiles( ROOT_DIR ) );
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
@@ -64,7 +54,7 @@ process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
-	'packages/*/src/index.{js,jsx,ts,tsx}',
+	'packages/*/src/index.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
 	.sort()
@@ -236,7 +226,7 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: createPlaywrightProvider(),
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'

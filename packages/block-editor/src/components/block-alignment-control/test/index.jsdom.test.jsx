@@ -230,7 +230,8 @@ describe( 'BlockAlignmentUI unavailable alignments', () => {
 } );
 
 describe( 'BlockAlignmentUI with no available alignments', () => {
-	// Group supports only wide and full, so a flow layout leaves it nothing.
+	// Paragraph, Heading, Group and many others support only wide and full, so
+	// a flow layout leaves them nothing that works.
 	const controls = [ 'wide', 'full' ];
 	const onChange = vi.fn();
 
@@ -238,25 +239,12 @@ describe( 'BlockAlignmentUI with no available alignments', () => {
 		onChange.mockClear();
 	} );
 
-	test( 'still offers None alongside what the layout withholds', async () => {
-		const user = userEvent.setup();
-		renderWithTheme(
+	test( 'renders nothing when every alignment is withheld', () => {
+		const { container } = renderWithTheme(
 			<BlockAlignmentUI onChange={ onChange } controls={ controls } />
 		);
 
-		await user.click(
-			screen.getByRole( 'button', { name: 'Align block' } )
-		);
-
-		expect(
-			screen
-				.getAllByRole( 'menuitemradio' )
-				.map( ( item ) => item.textContent )
-		).toEqual( [
-			'None',
-			'Wide widthNot available',
-			'Full widthNot available',
-		] );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	test( 'renders nothing when the layout places children itself', () => {

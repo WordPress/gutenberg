@@ -6,7 +6,7 @@ vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
 	__: ( ( text: string ) =>
 		'Anonymous User' === text
 			? 'Translated Anonymous User'
-			: text ) as typeof import('@wordpress/i18n').__,
+			: text ) as typeof import( '@wordpress/i18n' ).__,
 } ) );
 
 describe( 'getCollaboratorDisplayName', () => {

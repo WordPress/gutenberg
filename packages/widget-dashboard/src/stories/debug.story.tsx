@@ -371,7 +371,8 @@ function StagingEnforcementStory( {
 }
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground/Debug',
+	id: 'widget-dashboard-playground-debug',
+	title: 'Widgets/Dashboard/Playground/Debug',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {

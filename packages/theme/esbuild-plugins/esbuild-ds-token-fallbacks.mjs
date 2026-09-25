@@ -25,25 +25,30 @@ const LOADER_MAP = {
 const plugin = {
 	name: 'ds-token-fallbacks-js',
 	setup( build ) {
-		build.onLoad( { filter: /\.[mc]?[jt]sx?$/ }, async ( args ) => {
-			// Skip node_modules.
-			if ( args.path.includes( 'node_modules' ) ) {
-				return undefined;
+		build.onLoad(
+			{ filter: /\.[mc]?[jt]sx?$/, namespace: 'file' },
+			async ( args ) => {
+				// Skip node_modules.
+				if ( args.path.includes( 'node_modules' ) ) {
+					return undefined;
+				}
+
+				const source = await readFile( args.path, 'utf8' );
+
+				if ( ! source.includes( '--wpds-' ) ) {
+					return undefined;
+				}
+
+				const ext = args.path.match( /(\.[^.]+)$/ )?.[ 1 ] || '.js';
+
+				return {
+					contents: addFallbackToVar( source, {
+						escapeQuotes: true,
+					} ),
+					loader: LOADER_MAP[ ext ] || 'jsx',
+				};
 			}
-
-			const source = await readFile( args.path, 'utf8' );
-
-			if ( ! source.includes( '--wpds-' ) ) {
-				return undefined;
-			}
-
-			const ext = args.path.match( /(\.[^.]+)$/ )?.[ 1 ] || '.js';
-
-			return {
-				contents: addFallbackToVar( source, { escapeQuotes: true } ),
-				loader: LOADER_MAP[ ext ] || 'jsx',
-			};
-		} );
+		);
 	},
 };
 

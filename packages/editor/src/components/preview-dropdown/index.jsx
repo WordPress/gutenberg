@@ -91,7 +91,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
-				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				? ( VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default' )
 				: 'default'
 		);
 		// Only auto-open the block inspector when enabling responsive styles
@@ -135,7 +135,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 		...( hasMobileViewport
 			? [
@@ -146,7 +146,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 	];
 

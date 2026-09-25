@@ -25,9 +25,8 @@ const { state } = store( 'router', {
 			const force = e.target.dataset.forceNavigation === 'true';
 			const { timeout } = state;
 
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 
 			try {
 				yield actions.navigate( e.target.href, { force, timeout } );

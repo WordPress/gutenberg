@@ -184,14 +184,14 @@ export type DataViewsProps< Item > = {
 			 * have a string `id` property, which is used by default.
 			 */
 			getItemId?: ( item: Item ) => string;
-	  }
+		}
 	: {
 			/**
 			 * Returns a unique id for an item. Required when items have no
 			 * string `id` property.
 			 */
 			getItemId: ( item: Item ) => string;
-	  } );
+		} );
 
 /**
  * The filters applied to the dataset.
@@ -734,8 +734,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	 * The focus on mount property of the modal.
 	 */
 	modalFocusOnMount?:
-		| Parameters< typeof useFocusOnMount >[ 0 ]
-		| 'firstContentElement';
+		Parameters< typeof useFocusOnMount >[ 0 ] | 'firstContentElement';
 }
 
 export interface ActionButton< Item > extends ActionBase< Item > {
@@ -903,24 +902,30 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
-export interface ViewPickerGridProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerGridProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker grid layout.
 	 */
 	view: ViewPickerGrid;
 }
 
-export interface ViewPickerTableProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerTableProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker table layout.
 	 */
 	view: ViewPickerTable;
 }
 
-export interface ViewPickerActivityProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerActivityProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker activity layout.
 	 */

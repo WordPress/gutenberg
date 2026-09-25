@@ -251,10 +251,10 @@ function PostLockedModal() {
 													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
 												),
 												userDisplayName
-										  )
+											)
 										: __(
 												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-										  ),
+											),
 									{
 										strong: <strong />,
 										PreviewLink: (
@@ -279,10 +279,10 @@ function PostLockedModal() {
 													'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
 												),
 												userDisplayName
-										  )
+											)
 										: __(
 												'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
-										  ),
+											),
 									{
 										strong: <strong />,
 										PreviewLink: (

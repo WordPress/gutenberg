@@ -24,5 +24,8 @@
 		"@wordpress/block-library": "file:../../packages/block-library",
 		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }

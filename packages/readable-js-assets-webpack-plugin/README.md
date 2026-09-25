@@ -34,8 +34,8 @@ module.exports = {
 
 **Note:**
 
--   Multiple instances of the plugin are not supported and may produced unexpected results;
--   It assumes your webpack pipeline is already generating a `.min.js` JS asset file for each JS entry-point.
+- Multiple instances of the plugin are not supported and may produced unexpected results;
+- It assumes your webpack pipeline is already generating a `.min.js` JS asset file for each JS entry-point.
 
 ## Contributing to this package
 

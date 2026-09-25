@@ -17,6 +17,7 @@
 .components-checkbox-control__label {
 	// Ensure label is aligned with checkbox along X axis
 	line-height: var(--checkbox-input-size);
+	color: var(--wpds-color-foreground-content-neutral);
 
 	.components-checkbox-control:not(:has(:disabled)) & {
 		cursor: var(--wpds-cursor-control);
@@ -90,7 +91,7 @@ svg.components-checkbox-control__indeterminate {
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
-		color: $components-color-gray-400;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 }
 

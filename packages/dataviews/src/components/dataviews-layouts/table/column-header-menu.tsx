@@ -193,7 +193,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									disabled={
 										isRtl
 											? index >=
-											  visibleFieldIds.length - 1
+												visibleFieldIds.length - 1
 											: index < 1
 									}
 									onClick={ () => {
@@ -230,7 +230,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										isRtl
 											? index < 1
 											: index >=
-											  visibleFieldIds.length - 1
+												visibleFieldIds.length - 1
 									}
 									onClick={ () => {
 										// In RTL, moving right visually means moving left in the array

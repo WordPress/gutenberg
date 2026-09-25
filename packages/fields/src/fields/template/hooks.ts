@@ -33,7 +33,7 @@ export function useTemplateFieldMode(
 				? unlock( select( coreStore ) ).getTemplateId(
 						postType,
 						postId
-				  )
+					)
 				: undefined;
 			return templateId ? 'block-theme' : null;
 		},

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
@@ -53,7 +53,7 @@ function ClassicTemplateEdit( {
 		[ postId, data.type ]
 	);
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={ value }
@@ -117,7 +117,7 @@ function BlockThemeTemplateEdit( {
 		];
 	}, [ templates, defaultTemplateLabel ] );
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={ value }

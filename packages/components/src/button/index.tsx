@@ -200,7 +200,7 @@ export const Button = forwardRef( function UnforwardedButton(
 					'aria-checked': ariaChecked,
 					'aria-pressed': ariaPressed,
 					'aria-selected': ariaSelected,
-			  }
+				}
 			: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
 		Tag === 'a' ? { href, target } : {};
@@ -299,7 +299,7 @@ export const Button = forwardRef( function UnforwardedButton(
 					tooltipPosition &&
 					// Convert legacy `position` values to be used with the new `placement` prop
 					positionToPlacement( tooltipPosition ),
-		  }
+			}
 		: {};
 
 	return (

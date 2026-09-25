@@ -25,9 +25,7 @@ export default function RootSinglePage() {
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;

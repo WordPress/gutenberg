@@ -258,7 +258,7 @@ export function useLanePlacement(
 				? new MutationObserver( () => {
 						refreshObserved();
 						recompute();
-				  } )
+					} )
 				: null;
 		if ( mutationObserver ) {
 			mutationObserver.observe( container, {

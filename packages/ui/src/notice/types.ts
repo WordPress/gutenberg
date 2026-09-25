@@ -27,18 +27,6 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 	 * The content to be rendered inside the notice.
 	 */
 	children?: ReactNode;
-
-	/**
-	 * The message to be announced to screen readers. Defaults to the children content.
-	 * Used by the `speak()` function from `@wordpress/a11y`.
-	 */
-	spokenMessage?: ReactNode;
-
-	/**
-	 * The politeness level for screen reader announcements.
-	 * Defaults to 'assertive' for error intent, 'polite' for others.
-	 */
-	politeness?: 'polite' | 'assertive';
 }
 
 export interface TitleProps extends ComponentProps< 'span' > {
@@ -62,17 +50,16 @@ export interface ActionsProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps
-	extends Omit<
-		IconButtonProps,
-		| 'loading'
-		| 'loadingAnnouncement'
-		| 'variant'
-		| 'size'
-		| 'tone'
-		| 'label'
-		| 'icon'
-	> {
+export interface CloseIconProps extends Omit<
+	IconButtonProps,
+	| 'loading'
+	| 'loadingAnnouncement'
+	| 'variant'
+	| 'size'
+	| 'tone'
+	| 'label'
+	| 'icon'
+> {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.
@@ -85,8 +72,10 @@ export interface CloseIconProps
 	icon?: IconButtonProps[ 'icon' ];
 }
 
-export interface ActionButtonProps
-	extends Omit< ButtonProps, 'size' | 'tone' > {
+export interface ActionButtonProps extends Omit<
+	ButtonProps,
+	'size' | 'tone'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */

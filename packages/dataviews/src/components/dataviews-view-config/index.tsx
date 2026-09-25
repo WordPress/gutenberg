@@ -5,7 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -111,7 +111,7 @@ function SortFieldControl() {
 	}, [ fields ] );
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
 			options={ orderOptions }

@@ -60,7 +60,7 @@ function Avatar( {
 			? {
 					'--editor-avatar-outline-color': borderColor,
 					'--editor-avatar-name-color': nameColor,
-			  }
+				}
 			: {} ),
 	};
 

@@ -9,11 +9,10 @@ export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 	children: ReactNode;
 }
 
-export interface LinkItemProps
-	extends Omit<
-		ComponentProps< 'a' >,
-		'aria-current' | 'children' | 'href' | 'target'
-	> {
+export interface LinkItemProps extends Omit<
+	ComponentProps< 'a' >,
+	'aria-current' | 'children' | 'href' | 'target'
+> {
 	/**
 	 * The complete browser-compatible destination for the ancestor page.
 	 */
@@ -33,11 +32,10 @@ export interface LinkItemProps
 	children: string;
 }
 
-export interface CurrentItemProps
-	extends Omit<
-		ComponentProps< 'span' >,
-		'aria-current' | 'children' | 'tabIndex'
-	> {
+export interface CurrentItemProps extends Omit<
+	ComponentProps< 'span' >,
+	'aria-current' | 'children' | 'tabIndex'
+> {
 	/**
 	 * The plain-text label for the current page.
 	 */

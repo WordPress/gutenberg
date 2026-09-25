@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
+
+## 2.2.0 (2026-09-23)
+
 ### Internal
 
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Run rendered Theme tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 2.1.0 (2026-09-10)

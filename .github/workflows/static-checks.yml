@@ -5,8 +5,10 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -120,7 +122,7 @@ jobs:
 
             - name: Validate JavaScript test routing
               if: ${{ matrix.node == '24' && matrix.os == 'ubuntu-24.04' }}
-              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
+              run: npm run test:unit:routing
 
             - name: Build packages
               run: npm run build

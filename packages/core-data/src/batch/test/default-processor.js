@@ -8,9 +8,8 @@ describe( 'defaultProcessor', () => {
 
 	beforeEach( async () => {
 		vi.resetModules();
-		( { default: defaultProcessor } = await import(
-			'../default-processor'
-		) );
+		( { default: defaultProcessor } =
+			await import( '../default-processor' ) );
 	} );
 
 	const preflightResponse = {
@@ -83,7 +82,7 @@ describe( 'defaultProcessor', () => {
 								body: 'Error!',
 							},
 						],
-				  }
+					}
 		);
 		const results = await defaultProcessor( requests );
 		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
@@ -107,7 +106,7 @@ describe( 'defaultProcessor', () => {
 								body: 'Error!',
 							},
 						],
-				  }
+					}
 		);
 		const results = await defaultProcessor( requests );
 		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );

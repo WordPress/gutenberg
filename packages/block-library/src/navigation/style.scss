@@ -123,6 +123,24 @@ $navigation-icon-size: 24px;
 		--navigation-layout-direction: column;
 		--navigation-layout-justify: initial;
 		--navigation-layout-align: flex-start;
+
+		// Align wrapped label text with the item justification. Only vertical
+		// menus need it: a horizontal item is only ever as wide as its own text.
+		text-align: var(--navigation-layout-text-align, inherit);
+
+		// Buttons declare their own text-align, and a directly declared value
+		// beats an inherited one, so opt submenu toggles back in.
+		.wp-block-navigation-item__content {
+			text-align: inherit;
+		}
+
+		// Flyout submenus are separate panels, so they keep their own
+		// alignment rather than following the parent menu's justification.
+		// open-always submenus render inline as part of the same vertical
+		// stack instead, so they should keep following it.
+		.wp-block-navigation-item:not(.open-always) > .wp-block-navigation__submenu-container {
+			text-align: initial;
+		}
 	}
 
 	&.no-wrap {
@@ -132,6 +150,7 @@ $navigation-icon-size: 24px;
 	&.items-justified-center {
 		--navigation-layout-justification-setting: center;
 		--navigation-layout-justify: center;
+		--navigation-layout-text-align: center;
 
 		&.is-vertical {
 			--navigation-layout-align: center;
@@ -141,6 +160,7 @@ $navigation-icon-size: 24px;
 	&.items-justified-right {
 		--navigation-layout-justification-setting: flex-end;
 		--navigation-layout-justify: flex-end;
+		--navigation-layout-text-align: end;
 
 		&.is-vertical {
 			--navigation-layout-align: flex-end;
@@ -248,18 +268,18 @@ $navigation-icon-size: 24px;
 		height: auto;
 	}
 
-	// Show submenus on hover unless they open on click.
+	// Show submenus on hover unless they open on click or are always shown.
 	// Restricted to true-hover devices to prevent sticky touch-hover on mobile.
 	@media (hover: hover) {
-		&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+		&:not(.open-on-click):not(.open-always):hover > .wp-block-navigation__submenu-container {
 			@include show-submenu;
 			min-width: 200px;
 		}
 	}
 	// Keep submenus open when focus is within.
-	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
+	&:not(.open-on-click):not(.open-on-hover-click):not(.open-always):focus-within > .wp-block-navigation__submenu-container,
 	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+	&:not(.open-always) .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
 		@include show-submenu;
 		min-width: 200px;
 	}
@@ -313,6 +333,8 @@ $navigation-icon-size: 24px;
 			border: none;
 			background-color: transparent;
 			color: inherit;
+			// Has to be !important to override the inline instance style.
+			box-shadow: none !important;
 		}
 	}
 }
@@ -607,6 +629,7 @@ button.wp-block-navigation-item__content {
 
 				// Inherit alignment settings from container.
 				align-items: var(--navigation-layout-justification-setting, inherit);
+				text-align: var(--navigation-layout-text-align, inherit);
 
 				// Always align the contents of the menu to the top.
 				&,
@@ -645,11 +668,18 @@ button.wp-block-navigation-item__content {
 				// Apply top padding to nested submenus.
 				.wp-block-navigation__submenu-container {
 					padding-top: var(--wp--style--block-gap, 2em);
+
+					// Unfolded inline here, not shown as a panel, so submenus
+					// follow the menu's justification.
+					text-align: inherit;
 				}
 
 				// A default padding is added to submenu items. It's not appropriate inside the modal.
 				.wp-block-navigation-item__content {
 					padding: 0;
+
+					// See the note on submenu toggles above.
+					text-align: inherit;
 				}
 
 				// Default column display for overlay menu contents.
@@ -671,6 +701,12 @@ button.wp-block-navigation-item__content {
 			.wp-block-page-list {
 				color: inherit !important;
 				background: transparent !important;
+			}
+
+			// Submenus unfold inline here, so drop the dropdown shadow.
+			// Has to be !important to override the inline instance style.
+			.wp-block-navigation-item .wp-block-navigation__submenu-container {
+				box-shadow: none !important;
 			}
 
 			// Override justification dropdown menu positioning rules.

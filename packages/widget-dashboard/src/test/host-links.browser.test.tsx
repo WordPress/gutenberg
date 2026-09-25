@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render as renderInBrowser } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { forwardRef } from '@wordpress/element';
@@ -194,6 +194,16 @@ describe( 'host links across the chrome compositions', () => {
 			expect( link ).not.toHaveAttribute( 'data-host-link' );
 			expect( link ).toHaveAttribute( 'href', MATCHED_HREF );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
+
+			/*
+			 * The target rides on the anchor rather than on the UI link,
+			 * whose own new-tab glyph would double the action's icon.
+			 */
+			expect(
+				within( link ).queryByRole( 'img', {
+					name: '(opens in a new tab)',
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		/*

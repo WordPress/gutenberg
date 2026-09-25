@@ -99,7 +99,7 @@ export function Actions(): React.ReactNode {
 					onClick: () => setResetDialogOpen( true ),
 					disabled: ! onLayoutReset,
 				},
-		  ]
+			]
 		: [];
 
 	if ( ! onEditChange ) {

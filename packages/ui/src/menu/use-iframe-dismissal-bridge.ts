@@ -123,7 +123,7 @@ function useCloseOnIframePointerDown( {
 								forEachIframe( node, addIframe )
 							);
 						} );
-				  } )
+					} )
 				: null;
 			observer?.observe( document.documentElement, {
 				childList: true,
@@ -200,7 +200,7 @@ export function useIframeDismissalBridge( {
 		}
 
 		setUncontrolledOpen( nextOpen );
-		setTrigger( nextOpen ? eventDetails.trigger ?? null : null );
+		setTrigger( nextOpen ? ( eventDetails.trigger ?? null ) : null );
 	};
 
 	return {

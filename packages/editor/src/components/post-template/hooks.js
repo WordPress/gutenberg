@@ -34,7 +34,7 @@ export function useAllowSwitchingTemplates() {
 			const templates = isFrontPage
 				? getEntityRecords( 'postType', 'wp_template', {
 						per_page: -1,
-				  } )
+					} )
 				: [];
 			const hasFrontPage =
 				isFrontPage &&
@@ -156,13 +156,7 @@ export function usePostTemplatePanelMode() {
 					name: 'wp_template',
 				} ) ?? false;
 		}
-		const canViewTemplates = isVisible
-			? !! canUser( 'read', {
-					kind: 'postType',
-					name: 'wp_template',
-			  } )
-			: false;
-		if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+		if ( ! isBlockTheme && isVisible ) {
 			return 'classic';
 		}
 		if ( isBlockTheme && !! getCurrentTemplateId() ) {

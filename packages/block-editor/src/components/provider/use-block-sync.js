@@ -441,7 +441,7 @@ export default function useBlockSync( {
 							? restoreSelectionIds(
 									selectionInfo,
 									idMappingRef.current
-							  )
+								)
 							: selectionInfo;
 
 						pendingChangesRef.current.outgoing.push(
@@ -476,12 +476,12 @@ export default function useBlockSync( {
 						const isOurs = clientId
 							? idMappingRef.current.internalToExternal.has(
 									newSelectionStart.clientId
-							  )
+								)
 							: ! getBlockParents(
 									newSelectionStart.clientId
-							  ).some( ( parentId ) =>
+								).some( ( parentId ) =>
 									areInnerBlocksControlled( parentId )
-							  );
+								);
 
 						if ( isOurs ) {
 							const selectionInfo = {
@@ -495,7 +495,7 @@ export default function useBlockSync( {
 									? restoreSelectionIds(
 											selectionInfo,
 											idMappingRef.current
-									  )
+										)
 									: selectionInfo
 							);
 						}
