@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
 
 // Approximate height of the sticky admin header so that
@@ -72,7 +73,7 @@ $sticky-header-clearance: 120px;
 			p {
 				margin: 0;
 				font-size: 13px;
-				line-height: 20px;
+				line-height: math.div(20, 13); // Unit-less equivalent of 20px at this 13px font-size.
 			}
 		}
 
