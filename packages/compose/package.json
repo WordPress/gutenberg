@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "8.8.0",
+	"version": "8.9.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,7 +58,7 @@
 		"use-memo-one": "^1.1.1"
 	},
 	"devDependencies": {
-		"@testing-library/dom": "^10.4.1",
+		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"mock-match-media": "^0.4.2",

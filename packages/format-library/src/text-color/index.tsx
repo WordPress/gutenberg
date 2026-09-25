@@ -11,8 +11,9 @@ import {
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
-import type { ColorObject, TextColorEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
+import type { ColorObject } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
@@ -63,7 +64,7 @@ function TextColorEdit( {
 	isActive,
 	activeAttributes,
 	contentRef,
-}: TextColorEditProps ) {
+}: FormatEditProps ) {
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
 		'color.palette'

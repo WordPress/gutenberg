@@ -808,9 +808,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1933,11 +1930,6 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/toolbar-button.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/rich-text/utils.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4569,16 +4561,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/card/get-padding-by-size.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/card/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/color-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4596,11 +4578,6 @@
 	},
 	"packages/components/src/custom-gradient-picker/index.tsx": {
 		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -4723,16 +4700,6 @@
 		}
 	},
 	"packages/components/src/tabs/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/text/hook.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/text/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -6288,22 +6255,12 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-author/combobox.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/post-author/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-author/panel.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/post-author/select.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7424,11 +7381,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/pagination/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}

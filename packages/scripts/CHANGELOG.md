@@ -2,11 +2,15 @@
 
 ## Unreleased
 
+## 36.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Switch `test-unit-js` to consumer-installed Vitest 5 and Vite 7/8 at the 36.0.0 boundary. Run once by default, discover consumer Vitest/Vite config, and use Vitest lint defaults for test/spec files. Keep `test-unit-jest` as a maintenance-only adapter for consumer-installed Jest, with no scheduled removal. Remove the bundled Jest dependencies, preset config, Babel transformer, and GitHub Actions reporter. Retire the Jest preset and console package source; published versions remain available. Jest projects must install their own dependencies and configure the published preset if needed. See the [migration guide](docs/vitest-migration.md). ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 
 -   Require Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` and update the bundled `markdownlint-cli` from `^0.31.1` to `^0.49.1`, which moves `markdownlint` from 0.25 to 0.41. `lint-md-docs` now runs the rules added since then (MD051 through MD060) by default, so projects may see new reports. The `header` rule aliases (for example `header-increment`) no longer work in configuration files; use the `heading` names ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead. Note that `resolveConfig` also searches ancestor directories and the global config directory (`~/.config/stylelint`), so a project with no local config may now pick up an unrelated config found there instead of the bundled default ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
 
 ### Enhancements
 
