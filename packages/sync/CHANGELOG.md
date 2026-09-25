@@ -7,9 +7,11 @@
 -   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
 -   Remove the `privateApis` export. `ConnectionErrorCode`, `createSyncManager`, `Delta`, `CRDT_DOC_META_PERSISTENCE_KEY`, `CRDT_RECORD_MAP_KEY`, `LOCAL_EDITOR_ORIGIN`, `LOCAL_UNDO_IGNORED_ORIGIN`, and `retrySyncConnection` are now regular exports, and the package no longer depends on `@wordpress/private-apis` ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
 
+## 1.56.0 (2026-09-23)
+
 ### New Features
 
--   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#82621](https://github.com/WordPress/gutenberg/pull/82621)).
 
 ## 1.55.0 (2026-09-10)
 

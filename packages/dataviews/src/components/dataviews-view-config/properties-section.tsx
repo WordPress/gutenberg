@@ -144,7 +144,7 @@ export function PropertiesSection( {
 											? visibleFieldIds.filter(
 													( fieldId ) =>
 														fieldId !== field.id
-											  )
+												)
 											: [ ...visibleFieldIds, field.id ],
 									} );
 								} }

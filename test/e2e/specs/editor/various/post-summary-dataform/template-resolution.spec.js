@@ -1,4 +1,8 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 const { EXPERIMENTS, openPostSummary } = require( './utils' );
 
 /*
@@ -38,6 +42,90 @@ test.describe( 'Template resolution (DataForm inspector)', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test.describe( 'without template capabilities', () => {
+		let postId;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const editorUser = await requestUtils.createUser( {
+				username: 'editoruser',
+				email: 'editoruser@example.com',
+				password: 'editoruserpassword',
+				roles: [ 'editor' ],
+			} );
+			const post = await requestUtils.createPost( {
+				title: 'Custom template post',
+				status: 'draft',
+				author: editorUser.id,
+				template: 'custom-template',
+			} );
+			postId = post.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts();
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'shows the assigned template to an editor', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			const page = await context.newPage();
+			await page.goto( '/wp-login.php' );
+			await page
+				.getByLabel( 'Username or Email Address' )
+				.fill( 'editoruser' );
+			await page
+				.getByLabel( 'Password', { exact: true } )
+				.fill( 'editoruserpassword' );
+			await page.getByRole( 'button', { name: 'Log In' } ).click();
+			await page.waitForURL( '**/wp-admin/**' );
+
+			await page.goto(
+				`/wp-admin/post.php?post=${ postId }&action=edit`
+			);
+			await page.waitForFunction( () => !! window.wp?.data );
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+			} );
+
+			const summary = await openPostSummary( {
+				editor: new Editor( { page } ),
+				page,
+			} );
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Template' } )
+			).toHaveAccessibleDescription( 'Custom' );
+
+			// The template actions panel offers no template editing or creation.
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const panelToggle = sidebar.getByRole( 'button', {
+				name: 'Template: Custom',
+			} );
+			await panelToggle.click();
+			await expect( panelToggle ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Edit', exact: true } )
+			).toBeHidden();
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Create new' } )
+			).toBeHidden();
+
+			await context.close();
+		} );
 	} );
 
 	test.describe( '`page_for_posts` setting', () => {

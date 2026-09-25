@@ -4,27 +4,60 @@
 
 ### Breaking Changes
 
+-   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now announce dynamic updates explicitly, for example with `speak()` from `@wordpress/a11y` ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+### New Features
+
+-   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
+
+### Bug Fixes
+
+-   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
+-   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
+
+## 0.23.0 (2026-09-23)
+
+### Breaking Changes
+
+-   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Remove the `readOnly` prop ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 
 ### New Features
 
+-   Add `RadioGroupControl` component. ([#83143](https://github.com/WordPress/gutenberg/pull/83143))
+-   Add `SwitchControl` component. ([#83146](https://github.com/WordPress/gutenberg/pull/83146))
+-   Add `Switch` form primitive ([#83039](https://github.com/WordPress/gutenberg/pull/83039)).
+-   Add `RadioGroup` form primitive ([#83038](https://github.com/WordPress/gutenberg/pull/83038)).
 -   Add `CheckboxGroup` form primitive ([#82556](https://github.com/WordPress/gutenberg/pull/82556)).
 
 ### Enhancements
 
+-   `Fieldset`: Use a tighter gap between the legend and an immediately following description or details ([#82729](https://github.com/WordPress/gutenberg/pull/82729)).
+-   `Select`, `SelectControl`: Mark as recommended for use in a WordPress environment ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `Select`, `SelectControl`: Add `ItemLabel` and `ItemDescription` subcomponents. Multiple descriptions contribute to `aria-describedby` in DOM order. `SelectControl` `items` may include an optional `description` string. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 -   `Select`, `SelectControl`: Align the selected item with the trigger by default, and drop the popup max-height cap when that alignment is enabled ([#82043](https://github.com/WordPress/gutenberg/pull/82043)).
+-   `Select`, `Combobox`, `Autocomplete`: Allow browsing read-only controls while keeping their value unchanged ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
+-   `Radio`: Enlarge the hit target to 24px without changing the visual size. ([#83275](https://github.com/WordPress/gutenberg/pull/83275))
 -   `Checkbox`: Enlarge the hit target to 24px without changing the visual size. ([#82597](https://github.com/WordPress/gutenberg/pull/82597))
 -   `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Add `statusContent` for the list status live region. The region stays mounted. Use it for async loading. Use `emptyContent` for the empty list. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 -   `Autocomplete`, `Combobox`, `SearchableChipSelect`, `SearchableChipSelectControl`, `SearchableSelect`: Export a `useFilteredItems` hook that returns the client-side filtered item list, for result-count status. ([#82592](https://github.com/WordPress/gutenberg/pull/82592))
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: Assistive technology now hears selected chip names, how to remove them, and how to move to them from the input ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
+-   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
+-   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+-   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
 
 ### Internal
 
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
+-   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+-   `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
 
 ## 0.22.0 (2026-09-10)
 

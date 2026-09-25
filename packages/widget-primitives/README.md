@@ -53,13 +53,21 @@ Error handling and chrome stay with the host, which wraps the lazy render in a `
 
 It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
+### `HostLink`
+
+It's how a consumer mounts a link target, and the only piece of the seam most consumers touch: the host's `Link` when `match` recognizes the target, a plain anchor otherwise. A target that opens a new document never routes, which it reads off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
+
+It takes `href` plus anchor props and composes through the `render` prop of a UI link, which merges its own anchor props in.
+
 ### `WidgetHostProvider` / `useWidgetHost`
 
-It's the seam through which the embedding application provides what only it knows, as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
+It's the seam itself: the embedding application provides what only it knows as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
 
-The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it. A matched link action navigates client-side; `null`, `download`, and `openInNewTab` keep the plain anchor.
+The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it.
 
-Consumers reach the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+Applications mount the provider. `useWidgetHost` reads the bag directly, for a capability no component covers yet or an answer a consumer needs before it renders.
+
+`HostLink` reaches the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
 
 ### Contract types
 

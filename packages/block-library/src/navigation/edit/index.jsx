@@ -295,10 +295,8 @@ function Navigation( {
 		hasSelectedStyleState,
 	} = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				hasSelectedStyleState: hasSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			const { getSettings, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			const settings = getSettings();
 
 			return {
@@ -770,7 +768,7 @@ function Navigation( {
 		submenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
-			  )
+				)
 			: '';
 
 	const isFirstRender = useRef( true ); // Don't speak on first render.

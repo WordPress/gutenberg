@@ -327,12 +327,12 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			const availableWidth = visibleListRef.current
 				? getContentBoxInlineSize( visibleListRef.current )
 				: rootElement.clientWidth ||
-				  rootElement.getBoundingClientRect().width;
+					rootElement.getBoundingClientRect().width;
 			const currentItemWidth = currentItem
 				? measureElement(
 						intrinsicItemRefs.current.get( currentItem.itemKey ) ??
 							null
-				  )
+					)
 				: 0;
 			const linkItemWidths = linkItems.map( ( item ) =>
 				measureElement(
@@ -342,7 +342,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			const pinnedIndex = pinnedItemKey
 				? linkItems.findIndex(
 						( item ) => item.itemKey === pinnedItemKey
-				  )
+					)
 				: undefined;
 			const nextLayout = getCollapsedLayout(
 				{
@@ -496,7 +496,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 					collapsedItems.length
 				),
 				collapsedItems.length
-		  )
+			)
 		: '';
 
 	let visiblePosition = 0;

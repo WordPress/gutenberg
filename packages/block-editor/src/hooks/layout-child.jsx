@@ -65,7 +65,7 @@ export function getChildLayoutStyleRules( {
 		? {
 				...layout,
 				...viewportOverrides,
-		  }
+			}
 		: layout;
 	const hasViewportOverride = ( key ) =>
 		Object.hasOwn( viewportOverrides || {}, key );
@@ -121,9 +121,8 @@ export function getChildLayoutStyleRules( {
 		hasViewportOverride( 'columnSpan' )
 	) {
 		if ( columnStart && columnSpan ) {
-			declarations[
-				'grid-column'
-			] = `${ columnStart } / span ${ columnSpan }`;
+			declarations[ 'grid-column' ] =
+				`${ columnStart } / span ${ columnSpan }`;
 		} else if ( columnStart ) {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {

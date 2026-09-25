@@ -76,16 +76,18 @@ export function MediaControlPreview( {
  * MediaControl - Complete media selection control for inspector panels
  *
  * @param {Object}   props
- * @param {number}   props.mediaId      Media attachment ID
- * @param {string}   props.mediaUrl     Media URL
- * @param {string}   props.filename     Filename to display
- * @param {Array}    props.allowedTypes Allowed media types
- * @param {Function} props.onSelect     Callback when media selected
- * @param {Function} props.onSelectURL  Callback when URL entered
- * @param {Function} props.onError      Error callback
- * @param {Function} props.onReset      Reset/remove callback
- * @param {boolean}  props.isUploading  Whether upload in progress
- * @param {string}   props.emptyLabel   Label when no media (default: 'Add media')
+ * @param {number}   props.mediaId               Media attachment ID
+ * @param {string}   props.mediaUrl              Media URL
+ * @param {string}   props.filename              Filename to display
+ * @param {Array}    props.allowedTypes          Allowed media types
+ * @param {Function} props.onSelect              Callback when media selected
+ * @param {Function} props.onSelectURL           Callback when URL entered
+ * @param {Function} props.onError               Error callback
+ * @param {Function} props.onReset               Reset/remove callback
+ * @param {boolean}  props.isUploading           Whether upload in progress
+ * @param {string}   props.emptyLabel            Label when no media (default: 'Add media')
+ * @param {boolean}  props.useFeaturedImage      Whether the featured image is in use
+ * @param {Function} props.onToggleFeaturedImage Callback toggling the featured image
  * @return {Element} Media control component
  */
 export function MediaControl( {
@@ -99,6 +101,8 @@ export function MediaControl( {
 	onReset,
 	isUploading = false,
 	emptyLabel = __( 'Media' ),
+	useFeaturedImage,
+	onToggleFeaturedImage,
 } ) {
 	const { getSettings } = useSelect( blockEditorStore );
 	const onFilesDrop = ( filesList ) => {
@@ -131,6 +135,8 @@ export function MediaControl( {
 				onSelect={ onSelect }
 				onSelectURL={ onSelectURL }
 				onError={ onError }
+				useFeaturedImage={ useFeaturedImage }
+				onToggleFeaturedImage={ onToggleFeaturedImage }
 				name={
 					<MediaControlPreview
 						url={ mediaUrl }

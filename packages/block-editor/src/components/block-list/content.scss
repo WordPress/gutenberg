@@ -403,7 +403,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-size: $default-font-size;
 	font-family: $default-font;
 	color: $black;
-	font-weight: normal;
+	font-weight: 400;
 
 	.is-zoomed-out & {
 		// Maintains an absolute font-size by counter-scaling based on the zoom level.

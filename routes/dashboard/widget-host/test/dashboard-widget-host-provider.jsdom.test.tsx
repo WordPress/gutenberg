@@ -7,7 +7,7 @@ import { DashboardWidgetHostProvider } from '../dashboard-widget-host-provider';
 
 vi.mock( import( '@wordpress/route' ), async () => {
 	const { createElement, forwardRef } =
-		await vi.importActual< typeof import('@wordpress/element') >(
+		await vi.importActual< typeof import( '@wordpress/element' ) >(
 			'@wordpress/element'
 		);
 	type MockLinkProps = AnchorHTMLAttributes< HTMLAnchorElement > & {
@@ -26,7 +26,7 @@ vi.mock( import( '@wordpress/route' ), async () => {
 		}
 	);
 	return {
-		Link: Link as unknown as typeof import('@wordpress/route').Link,
+		Link: Link as unknown as typeof import( '@wordpress/route' ).Link,
 	};
 } );
 

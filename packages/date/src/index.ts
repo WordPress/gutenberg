@@ -624,7 +624,7 @@ function buildMoment(
 		return isUTCOffset( timezone )
 			? dateMoment.utcOffset( timezone )
 			: // A false isUTCOffset() guarantees that timezone is a string.
-			  dateMoment.tz( timezone as string );
+				dateMoment.tz( timezone as string );
 	}
 
 	if ( settings.timezone.string ) {

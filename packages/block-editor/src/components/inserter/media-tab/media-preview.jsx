@@ -69,7 +69,7 @@ function MediaPreviewOptions( { category, media, onDetach } ) {
 										/* translators: %s: Name of the post type e.g: "Page". */
 										__( 'Detach from %s' ),
 										category.postTypeLabel
-								  )
+									)
 								: __( 'Detach from post' ) }
 						</MenuItem>
 					) }

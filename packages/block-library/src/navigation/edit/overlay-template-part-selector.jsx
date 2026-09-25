@@ -3,7 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Button,
 	FlexBlock,
 	FlexItem,
@@ -255,7 +255,7 @@ export default function OverlayTemplatePartSelector( {
 					selectedTemplatePart.title?.rendered
 						? decodeEntities( selectedTemplatePart.title.rendered )
 						: selectedTemplatePart.slug
-			  )
+				)
 			: __( 'Edit overlay' );
 	}, [ selectedTemplatePart ] );
 
@@ -301,7 +301,7 @@ export default function OverlayTemplatePartSelector( {
 						className="wp-block-navigation__overlay-selector-controls"
 					>
 						<FlexBlock>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Overlay template' ) }
 								hideLabelFromVision
 								aria-labelledby={ headingId }

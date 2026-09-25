@@ -8,7 +8,7 @@ const CircularOptionPickerStoryContext = createContext< {
 } >( {} );
 
 const meta: Meta< typeof CircularOptionPicker > = {
-	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/CircularOptionPicker',
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { useItemContent } from '../../../utils/item-popup';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import { Icon } from '../../../icon';
@@ -44,6 +45,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 		return (
 			<_Select.Item
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					size === 'small' && itemPopupStyles[ 'is-size-small' ],
@@ -54,14 +56,13 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 				{ ...itemAriaProps }
 				{ ...restProps }
 			>
-				<Icon
-					icon={ check }
-					className={ clsx(
-						itemPopupStyles[ 'item-icon' ],
-						itemPopupStyles[ 'item-indicator-icon' ]
-					) }
-					size={ size === 'small' ? 20 : 24 }
-				/>
+				<span className={ itemPopupStyles[ 'item-icon' ] }>
+					<Icon
+						icon={ check }
+						className={ itemPopupStyles[ 'item-indicator-icon' ] }
+						size={ size === 'small' ? 20 : 24 }
+					/>
+				</span>
 				<div className={ itemPopupStyles[ 'item-text' ] }>
 					{ contentChildren }
 				</div>

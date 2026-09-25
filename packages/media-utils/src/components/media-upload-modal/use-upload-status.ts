@@ -100,7 +100,7 @@ export function useUploadStatus( {
 							? {
 									...item,
 									status: 'uploaded' as const,
-							  }
+								}
 							: item
 					)
 				);

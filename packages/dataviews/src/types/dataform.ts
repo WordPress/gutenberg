@@ -406,11 +406,7 @@ export type NormalizedDetailsLayout = {
  * The layout configuration for a form or a form field.
  */
 export type Layout =
-	| RegularLayout
-	| PanelLayout
-	| CardLayout
-	| RowLayout
-	| DetailsLayout;
+	RegularLayout | PanelLayout | CardLayout | RowLayout | DetailsLayout;
 
 /**
  * The normalized version of {@link Layout}, with defaults applied.
@@ -426,8 +422,7 @@ export type NormalizedLayout =
  * A normalized summary field, for panel or card layouts.
  */
 export type NormalizedSummaryField =
-	| NormalizedPanelSummaryField
-	| NormalizedCardSummaryField;
+	NormalizedPanelSummaryField | NormalizedCardSummaryField;
 
 /**
  * A field within a form. Can also be expressed as a plain string (the field id).

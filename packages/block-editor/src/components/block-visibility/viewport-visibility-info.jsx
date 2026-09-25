@@ -1,12 +1,8 @@
-import {
-	Icon as WCIcon,
-	__experimentalText as WCText,
-	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Notice } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
@@ -14,7 +10,6 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const DEFAULT_VISIBILITY_STATE = {
 	currentBlockVisibility: undefined,
 	hasParentHiddenEverywhere: false,
@@ -82,13 +77,11 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 		[ clientId, currentViewport ]
 	);
 
-	if (
-		! (
-			isBlockCurrentlyHidden ||
-			hasParentHiddenEverywhere ||
-			isBlockParentHiddenAtViewport
-		)
-	) {
+	if ( ! (
+		isBlockCurrentlyHidden ||
+		hasParentHiddenEverywhere ||
+		isBlockParentHiddenAtViewport
+	) ) {
 		return null;
 	}
 
@@ -97,14 +90,14 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	if ( isBlockCurrentlyHidden ) {
 		// Block is currently hidden - check if hidden everywhere or at specific viewport
 		if ( currentBlockVisibility === false ) {
-			label = __( 'Block is hidden' );
+			label = __( 'Hidden' );
 		} else {
 			const viewportLabel =
 				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 				currentViewport;
 			label = sprintf(
 				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
+				__( 'Hidden on %s' ),
 				viewportLabel
 			);
 		}
@@ -112,24 +105,25 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 
 	// Parent is hidden - check if hidden everywhere or at specific viewport
 	if ( hasParentHiddenEverywhere ) {
-		label = __( 'Parent block is hidden' );
+		label = __( 'Parent hidden' );
 	} else if ( isBlockParentHiddenAtViewport ) {
 		const viewportLabel =
 			BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 			currentViewport;
 		label = sprintf(
 			/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-			__( 'Parent block is hidden on %s' ),
+			__( 'Parent hidden on %s' ),
 			viewportLabel
 		);
 	}
 
 	return (
-		<WCBadge className="block-editor-block-visibility-info">
-			<HStack spacing={ 2 } justify="start">
-				<WCIcon icon={ unseen } />
-				<WCText>{ label }</WCText>
-			</HStack>
-		</WCBadge>
+		<Notice.Root
+			className="block-editor-block-visibility-info"
+			icon={ unseen }
+			intent="info"
+		>
+			<Notice.Description>{ label }</Notice.Description>
+		</Notice.Root>
 	);
 }

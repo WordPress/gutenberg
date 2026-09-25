@@ -12,8 +12,8 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
-import MoreMenuGroup from '../more-menu/more-menu-group';
 import MoreMenuItem from '../more-menu/more-menu-item';
+import { toMenuItems } from '../more-menu/more-menu-submenu';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
@@ -91,7 +91,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
-				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				? ( VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default' )
 				: 'default'
 		);
 		// Only auto-open the block inspector when enabling responsive styles
@@ -135,7 +135,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 		...( hasMobileViewport
 			? [
@@ -146,7 +146,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 	];
 
@@ -267,7 +267,12 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 					name="core/plugin-preview-menu"
 					fillProps={ { as: MoreMenuItem } }
 				>
-					{ ( items ) => <MoreMenuGroup>{ items }</MoreMenuGroup> }
+					{ ( items ) => (
+						<>
+							<Menu.Separator />
+							<Menu.Group>{ toMenuItems( items ) }</Menu.Group>
+						</>
+					) }
 				</ActionItem.Slot>
 			</Menu.Popup>
 		</Menu.Root>

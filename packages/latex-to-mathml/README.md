@@ -30,17 +30,17 @@ Converts LaTeX math syntax to MathML.
 
 #### Parameters
 
--   `latex` (`string`): The LaTeX string to convert.
--   `options` (`Object`): Optional conversion options.
-    -   `displayMode` (`boolean`): Whether to render in display mode (block) or inline mode. Default: `true`.
+- `latex` (`string`): The LaTeX string to convert.
+- `options` (`Object`): Optional conversion options.
+    - `displayMode` (`boolean`): Whether to render in display mode (block) or inline mode. Default: `true`.
 
 #### Returns
 
--   (`string`): The MathML string.
+- (`string`): The MathML string.
 
 #### Throws
 
--   Will throw an error if the LaTeX syntax is invalid.
+- Will throw an error if the LaTeX syntax is invalid.
 
 ## Contributing to this package
 

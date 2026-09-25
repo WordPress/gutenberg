@@ -70,7 +70,7 @@ export function useBorderControlDropdown(
 						( indicatorStyle !== 'none'
 							? COLORS.gray[ 300 ]
 							: undefined ),
-			  }
+				}
 			: undefined,
 		onColorChange,
 		onStyleChange,

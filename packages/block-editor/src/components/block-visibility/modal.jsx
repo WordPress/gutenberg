@@ -8,7 +8,7 @@ import {
 } from '@wordpress/element';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	Flex,
 	FlexItem,
 	Icon as WCIcon,
@@ -123,13 +123,13 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		const message =
 			blocks?.length > 1
 				? // translators: %s: The shortcut key to access the List View.
-				  __(
+					__(
 						'Blocks hidden. You can access them via the List View (%s).'
-				  )
+					)
 				: // translators: %s: The shortcut key to access the List View.
-				  __(
+					__(
 						'Block hidden. You can access it via the List View (%s).'
-				  );
+					);
 
 		return sprintf( message, listViewShortcut );
 	}, [ hideEverywhere, blocks?.length, listViewShortcut ] );
@@ -185,7 +185,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 							},
 							{}
 						),
-				  };
+					};
 			const attributesByClientId = Object.fromEntries(
 				blocks.map( ( { clientId, attributes } ) => [
 					clientId,
@@ -239,14 +239,14 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 						{ hasMultipleBlocks
 							? __(
 									'Select the viewport sizes for which you want to hide the blocks. Changes will apply to all selected blocks.'
-							  )
+								)
 							: __(
 									'Select the viewport size for which you want to hide the block.'
-							  ) }
+								) }
 					</legend>
 					<ul className="block-editor-block-visibility-modal__options">
 						<li className="block-editor-block-visibility-modal__options-item block-editor-block-visibility-modal__options-item--everywhere">
-							<CheckboxControl
+							<WCCheckboxControl
 								className="block-editor-block-visibility-modal__options-checkbox--everywhere"
 								label={ __( 'Omit from published content' ) }
 								checked={ hideEverywhere === true }
@@ -267,7 +267,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 												key={ key }
 												className="block-editor-block-visibility-modal__options-item"
 											>
-												<CheckboxControl
+												<WCCheckboxControl
 													label={ sprintf(
 														// translators: %s: The viewport name.
 														__( 'Hide on %s' ),

@@ -215,7 +215,7 @@ export function useScaleCanvas( {
 				containerWidth,
 				maxContainerWidth,
 				scaleContainerWidth,
-		  } )
+			} )
 		: scale;
 
 	/**

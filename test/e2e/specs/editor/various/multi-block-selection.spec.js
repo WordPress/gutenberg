@@ -1035,7 +1035,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should select the whole paragraph on triple click from the block edge', async ( {
+	test( 'should select the whole paragraph on triple click', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -1048,24 +1048,14 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second' },
 		} );
-
-		// Deselect the block so the rich text element is not focused and the
-		// selection observer, not the rich text, dispatches the selection.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 
-		const paragraph = editor.canvas
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		const box = await paragraph.boundingBox();
-
-		// Triple click just left of the paragraph text (on the canvas
-		// padding), so the paragraph selection is made without focusing the
-		// rich text element.
-		await page.mouse.click( box.x - 5, box.y + box.height / 2, {
-			clickCount: 3,
-		} );
+			.first()
+			.click( { clickCount: 3 } );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
@@ -1094,6 +1084,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				startOffset: 0,
 				endOffset: 'One two three'.length,
 			} );
+
+		// Typing replaces the selection.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 	} );
 
 	test( 'should gradually multi-select', async ( {

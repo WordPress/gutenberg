@@ -15,7 +15,7 @@ const v1ToV5ImageFillStyles = ( url, focalPoint ) => {
 				backgroundPosition: focalPoint
 					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
 					: `50% 50%`,
-		  }
+			}
 		: {};
 };
 
@@ -26,9 +26,9 @@ const v6ToV7ImageFillStyles = ( url, focalPoint ) => {
 				backgroundPosition: focalPoint
 					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
 							focalPoint.y * 100
-					  ) }%`
+						) }%`
 					: `50% 50%`,
-		  }
+			}
 		: {};
 };
 

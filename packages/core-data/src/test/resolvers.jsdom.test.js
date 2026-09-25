@@ -756,12 +756,12 @@ describe( 'getEntityRecords', () => {
 			resolveSelect,
 		} );
 
-		// Permissions should have been cached
+		// Permissions should have been cached. `canUser` is keyed by the
+		// resource, so one entry covers all four actions.
 		expect( dispatch.receiveUserPermissions ).toHaveBeenCalled();
-		expect( finishResolutions ).toHaveBeenCalledWith(
-			'canUser',
-			expect.any( Array )
-		);
+		expect( finishResolutions ).toHaveBeenCalledWith( 'canUser', [
+			[ { kind: 'postType', name: 'post', id: 1 } ],
+		] );
 		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
@@ -1037,19 +1037,19 @@ describe( 'canUser', () => {
 	];
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
-	let dispatch, registry;
+	let dispatch;
 	beforeEach( async () => {
-		registry = {
-			select: vi.fn( () => ( {
-				hasStartedResolution: () => false,
-			} ) ),
-			batch: ( callback ) => callback(),
-		};
 		dispatch = Object.assign( vi.fn(), {
 			receiveUserPermissions: vi.fn(),
-			finishResolutions: vi.fn(),
 		} );
 		triggerFetch.mockReset();
+	} );
+
+	it( 'drops the action from the resolution args', () => {
+		expect( canUser.getResolutionArgs( 'create', 'media', 123 ) ).toEqual( [
+			'media',
+			123,
+		] );
 	} );
 
 	it( 'does nothing when there is an API error', async () => {
@@ -1057,13 +1057,9 @@ describe( 'canUser', () => {
 			Promise.reject( { status: 404 } )
 		);
 
-		await canUser(
-			'create',
-			'media'
-		)( { dispatch, registry, resolveSelect } );
-		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
+		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
-			registry,
 			resolveSelect,
 		} );
 
@@ -1081,10 +1077,7 @@ describe( 'canUser', () => {
 			headers: new Map(),
 		} ) );
 
-		await canUser(
-			'create',
-			'media'
-		)( { dispatch, registry, resolveSelect } );
+		await canUser( 'media' )( { dispatch, resolveSelect } );
 
 		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
 			'create/media': false,
@@ -1096,9 +1089,8 @@ describe( 'canUser', () => {
 
 	it( 'throws an error when an entity resource object is malformed', async () => {
 		await expect(
-			canUser( 'create', { name: 'wp_block' } )( {
+			canUser( { name: 'wp_block' } )( {
 				dispatch,
-				registry,
 				resolveSelect,
 			} )
 		).rejects.toThrow( 'The entity resource object is not valid.' );
@@ -1109,10 +1101,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser(
-			'create',
-			'media'
-		)( { dispatch, registry, resolveSelect } );
+		await canUser( 'media' )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -1133,9 +1122,8 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
+		await canUser( { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
-			registry,
 			resolveSelect,
 		} );
 
@@ -1155,10 +1143,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser(
-			'create',
-			'media'
-		)( { dispatch, registry, resolveSelect } );
+		await canUser( 'media' )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -1176,9 +1161,8 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
+		await canUser( { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
-			registry,
 			resolveSelect,
 		} );
 
@@ -1198,11 +1182,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser(
-			'create',
-			'blocks',
-			123
-		)( { dispatch, registry, resolveSelect } );
+		await canUser( 'blocks', 123 )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -1220,15 +1200,11 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', {
+		await canUser( {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( {
-			dispatch,
-			registry,
-			resolveSelect,
-		} );
+		} )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -1241,203 +1217,21 @@ describe( 'canUser', () => {
 		);
 	} );
 
-	it( 'runs apiFetch only once per resource', async () => {
-		registry = {
-			...registry,
-			select: () => ( {
-				hasStartedResolution: ( _, [ action ] ) => action === 'read',
-			} ),
-		};
-
+	it( 'receives every action permission from a single request', async () => {
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
 		} ) );
 
-		await canUser(
-			'create',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'read',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
+		await canUser( 'blocks' )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				'create/blocks': true,
-				'read/blocks': true,
-			} )
-		);
-	} );
-
-	it( 'runs apiFetch only once per entity', async () => {
-		registry = {
-			...registry,
-			select: () => ( {
-				hasStartedResolution: ( _, [ action ] ) => action === 'read',
-			} ),
-		};
-
-		triggerFetch.mockImplementation( () => ( {
-			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
-		} ) );
-
-		await canUser( 'create', {
-			kind: 'postType',
-			name: 'wp_block',
-		} )( {
-			dispatch,
-			registry,
-			resolveSelect,
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
+			'create/blocks': true,
+			'read/blocks': true,
+			'update/blocks': false,
+			'delete/blocks': false,
 		} );
-		await canUser( 'read', {
-			kind: 'postType',
-			name: 'wp_block',
-		} )( {
-			dispatch,
-			registry,
-			resolveSelect,
-		} );
-
-		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
-
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				'create/postType/wp_block': true,
-				'read/postType/wp_block': true,
-			} )
-		);
-	} );
-
-	it( 'retrieves all permissions even when ID is not given', async () => {
-		registry = {
-			...registry,
-			select: () => ( {
-				hasStartedResolution: ( _, [ action ] ) => action === 'read',
-			} ),
-		};
-
-		triggerFetch.mockImplementation( () => ( {
-			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
-		} ) );
-
-		await canUser(
-			'create',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'read',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'update',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'delete',
-			'blocks'
-		)( { dispatch, registry, resolveSelect } );
-
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				'create/blocks': true,
-				'read/blocks': true,
-				'update/blocks': false,
-				'delete/blocks': false,
-			} )
-		);
-	} );
-
-	it( 'runs apiFetch only once per resource ID', async () => {
-		registry = {
-			...registry,
-			select: () => ( {
-				hasStartedResolution: ( _, [ action ] ) => action === 'create',
-			} ),
-		};
-
-		triggerFetch.mockImplementation( () => ( {
-			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
-		} ) );
-
-		await canUser(
-			'create',
-			'blocks',
-			123
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'read',
-			'blocks',
-			123
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'update',
-			'blocks',
-			123
-		)( { dispatch, registry, resolveSelect } );
-		await canUser(
-			'delete',
-			'blocks',
-			123
-		)( { dispatch, registry, resolveSelect } );
-
-		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
-
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				'create/blocks/123': true,
-				'read/blocks/123': true,
-				'update/blocks/123': true,
-				'delete/blocks/123': true,
-			} )
-		);
-	} );
-
-	it( 'runs apiFetch only once per entity ID', async () => {
-		registry = {
-			...registry,
-			select: () => ( {
-				hasStartedResolution: ( _, [ action ] ) => action === 'create',
-			} ),
-		};
-
-		triggerFetch.mockImplementation( () => ( {
-			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
-		} ) );
-
-		await canUser( 'create', {
-			kind: 'postType',
-			name: 'wp_block',
-			id: 123,
-		} )( { dispatch, registry, resolveSelect } );
-		await canUser( 'read', {
-			kind: 'postType',
-			name: 'wp_block',
-			id: 123,
-		} )( { dispatch, registry, resolveSelect } );
-		await canUser( 'update', {
-			kind: 'postType',
-			name: 'wp_block',
-			id: 123,
-		} )( { dispatch, registry, resolveSelect } );
-		await canUser( 'delete', {
-			kind: 'postType',
-			name: 'wp_block',
-			id: 123,
-		} )( { dispatch, registry, resolveSelect } );
-
-		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
-
-		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				'create/postType/wp_block/123': true,
-				'read/postType/wp_block/123': true,
-				'update/postType/wp_block/123': true,
-				'delete/postType/wp_block/123': true,
-			} )
-		);
 	} );
 } );
 

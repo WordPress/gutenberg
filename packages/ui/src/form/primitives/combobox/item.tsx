@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check, plus } from '@wordpress/icons';
 import { Icon } from '../../../icon';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import type { ComboboxItemProps } from './types';
@@ -15,6 +16,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 		return (
 			<_Combobox.Item
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					className
@@ -22,16 +24,19 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				ref={ ref }
 				{ ...restProps }
 			>
-				<Icon
-					icon={ variant === 'creatable' ? plus : check }
-					className={ clsx(
-						itemPopupStyles[ 'item-icon' ],
-						variant !== 'creatable' &&
-							itemPopupStyles[ 'item-indicator-icon' ]
-					) }
-					size={ 24 }
-				/>
-				{ children }
+				<span className={ itemPopupStyles[ 'item-icon' ] }>
+					<Icon
+						icon={ variant === 'creatable' ? plus : check }
+						className={ clsx(
+							variant !== 'creatable' &&
+								itemPopupStyles[ 'item-indicator-icon' ]
+						) }
+						size={ 24 }
+					/>
+				</span>
+				<div className={ itemPopupStyles[ 'item-content' ] }>
+					{ children }
+				</div>
 			</_Combobox.Item>
 		);
 	}

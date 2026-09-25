@@ -237,7 +237,7 @@ export function DimensionsOverlay( {
 					tooltipSize.height,
 					containerSize.height
 				),
-		  }
+			}
 		: preferred;
 
 	return (

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
@@ -135,7 +135,7 @@ describe( 'DimensionsTool', () => {
 			expect( aspectRatioSelect ).toHaveValue( 'auto' );
 		} );
 
-		it( 'displays an aspect ratio that is written differently to the option with the same ratio', () => {
+		it( 'displays an aspect ratio that is written differently to the option with the same ratio', async () => {
 			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
@@ -155,10 +155,12 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			await waitFor( () =>
+				expect( aspectRatioSelect ).toHaveValue( '16/9' )
+			);
 		} );
 
-		it( 'displays an aspect ratio without a matching option as custom', () => {
+		it( 'displays an aspect ratio without a matching option as custom', async () => {
 			const onChange = vi.fn();
 			render(
 				<ControlledExample
@@ -167,12 +169,14 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
-			).toHaveValue( 'custom' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+				).toHaveValue( 'custom' )
+			);
 		} );
 
-		it( 'updates the scale control when the value prop changes', () => {
+		it( 'updates the scale control when the value prop changes', async () => {
 			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
@@ -192,9 +196,11 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'radio', { name: 'Contain' } )
-			).toBeChecked();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'radio', { name: 'Contain' } )
+				).toBeChecked()
+			);
 		} );
 	} );
 

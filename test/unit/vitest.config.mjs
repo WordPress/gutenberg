@@ -1,11 +1,12 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPlaywrightProvider } from './config/playwright-provider.mjs';
+import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
+import { createPostcssBrowserPlugin } from './config/postcss-browser-plugin.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -22,21 +23,20 @@ const isolationSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/isolation.vitest.js'
 );
-const testMigration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
-const vitestTests = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	testMigration
-);
+const vitestTests = getVitestTestsByProject( discoverTestFiles( ROOT_DIR ) );
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
 const reporters = [ 'default' ];
+const browserTraces =
+	process.env.WP_VITEST_BROWSER_TRACE === '1'
+		? createBrowserTraceArtifacts( ROOT_DIR )
+		: undefined;
+
+if ( browserTraces ) {
+	reporters.push( browserTraces.reporter );
+}
 
 if ( process.env.GITHUB_ACTIONS === 'true' ) {
 	reporters.push( 'github-actions' );
@@ -64,7 +64,7 @@ process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
-	'packages/*/src/index.{js,jsx,ts,tsx}',
+	'packages/*/src/index.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
 	.sort()
@@ -138,6 +138,11 @@ export default defineConfig( {
 		],
 	},
 	test: {
+		// Vitest only reads attachmentsDir from the root configuration.
+		attachmentsDir: path.join(
+			ROOT_DIR,
+			'test-results/vitest-attachments'
+		),
 		projects: [
 			{
 				extends: true,
@@ -205,6 +210,9 @@ export default defineConfig( {
 				 */
 				root: CONFIG_DIR,
 				optimizeDeps: {
+					rolldownOptions: {
+						plugins: [ createPostcssBrowserPlugin( ROOT_DIR ) ],
+					},
 					entries: vitestTests.browser.map( ( testPath ) =>
 						path.join( ROOT_DIR, testPath )
 					),
@@ -212,12 +220,16 @@ export default defineConfig( {
 				test: {
 					name: 'browser',
 					dir: ROOT_DIR,
-					attachmentsDir: path.join(
-						ROOT_DIR,
-						'test-results/vitest-browser-attachments'
-					),
 					include: vitestTests.browser,
 					setupFiles: [
+						...( browserTraces
+							? [
+									path.join(
+										CONFIG_DIR,
+										'config/browser-traces.vitest.js'
+									),
+								]
+							: [] ),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/browser.vitest.js'
@@ -236,7 +248,8 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: createPlaywrightProvider(),
+						commands: browserTraces?.commands,
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'

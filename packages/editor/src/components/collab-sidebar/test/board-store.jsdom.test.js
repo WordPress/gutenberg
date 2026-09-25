@@ -91,7 +91,7 @@ describe( 'createBoardStore', () => {
 									( sum, r ) => sum + r.height,
 									0
 								),
-						  }
+							}
 						: { top: 0, width: 0, height: 0 };
 				const selection = window.getSelection();
 				selection.removeAllRanges();

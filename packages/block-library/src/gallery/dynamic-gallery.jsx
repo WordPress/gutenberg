@@ -5,7 +5,7 @@ import {
 	Notice,
 	PanelBody,
 	Placeholder,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
@@ -56,7 +56,7 @@ const ORDER_OPTIONS = [
  */
 function OrderControl( { orderby, order, onChange } ) {
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Order by' ) }
 			value={ `${ orderby }/${ order }` }
 			options={ ORDER_OPTIONS }
@@ -386,8 +386,8 @@ export function GalleryDynamicView( {
 	// source wording comes from the source descriptor.
 	const emptyInstructions = isResolvingDynamic
 		? __( 'Loading images…' )
-		: sourceDescriptor?.emptyMessage ??
-		  __( 'Dynamic images will appear here.' );
+		: ( sourceDescriptor?.emptyMessage ??
+			__( 'Dynamic images will appear here.' ) );
 
 	return (
 		<>

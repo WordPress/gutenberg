@@ -67,7 +67,7 @@ const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
 					...tabObj.tab,
 					disabled: true,
 				},
-		  }
+			}
 		: tabObj
 );
 
@@ -79,7 +79,7 @@ const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
 					...tabObj.tab,
 					disabled: true,
 				},
-		  }
+			}
 		: tabObj
 );
 
@@ -706,9 +706,6 @@ describe( 'Tabs', () => {
 
 				it( 'should ignore any changes to the `defaultValue` prop after the first render', async () => {
 					const mockOnValueChange = vi.fn();
-					const consoleErrorSpy = vi
-						.spyOn( console, 'error' )
-						.mockImplementation( () => {} );
 
 					const { rerender } = await render(
 						<UncontrolledTabs
@@ -746,14 +743,11 @@ describe( 'Tabs', () => {
 
 					expect( mockOnValueChange ).not.toHaveBeenCalled();
 
-					expect( consoleErrorSpy ).toHaveBeenCalled();
-					expect( consoleErrorSpy ).toHaveBeenCalledWith(
+					expect( console ).toHaveErroredWith(
 						expect.stringContaining(
 							'changing the default value state'
 						)
 					);
-
-					consoleErrorSpy.mockRestore();
 				} );
 			} );
 
@@ -980,7 +974,7 @@ describe( 'Tabs', () => {
 										),
 
 										tabpanel: { tabIndex: -1 },
-								  }
+									}
 								: tabObj
 						) }
 						{ ...valueProps }
@@ -2416,9 +2410,6 @@ describe( 'Tabs', () => {
 	describe( 'Development mode validation', () => {
 		function collectUncaughtErrors() {
 			const errors: Error[] = [];
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 			const windowHandler = ( event: ErrorEvent ) => {
 				event.preventDefault();
 				errors.push( event.error );
@@ -2428,7 +2419,6 @@ describe( 'Tabs', () => {
 				errors,
 				cleanup: () => {
 					window.removeEventListener( 'error', windowHandler );
-					consoleErrorSpy.mockRestore();
 				},
 			};
 		}
@@ -2457,6 +2447,11 @@ describe( 'Tabs', () => {
 			expect( errors[ 0 ].message ).toBe(
 				'Tabs: Tab/Panel count mismatch (3 Tabs, 2 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message: `Uncaught Error: ${ errors[ 0 ].message }`,
+				} )
+			);
 
 			cleanup();
 		} );
@@ -2484,6 +2479,11 @@ describe( 'Tabs', () => {
 
 			expect( errors[ 0 ].message ).toBe(
 				'Tabs: Tab/Panel count mismatch (2 Tabs, 3 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message: `Uncaught Error: ${ errors[ 0 ].message }`,
+				} )
 			);
 
 			cleanup();
@@ -2534,6 +2534,11 @@ describe( 'Tabs', () => {
 			expect( errors[ 0 ].message ).toBe(
 				'Tabs: Tab/Panel count mismatch (2 Tabs, 0 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
 			);
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message: `Uncaught Error: ${ errors[ 0 ].message }`,
+				} )
+			);
 
 			cleanup();
 		} );
@@ -2579,6 +2584,11 @@ describe( 'Tabs', () => {
 
 			expect( errors[ 0 ].message ).toBe(
 				'Tabs: Tab/Panel count mismatch (2 Tabs, 1 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message: `Uncaught Error: ${ errors[ 0 ].message }`,
+				} )
 			);
 
 			cleanup();

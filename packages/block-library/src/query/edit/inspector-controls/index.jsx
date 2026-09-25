@@ -1,6 +1,6 @@
 import {
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
@@ -237,10 +237,10 @@ export default function QueryInspectorControls( props ) {
 										inherit
 											? __(
 													'Display a list of posts or custom post types based on the current template.'
-											  )
+												)
 											: __(
 													'Display a list of posts or custom post types based on specific criteria.'
-											  )
+												)
 									}
 									value={ !! inherit ? 'default' : 'custom' }
 								>
@@ -275,7 +275,7 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							{ postTypesSelectOptions.length > 2 ? (
-								<SelectControl
+								<WCSelectControl
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }

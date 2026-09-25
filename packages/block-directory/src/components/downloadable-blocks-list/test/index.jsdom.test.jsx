@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import DownloadableBlocksList from '../';
@@ -32,7 +32,7 @@ describe( 'DownloadableBlocksList', () => {
 			expect( container ).toBeEmptyDOMElement();
 		} );
 
-		it( 'should render plugins items into the list', () => {
+		it( 'should render plugins items into the list', async () => {
 			render(
 				<DownloadableBlocksList
 					items={ items }
@@ -40,9 +40,11 @@ describe( 'DownloadableBlocksList', () => {
 					onHover={ vi.fn() }
 				/>
 			);
-			const downloadableBlocks = screen.getAllByRole( 'option' );
-
-			expect( downloadableBlocks ).toHaveLength( items.length );
+			await waitFor( () =>
+				expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+					items.length
+				)
+			);
 		} );
 	} );
 } );
