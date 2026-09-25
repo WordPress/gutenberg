@@ -5,6 +5,7 @@
 ### Deprecations
 
 -   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
 
 ### Breaking Changes
 

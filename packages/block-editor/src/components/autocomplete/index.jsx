@@ -1,12 +1,16 @@
 import { applyFilters, hasFilter } from '@wordpress/hooks';
 import {
 	Autocomplete as WCAutocomplete,
-	__unstableUseAutocompleteProps as useAutocompleteProps,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
+import { unlock } from '../../lock-unlock';
+
+const { useAutocompleteProps } = unlock( componentsPrivateApis );
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -61,6 +65,10 @@ export function useBlockEditorAutocompleteProps( props ) {
  * @type {React.FC}
  */
 function BlockEditorAutocomplete( props ) {
+	deprecated( 'wp.blockEditor.Autocomplete', {
+		since: '7.2',
+		hint: 'The RichText component accepts completers through its autocompleters prop.',
+	} );
 	return (
 		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
 	);

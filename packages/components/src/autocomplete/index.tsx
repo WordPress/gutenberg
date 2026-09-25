@@ -436,6 +436,18 @@ export function useAutocompleteProps(
 	};
 }
 
+export function useDeprecatedAutocompleteProps(
+	options: Omit< UseAutocompleteProps, 'contentRef' >
+) {
+	deprecated(
+		'`__unstableUseAutocompleteProps` from `@wordpress/components`',
+		{
+			since: '7.2',
+		}
+	);
+	return useAutocompleteProps( options );
+}
+
 export default function Autocomplete( {
 	children,
 	isSelected,
