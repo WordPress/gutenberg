@@ -224,6 +224,59 @@ test.describe( 'Block Notes', () => {
 		).toHaveText( 'Test comment to restore.' );
 	} );
 
+	test( 'floats a restored note back beside its block', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block' },
+			comment: 'Bring me back.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block' },
+			comment: 'Stay put.',
+		} );
+
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Bring me back.',
+		} );
+		await expect( thread ).toHaveClass( /is-floating/ );
+
+		await thread.click();
+		await thread.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+		await expect( thread ).toBeHidden();
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note deleted.' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
+
+		// The restored thread has to be laid out again, not just re-rendered:
+		// a thread without a position sits at the top of the panel, out of
+		// sight, until something else moves the canvas.
+		await expect( thread ).toBeInViewport();
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect
+			.poll( async () => {
+				const threadBox = await thread.boundingBox();
+				const blockBox = await paragraph.first().boundingBox();
+				return Math.abs( threadBox.y - blockBox.y );
+			} )
+			.toBeLessThan( 24 );
+	} );
+
 	test( 'can restore a deleted block note with the undo shortcut', async ( {
 		page,
 		pageUtils,
