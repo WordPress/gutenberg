@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Playlist: Make the tracklist keyboard navigable on the frontend. The list is now a single tab stop, the arrow keys and Home/End move focus between tracks, and Enter or Space plays the focused track ([#81513](https://github.com/WordPress/gutenberg/pull/81513)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 
 ## 11.1.0 (2026-09-23)
