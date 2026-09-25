@@ -70,6 +70,10 @@
 	}
 }
 
+.wp-block-social-links a.wp-block-social-link-anchor, .wp-block-social-links.has-normal-icon-size a.wp-block-social-link-anchor {
+    font-size: 24px;
+}
+
 .wp-block-social-link {
 	display: block;
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
