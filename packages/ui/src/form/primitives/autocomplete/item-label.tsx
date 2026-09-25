@@ -4,7 +4,9 @@ import { Text } from '../../../text';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { AutocompleteItemLabelProps } from './types';
 
-/** The primary label and accessible name of an autocomplete item. */
+/**
+ * The primary label and accessible name of an autocomplete item.
+ */
 export const ItemLabel = forwardRef<
 	HTMLSpanElement,
 	AutocompleteItemLabelProps

@@ -90,7 +90,9 @@ export const Default: Story = {
 	},
 };
 
-/** Item descriptions appear below labels and contribute to each suggestion's accessible description. */
+/**
+ * Item descriptions appear below labels and contribute to each suggestion's accessible description.
+ */
 export const WithItemDescriptions: Story = {
 	args: {
 		items: URLS.slice( 0, 3 ),

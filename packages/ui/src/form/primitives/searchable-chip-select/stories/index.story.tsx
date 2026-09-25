@@ -47,7 +47,9 @@ export const Default: Story = {
 	},
 };
 
-/** Item descriptions appear below labels in the popup and are not copied to chips. */
+/**
+ * Item descriptions appear below labels in the popup and are not copied to chips.
+ */
 export const WithItemDescriptions: Story = {
 	args: {
 		...Default.args,

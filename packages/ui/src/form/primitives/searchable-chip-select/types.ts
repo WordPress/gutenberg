@@ -12,7 +12,9 @@ export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
-	/** Supplementary text shown below the item label in the popup. */
+	/**
+	 * Supplementary text shown below the item label in the popup.
+	 */
 	description?: string;
 	/**
 	 * When `true`, the item renders in the list footer, not the main list,

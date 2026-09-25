@@ -60,12 +60,16 @@ export type ComboboxInputGroupProps = ComponentProps<
 };
 
 export interface ComboboxItemLabelProps extends ComponentProps< 'span' > {
-	/** The primary label and accessible name of a combobox item. */
+	/**
+	 * The primary label and accessible name of a combobox item.
+	 */
 	children: ReactNode;
 }
 
 export interface ComboboxItemDescriptionProps extends ComponentProps< 'span' > {
-	/** Supplementary content described by the combobox item. */
+	/**
+	 * Supplementary content described by the combobox item.
+	 */
 	children: ReactNode;
 }
 
@@ -85,7 +89,9 @@ export type ComboboxItemProps = Omit<
 	ComponentProps< typeof _Combobox.Item >,
 	'children'
 > & {
-	/** One direct ItemLabel, followed by zero or more ItemDescription components. */
+	/**
+	 * One direct ItemLabel, followed by zero or more ItemDescription components.
+	 */
 	children: ComboboxItemChildren;
 	/**
 	 * The variant of the item.

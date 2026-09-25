@@ -45,12 +45,16 @@ export type AutocompleteInputGroupProps = ComponentProps<
 };
 
 export interface AutocompleteItemLabelProps extends ComponentProps< 'span' > {
-	/** The primary label and accessible name of an autocomplete item. */
+	/**
+	 * The primary label and accessible name of an autocomplete item.
+	 */
 	children: ReactNode;
 }
 
 export interface AutocompleteItemDescriptionProps extends ComponentProps< 'span' > {
-	/** Supplementary content described by the autocomplete item. */
+	/**
+	 * Supplementary content described by the autocomplete item.
+	 */
 	children: ReactNode;
 }
 
@@ -70,7 +74,9 @@ export type AutocompleteItemProps = Omit<
 	ComponentProps< typeof _Autocomplete.Item >,
 	'children'
 > & {
-	/** One direct ItemLabel, followed by zero or more ItemDescription components. */
+	/**
+	 * One direct ItemLabel, followed by zero or more ItemDescription components.
+	 */
 	children: AutocompleteItemChildren;
 };
 

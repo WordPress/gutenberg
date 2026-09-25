@@ -43,7 +43,9 @@ export const Default: Story = {
 	},
 };
 
-/** Item descriptions appear below labels in the popup and are not copied to the trigger. */
+/**
+ * Item descriptions appear below labels in the popup and are not copied to the trigger.
+ */
 export const WithItemDescriptions: Story = {
 	args: {
 		...Default.args,
