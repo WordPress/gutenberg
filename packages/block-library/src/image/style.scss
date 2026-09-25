@@ -384,7 +384,6 @@
 				animation: none;
 				.lightbox-image-container {
 					animation: lightbox-zoom-in 0.4s;
-					will-change: transform, clip-path;
 					// Override fade animation for image
 					img {
 						animation: none;
@@ -399,7 +398,6 @@
 					animation: none;
 					.lightbox-image-container {
 						animation: lightbox-zoom-out 0.4s;
-						will-change: transform, clip-path;
 						// Override fade animation for image
 						img {
 							animation: none;
