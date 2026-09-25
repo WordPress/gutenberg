@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
+import { Text } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
 import {
 	detectLocale,
@@ -36,7 +37,7 @@ interface EmojiPickerProps {
  */
 export const SKIN_TONE_PREFERENCE_KEY = 'emojiPickerSkinTone';
 
-const COLUMNS = 8;
+const COLUMNS = 6;
 
 /*
  * Unicode's Component group holds the skin-tone swatches and hair
@@ -345,6 +346,41 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	}
 
 	/**
+	 * Select an emoji, applying the user's skin tone preference and
+	 * recording its use.
+	 *
+	 * @param emoji Base Emojibase record.
+	 */
+	const pick = ( emoji: EmojibaseEntry ) => {
+		recordUse( normalizeHexcode( emoji.hexcode ) );
+		onSelect( applySkinTone( emoji, skinTone ).emoji );
+	};
+
+	/*
+	 * The clear and skin tone buttons sit between the field and the grid in
+	 * the tab order, so ArrowDown jumps straight to the first emoji, and
+	 * Enter picks the top match without leaving the field.
+	 */
+	const onSearchKeyDown = ( event: React.KeyboardEvent ) => {
+		if ( event.key === 'ArrowDown' ) {
+			const firstCell =
+				viewportRef.current?.querySelector< HTMLElement >(
+					'[role="gridcell"]'
+				);
+			if ( firstCell ) {
+				event.preventDefault();
+				firstCell.focus();
+			}
+		} else if ( event.key === 'Enter' && isSearching ) {
+			const topMatch = searchRows[ 0 ]?.[ 0 ];
+			if ( topMatch ) {
+				event.preventDefault();
+				pick( topMatch );
+			}
+		}
+	};
+
+	/**
 	 * Render one grid row, applying the user's skin tone preference and
 	 * recording usage on selection.
 	 *
@@ -370,10 +406,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 						role="gridcell"
 						className="editor-collab-sidebar-panel__picker-emoji"
 						aria-label={ labelFor( display ) }
-						onClick={ () => {
-							recordUse( normalizeHexcode( emoji.hexcode ) );
-							onSelect( display.emoji );
-						} }
+						onClick={ () => pick( emoji ) }
 					>
 						{ display.emoji }
 					</Composite.Item>
@@ -391,6 +424,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 					onChange={ setQuery }
 					placeholder={ __( 'Search emoji' ) }
 					label={ __( 'Search emoji' ) }
+					onKeyDown={ onSearchKeyDown }
 				/>
 				<SkinTonePicker
 					value={ skinTone }
@@ -436,7 +470,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 							) }
 						{ ! isSearching && frequentRows.length > 0 && (
 							<Composite.Group role="rowgroup">
-								<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
+								<Composite.GroupLabel
+									render={ <Text variant="heading-sm" /> }
+									className="editor-collab-sidebar-panel__picker-category"
+								>
 									{ __( 'Frequently used' ) }
 								</Composite.GroupLabel>
 								{ frequentRows.map( ( row, rowIndex ) =>
@@ -450,7 +487,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 									key={ group.key }
 									role="rowgroup"
 								>
-									<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
+									<Composite.GroupLabel
+										render={ <Text variant="heading-sm" /> }
+										className="editor-collab-sidebar-panel__picker-category"
+									>
 										{ getGroupLabel( group.key ) }
 									</Composite.GroupLabel>
 									{ group.rows.map( ( row, rowIndex ) =>

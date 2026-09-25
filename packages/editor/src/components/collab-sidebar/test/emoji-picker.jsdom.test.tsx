@@ -163,12 +163,12 @@ describe( 'chunkRows', () => {
 		expect( chunkRows( [] ) ).toEqual( [] );
 	} );
 
-	it( 'splits into rows of 8 with a final partial row', () => {
+	it( 'splits into rows of 6 with a final partial row', () => {
 		const input = makeEntries( 10 );
 		const rows = chunkRows( input );
 		expect( rows ).toHaveLength( 2 );
-		expect( rows[ 0 ] ).toHaveLength( 8 );
-		expect( rows[ 1 ] ).toHaveLength( 2 );
+		expect( rows[ 0 ] ).toHaveLength( 6 );
+		expect( rows[ 1 ] ).toHaveLength( 4 );
 	} );
 
 	it( 'uses one row when input fits in a single row', () => {

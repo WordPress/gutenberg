@@ -1620,6 +1620,57 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'ArrowDown moves from the search field into the emoji grid', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Search to grid' },
+				comment: 'Arrow from search',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const search = page.getByPlaceholder( 'Search emoji' );
+			await expect( search ).toBeFocused();
+			await search.fill( 'thumbs up' );
+			await page.keyboard.press( 'ArrowDown' );
+
+			// The top match takes focus, skipping the clear and skin tone
+			// buttons in between, so the grid is one key away.
+			const firstMatch = page.getByRole( 'gridcell' ).first();
+			await expect( firstMatch ).toBeFocused();
+			await expect( firstMatch ).toHaveAccessibleName( /thumbs up/i );
+
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
+			).toContainText( '👍' );
+		} );
+
+		test( 'Enter in the search field picks the top match', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Search and enter' },
+				comment: 'Enter from search',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'thumbs up' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
+			).toContainText( '👍' );
+		} );
+
 		test( 'a full-picker pick that matches a curated emoji stores as the curated slug', async ( {
 			page,
 			blockNoteUtils,
@@ -1979,49 +2030,63 @@ test.describe( 'Block Notes', () => {
 			).toBeLessThanOrEqual( 1 );
 		} );
 
-		test( 'emoji grid fills the picker width', async ( {
+		test( 'emoji grid sits evenly inside the picker', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
-				attributes: { content: 'Testing grid fills picker' },
-				comment: 'Grid fill',
+				attributes: { content: 'Testing grid layout' },
+				comment: 'Grid layout',
 			} );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
-			const picker = page.locator(
-				'.editor-collab-sidebar-panel__picker'
-			);
-			// Measure a full 8-emoji row: the first row on screen is the
-			// "Frequently used" section, which may hold fewer emoji and
-			// legitimately end short of the right edge.
-			const lastEmojiInFullRow = page
+			// Measure a full row: the first row on screen is the "Frequently
+			// used" section, which may hold fewer emoji.
+			const fullRow = page
 				.locator( '.editor-collab-sidebar-panel__picker-row' )
 				.filter( {
 					has: page.locator(
-						'.editor-collab-sidebar-panel__picker-emoji:nth-child(8)'
+						'.editor-collab-sidebar-panel__picker-emoji:nth-child(6)'
 					),
 				} )
-				.first()
-				.locator( '.editor-collab-sidebar-panel__picker-emoji' )
-				.last();
+				.first();
+			const cells = fullRow.locator(
+				'.editor-collab-sidebar-panel__picker-emoji'
+			);
+			await expect( cells ).toHaveCount( 6 );
+			await expect( cells.first() ).toHaveCSS( 'font-size', '24px' );
 
-			const pickerBox = await picker.boundingBox();
-			const emojiBox = await lastEmojiInFullRow.boundingBox();
-			const horizontalSlack =
-				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
-
-			// Last emoji in a full row should sit close to the picker's
-			// right edge. Tolerance allows for viewport padding (4px)
-			// plus a reserved scrollbar gutter (~17px on most
-			// platforms). Catches regressions where the picker is sized
-			// wider than the emoji grid (buttons fill only the left
-			// fraction, with a large empty band to the right — the
-			// original bug had ~145px of slack).
-			expect( horizontalSlack ).toBeLessThanOrEqual( 24 );
+			// The grid's inset from the viewport's content edges is the same
+			// on both sides. `clientWidth` leaves out a classic scrollbar, so
+			// only space nothing fills counts against the right side.
+			const { leftInset, rightInset } = await fullRow.evaluate(
+				( row ) => {
+					const viewport = row.closest(
+						'.editor-collab-sidebar-panel__picker-viewport'
+					);
+					const viewportLeft =
+						viewport.getBoundingClientRect().left +
+						viewport.clientLeft;
+					const cellRects = [
+						...row.querySelectorAll(
+							'.editor-collab-sidebar-panel__picker-emoji'
+						),
+					].map( ( cell ) => cell.getBoundingClientRect() );
+					return {
+						leftInset: cellRects[ 0 ].left - viewportLeft,
+						rightInset:
+							viewportLeft +
+							viewport.clientWidth -
+							cellRects[ cellRects.length - 1 ].right,
+					};
+				}
+			);
+			expect( Math.abs( leftInset - rightInset ) ).toBeLessThanOrEqual(
+				1
+			);
 		} );
 
 		test.describe( 'Filtered emoji list', () => {

@@ -433,22 +433,17 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__picker {
-	// Grid geometry derived once from the tokens, so the width below can
-	// never disagree with the rendered cells, gaps, and padding.
-	// `scrollbar-gutter: stable` reserves a width CSS cannot read, so
-	// budget ~17px; overlay-scrollbar platforms just get a roomier
-	// viewport.
-	--emoji-picker-cell-size: var(--wpds-dimension-size-md);
+	--emoji-picker-cell-size: var(--wpds-dimension-size-lg);
 	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
-	--emoji-picker-viewport-padding: var(--wpds-dimension-padding-xs);
-	--emoji-picker-scrollbar-allowance: 17px;
+	--emoji-picker-padding: var(--wpds-dimension-padding-lg);
 
 	display: flex;
 	flex-direction: column;
-	// The 8-column grid plus the reserved scrollbar gutter, so buttons
-	// don't shrink under flex pressure once a scrollbar appears.
-	width: calc(8 * var(--emoji-picker-cell-size) + 7 * var(--emoji-picker-gap) + 2 * var(--emoji-picker-viewport-padding) + var(--emoji-picker-scrollbar-allowance));
-	height: 320px;
+	// Sized by the grid rather than a fixed width, so the scrollbar gutter
+	// counts only where the platform actually reserves one. A budgeted
+	// allowance left a blank band on the right under overlay scrollbars.
+	width: max-content;
+	height: 360px;
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-sm);
 	color: var(--wpds-color-foreground-content-neutral);
@@ -460,7 +455,11 @@ mark.wp-note {
 	display: flex;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
-	padding: var(--wpds-dimension-padding-sm);
+	padding: var(--emoji-picker-padding);
+	padding-bottom: var(--wpds-dimension-padding-sm);
+	// Takes the grid's width instead of widening the picker to fit the
+	// field's own intrinsic size.
+	contain: inline-size;
 
 	.components-search-control {
 		flex: 1;
@@ -473,7 +472,8 @@ mark.wp-note {
 	// Fixed square, so the toggle doesn't grow with its emoji content.
 	width: var(--emoji-picker-cell-size);
 	padding: 0;
-	font-size: 18px;
+	font-size: 24px;
+	line-height: 1;
 	justify-content: center;
 }
 
@@ -511,7 +511,7 @@ mark.wp-note {
 	// Reserved always, so the grid doesn't shift when scrolling kicks in.
 	scrollbar-gutter: stable;
 	position: relative;
-	padding-inline: var(--emoji-picker-viewport-padding);
+	padding-inline: var(--emoji-picker-padding);
 }
 
 .editor-collab-sidebar-panel__picker-status {
@@ -521,21 +521,36 @@ mark.wp-note {
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.editor-collab-sidebar-panel__picker-list {
-	padding-bottom: var(--wpds-dimension-padding-sm);
+// Rows sit directly in the list while searching and inside a category
+// otherwise, so both stack with the same gap as the cells.
+.editor-collab-sidebar-panel__picker-list,
+.editor-collab-sidebar-panel__picker-list [role="rowgroup"] {
+	display: flex;
+	flex-direction: column;
+	gap: var(--emoji-picker-gap);
 }
 
+.editor-collab-sidebar-panel__picker-list {
+	padding-bottom: var(--emoji-picker-padding);
+}
+
+// Type comes from the Design System's `heading-sm` Text variant, the label
+// style its grouped selects and menus use.
 .editor-collab-sidebar-panel__picker-category {
+	display: block;
 	position: sticky;
 	top: 0;
-	padding: var(--wpds-dimension-padding-sm);
+	padding-block: var(--wpds-dimension-padding-sm);
 	// `.components-popover` paints `$white`, not a token, and rows must
 	// scroll behind exactly that color. Move both together if it changes.
 	background-color: $white;
 	color: var(--wpds-color-foreground-content-neutral-weak);
-	font-size: var(--wpds-typography-font-size-xs);
-	font-weight: var(--wpds-typography-font-weight-emphasis);
 	z-index: 1;
+}
+
+// Space between one category's last row and the next heading.
+.editor-collab-sidebar-panel__picker-list [role="rowgroup"] + [role="rowgroup"] {
+	padding-top: var(--wpds-dimension-padding-sm);
 }
 
 .editor-collab-sidebar-panel__picker-row {
@@ -559,7 +574,7 @@ mark.wp-note {
 	border-radius: var(--wpds-border-radius-sm);
 	background: transparent;
 	cursor: var(--wpds-cursor-control);
-	font-size: 18px;
+	font-size: 24px;
 	line-height: 1;
 	// Keep a keyboard-scrolled cell clear of the sticky category header.
 	scroll-margin-block: $grid-unit-40 $grid-unit-05;
