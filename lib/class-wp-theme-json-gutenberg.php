@@ -2819,6 +2819,83 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Rebases a feature selector onto a different selector for the block.
+	 *
+	 * A feature selector is block-scoped, e.g. Navigation Link's color selector
+	 * is `.wp-block-navigation-link .wp-block-navigation-item__content`. When a
+	 * node swaps in another selector for the block, such as a custom state, the
+	 * block part has to be swapped rather than prepended: prepending would look
+	 * for the block inside the state, which is the same element.
+	 *
+	 * A selector that isn't block-scoped is scoped as a descendant, which is all
+	 * that can be done with it.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $scope          Selector to rebase onto.
+	 * @param string $selector       The feature selector.
+	 * @param string $block_selector The block's own selector.
+	 * @return string The rebased selector.
+	 */
+	protected static function rebase_selector( $scope, $selector, $block_selector ) {
+		if ( ! $scope || ! $selector ) {
+			return $selector;
+		}
+
+		$rebased = array();
+
+		foreach ( static::split_selector_list( $selector ) as $inner ) {
+			$inner = trim( $inner );
+
+			if ( '' === $inner ) {
+				continue;
+			}
+
+			$relative  = static::get_selector_relative_to_block( $inner, $block_selector );
+			$rebased[] = static::scope_selector( $scope, null === $relative ? $inner : $relative );
+		}
+
+		return implode( ', ', $rebased );
+	}
+
+	/**
+	 * Returns the part of a block-scoped selector that sits below the block
+	 * itself, e.g. `.wp-block-navigation-item__content` for Navigation Link's
+	 * `.wp-block-navigation-link .wp-block-navigation-item__content`.
+	 *
+	 * The block selector has to be followed by a combinator to count as a
+	 * prefix, so `.wp-block-navigation-link-fancy` isn't read as the Navigation
+	 * Link block with `-fancy` below it.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $selector       A feature selector.
+	 * @param string $block_selector The block's own selector.
+	 * @return string|null The part below the block, an empty string when the
+	 *                     selector is the block itself, or null when the
+	 *                     selector isn't scoped to the block.
+	 */
+	protected static function get_selector_relative_to_block( $selector, $block_selector ) {
+		$block_selector = trim( (string) $block_selector );
+
+		if ( '' === $block_selector || ! str_starts_with( $selector, $block_selector ) ) {
+			return null;
+		}
+
+		$relative = substr( $selector, strlen( $block_selector ) );
+
+		if ( '' === $relative ) {
+			return '';
+		}
+
+		if ( ! preg_match( '/^[ >+~]/', $relative ) ) {
+			return null;
+		}
+
+		return trim( $relative );
+	}
+
+	/**
 	 * Scopes a style node's feature selectors, e.g. `$node['selectors']`, to a
 	 * different selector, optionally appending a pseudo-selector to each.
 	 *
@@ -2833,11 +2910,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $scope             Selector to scope the feature selectors to.
 	 * @param array  $feature_selectors Feature selectors keyed by feature, as stored
 	 *                                  in a style node's `selectors`.
+	 * @param string $block_selector    The block's own selector, replaced by `$scope`
+	 *                                  where a feature selector is scoped to it.
 	 * @param string $pseudo_selector   Optional. Pseudo-selector to append to each
 	 *                                  scoped selector, e.g. ':hover'. Default ''.
 	 * @return array The scoped feature selectors.
 	 */
-	protected static function scope_feature_selectors( $scope, $feature_selectors, $pseudo_selector = '' ) {
+	protected static function scope_feature_selectors( $scope, $feature_selectors, $block_selector, $pseudo_selector = '' ) {
 		$scoped = array();
 
 		foreach ( $feature_selectors ?? array() as $feature => $selector ) {
@@ -2845,7 +2924,7 @@ class WP_Theme_JSON_Gutenberg {
 				$scoped[ $feature ] = array();
 				foreach ( $selector as $subfeature => $subfeature_selector ) {
 					$scoped[ $feature ][ $subfeature ] = static::append_to_selector(
-						static::scope_selector( $scope, $subfeature_selector ),
+						static::rebase_selector( $scope, $subfeature_selector, $block_selector ),
 						$pseudo_selector
 					);
 				}
@@ -2853,7 +2932,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$scoped[ $feature ] = static::append_to_selector(
-				static::scope_selector( $scope, $selector ),
+				static::rebase_selector( $scope, $selector, $block_selector ),
 				$pseudo_selector
 			);
 		}
@@ -3806,7 +3885,7 @@ class WP_Theme_JSON_Gutenberg {
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
-								'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors ),
+								'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors, $selector ),
 								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
@@ -3822,7 +3901,7 @@ class WP_Theme_JSON_Gutenberg {
 											'name'       => $name,
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
-											'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors, $pseudo ),
+											'selectors'  => static::scope_feature_selectors( $custom_css_selector, $feature_selectors, $selector, $pseudo ),
 											'elements'   => $selectors[ $name ]['elements'] ?? array(),
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,

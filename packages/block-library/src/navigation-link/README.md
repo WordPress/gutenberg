@@ -76,7 +76,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
-- **color**: `.wp-block-navigation-item__content`
+- **color**: `.wp-block-navigation-link .wp-block-navigation-item__content`
 - **states**:
   - -current: `.wp-block-navigation .current-menu-item`
 

@@ -8479,8 +8479,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_block_custom_states_are_processed() {
 		// Only -current styles — no base block styles — so we can assert the
 		// output uses the current-menu-item selector and not the block selector.
-		// Color is scoped to the anchor because core/navigation-link declares a
-		// `selectors.color` of `.wp-block-navigation-item__content`.
+		// Color lands on the anchor because core/navigation-link declares a
+		// `selectors.color` of `.wp-block-navigation-link .wp-block-navigation-item__content`.
+		// The state selector replaces the block part of that, since the state
+		// selector matches the same list item the block selector does.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -8593,7 +8595,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet_bogus = $theme_json_bogus_state->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected_bogus   = ':root :where(.wp-block-navigation-item__content){color: black;}';
+		// The color selector is scoped to the block, so the styles don't reach
+		// the anchors of the other blocks that share the content class, such as
+		// Navigation Submenu, Home Link and Page List.
+		$expected_bogus = ':root :where(.wp-block-navigation-link .wp-block-navigation-item__content){color: black;}';
 		$this->assertSameCSS( $expected_bogus, $stylesheet_bogus );
 		$this->assertStringNotContainsString( '-bogus', $stylesheet_bogus );
 		$this->assertStringNotContainsString( 'yellow', $stylesheet_bogus );
