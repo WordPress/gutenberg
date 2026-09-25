@@ -13,7 +13,7 @@
 
 ### Documentation
 
--   Document public entrypoints, derived provider and warning types, and mixed-version WordPress compatibility checks ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
+-   Document public entrypoints and derived provider and warning types ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
 
 ## 2.2.0 (2026-09-23)
 
