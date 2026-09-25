@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 
 const addItems = vi.fn();
 // The settings a block editor provider writes into the store. `mediaUpload`
@@ -339,7 +340,7 @@ describe( 'installClientSideModalUploads', () => {
 		// The details sidebar re-renders only on the title change the refetch
 		// brings, so the model must no longer be uploading at that point.
 		const model = created[ 0 ];
-		const fetch = model.fetch as ReturnType< typeof vi.fn >;
+		const fetch = model.fetch as Mock< () => unknown >;
 		const fetchImplementation = fetch.getMockImplementation()!;
 		let uploadingWhenFetched: unknown;
 		fetch.mockImplementation( () => {
