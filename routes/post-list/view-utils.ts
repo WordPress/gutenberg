@@ -16,6 +16,8 @@ export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
 export interface ViewListEntry {
 	title: string;
 	slug: string;
+	/** Total items the view holds, counted server-side. */
+	count?: number;
 	view?: ViewOverrides;
 }
 
