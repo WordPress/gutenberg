@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Mark as recommended for use in a WordPress environment.
+-   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Mark as recommended for use in a WordPress environment ([#83535](https://github.com/WordPress/gutenberg/pull/83535)).
 
 ### Bug Fixes
 
