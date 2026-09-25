@@ -41,45 +41,70 @@ test.describe( 'Columns', () => {
 		await expect( inserterOptions ).toHaveText( 'Column' );
 	} );
 
-	test( 'prevent the removal of locked column block from the column count change UI', async ( {
-		page,
+	test( 'adds a column after the selected one from the parent selector', async ( {
 		editor,
-		pageUtils,
+		page,
 	} ) => {
-		// Open Columns
-		await editor.insertBlock( { name: 'core/columns' } );
-		await editor.canvas
-			.locator( '[aria-label="Three columns; equal split"]' )
-			.click();
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+			],
+		} );
 
-		// Lock last column block
 		await editor.selectBlocks(
-			editor.canvas.locator(
-				'role=document[name="Block: Column (3 of 3)"i]'
-			)
+			editor.canvas.getByLabel( 'Block: Column (1 of 2)' )
 		);
-		await editor.clickBlockToolbarButton( 'Options' );
-		await page.getByRole( 'menuitem', { name: 'Lock' } ).click();
-		await page.locator( 'role=checkbox[name="Lock removal"i]' ).check();
-		await page.getByRole( 'button', { name: 'Apply' } ).click();
+		await editor.showBlockToolbar();
+		await page.getByRole( 'button', { name: 'Add column' } ).click();
 
-		// Select columns block
-		await editor.selectBlocks(
-			editor.canvas.locator( 'role=document[name="Block: Columns"i]' )
-		);
-		await editor.openDocumentSettingsSidebar();
-
-		const columnsChangeInput = page.locator(
-			'role=spinbutton[name="Columns"i]'
-		);
-
-		// The min attribute should take into account locked columns
-		await expect( columnsChangeInput ).toHaveAttribute( 'min', '3' );
-
-		// Changing the number of columns should take into account locked columns
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '1' );
-		await pageUtils.pressKeys( 'Tab' );
-		await expect( columnsChangeInput ).toHaveValue( '3' );
+		// The new empty column lands between the two.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+						innerBlocks: [],
+					},
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '2' },
+							},
+						],
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'Ungroup properly', async ( { editor } ) => {
@@ -169,75 +194,6 @@ test.describe( 'Columns', () => {
 				attributes: { content: '2' },
 			},
 		] );
-	} );
-
-	test.describe( 'should update the column widths correctly', () => {
-		const initialColumnWidths = [ '10%', '20%', '30%', '40%' ];
-
-		const expected = [
-			{
-				newColumnCount: 2,
-				newColumnWidths: [ '33.33%', '66.67%' ],
-			},
-			{
-				newColumnCount: 3,
-				newColumnWidths: [ '16.67%', '33.33%', '50%' ],
-			},
-			{
-				newColumnCount: 5,
-				newColumnWidths: [ '8%', '16%', '24%', '32%', '20%' ],
-			},
-			{
-				newColumnCount: 6,
-				newColumnWidths: [
-					'6.67%',
-					'13.33%',
-					'20%',
-					'26.66%',
-					'16.67%',
-					'16.67%',
-				],
-			},
-		];
-
-		expected.forEach( ( { newColumnCount, newColumnWidths } ) => {
-			test( `when the column count is changed to ${ newColumnCount }`, async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/columns',
-					attributes: {
-						columns: initialColumnWidths.length,
-					},
-					innerBlocks: initialColumnWidths.map( ( width ) => ( {
-						name: 'core/column',
-						attributes: { width },
-					} ) ),
-				} );
-
-				await editor.selectBlocks(
-					editor.canvas.getByRole( 'document', {
-						name: 'Block: Columns',
-					} )
-				);
-				await editor.openDocumentSettingsSidebar();
-
-				await page
-					.getByRole( 'spinbutton', { name: 'Columns' } )
-					.fill( newColumnCount.toString() );
-
-				await expect( editor.getBlocks() ).resolves.toMatchObject( [
-					{
-						name: 'core/columns',
-						innerBlocks: newColumnWidths.map( ( width ) => ( {
-							name: 'core/column',
-							attributes: { width },
-						} ) ),
-					},
-				] );
-			} );
-		} );
 	} );
 
 	test( 'should not split in middle', async ( { editor, page } ) => {
@@ -408,7 +364,7 @@ test.describe( 'Columns', () => {
 
 	test.describe( 'Template Lock', () => {
 		for ( const templateLock of [ 'all', 'insert', 'contentOnly' ] ) {
-			test( `templateLock="${ templateLock }" should hide column count control`, async ( {
+			test( `templateLock="${ templateLock }" should hide the parent selector inserter`, async ( {
 				editor,
 				page,
 			} ) => {
@@ -427,15 +383,18 @@ test.describe( 'Columns', () => {
 						},
 					],
 				} );
-				await editor.openDocumentSettingsSidebar();
+				await editor.selectBlocks(
+					editor.canvas.getByLabel( 'Block: Column (1 of 1)' )
+				);
+				await editor.showBlockToolbar();
 
 				await expect(
-					page.getByRole( 'slider', { name: 'Columns' } )
+					page.getByRole( 'button', { name: 'Add column' } )
 				).toBeHidden();
 			} );
 		}
 
-		test( 'templateLock=false should show column count control inside locked parent', async ( {
+		test( 'templateLock=false should show the parent selector inserter inside a locked parent', async ( {
 			editor,
 			page,
 		} ) => {
@@ -464,13 +423,12 @@ test.describe( 'Columns', () => {
 				],
 			} );
 			await editor.selectBlocks(
-				editor.canvas.getByLabel( 'Block: Columns' )
+				editor.canvas.getByLabel( 'Block: Column (1 of 1)' )
 			);
-
-			await editor.openDocumentSettingsSidebar();
+			await editor.showBlockToolbar();
 
 			await expect(
-				page.getByRole( 'slider', { name: 'Columns' } )
+				page.getByRole( 'button', { name: 'Add column' } )
 			).toBeVisible();
 		} );
 	} );
