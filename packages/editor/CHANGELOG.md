@@ -10,6 +10,7 @@
 
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
+-   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 
 ## 15.1.0 (2026-09-23)
 
