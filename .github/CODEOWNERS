@@ -25,6 +25,7 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+.npmrc                                          @manzoorwanijk
 # Emptied out by #83033; the entry stays so anything reappearing there gets reviewed.
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
