@@ -1732,6 +1732,54 @@ test.describe( 'Block Notes', () => {
 				'false'
 			);
 		} );
+
+		test( 'moving the caret out of a marker within the block deselects its note', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await blockNoteUtils.addNote( 'Brave note' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Brave note' } );
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+
+			// Deselect the freshly added note, then place the caret inside the
+			// marker so it becomes the selected note.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await mark.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// Clicking elsewhere in the same block moves the caret out of the
+			// marker, which should deselect the note without leaving the block.
+			const box = await paragraph.boundingBox();
+			await paragraph.click( {
+				position: { x: box.width - 4, y: box.height / 2 },
+			} );
+			await expect( editor.canvas.locator( ':focus' ) ).toHaveAttribute(
+				'data-type',
+				'core/paragraph'
+			);
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			// Returning the caret to the marker selects the note again.
+			await mark.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
 	} );
 
 	test.describe( 'Rich text formatting in the note form', () => {
