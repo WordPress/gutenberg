@@ -36,11 +36,19 @@ export function useHandleLinkChange( {
 				return;
 			}
 
+			// The sidebar link picker and the page creator send no link settings,
+			// so only apply the setting when the change includes it.
+			const settingsUpdateAttributes =
+				updatedLink.opensInNewTab !== undefined
+					? { opensInNewTab: updatedLink.opensInNewTab }
+					: {};
+
 			const attrs = {
 				url: updatedLink.url,
 				kind: updatedLink.kind,
 				type: updatedLink.type,
 				id: updatedLink.id,
+				...settingsUpdateAttributes,
 			};
 
 			const currentText = attributes.label
@@ -76,6 +84,7 @@ export function useHandleLinkChange( {
 					kind: 'custom',
 					type: 'custom',
 					id: undefined,
+					...settingsUpdateAttributes,
 					...textUpdateAttributes,
 				} );
 			} else {
