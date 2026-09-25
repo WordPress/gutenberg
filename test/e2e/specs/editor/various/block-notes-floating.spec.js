@@ -318,6 +318,77 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expectAligned( thread, noted );
 	} );
 
+	test( 'follows its block when an editor notice shifts the canvas', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Notice note',
+		} );
+
+		const thread = getThread( page, 'Notice note' );
+		const noted = getParagraph( editor, 'Noted' );
+		const notice = page
+			.getByRole( 'region', { name: 'Editor content' } )
+			.getByText( 'Test notice', { exact: true } );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// Moves the canvas without resizing anything inside it.
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/notices' )
+				.createNotice( 'warning', 'Test notice', {
+					id: 'floating-notes-notice',
+				} )
+		);
+
+		await expect( notice ).toBeVisible();
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 20 );
+		await expectAligned( thread, noted );
+
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/notices' )
+				.removeNotice( 'floating-notes-notice' )
+		);
+
+		await expect( notice ).toBeHidden();
+		await expectAligned( thread, noted );
+	} );
+
+	test( 'follows its block in the tablet preview', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Preview note',
+		} );
+
+		const thread = getThread( page, 'Preview note' );
+		const noted = getParagraph( editor, 'Noted' );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// The device preview insets the canvas frame.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).setDeviceType( 'Tablet' )
+		);
+
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 20 );
+		await expectAligned( thread, noted );
+	} );
+
 	test( 'keeps threads aligned while the canvas scrolls', async ( {
 		editor,
 		page,

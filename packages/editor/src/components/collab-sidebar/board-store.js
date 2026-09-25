@@ -1,7 +1,12 @@
 import { getScrollContainer } from '@wordpress/dom';
 import { getNoteAnchorRect } from './utils';
 
-const EMPTY_SNAPSHOT = { heights: {}, anchorRects: {}, canvas: null };
+const EMPTY_SNAPSHOT = {
+	heights: {},
+	anchorRects: {},
+	canvas: null,
+	frameOffset: 0,
+};
 
 function isSameTops( a, b ) {
 	const keys = Object.keys( a );
@@ -38,6 +43,7 @@ export function createBoardStore() {
 	const heights = {};
 	let rootEl = null;
 	let canvas = null;
+	let frameEl = null;
 	let observer = null;
 	let styleObserver = null;
 	let snapshot = EMPTY_SNAPSHOT;
@@ -54,15 +60,31 @@ export function createBoardStore() {
 			}
 		}
 
+		// Threads are positioned in their container, while anchors are read
+		// in the canvas frame's viewport. Anything above the canvas (e.g. a
+		// notice) moves the frame away from the container.
+		const containerEl = [ ...floatingRefs.values() ][ 0 ]?.offsetParent;
+		const frameOffset =
+			frameEl && containerEl
+				? frameEl.getBoundingClientRect().top -
+					containerEl.getBoundingClientRect().top
+				: 0;
+
 		if (
 			canvas === snapshot.canvas &&
+			frameOffset === snapshot.frameOffset &&
 			isSameHeights( heights, snapshot.heights ) &&
 			isSameTops( anchorRects, snapshot.anchorRects )
 		) {
 			return;
 		}
 
-		snapshot = { heights: { ...heights }, anchorRects, canvas };
+		snapshot = {
+			heights: { ...heights },
+			anchorRects,
+			canvas,
+			frameOffset,
+		};
 		for ( const listener of listeners ) {
 			listener();
 		}
@@ -98,6 +120,10 @@ export function createBoardStore() {
 			return;
 		}
 		observer.observe( rootEl );
+		// Content above the canvas moves the frame and shrinks it.
+		if ( frameEl ) {
+			observer.observe( frameEl );
+		}
 		// The block move animation offsets blocks with a transform, which
 		// resizes nothing, so the first pass reads their old positions.
 		styleObserver.observe( rootEl, {
@@ -119,10 +145,14 @@ export function createBoardStore() {
 		}
 		if ( observer && rootEl ) {
 			observer.unobserve( rootEl );
+			if ( frameEl ) {
+				observer.unobserve( frameEl );
+			}
 			styleObserver.disconnect();
 		}
 		rootEl = nextRootEl;
 		canvas = rootEl ? getScrollContainer( rootEl ) : null;
+		frameEl = rootEl?.ownerDocument.defaultView?.frameElement ?? null;
 		observeRoot();
 	}
 

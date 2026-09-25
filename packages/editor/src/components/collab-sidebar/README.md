@@ -69,10 +69,10 @@ A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
 - `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `rootEl` / `canvas` - the block-list root (`.is-root-container`, found from the first registered block) and its scroll container.
-- `snapshot: { heights, anchorRects, canvas }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it.
+- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`.
+- `snapshot: { heights, anchorRects, canvas, frameOffset }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it. `frameOffset` is the canvas frame's top minus the top of the threads' container (their `offsetParent`): anchors are read in the frame's viewport, threads are positioned in the container, and anything above the canvas (e.g. an editor notice or the device preview inset) separates the two.
 
-One `ResizeObserver` watches every floating element and the root. Watching the root means editing, adding or removing any block re-anchors the threads after it. Every callback runs `measure()`, which reads the heights and each thread's anchor via `getNoteAnchorRect()` (in `utils.js`), and emits only when a value changed.
+One `ResizeObserver` watches every floating element, the root and the canvas frame. Watching the root means editing, adding or removing any block re-anchors the threads after it. Content above the canvas moves the frame and shrinks it, so watching the frame keeps `frameOffset` current; a frame that moves without resizing isn't detected. Every callback runs `measure()`, which reads the heights and each thread's anchor via `getNoteAnchorRect()` (in `utils.js`), and emits only when a value changed.
 
 A `MutationObserver` watches `style` attributes under the root and calls `requestMeasure()`. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions; this keeps the threads following the blocks until the transform is cleared.
 
@@ -96,7 +96,7 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 1. Subscribes via `useSyncExternalStore` only while floating; otherwise it passes a no-op subscribe, so the store drops its observer.
 2. Requests a measurement whenever `threads` changes. `threads` is rebuilt on any block insert, removal or move, which can shift anchors without resizing the root.
 3. Derives `notePositions` during render with `useMemo( () => calculateNotePositions(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
-4. In a layout effect keyed on `isFloating + sidebarRef + canvas`, attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes `--canvas-scroll` on the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
+4. In a layout effect keyed on `isFloating + sidebarRef + canvas`, attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes `--canvas-scroll` on the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.) A second layout effect writes the snapshot's `frameOffset` as `--canvas-offset`.
 5. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
 ### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
@@ -113,7 +113,7 @@ Algorithm, keyed on the selected note as an **anchor**:
 
 ### 4. `FloatingContainer` - the render shell
 
-Renders a `Stack` with `top: floating.y` when in floating mode. CSS uses the `--canvas-scroll` custom property to translate the whole panel in sync with the canvas, so per-thread `top` values stay stable while scrolling.
+Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset` plus `--canvas-scroll`, so it tracks the canvas frame and its scroll, so per-thread `top` values stay stable while scrolling.
 
 ### Why this shape
 
