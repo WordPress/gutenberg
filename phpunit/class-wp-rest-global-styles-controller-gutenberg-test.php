@@ -263,44 +263,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
-	 * An axis with no options, `"opsz": {}` in theme.json, is sent as an
-	 * object, not as the empty list PHP would encode.
-	 *
-	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
-	 */
-	public function test_get_theme_item_sends_font_variation_policies_as_objects() {
-		wp_set_current_user( self::$admin_id );
-		$add_policy = static function ( $theme_json ) {
-			return $theme_json->update_with(
-				array(
-					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-					'settings' => array(
-						'typography' => array(
-							'fontVariations' => array(
-								'roboto-flex' => array(
-									'GRAD' => array( 'max' => 50 ),
-									'opsz' => array(),
-								),
-							),
-						),
-					),
-				)
-			);
-		};
-		add_filter( 'wp_theme_json_data_theme', $add_policy );
-		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/themes/emptytheme' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		remove_filter( 'wp_theme_json_data_theme', $add_policy );
-		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-
-		$this->assertSame( '{"roboto-flex":{"GRAD":{"max":50},"opsz":{}}}', wp_json_encode( $data['settings']['typography']['fontVariations'] ) );
-	}
-
-	/**
 	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::get_theme_item
 	 */
 	public function test_get_theme_item_theme_options_manager_permission_check() {

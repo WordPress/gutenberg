@@ -370,7 +370,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$data['settings'] = ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? gutenberg_prepare_font_variations_for_json( $config['settings'] ) : new stdClass();
+			$data['settings'] = ! empty( $config['settings'] ) && $is_global_styles_user_theme_json ? $config['settings'] : new stdClass();
 		}
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
@@ -599,7 +599,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		$data   = array();
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$data['settings'] = gutenberg_prepare_font_variations_for_json( $theme->get_settings() );
+			$data['settings'] = $theme->get_settings();
 		}
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
@@ -676,7 +676,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
 			$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
 			if ( isset( $variation['settings'] ) ) {
-				$variation['settings'] = gutenberg_prepare_font_variations_for_json( $variation['settings'] );
+				$variation['settings'] = $variation['settings'];
 			}
 			$data = rest_ensure_response( $variation );
 			if ( ! empty( $resolved_theme_uris ) ) {

@@ -623,32 +623,9 @@
 							"default": true
 						},
 						"fontVariations": {
-							"description": "Variable font axes that users can set, by font family slug, then by OpenType axis tag. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. Keyed by tag so that theme.json origins merge per axis. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead.",
-							"type": "object",
-							"additionalProperties": {
-								"type": "object",
-								"propertyNames": {
-									"pattern": "^[A-Za-z0-9]{4}$"
-								},
-								"additionalProperties": {
-									"type": "object",
-									"properties": {
-										"name": {
-											"description": "Label shown for the axis.",
-											"type": "string"
-										},
-										"min": {
-											"description": "Lowest value users can set.",
-											"type": "number"
-										},
-										"max": {
-											"description": "Highest value users can set.",
-											"type": "number"
-										}
-									},
-									"additionalProperties": false
-								}
-							}
+							"description": "Allow users to set the variable font axes a font declares that have no CSS property of their own, such as `GRAD` or `FILL`, in a Font variations panel. The axes come from the font itself; this only decides whether the panel is offered. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead.",
+							"type": "boolean",
+							"default": false
 						},
 						"fontWeight": {
 							"description": "Allow users to set custom font weights.",

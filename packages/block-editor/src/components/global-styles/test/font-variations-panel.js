@@ -19,121 +19,82 @@ const robotoFlex = {
 	],
 };
 
-function getSettings( policy ) {
+function getSettings( fontVariations = true, families = [ robotoFlex ] ) {
 	return {
 		typography: {
-			fontFamilies: { theme: [ robotoFlex ] },
-			fontVariations: { 'roboto-flex': policy },
+			fontFamilies: { theme: families },
+			fontVariations,
 		},
 	};
 }
 
 describe( 'getFontVariationAxes', () => {
-	it( 'returns the policy axes within the range the face declares', () => {
-		const settings = getSettings( {
-			GRAD: { min: -50, max: 50 },
-			opsz: {},
-		} );
-
+	it( 'returns the axes the face declares, over the range it declares', () => {
 		expect(
 			getFontVariationAxes(
-				settings,
+				getSettings(),
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [
-			{ tag: 'GRAD', name: undefined, min: -50, max: 50, default: 0 },
 			{ tag: 'opsz', name: undefined, min: 8, max: 144, default: 14 },
+			{ tag: 'GRAD', name: undefined, min: -200, max: 150, default: 0 },
+			{ tag: 'XTRA', name: undefined, min: 323, max: 603, default: 468 },
 		] );
 	} );
 
-	it( 'resolves the font family from each value format', () => {
-		const settings = getSettings( { GRAD: {} } );
+	it( 'leaves out axes that have a CSS property of their own', () => {
+		expect(
+			getFontVariationAxes(
+				getSettings(),
+				'var:preset|font-family|roboto-flex'
+			).map( ( { tag } ) => tag )
+		).not.toContain( 'wght' );
+	} );
 
+	it( 'resolves the font family from each value format', () => {
 		[
 			'var:preset|font-family|roboto-flex',
 			'var(--wp--preset--font-family--roboto-flex)',
 			'"Roboto Flex", sans-serif',
 		].forEach( ( fontFamily ) => {
-			expect( getFontVariationAxes( settings, fontFamily ) ).toHaveLength(
-				1
-			);
+			expect(
+				getFontVariationAxes( getSettings(), fontFamily )
+			).toHaveLength( 3 );
 		} );
 	} );
 
-	it( 'ignores registered axes and axes the face does not have', () => {
-		const settings = getSettings( {
-			wght: { min: 300, max: 700 },
-			FILL: { min: 0, max: 1 },
-			XTRA: {},
-		} );
+	it( 'drops an axis with nothing to choose between', () => {
+		const pinned = {
+			...robotoFlex,
+			fontFace: [
+				{ axes: [ { tag: 'GRAD', min: 0, default: 0, max: 0 } ] },
+			],
+		};
 
 		expect(
 			getFontVariationAxes(
-				settings,
-				'var:preset|font-family|roboto-flex'
-			)
-		).toEqual( [
-			{ tag: 'XTRA', name: undefined, min: 323, max: 603, default: 468 },
-		] );
-	} );
-
-	it( 'drops an axis whose ranges do not overlap', () => {
-		const settings = getSettings( { GRAD: { min: 200, max: 300 } } );
-
-		expect(
-			getFontVariationAxes(
-				settings,
+				getSettings( true, [ pinned ] ),
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [] );
 	} );
 
-	it( 'shows axes in the order the policy lists them', () => {
-		const settings = getSettings( { opsz: {}, XTRA: {}, GRAD: {} } );
-
+	it( 'returns nothing when the panel is off, or no family resolves', () => {
 		expect(
 			getFontVariationAxes(
-				settings,
-				'var:preset|font-family|roboto-flex'
-			).map( ( { tag } ) => tag )
-		).toEqual( [ 'opsz', 'XTRA', 'GRAD' ] );
-	} );
-
-	it( 'does not read a policy written as a list', () => {
-		const settings = getSettings( [ { tag: 'GRAD' } ] );
-
-		expect(
-			getFontVariationAxes(
-				settings,
+				getSettings( false ),
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [] );
-	} );
-
-	it( 'reads an axis sent as an empty list as having no options', () => {
-		const settings = getSettings( {
-			GRAD: { min: -50, max: 50 },
-			opsz: [],
-		} );
-
-		expect(
-			getFontVariationAxes(
-				settings,
-				'var:preset|font-family|roboto-flex'
-			).map( ( { tag, min, max } ) => `${ tag } ${ min }-${ max }` )
-		).toEqual( [ 'GRAD -50-50', 'opsz 8-144' ] );
-	} );
-
-	it( 'returns nothing without a policy or a font family', () => {
 		expect(
 			getFontVariationAxes(
 				{ typography: { fontFamilies: { theme: [ robotoFlex ] } } },
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [] );
-		expect(
-			getFontVariationAxes( getSettings( { GRAD: {} } ), undefined )
-		).toEqual( [] );
+		expect( getFontVariationAxes( getSettings(), undefined ) ).toEqual(
+			[]
+		);
 	} );
 } );
 
@@ -160,7 +121,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 	const settings = {
 		typography: {
 			fontFamilies: { theme: [ family ] },
-			fontVariations: { split: { opsz: {}, GRAD: {} } },
+			fontVariations: true,
 		},
 	};
 	const tags = ( axes ) =>

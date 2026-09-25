@@ -71,7 +71,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );
 
-	$settings['__experimentalFeatures'] = gutenberg_prepare_font_variations_for_json( gutenberg_get_global_settings() );
+	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 	// These settings may need to be updated based on data coming from theme.json sources.
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];

@@ -201,7 +201,7 @@ Settings related to typography.
 | defaultFontSizes | Allow users to choose font sizes from the default font size presets. | `boolean` | `true` |
 | customFontSize | Allow users to set custom font sizes. | `boolean` | `true` |
 | fontStyle | Allow users to set custom font styles. | `boolean` | `true` |
-| fontVariations | Variable font axes that users can set, by font family slug, then by OpenType axis tag. Only axes listed here are offered, within the range the font declares and, when given, the narrower range set here. Keyed by tag so that theme.json origins merge per axis. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead. |  |  |
+| fontVariations | Allow users to set the variable font axes a font declares that have no CSS property of their own, such as `GRAD` or `FILL`, in a Font variations panel. The axes come from the font itself; this only decides whether the panel is offered. `wght`, `wdth`, `slnt` and `ital` are set through font weight, width and style instead. | `boolean` | `false` |
 | fontWeight | Allow users to set custom font weights. | `boolean` | `true` |
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |

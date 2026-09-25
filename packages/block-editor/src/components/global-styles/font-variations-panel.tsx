@@ -28,12 +28,6 @@ type FontFaceAxis = {
 	max: number;
 };
 
-type FontVariationPolicy = {
-	name?: string;
-	min?: number;
-	max?: number;
-};
-
 type FontFamily = {
 	slug: string;
 	fontFamily: string;
@@ -54,10 +48,7 @@ export type FontAppearance = {
 type Settings = {
 	typography?: {
 		fontFamilies?: Record< string, FontFamily[] | undefined >;
-		fontVariations?: Record<
-			string,
-			Record< string, FontVariationPolicy > | undefined
-		>;
+		fontVariations?: boolean;
 		[ key: string ]: unknown;
 	};
 	[ key: string ]: unknown;
@@ -155,32 +146,35 @@ function getCandidateFaces(
 }
 
 /**
- * Returns the axes a user can set for a font family: the axes the theme
- * exposes in `settings.typography.fontVariations`, limited to the axes the
- * faces in use declare, with the range all of them allow.
+ * Returns the axes a user can set for a font family: the ones the faces in use
+ * declare, over the range all of them allow, once the theme has turned the panel
+ * on with `settings.typography.fontVariations`.
+ *
+ * Axes that have a CSS property of their own are left out, because they are set
+ * through the typography controls instead. What remains is what only
+ * `font-variation-settings` can reach, and the font is the authority on its
+ * range: a theme decides whether to offer this editing at all, not how far each
+ * axis may travel.
  *
  * @param settings        Block or Global Styles settings.
  * @param fontFamilyValue Font family from block attributes or Global Styles.
  * @param appearance      Font style and weight, which select the faces.
- * @return The axes to show, in policy order.
+ * @return The axes to show, in the order the faces declare them.
  */
 export function getFontVariationAxes(
 	settings: Settings | undefined,
 	fontFamilyValue: unknown,
 	appearance?: FontAppearance
 ): FontVariationAxis[] {
+	if ( ! settings?.typography?.fontVariations ) {
+		return EMPTY_AXES;
+	}
 	const fontFamiliesByOrigin = settings?.typography?.fontFamilies;
 	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
 		( origin ) => fontFamiliesByOrigin?.[ origin ] ?? []
 	);
 	const slug = getFontFamilySlug( fontFamilyValue, fontFamilies );
 	if ( ! slug ) {
-		return EMPTY_AXES;
-	}
-	// The policy is keyed by axis tag, so that theme.json origins merge it
-	// per axis; its key order is the order the axes are shown in.
-	const policy = settings?.typography?.fontVariations?.[ slug ];
-	if ( ! policy || typeof policy !== 'object' || Array.isArray( policy ) ) {
 		return EMPTY_AXES;
 	}
 
@@ -211,29 +205,18 @@ export function getFontVariationAxes(
 		} );
 	} );
 
-	return Object.entries( policy ).flatMap( ( [ tag, entry ] ) => {
-		// Each axis entry is an object: the server sends `"opsz": {}` as an
-		// object (gutenberg_prepare_font_variations_for_json()). An empty list,
-		// which PHP writes for an empty array, is still read as no options, so
-		// settings from a server without that step keep working.
-		const axis = capabilities.get( tag );
-		if (
-			! axis ||
-			! entry ||
-			typeof entry !== 'object' ||
-			REGISTERED_AXES_WITH_PROPERTIES.includes( axis.tag )
-		) {
+	return [ ...capabilities.values() ].flatMap( ( axis ) => {
+		if ( REGISTERED_AXES_WITH_PROPERTIES.includes( axis.tag ) ) {
 			return [];
 		}
-		const min = Math.max( axis.min, entry.min ?? axis.min );
-		const max = Math.min( axis.max, entry.max ?? axis.max );
+		const { min, max } = axis;
 		if ( ! ( min < max ) ) {
 			return [];
 		}
 		return [
 			{
 				tag: axis.tag,
-				name: entry.name ?? axis.name,
+				name: axis.name,
 				min,
 				max,
 				default: Math.min( Math.max( axis.default ?? min, min ), max ),
