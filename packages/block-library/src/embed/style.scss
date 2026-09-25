@@ -95,4 +95,12 @@
 	.wp-embed-aspect-1-2 .wp-block-embed__wrapper::before {
 		padding-top: 200%; // 2 / 1 * 100
 	}
+
+	.wp-embed-aspect-5-3 .wp-block-embed__wrapper::before {
+		padding-top: 60%; // 3 / 5 * 100
+	}
+
+	.wp-embed-aspect-5-2 .wp-block-embed__wrapper::before {
+		padding-top: 40%; // 2 / 5 * 100
+	}
 }
