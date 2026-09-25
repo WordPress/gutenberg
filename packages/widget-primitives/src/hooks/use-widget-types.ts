@@ -115,6 +115,8 @@ function recordOverlay( record: WidgetModuleRecord ) {
 		name: record.name as WidgetName,
 		renderModule: record.render_module ?? '',
 		...( record.presentation ? { presentation: record.presentation } : {} ),
+		...( record.presence ? { presence: record.presence } : {} ),
+		...( record.provenance ? { provenance: record.provenance } : {} ),
 		...( record.category ? { category: record.category } : {} ),
 		...( record.description ? { description: record.description } : {} ),
 		...( record.help ? { help: record.help } : {} ),
@@ -184,7 +186,7 @@ export function useWidgetTypes(
 									attributes: resolveFields(
 										record.attributes
 									),
-								}
+							  }
 							: {} ),
 						...( record.icon ? { icon: pendingIcon } : {} ),
 						...( record.actions
@@ -193,7 +195,7 @@ export function useWidgetTypes(
 										record.actions,
 										true
 									),
-								}
+							  }
 							: {} ),
 						...recordOverlay( record ),
 					} as WidgetType;
@@ -247,7 +249,7 @@ export function useWidgetTypes(
 										actions,
 										actions === record.actions
 									),
-								}
+							  }
 							: {} ),
 						...recordOverlay( record ),
 					} as WidgetType;

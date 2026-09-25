@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetModuleRecord`, `WidgetType`: carry `presence` and `provenance` metadata from the widget registry and REST record ([#83441](https://github.com/WordPress/gutenberg/issues/83441)).
+
 ## 0.8.0 (2026-09-23)
 
 ### New Features

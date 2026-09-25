@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `createDashboardWidget` utility to create widget instances from a widget type with default placement and attributes ([#83441](https://github.com/WordPress/gutenberg/issues/83441)).
+
 ## 0.8.0 (2026-09-23)
 
 ### Enhancements

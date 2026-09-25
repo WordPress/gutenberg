@@ -423,6 +423,8 @@ function gutenberg_register_widget_types() {
 				'render_module' => $widget['render_module'] ?? null,
 				'widget_module' => $widget['widget_module'] ?? null,
 				'presentation'  => $widget['presentation'] ?? null,
+				'presence'      => $widget['presence'] ?? 'offer',
+				'provenance'    => $widget['provenance'] ?? 'core',
 				'category'      => $widget['category'] ?? null,
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,

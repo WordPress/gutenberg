@@ -22,6 +22,12 @@ const GUTENBERG_DASHBOARD_LAYOUT_SCOPE = 'core/dashboard';
 const GUTENBERG_DASHBOARD_LAYOUT_KEY = 'dashboardLayout';
 
 /**
+ * Preferences key under `GUTENBERG_DASHBOARD_LAYOUT_SCOPE` that holds
+ * the array of known widget type names.
+ */
+const GUTENBERG_DASHBOARD_KNOWN_WIDGET_TYPES_KEY = 'knownWidgetTypes';
+
+/**
  * Identifier of the bundled dashboard, formatted as `<plugin>_<page>`
  * to match the underscore form produced by the wp-build pipeline
  * (mirrors the `{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}` pair used in
