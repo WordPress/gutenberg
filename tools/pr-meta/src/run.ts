@@ -120,6 +120,12 @@ async function run() {
 		return;
 	}
 
+	/* Props runs on every comment, so most writes change nothing. */
+	if ( existing?.body === merged ) {
+		info( `The "${ section }" section is already up to date.` );
+		return;
+	}
+
 	const url = existing
 		? await api.updateComment( existing.id, merged )
 		: await api.createComment( prNumber, merged );
