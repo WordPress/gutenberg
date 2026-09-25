@@ -362,8 +362,21 @@ export function useNoteActions() {
 				 * the user happens to click somewhere. Collapse the selection
 				 * to the end of the range so the marker shows its author
 				 * color right away.
+				 *
+				 * This reaches the canvas although focus is in the sidebar:
+				 * the iframe's `document.activeElement` still points at the
+				 * noted editable, and rich text applies a selection from
+				 * state whenever that is its element (see
+				 * `packages/rich-text/src/hook`). Skip it if the user moved
+				 * the selection elsewhere while the save was in flight.
 				 */
-				if ( wrapped ) {
+				const selectionStart = getSelectionStart();
+				if (
+					wrapped &&
+					selectionStart?.clientId === clientId &&
+					selectionStart?.attributeKey ===
+						inlineSelection.attributeKey
+				) {
 					selectionChange(
 						clientId,
 						inlineSelection.attributeKey,
