@@ -1279,6 +1279,45 @@ test.describe( 'Block Notes', () => {
 			expect( noteIds ).toHaveLength( 2 );
 		} );
 
+		test( 'keeps the clicked note selected on a block with several notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes' },
+				comment: 'First note',
+			} );
+			await blockNoteUtils.addNote( 'Second note' );
+			// Move the block selection away, so clicking a thread also selects its block.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Another block' },
+			} );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const firstThread = settings.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			const secondThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Second note',
+			} );
+
+			await secondThread.click();
+
+			await expect( secondThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( firstThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
 		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
 			editor,
 			page,

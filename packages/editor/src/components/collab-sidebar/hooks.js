@@ -567,14 +567,22 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 
 	// Select the block's primary note, or clear the selection if it has none.
 	const syncWithBlock = useEvent( ( clientId ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			registry.select( editorStore )
+		);
 		// A pending focus request is an explicit pick; leave it alone.
-		if ( unlock( registry.select( editorStore ) ).isNoteFocused() ) {
+		if ( isNoteFocused() ) {
 			return;
 		}
 		// Orphaned threads have no block either; don't match them.
 		const blockThreads = clientId
 			? notes.filter( ( thread ) => thread.blockClientId === clientId )
 			: [];
+		// Selecting a thread also selects its block; keep the picked thread.
+		const currentNoteId = getSelectedNote();
+		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
+			return;
+		}
 		selectNote( pickPrimaryNote( blockThreads )?.id );
 	} );
 
