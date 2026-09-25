@@ -1,4 +1,19 @@
 :root :where(.wp-block-table-of-contents) {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+
+	ol {
+		list-style-type: none;
+		counter-reset: toc-counter;
+		padding-left: 1.5em;
+
+		li {
+			counter-increment: toc-counter;
+
+			&::before {
+				content: counters(toc-counter, ".") " ";
+			}
+		}
+	}
 }
+
