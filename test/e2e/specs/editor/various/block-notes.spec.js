@@ -1381,6 +1381,34 @@ test.describe( 'Block Notes', () => {
 			await expect( triggers.first() ).toHaveCSS( 'opacity', '0' );
 		} );
 
+		test( 'the add-reaction trigger stays visible once the note has reactions', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the trailing trigger' },
+				comment: 'Test comment for the trailing trigger',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await expect(
+				page.getByRole( 'button', { name: /Heart/ } )
+			).toBeVisible();
+
+			// With pills to sit beside, the trigger trails them in the row
+			// rather than floating, and stays put without a hover. Picking
+			// the emoji leaves focus on the trigger, which would hold it open,
+			// so hand focus back to the still-selected thread.
+			await page
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.focus();
+			await page.mouse.move( 0, 0 );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__add-reaction' )
+			).toHaveCSS( 'opacity', '1' );
+		} );
+
 		test( 'reactions stay visible once the thread is deselected', async ( {
 			page,
 			editor,
