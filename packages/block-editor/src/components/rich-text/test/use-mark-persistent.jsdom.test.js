@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { StrictMode } from '@wordpress/element';
 import { useMarkPersistent } from '../use-mark-persistent';
@@ -17,10 +17,6 @@ describe( 'useMarkPersistent', () => {
 	beforeEach( () => {
 		vi.useFakeTimers();
 		markPersistent.mockClear();
-	} );
-
-	afterEach( () => {
-		vi.useRealTimers();
 	} );
 
 	it( 'does not mark on mount', () => {
@@ -57,15 +53,18 @@ describe( 'useMarkPersistent', () => {
 		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'starts the timer for the first character in an empty field', () => {
+	it( 'does not mark when an empty field gets its value later', () => {
 		const { rerender } = renderHook( useMarkPersistent, {
 			initialProps: props( '' ),
 		} );
 
+		// A value set from outside updates the html one render before the
+		// text.
+		rerender( props( 'a', '' ) );
 		rerender( props( 'a' ) );
-		vi.advanceTimersByTime( 1000 );
+		vi.runAllTimers();
 
-		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
+		expect( markPersistent ).not.toHaveBeenCalled();
 	} );
 
 	it( 'treats html that lags behind the text as typing', () => {

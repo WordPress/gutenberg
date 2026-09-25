@@ -56,6 +56,12 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 
 		previousRef.current = next;
 
+		// An empty field waits for its first value, which can load later
+		// (e.g. Site Title, bindings). Marking it would add an undo level.
+		if ( ! previous.text ) {
+			return;
+		}
+
 		if ( changeType === 'typing' ) {
 			markPersistentDebounced();
 			return;
