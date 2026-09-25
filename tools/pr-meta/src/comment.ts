@@ -40,8 +40,125 @@ export function sanitizeBody( body: string ): string {
 	return body.replace( /<!--(\s*\/?\s*)pr-meta:/g, '&lt;!--$1pr-meta:' );
 }
 
-function parseAttributes( raw: string ): { sha?: string; runUrl?: string } {
-	const attributes: { sha?: string; runUrl?: string } = {};
+/** Section headings are `####`, so a body's own headings start below them. */
+const BODY_HEADING_LEVEL = 5;
+const MAX_HEADING_LEVEL = 6;
+
+/*
+ * The hashes and the rest of the line, so neither is reconstructed by hand.
+ * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
+ * so no line would match and the body would be left half demoted.
+ */
+const HEADING = /^( {0,3})(#{1,6})([ \t].*|\r?)$/s;
+/* A fence opens on three or more backticks or tildes, indented at most three. */
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
+
+/**
+ * Tracks whether a line falls inside a fenced code block.
+ *
+ * A fence closes only on the character it opened with, repeated at least as
+ * many times.
+ *
+ * @return A tracker fed one line at a time, in order.
+ */
+function fenceTracker() {
+	let open: string | undefined;
+
+	return {
+		/**
+		 * @param line The next line of the body.
+		 * @return Whether it is fenced, its delimiters included.
+		 */
+		track( line: string ): boolean {
+			const match = line.match( FENCE );
+
+			if ( ! match ) {
+				return open !== undefined;
+			}
+
+			const [ , marker, info ] = match;
+
+			if ( open === undefined ) {
+				if ( marker.startsWith( '`' ) && info.includes( '`' ) ) {
+					return false;
+				}
+				open = marker;
+				return true;
+			}
+
+			if (
+				marker[ 0 ] === open[ 0 ] &&
+				marker.length >= open.length &&
+				info.trim() === ''
+			) {
+				open = undefined;
+			}
+
+			return true;
+		},
+
+		/** The marker of a fence still waiting to be closed. */
+		get openMarker() {
+			return open;
+		},
+	};
+}
+
+/**
+ * Pushes a body's own headings below the heading of its section.
+ *
+ * A producer renders its markdown without knowing where it will sit, so props
+ * opens with `## Unlinked Accounts` and would outrank the `#### Props` above
+ * it. Shifting them all by the same amount keeps their hierarchy intact.
+ *
+ * @param body Markdown that may carry its own headings.
+ * @return The same markdown, its headings demoted.
+ */
+export function demoteHeadings( body: string ): string {
+	const lines = body.split( '\n' );
+
+	let fences = fenceTracker();
+	let shallowest = MAX_HEADING_LEVEL;
+
+	for ( const line of lines ) {
+		const level = fences.track( line )
+			? undefined
+			: line.match( HEADING )?.[ 2 ].length;
+
+		if ( level !== undefined ) {
+			shallowest = Math.min( shallowest, level );
+		}
+	}
+
+	const shift = Math.max( 0, BODY_HEADING_LEVEL - shallowest );
+
+	if ( shift === 0 ) {
+		return body;
+	}
+
+	fences = fenceTracker();
+
+	return lines
+		.map( ( line ) => {
+			if ( fences.track( line ) ) {
+				return line;
+			}
+
+			return line.replace(
+				HEADING,
+				( _, indent, hashes, rest ) =>
+					`${ indent }${ '#'.repeat(
+						Math.min( hashes.length + shift, MAX_HEADING_LEVEL )
+					) }${ rest }`
+			);
+		} )
+		.join( '\n' );
+}
+
+function parseAttributes(
+	raw: string
+): Pick< ParsedSection, 'sha' | 'runUrl' > {
+	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' > = {};
 
 	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
 		const [ key, value ] = pair.split( '=' );
@@ -124,8 +241,13 @@ function truncate(
 function closeOpenBlocks( body: string ): string {
 	const closing = [];
 
-	if ( ( body.match( /^```/gm ) ?? [] ).length % 2 !== 0 ) {
-		closing.push( '```' );
+	/* Closes with the marker that opened, not always three backticks. */
+	const fences = fenceTracker();
+	for ( const line of body.split( '\n' ) ) {
+		fences.track( line );
+	}
+	if ( fences.openMarker ) {
+		closing.push( fences.openMarker );
 	}
 
 	const open = ( body.match( /<details>/g ) ?? [] ).length;
@@ -302,7 +424,10 @@ export function mergeSection(
 		}
 	}
 
-	const body = sanitizeBody( update.body ).trim();
+	/* Blank lines only: trimming spaces would turn indented code into a fence. */
+	const body = demoteHeadings( sanitizeBody( update.body ) )
+		.replace( /^\n+/, '' )
+		.replace( /\s+$/, '' );
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);

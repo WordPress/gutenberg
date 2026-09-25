@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	COMMENT_MARKER,
+	demoteHeadings,
 	isParseable,
 	isPrMetaComment,
 	mergeSection,
@@ -382,6 +383,10 @@ describe( 'budgets', () => {
 		}
 
 		expect( comment!.length ).toBeLessThan( COMMENT_LIMIT );
+		// Fitting by dropping sections would pass the length check too.
+		expect( parseSections( comment! ).map( ( s ) => s.id ) ).toEqual(
+			SECTIONS.map( ( s ) => s.id )
+		);
 	} );
 } );
 
@@ -523,7 +528,7 @@ describe( 'collapsing', () => {
 		let comment = bodyOf(
 			mergeSection(
 				undefined,
-				{ id: 'flaky-tests', body: 'Traces.', sha: HEAD },
+				{ id: 'performance', body: 'Tables.', sha: HEAD },
 				HEAD
 			)
 		);
@@ -536,9 +541,27 @@ describe( 'collapsing', () => {
 
 		expect( comment.match( /<details>/g ) ).toHaveLength( 1 );
 		expect(
-			parseSections( comment ).find( ( s ) => s.id === 'flaky-tests' )
+			parseSections( comment ).find( ( s ) => s.id === 'performance' )
 				?.body
-		).toBe( 'Traces.' );
+		).toBe( 'Tables.' );
+	} );
+
+	/* Its body folds each test already, and a fold in a fold renders badly. */
+	it( 'leaves a section that folds its own items open', () => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'flaky-tests',
+					body: '<details>\n<summary>A test</summary>\n\nTrace.\n\n</details>',
+					sha: HEAD,
+				},
+				HEAD
+			)
+		);
+
+		expect( merged.match( /<details>/g ) ).toHaveLength( 1 );
+		expect( merged ).not.toContain( '<summary>Show' );
 	} );
 } );
 
@@ -561,5 +584,113 @@ describe( 'rendering other sections', () => {
 		);
 
 		expect( merged ).toContain( 'not the current head' );
+	} );
+} );
+
+describe( 'demoteHeadings', () => {
+	it( 'pushes a props body below its own section heading', () => {
+		const props =
+			'## Unlinked Accounts\n\nSome text.\n\n## Core SVN\n\nMore text.';
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body: props } )
+		);
+
+		expect( merged ).toContain( '##### Unlinked Accounts' );
+		expect( merged ).toContain( '##### Core SVN' );
+		expect( merged ).not.toMatch( /^## Unlinked/m );
+	} );
+
+	it( 'keeps the hierarchy between headings', () => {
+		const body = '## Title\n\nText.\n\n### Deep\n\nText.';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Title\n\nText.\n\n###### Deep\n\nText.'
+		);
+	} );
+
+	/*
+	 * Markdown has no seventh level, so a body deep enough to need one loses
+	 * the distinction rather than the demotion.
+	 */
+	it( 'flattens levels a demotion pushes past the sixth', () => {
+		const body = '# One\n\n## Two\n\n### Three';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### One\n\n###### Two\n\n###### Three'
+		);
+	} );
+
+	it( 'leaves a body that has no headings alone', () => {
+		const body = 'Just text, and a # that is not a heading.';
+
+		expect( demoteHeadings( body ) ).toBe( body );
+	} );
+
+	/* A stack trace can hold anything, including lines that look like headings. */
+	it.each( [
+		[ 'a plain fence', '```', '```' ],
+		[ 'a fence with a language', '```js', '```' ],
+		[ 'a tilde fence', '~~~', '~~~' ],
+	] )( 'ignores what looks like a heading inside %s', ( _, open, close ) => {
+		const body = `## Real\n\n${ open }\n# Not a heading\n${ close }`;
+
+		expect( demoteHeadings( body ) ).toBe(
+			`##### Real\n\n${ open }\n# Not a heading\n${ close }`
+		);
+	} );
+
+	/* Reading the level by hunting for a space loses the first word. */
+	it( 'keeps the text of a heading separated by a tab', () => {
+		expect( demoteHeadings( '#\tTabbed' ) ).toBe( '#####\tTabbed' );
+	} );
+
+	/*
+	 * A `.` stops at a carriage return, so a CRLF body would match on its last
+	 * line only, demoting that one and leaving every fence untracked.
+	 */
+	it( 'handles a body with carriage returns', () => {
+		const body = '## Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n## After';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n##### After'
+		);
+	} );
+
+	it( 'demotes a heading with no text among carriage returns', () => {
+		expect( demoteHeadings( '#\r\n\r\n## After' ) ).toBe(
+			'#####\r\n\r\n###### After'
+		);
+	} );
+
+	it( 'demotes a heading indented up to three spaces, keeping the indent', () => {
+		expect( demoteHeadings( '   ## Indented' ) ).toBe(
+			'   ##### Indented'
+		);
+	} );
+
+	/* Four spaces makes it indented code rather than a heading. */
+	it( 'leaves a heading indented four spaces alone', () => {
+		expect( demoteHeadings( '    ## Code\n\n## Plain' ) ).toBe(
+			'    ## Code\n\n##### Plain'
+		);
+	} );
+
+	it( 'demotes a heading with no text', () => {
+		expect( demoteHeadings( '#\n\n## Plain' ) ).toBe(
+			'#####\n\n###### Plain'
+		);
+	} );
+
+	it( 'leaves a hash that opens no heading alone', () => {
+		expect( demoteHeadings( '## Real\n\n#hashtag' ) ).toBe(
+			'##### Real\n\n#hashtag'
+		);
+	} );
+
+	it( 'caps the demotion at the deepest heading level', () => {
+		expect( demoteHeadings( '# One\n\n###### Six' ) ).toBe(
+			'##### One\n\n###### Six'
+		);
 	} );
 } );

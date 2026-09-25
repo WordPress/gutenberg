@@ -41,13 +41,15 @@ permissions:
     pull-requests: write
 ```
 
-**`if: ${{ !cancelled() }}`**, so a failed producer still clears its section instead of leaving a stale one behind.
+**A deliberate answer to producer failure.** Use `if: ${{ !cancelled() }}` where a missing result reliably means "nothing to report", so a failed producer clears its section rather than leaving a stale one. Where a missing result is instead indistinguishable from a failure, require the producer to have succeeded, as the props and flaky tests writers do; clearing there would erase something nothing had disproved.
 
 The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a local action needs the repository on disk. `sparse-checkout: tools/pr-meta` is enough. Under `pull_request_target` the checkout must stay on the base ref, never the pull request's head.
 
 ## Adding a section
 
 Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
+
+A producer renders its markdown without knowing where it will sit, so any headings in a body are demoted to sit below the section heading, keeping their relative hierarchy. Headings inside a code fence are left alone, and a body deep enough to need a seventh level flattens at the sixth, markdown having no more. Setext headings, the ones underlined with `=` or `-`, are not demoted.
 
 A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open.
 
