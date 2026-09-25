@@ -15,6 +15,7 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
+import deprecated from '@wordpress/deprecated';
 import { isAppleOS, withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
@@ -440,6 +441,10 @@ export default function Autocomplete( {
 	isSelected,
 	...options
 }: AutocompleteProps ) {
+	deprecated( 'wp.components.Autocomplete', {
+		since: '7.2',
+		hint: 'The block editor’s RichText component accepts completers through its autocompleters prop.',
+	} );
 	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>
