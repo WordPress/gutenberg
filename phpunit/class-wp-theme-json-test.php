@@ -8474,6 +8474,86 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_rebase_selector
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::rebase_selector
+	 *
+	 * @param string $selector       The feature selector to rebase.
+	 * @param string $block_selector The block's own selector.
+	 * @param string $expected       The expected rebased selector.
+	 */
+	public function test_rebase_selector( $selector, $block_selector, $expected ) {
+		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'rebase_selector' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+
+		$this->assertSame( $expected, $reflection->invoke( null, '.state', $selector, $block_selector ) );
+	}
+
+	/**
+	 * Data provider for test_rebase_selector.
+	 *
+	 * @return array[]
+	 */
+	public function data_rebase_selector() {
+		return array(
+			'descendant of the block'        => array(
+				'selector'       => '.wp-block-x .feature',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state .feature',
+			),
+			'child of the block'             => array(
+				'selector'       => '.wp-block-x > .feature',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state > .feature',
+			),
+			// The scope replaces the block rather than wrapping it, otherwise
+			// the selector would look for the block inside itself.
+			'the block itself'               => array(
+				'selector'       => '.wp-block-x',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state',
+			),
+			// Nothing better can be done with a selector that isn't scoped to
+			// the block, so it's scoped as a descendant.
+			'not scoped to the block'        => array(
+				'selector'       => '.unrelated',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state .unrelated',
+			),
+			// A shared prefix isn't a block scope without a combinator after it.
+			'block name is only a prefix'    => array(
+				'selector'       => '.wp-block-x-fancy .feature',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state .wp-block-x-fancy .feature',
+			),
+			'selector list for the block'    => array(
+				'selector'       => '.wp-block-a .feature',
+				'block_selector' => '.wp-block-a, .wp-block-b',
+				'expected'       => '.state .feature',
+			),
+			// The first part of the list is a prefix but not a scope, so the
+			// second part has to be tried before giving up.
+			'later part of the list matches' => array(
+				'selector'       => '.wp-block-a-fancy .feature',
+				'block_selector' => '.wp-block-a, .wp-block-a-fancy',
+				'expected'       => '.state .feature',
+			),
+			'selector list for the feature'  => array(
+				'selector'       => '.wp-block-x .one, .wp-block-x .two',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state .one, .state .two',
+			),
+			'block itself within a list'     => array(
+				'selector'       => '.wp-block-x, .wp-block-x .feature',
+				'block_selector' => '.wp-block-x',
+				'expected'       => '.state, .state .feature',
+			),
+		);
+	}
+
+	/**
 	 * Navigation Link declares a `selectors.color.background` pointing at its
 	 * anchor, so that a background doesn't paint behind the submenu the list
 	 * item also wraps. Text color must not follow it there: the anchor carries

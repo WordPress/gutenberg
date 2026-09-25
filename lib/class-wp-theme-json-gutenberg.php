@@ -2851,7 +2851,16 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			$relative  = static::get_selector_relative_to_block( $inner, $block_selector );
+			$relative = static::get_selector_relative_to_block( $inner, $block_selector );
+
+			if ( '' === $relative ) {
+				// The feature selector is the block itself, so the scope
+				// replaces it outright. `scope_selector()` can't be used here:
+				// it returns '' for an empty selector rather than the scope.
+				$rebased[] = $scope;
+				continue;
+			}
+
 			$rebased[] = static::scope_selector( $scope, null === $relative ? $inner : $relative );
 		}
 
@@ -2867,6 +2876,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * prefix, so `.wp-block-navigation-link-fancy` isn't read as the Navigation
 	 * Link block with `-fancy` below it.
 	 *
+	 * A block selector can be a selector list, so each part is tried in turn and
+	 * the first one the feature selector is scoped to wins.
+	 *
 	 * @since 7.2.0
 	 *
 	 * @param string $selector       A feature selector.
@@ -2876,23 +2888,30 @@ class WP_Theme_JSON_Gutenberg {
 	 *                     selector isn't scoped to the block.
 	 */
 	protected static function get_selector_relative_to_block( $selector, $block_selector ) {
-		$block_selector = trim( (string) $block_selector );
+		foreach ( static::split_selector_list( (string) $block_selector ) as $block_part ) {
+			$block_part = trim( $block_part );
 
-		if ( '' === $block_selector || ! str_starts_with( $selector, $block_selector ) ) {
-			return null;
+			if ( '' === $block_part || ! str_starts_with( $selector, $block_part ) ) {
+				continue;
+			}
+
+			$relative = substr( $selector, strlen( $block_part ) );
+
+			if ( '' === $relative ) {
+				return '';
+			}
+
+			// A prefix that isn't followed by a combinator is another selector
+			// that happens to start with the same characters, so keep looking:
+			// a later part of the list may be the real prefix.
+			if ( ! preg_match( '/^[ >+~]/', $relative ) ) {
+				continue;
+			}
+
+			return trim( $relative );
 		}
 
-		$relative = substr( $selector, strlen( $block_selector ) );
-
-		if ( '' === $relative ) {
-			return '';
-		}
-
-		if ( ! preg_match( '/^[ >+~]/', $relative ) ) {
-			return null;
-		}
-
-		return trim( $relative );
+		return null;
 	}
 
 	/**
