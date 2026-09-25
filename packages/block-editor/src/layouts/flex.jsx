@@ -523,17 +523,20 @@ function FlexLayoutJustifyContentControl( {
 		{
 			value: 'left',
 			icon: justifyLeft,
-			label: __( 'Left' ),
+			label: _x( 'Left', 'Flex layout justification option' ),
+			description: __( 'Space after the items.' ),
 		},
 		{
 			value: 'center',
 			icon: justifyCenter,
-			label: __( 'Center' ),
+			label: _x( 'Center', 'Flex layout justification option' ),
+			description: __( 'Space on both sides.' ),
 		},
 		{
 			value: 'right',
 			icon: justifyRight,
-			label: __( 'Right' ),
+			label: _x( 'Right', 'Flex layout justification option' ),
+			description: __( 'Space before the items.' ),
 		},
 	];
 	if ( orientation === 'horizontal' ) {
@@ -542,16 +545,19 @@ function FlexLayoutJustifyContentControl( {
 				value: 'space-between',
 				icon: justifySpaceBetween,
 				label: __( 'Space between' ),
+				description: __( 'No space at the edges.' ),
 			},
 			{
 				value: 'space-around',
 				icon: justifySpaceAround,
 				label: __( 'Space around' ),
+				description: __( 'Half space at the edges.' ),
 			},
 			{
 				value: 'space-evenly',
 				icon: justifySpaceEvenly,
 				label: __( 'Space evenly' ),
+				description: __( 'Equal space at the edges.' ),
 			}
 		);
 	} else {
@@ -559,6 +565,7 @@ function FlexLayoutJustifyContentControl( {
 			value: 'stretch',
 			icon: justifyStretch,
 			label: __( 'Stretch items' ),
+			description: __( 'Fill the available space.' ),
 		} );
 	}
 
@@ -597,13 +604,16 @@ function FlexLayoutJustifyContentControl( {
 						onValueChange={ onJustificationChange }
 					>
 						{ justificationOptions.map(
-							( { value, icon, label } ) => (
+							( { value, icon, label, description } ) => (
 								<Menu.RadioItem
 									key={ value }
 									value={ value }
 									prefix={ <Menu.PrefixIcon icon={ icon } /> }
 								>
 									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+									<Menu.ItemDescription>
+										{ description }
+									</Menu.ItemDescription>
 								</Menu.RadioItem>
 							)
 						) }

@@ -542,6 +542,8 @@ The current semantic class names that can be output by the Layout block support 
 -   `is-content-justification-center`: When a block explicitly sets `justifyContent` to `center`.
 -   `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
 -   `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
+-   `is-content-justification-space-around`: When a block explicitly sets `justifyContent` to `space-around`.
+-   `is-content-justification-space-evenly`: When a block explicitly sets `justifyContent` to `space-evenly`.
 -   `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
 
 ### Opting out of generated layout styles
