@@ -47,7 +47,7 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords(
+	const { records: threads, hasResolved } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -170,6 +170,7 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+		hasResolved,
 	};
 }
 
@@ -274,7 +275,9 @@ function clearInlineNoteMarker(
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getCurrentPostId } = useSelect( editorStore );
+	const { getCurrentPostId, isEditedPostAutosaveable } =
+		useSelect( editorStore );
+	const { autosave } = useDispatch( editorStore );
 	const {
 		getBlockAttributes,
 		getClientIdsWithDescendants,
@@ -283,6 +286,20 @@ export function useNoteActions() {
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	/*
+	 * A note's link to its block is a block attribute, which only persists
+	 * when the post is saved, while the note itself is saved right away.
+	 * Autosave right after the link changes so leaving without saving
+	 * doesn't orphan the note. On the author's own draft the autosave
+	 * updates the post itself; otherwise the orphan is re-attached from the
+	 * autosave on load (see useReattachOrphanedNotes).
+	 */
+	const autosaveNoteAnchor = () => {
+		if ( isEditedPostAutosaveable() ) {
+			autosave();
+		}
+	};
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -354,6 +371,7 @@ export function useNoteActions() {
 				}
 
 				updateBlockAttributes( clientId, newAttributes );
+				autosaveNoteAnchor();
 			}
 
 			createNotice(
@@ -494,6 +512,7 @@ export function useNoteActions() {
 					}
 				}
 				updateBlockAttributes( clientId, newAttributes );
+				autosaveNoteAnchor();
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
