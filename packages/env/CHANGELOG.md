@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.16.0 (2026-09-23)
+
 ### Bug Fixes
 
 -   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).

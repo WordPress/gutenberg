@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-editor",
-	"version": "0.18.0",
+	"version": "0.19.0",
 	"description": "Media editor components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -64,7 +64,7 @@
 	},
 	"devDependencies": {
 		"@storybook/react-vite": "^10.5.3",
-		"@testing-library/dom": "^10.4.1",
+		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",

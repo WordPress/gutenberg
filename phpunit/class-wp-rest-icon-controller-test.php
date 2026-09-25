@@ -28,15 +28,19 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 		parent::set_up();
 
 		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the core icons that
-		 * `init` only registers once. Re-register them when empty so order-dependent tests pass.
+		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
+		 * icons that `init` only registers once. Replay the registration so order-dependent
+		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
+		 * collection at once, so drop whatever survived rather than topping up.
 		 */
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
+		$collections_registry = WP_Icon_Collections_Registry::get_instance();
+		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
+			if ( $collections_registry->is_registered( $collection_slug ) ) {
+				$collections_registry->unregister( $collection_slug );
+			}
 		}
-		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
-			gutenberg_register_default_icons();
-		}
+		gutenberg_register_default_icon_collections();
+		gutenberg_register_default_icons();
 
 		$collections = array(
 			'test-public'  => true,
