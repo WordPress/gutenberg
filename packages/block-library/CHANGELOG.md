@@ -6,6 +6,10 @@
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 
+### Internal
+
+-   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
