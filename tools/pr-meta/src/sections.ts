@@ -34,7 +34,8 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'props',
 		heading: '🎉 Props',
 		scope: 'pr-state',
-		budget: 8000,
+		// Generous: truncation cuts the trailer a committer copies.
+		budget: 20000,
 	},
 	{
 		id: 'labels',
@@ -52,21 +53,20 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'bundle-size',
 		heading: '📦 Bundle size',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 	},
 	{
 		id: 'performance',
 		heading: '⚡ Performance',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 		summary: 'Show the results',
 	},
 	{
 		id: 'flaky-tests',
 		heading: '🏁 Flaky tests',
 		scope: 'commit',
-		budget: 16000,
-		summary: 'Show the failures',
+		budget: 14000,
 	},
 ];
 
