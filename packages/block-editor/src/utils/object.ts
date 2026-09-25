@@ -87,3 +87,17 @@ export function uniqByProperty< T extends AnyObject >(
 		return seen.has( value ) ? false : seen.add( value );
 	} );
 }
+
+/**
+ * Whether a value is a plain object, meaning a non-null object that is not an
+ * array.
+ *
+ * @param value Value to test.
+ *
+ * @return Whether the value is a plain object.
+ */
+export function isPlainObject( value: unknown ): value is AnyObject {
+	return (
+		typeof value === 'object' && value !== null && ! Array.isArray( value )
+	);
+}
