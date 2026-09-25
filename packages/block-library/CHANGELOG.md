@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Gallery: Add an "Order by" control to the Settings panel of a static gallery, sorting its images in place by date or title with the same options the dynamic source offers. The control reflects the order the images are currently in and shows "Custom" once they are dragged into another. It replaces the "Randomize order" toggle: "Random" is now the last option of the "Order by" control in both static and dynamic galleries, and choosing any other order clears it. A dynamic gallery's "Order by" moves from the Source panel to the same Settings item, so the control keeps its place across modes and the Source panel only describes and detaches the source ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
