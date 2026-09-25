@@ -6,6 +6,7 @@ import transforms from './transforms';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -34,6 +35,7 @@ export const settings = {
 		],
 	},
 	deprecated,
+	variations,
 	transforms,
 	template: TEMPLATE,
 	templateInsertUpdatesSelection: true,
