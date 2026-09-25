@@ -28,14 +28,15 @@ type CanvasWidths = {
 /**
  * Measures the width of the editor canvas and of the surrounding editor
  * container, and keeps the floating notes overlay aligned with the visible
- * canvas edge by insetting it by the canvas scrollbar width (a runtime
- * measurement CSS can't read).
+ * canvas edge (runtime measurements CSS can't read).
  *
- * @param overlayRef Ref to the floating notes overlay element.
+ * @param overlayRef      Ref to the floating notes overlay element.
+ * @param isDevicePreview Whether the canvas simulates a device width.
  * @return The current canvas and editor widths, in pixels.
  */
 function useCanvasWidths(
-	overlayRef: RefObject< HTMLDivElement | null >
+	overlayRef: RefObject< HTMLDivElement | null >,
+	isDevicePreview: boolean
 ): CanvasWidths {
 	const [ widths, setWidths ] = useState< CanvasWidths >( {
 		canvasWidth: Infinity,
@@ -55,6 +56,31 @@ function useCanvasWidths(
 		);
 
 		let resizeObserver: ResizeObserver | undefined;
+
+		// A Desktop canvas can be narrower than the editor (after a resize)
+		// and is then centered in it, while the overlay is positioned against
+		// the editor. Measure the distance from the canvas edge to the editor
+		// edge so the notes stay over the space reserved inside the canvas.
+		// The device preview is left out on purpose: there the notes float
+		// over the backdrop at the editor edge.
+		const getCanvasEdgeOffset = () => {
+			if ( isDevicePreview || ! editor || ! iframe ) {
+				return 0;
+			}
+			const editorRect = editor.getBoundingClientRect();
+			const canvasRect = iframe.getBoundingClientRect();
+			const editorStart = editorRect.left + editor.clientLeft;
+			const editorEnd = editorStart + editor.clientWidth;
+			const isRTL =
+				editor.ownerDocument.defaultView?.getComputedStyle( overlay )
+					.direction === 'rtl';
+			return Math.max(
+				0,
+				isRTL
+					? canvasRect.left - editorStart
+					: editorEnd - canvasRect.right
+			);
+		};
 
 		const sync = () => {
 			const view = iframe?.contentWindow;
@@ -79,7 +105,7 @@ function useCanvasWidths(
 				view && root ? view.innerWidth - root.clientWidth : 0;
 			overlay.style.setProperty(
 				'inset-inline-end',
-				`${ scrollbarWidth }px`
+				`${ scrollbarWidth + getCanvasEdgeOffset() }px`
 			);
 		};
 
@@ -101,6 +127,10 @@ function useCanvasWidths(
 				if ( editor ) {
 					resizeObserver.observe( editor );
 				}
+				// The canvas moves within the editor when it is resized.
+				if ( iframe ) {
+					resizeObserver.observe( iframe );
+				}
 			}
 		};
 
@@ -114,7 +144,7 @@ function useCanvasWidths(
 			resizeObserver?.disconnect();
 			overlay.style.removeProperty( 'inset-inline-end' );
 		};
-	}, [ overlayRef ] );
+	}, [ overlayRef, isDevicePreview ] );
 
 	return widths;
 }
@@ -147,7 +177,10 @@ export function FloatingNotes( {
 	// simulated device width; the notes are editor chrome floating over the
 	// backdrop beside the previewed canvas, so they size to the editor
 	// container instead.
-	const { canvasWidth, editorWidth } = useCanvasWidths( overlayRef );
+	const { canvasWidth, editorWidth } = useCanvasWidths(
+		overlayRef,
+		isDevicePreview
+	);
 	const availableWidth = isDevicePreview ? editorWidth : canvasWidth;
 	const hasRoom = availableWidth >= MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES;
 	// Note actions route to the "All notes" sidebar while the canvas has no
