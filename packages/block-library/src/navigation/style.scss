@@ -54,11 +54,13 @@ $navigation-icon-size: 24px;
 	// This also fixes an issue where a navigation with an explicitly set color is overridden
 	// by link colors defined in Global Styles.
 	//
-	// Only when the navigation sets a color of its own, which is what there is
-	// to protect. Applying it unconditionally also outranks a Navigation Link
-	// color from Global Styles, which is generated inside `:root :where()` and
-	// so carries a single class worth of specificity.
-	&.has-text-color .wp-block-navigation-item__content.wp-block-navigation-item__content {
+	// A side effect is that it also outranks a Navigation Link text color set in
+	// Global Styles, which is generated inside `:root :where()` and so carries a
+	// single class worth of specificity. No specificity sits both above a parent
+	// group's link color and below that, so the two can't both be honoured from
+	// here. Per-instance Navigation Link colors are unaffected: a preset class
+	// carries `!important` and a custom color is inline.
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
 		color: inherit;
 	}
 
