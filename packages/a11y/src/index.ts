@@ -3,6 +3,7 @@ import addContainer from './script/add-container';
 import addIntroText from './script/add-intro-text';
 
 export { speak } from './shared/index';
+export { prefersReducedMotion } from './shared/prefers-reduced-motion';
 
 /**
  * Create the live regions.
