@@ -87,6 +87,8 @@ const expansion = ( state, action ) => {
  * @param {string}         props.description            Optional accessible description for the tree grid component.
  * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
+ * @param {?ComponentType} props.blockDetails           Component rendered in a row of its own under the row of `blockDetailsClientId`.
+ * @param {?string}        props.blockDetailsClientId   The block whose row shows `blockDetails`.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -103,6 +105,8 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
+		blockDetails: BlockDetails,
+		blockDetailsClientId,
 	},
 	ref
 ) {
@@ -308,6 +312,7 @@ function ListViewComponent(
 	const contextValue = useMemo(
 		() => ( {
 			AdditionalBlockContent,
+			BlockDetails,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			rootClientId,
@@ -317,6 +322,7 @@ function ListViewComponent(
 		} ),
 		[
 			AdditionalBlockContent,
+			BlockDetails,
 			BlockSettingsMenu,
 			instanceId,
 			rootClientId,
@@ -328,6 +334,7 @@ function ListViewComponent(
 	// Values that change while expanding, collapsing, or dragging.
 	const treeStateContextValue = useMemo(
 		() => ( {
+			blockDetailsClientId,
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
@@ -336,6 +343,7 @@ function ListViewComponent(
 			firstDraggedBlockIndex,
 		} ),
 		[
+			blockDetailsClientId,
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
@@ -445,6 +453,7 @@ export default forwardRef( ( props, ref ) => {
 			rootClientId={ null }
 			onSelect={ null }
 			additionalBlockContent={ null }
+			blockDetails={ null }
 			blockSettingsMenu={ undefined }
 		/>
 	);

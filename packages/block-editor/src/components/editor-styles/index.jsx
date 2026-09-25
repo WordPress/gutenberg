@@ -56,6 +56,39 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
+/**
+ * Names where an editor style comes from, so tools reading the canvas (the
+ * style inspector) can tell a person which part of the editor set a value.
+ *
+ * @param {Object} style Editor style entry.
+ * @return {string} Origin slug, written to `data-style-origin`.
+ */
+function getStyleOrigin( style ) {
+	if ( style.origin ) {
+		return style.origin;
+	}
+	switch ( style.__unstableType ) {
+		case 'variation':
+			return 'block-style-variation';
+		case 'custom-css':
+			return 'block-custom-css';
+		case 'presets':
+			return 'global-presets';
+		case 'user':
+			return style.isGlobalStyles
+				? 'global-custom-css'
+				: 'customizer-css';
+		case 'theme':
+			return style.isGlobalStyles ? 'global-styles' : 'theme';
+		case 'core':
+			return 'editor';
+	}
+	if ( style.isStyleOverride ) {
+		return 'block-supports';
+	}
+	return style.isGlobalStyles ? 'global-styles' : 'other';
+}
+
 function EditorStyles( { styles, scope, transformOptions } ) {
 	const overrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
@@ -81,7 +114,7 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 
 		for ( const [ id, override ] of orderedOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
-			const overrideWithId = { ...override, id };
+			const overrideWithId = { ...override, id, isStyleOverride: true };
 			if ( index === -1 ) {
 				_styles.push( overrideWithId );
 			} else {
@@ -89,11 +122,14 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 			}
 		}
 
+		const cssStyles = _styles.filter( ( style ) => style?.css );
 		return [
-			transformStyles(
-				_styles.filter( ( style ) => style?.css ),
-				scope,
-				transformOptions
+			transformStyles( cssStyles, scope, transformOptions ).map(
+				( css, index ) => ( {
+					css,
+					origin: getStyleOrigin( cssStyles[ index ] ),
+					variation: cssStyles[ index ].variation,
+				} )
 			),
 			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
@@ -109,8 +145,14 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 			<style
 				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
 			/>
-			{ transformedStyles.map( ( css, index ) => (
-				<style key={ index }>{ css }</style>
+			{ transformedStyles.map( ( { css, origin, variation }, index ) => (
+				<style
+					key={ index }
+					data-style-origin={ origin }
+					data-style-variation={ variation }
+				>
+					{ css }
+				</style>
 			) ) }
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"

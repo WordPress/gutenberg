@@ -6,7 +6,7 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useListViewTreeState } from './context';
+import { useListViewContext, useListViewTreeState } from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -93,6 +93,7 @@ function ListViewBranch( props ) {
 	const syncedBranch = isSyncedBranch || isParentSynced;
 
 	const {
+		blockDetailsClientId,
 		blockDropPosition,
 		blockDropTargetIndex,
 		firstDraggedBlockIndex,
@@ -100,6 +101,7 @@ function ListViewBranch( props ) {
 		expansionState,
 		draggedClientIds,
 	} = useListViewTreeState();
+	const { BlockDetails } = useListViewContext();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -237,6 +239,27 @@ function ListViewBranch( props ) {
 						isNesting={ isNesting }
 					/>
 				) }
+				{ showBlock &&
+					BlockDetails &&
+					clientId === blockDetailsClientId && (
+						<TreeGridRow
+							className="block-editor-list-view-block-details"
+							level={ level + 1 }
+							positionInSet={ 1 }
+							setSize={ 1 }
+						>
+							{ /* Keys pressed inside the details stay there, rather than moving through the tree. */ }
+							<td
+								role="gridcell"
+								colSpan={ 3 }
+								onKeyDown={ ( event ) =>
+									event.stopPropagation()
+								}
+							>
+								<BlockDetails clientId={ clientId } />
+							</td>
+						</TreeGridRow>
+					) }
 				{ showNestedBlocks && (
 					<ListViewBranch
 						parentId={ clientId }

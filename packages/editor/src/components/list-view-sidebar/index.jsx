@@ -1,6 +1,6 @@
 import {
-	__experimentalListView as ListView,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -13,11 +13,42 @@ import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { TabbedSidebar } = unlock( blockEditorPrivateApis );
+const {
+	TabbedSidebar,
+	StyleInspector,
+	PrivateListView: ListView,
+} = unlock( blockEditorPrivateApis );
+
+/**
+ * The style inspector, shown in List View under the row of the block it
+ * explains.
+ *
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of the block the row belongs to.
+ */
+function StyleInspectorDetails( { clientId } ) {
+	const { setIsStyleInspectorOpened } = unlock( useDispatch( editorStore ) );
+	return (
+		<StyleInspector
+			clientId={ clientId }
+			onClose={ () => setIsStyleInspectorOpened( false ) }
+		/>
+	);
+}
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
+	const { isStyleInspectorOpened, inspectedClientId } = useSelect(
+		( select ) => ( {
+			isStyleInspectorOpened: unlock(
+				select( editorStore )
+			).isStyleInspectorOpened(),
+			inspectedClientId:
+				select( blockEditorStore ).getSelectedBlockClientId(),
+		} ),
+		[]
+	);
 
 	// When closing the list view, focus should return to the toggle button.
 	const closeListView = useCallback( () => {
@@ -93,6 +124,12 @@ export default function ListViewSidebar() {
 									<ListView
 										dropZoneElement={ dropZoneElement }
 										focusOnMount
+										blockDetails={ StyleInspectorDetails }
+										blockDetailsClientId={
+											isStyleInspectorOpened
+												? inspectedClientId
+												: null
+										}
 									/>
 								</div>
 							</div>

@@ -766,3 +766,16 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Opens or closes the style inspector pane under List View.
+ *
+ * @param {boolean} isOpen Whether the pane should be open.
+ * @return {Object} Action object.
+ */
+export function setIsStyleInspectorOpened( isOpen ) {
+	return {
+		type: 'SET_IS_STYLE_INSPECTOR_OPENED',
+		isOpen,
+	};
+}

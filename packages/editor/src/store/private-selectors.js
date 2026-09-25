@@ -605,3 +605,13 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns whether the style inspector pane under List View is open.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the style inspector is open.
+ */
+export function isStyleInspectorOpened( state ) {
+	return state.styleInspectorPanel;
+}
