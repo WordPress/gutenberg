@@ -1,4 +1,4 @@
-import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
+import { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
 
 /**
  * Vite plugin that injects design-system token fallbacks into JS/TS files.
@@ -11,22 +11,22 @@ import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
  */
 const plugin = () => ( {
 	name: 'ds-token-fallbacks-js',
+	enforce: 'pre',
 	transform( code, id ) {
-		if ( ! /\.[mc]?[jt]sx?$/.test( id ) ) {
+		const [ filename, query = '' ] = id.split( '?' );
+		const params = new URLSearchParams( query );
+		if (
+			! /\.[mc]?[jt]sx?$/.test( filename ) ||
+			params.has( 'raw' ) ||
+			params.has( 'url' )
+		) {
 			return null;
 		}
 		if ( id.includes( 'node_modules' ) ) {
 			return null;
 		}
-		if ( ! code.includes( '--wpds-' ) ) {
-			return null;
-		}
-		// Sourcemap omitted: replacements are small, inline substitutions
-		// that preserve line structure, so the debugging impact is negligible.
-		return {
-			code: addFallbackToVar( code, { escapeQuotes: true } ),
-			map: null,
-		};
+		const result = transformDsTokenFallbacks( code, filename );
+		return result ? { code: result.code, map: result.map } : null;
 	},
 } );
 

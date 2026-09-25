@@ -178,6 +178,8 @@ export default function consoleTests() {
 				cleanup = () => console[ methodName ]( 'Cleanup message.' );
 			} );
 
+			// The unasserted console call must fail the test even after resetting mocks.
+			// eslint-disable-next-line vitest/expect-expect
 			test.fails(
 				'does not let afterEach reset hide an unexpected call',
 				() => {

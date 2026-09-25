@@ -10,6 +10,8 @@
 
 -   Notes: Keep a note attached to its block when leaving without saving. Adding or deleting a note triggers an autosave, and orphaned notes are re-attached from the current user's autosave on load ([#83511](https://github.com/WordPress/gutenberg/pull/83511)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+-   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
+-   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 
 ## 15.1.0 (2026-09-23)
 

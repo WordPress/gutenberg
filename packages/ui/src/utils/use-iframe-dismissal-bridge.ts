@@ -1,6 +1,12 @@
-import type { Menu as _Menu } from '@base-ui/react/menu';
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import type { RootProps } from './types';
+
+type Actions = { close: () => void };
+
+type OpenChangeHandler< EventDetails > = (
+	open: boolean,
+	eventDetails: EventDetails
+) => void;
 
 function getIframeDocument( iframe: HTMLIFrameElement ) {
 	try {
@@ -25,7 +31,7 @@ function forEachIframe(
 	element.querySelectorAll( 'iframe' ).forEach( callback );
 }
 
-function isInsideCurrentMenu( event: Event, trigger: Element ) {
+function isInsideCurrentPopup( event: Event, trigger: Element ) {
 	const target = event.target as Node | null;
 	const targetElement =
 		target?.nodeType === Node.ELEMENT_NODE
@@ -149,25 +155,34 @@ function useCloseOnIframePointerDown( {
 
 /*
  * Temporary bridge for https://github.com/mui/base-ui/issues/5410#issuecomment-5376507925.
- * Base UI 1.7.0 listens for outside presses only in the menu's owner document,
+ * Base UI listens for outside presses only in the popup's owner document,
  * but pointer events do not cross document boundaries. Once the minimum Base
  * UI version fixes this, delete this hook's import, call, and prop spread from
- * `Root`, then pass `handleOpenChange` directly to `_Menu.Root` again.
+ * `Menu.Root` and `Popover.Root`, then pass their `onOpenChange` handlers
+ * directly to the Base UI roots again.
  */
-export function useIframeDismissalBridge( {
+export function useIframeDismissalBridge<
+	TActions extends Actions,
+	TEventDetails extends {
+		isCanceled: boolean;
+		trigger: Element | undefined;
+	},
+>( {
 	actionsRef,
 	defaultOpen,
 	disabled,
 	modal,
 	onOpenChange,
 	open: openProp,
-}: Pick<
-	RootProps,
-	'actionsRef' | 'defaultOpen' | 'disabled' | 'modal' | 'open'
-> & {
-	onOpenChange: NonNullable< RootProps[ 'onOpenChange' ] >;
+}: {
+	actionsRef?: RefObject< TActions | null >;
+	defaultOpen?: boolean;
+	disabled?: boolean;
+	modal?: boolean | 'trap-focus';
+	onOpenChange: OpenChangeHandler< TEventDetails >;
+	open?: boolean;
 } ) {
-	const fallbackActionsRef = useRef< _Menu.Root.Actions | null >( null );
+	const fallbackActionsRef = useRef< TActions | null >( null );
 	const resolvedActionsRef = actionsRef ?? fallbackActionsRef;
 	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
 		defaultOpen ?? false
@@ -176,7 +191,7 @@ export function useIframeDismissalBridge( {
 	const open = openProp ?? uncontrolledOpen;
 	const handleIframePointerDown = useCallback(
 		( event: Event ) => {
-			if ( trigger && ! isInsideCurrentMenu( event, trigger ) ) {
+			if ( trigger && ! isInsideCurrentPopup( event, trigger ) ) {
 				resolvedActionsRef.current?.close();
 			}
 		},
@@ -189,7 +204,7 @@ export function useIframeDismissalBridge( {
 		ownerDocument: trigger?.ownerDocument ?? null,
 	} );
 
-	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
+	const handleOpenChange: OpenChangeHandler< TEventDetails > = (
 		nextOpen,
 		eventDetails
 	) => {
