@@ -6,7 +6,7 @@
  *
  * Extends the fields of Pages through the fields API, one self-contained
  * function per case. Every case registers its fields on
- * `gutenberg_fields_init`, the action the registry fires the first time its
+ * `gutenberg_fields_api_init`, the action the registry fires the first time its
  * fields are read, after `init`, once the default fields are registered:
  *
  * 1. `add_field_declarative`: a declarative field (`menu_order`), plain data,
@@ -50,7 +50,7 @@ function gutenberg_test_fields_api_add_field_declarative() {
 		)
 	);
 }
-add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_declarative' );
+add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_add_field_declarative' );
 
 /**
  * Case 2: a field (`reading_time`) whose value and render come from a script
@@ -61,7 +61,7 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_declar
  *   import map of the editor pages. A stylesheet cannot ride along with a
  *   script module, so the function enqueues it on every screen where the
  *   field can show.
- * - The field, on `gutenberg_fields_init`. The action fires whenever the
+ * - The field, on `gutenberg_fields_api_init`. The action fires whenever the
  *   registry is first read, during REST requests too, so its callback
  *   registers the field and nothing else.
  *
@@ -115,7 +115,7 @@ function gutenberg_test_fields_api_add_field_with_script_module() {
 		'gutenberg-test-fields-api/reading-time'
 	);
 }
-add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_script_module' );
+add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_add_field_with_script_module' );
 
 /**
  * Case 3: a patch of a default field (`comment_status`). Only the properties
@@ -123,7 +123,7 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_s
  * has. Hideable, so the field can be shown from the view options.
  *
  * A registration with the id of an existing field patches it, so the patch
- * must come after the default fields, registered on `gutenberg_fields_init`
+ * must come after the default fields, registered on `gutenberg_fields_api_init`
  * at priority 0: the default priority does. A patch registered before would
  * be patched by the default definition in turn. The assets go on `init`,
  * split from the field as in case 2.
@@ -166,7 +166,7 @@ function gutenberg_test_fields_api_update_field() {
 		'gutenberg-test-fields-api/comment-status'
 	);
 }
-add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_update_field' );
+add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_update_field' );
 
 /**
  * Case 4: a substitute for a default field (`author`). Unregistering drops
@@ -189,7 +189,7 @@ function gutenberg_test_fields_api_replace_field() {
 		)
 	);
 }
-add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_replace_field' );
+add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_replace_field' );
 
 /**
  * Case 5: a field (`subtitle`) whose value is data the plugin adds to the
@@ -199,7 +199,7 @@ add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_replace_field' )
  *   endpoint does not expose otherwise, so the record of every page carries
  *   `subtitle` and a request updating a page can set it. Hooked to
  *   `rest_api_init` on its own: a request to the Pages endpoint does not read
- *   the fields registry, so `gutenberg_fields_init` may never fire during it.
+ *   the fields registry, so `gutenberg_fields_api_init` may never fire during it.
  * - A declarative field like case 1. The field API reads the value from the
  *   record and, as the field is not read-only, the Quick Edit form saves the
  *   edits with the record, through the REST field.
@@ -225,7 +225,7 @@ function gutenberg_test_fields_api_add_field_with_data() {
 		)
 	);
 }
-add_action( 'gutenberg_fields_init', 'gutenberg_test_fields_api_add_field_with_data' );
+add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_add_field_with_data' );
 
 add_action(
 	'rest_api_init',

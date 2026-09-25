@@ -18,7 +18,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
-	 * the defaults; the next read fires `gutenberg_fields_init` again and
+	 * the defaults; the next read fires `gutenberg_fields_api_init` again and
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
@@ -369,22 +369,22 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Reading the registry fires `gutenberg_fields_init` once, whichever
+	 * Reading the registry fires `gutenberg_fields_api_init` once, whichever
 	 * getter is read first and however many times it is read.
 	 */
 	public function test_reading_the_registry_fires_the_action_once() {
 		$registry = Gutenberg_Fields_Registry::get_instance();
 		$registry->reset();
-		$fired = did_action( 'gutenberg_fields_init' );
+		$fired = did_action( 'gutenberg_fields_api_init' );
 
 		gutenberg_get_registered_fields( 'postType', 'page' );
-		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_init' ), 'The first read fires the action.' );
+		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_api_init' ), 'The first read fires the action.' );
 
 		gutenberg_get_registered_fields( 'postType', 'post' );
 		gutenberg_get_registered_field_modules( 'postType', 'page' );
 		gutenberg_get_all_registered_field_modules();
 		$registry->get_all_registered();
-		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_init' ), 'Further reads do not fire it again.' );
+		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_api_init' ), 'Further reads do not fire it again.' );
 	}
 
 	/**
@@ -395,13 +395,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$callback = static function ( $registry ) use ( &$received ) {
 			$received = $registry;
 		};
-		add_action( 'gutenberg_fields_init', $callback );
+		add_action( 'gutenberg_fields_api_init', $callback );
 
 		try {
 			Gutenberg_Fields_Registry::get_instance()->reset();
 			gutenberg_get_registered_fields( 'postType', 'page' );
 		} finally {
-			remove_action( 'gutenberg_fields_init', $callback );
+			remove_action( 'gutenberg_fields_api_init', $callback );
 		}
 
 		$this->assertSame( Gutenberg_Fields_Registry::get_instance(), $received );
@@ -426,13 +426,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			);
 			gutenberg_unregister_fields( 'postType', 'page', array( 'author' ) );
 		};
-		add_action( 'gutenberg_fields_init', $callback );
+		add_action( 'gutenberg_fields_api_init', $callback );
 
 		try {
 			Gutenberg_Fields_Registry::get_instance()->reset();
 			$fields = gutenberg_get_registered_fields( 'postType', 'page' );
 		} finally {
-			remove_action( 'gutenberg_fields_init', $callback );
+			remove_action( 'gutenberg_fields_api_init', $callback );
 		}
 
 		$fields = array_column( $fields, null, 'id' );
@@ -448,11 +448,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_registering_does_not_fire_the_action() {
 		Gutenberg_Fields_Registry::get_instance()->reset();
-		$fired = did_action( 'gutenberg_fields_init' );
+		$fired = did_action( 'gutenberg_fields_api_init' );
 
 		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ) );
 
-		$this->assertSame( $fired, did_action( 'gutenberg_fields_init' ) );
+		$this->assertSame( $fired, did_action( 'gutenberg_fields_api_init' ) );
 	}
 
 	/**
@@ -462,13 +462,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_resetting_fires_the_action_again_on_the_next_read() {
 		$registry = Gutenberg_Fields_Registry::get_instance();
 		gutenberg_get_registered_fields( 'postType', 'page' );
-		$fired = did_action( 'gutenberg_fields_init' );
+		$fired = did_action( 'gutenberg_fields_api_init' );
 
 		$registry->reset();
-		$this->assertSame( $fired, did_action( 'gutenberg_fields_init' ), 'Resetting does not fire the action by itself.' );
+		$this->assertSame( $fired, did_action( 'gutenberg_fields_api_init' ), 'Resetting does not fire the action by itself.' );
 
 		gutenberg_get_registered_fields( 'postType', 'page' );
-		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_init' ) );
+		$this->assertSame( $fired + 1, did_action( 'gutenberg_fields_api_init' ) );
 	}
 
 	/**
