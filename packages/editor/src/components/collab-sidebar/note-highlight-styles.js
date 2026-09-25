@@ -181,9 +181,8 @@ export function buildHighlightCss( threads, selectedId = null ) {
 	 * the author color into the system highlight, so it has to be dropped here
 	 * where the per-note rules can be outranked, not in the reset above), and a
 	 * dashed outline in the system text color instead - the same fallback the
-	 * block-level highlights use. The underline is restated in that color too,
-	 * since an author `color-mix()` is left alone by the forcing and can land
-	 * anywhere against a system canvas.
+	 * block-level highlights use. The forcing already paints the underline in
+	 * that color; it is restated so the intent is visible.
 	 *
 	 * Emitted last and carrying the same specificity as the per-note rules, so
 	 * it is the cascade and not `!important` that settles which one applies.
@@ -216,8 +215,10 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * Every other block (images, covers, other media whose editables are nested
  * inside non-block containers) paints the tint onto an `::after` overlay
  * instead - a tinted veil with the rule drawn all the way around - because a
- * background behind e.g. an image is hidden by the image itself. The overlay
- * ignores pointer events, so the block stays editable through it.
+ * background behind e.g. an image is hidden by the image itself. A container
+ * holding no editable text at all (a group of images, a gallery) gets the
+ * overlay too. A container mixing text and media only tints its text. The
+ * overlay ignores pointer events, so the block stays editable through it.
  *
  * Both are present at rest, with no hover or selected variant, so an annotated
  * block is legible as one without clicking anything. The tint covers a whole
@@ -226,11 +227,9 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * draws the block's own outline instead, which is what already signals "this
  * block" everywhere else in the editor.
  *
- * Under forced colors both tints and shadows are stripped by the browser, so
- * each annotated block falls back to a dashed outline - dashed so it cannot be
- * mistaken for the solid outline the editor draws on the selected block - and
- * its underline is restated in the system text color, which the forcing does
- * not do for an author `color-mix()`.
+ * Under forced colors the tints are stripped by the browser, so each annotated
+ * block falls back to a dashed outline - dashed so it cannot be mistaken for
+ * the solid outline the editor draws on the selected block.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
@@ -239,6 +238,7 @@ export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
 	const blockSelectors = [];
 	const textSelectors = [];
+	const overlaySelectors = [];
 	for ( const highlight of blockHighlights ?? [] ) {
 		if ( ! highlight?.clientId ) {
 			continue;
@@ -264,29 +264,50 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		textSelectors.push( textSel, leafSel );
 		rules.push( `${ textSel }{${ textDeclarations }}` );
 		rules.push( `${ leafSel }{${ textDeclarations }}` );
-		// Block wrappers are position:relative and the overlay sits above the
-		// content, so `inset:0` hugs the block exactly with no reflow.
+		// Non-text blocks, plus containers with no text to tint (a group of
+		// images, a gallery, columns of media), which the leaf rule above
+		// cannot mark. A multi-selected block is left out so the editor's
+		// selection overlay owns the pseudo-element outright.
+		const veilSel = `${ blockSel }:not(.block-editor-rich-text__editable):not(.is-multi-selected)`;
+		const veilSelectors = [
+			`${ veilSel }:not(:has(> [data-block]))::after`,
+			`${ veilSel }:has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`,
+		];
+		overlaySelectors.push( ...veilSelectors );
+		/*
+		 * Block wrappers are position:relative and the overlay sits above the
+		 * content, so `inset:0` hugs the block exactly with no reflow.
+		 *
+		 * The editor draws its hover, highlight and focus outline on this same
+		 * `::after` (the `selected-block-focus` mixin), setting `outline` and
+		 * `box-shadow`. The rule is a border so the two share no property and
+		 * both show together, whatever the specificity or load order.
+		 * (`::before` is not free either: cover, spacer and separator use it.)
+		 */
 		rules.push(
-			`${ blockSel }:not(.block-editor-rich-text__editable):not(:has(> [data-block]))::after{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };box-shadow:inset 0 0 0 ${ RULE_THICKNESS } ${ ruleColor(
+			`${ veilSelectors.join(
+				','
+			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };border:${ RULE_THICKNESS } solid ${ ruleColor(
 				color
 			) };}`
 		);
 	}
 	if ( blockSelectors.length > 0 ) {
 		/*
-		 * The underline is the one part of the resting treatment the forcing
-		 * leaves alone (an author `color-mix()` is not remapped), so it would
-		 * keep a palette color that can land anywhere against a system canvas;
-		 * restating it in the system text color keeps every marking in the
-		 * palette the mode allows. Same selectors as the resting rules, so it
-		 * is source order and not `!important` that settles the cascade.
+		 * The forcing already paints the underline in the system text color;
+		 * it is restated so the intent is visible. The overlay's border is
+		 * dropped, since the forcing would turn it into a solid ring beside
+		 * the dashed outline. Same selectors as the resting rules, so it is
+		 * source order and not `!important` that settles the cascade.
 		 */
 		rules.push(
 			`@media (forced-colors: active){${ blockSelectors.join(
 				','
 			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}${ textSelectors.join(
 				','
-			) }{text-decoration-color:CanvasText;}}`
+			) }{text-decoration-color:CanvasText;}${ overlaySelectors.join(
+				','
+			) }{border:none;}}`
 		);
 	}
 	return rules.join( '' );

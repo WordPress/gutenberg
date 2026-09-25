@@ -47,11 +47,14 @@ test.describe( 'Block Notes', () => {
 	 * @param {number}                             rgb.r   Red channel.
 	 * @param {number}                             rgb.g   Green channel.
 	 * @param {number}                             rgb.b   Blue channel.
+	 * @param {string|null}                        pseudo  Pseudo-element to read, if any.
 	 * @return {Promise<string>} 'tint', or a description.
 	 */
-	async function readTint( locator, { r, g, b } ) {
+	async function readTint( locator, { r, g, b }, pseudo = null ) {
 		const bg = await locator.evaluate(
-			( el ) => window.getComputedStyle( el ).backgroundColor
+			( el, pseudoElt ) =>
+				window.getComputedStyle( el, pseudoElt ).backgroundColor,
+			pseudo
 		);
 		const m = bg.match(
 			/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
@@ -2092,8 +2095,9 @@ test.describe( 'Block Notes', () => {
 			}
 		} );
 
-		test( 'overlays a non-text block with the tint and an all-around rule at rest', async ( {
+		test( 'overlays a non-text block with the tint and an all-around rule, alongside the selection outline', async ( {
 			editor,
+			page,
 			requestUtils,
 			blockNoteUtils,
 		} ) => {
@@ -2123,40 +2127,85 @@ test.describe( 'Block Notes', () => {
 				image.evaluate( ( el ) => {
 					const style = window.getComputedStyle( el, '::after' );
 					return {
-						background: style.backgroundColor,
-						shadow: style.boxShadow,
+						border: `${ style.borderTopWidth } ${ style.borderTopStyle } ${ style.borderTopColor }`,
+						outlineStyle: style.outlineStyle,
 						pointerEvents: style.pointerEvents,
 					};
 				} );
 
-			// Same tint classification as readTint, applied to the overlay:
-			// the author color at the single allowed alpha (≈ 0x40).
+			// Same tint classification as the text blocks, read off the
+			// overlay: the author color at the single allowed alpha.
 			await expect
-				.poll( async () => {
-					const { background } = await readOverlay();
-					const m = background.match(
-						/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-					);
-					if ( ! m ) {
-						return background;
-					}
-					const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
-					return Number( m[ 1 ] ) === rgb.r &&
-						Number( m[ 2 ] ) === rgb.g &&
-						Number( m[ 3 ] ) === rgb.b &&
-						alpha > 0.2 &&
-						alpha < 0.35
-						? 'tint'
-						: background;
-				} )
+				.poll( () => readTint( image, rgb, '::after' ) )
 				.toBe( 'tint' );
 
-			// The all-around rule is inset so it cannot reflow the canvas; the
-			// overlay must ignore pointer events or it would swallow every
-			// click on the block.
-			const { shadow, pointerEvents } = await readOverlay();
-			expect( shadow ).toContain( 'inset' );
-			expect( pointerEvents ).toBe( 'none' );
+			// The all-around rule is inside the overlay so it cannot reflow the
+			// canvas; the overlay must ignore pointer events or it would
+			// swallow every click on the block.
+			const atRest = await readOverlay();
+			// Chrome snaps border widths to device pixels, so only the style is exact.
+			expect( atRest.border ).toMatch( /^[1-9][\d.]*px solid / );
+			expect( atRest.pointerEvents ).toBe( 'none' );
+
+			/*
+			 * The editor draws its highlight and focus outline on the same
+			 * `::after`. Both treatments have to show together: the note's
+			 * tint and rule stay put while the editor's solid outline marks
+			 * the block, whether it is highlighted from the sidebar or
+			 * focused in the canvas.
+			 */
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Whole image note' } )
+				.click();
+			await expect( image ).toHaveClass( /is-highlighted/ );
+			expect( await readTint( image, rgb, '::after' ) ).toBe( 'tint' );
+			let selected = await readOverlay();
+			expect( selected.border ).toBe( atRest.border );
+			expect( selected.outlineStyle ).toBe( 'solid' );
+
+			await image.focus();
+			await expect( image ).toBeFocused();
+			expect( await readTint( image, rgb, '::after' ) ).toBe( 'tint' );
+			selected = await readOverlay();
+			expect( selected.border ).toBe( atRest.border );
+			expect( selected.outlineStyle ).toBe( 'solid' );
+		} );
+
+		test( 'overlays a container that holds no editable text', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			// Columns of images have no text for the leaf rule to tint, so
+			// they need the overlay or the note would leave no mark in the
+			// canvas.
+			await editor.insertBlock( {
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [ { name: 'core/image' } ],
+					},
+				],
+			} );
+			const columns = editor.canvas.getByRole( 'document', {
+				name: 'Block: Columns',
+			} );
+			await editor.selectBlocks( columns );
+			await blockNoteUtils.addNote( 'Columns of images note' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect
+				.poll( () => readTint( columns, rgb, '::after' ) )
+				.toBe( 'tint' );
 		} );
 
 		test( 'clears the tint when the block-level note is deleted', async ( {
