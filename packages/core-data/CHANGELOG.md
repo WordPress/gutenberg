@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment). An unscoped search given no `perPage` returns every title holding each word typed rather than cutting the merged results, which cannot be paged through, so no matching result is lost ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+
 ## 8.1.0 (2026-09-23)
 
 ### Bug Fixes
