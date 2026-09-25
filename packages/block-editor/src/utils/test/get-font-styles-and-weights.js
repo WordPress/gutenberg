@@ -658,10 +658,13 @@ describe( 'getFontStylesAndWeights', () => {
 	} );
 
 	it( 'should resolve an oblique range descriptor to a style the property accepts', () => {
-		// Roboto Flex: a `slnt` axis of -10 to 0 declared as a descriptor range.
+		/*
+		 * Roboto Flex, whose `slnt` axis runs -10 to 0. `font-style: oblique`
+		 * takes the angle with the sign flipped, so the face declares 0 to 10.
+		 */
 		const fontFamilyFaces = [
 			{
-				fontStyle: 'oblique -10deg 0deg',
+				fontStyle: 'oblique 0deg 10deg',
 				fontWeight: '100 1000',
 			},
 		];
