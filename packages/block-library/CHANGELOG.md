@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ## 11.1.0 (2026-09-23)
