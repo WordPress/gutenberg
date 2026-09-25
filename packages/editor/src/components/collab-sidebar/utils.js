@@ -431,6 +431,48 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Picks the threads the block toolbar indicator represents: every unresolved
+ * thread on the block, falling back to all of them when none are unresolved.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Array} Threads the indicator should aggregate.
+ */
+export function pickIndicatorNotes( threads ) {
+	const unresolved = threads.filter( ( thread ) => thread.status === 'hold' );
+	return unresolved.length > 0 ? unresolved : threads;
+}
+
+/**
+ * Collects the distinct participants across a set of threads: each thread's
+ * author plus everyone who replied, in chronological order.
+ *
+ * @param {Array} threads Thread objects, each with an optional `reply` list.
+ * @return {Array} Participants as `{ id, name, avatar }`, first contribution first.
+ */
+export function getThreadParticipants( threads ) {
+	const entries = threads
+		.flatMap( ( thread ) => [ thread, ...( thread.reply ?? [] ) ] )
+		.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
+
+	const participantsMap = new Map();
+	for ( const entry of entries ) {
+		if ( ! entry.author_name || participantsMap.has( entry.author ) ) {
+			continue;
+		}
+
+		participantsMap.set( entry.author, {
+			id: entry.author,
+			name: entry.author_name,
+			avatar:
+				entry.author_avatar_urls?.[ '48' ] ||
+				entry.author_avatar_urls?.[ '96' ],
+		} );
+	}
+
+	return Array.from( participantsMap.values() );
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata
