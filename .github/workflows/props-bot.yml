@@ -32,12 +32,11 @@ on:
 # Cancels all previous runs for a pull request that have not completed.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. `github.sha` would not do: on `issue_comment` it is the default
-    # branch tip, the same value for every issue and pull request in the
-    # repository, so one comment anywhere would cancel every other run.
-    group: ${{ github.workflow }}-${{ github.event.number || github.event.issue.number || github.event.pull_request.number || github.run_id }}
-    # An unrelated label event would otherwise cancel a queued props update.
-    cancel-in-progress: ${{ github.event.action != 'labeled' || github.event.label.name == 'props-bot' }}
+    # places. A run that will do no props work takes a group of its own: a
+    # group replaces its pending run whatever `cancel-in-progress` says, so
+    # sharing one would drop a props update that is only waiting its turn.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
