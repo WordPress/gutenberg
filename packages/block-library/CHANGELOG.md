@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
 
 ## 11.1.0 (2026-09-23)
