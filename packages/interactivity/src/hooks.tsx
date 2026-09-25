@@ -220,10 +220,26 @@ const resolve = ( path: string, namespace: string ) => {
 
 	try {
 		const pathParts = path.split( '.' );
-		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
+		const result = pathParts.reduce( ( acc, key ) => acc[ key ], current );
+
+		// Show a warning when path is invalid or resolves to undefined.
+		if ( globalThis.SCRIPT_DEBUG ) {
+			if ( typeof result === 'undefined' ) {
+				warn(
+					`"${ path }" in "${ namespace }" namespace resolved to "undefined".`
+				);
+			}
+		}
+
+		return result;
 	} catch ( e ) {
 		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
+		}
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn(
+				`Failed to resolve "${ path }" in "${ namespace }" namespace.`
+			);
 		}
 	}
 };
