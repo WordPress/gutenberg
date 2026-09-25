@@ -1,8 +1,6 @@
 # Autocomplete
 
-<div class="callout callout-alert">
-This component is deprecated. In the block editor, pass completers to the <code>RichText</code> component through its <code>autocompleters</code> prop.
-</div>
+<p class="callout callout-alert">This component is deprecated. In the block editor, pass completers to the `RichText` component through its `autocompleters` prop.</p>
 
 This component is used to provide autocompletion support for a child input component.
 
