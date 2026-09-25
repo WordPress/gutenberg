@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DateFormatPicker from '../';
 
 export default {
-	title: 'BlockEditor/DateFormatPicker',
+	id: 'blockeditor-dateformatpicker',
+	title: 'Editor/Block Editor/DateFormatPicker',
 	component: DateFormatPicker,
 	parameters: {
 		docs: {

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import type { ConnectionStatus } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
@@ -225,8 +218,9 @@ export const getTemplateId = createRegistrySelector(
 			if ( ! templates ) {
 				return;
 			}
-			const id = templates.find( ( { slug } ) => slug === 'front-page' )
-				?.id;
+			const id = templates.find(
+				( { slug } ) => slug === 'front-page'
+			)?.id;
 			if ( id ) {
 				return id;
 			}

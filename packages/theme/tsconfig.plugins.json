@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"declarationDir": "build-types",
 		"moduleResolution": "bundler",
@@ -9,6 +9,8 @@
 	},
 	"include": [
 		"esbuild-plugins/*.mjs",
+		"js-plugins/*.mjs",
+		"lightningcss-plugins/*.mjs",
 		"postcss-plugins/*.mjs",
 		"prebuilt/js/*.mjs",
 		"stylelint-plugins/*.mjs",

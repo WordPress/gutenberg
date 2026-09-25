@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isShallowEqualObjects from './objects';
 import isShallowEqualArrays from './arrays';
 

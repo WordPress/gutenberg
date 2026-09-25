@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { InputChangeCallback } from './types';
 
 /**

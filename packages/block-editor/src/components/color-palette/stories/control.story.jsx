@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ColorPaletteControl from '../control';
 
 export default {
-	title: 'BlockEditor/ColorPaletteControl',
+	id: 'blockeditor-colorpalettecontrol',
+	title: 'Editor/Block Editor/ColorPaletteControl',
 	component: ColorPaletteControl,
 	parameters: {
 		controls: { expanded: true },

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useContext } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { InputEventContext } from './contexts';
 
 export function RichTextInputEvent( { inputType, onInput } ) {

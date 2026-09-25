@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { backup } from '@wordpress/icons';
 import { dispatch, select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,18 +14,8 @@ import {
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
-
-declare global {
-	interface Window {
-		__experimentalTemplateActivate?: boolean;
-	}
-}
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
@@ -182,17 +169,8 @@ const revertTemplate = async (
 
 const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
-	label: __( 'Reset' ),
+	label: __( 'Reset…' ),
 	isEligible: ( item ) => {
-		if ( window?.__experimentalTemplateActivate ) {
-			return (
-				item.type === 'wp_template_part' &&
-				item?.source === 'custom' &&
-				item?.has_theme_file
-			);
-		}
-
-		// When experiment is disabled: use wp/6.9 logic for both templates and template parts.
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === 'custom' &&
@@ -228,12 +206,12 @@ const resetPostAction: Action< Template | TemplatePart > = {
 								/* translators: %d: The number of items. */
 								__( '%d items reset.' ),
 								items.length
-						  )
+							)
 						: sprintf(
 								/* translators: %s: The template/part's name. */
 								__( '"%s" reset.' ),
 								getItemTitle( items[ 0 ] )
-						  ),
+							),
 					{
 						type: 'snackbar',
 						id: 'revert-template-action',
@@ -246,19 +224,19 @@ const resetPostAction: Action< Template | TemplatePart > = {
 						items.length === 1
 							? __(
 									'An error occurred while reverting the template.'
-							  )
+								)
 							: __(
 									'An error occurred while reverting the templates.'
-							  );
+								);
 				} else {
 					fallbackErrorMessage =
 						items.length === 1
 							? __(
 									'An error occurred while reverting the template part.'
-							  )
+								)
 							: __(
 									'An error occurred while reverting the template parts.'
-							  );
+								);
 				}
 
 				const typedError = error as CoreDataError;

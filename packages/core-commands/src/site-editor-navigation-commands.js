@@ -1,29 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	post,
-	page,
-	layout,
-	symbol,
-	symbolFilled,
-	styles,
-	navigation,
-	brush,
-} from '@wordpress/icons';
+import { post, page, layout, symbolFilled } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
@@ -289,7 +273,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				result.push( {
 					name: 'core/edit-site/open-template-parts',
 					label: __( 'Go to: Template parts' ),
-					icon: symbolFilled,
 					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -348,7 +331,6 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-styles',
 					label: __( 'Go to: Styles' ),
-					icon: styles,
 					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -368,7 +350,6 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-navigation',
 					label: __( 'Go to: Navigation' ),
-					icon: navigation,
 					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -388,7 +369,6 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-templates',
 					label: __( 'Go to: Templates' ),
-					icon: layout,
 					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -410,7 +390,6 @@ const getSiteEditorBasicNavigationCommands = () =>
 				result.push( {
 					name: 'core/edit-site/open-patterns',
 					label: __( 'Go to: Patterns' ),
-					icon: symbol,
 					category: 'view',
 					callback: ( { close } ) => {
 						if ( canCreateTemplate ) {
@@ -480,7 +459,6 @@ const getGlobalStylesOpenCssCommands = () =>
 				{
 					name: 'core/open-styles-css',
 					label: __( 'Open custom CSS' ),
-					icon: brush,
 					category: 'view',
 					callback: ( { close } ) => {
 						close();

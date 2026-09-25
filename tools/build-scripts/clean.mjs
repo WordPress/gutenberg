@@ -1,13 +1,9 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-import spawn from 'cross-spawn';
 import path from 'path';
-import { rimraf } from 'rimraf';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
+import spawn from 'cross-spawn';
+import { rimraf } from 'rimraf';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );

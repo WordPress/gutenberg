@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'RichText (@firefox, @webkit)', () => {
@@ -40,7 +37,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'primary+a' );
@@ -60,7 +57,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Some ' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -82,7 +79,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+i' );
@@ -105,7 +102,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
@@ -125,12 +122,44 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( count ).toBe( 1 );
 	} );
 
+	test( 'should highlight the active format when the canvas root is the editing host', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// With more than one block, the canvas root is the editing host and
+		// has focus, not the field.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'a' );
+
+		expect(
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement === document.body )
+		).toBe( true );
+
+		const boundary = editor.canvas.locator(
+			'[data-rich-text-format-boundary]'
+		);
+		await expect( boundary ).toHaveCount( 1 );
+		await expect( boundary ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Some ' );
 		await editor.clickBlockToolbarButton( 'Bold' );
@@ -152,7 +181,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A `backtick`' );
 
@@ -175,7 +204,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '`a`' );
 		// Wait until the backtick transformation is recorded as an automatic change.
@@ -190,12 +219,41 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should retain focus after backspace-undo of heading prefix transform', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '## ' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/heading' } ] );
+
+		await page.keyboard.press( 'Backspace' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		await page.keyboard.type( 'hello' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '## hello' },
+			},
+		] );
+	} );
+
 	test( 'should not undo backtick transform with backspace after typing', async ( {
 		page,
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.type( 'b' );
@@ -210,7 +268,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '`a`' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
@@ -228,7 +286,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A `backtick` and more.' );
 
@@ -246,7 +304,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A selection test.' );
 		await page.keyboard.press( 'Home' );
@@ -278,7 +336,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -373,7 +431,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
@@ -405,7 +463,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '12' );
@@ -429,7 +487,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Tab' );
@@ -452,7 +510,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		// Simulate moving focus to a different app, then moving focus back,
@@ -485,7 +543,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -515,7 +573,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+a' );
@@ -538,7 +596,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -565,7 +623,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -587,7 +645,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
@@ -616,7 +674,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Add text and select to color.
@@ -673,7 +731,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		// Create two lines of text in a paragraph.
 		await page.keyboard.type( '1' );
@@ -724,7 +782,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Create an indented list of two lines.
@@ -775,7 +833,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 	test( 'should navigate around emoji', async ( { page, editor } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '🍓' );
 		// Only one press on arrow left should be required to move in front of
@@ -795,7 +853,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		// Playwright doesn't support composition, so emulate it by inserting
 		// text in the DOM directly, setting selection in the right place, and
@@ -835,7 +893,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
@@ -865,6 +923,79 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				name: 'core/paragraph',
 				attributes: { content: '<strong>1</strong>-<em>2</em>' },
 			},
+		] );
+	} );
+
+	test( 'should not focus the text when clicking the padding of a flex group', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', orientation: 'vertical' },
+				style: {
+					spacing: {
+						padding: {
+							top: '60px',
+							right: '40px',
+							bottom: '60px',
+							left: '40px',
+						},
+					},
+				},
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Outside' },
+		} );
+		await editor.canvas.getByText( 'Outside' ).click();
+
+		const group = editor.canvas.locator( '[data-type="core/group"]' );
+		const box = await group.boundingBox();
+		// Click inside the group's top padding, above the paragraph.
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+
+		await expect( group ).toBeFocused();
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/group' );
+
+		// Click the padding again while the group already has focus but is
+		// no longer selected, so the click does not move focus.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+		await page.mouse.click( box.x + box.width / 2, box.y + 20 );
+		await expect( group ).toBeFocused();
+
+		// The paragraph must not have received the caret.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inside' },
+					},
+				],
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
 		] );
 	} );
 } );

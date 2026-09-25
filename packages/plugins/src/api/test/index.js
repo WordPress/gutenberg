@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { memo } from '@wordpress/element';
 import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 

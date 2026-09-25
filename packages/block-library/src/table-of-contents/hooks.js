@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';

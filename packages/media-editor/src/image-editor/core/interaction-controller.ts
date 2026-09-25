@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, Size } from './types';
 import {
 	DEFAULT_KEYBOARD_STEP,
@@ -699,13 +696,13 @@ export class InteractionController {
 					panSize.width > 0
 						? ( moveEvent.touches[ 0 ].clientX -
 								touch.lastTouchX ) /
-						  panSize.width
+							panSize.width
 						: 0;
 				const deltaY =
 					panSize.height > 0
 						? ( moveEvent.touches[ 0 ].clientY -
 								touch.lastTouchY ) /
-						  panSize.height
+							panSize.height
 						: 0;
 
 				const { pan: newCrop } = restrictPanZoom(
@@ -959,5 +956,13 @@ export class InteractionController {
 		this.drag = null;
 		this.touch = null;
 		this.lastTap = null;
+		// Reset the gesture bookkeeping too. The timers above are cancelled
+		// rather than run, so these flags would otherwise stay set: a stale
+		// `wheelGestureActive` suppresses the next wheel gesture's start,
+		// and `setStatus` dedupes against `isDragging` / `isZooming`, so a
+		// stale value swallows the next real change.
+		this.wheelGestureActive = false;
+		this.isDragging = false;
+		this.isZooming = false;
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getRectangleFromRange from './get-rectangle-from-range';
 import { assertIsDefined } from '../utils/assert-is-defined';
 

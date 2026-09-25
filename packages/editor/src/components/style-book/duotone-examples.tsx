@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalGrid as Grid } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { Duotone } from './types';
 
 const DuotoneExamples = ( { duotones }: { duotones: Duotone[] } ) => {

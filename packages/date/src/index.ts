@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import type { Moment } from 'moment';
 import momentLib from 'moment';
 import 'moment-timezone/moment-timezone.js';
 import 'moment-timezone/moment-timezone-utils.js';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-/**
- * Internal dependencies
- */
 import type { DateSettings } from './types';
 
 export type * from './types';
@@ -634,7 +624,7 @@ function buildMoment(
 		return isUTCOffset( timezone )
 			? dateMoment.utcOffset( timezone )
 			: // A false isUTCOffset() guarantees that timezone is a string.
-			  dateMoment.tz( timezone as string );
+				dateMoment.tz( timezone as string );
 	}
 
 	if ( settings.timezone.string ) {

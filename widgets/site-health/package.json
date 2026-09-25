@@ -7,9 +7,9 @@
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/primitives": "file:../../packages/primitives",
-		"@wordpress/ui": "file:../../packages/ui"
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/widget-primitives": "file:../../packages/widget-primitives"
 	},
 	"devDependencies": {
 		"@types/react": "^18.3.27"

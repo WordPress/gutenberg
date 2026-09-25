@@ -1,6 +1,7 @@
-/** @typedef {import('@octokit/rest')} GitHub */
-/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
+/** @typedef {import('@octokit/rest').Octokit} GitHub */
+/** @typedef {import('@octokit/rest').RestEndpointMethodTypes} RestEndpointMethodTypes */
+/** @typedef {RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]} IssuesListForRepoResponseItem */
+/** @typedef {RestEndpointMethodTypes['issues']['listMilestones']['response']['data'][number]} OktokitIssuesListMilestonesForRepoResponseItem */
 
 /**
  * @typedef {"open"|"closed"|"all"} IssueState
@@ -17,13 +18,13 @@
  * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
  */
 async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
+	const options = octokit.issues.listMilestones.endpoint.merge( {
 		owner,
 		repo,
 	} );
 
 	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
+	 * @type {AsyncIterableIterator<{ data: OktokitIssuesListMilestonesForRepoResponseItem[] }>}
 	 */
 	const responses = octokit.paginate.iterator( options );
 
@@ -70,12 +71,12 @@ async function getIssuesByMilestone(
 	} );
 
 	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
+	 * @type {AsyncIterableIterator<{ data: IssuesListForRepoResponseItem[] }>}
 	 */
 	const responses = octokit.paginate.iterator( options );
 
 	/**
-	 * @type {import('@octokit/rest').IssuesListForRepoResponse}
+	 * @type {IssuesListForRepoResponseItem[]}
 	 */
 	const pulls = [];
 
@@ -90,15 +91,7 @@ async function getIssuesByMilestone(
 		return pulls.filter(
 			( pull ) =>
 				pull.closed_at &&
-				closedSinceTimestamp <
-					new Date(
-						// The ugly `as unknown as string` cast is required because of
-						// https://github.com/octokit/plugin-rest-endpoint-methods.js/issues/64
-						// Fixed in Octokit v18.1.1, see https://github.com/WordPress/gutenberg/pull/29043
-						/** @type {string} */ (
-							/** @type {unknown} */ ( pull.closed_at )
-						)
-					)
+				closedSinceTimestamp < new Date( pull.closed_at )
 		);
 	}
 

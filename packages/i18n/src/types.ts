@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type sprintf from '@tannin/sprintf';
 import { type TanninDomainMetadata } from 'tannin';
 

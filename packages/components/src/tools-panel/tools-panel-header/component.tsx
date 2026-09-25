@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
@@ -107,12 +96,12 @@ const OptionalControlsGroup = ( {
 							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
 							__( 'Hide and reset %s' ),
 							label
-					  )
+						)
 					: sprintf(
 							// translators: %s: The name of the control to display e.g. "Padding".
 							_x( 'Show %s', 'input control' ),
 							label
-					  );
+						);
 
 				return (
 					<MenuItem

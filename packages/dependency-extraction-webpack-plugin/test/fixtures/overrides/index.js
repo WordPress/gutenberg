@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import { isURL } from '@wordpress/url';
-
-/**
- * External dependencies
- */
 import { range } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 

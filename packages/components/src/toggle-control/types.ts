@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 import type { FormToggleProps } from '../form-toggle/types';
 

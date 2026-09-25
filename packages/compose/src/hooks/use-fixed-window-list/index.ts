@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import useEvent from '../use-event';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
@@ -93,7 +86,7 @@ export default function useFixedWindowList(
 		// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 		const overscan = initRender
 			? visibleItems
-			: windowOverscan ?? visibleItems;
+			: ( windowOverscan ?? visibleItems );
 		const firstViewableIndex = Math.floor(
 			scrollContainer.scrollTop / itemHeight
 		);

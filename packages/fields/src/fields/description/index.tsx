@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Template } from '../../types';
 
 // A template is editable only when it's a user-created custom template.

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, privateApis } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Button } from '@wordpress/components';
+import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {
@@ -17,9 +10,6 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import DateControl from '../../components/dataform-controls/date';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedTextControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -29,8 +19,11 @@ function getCustomValidity< Item >(
 	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
-		customValidity = validity?.required?.message
-			? validity.required
+		customValidity = validity.required.message
+			? {
+					type: validity.required.type,
+					message: validity.required.message,
+				}
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
@@ -59,14 +52,19 @@ function CustomEditControl< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! isValid?.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
@@ -116,6 +114,8 @@ const ValidationComponent = ( {
 		dateRange?: string;
 		datetime?: string;
 		time?: string;
+		showConditionalText?: boolean;
+		conditionalText?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -141,6 +141,8 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 		time: undefined,
+		showConditionalText: undefined,
+		conditionalText: undefined,
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -553,7 +555,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async' ? getElements( 'select' ) : undefined,
 				isValid: {
@@ -573,7 +575,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'item1', label: 'Item 1' },
 								{ value: 'item2', label: 'Item 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'textWithRadio' )
@@ -743,7 +745,7 @@ const ValidationComponent = ( {
 								{ value: 'de', label: 'Germany' },
 								{ value: 'jp', label: 'Japan' },
 								{ value: 'au', label: 'Australia' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'countries' )
@@ -804,7 +806,7 @@ const ValidationComponent = ( {
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
 								{ value: 'option3', label: 'Option 3' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'toggleGroup' )
@@ -846,7 +848,7 @@ const ValidationComponent = ( {
 								{ value: 'strawberry', label: 'Strawberry' },
 								{ value: 'tangerine', label: 'Tangerine' },
 								{ value: 'watermelon', label: 'Watermelon' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'combobox' )
@@ -918,6 +920,22 @@ const ValidationComponent = ( {
 					max: minMax ? '17:00' : undefined,
 				},
 			},
+			{
+				id: 'showConditionalText',
+				type: 'boolean',
+				label: 'Show conditional text',
+			},
+			{
+				id: 'conditionalText',
+				type: 'text',
+				label: 'Conditional text',
+				description:
+					'Always required, but only validated while visible.',
+				isVisible: ( item ) => item.showConditionalText === true,
+				isValid: {
+					required: true,
+				},
+			},
 		];
 	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
@@ -982,6 +1000,8 @@ const ValidationComponent = ( {
 					'dateRange',
 					'datetime',
 					'time',
+					'showConditionalText',
+					'conditionalText',
 				],
 			};
 		}
@@ -1019,6 +1039,11 @@ const ValidationComponent = ( {
 				id: 'dateFields',
 				label: 'Date fields',
 				children: [ 'date', 'dateRange', 'datetime', 'time' ],
+			},
+			{
+				id: 'conditionalFields',
+				label: 'Conditionally visible fields',
+				children: [ 'showConditionalText', 'conditionalText' ],
 			},
 		];
 

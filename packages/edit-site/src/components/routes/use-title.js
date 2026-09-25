@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -8,10 +5,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );

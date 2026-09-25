@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';

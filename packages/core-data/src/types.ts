@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import type {
 	SelectionType,
 	SelectionDirection,

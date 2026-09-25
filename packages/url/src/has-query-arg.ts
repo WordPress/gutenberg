@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueryArg } from './get-query-arg';
 
 /**

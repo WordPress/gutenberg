@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SVG, Circle } from '@wordpress/primitives';
 
 export const PageControlIcon = () => (

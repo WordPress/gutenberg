@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import getFootnotesOrder from './get-footnotes-order';
 
 let oldFootnotes = {};

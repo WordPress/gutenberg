@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner, Popover } from '@wordpress/components';
 import {
@@ -17,10 +10,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -43,6 +32,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
+import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -151,7 +141,7 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
@@ -380,7 +370,7 @@ function ViewTable< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -515,15 +505,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? view.layout?.enableMoving ??
-												  true
+												? ( view.layout?.enableMoving ??
+													true )
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: view.layout?.enableMoving ??
-												  true
+												: ( view.layout?.enableMoving ??
+													true )
 										}
 									/>
 								) }
@@ -579,8 +569,7 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
+										'dataviews-view-table__actions-column--sticky': true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -615,7 +604,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {

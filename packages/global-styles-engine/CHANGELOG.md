@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+## 1.23.0 (2026-09-23)
+
+### New Features
+
+-   Add text shadow settings and presets ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   `generateGlobalStyles`: Treat a missing `spacing.blockGap` setting like a `null` one, as the server's `isset()` check does. WordPress stores `null` for themes that do not opt into block gap, but `getSetting` returns `undefined` for it, so the editor considered block gap supported and rendered the global block gap instead of the fallback gap styles the front end renders, such as the Columns block's `2em` default ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+
+## 1.22.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `getResolvedValue`: Return a copy when resolving a theme-relative (`file:./…`) URL instead of writing the resolved URL onto the given object, which could be the caller's own value or, via a `ref`, an object aliased by the user or theme config ([#82278](https://github.com/WordPress/gutenberg/pull/82278)).
+
+## 1.21.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+-   Generate SVG filters for user-defined duotone presets, not just theme and default ones. A duotone a user had created rendered on the front end but had no filter in the editor, so applying it showed no preview ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 1.20.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Report changes to site-wide border, shadow, outline, filter and dimensions in the global styles changelist. These are rendered by the styles engine but were not compared, so changing only one of them was reported as no change at all ([#81407](https://github.com/WordPress/gutenberg/pull/81407)).
+-   Render block element styles defined only inside responsive viewport states.
+## 1.19.0 (2026-07-29)
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

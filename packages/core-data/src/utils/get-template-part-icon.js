@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	header as headerIcon,
 	footer as footerIcon,

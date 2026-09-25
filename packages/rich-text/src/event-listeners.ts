@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { MutableRefObject } from 'react';
 
 /*

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { useStyle, useSetting } from './hooks';
 import { unlock } from './lock-unlock';
 

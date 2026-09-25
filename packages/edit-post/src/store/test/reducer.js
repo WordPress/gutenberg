@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { isSavingMetaBoxes, metaBoxLocations } from '../reducer';
 
 describe( 'state', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
@@ -11,10 +8,6 @@ import {
 import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
@@ -134,8 +127,7 @@ export type BlockSelectors = Record<
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-			| string
-			| Record< string, string | Record< string, string > >;
+			string | Record< string, string | Record< string, string > >;
 		name?: string;
 		styleVariationSelectors?: Record< string, string >;
 	}
@@ -169,8 +161,7 @@ interface StylesNode {
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
 	featureSelectors?:
-		| string
-		| Record< string, string | Record< string, string > >;
+		string | Record< string, string | Record< string, string > >;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
@@ -303,7 +294,8 @@ function getPresetsSvgFilters(
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		return [ 'default', 'theme' ]
+		// Includes `custom`, since the front end renders every origin.
+		return [ 'default', 'theme', 'custom' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
 				presetByOrigin[ origin ].map( ( preset: any ) =>
@@ -773,9 +765,8 @@ export function getLayoutStyles( {
 	fallbackGapValue?: string;
 } ): string {
 	let ruleset = '';
-	let gapValue = hasBlockGapSupport
-		? getGapCSSValue( style?.spacing?.blockGap )
-		: '';
+	const blockGapValue = style?.spacing?.blockGap;
+	let gapValue = hasBlockGapSupport ? getGapCSSValue( blockGapValue ) : '';
 
 	// Ensure a fallback gap value for the root layout definitions,
 	// and use a fallback value if one is provided for the current block.
@@ -786,6 +777,10 @@ export function getLayoutStyles( {
 			gapValue = fallbackGapValue;
 		}
 	}
+	const rowGapValue =
+		hasBlockGapSupport && blockGapValue && typeof blockGapValue !== 'string'
+			? getGapCSSValue( blockGapValue.top )
+			: gapValue;
 
 	if ( gapValue && layoutDefinitions ) {
 		Object.values( layoutDefinitions ).forEach(
@@ -798,6 +793,11 @@ export function getLayoutStyles( {
 				) {
 					return;
 				}
+				const layoutGapValue = [ 'default', 'constrained' ].includes(
+					name
+				)
+					? rowGapValue
+					: gapValue;
 
 				if ( spacingStyles?.length ) {
 					spacingStyles.forEach( ( spacingStyle: any ) => {
@@ -808,7 +808,7 @@ export function getLayoutStyles( {
 								( [ cssProperty, cssValue ] ) => {
 									declarations.push(
 										`${ cssProperty }: ${
-											cssValue ? cssValue : gapValue
+											cssValue ? cssValue : layoutGapValue
 										}`
 									);
 								}
@@ -824,19 +824,19 @@ export function getLayoutStyles( {
 									selector === ROOT_BLOCK_SELECTOR
 										? `:where(.${ className }${
 												spacingStyle?.selector || ''
-										  })`
+											})`
 										: `:where(${ selector }.${ className }${
 												spacingStyle?.selector || ''
-										  })`;
+											})`;
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
 										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
-										  }`
+											}`
 										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
-										  }`;
+											}`;
 							}
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
@@ -928,7 +928,7 @@ function pickStyleAndPseudoKeys(
 	}
 	const entries = Object.entries( treeToPickFrom );
 	const allowedPseudoSelectors = blockName
-		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		? ( VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? [] )
 		: [];
 
 	const pickedEntries = entries.filter(
@@ -966,8 +966,8 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		variationName,
 	} = node;
 	const pseudoSelectors = name
-		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
-		: VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [];
+		? ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? [] )
+		: ( VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [] );
 
 	if ( ! pseudoSelectors.length ) {
 		return [];
@@ -1059,6 +1059,35 @@ function getResponsiveStyleNodes(
 	);
 }
 
+/**
+ * Collects element styles from the default and responsive branches of a style
+ * node. Responsive styles are copied onto the element node so they can be
+ * expanded by `getResponsiveStyleNodes`.
+ *
+ * @param styleNode              Style node that may contain element styles.
+ * @param responsiveMediaQueries Media queries keyed by responsive state name.
+ * @return Element styles keyed by element name.
+ */
+function getElementStylesByName(
+	styleNode: BlockNode | BlockVariation,
+	responsiveMediaQueries: Record< string, string >
+): Record< string, any > {
+	const elementStylesByName = { ...( styleNode?.elements ?? {} ) };
+
+	Object.keys( responsiveMediaQueries ).forEach( ( breakpointKey ) => {
+		Object.entries( styleNode?.[ breakpointKey ]?.elements ?? {} ).forEach(
+			( [ elementName, styles ] ) => {
+				elementStylesByName[ elementName ] = {
+					...( elementStylesByName[ elementName ] ?? {} ),
+					[ breakpointKey ]: styles,
+				};
+			}
+		);
+	} );
+
+	return elementStylesByName;
+}
+
 export const getNodesWithStyles = (
 	tree: GlobalStylesConfig,
 	blockSelectors: string | BlockSelectors
@@ -1129,7 +1158,7 @@ export const getNodesWithStyles = (
 								? blockSelectors[ blockName ]
 										?.styleVariationSelectors?.[
 										variationName
-								  ]
+									]
 								: undefined;
 						if (
 							variationSelector &&
@@ -1159,7 +1188,10 @@ export const getNodesWithStyles = (
 						// element styles within the block type styles take
 						// precedence over these.
 						Object.entries(
-							typedVariation?.elements ?? {}
+							getElementStylesByName(
+								typedVariation,
+								responsiveMediaQueries
+							)
 						).forEach( ( [ element, elementStyles ] ) => {
 							if (
 								elementStyles &&
@@ -1190,7 +1222,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.selector
-										  )
+											)
 										: undefined;
 								const variationDuotoneSelector =
 									typeof blockSelectors !== 'string'
@@ -1199,7 +1231,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.duotoneSelector as string
-										  )
+											)
 										: undefined;
 								const variationFeatureSelectors =
 									typeof blockSelectors !== 'string'
@@ -1208,7 +1240,7 @@ export const getNodesWithStyles = (
 												blockSelectors[
 													variationBlockName
 												]?.featureSelectors ?? {}
-										  )
+											)
 										: undefined;
 
 								const variationBlockStyleNodes =
@@ -1248,7 +1280,10 @@ export const getNodesWithStyles = (
 								// Process element styles for the inner blocks
 								// of the variation.
 								Object.entries(
-									variationBlockStyles.elements ?? {}
+									getElementStylesByName(
+										variationBlockStyles,
+										responsiveMediaQueries
+									)
 								).forEach(
 									( [
 										variationBlockElement,
@@ -1302,34 +1337,34 @@ export const getNodesWithStyles = (
 
 			nodes.push( ...variationStyleNodesToAdd );
 
-			Object.entries( typedNode?.elements ?? {} ).forEach(
-				( [ elementName, value ] ) => {
-					if (
-						typeof blockSelectors !== 'string' &&
-						value &&
-						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName as ElementName ]
-					) {
-						nodes.push( {
-							styles: value,
-							selector: blockSelectors[ blockName ]?.selector
-								.split( ',' )
-								.map( ( sel: string ) => {
-									const elementSelectors =
-										ELEMENTS[
-											elementName as ElementName
-										].split( ',' );
-									return elementSelectors.map(
-										( elementSelector: string ) =>
-											sel + ' ' + elementSelector
-									);
-								} )
-								.join( ',' ),
-							elementName,
-						} );
-					}
+			Object.entries(
+				getElementStylesByName( typedNode, responsiveMediaQueries )
+			).forEach( ( [ elementName, value ] ) => {
+				if (
+					typeof blockSelectors !== 'string' &&
+					value &&
+					blockSelectors?.[ blockName ] &&
+					ELEMENTS[ elementName as ElementName ]
+				) {
+					nodes.push( {
+						styles: value,
+						selector: blockSelectors[ blockName ]?.selector
+							.split( ',' )
+							.map( ( sel: string ) => {
+								const elementSelectors =
+									ELEMENTS[
+										elementName as ElementName
+									].split( ',' );
+								return elementSelectors.map(
+									( elementSelector: string ) =>
+										sel + ' ' + elementSelector
+								);
+							} )
+							.join( ',' ),
+						elementName,
+					} );
 				}
-			);
+			} );
 
 			// Add variation nodes AFTER the main block and its elements
 			// to match PHP processing order.
@@ -1352,8 +1387,7 @@ export const getNodesWithSettings = (
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-			| string
-			| Record< string, string | Record< string, string > >;
+			string | Record< string, string | Record< string, string > >;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1630,7 +1664,7 @@ function renderStylesNode(
 						? getBlockStyleVariationFeatureSelector(
 								variationName,
 								featureSelector
-						  )
+							)
 						: featureSelector;
 					selectorForRule = selectorSuffix
 						? appendToSelector( selectorForRule, selectorSuffix )
@@ -2092,8 +2126,17 @@ export function generateGlobalStyles(
 	// Use provided block types or fall back to getBlockTypes()
 	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
 
+	/*
+	 * Mirror the server, which checks the setting with `isset()`: a theme opts
+	 * into block gap by giving `spacing.blockGap` a non-null value. WordPress'
+	 * default theme.json sets it to `null` for themes that do not opt in, and
+	 * `getSetting` returns `undefined` for a `null` setting, so an `undefined`
+	 * value must count as "not supported" as well.
+	 */
 	const blockGap = getSetting( config, 'spacing.blockGap' );
-	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
+	const hasBlockGapSupport =
+		hasBlockGapSupportOption ??
+		( blockGap !== null && blockGap !== undefined );
 	const hasFallbackGapSupport =
 		hasFallbackGapSupportOption ?? ! hasBlockGapSupport;
 

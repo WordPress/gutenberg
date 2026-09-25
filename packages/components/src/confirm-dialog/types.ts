@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ModalProps } from '../modal/types';
 
 export type DialogInputEvent =
@@ -60,4 +53,15 @@ export type ConfirmDialogProps = {
 	 * Both buttons will be disabled.
 	 */
 	isBusy?: boolean;
+	/**
+	 * The title of the underlying `Modal`: its accessible name, and the
+	 * visible heading unless `__experimentalHideHeader` is `true`.
+	 */
+	title?: ModalProps[ 'title' ];
+	/**
+	 * Whether the underlying `Modal` should hide its header, `title` included.
+	 *
+	 * @default true
+	 */
+	__experimentalHideHeader?: ModalProps[ '__experimentalHideHeader' ];
 };

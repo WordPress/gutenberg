@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Locking', () => {
@@ -10,7 +7,7 @@ test.describe( 'Block Locking', () => {
 
 	test( 'can prevent removal', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Some paragraph' );
 
@@ -30,7 +27,7 @@ test.describe( 'Block Locking', () => {
 
 	test( 'can disable movement', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 
@@ -60,7 +57,7 @@ test.describe( 'Block Locking', () => {
 
 	test( 'can lock everything', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Some paragraph' );
 
@@ -81,7 +78,7 @@ test.describe( 'Block Locking', () => {
 
 	test( 'can unlock from toolbar', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Some paragraph' );
 

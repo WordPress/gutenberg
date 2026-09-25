@@ -1,11 +1,6 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
-import { createHash } from 'node:crypto';
 import { createRequire as createNodeRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -14,37 +9,12 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
-let dsTokenFallbacksJs;
-try {
-	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
-	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
-	dsTokenFallbacks = postcssPlugin;
-	dsTokenFallbacksJs = esbuildPlugin;
-} catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
-}
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,
@@ -56,6 +26,8 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getBrowserslistQueries } from './browserslist.mjs';
+import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -73,22 +45,41 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
+import {
+	compileInlineStyle,
+	dsTokenFallbacks,
+} from './compile-inline-style.mjs';
+
+/**
+ * Resolve the ESBuild target from the project's Browserslist config.
+ *
+ * @return {string[]} ESBuild target strings.
+ */
+function getEsbuildTarget() {
+	return browserslistToEsbuild( getBrowserslistQueries() );
+}
+// Optional dependency: @wordpress/theme provides a plugin that injects fallback
+// values for design system tokens in JavaScript. Fails gracefully when the
+// package is not installed (it is an optional peerDependency).
+let dsTokenFallbacksJs;
+try {
+	const { default: esbuildPlugin } =
+		await import( '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks' );
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
 	'**/*.{spec,test}.*',
-];
-const TEST_FILE_PATTERNS = [
-	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
-	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -114,6 +105,11 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
+
+// Capability required to view a generated page when the page config does not
+// declare one. Pages rendering outside the menu page callback flow must
+// enforce this themselves.
+const DEFAULT_PAGE_CAPABILITY = 'manage_options';
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -206,66 +202,6 @@ function getSassOptions( workingDir ) {
 			// For local imports like @use "mixins"
 			path.join( PACKAGES_DIR, 'base-styles' ),
 		],
-	};
-}
-
-function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
-	return async function styleType( cssText, _dirname, filePath ) {
-		let moduleExports = null;
-
-		// Transform the code: token fallbacks, CSS modules and minification.
-		const plugins = [
-			dsTokenFallbacks,
-			cssModules &&
-				postcssModules( {
-					generateScopedName: '[contenthash]__[local]',
-					getJSON: ( _, json ) => {
-						moduleExports = json;
-					},
-				} ),
-			minify &&
-				cssnano( {
-					preset: [
-						'default',
-						{ discardComments: { removeAll: true } },
-					],
-				} ),
-		].filter( Boolean );
-
-		const { css } = await postcss( plugins ).process( cssText, {
-			from: filePath,
-			map: false,
-		} );
-
-		// Hash the transformed CSS so that the dedup key reflects the actual
-		// injected content, including mangled CSS module class names.
-		const hash = createHash( 'sha1' )
-			.update( css )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
-		// Skip automatic style injection in Node-based test environments, where DOM
-		// implementations do not reliably support modern CSS features like @layer.
-		let cssModule = cssModules
-			? `import { registerStyle } from '@wordpress/style-runtime';
-if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-	registerStyle("${ hash }", ${ JSON.stringify( css ) });
-}
-`
-			: `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
-	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "${ hash }");
-	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
-	document.head.appendChild(style);
-}
-`;
-
-		// The CSS modules transform produces an `exports` object with class name mappings.
-		if ( moduleExports ) {
-			const exportsString = JSON.stringify( moduleExports );
-			cssModule += `export default ${ exportsString };\n`;
-		}
-		return cssModule;
 	};
 }
 
@@ -601,7 +537,7 @@ async function bundlePackage( packageName, options = {} ) {
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
@@ -698,7 +634,7 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	if ( packageJson.wpScriptModuleExports ) {
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 		const rootBuildModuleDir = path.join(
 			BUILD_DIR,
 			'modules',
@@ -1301,6 +1237,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{CAPABILITY}}': page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1367,7 +1304,7 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob( `src/**/*.${ SOURCE_EXTENSIONS }`, {
+	const srcFiles = await glob( getSourceFileGlob( 'src/**/*' ), {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
@@ -1382,7 +1319,7 @@ async function transpilePackage( packageName ) {
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );
 	const srcDir = path.join( packageDir, 'src' );
-	const target = browserslistToEsbuild();
+	const target = getEsbuildTarget();
 
 	const builds = [];
 
@@ -1395,7 +1332,7 @@ async function transpilePackage( packageName ) {
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
 	const emotionPlugin = babel( {
-		filter: /\.[jt]sx?$/,
+		filter: /\.[cm]?[jt]sx?$/,
 		config: {
 			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
 		},
@@ -1450,7 +1387,10 @@ async function transpilePackage( packageName ) {
 					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
 					const newExt =
 						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
-					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+					relativePath = relativePath.replace(
+						/\.[cm]?[jt]sx?$/,
+						newExt
+					);
 
 					return {
 						path: relativePath,
@@ -1494,7 +1434,6 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1528,7 +1467,6 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1637,7 +1575,11 @@ async function compileStyles( packageName ) {
 							const ltrResult = await postcss(
 								[
 									dsTokenFallbacks,
-									autoprefixer( { grid: true } ),
+									autoprefixer( {
+										grid: true,
+										overrideBrowserslist:
+											getBrowserslistQueries(),
+									} ),
 								].filter( Boolean )
 							).process( source, { from: undefined } );
 
@@ -1688,7 +1630,7 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
-	if ( TEST_FILE_PATTERNS.some( ( regex ) => regex.test( relativePath ) ) ) {
+	if ( isTestSourceFile( relativePath ) ) {
 		return false;
 	}
 
@@ -1745,7 +1687,7 @@ async function buildRoute( routeName ) {
 
 	// Build route.js if it exists
 	if ( files.hasRoute ) {
-		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+		const routeEntryPoints = await glob( getSourceFileGlob( 'route' ), {
 			cwd: routeDir,
 			absolute: true,
 		} );
@@ -1758,7 +1700,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1776,7 +1718,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1809,7 +1751,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: true,
 				define: getDefine( false ),
 				plugins: [
@@ -1827,7 +1769,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
 				plugins: [
@@ -1873,7 +1815,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 					return metadata.pages.some(
 						( page ) => ! experimentalPageIds.has( page )
 					);
-			  } );
+				} );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -1883,9 +1825,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 	await Promise.all(
 		routes.map( async ( routeName ) => {
 			const buildTime = await buildRoute( routeName );
-			console.log(
-				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
-			);
+			console.log( `   ✔ Built route ${ routeName } (${ buildTime }ms)` );
 		} )
 	);
 }
@@ -1908,7 +1848,7 @@ async function buildWidget( widgetName ) {
 
 	// Build render.js if it exists
 	if ( files.hasRender ) {
-		const renderEntryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+		const renderEntryPoints = await glob( getSourceFileGlob( 'render' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1921,7 +1861,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1939,7 +1879,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1958,7 +1898,7 @@ async function buildWidget( widgetName ) {
 
 	// Build widget.js if it exists
 	if ( files.hasWidget ) {
-		const widgetEntryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+		const widgetEntryPoints = await glob( getSourceFileGlob( 'widget' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1971,7 +1911,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1989,7 +1929,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -2042,7 +1982,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2066,6 +2006,7 @@ function collectWidgets() {
 				help: metadata.help ?? null,
 				icon: metadata.icon ?? null,
 				actions: metadata.actions ?? null,
+				attributes: metadata.attributes ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
@@ -2171,10 +2112,10 @@ function toPhpActionsLiteral( actions ) {
 					typeof action.download === 'boolean'
 						? `'download' => ${
 								action.download ? 'true' : 'false'
-						  }`
+							}`
 						: `'download' => ${ toPhpStringLiteral(
 								action.download
-						  ) }`
+							) }`
 				);
 			}
 
@@ -2186,8 +2127,88 @@ function toPhpActionsLiteral( actions ) {
 				);
 			}
 
+			if ( action.icon !== undefined ) {
+				parts.push(
+					`'icon' => ${ toPhpStringLiteral( action.icon ) }`
+				);
+			}
+
+			if ( action.relevance !== undefined ) {
+				parts.push(
+					`'relevance' => ${ toPhpStringLiteral( action.relevance ) }`
+				);
+			}
+
 			return `array( ${ parts.join( ', ' ) } )`;
 		} );
+
+	if ( entries.length === 0 ) {
+		return 'null';
+	}
+
+	return `array( ${ entries.join( ', ' ) } )`;
+}
+
+/**
+ * Format any JSON value as a PHP literal: scalars as-is, lists as
+ * `array( ... )`, objects as `array( 'key' => ... )`. Non-finite numbers
+ * and unsupported values become `null`.
+ *
+ * @param {unknown} value Source value.
+ * @return {string} PHP literal.
+ */
+function toPhpValueLiteral( value ) {
+	if ( value === null || value === undefined ) {
+		return 'null';
+	}
+	if ( typeof value === 'boolean' ) {
+		return value ? 'true' : 'false';
+	}
+	if ( typeof value === 'number' ) {
+		return Number.isFinite( value ) ? String( value ) : 'null';
+	}
+	if ( typeof value === 'string' ) {
+		const escaped = value.replace( /\\/g, '\\\\' ).replace( /'/g, "\\'" );
+		return `'${ escaped }'`;
+	}
+	if ( Array.isArray( value ) ) {
+		return `array( ${ value.map( toPhpValueLiteral ).join( ', ' ) } )`;
+	}
+	if ( typeof value === 'object' ) {
+		const entries = Object.entries( value ).map(
+			( [ key, entry ] ) =>
+				`${ toPhpValueLiteral( key ) } => ${ toPhpValueLiteral(
+					entry
+				) }`
+		);
+		return `array( ${ entries.join( ', ' ) } )`;
+	}
+	return 'null';
+}
+
+/**
+ * Format a widget's attribute schema as a PHP array literal. Returns the
+ * PHP literal `null` when there are no valid entries; entries without a
+ * string `id` are dropped. Everything else is copied as declared; the
+ * registration gate constrains the shape.
+ *
+ * @param {import('./widget-utils.mjs').WidgetAttributeMetadata[]|null|undefined} attributes Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpAttributesLiteral( attributes ) {
+	if ( ! Array.isArray( attributes ) ) {
+		return 'null';
+	}
+
+	const entries = attributes
+		.filter(
+			( attribute ) =>
+				attribute &&
+				typeof attribute === 'object' &&
+				typeof attribute.id === 'string' &&
+				attribute.id !== ''
+		)
+		.map( toPhpValueLiteral );
 
 	if ( entries.length === 0 ) {
 		return 'null';
@@ -2223,6 +2244,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const helpStr = toPhpHelpLiteral( widget.help );
 			const iconStr = toPhpStringLiteral( widget.icon );
 			const actionsStr = toPhpActionsLiteral( widget.actions );
+			const attributesStr = toPhpAttributesLiteral( widget.attributes );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
@@ -2233,6 +2255,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'help'         => ${ helpStr },
 		'icon'         => ${ iconStr },
 		'actions'      => ${ actionsStr },
+		'attributes'   => ${ attributesStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },
@@ -2343,13 +2366,19 @@ async function buildAll( baseUrlExpression ) {
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
+			return {
+				id: page,
+				init: [],
+				title: undefined,
+				capability: DEFAULT_PAGE_CAPABILITY,
+			};
 		}
 		return {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
+			capability: page.capability || DEFAULT_PAGE_CAPABILITY,
 		};
 	} );
 
@@ -2367,7 +2396,7 @@ async function buildAll( baseUrlExpression ) {
 				normalizedPages
 					.filter( ( page ) => page.experimental )
 					.map( ( page ) => page.id )
-		  )
+			)
 		: new Set();
 	await buildRoutes( experimentalPageIds );
 
@@ -2397,7 +2426,12 @@ async function buildAll( baseUrlExpression ) {
 				path: metadata.path,
 				page,
 				hasRoute: routeFiles.hasRoute,
-				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+				// Must match the condition that builds `content.js`, which
+				// bundles the canvas alongside the stage and inspector.
+				hasContent:
+					routeFiles.hasStage ||
+					routeFiles.hasInspector ||
+					routeFiles.hasCanvas,
 			};
 		} );
 	} );
@@ -2412,6 +2446,7 @@ async function buildAll( baseUrlExpression ) {
 			routes: pageRoutes,
 			initModules: page.init,
 			title: page.title,
+			capability: page.capability,
 		};
 	} );
 
@@ -2448,9 +2483,7 @@ async function buildAll( baseUrlExpression ) {
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
 		for ( const page of pageData ) {
-			console.log(
-				`   ✔ Generated build/pages/${ page.slug }/page.php`
-			);
+			console.log( `   ✔ Generated build/pages/${ page.slug }/page.php` );
 			console.log(
 				`   ✔ Generated build/pages/${ page.slug }/page-wp-admin.php`
 			);
@@ -2620,7 +2653,7 @@ async function watchMode() {
 	const watcher = chokidar.watch( watchPaths, {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
-			'**/*.{spec,test}.{js,ts,tsx}',
+			getSourceFileGlob( '**/*.{spec,test}' ),
 			// Avoid rebuild loops: worker packages write bundled WASM/JS back
 			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
 			'**/worker-code.ts',
@@ -2801,10 +2834,10 @@ async function main() {
 			'base-url': {
 				type: 'string',
 				default:
-					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
 					boolConfigVal(
 						process.env.npm_package_config_IS_WORDPRESS_CORE
-					)
+					) )
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},

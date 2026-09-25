@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperAction, CropperState, TransformOperation } from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	WithInjectedProps,
 	WithoutInjectedProps,

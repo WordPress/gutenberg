@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
 	component: Text,
-	title: 'Components/Typography/Text',
+	title: 'Components/@wordpress-components/Typography/Text',
 	id: 'components-text',
 	argTypes: {
 		as: { control: { type: 'text' } },

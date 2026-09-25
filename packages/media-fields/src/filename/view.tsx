@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 
 // Proxy threshold for "long enough that the cell will visually truncate" —

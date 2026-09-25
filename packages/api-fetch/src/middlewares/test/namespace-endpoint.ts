@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import type { FetchHandler } from '../../types';
 import namespaceEndpointMiddleware from '../namespace-endpoint';
 

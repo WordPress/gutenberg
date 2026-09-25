@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { HStack } from '../h-stack';
 import { Text } from '../text';
 import { RangeControl, NumberControlWrapper } from './styles';

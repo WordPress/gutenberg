@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorController } from '../../state';
 import {
@@ -113,7 +106,7 @@ export function useSaveMediaEditor( {
 					? {
 							id,
 							url: media.source_url,
-					  }
+						}
 					: undefined;
 
 			if ( modifiers.length > 0 ) {
@@ -174,20 +167,20 @@ export function useSaveMediaEditor( {
 			const message =
 				error instanceof Error
 					? error.message
-					: ( error as { message?: string } )?.message ??
-					  __( 'An unknown error occurred.' );
+					: ( ( error as { message?: string } )?.message ??
+						__( 'An unknown error occurred.' ) );
 			createErrorNotice(
 				isImage
 					? sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save image. %s' ),
 							message
-					  )
+						)
 					: sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save media. %s' ),
 							message
-					  ),
+						),
 				{
 					type: 'snackbar',
 					context: MEDIA_EDITOR_NOTICES_CONTEXT,

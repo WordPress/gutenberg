@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG, font } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
@@ -60,8 +53,8 @@ export const StyledTabList = styled( Ariakit.TabList )`
 	&[aria-orientation='horizontal'] {
 		--fade-width: 64px;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
-		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
-			transparent 50%;
+		--fade-gradient-composed:
+			var( --fade-gradient-base ), black 60%, transparent 50%;
 		&.is-overflowing-first {
 			mask-image: linear-gradient(
 				to var( --direction-end ),
@@ -75,10 +68,8 @@ export const StyledTabList = styled( Ariakit.TabList )`
 			);
 		}
 		&.is-overflowing-first.is-overflowing-last {
-			mask-image: linear-gradient(
-					to right,
-					var( --fade-gradient-composed )
-				),
+			mask-image:
+				linear-gradient( to right, var( --fade-gradient-composed ) ),
 				linear-gradient( to left, var( --fade-gradient-composed ) );
 		}
 

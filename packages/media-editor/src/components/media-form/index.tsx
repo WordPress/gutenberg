@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Form, Field } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditorContext } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 

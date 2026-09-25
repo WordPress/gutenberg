@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { WidgetGridSettings } from '../../types';
 import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
 import { DEFAULT_ROW_HEIGHT } from '../row-height-presets';

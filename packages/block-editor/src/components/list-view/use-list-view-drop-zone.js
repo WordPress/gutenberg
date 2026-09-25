@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
@@ -9,10 +6,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,
@@ -513,7 +506,7 @@ export default function useListViewDropZone( {
 							? canInsertBlocks(
 									draggedBlockClientIds,
 									rootClientId
-							  )
+								)
 							: true,
 						canInsertDraggedBlocksAsChild: isBlockDrag
 							? canInsertBlocks( draggedBlockClientIds, clientId )
@@ -564,7 +557,7 @@ export default function useListViewDropZone( {
 		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
+			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
 		},

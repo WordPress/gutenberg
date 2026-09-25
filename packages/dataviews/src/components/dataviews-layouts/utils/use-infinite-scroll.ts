@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 
 /**

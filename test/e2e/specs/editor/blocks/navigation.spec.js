@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
@@ -2227,6 +2224,7 @@ class Navigation {
 	getNavBlock() {
 		return this.editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 	}
 
@@ -2313,7 +2311,7 @@ class Navigation {
 
 		// Check appender has focus
 		if ( submenu ) {
-			// chec for the submenu appender
+			// check for the submenu appender
 			await expect( this.getSubmenuBlockInserter() ).toBeFocused();
 		} else {
 			await expect( this.getNavBlockInserter() ).toBeFocused();

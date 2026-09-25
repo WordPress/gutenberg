@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/mixins";
+
+.components-input-control__container {
+	// Don't show the input's focus ring when an auxiliary control in a prefix
+	// or suffix has focus.
+	&:focus-within:not(:has(:is(.components-input-control__prefix, .components-input-control__suffix):focus-within)) {
+		.components-input-control__backdrop {
+			@include mixins.outset-ring__focus();
+		}
+	}
+}

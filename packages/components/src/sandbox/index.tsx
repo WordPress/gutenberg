@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useRef,
@@ -14,10 +7,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;

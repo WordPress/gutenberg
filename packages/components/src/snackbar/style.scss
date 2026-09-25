@@ -56,11 +56,7 @@
 	margin-left: $grid-unit-40;
 	color: $white;
 	flex-shrink: 0;
-
-	&:focus {
-		box-shadow: none;
-		outline: 1px dotted $white;
-	}
+	--focus-color: #{$white};
 
 	&:hover {
 		text-decoration: none;

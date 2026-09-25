@@ -1,23 +1,12 @@
-/**
- * WordPress dependencies
- */
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
-		_wpCollaborationEnabled?: string;
+		__experimentalEnableRealTimeCollaboration?: boolean;
 	}
 }
 
@@ -107,6 +96,15 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * The Yjs module used by the editor. Providers must use this instance
+	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
+	 * on the same document cause silent data corruption:
+	 *
+	 * https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import { useRichText } from './hook';
 import { KeyboardShortcutContext, InputEventContext } from './contexts';

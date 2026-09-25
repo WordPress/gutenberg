@@ -1,26 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Dropdown,
 	FlexItem,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -102,7 +91,7 @@ function OperatorSelector( {
 					{ filter.name }
 				</FlexItem>
 
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-filters__summary-operators-filter-select"
 					label={ __( 'Conditions' ) }
 					value={ value }
@@ -145,7 +134,7 @@ function OperatorSelector( {
 											return _filter;
 										}
 									),
-							  ]
+								]
 							: [
 									...( view.filters ?? [] ),
 									{
@@ -153,7 +142,7 @@ function OperatorSelector( {
 										operator: newOperator,
 										value: undefined,
 									},
-							  ];
+								];
 						onChangeView( {
 							...view,
 							page: 1,
@@ -247,7 +236,7 @@ export default function Filter( {
 				? field.getValueFormatted( {
 						item: { [ field.id ]: filterInView.value },
 						field,
-				  } )
+					} )
 				: String( filterInView.value );
 
 		activeElements = [

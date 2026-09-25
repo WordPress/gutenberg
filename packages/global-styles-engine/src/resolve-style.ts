@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getResolvedValue } from './utils/common';
 import { getValueFromObjectPath } from './utils/object';
 import { getVariationStyle } from './variation';
@@ -438,7 +435,8 @@ function computeResolvedStyle(
 	// Resolve the active block style variation's styles (with `{ ref }`
 	// values resolved) against the Global Styles tree.
 	const variation = variationName
-		? getVariationStyle( globalStyles, blockName, variationName ) ?? null
+		? ( getVariationStyle( globalStyles, blockName, variationName ) ??
+			null )
 		: null;
 
 	// Layers ordered low to high precedence: root defaults, the matching
@@ -461,13 +459,13 @@ function computeResolvedStyle(
 			? createContribution(
 					pickLayerRootContribution( block ),
 					createSourceDescriptor( 'block' )
-			  )
+				)
 			: null,
 		variation
 			? createContribution(
 					pickLayerRootContribution( variation ),
 					createSourceDescriptor( 'blockVariation' )
-			  )
+				)
 			: null,
 	];
 
@@ -498,7 +496,7 @@ function computeResolvedStyle(
 							getStateSlice( block, selectedState )
 						),
 						createSourceDescriptor( 'block' )
-				  )
+					)
 				: null,
 			variation
 				? createContribution(
@@ -506,7 +504,7 @@ function computeResolvedStyle(
 							getStateSlice( variation, selectedState )
 						),
 						createSourceDescriptor( 'blockVariation' )
-				  )
+					)
 				: null
 		);
 	}

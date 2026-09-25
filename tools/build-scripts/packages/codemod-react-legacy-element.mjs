@@ -31,10 +31,6 @@
  * is byte-for-byte identical except at the patched locations (handy for
  * diffing against the unpatched `-orig` files).
  */
-
-/**
- * External dependencies
- */
 import { parse } from '@babel/parser';
 import _traverse from '@babel/traverse';
 import MagicString from 'magic-string';

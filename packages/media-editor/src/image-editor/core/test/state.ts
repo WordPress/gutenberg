@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import type { CropperState, Size } from '../types';
 import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import { cropperReducer, enforceContainment, isStateDirty } from '../state';

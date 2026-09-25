@@ -1,20 +1,38 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { describe, expect, it } from 'vitest';
 import type {
 	OnLoadArgs,
 	OnLoadOptions,
 	OnLoadResult,
 	PluginBuild,
 } from 'esbuild';
+import { build as esbuildBuild } from 'esbuild';
+import {
+	composeVisitors,
+	transform as lightningcssTransform,
+} from 'lightningcss';
 import postcss from 'postcss';
-
+import tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
+import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
 import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
 import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
 const unknownJsFixture = join( fixturesDirectory, 'unknown-token.ts' );
+const emptyFallbackCssFixture = join( fixturesDirectory, 'empty-fallback.css' );
+const emptyFallbackJsFixture = join( fixturesDirectory, 'empty-fallback.ts' );
+
+function transformWithLightningcss( source: string, filename: string ) {
+	return lightningcssTransform( {
+		filename,
+		code: Buffer.from( source ),
+		visitor: lightningcssPlugin,
+	} ).code.toString();
+}
 
 type EsbuildOnLoad = (
 	args: OnLoadArgs
@@ -24,10 +42,7 @@ type EsbuildOnLoad = (
 	| null
 	| undefined;
 
-type ViteTransform = (
-	code: string,
-	id: string
-) => { code: string; map: null } | null;
+type ViteTransform = typeof transformDsTokenFallbacks;
 
 function getEsbuildHook(): {
 	options: OnLoadOptions;
@@ -74,6 +89,182 @@ describe( 'design token fallback build plugin parity', () => {
 		}
 	);
 
+	it.each( [ 'styles.css', 'styles.module.css' ] )(
+		'transforms supported CSS with Lightning CSS in %s',
+		async ( fixture ) => {
+			const filename = join( fixturesDirectory, fixture );
+			const source = await readFile( filename, 'utf8' );
+			const css = transformWithLightningcss( source, filename );
+
+			expect( css ).toMatchSnapshot();
+		}
+	);
+
+	it( 'keeps PostCSS and Lightning CSS var() fallbacks aligned', async () => {
+		const filename = join( fixturesDirectory, 'styles.module.css' );
+		const source = await readFile( filename, 'utf8' );
+		const postcssResult = await postcss( [ postcssPlugin ] ).process(
+			source,
+			{ from: filename }
+		);
+		const lightningcssResult = transformWithLightningcss(
+			source,
+			filename
+		);
+
+		// styles.module.css only contains real var() references (no string
+		// contents), so both tools should inject the same fallback value.
+		expect( postcssResult.css ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+		expect( lightningcssResult ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+	} );
+
+	it( 'keeps nested token fallbacks aligned across PostCSS and Lightning CSS', async () => {
+		const filename = join( fixturesDirectory, 'nested-fallback.css' );
+		const source = `
+.fixture {
+	background: var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong));
+}`;
+		const postcssResult = await postcss( [ postcssPlugin ] ).process(
+			source,
+			{ from: filename }
+		);
+		const lightningcssResult = transformWithLightningcss(
+			source,
+			filename
+		);
+		const expected =
+			'var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong, #fff))';
+
+		expect( postcssResult.css ).toContain( expected );
+		expect( lightningcssResult ).toContain( expected );
+	} );
+
+	it.each( [
+		{
+			property: 'gap',
+			token: '--wpds-dimension-gap-sm',
+			fallback: '8px',
+		},
+		{
+			property: 'outline-width',
+			token: '--wpds-border-width-focus',
+			fallback: 'var(--wp-admin-border-width-focus, 2px)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong',
+			fallback: 'var(--wp-admin-theme-color, #3858e9)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong-active',
+			fallback:
+				'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 93.0%, black)',
+		},
+	] )(
+		'preserves global references in $token and its fallback with Lightning CSS',
+		( { property, token, fallback } ) => {
+			const result = lightningcssTransform( {
+				filename: 'styles.module.css',
+				code: Buffer.from(
+					`.fixture { ${ property }: var(${ token } from global); }`
+				),
+				cssModules: { dashedIdents: true },
+				visitor: lightningcssPlugin,
+			} );
+
+			expect( result.code.toString() ).toContain(
+				`${ property }: var(${ token }, ${ fallback })`
+			);
+			expect( result.references ).toEqual( {} );
+		}
+	);
+
+	it( 'isolates injected fallbacks from changes by composed Lightning CSS visitors', () => {
+		const source = '.fixture { gap: var(--wpds-dimension-gap-sm); }';
+		const result = lightningcssTransform( {
+			filename: 'styles.css',
+			code: Buffer.from( source ),
+			visitor: composeVisitors( [
+				lightningcssPlugin,
+				{
+					Variable( variable ) {
+						const fallback = variable.fallback?.[ 0 ];
+						if ( fallback?.type === 'length' ) {
+							fallback.value.value = 999;
+						}
+					},
+				},
+			] ),
+		} );
+
+		expect( result.code.toString() ).toContain( '999px' );
+		expect( transformWithLightningcss( source, 'styles.css' ) ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+	} );
+
+	it( 'throws when a known token has no parsed fallback', () => {
+		const tokenName = '--wpds-test-missing-fallback';
+		// Simulate a generated token missing from the plugin's parsed cache.
+		Object.defineProperty( tokenFallbacks, tokenName, {
+			value: '1px',
+			configurable: true,
+		} );
+
+		try {
+			expect( () =>
+				transformWithLightningcss(
+					`a { gap: var(${ tokenName }); }`,
+					'styles.css'
+				)
+			).toThrow( `No parsed fallback for design token: ${ tokenName }.` );
+		} finally {
+			Reflect.deleteProperty( tokenFallbacks, tokenName );
+		}
+	} );
+
+	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {
+		const source = await readFile( emptyFallbackCssFixture, 'utf8' );
+		const result = await postcss( [ postcssPlugin ] ).process( source, {
+			from: emptyFallbackCssFixture,
+		} );
+
+		expect( result.css ).toContain( 'gap: var(--wpds-dimension-gap-sm,);' );
+	} );
+
+	it( 'leaves an empty var() fallback untouched in Lightning CSS', async () => {
+		const source = await readFile( emptyFallbackCssFixture, 'utf8' );
+		const result = transformWithLightningcss(
+			source,
+			emptyFallbackCssFixture
+		);
+
+		// Lightning CSS normalizes empty fallbacks with a space before `)`.
+		expect( result ).toContain( 'var(--wpds-dimension-gap-sm, )' );
+	} );
+
+	it( 'leaves an empty var() fallback untouched in esbuild', async () => {
+		const result = await getEsbuildHook().transform( {
+			path: emptyFallbackJsFixture,
+		} as OnLoadArgs );
+
+		expect( result?.contents ).toContain(
+			'gap: var(--wpds-dimension-gap-sm,);'
+		);
+	} );
+
+	it( 'leaves an empty var() fallback untouched in Vite', async () => {
+		const source = await readFile( emptyFallbackJsFixture, 'utf8' );
+		const result = getViteTransform()( source, emptyFallbackJsFixture );
+
+		expect( result ).toBeNull();
+	} );
+
 	it( 'keeps esbuild and Vite source-text transforms aligned', async () => {
 		const source = await readFile( validJsFixture, 'utf8' );
 		const esbuildResult = await getEsbuildHook().transform( {
@@ -81,9 +272,51 @@ describe( 'design token fallback build plugin parity', () => {
 		} as OnLoadArgs );
 		const viteResult = getViteTransform()( source, validJsFixture );
 
-		expect( esbuildResult?.loader ).toBe( 'tsx' );
-		expect( esbuildResult?.contents ).toBe( viteResult?.code );
+		expect( esbuildResult?.loader ).toBe( 'ts' );
+		expect( esbuildResult?.contents ).toBe(
+			`${ viteResult?.code }\n//# sourceMappingURL=${ viteResult?.map.toUrl() }`
+		);
 		expect( viteResult?.code ).toMatchSnapshot();
+	} );
+
+	it( 'leaves virtual modules to the plugin that owns their namespace', async () => {
+		const result = await esbuildBuild( {
+			bundle: true,
+			format: 'esm',
+			stdin: {
+				contents: 'import value from "virtual"; export default value;',
+				loader: 'js',
+				resolveDir: fixturesDirectory,
+			},
+			write: false,
+			plugins: [
+				esbuildPlugin,
+				{
+					name: 'virtual-module',
+					setup( build ) {
+						build.onResolve( { filter: /^virtual$/ }, () => ( {
+							path: 'virtual-module.ts',
+							namespace: 'virtual-test',
+						} ) );
+						build.onLoad(
+							{
+								filter: /.*/,
+								namespace: 'virtual-test',
+							},
+							() => ( {
+								contents:
+									'const value = "var(--wpds-dimension-gap-sm)"; export default value;',
+								loader: 'ts',
+							} )
+						);
+					},
+				},
+			],
+		} );
+
+		expect( result.outputFiles[ 0 ].text ).toContain(
+			'var(--wpds-dimension-gap-sm)'
+		);
 	} );
 
 	it.each( [ '.js', '.jsx', '.ts', '.tsx', '.mjs', '.mts', '.cjs', '.cts' ] )(
@@ -133,6 +366,9 @@ describe( 'design token fallback build plugin parity', () => {
 				from: unknownCssFixture,
 			} )
 		).rejects.toThrow( 'Unknown design token: --wpds-not-a-token' );
+		expect( () =>
+			transformWithLightningcss( cssSource, unknownCssFixture )
+		).toThrow( 'Unknown design token: --wpds-not-a-token' );
 		await expect(
 			getEsbuildHook().transform( {
 				path: unknownJsFixture,

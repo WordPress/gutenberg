@@ -13,9 +13,24 @@
 		"align": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"heading": true,
+			"button": true
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -32,6 +47,14 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
-	}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"shadow": true
+	},
+	"style": "wp-block-query-no-results"
 }

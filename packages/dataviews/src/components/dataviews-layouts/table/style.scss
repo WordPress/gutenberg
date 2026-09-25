@@ -14,7 +14,7 @@
 	th {
 		text-align: left;
 		color: var(--wpds-color-foreground-content-neutral);
-		font-weight: normal;
+		font-weight: 400;
 		font-size: var(--wpds-typography-font-size-md);
 	}
 	td,
@@ -40,7 +40,7 @@
 				bottom: 0;
 				left: 0;
 				width: 1px;
-				background-color: var(--wpds-color-background-surface-neutral);
+				background-color: var(--wpds-color-stroke-surface-neutral-weak);
 			}
 		}
 

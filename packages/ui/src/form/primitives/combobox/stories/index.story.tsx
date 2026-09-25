@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
+import { Spinner } from '../../../../spinner';
+import { Stack } from '../../../../stack';
+import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
 	GROUPED_ITEMS,
@@ -9,7 +12,8 @@ import {
 } from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
-	title: 'Design System/Components/Form/Primitives/Combobox',
+	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
+	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
 		'Combobox.Trigger': Combobox.Trigger,
@@ -29,6 +33,7 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
 		'Combobox.Empty': Combobox.Empty,
+		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
@@ -52,10 +57,10 @@ export const Default: Story = {
 	args: {
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -82,10 +87,14 @@ export const Compact: Story = {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger size="compact" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Trigger
+				size="compact"
+				aria-label="Fruit"
+				key="trigger"
+			/>,
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -95,7 +104,6 @@ export const Compact: Story = {
 								<Combobox.Item
 									key={ item.value }
 									value={ item }
-									size="compact"
 								>
 									{ item.label }
 								</Combobox.Item>
@@ -116,12 +124,30 @@ export const Compact: Story = {
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
  */
 export const DetachedInline: Story = {
+	parameters: {
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: ITEMS,
 		multiple: true,
 		inline: true,
+		// `inline` requires `open` so the input references the visible list
+		// with `aria-controls`.
+		open: true,
 		children: [
-			<Combobox.Input placeholder="Search" key="input" />,
+			<Combobox.Input
+				aria-label="Search items"
+				placeholder="Search items"
+				key="input"
+			/>,
 			<div
 				style={ {
 					minHeight: '200px',
@@ -181,10 +207,13 @@ export const Creatable: Story = {
 						: ITEMS
 				}
 			>
-				<Combobox.Trigger />
-				<Combobox.Popup>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
 					<Combobox.List>
@@ -218,37 +247,80 @@ export const Creatable: Story = {
 	},
 };
 
+function HiddenResultCount() {
+	const count = Combobox.useFilteredItems< FixtureItem >().length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
+	);
+}
+
+/**
+ * Loads the item list asynchronously. `Status` shows loading, then a
+ * visually hidden result count. Use `Empty` for no results.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		const LOADING_ITEM = {
-			value: 'loading',
-			label: 'Loading...',
-		};
-		const [ items, setItems ] = useState( [ LOADING_ITEM ] );
-		const [ value, setValue ] = useState< unknown >( LOADING_ITEM );
-
-		useEffect( () => {
-			const timeout = setTimeout( () => {
-				setItems( ITEMS );
-				setValue( ITEMS[ 0 ] );
-			}, 3000 );
-
-			return () => clearTimeout( timeout );
-		}, [] );
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< FixtureItem[] >( [] );
+		const [ value, setValue ] = useState< FixtureItem | undefined >();
+		const [ open, setOpen ] = useState( false );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
 		return (
 			<Combobox.Root
 				{ ...args }
 				items={ items }
 				value={ value }
-				onValueChange={ setValue }
+				open={ open }
+				onValueChange={ ( newValue ) => {
+					setValue(
+						( newValue ?? undefined ) as FixtureItem | undefined
+					);
+				} }
+				onOpenChange={ ( nextOpen ) => {
+					setOpen( nextOpen );
+					if ( ! nextOpen ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setValue( ( current ) => current ?? ITEMS[ 0 ] );
+						setLoading( false );
+					}, 500 );
+				} }
 			>
-				<Combobox.Trigger />
-				<Combobox.Popup>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
 					</div>
-					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.Status>
+						{ loading ? (
+							<Stack direction="row" gap="sm" align="center">
+								<Spinner />
+								Loading…
+							</Stack>
+						) : (
+							<HiddenResultCount />
+						) }
+					</Combobox.Status>
+					<Combobox.Empty>
+						{ loading ? null : 'No results found.' }
+					</Combobox.Empty>
 					<Combobox.List>
 						<Combobox.ListBody>
 							<Combobox.Collection>
@@ -256,7 +328,6 @@ export const AsyncItems: Story = {
 									<Combobox.Item
 										key={ item.value }
 										value={ item }
-										disabled={ item.value === 'loading' }
 									>
 										{ item.label }
 									</Combobox.Item>
@@ -281,7 +352,7 @@ export const WithCustomTriggerAndItem: Story = {
 		items: ITEMS,
 		defaultValue: ITEMS[ 0 ],
 		children: [
-			<Combobox.Trigger key="trigger">
+			<Combobox.Trigger aria-label="Fruit" key="trigger">
 				{ ( item: FixtureItem ) => (
 					<span
 						style={ {
@@ -303,9 +374,9 @@ export const WithCustomTriggerAndItem: Story = {
 					</span>
 				) }
 			</Combobox.Trigger>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.List>
 					<Combobox.ListBody>
@@ -350,10 +421,10 @@ export const Grouped: Story = {
 	args: {
 		items: GROUPED_ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -407,8 +478,9 @@ export const WithCustomZIndex: Story = {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
+				aria-label="Fruit"
 				positioner={
 					<Combobox.Positioner
 						style={ {
@@ -419,7 +491,7 @@ export const WithCustomZIndex: Story = {
 				key="popup"
 			>
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.List>
 					<Combobox.ListBody>

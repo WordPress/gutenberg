@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isHTMLInputElement from './is-html-input-element';
 
 /**

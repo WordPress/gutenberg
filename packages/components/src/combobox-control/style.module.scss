@@ -1,0 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.input-wrapper {
+	height: 38px; // 40px - 2px vertical borders on parent container
+	padding-inline: $grid-unit-10;
+}

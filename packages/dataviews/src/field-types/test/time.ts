@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import { setSettings, getSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import normalizeFields from '../index';
 import parseTime from '../utils/parse-time';
 import type { Field } from '../../types';

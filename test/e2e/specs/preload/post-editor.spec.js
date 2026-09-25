@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	recordRequests,
 	waitForRequestsToSettle,
@@ -18,6 +11,8 @@ test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Panel open state is persisted, and open panels fetch.
+		await requestUtils.resetPreferences();
 		await setCollaboration( requestUtils, true );
 		const post = await requestUtils.createPost( {
 			content:

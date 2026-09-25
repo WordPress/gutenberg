@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import warn from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';

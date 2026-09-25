@@ -24,7 +24,8 @@
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.0",
-		"@octokit/rest": "^16.26.0",
+		"@octokit/rest": "^22.0.1",
+		"adm-zip": "^0.6.1",
 		"chalk": "^4.1.1",
 		"commander": "^9.2.0",
 		"execa": "^4.0.2",
@@ -35,10 +36,15 @@
 		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
 	},
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"vitest": "^5.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
+		"build-plugin-zip": "node ./build-plugin-zip.mts",
 		"cherry-pick": "node ./cherry-pick.mjs",
 		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
 		"log-performance-results": "node ./log-performance-results.js"

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
 interface SubtitleProps {

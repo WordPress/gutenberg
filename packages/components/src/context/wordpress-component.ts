@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type * as React from 'react';
 
 /**
@@ -25,12 +22,12 @@ export type WordPressComponentProps<
 > = P &
 	( T extends React.ElementType
 		? // The `children` prop is being explicitly omitted since it is otherwise implicitly added
-		  // by `ComponentPropsWithRef`. The context is that components should require the `children`
-		  // prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
-		  Omit<
+			// by `ComponentPropsWithRef`. The context is that components should require the `children`
+			// prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+			Omit<
 				React.ComponentPropsWithoutRef< T >,
 				'as' | keyof P | 'children'
-		  >
+			>
 		: {} ) &
 	( IsPolymorphic extends true
 		? {
@@ -39,7 +36,7 @@ export type WordPressComponentProps<
 					| T
 					| keyof React.JSX.IntrinsicElements
 					| React.JSXElementConstructor< any >;
-		  }
+			}
 		: {} );
 
 export type WordPressComponent<
@@ -70,7 +67,7 @@ export type WordPressComponent<
 						'as' | keyof O | 'children'
 					>
 			): React.ReactNode;
-	  }
+		}
 	: unknown ) & {
 	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
@@ -88,10 +85,14 @@ export type WordPressComponent<
 export type WordPressComponentFromProps<
 	Props,
 	ForwardsRef extends boolean = true,
-> = Props extends WordPressComponentProps< infer P, infer T, infer I >
-	? WordPressComponent<
-			T,
-			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} ),
-			I
-	  >
-	: never;
+> =
+	Props extends WordPressComponentProps< infer P, infer T, infer I >
+		? WordPressComponent<
+				T,
+				P &
+					( ForwardsRef extends true
+						? React.RefAttributes< any >
+						: {} ),
+				I
+			>
+		: never;

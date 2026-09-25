@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import type { FormatTime, NormalizedField, SortDirection } from '../types';
 import type { FieldType } from '../types/private';
 import isValidElements from './utils/is-valid-elements';

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
 

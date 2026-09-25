@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import NumberControl from '../../number-control';
 import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
-
 import type {
 	RangeMarkProps,
 	RailProps,
@@ -70,9 +62,11 @@ export const AfterIconWrapper = styled.span`
 
 const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.ui.backgroundDisabled
-			: railColor || COLORS.theme.gray[ 300 ] };
+		background: ${
+			disabled
+				? COLORS.ui.backgroundDisabled
+				: railColor || COLORS.theme.gray[ 300 ]
+		};
 
 		@media ( forced-colors: active ) {
 			background: GrayText;
@@ -96,9 +90,9 @@ export const Rail = styled.span`
 
 const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.theme.gray[ 400 ]
-			: trackColor || 'currentColor' };
+		background: ${
+			disabled ? COLORS.theme.gray[ 400 ] : trackColor || 'currentColor'
+		};
 
 		@media ( forced-colors: active ) {
 			background: ${ disabled ? 'GrayText' : 'CanvasText' };
@@ -168,9 +162,9 @@ export const MarkLabel = styled.span`
 
 const thumbColor = ( { disabled }: ThumbProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.theme.gray[ 400 ]
-			: COLORS.theme.accent };
+		background: ${
+			disabled ? COLORS.theme.gray[ 400 ] : COLORS.theme.accent
+		};
 
 		@media ( forced-colors: active ) {
 			background: ${ disabled ? 'GrayText' : 'CanvasText' };
@@ -225,7 +219,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 						background: GrayText;
 					}
 				}
-		  `
+			`
 		: '';
 };
 

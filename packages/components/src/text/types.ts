@@ -1,21 +1,9 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import type { FindAllArgs } from 'highlight-words-core';
-
-/**
- * Internal dependencies
- */
 import type { TruncateProps } from '../truncate/types';
 
 export type TextSize =
-	| 'body'
-	| 'caption'
-	| 'footnote'
-	| 'largeTitle'
-	| 'subheadline'
-	| 'title';
+	'body' | 'caption' | 'footnote' | 'largeTitle' | 'subheadline' | 'title';
 
 type TextVariant = 'muted';
 

@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
@@ -304,7 +300,7 @@ export function toTree( {
 				attributes: isEditableTree
 					? {
 							'data-rich-text-line-break': 'true',
-					  }
+						}
 					: undefined,
 				object: true,
 			} );
@@ -325,7 +321,9 @@ export function toTree( {
 		}
 
 		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), ZWNBSP );
+			// Pad the text node the caret is in, not a sibling: a range in an
+			// empty text node has no rectangle to measure the caret by.
+			appendText( pointer, ZWNBSP );
 
 			// We CANNOT use CSS to add a placeholder with pseudo elements on
 			// the main block wrappers because that could clash with theme CSS.

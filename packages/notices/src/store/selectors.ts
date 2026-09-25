@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { DEFAULT_CONTEXT } from './constants';
 import type { Notice } from './types';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 
 const instanceMap = new WeakMap< object, number >();

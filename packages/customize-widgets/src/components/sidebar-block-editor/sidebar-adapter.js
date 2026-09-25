@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { settingIdToWidgetId } from '../../utils';
 
 const { wp } = window;

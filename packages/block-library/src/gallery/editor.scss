@@ -6,7 +6,7 @@
 // Adding `figure` to the selector increases the specificity above the global
 // styles specificity, which is levelled at 0-1-0. We should figure out why
 // `figure` is needed.
-:root :where(figure.wp-block-gallery) {
+:root :where(figure.wp-block-gallery.is-layout-flex) {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
@@ -16,7 +16,17 @@
 	> .blocks-gallery-caption {
 		flex: 0 0 100%;
 	}
+}
 
+:root :where(.wp-block-gallery.is-layout-grid) {
+	> .blocks-gallery-caption,
+	> .components-placeholder,
+	> .block-editor-media-placeholder {
+		grid-column: 1 / -1;
+	}
+}
+
+:root :where(figure.wp-block-gallery) {
 	// @todo this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	BlockPreview,
@@ -9,10 +6,6 @@ import {
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { EditorProvider } from '../../../components/provider';
 import { useStyle } from '../../../components/global-styles';
 import { unlock } from '../../../lock-unlock';

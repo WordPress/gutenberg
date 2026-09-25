@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
 
 /**

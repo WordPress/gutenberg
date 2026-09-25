@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

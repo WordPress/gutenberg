@@ -11,6 +11,7 @@ Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an e
 
 -   **The contract.** What a widget _is_, _asks_, and _shows_ belongs to primitives, layer by layer. See _Widget Primitives / Anatomy_.
 -   **Data.** The engine is stateless. Widget types arrive through `widgetTypes`; the consumer owns `layout` and its persistence.
+-   **Permissions.** Who may customize the dashboard or insert a widget type is the application's to decide; it answers through `WidgetDashboard.Policy`. See _Policy_.
 
 Widgets are one _concept_ the admin renders, among materials and surfaces shared across screens.
 For that broader vocabulary, see [the admin materials and surfaces discussion](https://github.com/WordPress/gutenberg/issues/70913).

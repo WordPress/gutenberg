@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Response } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 type RestPost = {
@@ -22,7 +15,7 @@ function rawField( field: RestPost[ 'content' ] ): string {
 
 	return typeof field === 'string'
 		? field
-		: field.raw ?? field.rendered ?? '';
+		: ( field.raw ?? field.rendered ?? '' );
 }
 
 async function getCurrentPostId( page: Page ): Promise< number > {

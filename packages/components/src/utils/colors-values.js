@@ -72,21 +72,22 @@ const THEME = {
 	},
 };
 
-/* eslint-enable @wordpress/no-ds-tokens */
-
 const UI = {
 	background: THEME.background,
 	backgroundDisabled: THEME.gray[ 100 ],
 	border: THEME.gray[ 600 ],
 	borderHover: THEME.gray[ 700 ],
 	borderFocus: THEME.accent,
-	borderDisabled: THEME.gray[ 400 ],
-	textDisabled: THEME.gray[ 600 ],
+	// The gray ramp above has no disabled step to map these through.
+	borderDisabled: `var(--wpds-color-stroke-interactive-neutral-disabled, #dbdbdb)`,
+	textDisabled: `var(--wpds-color-foreground-interactive-neutral-disabled, #8d8d8d)`,
 
 	// Matches @wordpress/base-styles
 	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,
 	lightGrayPlaceholder: `color-mix(in srgb, ${ THEME.background }, transparent 35%)`,
 };
+
+/* eslint-enable @wordpress/no-ds-tokens */
 
 export const COLORS = Object.freeze( {
 	/**

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getBlockVariations } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { matchesPatterns } from '../embed/util';
 
 const DEFAULT_EMBED_BLOCK = 'core/embed';

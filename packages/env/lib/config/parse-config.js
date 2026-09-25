@@ -1,12 +1,5 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const readRawConfigFile = require( './read-raw-config-file' );
 const {
 	parseSourceString,

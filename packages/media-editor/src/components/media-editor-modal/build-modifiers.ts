@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, Size } from '../../image-editor';
 import { getRotatedBBox } from '../../image-editor/core/camera';
 

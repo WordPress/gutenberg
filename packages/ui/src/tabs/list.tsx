@@ -54,9 +54,9 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				const scrollFromStart =
 					direction === 'rtl' && scrollLeft < 0
 						? // In RTL layouts, scrollLeft is typically 0 at the visual "start"
-						  // (right edge) and becomes negative toward the "end" (left edge).
-						  // Normalize value for correct first/last detection logic.
-						  -scrollLeft
+							// (right edge) and becomes negative toward the "end" (left edge).
+							// Normalize value for correct first/last detection logic.
+							-scrollLeft
 						: scrollLeft;
 
 				// Use SCROLL_EPSILON to handle subpixel rendering differences.

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const browserslist = require( 'browserslist' );
-
-/**
- * Internal dependencies
- */
 const exclusions = require( './polyfill-exclusions' );
 const replacePolyfills = require( './replace-polyfills' );
 
@@ -34,7 +27,7 @@ module.exports = ( api ) => {
 						useBuiltIns: 'usage',
 						exclude: exclusions,
 						corejs: require( 'core-js/package.json' ).version,
-				  }
+					}
 				: {} ),
 		};
 

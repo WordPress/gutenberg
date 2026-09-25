@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MutableRefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 

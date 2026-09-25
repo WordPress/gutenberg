@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	FlexBlock,
 	__experimentalItem as Item,
@@ -18,15 +11,12 @@ import {
 import { chevronDownSmall } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../../store';
 import NavigationItem from '../navigation-item';
 import { wrapIcon } from '../items';
 import type { IconType, MenuItem } from '../../../store/types';
-import './style.scss';
+import navigationItemStyles from '../navigation-item/style.module.scss';
+import styles from './style.module.scss';
 
 const ANIMATION_DURATION = 0.2;
 
@@ -78,9 +68,9 @@ export default function DropdownItem( {
 	const items = menuItems.filter( ( item ) => item.parent === id );
 	const disableMotion = useReducedMotion();
 	return (
-		<div className="boot-dropdown-item">
+		<div className={ styles.dropdown }>
 			<Item
-				className={ clsx( 'boot-navigation-item', className ) }
+				className={ clsx( navigationItemStyles.item, className ) }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					e.stopPropagation();
@@ -97,8 +87,8 @@ export default function DropdownItem( {
 					<FlexBlock>{ children }</FlexBlock>
 					<WCIcon
 						icon={ chevronDownSmall }
-						className={ clsx( 'boot-dropdown-item__chevron', {
-							'is-up': isExpanded,
+						className={ clsx( styles.chevron, {
+							[ styles[ 'is-up' ] ]: isExpanded,
 						} ) }
 					/>
 				</HStack>
@@ -114,11 +104,14 @@ export default function DropdownItem( {
 							duration: disableMotion ? 0 : ANIMATION_DURATION,
 							ease: 'easeOut',
 						} }
-						className="boot-dropdown-item__children"
+						className={ styles[ 'dropdown-children' ] }
 					>
 						{ items.map( ( item, index ) => (
 							<NavigationItem
 								key={ index }
+								className={
+									navigationItemStyles[ 'is-compact' ]
+								}
 								to={ item.to }
 								shouldShowPlaceholder={ false }
 							>

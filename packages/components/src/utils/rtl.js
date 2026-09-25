@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
 import { isRTL } from '@wordpress/i18n';
 
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );

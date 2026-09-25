@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import blockCompleter from '../block';
 
 describe( 'block autocompleter', () => {

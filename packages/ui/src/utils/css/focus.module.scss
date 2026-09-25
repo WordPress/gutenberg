@@ -4,10 +4,13 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer utilities {
+		/*
+		 * Shared focus-ring utility classes. For new code, prefer using the
+		 * mixin directly in the component stylesheet.
+		 */
 		.outset-ring--focus:focus,
 		.outset-ring--focus-visible:focus-visible,
 		.outset-ring--focus-within:focus-within,
-		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
 		.outset-ring-parent:focus-visible .outset-ring--focus-parent-visible {
 			@include mixins.focus-ring();
 		}

@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import type { ClipboardEvent, ForwardedRef } from 'react';
 import type { Colord } from 'colord';
 import { colord, extend, getFormat } from 'colord';
 import type { HslaColor } from 'react-colorful';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -19,10 +12,6 @@ import {
 } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem, contextConnect } from '../context';
 import {
 	ColorfulWrapper,
@@ -35,7 +24,6 @@ import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
-
 import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );

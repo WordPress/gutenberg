@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';

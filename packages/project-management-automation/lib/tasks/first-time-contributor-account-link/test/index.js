@@ -1,11 +1,19 @@
-/**
- * Internal dependencies
- */
-import firstTimeContributorAccountLink from '../';
-import hasWordPressProfile from '../../../has-wordpress-profile';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as core from '@actions/core';
+import hasWordPressProfile from '../../../has-wordpress-profile.js';
+import firstTimeContributorAccountLink from '../index.js';
 
-jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	setOutput: vi.fn(),
+} ) );
 
+vi.mock( import( '../../../has-wordpress-profile.js' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const setOutput = vi.mocked( core.setOutput );
+const mockedHasWordPressProfile = vi.mocked( hasWordPressProfile );
 const botUser = {
 	data: {
 		name: 'Ghost',
@@ -25,7 +33,8 @@ const humanUser = {
 
 describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
-		hasWordPressProfile.mockReset();
+		setOutput.mockReset();
+		mockedHasWordPressProfile.mockReset();
 	} );
 
 	const payload = {
@@ -58,10 +67,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -90,10 +99,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -104,15 +113,65 @@ describe( 'firstTimeContributorAccountLink', () => {
 		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the commit author has no GitHub username', async () => {
+		const payloadWithoutUsername = {
+			...payload,
+			commits: [
+				{
+					...payload.commits[ 0 ],
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+					},
+				},
+			],
+		};
+		const getByUsername = vi.fn();
+		await firstTimeContributorAccountLink( payloadWithoutUsername, {
+			rest: {
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payloadWithoutOwner = {
+			...payload,
+			repository: {
+				name: payload.repository.name,
+			},
+		};
+		const getByUsername = vi.fn( () => humanUser );
+		const listCommits = vi.fn();
+
+		await firstTimeContributorAccountLink( payloadWithoutOwner, {
+			rest: {
+				repos: {
+					listCommits,
+				},
+				users: {
+					getByUsername,
+				},
+			},
+		} );
+
+		expect( getByUsername ).not.toHaveBeenCalled();
+		expect( listCommits ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing for commits by bots', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
 					// Return a bot when `getByUsername` is called.
-					getByUsername: jest.fn( () => botUser ),
+					getByUsername: vi.fn( () => botUser ),
 				},
 			},
 		};
@@ -129,7 +188,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -143,10 +202,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -161,14 +217,14 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -179,15 +235,12 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
 
-		hasWordPressProfile.mockImplementation( () => {
+		mockedHasWordPressProfile.mockImplementation( () => {
 			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
@@ -201,14 +254,14 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -219,15 +272,12 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
-				},
-				issues: {
-					createComment: jest.fn(),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
 
-		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
+		mockedHasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
@@ -239,11 +289,13 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expect.stringMatching( /^Congratulations/ ),
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-prompt',
+			expect.stringMatching( /^Congratulations/ )
+		);
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-pr-number',
+			123
+		);
 	} );
 } );

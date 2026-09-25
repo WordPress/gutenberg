@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import BlockTitle from '../';
 
@@ -17,7 +10,8 @@ registerCoreBlocks();
 const blocks = [ createBlock( 'core/paragraph' ) ];
 
 const meta = {
-	title: 'BlockEditor/BlockTitle',
+	id: 'blockeditor-blocktitle',
+	title: 'Editor/Block Editor/BlockTitle',
 	component: BlockTitle,
 	parameters: {
 		docs: {

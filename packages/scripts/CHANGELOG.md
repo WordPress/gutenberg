@@ -2,13 +2,67 @@
 
 ## Unreleased
 
+## 36.0.0 (2026-09-23)
+
+### Breaking Changes
+
+-   Switch `test-unit-js` to consumer-installed Vitest 5 and Vite 7/8 at the 36.0.0 boundary. Run once by default, discover consumer Vitest/Vite config, and use Vitest lint defaults for test/spec files. Keep `test-unit-jest` as a maintenance-only adapter for consumer-installed Jest, with no scheduled removal. Remove the bundled Jest dependencies, preset config, Babel transformer, and GitHub Actions reporter. Retire the Jest preset and console package source; published versions remain available. Jest projects must install their own dependencies and configure the published preset if needed. See the [migration guide](docs/vitest-migration.md). ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
+
+-   Require Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` and update the bundled `markdownlint-cli` from `^0.31.1` to `^0.49.1`, which moves `markdownlint` from 0.25 to 0.41. `lint-md-docs` now runs the rules added since then (MD051 through MD060) by default, so projects may see new reports. The `header` rule aliases (for example `header-increment`) no longer work in configuration files; use the `heading` names ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+
+-   `lint-style`: Use stylelint's `resolveConfig` for config detection instead of a static extension list, supporting all current and future config file formats without manual maintenance overhead. Note that `resolveConfig` also searches ancestor directories and the global config directory (`~/.config/stylelint`), so a project with no local config may now pick up an unrelated config found there instead of the bundled default ([#79280](https://github.com/WordPress/gutenberg/pull/79280)).
+
+### Enhancements
+
+-   `check-engines`: Check only the tools listed in `engines`, instead of always passing `--node` and `--npm`. Without an `engines` field in the project, it now checks only the Node.js version ([#83326](https://github.com/WordPress/gutenberg/pull/83326)).
+-   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present ([#81917](https://github.com/WordPress/gutenberg/pull/81917)).
+-   `format`: Format `.cjs` and `.mjs` files when expanding a directory ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+-   `format`: Format `.cts` and `.mts` files when expanding a directory ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The default ESLint config now lints `.jsx`, `.ts`, `.tsx`, `.mts` and `.cts` files, which ESLint's own file discovery skips ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `build` and `start`: Discover `.cjs`, `.cts` and `.mts` entry points, resolve them from extensionless imports, and transpile `.cjs` and `.cts` modules ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   The bundled `wp-prettier` dependency has been upgraded from `3.0.3` to `3.9.6` ([#82731](https://github.com/WordPress/gutenberg/pull/82731)).
+
+### Bug Fixes
+
+-   Update the bundled webpack to `^5.111.0`, which fixes a code-generation regression in webpack 5.110.3 that can make production bundles fail at startup ([#82698](https://github.com/WordPress/gutenberg/pull/82698)).
+
+## 35.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+### Bug Fixes
+
+-   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Enhancements
+
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Internal
+
+-   Update bundled Jest packages to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 34.2.0 (2026-08-26)
+
+## 34.1.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Set Sass's `charset` option to `false` so production builds no longer emit a UTF-8 BOM in the middle of the extracted CSS ([#81383](https://github.com/WordPress/gutenberg/pull/81383)).
+
+## 34.0.0 (2026-07-29)
+
 ### Breaking Changes
 
 -   Upgrade the bundled Jest packages from v29 to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 
 ### Enhancements
 
-- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+-   `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 33.0.0 (2026-07-14)
 

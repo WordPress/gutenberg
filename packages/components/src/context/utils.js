@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { CONNECTED_NAMESPACE, COMPONENT_NAMESPACE } from './constants';
 
 /**

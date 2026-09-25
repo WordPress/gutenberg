@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
+const fs = require( 'fs' );
 const remark = require( 'remark' );
 const unified = require( 'unified' );
 const remarkParser = require( 'remark-parse' );
 const inject = require( 'mdast-util-inject' );
-const fs = require( 'fs' );
-
-/**
- * Internal dependencies
- */
 const formatter = require( './formatter' );
 const embed = require( './embed' );
 

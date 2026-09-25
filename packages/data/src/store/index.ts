@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DataRegistry, StoreDescriptor, AnyConfig } from '../types';
 
 const coreDataStore: StoreDescriptor< AnyConfig > = {

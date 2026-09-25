@@ -1,6 +1,5 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { forwardRef } from '@wordpress/element';
-
 import type { TriggerProps } from './types';
 
 /**

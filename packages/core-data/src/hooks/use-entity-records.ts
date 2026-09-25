@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
@@ -53,8 +46,10 @@ export type WithPermissions< RecordType > = RecordType & {
 	permissions: { delete: boolean; update: boolean };
 };
 
-interface EntityRecordsWithPermissionsResolution< RecordType >
-	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+interface EntityRecordsWithPermissionsResolution< RecordType > extends Omit<
+	EntityRecordsResolution< RecordType >,
+	'records'
+> {
 	/** The requested entity records with permissions */
 	records: WithPermissions< RecordType >[] | null;
 }
@@ -200,7 +195,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 								'_links',
 							] ),
 						].join(),
-				  }
+					}
 				: {} ),
 		},
 		options

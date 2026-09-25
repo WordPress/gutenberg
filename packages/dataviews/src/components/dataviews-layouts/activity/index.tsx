@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ViewActivityProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import ActivityGroup from './activity-group';

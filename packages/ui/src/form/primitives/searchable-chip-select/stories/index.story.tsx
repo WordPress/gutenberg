@@ -1,16 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableChipSelect } from '../';
+import {
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
-	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.Group': SearchableChipSelect.Group,
+		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
+		'SearchableChipSelect.Collection': SearchableChipSelect.Collection,
 	},
 	argTypes: {
 		items: { control: false },
@@ -18,9 +27,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -32,59 +40,14 @@ export const Default: Story = {
 	args: {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
-	},
-};
-
-/**
- * The `creatableItem` prop is used to add some kind of "Create new item"
- * action item to the footer of the list.
- *
- * In the `onValueChange` function, add some logic to handle the creation of a new item
- * whenever the `creatableItem` is selected.
- */
-export const Creatable: Story = {
-	args: {
-		...Default.args,
-	},
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< typeof ITEMS >( [
-			ITEMS[ 0 ],
-			ITEMS[ 1 ],
-		] );
-		const creatableItem = {
-			value: 'create',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-		};
-
-		return (
-			<SearchableChipSelect
-				{ ...args }
-				creatableItem={ creatableItem }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( values: typeof ITEMS, event ) => {
-					if ( values.some( ( item ) => item.value === 'create' ) ) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-						setValue(
-							values.filter( ( item ) => item.value !== 'create' )
-						);
-					} else {
-						setValue( values );
-					}
-					args.onValueChange?.( values, event );
-				} }
-			/>
-		);
+		'aria-label': 'Fruit',
 	},
 };
 
 /**
  * To customize what is rendered inside the chips, pass a
  * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * The chip is named from its content. Pass `aria-label` when that content is not a usable name.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.
@@ -123,6 +86,40 @@ export const WithCustomEmptyContent: Story = {
 	args: {
 		...Default.args,
 		emptyContent: 'No fruit found 🥺',
+	},
+};
+
+/**
+ * To render grouped items, pass an array of groups to `items` (each with
+ * `label` and `items` properties) and provide `children` that renders each
+ * group using `SearchableChipSelect.Group`, `SearchableChipSelect.GroupLabel`,
+ * and `SearchableChipSelect.Collection`. Grouped items have no default
+ * renderer, so `children` is required.
+ */
+export const Grouped: Story = {
+	args: {
+		'aria-label': 'Fruit',
+		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableChipSelect.Group
+				key={ group.label }
+				items={ group.items }
+			>
+				<SearchableChipSelect.GroupLabel>
+					{ group.label }
+				</SearchableChipSelect.GroupLabel>
+				<SearchableChipSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableChipSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableChipSelect.Item>
+					) }
+				</SearchableChipSelect.Collection>
+			</SearchableChipSelect.Group>
+		),
 	},
 };
 

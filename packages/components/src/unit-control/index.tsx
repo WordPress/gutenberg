@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
@@ -130,6 +119,12 @@ function UnforwardedUnitControl(
 			return;
 		}
 
+		// After clearing a value whose unit isn't offered, the select shows the
+		// first offered unit, so only fall back to the current unit if offered.
+		const fallbackUnit = units.some( ( option ) => option.value === unit )
+			? unit
+			: undefined;
+
 		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
@@ -138,7 +133,7 @@ function UnforwardedUnitControl(
 			nextQuantityValue,
 			units,
 			parsedQuantity,
-			unit
+			fallbackUnit
 		).join( '' );
 
 		onChangeProp?.( onChangeValue, changeProps );

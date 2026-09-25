@@ -15,6 +15,10 @@ if ( ! function_exists( 'wp_register_icon_collection' ) ) {
 	 *
 	 *     @type string $label       Required. A human-readable label for the icon collection.
 	 *     @type string $description Optional. A human-readable description for the icon collection.
+	 *     @type bool   $public      Optional. Whether the collection and its icons are exposed through
+	 *                               the REST API and selectable in the editor's Icon block. Icons in
+	 *                               non-public collections remain available via {@see wp_get_icon()}.
+	 *                               Default true.
 	 * }
 	 * @return bool True if the icon collection was registered successfully, else false.
 	 */
@@ -44,7 +48,7 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 *                          reserved for WordPress core icons; third-party code should
 	 *                          register icons under its own collection rather than the
 	 *                          "core" collection.
-	 * @param array  $args {
+	 * @param array  $args      {
 	 *     List of properties for the icon.
 	 *
 	 *     @type string $label     Required. A human-readable label for the icon.
@@ -72,80 +76,6 @@ if ( ! function_exists( 'wp_unregister_icon' ) ) {
 		return WP_Icons_Registry::get_instance()->unregister( $icon_name );
 	}
 }
-
-/**
- * Registers the default icon collections for Gutenberg.
- */
-function gutenberg_register_default_icon_collections() {
-	wp_register_icon_collection(
-		'core',
-		array(
-			'label'       => __( 'WordPress', 'gutenberg' ),
-			'description' => __( 'Core icon collection.', 'gutenberg' ),
-		)
-	);
-}
-
-$default_icon_collections_priority = has_action( 'init', '_wp_register_default_icon_collections' );
-if ( false !== $default_icon_collections_priority ) {
-	remove_action( 'init', '_wp_register_default_icon_collections', $default_icon_collections_priority );
-}
-add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
-
-/**
- * Registers the default core icons from the Gutenberg manifest.
- */
-function gutenberg_register_default_icons() {
-	$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
-	$icons_directory = trailingslashit( $icons_directory );
-	$manifest_path   = $icons_directory . 'manifest.php';
-
-	if ( ! is_readable( $manifest_path ) ) {
-		wp_trigger_error(
-			__FUNCTION__,
-			__( 'Core icon collection manifest is missing or unreadable.', 'gutenberg' )
-		);
-		return;
-	}
-
-	$collection = include $manifest_path;
-
-	if ( empty( $collection ) ) {
-		wp_trigger_error(
-			__FUNCTION__,
-			__( 'Core icon collection manifest is empty or invalid.', 'gutenberg' )
-		);
-		return;
-	}
-
-	foreach ( $collection as $icon_name => $icon_data ) {
-		if (
-			empty( $icon_data['filePath'] )
-			|| ! is_string( $icon_data['filePath'] )
-		) {
-			_doing_it_wrong(
-				__FUNCTION__,
-				__( 'Core icon collection manifest must provide a valid "filePath" for each icon.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return;
-		}
-
-		wp_register_icon(
-			'core/' . $icon_name,
-			array(
-				'label'     => $icon_data['label'],
-				'file_path' => $icons_directory . $icon_data['filePath'],
-			)
-		);
-	}
-}
-
-$default_icons_priority = has_action( 'init', '_wp_register_default_icons' );
-if ( false !== $default_icons_priority ) {
-	remove_action( 'init', '_wp_register_default_icons', $default_icons_priority );
-}
-add_action( 'init', 'gutenberg_register_default_icons' );
 
 if ( ! function_exists( 'wp_get_icon' ) ) {
 	/**

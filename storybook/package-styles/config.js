@@ -1,12 +1,11 @@
-/**
- * Internal dependencies
- */
 import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?inline';
 import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?inline';
 import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inline';
 import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?inline';
 import componentsLtr from '../package-styles/components-ltr.lazy.scss?inline';
 import componentsRtl from '../package-styles/components-rtl.lazy.scss?inline';
+import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
+import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
 import editorLtr from '../package-styles/editor-ltr.lazy.scss?inline';
 import editorRtl from '../package-styles/editor-rtl.lazy.scss?inline';
 import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?inline';
@@ -17,6 +16,8 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
+import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline';
+import mediaEditorRtl from '../package-styles/media-editor-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
@@ -76,16 +77,6 @@ const CONFIG = [
 		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
 	},
 	{
-		// The DataForm stories include a `richtext` control, which renders
-		// format UI from `@wordpress/format-library` and the inline link
-		// popover (`LinkControl`) from `@wordpress/block-editor`. Stack those
-		// styles on top of the `dataviews-` set above (all matching entries
-		// apply); the control's own styles ship with `@wordpress/components`.
-		componentIdMatcher: /^dataviews-dataform/,
-		ltr: [ blockEditorLtr, formatLibraryLtr ],
-		rtl: [ blockEditorRtl, formatLibraryRtl ],
-	},
-	{
 		componentIdMatcher: /^fields-/,
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
@@ -101,14 +92,20 @@ const CONFIG = [
 		rtl: [ designTokens ],
 	},
 	{
+		// Dashboard stories include form controls and the command palette.
+		componentIdMatcher: /^widget-dashboard-/,
+		ltr: [ componentsLtr, commandsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
+	},
+	{
 		componentIdMatcher: /^tokens-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],
 	},
 	{
 		componentIdMatcher: /^mediaeditor-/,
-		ltr: [ componentsLtr ],
-		rtl: [ componentsRtl ],
+		ltr: [ componentsLtr, mediaEditorLtr ],
+		rtl: [ componentsRtl, mediaEditorRtl ],
 	},
 	{
 		componentIdMatcher: /^design-system-/,
@@ -117,6 +114,11 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^design-system-patterns-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
+	{
+		componentIdMatcher: /^widget-primitives-/,
 		ltr: [ componentsLtr, dataviewsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl ],
 	},

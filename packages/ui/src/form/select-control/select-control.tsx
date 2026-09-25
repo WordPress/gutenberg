@@ -1,6 +1,5 @@
 import { forwardRef } from '@wordpress/element';
 import { Field, Select } from '../primitives';
-import { SelectControlSizeContext } from './context';
 import { Item } from './item';
 import type { SelectControlProps } from './types';
 
@@ -20,6 +19,7 @@ export const SelectControl = forwardRef<
 		details,
 		hideLabelFromVision,
 		placeholder,
+		popupWidth = 'content',
 		size = 'default',
 		triggerContent,
 		...restProps
@@ -39,21 +39,26 @@ export const SelectControl = forwardRef<
 				>
 					{ triggerContent }
 				</Select.Trigger>
-				<Select.Popup>
-					<SelectControlSizeContext.Provider value={ size }>
-						{ children !== undefined
-							? children
-							: items?.map( ( item ) => (
-									<Item
-										key={ item.value ?? 'null' }
-										value={ item }
-										label={ item.label }
-										disabled={ item.disabled }
-									>
+				<Select.Popup width={ popupWidth }>
+					{ children !== undefined
+						? children
+						: items?.map( ( item ) => (
+								<Item
+									key={ item.value ?? 'null' }
+									value={ item }
+									label={ item.label }
+									disabled={ item.disabled }
+								>
+									<Select.ItemLabel>
 										{ item.label }
-									</Item>
-							  ) ) }
-					</SelectControlSizeContext.Provider>
+									</Select.ItemLabel>
+									{ item.description ? (
+										<Select.ItemDescription>
+											{ item.description }
+										</Select.ItemDescription>
+									) : null }
+								</Item>
+							) ) }
 				</Select.Popup>
 			</Select.Root>
 			{ description && (

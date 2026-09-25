@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { trash } from '@wordpress/icons';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -14,10 +11,6 @@ import {
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import {
 	getItemTitle,
 	isTemplateOrTemplatePart,
@@ -35,7 +28,7 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 // moves the post to trash.
 const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	id: 'delete-post',
-	label: __( 'Delete' ),
+	label: __( 'Delete…' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
@@ -65,12 +58,12 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 									items.length
 								),
 								items.length
-						  )
+							)
 						: sprintf(
 								// translators: %s: The template or template part's title
 								_x( 'Delete "%s"?', 'template part' ),
 								getItemTitle( items[ 0 ] )
-						  ) }
+							) }
 				</WCText>
 				<HStack justify="right">
 					<Button
@@ -99,7 +92,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														decodeEntities(
 															getItemTitle( item )
 														)
-												  )
+													)
 												: sprintf(
 														/* translators: %s: The template/part's name. */
 														_x(
@@ -109,7 +102,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														decodeEntities(
 															getItemTitle( item )
 														)
-												  );
+													);
 										},
 										getBatchMessage: () => {
 											return isResetting
@@ -127,20 +120,20 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 											return isResetting
 												? __(
 														'An error occurred while reverting the item.'
-												  )
+													)
 												: __(
 														'An error occurred while deleting the item.'
-												  );
+													);
 										},
 										getBatchMessage: ( errors ) => {
 											if ( errors.size === 0 ) {
 												return isResetting
 													? __(
 															'An error occurred while reverting the items.'
-													  )
+														)
 													: __(
 															'An error occurred while deleting the items.'
-													  );
+														);
 											}
 
 											if ( errors.size === 1 ) {
@@ -151,14 +144,14 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 																'An error occurred while reverting the items: %s'
 															),
 															[ ...errors ][ 0 ]
-													  )
+														)
 													: sprintf(
 															/* translators: %s: an error message */
 															__(
 																'An error occurred while deleting the items: %s'
 															),
 															[ ...errors ][ 0 ]
-													  );
+														);
 											}
 
 											return isResetting
@@ -170,7 +163,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														[ ...errors ].join(
 															','
 														)
-												  )
+													)
 												: sprintf(
 														/* translators: %s: a list of comma separated error messages */
 														__(
@@ -179,7 +172,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 														[ ...errors ].join(
 															','
 														)
-												  );
+													);
 										},
 									},
 								},

@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-/**
- * WordPress dependencies
- */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import {
 	generateThumbnails,
 	getTranscodeImageOperation,
@@ -34,23 +24,24 @@ import {
 	convertGifToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
 
 // Mock @wordpress/blob
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn( () => 'blob:mock-url' ),
-	revokeBlobURL: jest.fn(),
+vi.mock( import( '@wordpress/blob' ), () => ( {
+	createBlobURL: vi.fn( () => 'blob:mock-url' ),
+	revokeBlobURL: vi.fn(),
 } ) );
 
 // Mock vips utilities. The real isAnimatedGif() is needed by prepareItem
 // so it is required from the actual module rather than stubbed out.
-jest.mock( '../utils', () => {
-	const actual = jest.requireActual( '../utils' );
+vi.mock( import( '../utils' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
-		vipsHasTransparency: jest.fn(),
-		vipsGetUltraHdrInfo: jest.fn(),
-		vipsRotateImage: jest.fn(),
-		terminateVipsWorker: jest.fn(),
-		maybeRecycleVipsWorker: jest.fn(),
+		vipsHasTransparency: vi.fn(),
+		vipsGetUltraHdrInfo: vi.fn(),
+		vipsRotateImage: vi.fn(),
+		terminateVipsWorker: vi.fn(),
+		maybeRecycleVipsWorker: vi.fn(),
 		isAnimatedGif: actual.isAnimatedGif,
 		cloneFile: actual.cloneFile,
 		convertBlobToFile: actual.convertBlobToFile,
@@ -58,15 +49,26 @@ jest.mock( '../utils', () => {
 	};
 } );
 
+// Mock the HEIC conversion so prepareItem's failure branch can be driven.
+// HeicUnsupportedError is kept real: prepareItem tells the two failures apart
+// with instanceof, so a stubbed class would make the test pass vacuously.
+vi.mock( import( '../../canvas-utils' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		canvasConvertToJpeg: vi.fn(),
+		HeicUnsupportedError: actual.HeicUnsupportedError,
+	};
+} );
+
 // Mock the video-conversion wrapper so the dynamic worker import is never
 // executed. isUnsupportedConversionError is kept real so transcodeGifItem's
 // graceful-skip vs. hard-failure branching is genuinely exercised.
-jest.mock( '../utils/video-conversion', () => {
-	const actual = jest.requireActual( '../utils/video-conversion' );
+vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
-		convertGifToVideo: jest.fn(),
-		cancelGifToVideoOperations: jest.fn(),
-		terminateVideoConversionWorker: jest.fn(),
+		convertGifToVideo: vi.fn(),
+		cancelGifToVideoOperations: vi.fn(),
+		terminateVideoConversionWorker: vi.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 		isSizeLimitConversionError: actual.isSizeLimitConversionError,
 		isConversionTimeoutError: actual.isConversionTimeoutError,
@@ -76,7 +78,7 @@ jest.mock( '../utils/video-conversion', () => {
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should return transcode operation for valid format conversion', async () => {
@@ -341,8 +343,8 @@ describe( 'private actions', () => {
 		];
 
 		it( 'should call mediaFinalize with the attachment ID and sub-sizes', async () => {
-			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -360,8 +362,8 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should pass empty array when no sub-sizes accumulated', async () => {
-			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -378,7 +380,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should not call mediaFinalize when no callback is provided', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
@@ -394,8 +396,8 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should not call mediaFinalize when there is no attachment ID', async () => {
-			const mediaFinalize = jest.fn();
-			const finishOperation = jest.fn();
+			const mediaFinalize = vi.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {},
@@ -424,10 +426,10 @@ describe( 'private actions', () => {
 				id: 42,
 				url: 'https://example.com/wp-content/uploads/image-scaled.jpg',
 			};
-			const mediaFinalize = jest
+			const mediaFinalize = vi
 				.fn()
 				.mockResolvedValue( updatedAttachment );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
 					attachment: {
@@ -457,12 +459,9 @@ describe( 'private actions', () => {
 			// apiFetch rejects a failed REST request with a plain object, not
 			// an Error instance, so reject with one here to mirror that.
 			const restError = { code: 'rest_error', message: 'Server error' };
-			const mediaFinalize = jest.fn().mockRejectedValue( restError );
-			const finishOperation = jest.fn();
-			const cancelItem = jest.fn();
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
+			const mediaFinalize = vi.fn().mockRejectedValue( restError );
+			const finishOperation = vi.fn();
+			const cancelItem = vi.fn();
 			const file = new File( [ 'foo' ], 'foo.jpg', {
 				type: 'image/jpeg',
 			} );
@@ -480,7 +479,7 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
-			expect( warnSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Media finalization failed:',
 				restError
 			);
@@ -492,11 +491,10 @@ describe( 'private actions', () => {
 					file,
 				} )
 			);
-			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => undefined,
 			};
@@ -544,8 +542,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -663,8 +661,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -702,8 +700,8 @@ describe( 'private actions', () => {
 					dispatchedOperations = action.operations;
 				}
 			};
-			dispatch.cancelItem = jest.fn();
-			dispatch.finishOperation = jest.fn();
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
 
 			const select = {
 				getItem: () => item,
@@ -721,19 +719,74 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'prepareItem HEIC conversion failures', () => {
+		async function runPrepareItem() {
+			const file = new File( [ 'data' ], 'IMG_1982.heic', {
+				type: 'image/heic',
+			} );
+			const item = { id: 'heic-id', file, additionalData: {} };
+
+			const dispatch = () => {};
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			await prepareItem( 'heic-id' )( { select, dispatch } );
+
+			return dispatch;
+		}
+
+		it( 'reports a browser with no HEIC decoder as a decode error', async () => {
+			canvasConvertToJpeg.mockRejectedValue(
+				new HeicUnsupportedError( 'No decoder here' )
+			);
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.HEIC_DECODE_ERROR,
+				} )
+			);
+		} );
+
+		it( 'reports a failed decode as a processing error, not a missing decoder', async () => {
+			// A damaged file, an out-of-memory canvas and a null 2d context
+			// all land here. None of them says the browser cannot read HEIC,
+			// so none should send the user off to install another one.
+			const cause = new Error( 'Corrupt image data' );
+			canvasConvertToJpeg.mockRejectedValue( cause );
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					cause,
+				} )
+			);
+		} );
+	} );
+
 	describe( 'transcodeGifItem', () => {
 		const gifFile = new File( [ 'gif' ], 'animation.gif', {
 			type: 'image/gif',
 		} );
 
 		function buildArgs() {
-			const dispatch = Object.assign( jest.fn(), {
-				finishOperation: jest.fn(),
-				cancelItem: jest.fn(),
-				addSideloadItem: jest.fn(),
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				cancelItem: vi.fn(),
+				addSideloadItem: vi.fn(),
 			} );
 			const select = {
-				getItem: jest.fn( () => ( {
+				getItem: vi.fn( () => ( {
 					id: 'gif-1',
 					file: gifFile,
 					parentId: 'parent-1',
@@ -743,22 +796,17 @@ describe( 'private actions', () => {
 			return { select, dispatch };
 		}
 
-		let consoleError;
 		let consoleDebug;
 
 		beforeEach( () => {
 			convertGifToVideo.mockReset();
 			createBlobURL.mockClear();
-			consoleError = jest
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-			consoleDebug = jest
+			consoleDebug = vi
 				.spyOn( console, 'debug' )
 				.mockImplementation( () => {} );
 		} );
 
 		afterEach( () => {
-			consoleError.mockRestore();
 			consoleDebug.mockRestore();
 		} );
 
@@ -883,7 +931,7 @@ describe( 'private actions', () => {
 				dispatch.cancelItem.mock.calls[ 0 ];
 			expect( cancelledId ).toBe( 'gif-1' );
 			expect( silent ).toBe( true );
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
@@ -911,7 +959,7 @@ describe( 'private actions', () => {
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'exceeds maximum conversion size' )
 			);
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
@@ -936,7 +984,7 @@ describe( 'private actions', () => {
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'timed out' )
 			);
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
@@ -958,14 +1006,17 @@ describe( 'private actions', () => {
 			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
 			expect( error.cause ).toBe( cause );
 			expect( silent ).toBe( true );
-			expect( consoleError ).toHaveBeenCalled();
+			expect( console ).toHaveErroredWith(
+				'[video-conversion] GIF to video conversion failed:',
+				cause
+			);
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when the item is not in the queue', async () => {
 			const { dispatch } = buildArgs();
-			const select = { getItem: jest.fn( () => undefined ) };
+			const select = { getItem: vi.fn( () => undefined ) };
 
 			await transcodeGifItem( 'missing' )( { select, dispatch } );
 
@@ -977,9 +1028,9 @@ describe( 'private actions', () => {
 
 	describe( 'generateThumbnails (animated GIF video sideload)', () => {
 		function runGenerate( { item, settings } ) {
-			const dispatchFn = jest.fn();
-			dispatchFn.finishOperation = jest.fn();
-			dispatchFn.addSideloadItem = jest.fn();
+			const dispatchFn = vi.fn();
+			dispatchFn.finishOperation = vi.fn();
+			dispatchFn.addSideloadItem = vi.fn();
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
@@ -1082,7 +1133,7 @@ describe( 'private actions', () => {
 		} );
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'probes the file and finishes the operation when UltraHDR', async () => {
@@ -1091,7 +1142,7 @@ describe( 'private actions', () => {
 				height: 768,
 				hdrCapacity: 3,
 			} );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const item = makeItem();
 			const select = { getItem: () => item };
 			const dispatch = { finishOperation };
@@ -1108,7 +1159,7 @@ describe( 'private actions', () => {
 
 		it( 'finishes cleanly when buffer is not UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( null );
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
 			const dispatch = { finishOperation };
 
@@ -1122,7 +1173,7 @@ describe( 'private actions', () => {
 			vipsGetUltraHdrInfo.mockRejectedValue(
 				new Error( 'wasm module unavailable' )
 			);
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
 			const dispatch = { finishOperation };
 
@@ -1134,7 +1185,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'returns early when item is not found', async () => {
-			const finishOperation = jest.fn();
+			const finishOperation = vi.fn();
 			const select = { getItem: () => undefined };
 			const dispatch = { finishOperation };
 
@@ -1173,12 +1224,12 @@ describe( 'private actions', () => {
 		} );
 
 		const makeHarness = ( item, settings = {} ) => {
-			const addSideloadItem = jest.fn();
-			const finishOperation = jest.fn();
+			const addSideloadItem = vi.fn();
+			const finishOperation = vi.fn();
 			const dispatch = {
 				addSideloadItem,
 				finishOperation,
-				addItem: jest.fn(),
+				addItem: vi.fn(),
 			};
 			const select = {
 				getItem: () => item,
@@ -1204,7 +1255,7 @@ describe( 'private actions', () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( ULTRAHDR_INFO );
 			await detectUltraHdr( item.id )( {
 				select: { getItem: () => item },
-				dispatch: { finishOperation: jest.fn() },
+				dispatch: { finishOperation: vi.fn() },
 			} );
 		};
 
@@ -1213,12 +1264,12 @@ describe( 'private actions', () => {
 		const clearTracking = async ( id ) => {
 			await removeItem( id )( {
 				select: { getItem: () => ( {} ), getAllItems: () => [] },
-				dispatch: jest.fn(),
+				dispatch: vi.fn(),
 			} );
 		};
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		afterEach( async () => {
@@ -1256,10 +1307,10 @@ describe( 'private actions', () => {
 
 		it( 'keeps the over-threshold -scaled full-size copy as UltraHDR (no transcode)', async () => {
 			const originalCreateImageBitmap = global.createImageBitmap;
-			global.createImageBitmap = jest.fn( async () => ( {
+			global.createImageBitmap = vi.fn( async () => ( {
 				width: 5000,
 				height: 4000,
-				close: jest.fn(),
+				close: vi.fn(),
 			} ) );
 
 			try {
@@ -1350,11 +1401,11 @@ describe( 'private actions', () => {
 		} );
 
 		const makeHarness = ( item ) => {
-			const addSideloadItem = jest.fn();
+			const addSideloadItem = vi.fn();
 			const dispatch = {
 				addSideloadItem,
-				finishOperation: jest.fn(),
-				addItem: jest.fn(),
+				finishOperation: vi.fn(),
+				addItem: vi.fn(),
 			};
 			const select = {
 				getItem: () => item,
@@ -1373,7 +1424,7 @@ describe( 'private actions', () => {
 			);
 
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			vipsRotateImage.mockResolvedValue(
 				new File( [ 'rotated' ], 'photo-rotated.jpg', {
 					type: 'image/jpeg',
@@ -1486,9 +1537,6 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'continues thumbnail generation when rotation fails', async () => {
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
 			vipsRotateImage.mockRejectedValue( new Error( 'decode failed' ) );
 
 			const item = makeItem( {
@@ -1497,21 +1545,17 @@ describe( 'private actions', () => {
 			} );
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			try {
-				await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( { select, dispatch } );
 
-				expect( warnSpy ).toHaveBeenCalledWith(
-					'Failed to rotate image, continuing with thumbnails'
-				);
-				expect(
-					sideloadedSize( addSideloadItem, 'original' )
-				).toBeUndefined();
-				expect(
-					sideloadedSize( addSideloadItem, 'thumbnail' )
-				).toBeDefined();
-			} finally {
-				warnSpy.mockRestore();
-			}
+			expect( console ).toHaveWarnedWith(
+				'Failed to rotate image, continuing with thumbnails'
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+			expect(
+				sideloadedSize( addSideloadItem, 'thumbnail' )
+			).toBeDefined();
 		} );
 	} );
 
@@ -1520,15 +1564,15 @@ describe( 'private actions', () => {
 			// The queue already counts its items for progress UI; the
 			// `mediaUpload` callback it delegates the server upload to must
 			// not count the same file again (see gutenberg#80369).
-			const mediaUpload = jest.fn();
+			const mediaUpload = vi.fn();
 			const file = new File( [ 'content' ], 'photo.jpg', {
 				type: 'image/jpeg',
 			} );
 			const item = { id: 'item-1', file, additionalData: {} };
 
-			const dispatch = jest.fn();
-			dispatch.finishOperation = jest.fn();
-			dispatch.cancelItem = jest.fn();
+			const dispatch = vi.fn();
+			dispatch.finishOperation = vi.fn();
+			dispatch.cancelItem = vi.fn();
 
 			await uploadItem( 'item-1' )( {
 				select: {
@@ -1549,7 +1593,7 @@ describe( 'private actions', () => {
 
 	describe( 'removeItem worker teardown', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		const runRemove = async ( remaining ) =>
@@ -1558,7 +1602,7 @@ describe( 'private actions', () => {
 					getItem: () => ( {} ),
 					getAllItems: () => remaining,
 				},
-				dispatch: jest.fn(),
+				dispatch: vi.fn(),
 			} );
 
 		it( 'terminates both background workers once the queue empties', async () => {

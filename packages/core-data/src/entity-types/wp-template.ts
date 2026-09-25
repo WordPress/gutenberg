@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Context,
 	PostStatus,
@@ -8,7 +5,6 @@ import type {
 	OmitNevers,
 	ContextualField,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
