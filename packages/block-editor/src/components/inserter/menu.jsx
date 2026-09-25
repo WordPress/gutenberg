@@ -18,7 +18,7 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
 import { PatternCategoryPreviews } from './block-patterns-tab/pattern-category-previews';
-import { MediaTab, MediaCategoryPanel } from './media-tab';
+import { MediaTab } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
@@ -63,8 +63,6 @@ function InserterMenu(
 		__experimentalInitialCategory
 	);
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
-	const [ selectedMediaCategory, setSelectedMediaCategory ] =
-		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
@@ -167,8 +165,6 @@ function InserterMenu(
 		selectedTab === 'patterns' &&
 		! delayedFilterValue &&
 		!! selectedPatternCategory;
-
-	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
 	const [ isScrolled, setIsScrolled ] = useState( false );
 	const blocksPanelRef = useRef( null );
@@ -312,26 +308,10 @@ function InserterMenu(
 		return (
 			<MediaTab
 				rootClientId={ destinationRootClientId }
-				selectedCategory={ selectedMediaCategory }
-				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
-			>
-				{ showMediaPanel && (
-					<MediaCategoryPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
-						category={ selectedMediaCategory }
-					/>
-				) }
-			</MediaTab>
+			/>
 		);
-	}, [
-		destinationRootClientId,
-		onInsert,
-		selectedMediaCategory,
-		setSelectedMediaCategory,
-		showMediaPanel,
-	] );
+	}, [ destinationRootClientId, onInsert ] );
 
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
@@ -358,7 +338,7 @@ function InserterMenu(
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
-				'show-panel': showPatternPanel || showMediaPanel,
+				'show-panel': showPatternPanel,
 				'is-zoom-out': isZoomOutMode,
 			} ) }
 			ref={ ref }

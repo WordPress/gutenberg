@@ -214,10 +214,6 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-inserter__media-list__list-item {
-		height: 100%;
-	}
-
 	.block-editor-block-card {
 		padding-left: 0;
 		padding-right: 0;
@@ -229,17 +225,12 @@ $block-inserter-tabs-height: 44px;
 	border-bottom: $border-width solid $gray-200;
 }
 
-.block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	flex-grow: 1;
 	padding: 0 $grid-unit-20 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-}
-
-.block-editor-inserter__media-tabs-container {
-	padding-top: $grid-unit-20;
 }
 
 .block-editor-inserter__category-tablist {
@@ -263,7 +254,6 @@ $block-inserter-tabs-height: 44px;
 		background: $gray-100;
 		border-top: $border-width solid $gray-200;
 
-		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
 			padding: 0 $grid-unit-30 $grid-unit-20;
 		}
@@ -288,7 +278,6 @@ $block-inserter-tabs-height: 44px;
 	min-width: 280px;
 }
 
-.block-editor-inserter__media-list,
 .block-editor-block-patterns-list {
 	overflow-y: auto;
 	flex-grow: 1;
@@ -350,9 +339,6 @@ $block-inserter-tabs-height: 44px;
 		gap: $grid-unit-10;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
-		}
-		.block-editor-inserter__media-list__list-item {
-			min-height: 100px;
 		}
 	}
 }
@@ -425,12 +411,6 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-patterns-list__list-item {
 		min-height: 240px;
 	}
-
-	.block-editor-inserter__media-list__list-item {
-		height: inherit;
-		min-height: 100px;
-		max-height: 800px;
-	}
 }
 
 .components-heading.block-editor-inserter__patterns-category-panel-title {
@@ -447,238 +427,178 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-// On mobile the media category renders inside a `Navigator.Screen`. The screen
-// is a grid item the navigator aligns to the start (so it's content-height by
-// default); stretch it to full height and make it a flex column so the panel
-// below the back-button header fills the remaining space rather than overflowing.
-.block-editor-inserter__media-mobile-screen {
+// The Media tab is a single column: every source is a collapsible panel, and
+// the open one takes the height left beneath the other panels' headers so its
+// results scroll internally. The column is at least as tall as its content
+// (the headers plus the open panel's minimum height), so with many sources or
+// a short viewport it outgrows the tab panel, which scrolls.
+$media-panel-min-height: 320px;
+
+.block-editor-inserter__media-sources {
 	display: flex;
 	flex-direction: column;
-	align-self: stretch;
+	flex: 1 0 auto;
+
+	.block-editor-inserter__media-sources__source {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		border-bottom: $border-width solid $gray-200;
+
+		// The open panel grows to fill the column but never below a usable
+		// height (roughly the search field, two rows of cards and the pager).
+		// Below that the column outgrows the tab panel, which scrolls.
+		&.is-open {
+			flex: 1;
+			min-height: $media-panel-min-height;
+		}
+	}
+
+	.block-editor-inserter__media-sources__trigger {
+		// Reset the native button so the header reads as a row in the column.
+		appearance: none;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		cursor: var(--wpds-cursor-control);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: $grid-unit-10;
+		width: 100%;
+		padding: $grid-unit-15 $grid-unit-20;
+		font-weight: 500;
+		text-align: start;
+		flex-shrink: 0;
+
+		&:focus-visible {
+			@include outset-ring__focus();
+		}
+	}
+
+	.block-editor-inserter__media-sources__panel {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	.block-editor-inserter__media-sources__footer {
+		flex-shrink: 0;
+		// Pinned to the bottom of the sidebar even when every panel is
+		// collapsed and nothing above it grows.
+		margin-top: auto;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+	}
 }
 
 .block-editor-inserter__media-panel {
-	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
-	// Mobile: fill the height left below the screen's back-button header so the
-	// results scroll internally and the attach footer stays on-screen.
+	// Fill the height of the open source panel so the results scroll
+	// internally and the footer stays on-screen.
 	flex: 1;
 	min-height: 0;
 
-	@include break-medium {
-		padding: 0;
-		// Desktop: the panel lives in the absolutely-positioned category panel,
-		// so fill its height directly instead.
-		flex: 0 1 auto;
-		min-height: 100%;
+	// The panel body is a DataViews grid composed from its sub-components.
+	// Strip the surface colour DataViews brings for full-page use, and let its
+	// layout container be the scroll host across the panel's full width, so
+	// the scrollbar sits at the sidebar edge: the search, grid, empty state
+	// and footer each carry the horizontal gutter instead of the panel.
+	.dataviews-wrapper {
+		background-color: transparent;
 	}
 
-	.block-editor-inserter__media-panel-spinner {
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex: 1;
-	}
+	.block-editor-inserter__media-grid__search {
+		flex-shrink: 0;
+		padding: 0 $grid-unit-20 $grid-unit-20;
 
-	.block-editor-inserter__media-panel-search {
-		margin-bottom: $grid-unit-30;
-		@include break-medium() {
-			margin-bottom: 0;
-			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+		.dataviews-search {
+			width: 100%;
 		}
 	}
 
-	// The empty state grows to fill, alongside `-results`/`-spinner`, so the
-	// attach footer below stays pinned to the bottom in every state.
-	.block-editor-inserter__no-results {
-		flex-grow: 1;
+	.dataviews-view-grid {
+		padding: 0 $grid-unit-20 $grid-unit-20;
+
+		// The footer supplies the breathing room beneath the grid when present,
+		// so drop the grid's own bottom gutter rather than doubling up.
+		&.has-footer {
+			padding-bottom: 0;
+		}
 	}
 
-	.block-editor-inserter__media-panel-footer {
+	.dataviews-no-results,
+	.dataviews-loading {
+		padding: 0 $grid-unit-20;
+	}
+
+	.block-editor-inserter__media-grid__footer {
 		// Keeps the footer at its natural height rather than collapsing to make
 		// room for the scrolling grid above.
 		flex-shrink: 0;
-		padding-top: $grid-unit-20;
-		padding-bottom: $grid-unit-20;
-		@include break-medium() {
-			// Align with the search field and grid gutters.
-			padding-left: $grid-unit-30;
-			padding-right: $grid-unit-30;
+		padding: $grid-unit-20;
+	}
+
+	.block-editor-inserter__media-grid__date-span {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+		// Beside the pager there is only room for one line: truncate rather
+		// than wrap (the full span is in the `title`).
+		min-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.block-editor-inserter__media-grid__preview {
+		position: relative;
+		width: 100%;
+		height: 100%;
+
+		img,
+		video {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
+
+		audio {
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+		}
+	}
+
+	.block-editor-inserter__media-grid__spinner {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba($white, 0.6);
 	}
 
 	.block-editor-inserter__media-panel-attach {
 		// Match the padding (and so the height) of the "Open Media Library"
-		// footer button in the adjacent column, so the two line up.
+		// button beneath the panels, so the two line up.
 		&.components-button {
 			justify-content: center;
 			padding: $grid-unit-20;
 		}
 	}
-
-	.block-editor-inserter__media-panel-results {
-		// Take over the scroll host role the media list had when it was a direct
-		// flex child of the panel: grow to fill and constrain height
-		// (`min-height: 0` lets the inner list's `overflow-y: auto` engage).
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-		min-height: 0;
-
-		// While an attach/detach refetch is in flight, dim the existing grid (and
-		// gently pulse it) rather than clearing it or blocking it with a spinner.
-		// Mirrors the DataViews "refreshing" treatment; the delayed `is-loading`
-		// class (see `useDelayedLoading`) means quick refetches show nothing.
-		&.is-loading .block-editor-inserter__media-list {
-			opacity: 0.5;
-			pointer-events: none;
-
-			@media not ( prefers-reduced-motion ) {
-				opacity: 1;
-				animation: inserter-media-panel-pulse 1s ease-in-out infinite;
-			}
-		}
-	}
-
-	// When the footer is present it supplies the breathing room beneath the grid,
-	// so drop the list's own bottom padding — otherwise scrolling to the end
-	// leaves a doubled gap before the footer.
-	&.has-footer .block-editor-inserter__media-list {
-		padding-bottom: 0;
-	}
 }
 
-@keyframes inserter-media-panel-pulse {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-}
-
-.block-editor-inserter__media-panel-detach-modal {
-	// Render above the ellipsis dropdown (a `.components-popover`) it opens from,
-	// which otherwise stacks over the modal. Matches other dropdown-triggered
-	// modals (e.g. block rename).
-	z-index: z-index(".block-editor-inserter__media-panel-detach-modal");
-
-	p {
-		margin-top: 0;
-	}
-}
-
+// The "Detach" action's confirmation, rendered inside the DataViews action
+// modal.
 .block-editor-inserter__media-panel-detach-actions {
 	display: flex;
 	justify-content: flex-end;
 	gap: $grid-unit-10;
 	margin-top: $grid-unit-20;
 }
-
-.block-editor-inserter__media-list__list-item {
-	position: relative;
-	cursor: var(--wpds-cursor-control);
-	margin-bottom: $grid-unit-30;
-
-	&.is-placeholder {
-		min-height: 100px;
-	}
-
-	&[draggable="true"] .block-editor-inserter__media-list__list-item {
-		cursor: grab;
-	}
-
-	&.is-hovered {
-		.block-editor-inserter__media-list__item-preview > * {
-			outline-color: rgba($black, 0.3);
-		}
-	}
-
-	// Reveal the per-item options button on hover, and — so keyboard users can
-	// reach it — whenever focus is within the item (e.g. its preview is
-	// focused). The button is `display: none` by default, which can never
-	// receive focus, so without `:focus-within` the detach/report action is
-	// unreachable by keyboard.
-	&.is-hovered,
-	&:focus-within {
-		.block-editor-inserter__media-list__item-preview-options > button {
-			display: block;
-		}
-	}
-
-	.block-editor-inserter__media-list__item-preview-options {
-		position: absolute;
-		right: $grid-unit-10;
-		top: $grid-unit-10;
-
-		> button {
-			background: $white;
-			display: none;
-
-			// These styles are important so as focus isn't lost
-			// when the button is focused and we hover away.
-			&.is-opened,
-			&:focus {
-				display: block;
-			}
-
-			&:hover {
-				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-				// Windows High Contrast mode will show this outline, but not the box-shadow.
-				outline: 2px solid transparent;
-			}
-		}
-	}
-}
-
-.block-editor-inserter__media-list__item {
-	height: 100%;
-
-	.block-editor-inserter__media-list__item-preview {
-		display: flex;
-		align-items: center;
-		overflow: hidden;
-		border-radius: $radius-small;
-
-		> * {
-			margin: 0 auto;
-			max-width: 100%;
-			outline: $border-width solid rgba($black, 0.1);
-			outline-offset: -$border-width;
-		}
-
-		.block-editor-inserter__media-list__item-preview-spinner {
-			display: flex;
-			height: 100%;
-			width: 100%;
-			position: absolute;
-			justify-content: center;
-			background: rgba($white, 0.7);
-			align-items: center;
-			pointer-events: none;
-		}
-	}
-
-	&:focus .block-editor-inserter__media-list__item-preview > * {
-		outline-color: var(--wp-admin-theme-color);
-		outline-width: var(--wp-admin-border-width-focus);
-		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
-		@media not ( prefers-reduced-motion ) {
-			transition: outline 0.1s linear;
-		}
-	}
-}
-
-.block-editor-inserter__media-list__item-preview-options__popover {
-	.components-menu-item__button .components-menu-item__item {
-		min-width: auto;
-	}
-}
-
 
 .block-editor-inserter__mobile-tab-navigation {
 	padding: $grid-unit-20;
