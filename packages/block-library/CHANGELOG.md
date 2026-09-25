@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Navigation: keep the default overlay menu padding in themes that don't define root padding, such as classic themes ([#59360](https://github.com/WordPress/gutenberg/issues/59360)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
