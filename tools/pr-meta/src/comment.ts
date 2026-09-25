@@ -9,7 +9,6 @@ export type ParsedSection = {
 	body: string;
 	sha?: string;
 	runUrl?: string;
-	generation?: number;
 };
 
 export type SectionUpdate = {
@@ -17,8 +16,6 @@ export type SectionUpdate = {
 	body: string;
 	sha?: string;
 	runUrl?: string;
-	/** Run that produced this, to order writes a commit cannot order. */
-	generation?: number;
 };
 
 const SECTION_PATTERN =
@@ -150,9 +147,8 @@ export function demoteHeadings( body: string ): string {
 
 function parseAttributes(
 	raw: string
-): Pick< ParsedSection, 'sha' | 'runUrl' | 'generation' > {
-	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' | 'generation' > =
-		{};
+): Pick< ParsedSection, 'sha' | 'runUrl' > {
+	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' > = {};
 
 	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
 		const [ key, value ] = pair.split( '=' );
@@ -160,11 +156,6 @@ function parseAttributes(
 			attributes.sha = value;
 		} else if ( key === 'run' ) {
 			attributes.runUrl = value;
-		} else if ( key === 'gen' ) {
-			const generation = Number.parseInt( value, 10 );
-			attributes.generation = Number.isNaN( generation )
-				? undefined
-				: generation;
 		}
 	}
 
@@ -275,7 +266,6 @@ function renderSection(
 	const attributes = [
 		section.sha && `sha=${ section.sha }`,
 		section.runUrl && `run=${ section.runUrl }`,
-		section.generation !== undefined && `gen=${ section.generation }`,
 	]
 		.filter( Boolean )
 		.join( ' ' );
@@ -289,15 +279,6 @@ function renderSection(
 		definition ?? UNKNOWN_SECTION,
 		section.runUrl
 	);
-
-	/*
-	 * A cleared section stays as a bare pair of markers, invisible in the
-	 * rendered comment but still carrying its generation, so a run that was
-	 * gathered earlier cannot bring the old content back.
-	 */
-	if ( body === '' ) {
-		return `${ open }\n\n${ close }`;
-	}
 
 	const delimited = `${ open }\n${ body }\n${ close }`;
 
@@ -413,23 +394,6 @@ export function mergeSection(
 	 * optional, since without either one the two cases are indistinguishable
 	 * and guessing lets the stale run through.
 	 */
-	/*
-	 * A section describing the pull request rather than a commit has no SHA to
-	 * order writes by. Two runs can gather their view, queue behind each other
-	 * on the shared lock, and land out of order, so the later-numbered run
-	 * wins regardless of which reaches the lock first.
-	 */
-	if (
-		definition.scope === 'pr-state' &&
-		update.generation !== undefined &&
-		current?.generation !== undefined &&
-		update.generation < current.generation
-	) {
-		return {
-			rejected: `Result is from run ${ update.generation }, older than the run ${ current.generation } already reported.`,
-		};
-	}
-
 	if ( definition.scope === 'commit' && ( update.body || current ) ) {
 		if ( ! update.sha || ! headSha ) {
 			return {
@@ -449,37 +413,22 @@ export function mergeSection(
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);
-	/*
-	 * Clearing keeps the entry when it has a generation to remember, so a
-	 * later, older write is still ordered against it.
-	 */
-	const cleared =
-		definition.scope === 'pr-state' && update.generation !== undefined;
-	const next =
-		body || cleared
-			? [
-					...remaining,
-					{
-						id: update.id,
-						body,
-						sha:
-							definition.scope === 'commit'
-								? update.sha
-								: undefined,
-						runUrl:
-							definition.scope === 'commit'
-								? update.runUrl
-								: undefined,
-						generation:
-							definition.scope === 'pr-state'
-								? update.generation
-								: undefined,
-					},
-				]
-			: remaining;
+	const next = body
+		? [
+				...remaining,
+				{
+					id: update.id,
+					body,
+					sha: definition.scope === 'commit' ? update.sha : undefined,
+					runUrl:
+						definition.scope === 'commit'
+							? update.runUrl
+							: undefined,
+				},
+			]
+		: remaining;
 
-	/* Markers alone render as nothing, so a comment of them is worth no comment. */
-	if ( next.every( ( section ) => section.body === '' ) ) {
+	if ( next.length === 0 ) {
 		return { remove: Boolean( existing ) };
 	}
 

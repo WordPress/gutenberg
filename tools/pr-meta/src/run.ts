@@ -100,8 +100,6 @@ async function run() {
 			body,
 			sha: getInput( 'commit-sha' ) || undefined,
 			runUrl: getInput( 'run-url' ) || undefined,
-			generation:
-				Number.parseInt( getInput( 'generation' ), 10 ) || undefined,
 		},
 		headSha
 	);
