@@ -13,7 +13,7 @@
  * the script modules registered for it, each with the ids of the fields it
  * applies to. register() validates the definitions before storing them.
  *
- * Fields are registered on the `gutenberg_fields_api_init` action, on the
+ * Fields are registered on the `fields_api_init` action, on the
  * registry its callbacks receive. There is no function wrapping register()
  * or unregister(): the action is the one place a plugin gets the instance,
  * once the default fields are in place, the way `customize_register` hands
@@ -23,7 +23,7 @@
  *
  * The registry exists once `init` has run, see get_instance(), and is
  * filled lazily: the first time its fields are read it fires the
- * `gutenberg_fields_api_init` action, on which the default fields of every
+ * `fields_api_init` action, on which the default fields of every
  * post type and the fields of plugins are registered. Registering does not
  * fire the action; reading does, and only once. This mirrors how
  * rest_get_server() fires `rest_api_init` on its first use.
@@ -51,7 +51,7 @@ final class Gutenberg_Fields_Registry {
 	private $field_modules = array();
 
 	/**
-	 * Whether the `gutenberg_fields_api_init` action has fired since the registry
+	 * Whether the `fields_api_init` action has fired since the registry
 	 * was created or last reset.
 	 *
 	 * @var bool
@@ -188,7 +188,7 @@ final class Gutenberg_Fields_Registry {
 	 * modules, and removals.
 	 *
 	 * Unregistering reads the registered fields, so it fires the
-	 * `gutenberg_fields_api_init` action if it has not fired yet. Call it on that
+	 * `fields_api_init` action if it has not fired yet. Call it on that
 	 * action or later, once the default fields are registered.
 	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
@@ -291,7 +291,7 @@ final class Gutenberg_Fields_Registry {
 	}
 
 	/**
-	 * Empties the registry, so the next read fires the `gutenberg_fields_api_init`
+	 * Empties the registry, so the next read fires the `fields_api_init`
 	 * action again and registers the fields anew.
 	 *
 	 * Intended for tests.
@@ -303,7 +303,7 @@ final class Gutenberg_Fields_Registry {
 	}
 
 	/**
-	 * Fires the `gutenberg_fields_api_init` action the first time the registry
+	 * Fires the `fields_api_init` action the first time the registry
 	 * is read.
 	 *
 	 * The registry only exists once `init` has run, see get_instance(), so
@@ -339,7 +339,7 @@ final class Gutenberg_Fields_Registry {
 		 *
 		 * @param Gutenberg_Fields_Registry $registry The registry being read.
 		 */
-		do_action( 'gutenberg_fields_api_init', $this );
+		do_action( 'fields_api_init', $this );
 	}
 
 	/**
