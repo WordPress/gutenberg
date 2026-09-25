@@ -7,13 +7,21 @@ test.describe( 'Dataviews List Layout', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
+
+		/*
+		 * The tests expect only "Privacy Policy" then "Sample Page", newest first, so start
+		 * with no pages and give each an explicit date to keep their order stable.
+		 */
+		await requestUtils.deleteAllPages();
 		await requestUtils.createPage( {
 			title: 'Privacy Policy',
 			status: 'publish',
+			date: '2024-01-02T00:00:00',
 		} );
 		await requestUtils.createPage( {
 			title: 'Sample Page',
 			status: 'publish',
+			date: '2024-01-01T00:00:00',
 		} );
 	} );
 
