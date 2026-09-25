@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-### Deprecations
-
--   `Autocomplete`: deprecate the component. Pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
-
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. Pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
 
 ### Bug Fixes
 

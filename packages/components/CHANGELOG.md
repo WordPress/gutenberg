@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-### Deprecations
-
--   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
--   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
-
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
@@ -17,6 +12,11 @@
 ### Enhancements
 
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
+
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
 
 ### Bug Fixes
 
