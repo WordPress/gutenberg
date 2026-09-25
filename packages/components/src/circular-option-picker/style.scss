@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -120,6 +121,9 @@ $color-palette-circle-spacing: 12px;
 	margin-right: $grid-unit-20;
 
 	.components-button {
-		line-height: 22px;
+		// This is a text link (variant="link"), so it inherits the default
+		// .components-button font-size, $default-font-size (13px). Unit-less
+		// equivalent of 22px at that font-size.
+		line-height: math.div(22, 13);
 	}
 }
