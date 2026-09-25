@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Term Template: Fall back to the values the editor requests when the markup leaves out `termQuery` keys such as `order`, `orderBy` or `hideEmpty`, instead of logging "Undefined array key" warnings and ordering the terms newest first ([#83161](https://github.com/WordPress/gutenberg/pull/83161)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
