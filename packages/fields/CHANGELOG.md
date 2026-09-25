@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `date`: Render nothing instead of the current date when the post has no date ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `discussion`: Only describe the comment and ping settings that are known, instead of reporting "Closed" for settings that have not been loaded ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+-   `author`: Drop the avatar's alt text so it no longer repeats the author name that follows it ([#80695](https://github.com/WordPress/gutenberg/pull/80695)).
+
 ## 0.48.0 (2026-09-23)
 
 ### Enhancements
