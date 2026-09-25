@@ -1036,7 +1036,7 @@ The following set of react hooks available to import from the `@wordpress/core-d
 
 Hook that returns block content getters and setters for the nearest provided entity of the specified type.
 
-The return value has the shape `[ blocks, onInput, onChange ]`. `onInput` is for block changes that don't create undo levels or dirty the post, non-persistent changes, and `onChange` is for persistent changes. They map directly to the props of a `BlockEditorProvider` and are intended to be used with it, or similar components or hooks.
+The return value has the shape `[ blocks, onInput, onChange, { selection, onChangeSelection } ]`. `onInput` is for block changes that don't create undo levels or dirty the post, non-persistent changes, and `onChange` is for persistent changes. They map directly to the props of a `BlockEditorProvider` and are intended to be used with it, or similar components or hooks. `selection`/`onChangeSelection` read and write this entity's own selection.
 
 _Parameters_
 
@@ -1047,7 +1047,7 @@ _Parameters_
 
 _Returns_
 
-- `[unknown[], Function, Function]`: The block array and setters.
+- `[unknown[], Function, Function, Object]`: The block array, setters, and selection state.
 
 ### useEntityId
 
