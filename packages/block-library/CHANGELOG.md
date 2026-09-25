@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Query Pagination: Explain in the "Show label text" help that screen readers still announce a hidden label on the site ([#83160](https://github.com/WordPress/gutenberg/pull/83160)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
