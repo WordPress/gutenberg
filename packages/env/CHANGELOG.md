@@ -8,6 +8,10 @@
 
 -   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).
 
+### Internal
+
+-   Update `@wp-playground/cli` to 3.1.54, which replaces the `fs-ext` optional dependency with a prebuilt fork, so no install-time compilation is needed ([#82849](https://github.com/WordPress/gutenberg/pull/82849)).
+
 ## 11.15.0 (2026-09-10)
 
 ### Bug Fixes

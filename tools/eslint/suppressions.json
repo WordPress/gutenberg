@@ -4566,6 +4566,41 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/composite/group-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/hover.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/index.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/row.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/composite/typeahead.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/components/src/context/test/context-system-provider.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4636,9 +4671,64 @@
 			"count": 3
 		}
 	},
+	"packages/components/src/menu/checkbox-item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/item-help-text.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/item-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/popover.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/radio-item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/separator.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 4
+		}
+	},
 	"packages/components/src/menu/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
+		}
+	},
+	"packages/components/src/menu/submenu-trigger-item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu/trigger-button.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
 		}
 	},
 	"packages/components/src/navigator/styles.ts": {
@@ -4699,8 +4789,28 @@
 			"count": 2
 		}
 	},
+	"packages/components/src/tabs/index.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/components/src/tabs/styles.ts": {
 		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/tabs/tab.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/tabs/tablist.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/components/src/tabs/tabpanel.tsx": {
+		"@typescript-eslint/no-shadow": {
 			"count": 1
 		}
 	},
@@ -4801,6 +4911,11 @@
 	},
 	"packages/compose/src/hooks/use-disabled/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-dragging/index.ts": {
+		"@typescript-eslint/no-shadow": {
 			"count": 1
 		}
 	},
@@ -5096,6 +5211,9 @@
 		}
 	},
 	"packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -7553,6 +7671,16 @@
 			"count": 2
 		}
 	},
+	"packages/grid/src/dashboard-grid/index.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/grid/src/dashboard-lanes/index.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/image-cropper/src/stories/index.story.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -7718,6 +7846,491 @@
 			"count": 8
 		}
 	},
+	"packages/theme/src/color-ramps/stories/ramp-table.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/alert-dialog/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 2
+		}
+	},
+	"packages/ui/src/badge/badge.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/breadcrumb/overflow-trigger-button.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/breadcrumb/separator.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/breadcrumb/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/button/button.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/button/icon.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/calendar/calendar.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/calendar/range-calendar.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/collapsible/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 2
+		}
+	},
+	"packages/ui/src/form/checkbox-control/checkbox-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/input-control/input-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/clear.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/empty.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/group-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/input-group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/input.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/list-body.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/list.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/popup.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/row.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/autocomplete/status.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/checkbox-group/checkbox-group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/checkbox-group/nested-items.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/checkbox/checkbox.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/chip-with-remove.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/chips.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/clear.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/empty.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/group-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/input-group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/input.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/list-body.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/list-footer.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/list.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/popup.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/status.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/combobox/trigger.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/control-with-error/control-with-error.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/control-with-error/test/control-with-error.browser.test.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/control-with-error/test/fixtures/validated-input-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 2
+		}
+	},
+	"packages/ui/src/form/primitives/field/control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/description.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/details.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/root.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/field/visual-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/fieldset/description.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/fieldset/details.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/fieldset/legend.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/fieldset/root.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/input-layout/input-layout.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/input-layout/slot.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/input/input.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/radio-group/radio-group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/radio/radio.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/searchable-chip-select/searchable-chip-select.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/searchable-select/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/searchable-select/searchable-select.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/group-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/group.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/item-description.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/item-label.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/popup.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/select/trigger.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/switch/switch.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/primitives/textarea/textarea.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/radio-group-control/radio-group-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/searchable-chip-select-control/searchable-chip-select-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/searchable-select-control/searchable-select-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/select-control/item.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/select-control/select-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/switch-control/switch-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/textarea-control/textarea-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/with-validation/validated-input-control/validated-input-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/form/with-validation/validated-textarea-control/validated-textarea-control.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/icon-button/icon-button.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/icon/icon.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/link-button/icon.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/link-button/link-button.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/link/link.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/popover/stories/utils.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/skeleton/skeleton.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/spinner/spinner.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/stack/stack.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/tabs/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/tabs/tab.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/text/text.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/utils/keyboard-shortcut.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 2
+		}
+	},
+	"packages/ui/src/visually-hidden/visually-hidden.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7743,8 +8356,53 @@
 			"count": 1
 		}
 	},
+	"packages/widget-dashboard/src/components/widget-chrome/widget-chrome.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-header/widget-header-infotip.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widgets/widget-resize-handle.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widgets/widgets.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
 	"packages/widget-dashboard/src/lock-unlock.ts": {
 		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/test/host-links.browser.test.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/widget-dashboard.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-primitives/src/components/widget-render/stories/index.story.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
+		}
+	},
+	"packages/widget-primitives/src/widget-host/host-link.tsx": {
+		"@typescript-eslint/no-shadow": {
 			"count": 1
 		}
 	},
@@ -7830,6 +8488,11 @@
 		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		}
+	},
+	"routes/dashboard/widget-host/dashboard-widget-host-provider.tsx": {
+		"@typescript-eslint/no-shadow": {
+			"count": 1
 		}
 	},
 	"routes/experiments-home/stage.tsx": {

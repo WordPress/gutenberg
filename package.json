@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=24.18.0",
-		"npm": ">=11.16.0"
+		"npm": ">=12.0.2"
 	},
 	"devEngines": {
 		"runtime": {
@@ -25,7 +25,7 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=11.16.0",
+			"version": ">=12.0.2",
 			"onFail": "error"
 		}
 	},
@@ -83,8 +83,6 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
@@ -97,7 +95,6 @@
 		"husky": "^7.0.0",
 		"lerna": "^10.0.1",
 		"lint-staged": "^16.4.0",
-		"patch-package": "^8.0.0",
 		"syncpack": "^15.3.1",
 		"wait-on": "^8.0.1"
 	},
@@ -109,6 +106,9 @@
 		"lerna": {
 			"js-yaml": "4.3.2",
 			"pacote": "21.5.1"
+		},
+		"@y/websocket-server": {
+			"yjs": "npm:@y/y@^14.0.0-rc.7"
 		}
 	},
 	"scripts": {
@@ -161,7 +161,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && npm run agents:setup -- --if-safe",
+		"postinstall": "npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
@@ -223,5 +223,20 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"file:packages/icons": true,
+		"fs-ext-extra-prebuilt": false,
+		"fsevents": false,
+		"nx": false,
+		"unrs-resolver": false
+	},
+	"patchedDependencies": {
+		"@arraypress/waveform-player@1.26.0": "patches/@arraypress/waveform-player@1.26.0.patch"
+	}
 }
