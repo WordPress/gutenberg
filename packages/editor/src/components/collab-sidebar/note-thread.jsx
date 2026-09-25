@@ -325,6 +325,7 @@ export function NoteThread( {
 							),
 							placeholder: __( 'Reply or @ mention' ),
 						} }
+						draftKey={ `reply-${ note.id }` }
 					/>
 				</NoteCard>
 			) }
