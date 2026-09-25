@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Post Template: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated post falls between it and the wrapping text in RTL languages instead of against the container edge ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
