@@ -1,5 +1,20 @@
-import { type ComponentType } from 'react';
+import { type ComponentProps, type ComponentType } from 'react';
+import type { Badge } from '@wordpress/ui';
 import type { NavigationLinkProps } from '../navigation/types';
+
+export interface PageBadge {
+	/**
+	 * The text to display in the badge.
+	 */
+	label: string;
+
+	/**
+	 * The semantic intent of the badge, communicating its meaning through color.
+	 *
+	 * @default "none"
+	 */
+	intent?: ComponentProps< typeof Badge >[ 'intent' ];
+}
 
 export interface PageComponents {
 	/**
