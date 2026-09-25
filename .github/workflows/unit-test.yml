@@ -128,7 +128,10 @@ jobs:
                   # Keep a separate Flakiness.io history for each Node.js major.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
+                  # New workflow runs vary the seed; reruns keep the original seed.
+                  echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=node --project=jsdom --shard=$SHARD"
                   npm run test:unit:vitest:shuffled -- \
+                    --sequence.seed="$GITHUB_RUN_NUMBER" \
                     --project=node \
                     --project=jsdom \
                     --shard="$SHARD" \
@@ -177,9 +180,11 @@ jobs:
                       echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
                       exit 1
                     fi
-                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --project=browser "$BROWSER_TRACE_FILE"
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser \"$BROWSER_TRACE_FILE\""
+                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser "$BROWSER_TRACE_FILE"
                   else
-                    npm run test:unit:vitest:shuffled -- --project=browser
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser"
+                    npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser
                   fi
 
             - name: Upload Browser Mode failure artifacts
