@@ -1073,12 +1073,13 @@ test.describe( 'Image - lightbox', () => {
 				);
 				await expect( overlay ).toBeAttached();
 
-				// An element the theme made inert must stay inert after closing.
-				await wrapper.evaluate( ( element ) => {
+				// A direct child of <body> the theme made inert must stay inert
+				// after closing.
+				await page.evaluate( () => {
 					const themeInert = document.createElement( 'div' );
 					themeInert.id = 'theme-inert';
 					themeInert.inert = true;
-					element.prepend( themeInert );
+					document.body.prepend( themeInert );
 				} );
 
 				await page.locator( '.wp-lightbox-container img' ).click();
