@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
--   Media & Text: Add the "Enlarge on click" lightbox option to the media link control. It is opt-in and doesn't inherit the global lightbox `enabled` setting ([#83341](https://github.com/WordPress/gutenberg/issues/83341)).
+-   Media & Text: Add the "Enlarge on click" lightbox option to the media link control. It is opt-in and doesn't inherit the global lightbox `enabled` setting ([#83529](https://github.com/WordPress/gutenberg/pull/83529)).
 
 ## 11.1.0 (2026-09-23)
 
