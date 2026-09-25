@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getTextContent } from '../get-text-content';
 import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';
 
