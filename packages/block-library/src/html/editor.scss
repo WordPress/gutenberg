@@ -3,6 +3,12 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .block-library-html__edit {
+	// The canvas shows the block's rendered HTML, and content with no visible
+	// output (for example, only <script> tags, which are stripped in the
+	// editor) renders nothing. Keep a minimum height so the block stays
+	// visible and clickable in the canvas.
+	min-height: $grid-unit-50;
+
 	.block-library-html__preview-overlay {
 		position: absolute;
 		width: 100%;
