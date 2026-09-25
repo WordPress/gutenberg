@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `lint-js`, `lint-style`, `lint-md-docs`, `lint-pkg-json` and `format`: a file passed right after `--fix` or `--require-pragma` is now treated as a file instead of that flag's value, so only the listed files get processed ([#30466](https://github.com/WordPress/gutenberg/issues/30466)).
+
 ## 36.0.0 (2026-09-23)
 
 ### Breaking Changes
