@@ -189,6 +189,21 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'href'  => 'options-general.php#timezone',
 				),
 				array(
+					'id'    => 'underscored-admin-file',
+					'label' => 'Underscored admin file',
+					'href'  => 'export_report.php?type=csv',
+				),
+				array(
+					'id'    => 'colon-in-query',
+					'label' => 'Colon in query',
+					'href'  => 'admin.php?page=reports&from=2026-08-05T00:00:00.000+00:00',
+				),
+				array(
+					'id'    => 'dots-in-query',
+					'label' => 'Dots in query',
+					'href'  => 'edit.php?post_status=draft&range=2024-01-01..2024-01-31',
+				),
+				array(
 					'id'    => 'nested-admin',
 					'label' => 'Nested admin path',
 					'href'  => 'network/settings.php',
@@ -260,6 +275,21 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'id'    => 'admin-fragment',
 					'label' => 'Admin with fragment',
 					'href'  => 'options-general.php#timezone',
+				),
+				array(
+					'id'    => 'underscored-admin-file',
+					'label' => 'Underscored admin file',
+					'href'  => 'export_report.php?type=csv',
+				),
+				array(
+					'id'    => 'colon-in-query',
+					'label' => 'Colon in query',
+					'href'  => 'admin.php?page=reports&from=2026-08-05T00:00:00.000+00:00',
+				),
+				array(
+					'id'    => 'dots-in-query',
+					'label' => 'Dots in query',
+					'href'  => 'edit.php?post_status=draft&range=2024-01-01..2024-01-31',
 				),
 				array(
 					'id'    => 'dots-in-path',
