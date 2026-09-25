@@ -95,7 +95,9 @@
 		}
 	},
 	"selectors": {
-		"color": ".wp-block-navigation-link > .wp-block-navigation-item__content",
+		"color": {
+			"background": ".wp-block-navigation-link > .wp-block-navigation-item__content"
+		},
 		"states": {
 			"-current": ".wp-block-navigation .current-menu-item"
 		}

@@ -8474,15 +8474,48 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Navigation Link declares a `selectors.color.background` pointing at its
+	 * anchor, so that a background doesn't paint behind the submenu the list
+	 * item also wraps. Text color must not follow it there: the anchor carries
+	 * `color: inherit` from `.wp-block-navigation-item__content.wp-block-navigation-item__content`
+	 * in the Navigation block's stylesheet, at two classes inside another, which
+	 * outranks the one class `:root :where()` gives a Global Styles rule. Text
+	 * color has to land on the list item and reach the anchor by inheriting.
+	 */
+	public function test_navigation_link_text_color_stays_on_the_block_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-link' => array(
+							'color' => array(
+								'text'       => 'red',
+								'background' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$expected   = ':root :where(.wp-block-navigation-link){color: red;}:root :where(.wp-block-navigation-link > .wp-block-navigation-item__content){background-color: blue;}';
+		$this->assertSameCSS( $expected, $stylesheet );
+	}
+
+	/**
 	 * Test that block custom states (e.g. -current) are processed correctly.
 	 */
 	public function test_block_custom_states_are_processed() {
 		// Only -current styles — no base block styles — so we can assert the
 		// output uses the current-menu-item selector and not the block selector.
-		// Color lands on the anchor because core/navigation-link declares a
-		// `selectors.color` of `.wp-block-navigation-link > .wp-block-navigation-item__content`.
-		// The state selector replaces the block part of that, since the state
-		// selector matches the same list item the block selector does.
+		// Background lands on the anchor because core/navigation-link declares a
+		// `selectors.color.background` of
+		// `.wp-block-navigation-link > .wp-block-navigation-item__content`. The
+		// state selector replaces the block part of that, since the state
+		// selector matches the same list item the block selector does. Text
+		// color has no such selector and so stays on the list item.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -8502,7 +8535,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;color: red;}';
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item){color: red;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;}';
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
@@ -8526,7 +8559,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;color: red;}';
+		$expected   = ':root :where(.wp-block-navigation .current-menu-item){color: red;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;}';
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
@@ -8564,7 +8597,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;color: red;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content:hover){background-color: white;color: blue;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content:focus){background-color: yellow;color: green;}';
+		$expected = ':root :where(.wp-block-navigation .current-menu-item){color: red;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content){background-color: blue;}:root :where(.wp-block-navigation .current-menu-item:hover){color: blue;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content:hover){background-color: white;}:root :where(.wp-block-navigation .current-menu-item:focus){color: green;}:root :where(.wp-block-navigation .current-menu-item > .wp-block-navigation-item__content:focus){background-color: yellow;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -8595,10 +8628,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet_bogus = $theme_json_bogus_state->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		// The color selector is scoped to the block, so the styles don't reach
-		// the anchors of the other blocks that share the content class, such as
-		// Navigation Submenu, Home Link and Page List.
-		$expected_bogus = ':root :where(.wp-block-navigation-link > .wp-block-navigation-item__content){color: black;}';
+		$expected_bogus   = ':root :where(.wp-block-navigation-link){color: black;}';
 		$this->assertSameCSS( $expected_bogus, $stylesheet_bogus );
 		$this->assertStringNotContainsString( '-bogus', $stylesheet_bogus );
 		$this->assertStringNotContainsString( 'yellow', $stylesheet_bogus );
