@@ -10,6 +10,8 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
 import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
@@ -841,6 +843,57 @@ describe( 'Popover', () => {
 				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
+	} );
+
+	it( 'hints at transform only while it is being repositioned', async () => {
+		await render(
+			<Popover animate={ false } data-testid="popover-element">
+				Inside popover
+			</Popover>
+		);
+
+		const popover = screen.getByTestId( 'popover-element' );
+
+		// Positioning has just run, so the compositing hint is on.
+		expect( getComputedStyle( popover ).willChange ).toBe( 'transform' );
+
+		// Once the popover settles, the hint is dropped so the popover stops
+		// occupying a compositing layer of its own, which is what makes
+		// Chrome render it blurry.
+		await waitFor( () =>
+			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' )
+		);
+	} );
+
+	it( 'drops the transform hint when the popover moves into a slot without repositioning', async () => {
+		const Test = ( { hasSlot }: { hasSlot: boolean } ) => (
+			<SlotFillProvider>
+				<Popover animate={ false } data-testid="popover-element">
+					Inside popover
+				</Popover>
+				{ hasSlot && <Popover.Slot /> }
+			</SlotFillProvider>
+		);
+		const { rerender } = await render( <Test hasSlot={ false } /> );
+
+		const inlinePopover = screen.getByTestId( 'popover-element' );
+		await waitFor( () =>
+			expect( getComputedStyle( inlinePopover ).willChange ).toBe(
+				'auto'
+			)
+		);
+
+		// Mounting the slot swaps in a new floating element at the same
+		// coordinates, and that one has to lose the hint too.
+		await rerender( <Test hasSlot /> );
+
+		const slottedPopover = screen.getByTestId( 'popover-element' );
+		expect( slottedPopover ).not.toBe( inlinePopover );
+		await waitFor( () =>
+			expect( getComputedStyle( slottedPopover ).willChange ).toBe(
+				'auto'
+			)
+		);
 	} );
 
 	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {

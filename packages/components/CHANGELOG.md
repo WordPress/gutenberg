@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 
