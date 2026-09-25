@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
+-   `declaration-property-unit-allowed-list`: `line-height` no longer allows `px`. Per the WordPress CSS Coding Standards, line-height values must be unit-less, except for a specific pixel value necessary for a non-typographic element; such cases should disable the rule for that declaration with a comment explaining why ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### Enhancements
 
