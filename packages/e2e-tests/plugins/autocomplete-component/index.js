@@ -4,7 +4,6 @@
 	const useState = wp.element.useState;
 	const Autocomplete = wp.components.Autocomplete;
 	const create = wp.richText.create;
-	const toHTMLString = wp.richText.toHTMLString;
 	const registerPlugin = wp.plugins.registerPlugin;
 	const PluginSidebar = wp.editor.PluginSidebar;
 
@@ -21,28 +20,6 @@
 		getOptionCompletion: ( option ) => option.visual,
 	};
 
-	// Places the caret at a text offset within the element.
-	function setCaret( element, offset ) {
-		const doc = element.ownerDocument;
-		const walker = doc.createTreeWalker( element, NodeFilter.SHOW_TEXT );
-		let remaining = offset;
-		let node = walker.nextNode();
-		while ( node && remaining > node.data.length ) {
-			remaining -= node.data.length;
-			node = walker.nextNode();
-		}
-		const range = doc.createRange();
-		if ( node ) {
-			range.setStart( node, remaining );
-		} else {
-			range.setStart( element, element.childNodes.length );
-		}
-		range.collapse( true );
-		const selection = doc.defaultView.getSelection();
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
 	function Field() {
 		const ref = useRef();
 		const [ record, setRecord ] = useState( () => create() );
@@ -56,9 +33,15 @@
 			setRecord( create( { element, range } ) );
 		}
 
+		// The field is plain text, so the value is one text node.
 		function onChange( value ) {
-			ref.current.innerHTML = toHTMLString( { value } );
-			setCaret( ref.current, value.end );
+			ref.current.textContent = value.text;
+			ref.current.ownerDocument
+				.getSelection()
+				.collapse(
+					ref.current.firstChild ?? ref.current,
+					value.end ?? 0
+				);
 			setRecord( value );
 		}
 
@@ -75,7 +58,7 @@
 			( { onKeyDown, listBoxId, activeId } ) =>
 				el( 'div', {
 					ref,
-					contentEditable: true,
+					contentEditable: 'plaintext-only',
 					suppressContentEditableWarning: true,
 					role: 'textbox',
 					'aria-label': 'Autocomplete field',
