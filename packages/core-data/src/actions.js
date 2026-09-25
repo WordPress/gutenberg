@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
@@ -19,6 +20,10 @@ import {
 	getRawValue,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
+
+// Matches the block editor's `useMarkPersistent`, so an entity field and a
+// block attribute build undo levels at the same rate.
+const COALESCE_TIMEOUT = 1000;
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
@@ -422,9 +427,10 @@ export const deleteEntityRecord =
  * @param {Object}                  edits                The edits.
  * @param {Object}                  options              Options for the edit.
  * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
- * @param {boolean}                 [options.isCached]   Whether the edit is transient (e.g. typing). Transient
- *                                                       edits are staged and eventually merged into the
- *                                                       preceding undo level instead of creating a new one.
+ * @param {boolean}                 [options.isCached]   Merge this edit into the previous undo level. The
+ *                                                       caller decides where a run of edits starts and ends.
+ * @param {boolean}                 [options.coalesce]   Merge a burst of edits, such as typing, into one undo
+ *                                                       level. The store decides where the burst ends.
  *
  * @return {Object} Action object.
  */
@@ -464,6 +470,50 @@ export const editEntityRecord =
 			// so that the property is not considered dirty.
 			edits: clearUnchangedEdits( editsWithMerges, record ),
 		};
+
+		// `undoIgnore` edits (selection changes, for example) fire on every
+		// keystroke, so they neither read nor write the session and cannot break
+		// a run.
+		let coalesceSession;
+		let isCached = options.isCached;
+		if ( ! options.undoIgnore ) {
+			// Record plus the set of edited keys, so editing a different
+			// property starts a new level. Values are irrelevant, and may be
+			// functions.
+			const target = `${ kind }|${ name }|${ recordId }|${ Object.keys(
+				edits
+			)
+				.sort()
+				.join( ',' ) }`;
+			const session = select.getUndoCoalesceSession();
+			const now = Date.now();
+
+			// An explicit `isCached` always wins, so callers that assert it
+			// themselves, such as `useEntityBlockEditor`, are unaffected.
+			isCached =
+				options.isCached ??
+				( !! options.coalesce &&
+					session?.target === target &&
+					now - session.time < COALESCE_TIMEOUT );
+
+			// The undo manager opens no level for a record that changes nothing,
+			// so neither should this. Otherwise the next edit of the run stages
+			// into whichever level happens to be last.
+			const hasChanges = Object.keys( edits ).some( ( key ) => {
+				const from = editedRecord[ key ];
+				const to = edits[ key ];
+				return (
+					typeof from !== 'function' &&
+					typeof to !== 'function' &&
+					! isShallowEqual( from, to )
+				);
+			} );
+
+			if ( hasChanges ) {
+				coalesceSession = { target, time: now };
+			}
+		}
+
 		if ( entityConfig.syncConfig ) {
 			const objectType = `${ kind }/${ name }`;
 			const objectId = recordId;
@@ -480,9 +530,7 @@ export const editEntityRecord =
 			//
 			// Additionally, `undoIgnore: true` means the change should not
 			// affect the undo history at all (e.g., selection-only changes).
-			const isNewUndoLevel = options.undoIgnore
-				? false
-				: ! options.isCached;
+			const isNewUndoLevel = options.undoIgnore ? false : ! isCached;
 
 			// Use an untracked origin for undoIgnore changes so the Yjs
 			// UndoManager does not capture them as undo levels, while
@@ -513,12 +561,13 @@ export const editEntityRecord =
 						}, {} ),
 					},
 				],
-				options.isCached
+				isCached
 			);
 		}
 		dispatch( {
 			type: 'EDIT_ENTITY_RECORD',
 			...edit,
+			coalesceSession,
 		} );
 	};
 
@@ -568,6 +617,9 @@ export const clearEntityRecordEdits =
 			name,
 			recordId,
 			edits: clearedEdits,
+			// Discarding ends any open run, so a later edit cannot stage into
+			// the level that preceded the discard.
+			coalesceSession: null,
 		} );
 	};
 
@@ -606,14 +658,16 @@ export const redo =
 	};
 
 /**
- * Forces the creation of a new undo level.
+ * Flushes any staged edits into the preceding undo level and ends the current
+ * run of coalesced edits, so that the next edit starts a new undo level.
  *
- * @return {Object} Action object.
+ * Despite its name it does not create an undo level of its own.
  */
 export const __unstableCreateUndoLevel =
 	() =>
-	( { select } ) => {
+	( { select, dispatch } ) => {
 		select.getUndoManager().addRecord();
+		dispatch( { type: 'END_UNDO_COALESCE_SESSION' } );
 	};
 
 /**
@@ -641,6 +695,15 @@ export const saveEntityRecord =
 		} = options;
 
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
+
+		// Every save funnels through here, so this also ends the run for
+		// `saveEditedEntityRecord` and the post and site editor save flows. An
+		// autosave is not a user checkpoint, so it leaves the run alone rather
+		// than splitting an undo level mid-word.
+		if ( ! isAutosave ) {
+			dispatch( { type: 'END_UNDO_COALESCE_SESSION' } );
+		}
+
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
