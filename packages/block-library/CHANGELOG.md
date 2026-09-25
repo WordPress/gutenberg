@@ -5,6 +5,17 @@
 ### Enhancements
 
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+
+### Bug Fixes
+
+-   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+
+## 11.1.0 (2026-09-23)
+
+### Enhancements
+
 -   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
 -   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
 -   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).

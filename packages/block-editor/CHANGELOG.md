@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+
+### Bug Fixes
+
+-   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
+
+## 18.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   `InspectorControls`: Remove the `__experimentalGroup` prop from the fill and the slot. It was deprecated in WordPress 6.2 in favour of `group`, with removal scheduled for 6.4 ([#83171](https://github.com/WordPress/gutenberg/pull/83171)).
@@ -20,12 +30,14 @@
 -   `LinkControl`, `LinkPicker`: migrate the link preview badges from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
 -   `BlockQuickNavigation`: Highlight a block on the canvas while its item is hovered or focused, matching the List View. This affects the inspector Content tab, the pattern overrides panel, and the template and template part content panels ([#83049](https://github.com/WordPress/gutenberg/pull/83049)).
 -   Inserter and pattern search: rank title matches above keyword and description matches, and rank a word in the title that starts with the search term above a substring match ([#83312](https://github.com/WordPress/gutenberg/pull/83312)).
+-   `ViewportVisibilityInfo`: Migrate the block visibility badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Notice` component ([#82670](https://github.com/WordPress/gutenberg/pull/82670)).
 
 ### Bug Fixes
 
 -   `BlockAlignmentControl`: Hide the control again when none of a block's alignments are available. Paragraph, Heading, List and other blocks that support only wide and full were showing a menu of unavailable options that could not change anything ([#83265](https://github.com/WordPress/gutenberg/pull/83265)).
 -   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
+-   `FontAppearanceControl`: List only the weights inside a variable font's range, reading both ends of the range as whole numbers or as the keywords `normal` and `bold` ([#83128](https://github.com/WordPress/gutenberg/pull/83128)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))

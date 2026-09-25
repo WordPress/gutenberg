@@ -529,6 +529,43 @@ describe( 'UnitControl', () => {
 			expect( select ).toHaveValue( 'vmax' );
 		} );
 
+		it( 'should use the unit shown in the select after clearing a value whose unit is not offered', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = vi.fn();
+
+			const ControlledUnitControl = () => {
+				const [ value, setValue ] = useState< string | undefined >(
+					'10%'
+				);
+				return (
+					<UnitControl
+						value={ value }
+						units={ [
+							{ value: 'px', label: 'px' },
+							{ value: 'em', label: 'em' },
+						] }
+						onChange={ ( nextValue, extra ) => {
+							setValue( nextValue );
+							onChangeSpy( nextValue, extra );
+						} }
+					/>
+				);
+			};
+			render( <ControlledUnitControl /> );
+
+			const input = getInput();
+			await user.clear( input );
+
+			expect( getSelect() ).toHaveValue( 'px' );
+
+			await user.type( input, '5' );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'5px',
+				expect.anything()
+			);
+		} );
+
 		it( 'should run onBlur callback when the unit select is blurred', async () => {
 			const user = userEvent.setup();
 

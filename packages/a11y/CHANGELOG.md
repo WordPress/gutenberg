@@ -6,6 +6,8 @@
 
 -   Add `prefersReducedMotion`, which reports whether the user has asked their operating system to reduce motion. It is the counterpart to the `useReducedMotion` hook in `@wordpress/compose`, for code that runs outside React such as block view scripts ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
 
+## 4.56.0 (2026-09-23)
+
 ## 4.55.0 (2026-09-10)
 
 ## 4.54.0 (2026-08-26)

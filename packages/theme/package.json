@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -81,12 +81,17 @@
 		"prebuilt/css/design-tokens.css"
 	],
 	"dependencies": {
+		"@babel/parser": "^7.28.6",
+		"@babel/types": "^7.29.7",
+		"@jridgewell/remapping": "^2.3.5",
+		"@jridgewell/trace-mapping": "^0.3.31",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.7.1",
+		"magic-string": "^0.30.21",
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
@@ -104,8 +109,10 @@
 		"esbuild": "^0.27.2",
 		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
+		"source-map": "^0.6.1",
 		"storybook": "^10.5.3",
 		"stylelint": "^17.14.1",
+		"vite": "^8.2.2",
 		"vitest": "^5.0.0",
 		"vitest-browser-react": "^2.3.0"
 	},
