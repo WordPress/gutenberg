@@ -1,6 +1,5 @@
 const { join } = require( 'path' );
-const { writeFile } = require( 'fs' ).promises;
-const makeDir = require( 'make-dir' );
+const { writeFile, mkdir } = require( 'fs' ).promises;
 const { info } = require( './log' );
 const { writeOutputTemplate } = require( './output' );
 
@@ -36,7 +35,7 @@ async function initBlockJSON( {
 	const blockFolderName = plugin
 		? join( rootDirectory, folderName )
 		: rootDirectory;
-	await makeDir( blockFolderName );
+	await mkdir( blockFolderName, { recursive: true } );
 
 	await writeFile(
 		join( blockFolderName, 'block.json' ),
