@@ -1689,6 +1689,50 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should render viewport and pseudo-state block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							css: 'color:blue;',
+							':hover': {
+								css: 'color:green;',
+							},
+							'@mobile': {
+								css: 'color:pink;',
+								':hover': {
+									css: 'color:yellow;',
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/button',
+					selectors: {
+						root: '.wp-block-button .wp-block-button__link',
+						typography: { writingMode: '.wp-block-button' },
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const combinedCss = styles.map( ( s: any ) => s.css ).join( '\n' );
+			expect( combinedCss ).toContain( 'color:blue' );
+			expect( combinedCss ).toContain( 'color:green' );
+			expect( combinedCss ).toContain( 'color:pink' );
+			expect( combinedCss ).toContain( 'color:yellow' );
+		} );
+
 		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {
 			const config = {
 				version: 3,
