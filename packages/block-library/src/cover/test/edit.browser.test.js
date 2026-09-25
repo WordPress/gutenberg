@@ -7,6 +7,11 @@ import {
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// Keep the matrix popover above the block toolbar, as in the editor.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Browser fixtures need the styles WordPress normally enqueues.
+import '../../../../block-editor/src/components/block-popover/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Browser fixtures need the styles WordPress normally enqueues.
+import '../../../../components/src/popover/style.scss';
 const defaultSettings = {
 	__experimentalFeatures: {
 		color: {
