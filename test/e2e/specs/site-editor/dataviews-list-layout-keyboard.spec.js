@@ -7,13 +7,22 @@ test.describe( 'Dataviews List Layout', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
+
+		// These tests expect exactly two pages, listed as "Privacy Policy"
+		// then "Sample Page". The list is sorted by date, newest first, so
+		// start from no pages and give each one an explicit date: pages
+		// created without one can land in the same second, or either side of
+		// a second boundary, which makes their order unpredictable.
+		await requestUtils.deleteAllPages();
 		await requestUtils.createPage( {
 			title: 'Privacy Policy',
 			status: 'publish',
+			date: '2024-01-02T00:00:00',
 		} );
 		await requestUtils.createPage( {
 			title: 'Sample Page',
 			status: 'publish',
+			date: '2024-01-01T00:00:00',
 		} );
 	} );
 
