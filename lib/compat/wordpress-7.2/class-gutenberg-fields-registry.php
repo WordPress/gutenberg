@@ -15,20 +15,12 @@
  *
  * Fields are registered on the `fields_api_init` action, on the
  * registry its callbacks receive, and only there: register() and
- * unregister() refuse to run while the action is not firing, the way
- * wp_register_ability() refuses outside `wp_abilities_api_init`. There is
- * no function wrapping them: the action is the one place a plugin gets the
- * instance, once the default fields are in place, the way
- * `customize_register` hands out the WP_Customize_Manager and
- * `wp_connectors_init` the WP_Connector_Registry. Reading goes through the
- * functions in fields-api.php.
+ * unregister() refuse to run while the action is not firing.
  *
  * The registry exists once `init` has run, see get_instance(), and is
  * filled lazily: the first time its fields are read it fires the
  * `fields_api_init` action, on which the default fields of every
- * post type and the fields of plugins are registered. Reading fires the
- * action once; a read during `init` is refused, see initialize(). This
- * mirrors how rest_get_server() fires `rest_api_init` on its first use.
+ * post type and the fields of plugins are registered.
  *
  * Once the action has fired the registry does not change: every reader of
  * a request, the REST controller as well as the import map of the editor
@@ -82,8 +74,7 @@ final class Gutenberg_Fields_Registry {
 	 * derive from its supports, so a registry available earlier would let a
 	 * plugin register a field for a post type that does not exist yet, or
 	 * patch a default field before it is known whether the post type gets
-	 * it. Like WP_Abilities_Registry::get_instance(), the registry refuses to
-	 * exist before then.
+	 * it.
 	 *
 	 * @return Gutenberg_Fields_Registry|null The registry, or null when `init`
 	 *                                        has not run yet.
@@ -197,9 +188,7 @@ final class Gutenberg_Fields_Registry {
 	 * no field is forgotten). Unregistering every field forgets the entity:
 	 * its registered fields and script modules.
 	 *
-	 * Like register(), it only runs on the `fields_api_init` action. The
-	 * default fields are registered at priority 0 and adjusted at priority
-	 * 9, so a callback at the default priority can unregister any of them.
+	 * Like register(), it only runs on the `fields_api_init` action.
 	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
 	 * @param string        $name The entity name (e.g. `page`).
@@ -323,12 +312,7 @@ final class Gutenberg_Fields_Registry {
 	 *
 	 * The registry only exists once `init` has run, see get_instance(), so
 	 * the post types and the supports the default fields derive from are
-	 * final by the time the action fires. `init` counts as run from its
-	 * first callback on, though, so a read from an `init` callback would
-	 * fire the action while post types are still being registered and
-	 * snapshot incomplete defaults, for good: the action fires once. Such a
-	 * read is refused and returns nothing; the next read after `init` fires
-	 * the action.
+	 * final by the time the action fires.
 	 */
 	private function initialize() {
 		if ( $this->initialized ) {
@@ -352,12 +336,7 @@ final class Gutenberg_Fields_Registry {
 		 * Fires the first time the registered fields are read, after `init`.
 		 *
 		 * Register or adjust fields here, on `$registry`: it is the only way
-		 * to register fields. The default fields of every post
-		 * type are registered at priority 0 and adjusted at priority 9, so a
-		 * callback at the default priority sees the final defaults. The
-		 * plugin that owns a post type shapes its defaults at priority 9,
-		 * like core does for its own; a plugin extending a post type it does
-		 * not own hooks the default priority or later.
+		 * to register fields.
 		 *
 		 * The first read happens wherever the fields are needed: while
 		 * handling a REST request as well as on `admin_init`. A callback
