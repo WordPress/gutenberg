@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `@wordpress/fields/server-fields` script module, which provides the JavaScript parts (render component, elements, value setter, visibility) of the post fields registered on the server, starting with the author field.
+
 ## 0.48.0 (2026-09-23)
 
 ### Enhancements

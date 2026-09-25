@@ -1,0 +1,21 @@
+/**
+ * Styles for the `reading_time` field. Only fields with a JavaScript `render`
+ * can be targeted: it is the render that emits the class name.
+ */
+
+.gutenberg-test-reading-time {
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 2px;
+	background: rgb(56, 88, 233);
+	color: #fff;
+	line-height: 20px;
+}
+
+.gutenberg-test-reading-time.is-empty {
+	background: rgb(148, 148, 148);
+}
+
+.gutenberg-test-reading-time.is-long {
+	background: rgb(204, 24, 24);
+}

@@ -19,6 +19,19 @@ remove_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpo
 add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoints_7_2', PHP_INT_MAX );
 
 /**
+ * Registers the Fields REST API route.
+ *
+ * Exposes the fields registered on the server on the `gutenberg_fields_api_init` action.
+ *
+ * @see Gutenberg_REST_Fields_Controller_7_2
+ */
+function gutenberg_register_fields_controller_endpoints() {
+	$fields_controller = new Gutenberg_REST_Fields_Controller_7_2();
+	$fields_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints' );
+
+/**
  * Registers the Templates and Template Parts REST API routes.
  *
  * Replaces the core controller class so the 7.2 controller is used.

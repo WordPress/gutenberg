@@ -1,7 +1,9 @@
+import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
 import type { PostType } from '@wordpress/fields';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	viewPost,
 	viewPostRevisions,
@@ -21,12 +23,10 @@ import {
 	dateField,
 	parentField,
 	passwordField,
-	commentStatusField,
 	pingStatusField,
 	discussionField,
 	slugField,
 	statusField,
-	authorField,
 	templateAuthorField,
 	templatePartAuthorField,
 	titleField,
@@ -36,7 +36,6 @@ import {
 	patternTitleField,
 	patternDescriptionField,
 	patternSyncStatusField,
-	notesField,
 	scheduledDateField,
 	lastEditedDateField,
 	formatField,
@@ -53,7 +52,6 @@ import {
 	attachedToField,
 	authorField as mediaAuthorField,
 	captionField,
-	dateAddedField,
 	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
@@ -64,20 +62,6 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
-
-/**
- * Check if a post type supports editor notes.
- *
- * @param supports The post type supports object.
- * @return Whether editor notes are supported.
- */
-function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
-	const editor = supports?.editor;
-	if ( Array.isArray( editor ) ) {
-		return !! editor[ 0 ]?.notes;
-	}
-	return false;
-}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -139,6 +123,138 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
+/**
+ * A field as the server exposes it: the serializable subset of the Field
+ * API, see `Gutenberg_REST_Fields_Controller_7_2::get_field_schema()`.
+ */
+type ServerField< Item > = Pick< Field< Item >, 'id' > &
+	Partial< Omit< Field< Item >, 'id' > >;
+
+/**
+ * The response of the `wp/v2/fields` route.
+ */
+interface ServerFieldsResponse< Item > {
+	kind: string;
+	name: string;
+	fields: ServerField< Item >[];
+	script_modules: {
+		id: string;
+		fields: string[];
+	}[];
+}
+
+/**
+ * Loads the fields registered on the server for an entity.
+ *
+ * Fetches the definitions from the `wp/v2/fields` route and imports the
+ * script modules registered along with them.
+ *
+ * @param kind The entity kind (e.g. `postType`).
+ * @param name The entity name (e.g. `page`).
+ * @return The fields, in registration order, with their JavaScript parts.
+ */
+async function loadServerFields< Item >(
+	kind: string,
+	name: string
+): Promise< Field< Item >[] > {
+	let response: ServerFieldsResponse< Item >;
+	try {
+		response = await apiFetch< ServerFieldsResponse< Item > >( {
+			path: addQueryArgs( '/wp/v2/fields', { kind, name } ),
+		} );
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Could not load the fields of ${ kind }/${ name } from the server.`,
+			error
+		);
+		return [];
+	}
+
+	// The JavaScript parts of each field, by field id, in module order.
+	const scriptParts = new Map< string, Partial< Field< Item > > >();
+	await Promise.all(
+		( response.script_modules ?? [] ).map(
+			async ( { id: moduleId, fields: fieldIds } ) => {
+				let module;
+				try {
+					module = await import(
+						/* webpackIgnore: true */ /* @vite-ignore */ moduleId
+					);
+				} catch ( error ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`Could not load the script module ${ moduleId } of the fields of ${ kind }/${ name }.`,
+						error
+					);
+					return;
+				}
+
+				const parts = module?.default ?? {};
+				/*
+				 * Iterate over the registered field ids.
+				 * The parts augment the registered fields,
+				 * they don't contain a full field definition.
+				 *
+				 * If we don't check for the field id,
+				 * we may end up with a field that has been unregistered on the server,
+				 * but whose script module is still loaded.
+				 */
+				for ( const fieldId of fieldIds ?? [] ) {
+					if ( parts[ fieldId ] ) {
+						scriptParts.set( fieldId, {
+							...scriptParts.get( fieldId ),
+							...parts[ fieldId ],
+						} );
+					}
+				}
+			}
+		)
+	);
+
+	return ( response.fields ?? [] ).map(
+		( field ) =>
+			( {
+				...field,
+				...scriptParts.get( field.id ),
+			} ) as Field< Item >
+	);
+}
+
+/**
+ * Merges the fields registered on the server into the fields the editor
+ * derives itself.
+ *
+ * A server field with the id of a client field overrides its properties,
+ * keeping its position, so the data the server declares (label, type,
+ * elements, filter operators…) wins while the client keeps providing the
+ * JavaScript parts the server does not ship. A server field the client does
+ * not know about is appended, in registration order.
+ *
+ * @param clientFields The fields the editor derives.
+ * @param serverFields The fields registered on the server.
+ * @return The merged fields.
+ */
+function mergeServerFields< Item >(
+	clientFields: Field< Item >[],
+	serverFields: Field< Item >[]
+): Field< Item >[] {
+	const serverFieldsById = new Map(
+		serverFields.map( ( field ) => [ field.id, field ] )
+	);
+
+	const merged = clientFields.map( ( field ) => {
+		const serverField = serverFieldsById.get( field.id );
+		if ( ! serverField ) {
+			return field;
+		}
+		serverFieldsById.delete( field.id );
+		return { ...field, ...serverField };
+	} );
+
+	return [ ...merged, ...serverFieldsById.values() ];
+}
+
 /*
  * Media fields for the attachment post type.
  *
@@ -149,8 +265,8 @@ export function setIsReady( kind: string, name: string ) {
  * Note: media_thumbnail is not included as it's shown in the canvas preview
  */
 const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	dateAddedField,
+	// Metadata in panels (collapsed by default). The date added field is
+	// registered on the server.
 	mediaAuthorField,
 	filenameField,
 	mimeTypeField,
@@ -179,6 +295,10 @@ export const registerPostTypeSchema =
 			'postType',
 			postType
 		);
+
+		// Runs in parallel with the lookups below; awaited once the client
+		// fields are known.
+		const serverFieldsPromise = loadServerFields( 'postType', postType );
 
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
@@ -257,9 +377,9 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				! isDesignPostType &&
-					postTypeConfig.supports?.author &&
-					authorField,
+				// The author field of the post types supporting authors is
+				// registered on the server; templates and template parts
+				// unregister it there and keep their own.
 				postTypeSlug === 'wp_template' && templateAuthorField,
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
@@ -277,7 +397,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				postTypeConfig.supports?.comments && commentStatusField,
+				// The comment status field is registered on the server.
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
@@ -303,7 +423,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
-				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				// The notes field is registered on the server.
 				isPattern && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
@@ -322,6 +442,11 @@ export const registerPostTypeSchema =
 				fields.push( _titleField );
 			}
 		}
+
+		fields = mergeServerFields(
+			fields as Field< any >[],
+			await serverFieldsPromise
+		);
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
