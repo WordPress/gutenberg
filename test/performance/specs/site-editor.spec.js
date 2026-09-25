@@ -244,12 +244,21 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
+				const actionsButton = page.locator(
+					'.edit-site-template-card__actions button[aria-label="Actions"]'
+				);
+				const transformButton = page.getByRole( 'button', {
+					name: 'Transform into:',
+				} );
+
+				// The older UI's Actions menu only renders once the block
+				// patterns have loaded from the REST API, which can finish
+				// after the sidebar opens. Wait for whichever UI appears
+				// instead of checking once and picking the wrong branch.
+				await actionsButton.or( transformButton ).first().waitFor();
+
 				// eslint-disable-next-line no-restricted-syntax
-				const isActionsButtonVisible = await page
-					.locator(
-						'.edit-site-template-card__actions button[aria-label="Actions"]'
-					)
-					.isVisible();
+				const isActionsButtonVisible = await actionsButton.isVisible();
 
 				if ( isActionsButtonVisible ) {
 					await page
