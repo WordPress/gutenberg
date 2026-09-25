@@ -644,5 +644,6 @@ export default function useCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: getManipulateDocumentCommands(),
+		context: 'entity-edit',
 	} );
 }
