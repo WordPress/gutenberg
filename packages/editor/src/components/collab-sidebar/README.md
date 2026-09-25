@@ -114,7 +114,7 @@ Algorithm, keyed on the selected note as an **anchor**:
 
 ### 4. `FloatingContainer` - the render shell
 
-Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset` plus `--canvas-scroll`, so it tracks the canvas frame and its scroll, so per-thread `top` values stay stable while scrolling.
+Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset` plus `--canvas-scroll`, so it tracks the canvas frame and its scroll, so per-thread `top` values stay stable while scrolling. A `top` transition eases reflows (e.g. on selection change) unless the user prefers reduced motion; a thread's first positioning starts from `top: auto` and doesn't animate.
 
 ### Why this shape
 
