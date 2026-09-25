@@ -363,6 +363,11 @@
 					"allowEditing": true
 				}
 			},
+			"core/media-text": {
+				"lightbox": {
+					"allowEditing": true
+				}
+			},
 			"core/icon": {
 				"dimensions": {
 					"width": true

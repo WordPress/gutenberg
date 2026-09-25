@@ -16,6 +16,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
 import { imageFillStyles } from './image-fill';
 import { ALLOWED_MEDIA_TYPES } from './constants';
+import { Caption } from '../utils/caption';
 
 /**
  * Constants
@@ -97,6 +98,7 @@ function PlaceholderContainer( {
 
 function MediaContainer( props, ref ) {
 	const {
+		attributes,
 		className,
 		commitWidthChange,
 		focalPoint,
@@ -117,6 +119,8 @@ function MediaContainer( props, ref ) {
 		featuredImageURL,
 		featuredImageAlt,
 		refMedia,
+		setAttributes,
+		insertBlocksAfter,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -209,6 +213,16 @@ function MediaContainer( props, ref ) {
 						className="wp-block-media-text--placeholder-image"
 						style={ positionStyles }
 						withIllustration
+					/>
+				) }
+				{ ( mediaType === 'image' || mediaType === 'video' ) && (
+					<Caption
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						isSelected={ isSelected }
+						insertBlocksAfter={ insertBlocksAfter }
+						label={ __( 'Media caption text' ) }
+						showToolbarButton={ isSelected }
 					/>
 				) }
 			</ResizableBoxContainer>
