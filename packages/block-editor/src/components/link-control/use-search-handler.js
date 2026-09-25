@@ -2,7 +2,7 @@ import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import isURLLike from './is-url-like';
 import normalizeUrl from './normalize-url';
-import { CREATE_TYPE } from './constants';
+import { CREATE_TYPE, NO_RESULTS_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
@@ -55,30 +55,34 @@ const handleEntitySearch = async (
 		return results;
 	}
 
-	// Here we append a faux suggestion to represent a "CREATE" option. This
-	// is detected in the rendering of the search results and handled as a
-	// special case. This is currently necessary because the suggestions
-	// dropdown will only appear if there are valid suggestions and
-	// therefore unless the create option is a suggestion it will not
-	// display in scenarios where there are no results returned from the
-	// API. In addition promoting CREATE to a first class suggestion affords
-	// the a11y benefits afforded by `URLInput` to all suggestions (eg:
-	// keyboard handling, ARIA roles...etc).
+	// URLInput only renders the suggestions dropdown when its list is non-empty.
+	// Add a sentinel for empty searches so LinkControl can render a disabled
+	// "No results found" option even when there is no create action.
+	// When creation is available, also add a faux CREATE suggestion. This is
+	// handled specially by the results renderer and lets URLInput provide its
+	// normal keyboard and ARIA behavior for the action.
 	//
 	// Note also that the value of the `title` and `url` properties must correspond
 	// to the text value of the `<input>`. This is because `title` is used
 	// when creating the suggestion. Similarly `url` is used when using keyboard to select
 	// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
+	const noResultsSuggestion =
+		! results.length && ! withCreateSuggestion
+			? [ { type: NO_RESULTS_TYPE } ]
+			: [];
+
 	return isURLLike( val ) || ! withCreateSuggestion
-		? results
-		: results.concat( {
-				// the `id` prop is intentionally omitted here because it
-				// is never exposed as part of the component's public API.
-				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
-				title: val, // Must match the existing `<input>`s text value.
-				url: val, // Must match the existing `<input>`s text value.
-				type: CREATE_TYPE,
-			} );
+		? results.concat( noResultsSuggestion )
+		: results
+				.concat( {
+					// the `id` prop is intentionally omitted here because it
+					// is never exposed as part of the component's public API.
+					// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
+					title: val, // Must match the existing `<input>`s text value.
+					url: val, // Must match the existing `<input>`s text value.
+					type: CREATE_TYPE,
+				} )
+				.concat( noResultsSuggestion );
 };
 
 export default function useSearchHandler(

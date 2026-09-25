@@ -200,6 +200,9 @@ describe( 'Basic rendering', () => {
 
 		// Wait for the spinner SVG icon to be rendered.
 		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+		expect(
+			screen.queryByText( 'No results found.' )
+		).not.toBeInTheDocument();
 		// Check the suggestions list is not rendered yet.
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
@@ -212,6 +215,9 @@ describe( 'Basic rendering', () => {
 
 		// Check the suggestions list is rendered.
 		expect( resultsList ).toBeVisible();
+		expect(
+			within( resultsList ).queryByText( 'No results found.' )
+		).not.toBeInTheDocument();
 		// Check the spinner SVG icon is not rendered any longer.
 		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 
@@ -1220,6 +1226,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			Promise.resolve( noResults )
 		);
 	} );
+
 	it.each( [
 		[ 'HelloWorld', 'without spaces' ],
 		[ 'Hello World', 'with spaces' ],
@@ -1270,9 +1277,27 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const createButton = within( searchResults ).getByRole( 'option', {
 				name: /^Create:/,
 			} );
+			const noResultsMessage = within( searchResults ).getByRole(
+				'option',
+				{
+					name: 'No results found.',
+				}
+			);
 
 			expect( createButton ).toBeVisible();
 			expect( createButton ).toHaveTextContent( entityNameText );
+			expect( noResultsMessage ).toBeVisible();
+			expect( noResultsMessage ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			expect( noResultsMessage ).not.toHaveAttribute( 'tabindex' );
+			expect(
+				within( searchResults ).getAllByRole( 'option' )[ 0 ]
+			).toBe( noResultsMessage );
+			expect(
+				within( searchResults ).getAllByRole( 'option' )[ 1 ]
+			).toBe( createButton );
 
 			// No need to wait in this test because we control the Promise
 			// resolution manually via the `resolver` reference.
