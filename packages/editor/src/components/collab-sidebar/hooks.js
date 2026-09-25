@@ -4,8 +4,10 @@ import {
 	useState,
 	useEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
@@ -26,9 +28,11 @@ import {
 	applyNoteFormat,
 	calculateNotePositions,
 	findNoteInBlock,
+	focusNoteThread,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	pickPrimaryNote,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
@@ -534,6 +538,70 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			}
 		};
 	}, [ enabled, registry ] );
+}
+
+/**
+ * Keeps the selected note in step with the selected block, and focuses the
+ * selected note's thread when the selection asks for it.
+ *
+ * @param {Object} props
+ * @param {Array}  props.notes      Threads shown in the sidebar.
+ * @param {Object} props.sidebarRef Ref to the sidebar element.
+ */
+export function useNoteSelection( { notes, sidebarRef } ) {
+	const registry = useRegistry();
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const selectedBlockClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
+	const { selectedNote, noteFocused } = useSelect( ( select ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			select( editorStore )
+		);
+		return {
+			selectedNote: getSelectedNote(),
+			noteFocused: isNoteFocused(),
+		};
+	}, [] );
+
+	// Select the block's primary note, or clear the selection if it has none.
+	const syncWithBlock = useEvent( ( clientId ) => {
+		// A pending focus request is an explicit pick; leave it alone.
+		if ( unlock( registry.select( editorStore ) ).isNoteFocused() ) {
+			return;
+		}
+		// Orphaned threads have no block either; don't match them.
+		const blockThreads = clientId
+			? notes.filter( ( thread ) => thread.blockClientId === clientId )
+			: [];
+		selectNote( pickPrimaryNote( blockThreads )?.id );
+	} );
+
+	// Sync only on block transitions, so in-block changes (Escape, Cancel,
+	// the new note form) are left alone.
+	const prevBlockIdRef = useRef( selectedBlockClientId );
+	useEffect( () => {
+		if ( prevBlockIdRef.current === selectedBlockClientId ) {
+			return;
+		}
+		prevBlockIdRef.current = selectedBlockClientId;
+		syncWithBlock( selectedBlockClientId );
+	}, [ selectedBlockClientId, syncWithBlock ] );
+
+	// Must run after the sync above, which reads the focus flag this clears.
+	useEffect( () => {
+		if ( ! noteFocused || ! selectedNote ) {
+			return;
+		}
+		focusNoteThread(
+			selectedNote,
+			sidebarRef.current,
+			selectedNote === 'new' ? '[role="textbox"]' : undefined
+		);
+		// Re-select without the flag so the focus happens once.
+		selectNote( selectedNote );
+	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
 }
 
 export function useFloatingBoard( {

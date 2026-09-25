@@ -345,6 +345,51 @@ test.describe( 'Block Notes', () => {
 		] );
 	} );
 
+	test( 'clearing the block selection does not select an orphaned note', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Another block' },
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Orphaned note.',
+		} );
+
+		// Delete the noted block, orphaning its note.
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		// Only the "All notes" sidebar lists orphaned notes.
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: 'Original block deleted. Note: Orphaned note.',
+			} )
+		).toBeVisible();
+
+		const anotherBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Another block' } );
+		await anotherBlock.click();
+		await expect( anotherBlock ).toHaveClass( /is-selected/ );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await expect( anotherBlock ).not.toHaveClass( /is-selected/ );
+
+		await expect(
+			sidebar.getByRole( 'treeitem', { expanded: true } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,
