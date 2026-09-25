@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -66,7 +67,7 @@
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
 	font-weight: 400;
-	line-height: 16px;
+	line-height: math.div(16, 12); // Unit-less equivalent of 16px at this 12px font-size.
 	text-align: left;
 	color: $gray-700;
 	overflow-wrap: anywhere;
@@ -75,7 +76,7 @@
 .editor-collab-sidebar-panel__user-time {
 	font-size: 12px;
 	font-weight: 400;
-	line-height: 16px;
+	line-height: math.div(16, 12); // Unit-less equivalent of 16px at this 12px font-size.
 	text-align: left;
 	color: $gray-700;
 }
@@ -160,6 +161,7 @@
 // form needs to the editable element as rendered inside the note form. The
 // shell exposes no stable class name, so target the editable by its role.
 .editor-collab-sidebar-panel__note-form [role="textbox"] {
+	// stylelint-disable-next-line declaration-property-unit-allowed-list -- 20px doubles as the fixed row height used by the max-height calc below (20 rows), so it is kept as an exact pixel value rather than a font-size-relative ratio.
 	line-height: 20px;
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
