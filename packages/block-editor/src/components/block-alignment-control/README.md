@@ -38,6 +38,20 @@ The current value of the alignment setting. You may only choose from the `Option
 
 A callback function invoked when the toolbar's alignment value is changed via an interaction with any of the toolbar's buttons. Called with the new alignment value (ie: `left`, `center`, `right`, `wide`, `full`) as the only argument.
 
+### `controls`
+
+-   **Type:** `Array`
+-   **Default:** [ `none`, `left`, `center`, `right`, `wide`, `full` ]
+
+An array of available alignment controls.
+
+### `isCollapsed`
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+
+Whether the toolbar should be collapsed. Default is true.
+
 ## Related components
 
 Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
