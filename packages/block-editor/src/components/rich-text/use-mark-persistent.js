@@ -39,18 +39,22 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 	useLayoutEffect( () => {
 		const previous = previousRef.current;
 		const next = { html, text, hasActiveFormats };
-		previousRef.current = next;
 
 		// Ignore mount.
 		if ( ! previous ) {
+			previousRef.current = next;
 			return;
 		}
 
-		// Effects can re-run without a change, e.g. in strict mode.
+		// Effects can re-run without a change, e.g. in strict mode. Keep the
+		// last handled snapshot, so html lagging behind the text (e.g. a
+		// debounced `setAttributes`) still counts as typing.
 		const changeType = getChangeType( previous, next );
 		if ( changeType === 'none' ) {
 			return;
 		}
+
+		previousRef.current = next;
 
 		if ( changeType === 'typing' ) {
 			markPersistentDebounced();

@@ -68,6 +68,23 @@ describe( 'useMarkPersistent', () => {
 		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'treats html that lags behind the text as typing', () => {
+		const { rerender } = renderHook( useMarkPersistent, {
+			initialProps: props( 'a' ),
+		} );
+
+		// The text updates first, e.g. when the block debounces
+		// `setAttributes`.
+		rerender( props( 'a', 'ab' ) );
+		rerender( props( 'ab' ) );
+
+		expect( markPersistent ).not.toHaveBeenCalled();
+
+		vi.advanceTimersByTime( 1000 );
+
+		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'marks immediately when formatting changes', () => {
 		const { rerender } = renderHook( useMarkPersistent, {
 			initialProps: props( 'ab' ),
