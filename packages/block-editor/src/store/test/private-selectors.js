@@ -37,6 +37,7 @@ import {
 	shouldRenderBlockListView,
 	getStyleOverrides,
 	canHostEditableRoot,
+	getListViewSupportAncestor,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -2723,6 +2724,129 @@ describe( 'private selectors', () => {
 			after.forEach( ( dependant, index ) => {
 				expect( dependant ).toBe( before[ index ] );
 			} );
+		} );
+	} );
+
+	describe( 'getListViewSupportAncestor', () => {
+		const BLOCK_WITH_LIST_VIEW = 'test/block-with-list-view';
+		const BLOCK_WITHOUT_LIST_VIEW = 'test/block-without-list-view';
+		const BLOCK_CHILD = 'test/block-child';
+
+		beforeAll( () => {
+			registerBlockType( BLOCK_WITH_LIST_VIEW, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Block With List View',
+				supports: { listView: true },
+			} );
+
+			registerBlockType( BLOCK_WITHOUT_LIST_VIEW, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Block Without List View',
+			} );
+
+			registerBlockType( BLOCK_CHILD, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Child Block',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( BLOCK_WITH_LIST_VIEW );
+			unregisterBlockType( BLOCK_WITHOUT_LIST_VIEW );
+			unregisterBlockType( BLOCK_CHILD );
+		} );
+
+		// list-view-parent        (has List View support)
+		//   └─ child-of-list-view
+		// no-list-view-parent     (no support)
+		//   └─ child-of-no-list-view
+		// nav-parent              (core/navigation, always supported)
+		//   └─ child-of-nav
+		// outer-list-view         (has support)
+		//   └─ inner-list-view    (has support)
+		//        └─ deep-child
+		const state = {
+			blocks: {
+				byClientId: new Map( [
+					[ 'list-view-parent', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'child-of-list-view', { name: BLOCK_CHILD } ],
+					[
+						'no-list-view-parent',
+						{ name: BLOCK_WITHOUT_LIST_VIEW },
+					],
+					[ 'child-of-no-list-view', { name: BLOCK_CHILD } ],
+					[ 'nav-parent', { name: 'core/navigation' } ],
+					[ 'child-of-nav', { name: BLOCK_CHILD } ],
+					[ 'outer-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'inner-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'deep-child', { name: BLOCK_CHILD } ],
+				] ),
+				parents: new Map( [
+					[ 'list-view-parent', '' ],
+					[ 'child-of-list-view', 'list-view-parent' ],
+					[ 'no-list-view-parent', '' ],
+					[ 'child-of-no-list-view', 'no-list-view-parent' ],
+					[ 'nav-parent', '' ],
+					[ 'child-of-nav', 'nav-parent' ],
+					[ 'outer-list-view', '' ],
+					[ 'inner-list-view', 'outer-list-view' ],
+					[ 'deep-child', 'inner-list-view' ],
+				] ),
+				order: new Map(),
+				attributes: new Map(),
+			},
+			blockListSettings: new Map(),
+			selection: {
+				selectionStart: { clientId: 'child-of-nav' },
+				selectionEnd: { clientId: 'child-of-nav' },
+			},
+		};
+
+		it( 'returns null without a client ID', () => {
+			expect( getListViewSupportAncestor( state, undefined ) ).toBeNull();
+		} );
+
+		it( 'returns null for a top-level block', () => {
+			expect(
+				getListViewSupportAncestor( state, 'list-view-parent' )
+			).toBeNull();
+		} );
+
+		it( 'returns the parent when it has List View support', () => {
+			expect(
+				getListViewSupportAncestor( state, 'child-of-list-view' )
+			).toBe( 'list-view-parent' );
+		} );
+
+		it( 'returns null when no ancestor has List View support', () => {
+			expect(
+				getListViewSupportAncestor( state, 'child-of-no-list-view' )
+			).toBeNull();
+		} );
+
+		it( 'treats the Navigation block as always supported', () => {
+			expect( getListViewSupportAncestor( state, 'child-of-nav' ) ).toBe(
+				'nav-parent'
+			);
+		} );
+
+		it( 'returns the outermost ancestor when supported blocks are nested', () => {
+			expect( getListViewSupportAncestor( state, 'deep-child' ) ).toBe(
+				'outer-list-view'
+			);
+		} );
+
+		it( 'looks up the given block rather than the selected one', () => {
+			// The selection is on `child-of-nav`.
+			expect(
+				getListViewSupportAncestor( state, 'child-of-list-view' )
+			).toBe( 'list-view-parent' );
 		} );
 	} );
 } );
