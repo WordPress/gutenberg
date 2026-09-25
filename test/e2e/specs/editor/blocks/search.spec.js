@@ -17,6 +17,164 @@ test.describe( 'Search', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
+	test( 'applies the width to the inside wrapper verbatim, whatever the unit', async ( {
+		editor,
+	} ) => {
+		// The width used to be handed to a ResizableBox, which appended `px`
+		// to any unit it did not recognise and turned `20em` into `20empx`.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '20em' } } },
+		} );
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+
+		await expect( wrapper ).toHaveAttribute( 'style', /width:\s*20em/ );
+	} );
+
+	test( 'leaves the width alone when the block has none set', async ( {
+		editor,
+	} ) => {
+		// An inline width of `auto` would override anything coming from
+		// Global Styles or the stylesheet. The border puts a `border-width`
+		// declaration on the same element, so the assertion below has to tell
+		// the two apart.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: {
+				buttonPosition: 'button-inside',
+				style: { border: { width: '2px', style: 'solid' } },
+			},
+		} );
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+
+		await expect( wrapper ).toHaveAttribute( 'style', /border-width/ );
+		await expect( wrapper ).not.toHaveAttribute(
+			'style',
+			/(?:^|;)\s*width:/
+		);
+	} );
+
+	test( 'survives a width that is not a string', async ( { editor } ) => {
+		// Hand-written or generated content can put a number here. The server
+		// ignores it, and the editor has to do the same rather than throw.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: 350 } } },
+		} );
+
+		const searchBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Search',
+		} );
+
+		await expect( searchBlock ).toBeVisible();
+		await expect(
+			editor.canvas.locator( '.wp-block-search__inside-wrapper' )
+		).not.toHaveAttribute( 'style', /(?:^|;)\s*width:/ );
+	} );
+
+	test( 'stores a pixel width after dragging the resize handle', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '300px' } } },
+		} );
+
+		const searchBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Search',
+		} );
+		await searchBlock.click();
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		await expect( handle ).toBeVisible();
+
+		const handleBox = await handle.boundingBox();
+		await page.mouse.move(
+			handleBox.x + handleBox.width / 2,
+			handleBox.y + handleBox.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			handleBox.x + handleBox.width / 2 - 100,
+			handleBox.y + handleBox.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.style.dimensions.width ).toMatch( /^\d+px$/ );
+		expect(
+			parseInt( block.attributes.style.dimensions.width, 10 )
+		).toBeLessThan( 300 );
+	} );
+
+	test( 'stops dragging at the minimum width', async ( { page, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '400px' } } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		const box = await handle.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		// Well past the 220px floor.
+		await page.mouse.move(
+			box.x + box.width / 2 - 300,
+			box.y + box.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect( parseInt( block.attributes.style.dimensions.width, 10 ) ).toBe(
+			220
+		);
+	} );
+
+	test( 'keeps the handles on the block when it is narrower than the minimum', async ( {
+		editor,
+	} ) => {
+		// The floor must not make the overlay wider than the block, or the
+		// handles end up hanging past its edge.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '120px' } } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+		const overlay = editor.canvas.locator( '.wp-block-search__resizer' );
+
+		const wrapperBox = await wrapper.boundingBox();
+		const overlayBox = await overlay.boundingBox();
+
+		expect( Math.round( wrapperBox.width ) ).toBe( 120 );
+		expect( Math.round( overlayBox.width ) ).toBe(
+			Math.round( wrapperBox.width )
+		);
+	} );
+
 	test( 'should auto-configure itself to sensible defaults when inserted into a Navigation block', async ( {
 		page,
 		editor,
