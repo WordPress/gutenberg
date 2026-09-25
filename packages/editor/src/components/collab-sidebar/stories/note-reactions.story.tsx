@@ -69,11 +69,11 @@ function NoteReactions( {
 	return (
 		<Stack direction="row" gap="xs" justify="flex-start">
 			<AddReactionButton
-				noteId={ 1 }
+				target={ { kind: 'note', id: 1 } }
 				onToggleReaction={ toggleReaction }
 			/>
 			<ReactionDisplay
-				noteId={ 1 }
+				target={ { kind: 'note', id: 1 } }
 				reactions={ reactions }
 				onToggleReaction={ toggleReaction }
 			/>

@@ -36,7 +36,7 @@ describe( 'ReactionDisplay', () => {
 	it( 'renders nothing when there are no reactions', () => {
 		const { container } = render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {} }
 				onToggleReaction={ () => {} }
 			/>
@@ -48,7 +48,7 @@ describe( 'ReactionDisplay', () => {
 	it( 'renders nothing when every reaction has a zero count', () => {
 		const { container } = render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 0, reacted: false, my_reaction_id: 0 },
 				} }
@@ -62,7 +62,7 @@ describe( 'ReactionDisplay', () => {
 	it( 'renders a pill per reacted emoji with count and pressed state', () => {
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 2, reacted: true, my_reaction_id: 7 },
 					rocket: { count: 1, reacted: false, my_reaction_id: 0 },
@@ -91,7 +91,7 @@ describe( 'ReactionDisplay', () => {
 	it( 'falls back to the raw slug for emojis outside the curated set', () => {
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					custom: { count: 1, reacted: false, my_reaction_id: 0 },
 				} }
@@ -131,7 +131,7 @@ describe( 'ReactionDisplay', () => {
 		try {
 			render(
 				<ReactionDisplay
-					noteId={ uniqueNoteId }
+					target={ { kind: 'note', id: uniqueNoteId } }
 					reactions={ {
 						'1f44d': {
 							count: 2,
@@ -173,7 +173,7 @@ describe( 'ReactionDisplay', () => {
 		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 2, reacted: false, my_reaction_id: 0 },
 				} }
@@ -198,7 +198,7 @@ describe( 'ReactionDisplay', () => {
 				data-testid="thread"
 			>
 				<ReactionDisplay
-					noteId={ uniqueNoteId }
+					target={ { kind: 'note', id: uniqueNoteId } }
 					reactions={ {
 						heart: { count: 1, reacted: true, my_reaction_id: 7 },
 					} }
@@ -223,7 +223,7 @@ describe( 'ReactionDisplay', () => {
 		] );
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 1, reacted: true, my_reaction_id: 7 },
 				} }
@@ -253,7 +253,7 @@ describe( 'ReactionDisplay', () => {
 		] );
 		const { rerender } = render(
 			<ReactionDisplay
-				noteId={ noteId }
+				target={ { kind: 'note', id: noteId } }
 				reactions={ {
 					heart: { count: 1, reacted: false, my_reaction_id: 0 },
 				} }
@@ -275,7 +275,7 @@ describe( 'ReactionDisplay', () => {
 
 		// Someone adds the same reaction from the full picker, which
 		// invalidates the cached names but cannot reach this pill's state.
-		invalidateReactionNames( noteId, 'heart' );
+		invalidateReactionNames( { kind: 'note', id: noteId }, 'heart' );
 		let resolveRefetch!: ( names: unknown[] ) => void;
 		mockApiFetch.mockImplementation(
 			() =>
@@ -285,7 +285,7 @@ describe( 'ReactionDisplay', () => {
 		);
 		rerender(
 			<ReactionDisplay
-				noteId={ noteId }
+				target={ { kind: 'note', id: noteId } }
 				reactions={ {
 					heart: { count: 2, reacted: false, my_reaction_id: 0 },
 				} }
@@ -326,7 +326,7 @@ describe( 'ReactionDisplay', () => {
 		] );
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 3, reacted: true, my_reaction_id: 7 },
 				} }
@@ -391,7 +391,7 @@ describe( 'ReactionDisplay', () => {
 			const user = userEvent.setup();
 			render(
 				<ReactionDisplay
-					noteId={ uniqueNoteId }
+					target={ { kind: 'note', id: uniqueNoteId } }
 					reactions={ {
 						'1f44d': {
 							count: 1,
@@ -454,7 +454,7 @@ describe( 'ReactionDisplay', () => {
 			] );
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 1, reacted: true, my_reaction_id: 7 },
 				} }
@@ -489,7 +489,7 @@ describe( 'ReactionDisplay', () => {
 		);
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 1200, reacted: true, my_reaction_id: 7 },
 				} }
@@ -512,7 +512,7 @@ describe( 'ReactionDisplay', () => {
 		const onToggleReaction = vi.fn();
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 1, reacted: true, my_reaction_id: 7 },
 				} }
@@ -535,7 +535,7 @@ describe( 'ReactionDisplay', () => {
 		mockApiFetch.mockRejectedValue( new Error( 'network down' ) );
 		render(
 			<ReactionDisplay
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				reactions={ {
 					heart: { count: 1, reacted: true, my_reaction_id: 7 },
 				} }
@@ -551,5 +551,71 @@ describe( 'ReactionDisplay', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
 		).toBeVisible();
+	} );
+	it( 'lists reactors of a block target through the post-scoped query', async () => {
+		const user = userEvent.setup();
+		mockApiFetch.mockResolvedValue( [
+			{ author_name: 'Alice', content: { raw: 'heart' } },
+		] );
+		render(
+			<ReactionDisplay
+				target={ {
+					kind: 'block',
+					postId: 7,
+					reactionsId: `block${ uniqueNoteId }`,
+				} }
+				reactions={ {
+					heart: { count: 1, reacted: false },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart',
+				} )
+			).toBeVisible()
+		);
+		const { path } = mockApiFetch.mock.calls[ 0 ][ 0 ] as {
+			path: string;
+		};
+		expect( path ).toContain( 'post=7' );
+		expect( path ).toContain( 'parent=0' );
+		expect( path ).toContain( `block=block${ uniqueNoteId }` );
+		expect( path ).toContain( 'type=reaction' );
+	} );
+
+	it( 'prefers onRemoveLast over focusing the enclosing thread', async () => {
+		const user = userEvent.setup();
+		const onRemoveLast = vi.fn();
+		render(
+			<div
+				className="editor-collab-sidebar-panel__thread"
+				data-testid="thread"
+				tabIndex={ 0 }
+			>
+				<ReactionDisplay
+					target={ { kind: 'note', id: uniqueNoteId } }
+					reactions={ {
+						heart: { count: 1, reacted: true, my_reaction_id: 7 },
+					} }
+					onToggleReaction={ () => {} }
+					onRemoveLast={ onRemoveLast }
+				/>
+			</div>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
+		);
+
+		expect( onRemoveLast ).toHaveBeenCalledTimes( 1 );
+		expect( screen.getByTestId( 'thread' ) ).not.toHaveFocus();
 	} );
 } );

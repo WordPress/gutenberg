@@ -187,6 +187,47 @@ class BlockNoteUtils {
 		await expect( match ).toBeVisible();
 		await match.click();
 	}
+
+	/**
+	 * Open the block toolbar's reaction picker for the selected block and
+	 * pick an emoji by its exact label.
+	 *
+	 * @param {string} emoji Exact emoji label, e.g. "Heart".
+	 */
+	async addReactionToBlock( emoji ) {
+		await this.#editor.clickBlockToolbarButton( 'React to block' );
+		await this.waitForFullPicker();
+		await this.#page
+			.getByRole( 'gridcell', { name: emoji, exact: true } )
+			.first()
+			.click();
+	}
+
+	/**
+	 * The sidebar entry listing a block's reactions when the block has no
+	 * note of its own.
+	 *
+	 * @param {string} blockTitle The block's display title, e.g. "Paragraph".
+	 * @return {import('@playwright/test').Locator} The entry.
+	 */
+	blockReactionsEntry( blockTitle ) {
+		return this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', {
+				name: `Reactions on ${ blockTitle }`,
+				exact: true,
+			} );
+	}
+
+	/**
+	 * The reaction anchor written to the first block's metadata, if any.
+	 *
+	 * @return {Promise<string|undefined>} The anchor.
+	 */
+	async getReactionsId() {
+		const blocks = await this.#editor.getBlocks();
+		return blocks[ 0 ]?.attributes?.metadata?.reactionsId;
+	}
 }
 
 module.exports = { BlockNoteUtils };

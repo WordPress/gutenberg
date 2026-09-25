@@ -8,6 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
+import { BlockReactionsEntry } from './block-reactions-entry';
+import { isBlockReactionsEntry } from './block-reactions';
+import { useBlockReactionActions } from './use-block-reactions';
 import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
@@ -32,6 +35,7 @@ export function Notes( {
 		onDelete,
 		onToggleReaction,
 	} = useNoteActions( reactionsMap );
+	const { onToggleBlockReaction } = useBlockReactionActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -149,15 +153,31 @@ export function Notes( {
 	// Sync the selected note to the new block's primary thread when the
 	// block context changes. The ref tracks the previous block id so the
 	// effect only fires on block transitions, leaving in-block note changes
-	// (Escape, Cancel, "new" form) alone.
+	// (Escape, Cancel, "new" form) alone. A thread that was selected
+	// explicitly and belongs to the new block, such as a block-reactions
+	// entry that has no note to derive, keeps the selection.
+	const selectedThreadBlockId = notes.find(
+		( thread ) => thread.id === selectedNote
+	)?.blockClientId;
 	const prevBlockIdRef = useRef( selectedBlockClientId );
 	useEffect( () => {
 		if ( prevBlockIdRef.current === selectedBlockClientId ) {
 			return;
 		}
 		prevBlockIdRef.current = selectedBlockClientId;
+		if (
+			selectedThreadBlockId &&
+			selectedThreadBlockId === selectedBlockClientId
+		) {
+			return;
+		}
 		selectNote( targetNoteId );
-	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
+	}, [
+		selectedBlockClientId,
+		selectedThreadBlockId,
+		targetNoteId,
+		selectNote,
+	] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
@@ -298,32 +318,66 @@ export function Notes( {
 									</Text>
 								</Stack>
 							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								onToggleReaction={ onToggleReaction }
-								reactionsMap={ reactionsMap }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												registerThread,
-												unregisterThread,
-											}
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
+							{ isBlockReactionsEntry( thread ) ? (
+								<BlockReactionsEntry
+									entry={ thread }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+												}
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+									onToggleBlockReaction={
+										onToggleBlockReaction
+									}
+								/>
+							) : (
+								<NoteThread
+									note={ thread }
+									onAddReply={ onAddReply }
+									onDeleteNote={ handleDelete }
+									onEditNote={ onEditNote }
+									onToggleReaction={ onToggleReaction }
+									onToggleBlockReaction={
+										onToggleBlockReaction
+									}
+									reactionsMap={ reactionsMap }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+												}
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+								/>
+							) }
 						</Fragment>
 					) ) }
 				</>

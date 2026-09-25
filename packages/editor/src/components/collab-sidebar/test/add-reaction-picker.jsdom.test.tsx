@@ -50,7 +50,7 @@ describe( 'AddReactionButton', () => {
 		const onToggleReaction = vi.fn();
 		render(
 			<AddReactionButton
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				onToggleReaction={ onToggleReaction }
 			/>
 		);
@@ -119,7 +119,7 @@ describe( 'AddReactionButton', () => {
 			const onToggleReaction = vi.fn();
 			render(
 				<AddReactionButton
-					noteId={ uniqueNoteId }
+					target={ { kind: 'note', id: uniqueNoteId } }
 					onToggleReaction={ onToggleReaction }
 				/>
 			);
@@ -195,7 +195,7 @@ describe( 'AddReactionButton', () => {
 			const onToggleReaction = vi.fn();
 			render(
 				<AddReactionButton
-					noteId={ uniqueNoteId }
+					target={ { kind: 'note', id: uniqueNoteId } }
 					onToggleReaction={ onToggleReaction }
 				/>
 			);
@@ -254,7 +254,7 @@ describe( 'AddReactionButton', () => {
 		const user = userEvent.setup();
 		render(
 			<AddReactionButton
-				noteId={ uniqueNoteId }
+				target={ { kind: 'note', id: uniqueNoteId } }
 				disabled
 				onToggleReaction={ () => {} }
 			/>
@@ -266,6 +266,62 @@ describe( 'AddReactionButton', () => {
 		await user.click( button );
 		expect(
 			screen.queryByRole( 'button', { name: 'Rocket' } )
+		).not.toBeInTheDocument();
+	} );
+	it( 'renders a custom toggle through renderToggle and opens the picker from it', async () => {
+		const user = userEvent.setup();
+		const onToggleReaction = vi.fn();
+		render(
+			<AddReactionButton
+				target={ { kind: 'note', id: uniqueNoteId } }
+				onToggleReaction={ onToggleReaction }
+				renderToggle={ ( { isOpen, onToggle, label } ) => (
+					<button
+						type="button"
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+					>
+						{ label }
+					</button>
+				) }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'button', { name: 'Add reaction' } );
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
+		await user.click( trigger );
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Add reaction' } )
+		).toBeVisible();
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Rocket' } )
+		);
+
+		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
+	} );
+
+	it( 'names both the trigger and the popover dialog after the label prop', async () => {
+		const user = userEvent.setup();
+		render(
+			<AddReactionButton
+				target={ { kind: 'note', id: uniqueNoteId } }
+				label="React to block"
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'button', {
+			name: 'React to block',
+		} );
+		await user.click( trigger );
+
+		expect(
+			screen.getByRole( 'dialog', { name: 'React to block' } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Add reaction' } )
 		).not.toBeInTheDocument();
 	} );
 } );

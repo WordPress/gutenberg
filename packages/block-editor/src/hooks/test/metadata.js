@@ -166,6 +166,27 @@ describe( 'metadata', () => {
 			} );
 		} );
 
+		it( 'should preserve block reaction anchors in one-to-one transforms', () => {
+			const source = [
+				{
+					name: 'core/foo',
+					attributes: { metadata: { reactionsId: 'abc123xy' } },
+					innerBlocks: [],
+				},
+			];
+			const result = {
+				name: 'core/bar',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			const transformed = addTransforms( result, source, 0, [ result ] );
+
+			expect( transformed.attributes.metadata ).toEqual( {
+				reactionsId: 'abc123xy',
+			} );
+		} );
+
 		it( 'should preserve custom name metadata', () => {
 			registerBlockType( 'core/bar', {
 				apiVersion: 3,

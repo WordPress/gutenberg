@@ -30,6 +30,7 @@ import {
 } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import { invalidateReactionNames } from './reaction-display';
+import type { ReactionTarget } from './block-reactions';
 
 // Shared by the lazy component and the prefetch, so both hit one request.
 function loadEmojiPicker() {
@@ -109,10 +110,22 @@ class PickerErrorBoundary extends Component< PickerErrorBoundaryProps > {
 	}
 }
 
+interface RenderToggleArgs {
+	isOpen: boolean;
+	onToggle: () => void;
+	disabled: boolean;
+	label: string;
+	// Warms the picker; unset when only the curated row is available.
+	onPrefetch?: () => void;
+}
+
 interface AddReactionButtonProps {
-	noteId: number;
+	target: ReactionTarget;
 	disabled?: boolean;
+	label?: string;
+	className?: string;
 	onToggleReaction: ( slug: string ) => void;
+	renderToggle?: ( args: RenderToggleArgs ) => ReactNode;
 }
 
 /**
@@ -124,15 +137,24 @@ interface AddReactionButtonProps {
  * offered instead so adding a reaction keeps working.
  *
  * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
+ * @param props.target           The note or block the reaction hangs off.
  * @param props.disabled         Whether the button is disabled (e.g. on a
  *                               resolved note thread).
+ * @param props.label            Accessible name of the trigger and of the
+ *                               picker dialog. Defaults to "Add reaction".
+ * @param props.className        Class of the dropdown wrapper. Defaults to
+ *                               the sidebar's hover-revealed trigger class.
  * @param props.onToggleReaction Callback to toggle a reaction.
+ * @param props.renderToggle     Renders a custom trigger (e.g. a toolbar
+ *                               button) in place of the default icon button.
  */
 export function AddReactionButton( {
-	noteId,
+	target,
 	disabled = false,
+	label = __( 'Add reaction' ),
+	className = 'editor-collab-sidebar-panel__add-reaction',
 	onToggleReaction,
+	renderToggle,
 }: AddReactionButtonProps ) {
 	const { recordUse } = useFrequentEmojis();
 	const emojis = useReactionEmojis();
@@ -169,10 +191,13 @@ export function AddReactionButton( {
 	};
 
 	const showFullPicker = hasFullPicker && ! pickerFailed;
+	const onPrefetch = hasFullPicker
+		? () => prefetchFullPicker( baseUrl )
+		: undefined;
 
 	return (
 		<Dropdown
-			className="editor-collab-sidebar-panel__add-reaction"
+			className={ className }
 			popoverProps={ {
 				...POPOVER_PROPS,
 				/*
@@ -181,44 +206,46 @@ export function AddReactionButton( {
 				 * an unnamed generic container.
 				 */
 				role: 'dialog',
-				'aria-label': __( 'Add reaction' ),
+				'aria-label': label,
 			} }
 			contentClassName={
 				showFullPicker
 					? 'editor-collab-sidebar-panel__picker-popover'
 					: 'editor-collab-sidebar-panel__add-reaction-popover'
 			}
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
-					size="small"
-					// A plain glyph, per the design: no ring or fill at rest.
-					variant="minimal"
-					tone="neutral"
-					className="editor-collab-sidebar-panel__add-reaction-button"
-					icon={ reactionIcon }
-					label={ __( 'Add reaction' ) }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					disabled={ disabled }
-					onClick={ onToggle }
-					// Warm the picker so the popover opens populated.
-					onMouseEnter={
-						hasFullPicker
-							? () => prefetchFullPicker( baseUrl )
-							: undefined
-					}
-					onFocus={
-						hasFullPicker
-							? () => prefetchFullPicker( baseUrl )
-							: undefined
-					}
-				/>
-			) }
+			renderToggle={ ( { isOpen, onToggle } ) =>
+				renderToggle ? (
+					renderToggle( {
+						isOpen,
+						onToggle,
+						disabled,
+						label,
+						onPrefetch,
+					} )
+				) : (
+					<IconButton
+						size="small"
+						// A plain glyph, per the design: no ring or fill at rest.
+						variant="minimal"
+						tone="neutral"
+						className="editor-collab-sidebar-panel__add-reaction-button"
+						icon={ reactionIcon }
+						label={ label }
+						aria-haspopup="dialog"
+						aria-expanded={ isOpen }
+						disabled={ disabled }
+						onClick={ onToggle }
+						// Warm the picker so the popover opens populated.
+						onMouseEnter={ onPrefetch }
+						onFocus={ onPrefetch }
+					/>
+				)
+			}
 			renderContent={ ( { onClose } ) => {
 				const pickReaction = ( slug: string ) => {
 					onClose();
 					// Adding a reaction changes the slug's reactor list.
-					invalidateReactionNames( noteId, slug );
+					invalidateReactionNames( target, slug );
 					onToggleReaction( slug );
 				};
 				const pickCurated = ( slug: string ) => {

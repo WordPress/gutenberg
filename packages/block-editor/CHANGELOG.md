@@ -32,6 +32,10 @@
 -   Inserter and pattern search: rank title matches above keyword and description matches, and rank a word in the title that starts with the search term above a substring match ([#83312](https://github.com/WordPress/gutenberg/pull/83312)).
 -   `ViewportVisibilityInfo`: Migrate the block visibility badge from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Notice` component ([#82670](https://github.com/WordPress/gutenberg/pull/82670)).
 
+### Internal
+
+-   Block metadata: preserve `metadata.reactionsId`, the anchor for emoji reactions on a block, through one-to-one block transforms the way `noteId` already is ([#83169](https://github.com/WordPress/gutenberg/pull/83169)).
+
 ### Bug Fixes
 
 -   `BlockAlignmentControl`: Hide the control again when none of a block's alignments are available. Paragraph, Heading, List and other blocks that support only wide and full were showing a menu of unavailable options that could not change anything ([#83265](https://github.com/WordPress/gutenberg/pull/83265)).

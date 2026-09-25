@@ -662,7 +662,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	public function data_invalid_reaction_inputs() {
 		return array(
-			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_parent', 400 ),
+			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_reaction_target', 400 ),
 			'parent is a regular comment'  => array( 'comment', 'heart', true, 'rest_comment_invalid_parent', 400 ),
 			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
 			// Hex storage keys are accepted (see
@@ -1341,5 +1341,375 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertTrue( $deleted, 'The race injection did not delete this request\'s row.' );
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( $survivor_id, $response->get_data()['id'], 'Response did not repoint to the surviving row.' );
+	}
+	/**
+	 * Builds a create request for a reaction targeting a block anchor.
+	 *
+	 * @param int    $post_id Post the block belongs to.
+	 * @param string $anchor  Block anchor (`metadata.reactionsId`).
+	 * @param string $slug    Reaction storage slug.
+	 * @param array  $extra   Extra request params.
+	 * @return WP_REST_Request The request.
+	 */
+	protected function create_block_reaction_request( $post_id, $anchor, $slug = 'heart', $extra = array() ) {
+		$params  = array_merge(
+			array(
+				'post'    => $post_id,
+				'type'    => 'reaction',
+				'block'   => $anchor,
+				'content' => $slug,
+			),
+			$extra
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		return $request;
+	}
+
+	/**
+	 * Inserts an approved block reaction row directly, bypassing REST.
+	 *
+	 * @param int    $post_id Post the block belongs to.
+	 * @param string $anchor  Block anchor.
+	 * @param int    $user_id Reacting user.
+	 * @param string $slug    Reaction storage slug.
+	 * @return int Reaction comment ID.
+	 */
+	protected function insert_block_reaction( $post_id, $anchor, $user_id, $slug = 'heart' ) {
+		return wp_insert_comment(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_parent'   => 0,
+				'comment_type'     => 'reaction',
+				'comment_content'  => $slug,
+				'comment_approved' => 1,
+				'user_id'          => $user_id,
+				'comment_meta'     => array( '_wp_reaction_block' => $anchor ),
+			)
+		);
+	}
+
+	public function test_create_block_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+		$data     = $response->get_data();
+		$reaction = get_comment( $data['id'] );
+		$this->assertSame( 'reaction', $reaction->comment_type );
+		$this->assertSame( '0', $reaction->comment_parent );
+		$this->assertSame( (string) $post_id, $reaction->comment_post_ID );
+		$this->assertSame( 'heart', $reaction->comment_content );
+		$this->assertSame( '1', $reaction->comment_approved );
+		$this->assertSame( 'abc123xy', get_comment_meta( $reaction->comment_ID, '_wp_reaction_block', true ) );
+		$this->assertSame( 'abc123xy', $data['block'] );
+	}
+
+	public function test_cannot_create_reaction_with_both_parent_and_block() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy', 'heart', array( 'parent' => $note_id ) )
+		);
+
+		$this->assertErrorResponse( 'rest_comment_invalid_reaction_target', $response, 400 );
+	}
+
+	public function test_cannot_create_block_reaction_on_unknown_post() {
+		wp_set_current_user( self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( PHP_INT_MAX, 'abc123xy' )
+		);
+
+		$this->assertErrorResponse( 'rest_comment_invalid_post_id', $response, 403 );
+	}
+
+	/**
+	 * @dataProvider data_invalid_block_anchors
+	 *
+	 * @param string $anchor The anchor to submit.
+	 */
+	public function test_cannot_create_block_reaction_with_invalid_anchor( $anchor ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, $anchor )
+		);
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function data_invalid_block_anchors() {
+		return array(
+			'uppercase' => array( 'ABC123XY' ),
+			'too short' => array( 'abc12' ),
+			'too long'  => array( '0123456789abcdefg' ),
+			'hyphen'    => array( 'abc-1234' ),
+			'space'     => array( 'abc 1234' ),
+		);
+	}
+
+	public function test_cannot_create_duplicate_block_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$this->insert_block_reaction( $post_id, 'abc123xy', self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		$this->assertErrorResponse( 'rest_comment_duplicate_reaction', $response, 409 );
+	}
+
+	public function test_can_create_same_emoji_on_different_blocks() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$this->insert_block_reaction( $post_id, 'blockaaa', self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'blockbbb' )
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	public function test_can_create_same_emoji_on_same_anchor_in_different_posts() {
+		wp_set_current_user( self::$editor_id );
+		$post_id       = self::factory()->post->create();
+		$other_post_id = self::factory()->post->create();
+		$this->insert_block_reaction( $other_post_id, 'abc123xy', self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	public function test_block_reaction_uniqueness_ignores_note_reactions_on_same_post() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		$this->create_reaction( $post_id, $note_id, self::$editor_id, 'heart' );
+		wp_set_current_user( self::$editor_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy', 'heart' )
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	public function test_concurrent_duplicate_block_reaction_converges_to_single_row() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		$injected = false;
+		$inject   = function ( $prepared ) use ( $post_id, &$injected ) {
+			if ( ! $injected && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
+				$injected = true;
+				$this->insert_block_reaction( $post_id, 'abc123xy', self::$editor_id, 'heart' );
+			}
+			return $prepared;
+		};
+		add_filter( 'rest_pre_insert_comment', $inject );
+
+		try {
+			$response = rest_get_server()->dispatch(
+				$this->create_block_reaction_request( $post_id, 'abc123xy' )
+			);
+			$this->assertSame( 201, $response->get_status() );
+		} finally {
+			remove_filter( 'rest_pre_insert_comment', $inject );
+		}
+
+		$remaining = get_comments(
+			array(
+				'post_id'    => $post_id,
+				'parent'     => 0,
+				'user_id'    => self::$editor_id,
+				'type'       => 'reaction',
+				'status'     => 'approve',
+				'meta_key'   => '_wp_reaction_block',
+				'meta_value' => 'abc123xy',
+			)
+		);
+		$this->assertCount( 1, $remaining, 'Concurrent duplicate block reactions should converge to a single row.' );
+		$this->assertSame( (int) $remaining[0]->comment_ID, $response->get_data()['id'] );
+	}
+
+	public function test_concurrent_block_reaction_on_other_anchor_is_not_collapsed() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		$injected = false;
+		$inject   = function ( $prepared ) use ( $post_id, &$injected ) {
+			if ( ! $injected && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
+				$injected = true;
+				$this->insert_block_reaction( $post_id, 'blockbbb', self::$editor_id, 'heart' );
+			}
+			return $prepared;
+		};
+		add_filter( 'rest_pre_insert_comment', $inject );
+
+		try {
+			$response = rest_get_server()->dispatch(
+				$this->create_block_reaction_request( $post_id, 'blockaaa' )
+			);
+			$this->assertSame( 201, $response->get_status() );
+		} finally {
+			remove_filter( 'rest_pre_insert_comment', $inject );
+		}
+
+		$remaining = get_comments(
+			array(
+				'post_id' => $post_id,
+				'parent'  => 0,
+				'user_id' => self::$editor_id,
+				'type'    => 'reaction',
+				'status'  => 'approve',
+			)
+		);
+		$this->assertCount( 2, $remaining, 'Reactions on different blocks must not be treated as duplicates.' );
+	}
+
+	public function test_can_delete_own_block_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create();
+		$reaction_id = $this->insert_block_reaction( $post_id, 'abc123xy', self::$editor_id );
+
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNull( get_comment( $reaction_id ) );
+		$this->assertSame( '', get_comment_meta( $reaction_id, '_wp_reaction_block', true ) );
+	}
+
+	public function test_can_list_block_reactions_by_anchor() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$mine    = $this->insert_block_reaction( $post_id, 'blockaaa', self::$editor_id, 'heart' );
+		$this->insert_block_reaction( $post_id, 'blockbbb', self::$editor_id, 'heart' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_query_params(
+			array(
+				'post'   => $post_id,
+				'type'   => 'reaction',
+				'parent' => 0,
+				'block'  => 'blockaaa',
+				'status' => 'all',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array( $mine ), wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	public function test_note_reaction_response_has_empty_block() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create();
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $reaction_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( '', $response->get_data()['block'] );
+	}
+
+	public function test_cannot_create_block_reaction_without_edit_post_capability() {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		wp_set_current_user( self::$subscriber_id );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		$this->assertErrorResponse( 'rest_cannot_create_reaction', $response, rest_authorization_required_code() );
+	}
+
+	public function test_cannot_create_block_reaction_without_post_type_support() {
+		register_post_type(
+			'no_notes_cpt',
+			array(
+				'public'       => true,
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'editor' ),
+			)
+		);
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'no_notes_cpt' ) );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		unregister_post_type( 'no_notes_cpt' );
+
+		$this->assertErrorResponse( 'rest_comment_not_supported_post_type', $response, 403 );
+	}
+
+	public function test_can_create_block_reaction_on_draft_post() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_status' => 'draft' ) );
+
+		$response = rest_get_server()->dispatch(
+			$this->create_block_reaction_request( $post_id, 'abc123xy' )
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	public function test_schema_includes_block_property() {
+		$controller = new Gutenberg_REST_Comment_Controller_7_2();
+		$schema     = $controller->get_item_schema();
+
+		$this->assertArrayHasKey( 'block', $schema['properties'] );
+		$this->assertSame( 'string', $schema['properties']['block']['type'] );
+		$this->assertSame( '^[a-z0-9]{6,16}$', $schema['properties']['block']['pattern'] );
+		$this->assertArrayNotHasKey( 'readonly', $schema['properties']['block'] );
+
+		$collection = $controller->get_collection_params();
+		$this->assertArrayHasKey( 'block', $collection );
+	}
+
+	public function test_note_reaction_summary_excludes_block_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		$this->insert_block_reaction( $post_id, 'abc123xy', self::$editor_id, 'heart' );
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array(), $response->get_data()['reaction_summary'] );
+	}
+
+	public function test_deleting_note_leaves_block_reactions_untouched() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create();
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->insert_block_reaction( $post_id, 'abc123xy', self::$editor_id, 'heart' );
+
+		wp_delete_comment( $note_id, true );
+
+		$this->assertNotNull( get_comment( $reaction_id ) );
+		$this->assertSame( '1', get_comment( $reaction_id )->comment_approved );
 	}
 }

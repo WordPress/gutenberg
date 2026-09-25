@@ -275,6 +275,20 @@ mark.wp-note {
 	display: flex;
 }
 
+// Reactions on the block itself: its icon, then the pills and the trigger,
+// wrapping together. Never floats, since the row exists only once there is a
+// pill to sit beside.
+.editor-collab-sidebar-panel__block-reactions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+.editor-collab-sidebar-panel__block-reactions-icon {
+	flex-shrink: 0;
+}
+
 // The note's text and, below it, the reaction row. Anchors the trigger while
 // it floats, so it lands on the note itself rather than on whatever else the
 // card carries underneath.
@@ -329,6 +343,9 @@ mark.wp-note {
 	// reaction belongs to one note, so a thread-wide reveal would offer the
 	// option on every note in it at once.
 	.editor-collab-sidebar-panel__note:hover
+	.editor-collab-sidebar-panel__add-reaction,
+	// A block's reactions row is its own hover target, outside any note.
+	.editor-collab-sidebar-panel__block-reactions:hover
 	.editor-collab-sidebar-panel__add-reaction,
 	// Reveal on the trigger itself rather than on the thread: the thread is
 	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as

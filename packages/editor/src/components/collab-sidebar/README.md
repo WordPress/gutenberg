@@ -7,6 +7,8 @@ The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to in
 
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
+Emoji reactions are comments too (`type: 'reaction'`), on a note (as its child) or on a block itself (see [Block reactions](#block-reactions)).
+
 ## File structure
 
 ```
@@ -23,8 +25,15 @@ collab-sidebar/
 ├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
+├── reaction-display.tsx             ReactionDisplay - reaction pills for a note or block target
+├── add-reaction-picker.tsx          AddReactionButton - add-reaction trigger opening the emoji picker
+├── block-reactions-row.tsx          BlockReactionsRow - a block's own reactions (icon + pills + trigger)
+├── block-reactions-entry.tsx        BlockReactionsEntry - sidebar entry for a block with reactions but no note
+├── block-reactions-toolbar-button.tsx  BlockReactionsToolbarButton - block-toolbar "React to block" trigger
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
+├── use-block-reactions.ts          useBlockReactionSummary, useBlockReactionActions
+├── block-reactions.ts              reaction target type, anchor helpers, summary delta helpers
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
 ├── constants.js                    sidebar identifier strings
@@ -40,11 +49,15 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
+      ├── SelectedBlockReactionsToolbarButton - slot fill in the block toolbar ("React to block")
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
+      │         ├── BlockReactionsEntry[] - a block with reactions but no note (same shell as a thread)
+      │         │    └── BlockReactionsRow
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
+      │                   ├── BlockReactionsRow - the block's own reactions, on its first unresolved thread
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard
       │                   │         └── NoteByline + actions slot + body children
@@ -55,6 +68,16 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
 ```
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+
+## Block reactions
+
+A reaction on a block is a top-level `reaction` comment on the post (no parent), anchored to the block through the `_wp_reaction_block` comment meta. The anchor is `metadata.reactionsId` on the block: a short id the editor mints on the block's first reaction (`ensureBlockReactionsId` in `block-reactions.ts`), which like the first note makes the post dirty until saved. Blocks have no server-side identity, so the anchor lives in the content.
+
+The server returns every block reaction on the post as one read-only `block_reaction_summary` field on the post record (`edit` context, single-item requests only), keyed by anchor and then by emoji slug with the same `{ count, reacted, my_reaction_id }` shape as a note's `reaction_summary`. `useBlockReactionSummary` reads it off the raw post record; `useBlockReactionActions().onToggleBlockReaction` posts or deletes the reaction comment, folds the result into the cached post record as a partial (so unsaved edits survive) and refetches only the summary.
+
+`useNoteThreads` merges reacted blocks into the thread list in document order. A block's reactions row leads its first unresolved thread, so the floating view (which lists only unresolved threads) agrees with the full sidebar; a block with no unresolved note gets a `BlockReactionsEntry` of its own above the "Resolved" divider. An anchor with no matching block is not listed: a reaction carries no content worth keeping in view once its block is gone, and undo restores the block with its anchor.
+
+The trigger names are deliberately distinct: "React to block" in the toolbar, "Add block reaction" in the sidebar row, and "Add reaction" on a note.
 
 ## Floating board
 

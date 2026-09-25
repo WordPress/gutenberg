@@ -35,6 +35,13 @@ import {
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
+import {
+	BLOCK_REACTIONS_ENTRY_TYPE,
+	applyReactionSummaryDelta,
+	getBlockReactionsEntryId,
+	getBlockReactionsId,
+} from './block-reactions';
+import { useBlockReactionSummary } from './use-block-reactions';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -77,9 +84,17 @@ export function useNoteThreads( postId ) {
 		};
 	}, [] );
 
+	// Block reactions live on the post record, keyed by the anchor each
+	// block carries in its metadata; they join the list below either at
+	// the head of the block's first unresolved thread or as an entry of
+	// their own when the block has no note.
+	const blockReactionSummary = useBlockReactionSummary();
+
 	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
-		if ( ! threads || threads.length === 0 ) {
+		const hasBlockReactions =
+			Object.keys( blockReactionSummary ).length > 0;
+		if ( ( ! threads || threads.length === 0 ) && ! hasBlockReactions ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
@@ -90,6 +105,7 @@ export function useNoteThreads( postId ) {
 		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
+		const blockReactions = {};
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
@@ -99,13 +115,30 @@ export function useNoteThreads( postId ) {
 					clientIdByNoteId.set( noteId, clientId );
 				}
 			}
+			if ( hasBlockReactions ) {
+				const reactionsId = getBlockReactionsId( metadata );
+				const summary = reactionsId
+					? blockReactionSummary[ reactionsId ]
+					: undefined;
+				// An anchor with no block is simply not listed: a reaction
+				// carries no content worth keeping in view once its block
+				// is gone, and undo restores the block with its anchor.
+				if (
+					summary &&
+					Object.values( summary ).some(
+						( entry ) => entry?.count > 0
+					)
+				) {
+					blockReactions[ clientId ] = { reactionsId, summary };
+				}
+			}
 		}
 
 		// Materialize threads; collect roots; replies linked in a second pass
 		// via unshift to invert order (matches prior reverse semantics).
 		const threadsById = new Map();
 		const rootThreads = [];
-		for ( const item of threads ) {
+		for ( const item of threads ?? [] ) {
 			const thread = {
 				...item,
 				reply: [],
@@ -119,7 +152,7 @@ export function useNoteThreads( postId ) {
 				rootThreads.push( thread );
 			}
 		}
-		for ( const item of threads ) {
+		for ( const item of threads ?? [] ) {
 			if ( item.parent !== 0 ) {
 				threadsById
 					.get( item.parent )
@@ -127,7 +160,7 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		if ( rootThreads.length === 0 ) {
+		if ( rootThreads.length === 0 && ! hasBlockReactions ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
@@ -135,37 +168,67 @@ export function useNoteThreads( postId ) {
 		// first as the "overall comment", then inline notes ascending by
 		// marker start offset. Ties (rare; two markers at the same offset)
 		// fall back to creation order via thread id. Blocks themselves are
-		// already iterated in document order above.
+		// iterated in document order.
 		const unresolved = [];
 		const resolved = [];
-		for ( const [ clientId, noteIds ] of Object.entries(
-			blocksWithNotes
-		) ) {
-			const attributes = getBlockAttributes( clientId );
-			const orderedThreads = noteIds
-				.map( ( noteId ) => {
-					const thread = threadsById.get( noteId );
-					if ( ! thread ) {
-						return null;
+		for ( const clientId of clientIds ) {
+			const noteIds = blocksWithNotes[ clientId ];
+			const reactions = blockReactions[ clientId ];
+			if ( ! noteIds && ! reactions ) {
+				continue;
+			}
+
+			let firstUnresolvedThread = null;
+			if ( noteIds ) {
+				const attributes = getBlockAttributes( clientId );
+				const orderedThreads = noteIds
+					.map( ( noteId ) => {
+						const thread = threadsById.get( noteId );
+						if ( ! thread ) {
+							return null;
+						}
+						return {
+							thread,
+							start: getInlineMarkerStart( thread, attributes ),
+						};
+					} )
+					.filter( Boolean )
+					.sort( ( a, b ) => {
+						if ( a.start !== b.start ) {
+							return a.start - b.start;
+						}
+						return a.thread.id - b.thread.id;
+					} );
+				for ( const { thread } of orderedThreads ) {
+					if ( thread.status === 'hold' ) {
+						unresolved.push( thread );
+						firstUnresolvedThread ??= thread;
+					} else if ( thread.status === 'approved' ) {
+						resolved.push( thread );
 					}
-					return {
-						thread,
-						start: getInlineMarkerStart( thread, attributes ),
-					};
-				} )
-				.filter( Boolean )
-				.sort( ( a, b ) => {
-					if ( a.start !== b.start ) {
-						return a.start - b.start;
-					}
-					return a.thread.id - b.thread.id;
-				} );
-			for ( const { thread } of orderedThreads ) {
-				if ( thread.status === 'hold' ) {
-					unresolved.push( thread );
-				} else if ( thread.status === 'approved' ) {
-					resolved.push( thread );
 				}
+			}
+
+			if ( ! reactions ) {
+				continue;
+			}
+			// The floating view lists only unresolved threads, so the row
+			// rides on the first of those to keep both views in agreement;
+			// a block with only resolved notes gets an entry of its own
+			// above the "Resolved" divider.
+			if ( firstUnresolvedThread ) {
+				firstUnresolvedThread.blockReactions = reactions;
+			} else {
+				unresolved.push( {
+					id: getBlockReactionsEntryId( reactions.reactionsId ),
+					type: BLOCK_REACTIONS_ENTRY_TYPE,
+					parent: 0,
+					status: 'hold',
+					blockClientId: clientId,
+					reactionsId: reactions.reactionsId,
+					reactions: reactions.summary,
+					reply: [],
+				} );
 			}
 		}
 
@@ -180,7 +243,7 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+	}, [ clientIds, threads, getBlockAttributes, blockReactionSummary ] );
 
 	return {
 		notes,
@@ -301,25 +364,14 @@ function clearInlineNoteMarker(
  * @return {Object} The note with an updated `reaction_summary`.
  */
 function applyReactionDelta( note, emoji, addedReactionId ) {
-	const summary = { ...( note.reaction_summary || {} ) };
-	const entry = summary[ emoji ];
-
-	if ( addedReactionId ) {
-		summary[ emoji ] = {
-			count: ( entry?.count || 0 ) + 1,
-			reacted: true,
-			my_reaction_id: addedReactionId,
-		};
-	} else if ( entry ) {
-		const count = entry.count - 1;
-		if ( count > 0 ) {
-			summary[ emoji ] = { count, reacted: false };
-		} else {
-			delete summary[ emoji ];
-		}
-	}
-
-	return { ...note, reaction_summary: summary };
+	return {
+		...note,
+		reaction_summary: applyReactionSummaryDelta(
+			note.reaction_summary,
+			emoji,
+			addedReactionId
+		),
+	};
 }
 
 export function useNoteActions( reactionsMap = {} ) {

@@ -17,6 +17,8 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { SelectedBlockReactionsToolbarButton } from './block-reactions-toolbar-button';
+import { isBlockReactionsEntry } from './block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
@@ -107,7 +109,9 @@ function NotesSidebar( { postId } ) {
 	function openNoteForBlock( targetClientId ) {
 		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
+			( thread ) =>
+				thread.blockClientId === targetClientId &&
+				! isBlockReactionsEntry( thread )
 		);
 		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
@@ -123,6 +127,19 @@ function NotesSidebar( { postId } ) {
 			noteId: 'new',
 			isApproved: false,
 		} );
+	}
+
+	// A reaction from the toolbar lands in the sidebar, so bring that into
+	// view when it is not already showing. The floating sidebar only takes
+	// over on its own once the user closes whatever area is active.
+	async function revealBlockReactions() {
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
 	}
 
 	useShortcut(
@@ -154,13 +171,21 @@ function NotesSidebar( { postId } ) {
 	return (
 		<>
 			<NoteHighlightStyles
-				threads={ unresolvedNotes }
+				threads={ unresolvedNotes.filter(
+					( thread ) => ! isBlockReactionsEntry( thread )
+				) }
 				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }
 					onClick={ () => openNoteForBlock( clientId ) }
+				/>
+			) }
+			{ !! clientId && (
+				<SelectedBlockReactionsToolbarButton
+					clientId={ clientId }
+					onReacted={ revealBlockReactions }
 				/>
 			) }
 			<AddNoteMenuItem
