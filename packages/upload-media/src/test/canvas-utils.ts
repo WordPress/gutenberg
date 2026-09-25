@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	HeicUnsupportedError,
+	IMAGE_DECODER_TIMEOUT,
+} from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
 /*
@@ -305,6 +309,88 @@ describe( 'canvasConvertToJpeg', () => {
 			await expect( rejection ).rejects.not.toBeInstanceOf(
 				HeicUnsupportedError
 			);
+		} );
+
+		it( 'should not wait forever on a decode that never settles', async () => {
+			vi.useFakeTimers();
+			try {
+				global.createImageBitmap = vi
+					.fn()
+					.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+				// Strategy 2 claims the type, then the decode never settles,
+				// which is what a missing platform codec looks like.
+				// See https://github.com/WordPress/gutenberg/issues/81043.
+				const close = vi.fn();
+				( global as any ).ImageDecoder = vi.fn( function () {
+					return {
+						decode: vi.fn( () => new Promise( () => {} ) ),
+						close,
+					};
+				} );
+				( global as any ).ImageDecoder.isTypeSupported = vi
+					.fn()
+					.mockResolvedValue( true );
+				delete ( global as any ).VideoDecoder;
+
+				const outcome = canvasConvertToJpeg(
+					heicFile( validHeic )
+				).then(
+					() => 'converted',
+					( error ) => error
+				);
+				await vi.advanceTimersByTimeAsync( IMAGE_DECODER_TIMEOUT );
+
+				// Falls through to strategy 3, which is absent here.
+				await expect( outcome ).resolves.toBeInstanceOf(
+					HeicUnsupportedError
+				);
+				expect( close ).toHaveBeenCalled();
+			} finally {
+				vi.useRealTimers();
+			}
+		} );
+
+		it( 'should report a canvas failure after a successful decode as a processing error', async () => {
+			global.createImageBitmap = vi
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+			// Strategy 2 decodes fine: the browser can read HEIC.
+			const videoFrame = {
+				displayWidth: 10,
+				displayHeight: 10,
+				close: vi.fn(),
+			};
+			( global as any ).ImageDecoder = vi.fn( function () {
+				return {
+					decode: vi.fn().mockResolvedValue( { image: videoFrame } ),
+					close: vi.fn(),
+				};
+			} );
+			( global as any ).ImageDecoder.isTypeSupported = vi
+				.fn()
+				.mockResolvedValue( true );
+			// The canvas is what fails.
+			global.OffscreenCanvas = vi
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi.fn().mockReturnValue( null ),
+						convertToBlob: vi.fn(),
+					};
+				} );
+			delete ( global as any ).VideoDecoder;
+
+			// Falling through to strategy 3 would blame the codec instead.
+			const rejection = canvasConvertToJpeg( heicFile( validHeic ) );
+			await expect( rejection ).rejects.toThrow(
+				'Could not get canvas 2d context'
+			);
+			await expect( rejection ).rejects.not.toBeInstanceOf(
+				HeicUnsupportedError
+			);
+			expect( videoFrame.close ).toHaveBeenCalled();
 		} );
 
 		it( 'should fall through Strategy 1 failure to subsequent strategies', async () => {

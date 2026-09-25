@@ -1,6 +1,6 @@
 <?php
 /**
- * Icons API: registration of the core icon collection and its icons from the
+ * Icons API: registration of the core icon collections and their icons from the
  * plugin's own `packages/icons` manifest, replacing the core registration.
  *
  * @package gutenberg
@@ -17,6 +17,14 @@ function gutenberg_register_default_icon_collections() {
 			'description' => __( 'Core icon collection.', 'gutenberg' ),
 		)
 	);
+	wp_register_icon_collection(
+		'core-admin',
+		array(
+			'label'       => __( 'WordPress Admin', 'gutenberg' ),
+			'description' => __( 'Icon collection used by the WordPress admin interface.', 'gutenberg' ),
+			'public'      => false,
+		)
+	);
 }
 
 $default_icon_collections_priority = has_action( 'init', '_wp_register_default_icon_collections' );
@@ -26,7 +34,7 @@ if ( false !== $default_icon_collections_priority ) {
 add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
 
 /**
- * Registers the default core icons from the Gutenberg manifest.
+ * Registers the default core and core-admin icons from the Gutenberg manifest.
  */
 function gutenberg_register_default_icons() {
 	$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
@@ -64,12 +72,23 @@ function gutenberg_register_default_icons() {
 			return;
 		}
 
+		if ( empty( $icon_data['collections'] ) || ! is_array( $icon_data['collections'] ) ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				__( 'Core icon collection manifest must provide a non-empty "collections" array for each icon.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return;
+		}
+
 		$icon_args = array(
 			'label'     => $icon_data['label'],
 			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
 
-		wp_register_icon( 'core/' . $icon_name, $icon_args );
+		foreach ( $icon_data['collections'] as $collection_slug ) {
+			wp_register_icon( $collection_slug . '/' . $icon_name, $icon_args );
+		}
 	}
 }
 

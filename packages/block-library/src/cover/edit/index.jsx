@@ -703,10 +703,13 @@ function CoverEdit( {
 			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
+			onSelectMedia={ onSelectMedia }
+			onUploadError={ onUploadError }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
+			isSelected={ isSelected }
 		/>
 	);
 
