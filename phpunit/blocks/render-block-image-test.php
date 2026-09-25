@@ -168,4 +168,368 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		remove_all_filters( 'render_block_core/image' );
 	}
+	/**
+	 * @ticket 65960
+	 *
+	 * @covers ::render_block_core_image
+	 */
+	public function test_should_replace_stale_backed_up_intermediate_image_src() {
+		$attachment_id = self::factory()->post->create(
+			array(
+				'post_type'      => 'attachment',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attached_file',
+			'2026/09/canola-e1234567890123.jpg'
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			array(
+				'file'   => '2026/09/canola-e1234567890123.jpg',
+				'width'  => 1200,
+				'height' => 900,
+				'sizes'  => array(
+					'medium' => array(
+						'file'      => 'canola-e1234567890123-300x225.jpg',
+						'width'     => 300,
+						'height'    => 225,
+						'mime-type' => 'image/jpeg',
+					),
+				),
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attachment_backup_sizes',
+			array(
+				'medium-orig' => array(
+					'file'      => 'canola-300x225.jpg',
+					'width'     => 300,
+					'height'    => 225,
+					'mime-type' => 'image/jpeg',
+				),
+			)
+		);
+
+		$current_image = wp_get_attachment_image_src( $attachment_id, 'medium' );
+		$this->assertIsArray( $current_image );
+
+		$attachment_url = wp_get_attachment_url( $attachment_id );
+		$this->assertIsString( $attachment_url );
+
+		$stale_src =
+		trailingslashit( dirname( $attachment_url ) ) .
+		'canola-300x225.jpg';
+
+		$attributes = array(
+			'id'       => $attachment_id,
+			'sizeSlug' => 'medium',
+		);
+
+		$content =
+		'<figure class="wp-block-image size-medium">' .
+		'<img src="' . esc_url( $stale_src ) . '" class="wp-image-' . $attachment_id . '"/>' .
+		'</figure>';
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+
+		$parsed_block = $parsed_blocks[0];
+		$block        = new WP_Block( $parsed_block );
+
+		$rendered_block =
+		gutenberg_render_block_core_image(
+			$attributes,
+			$content,
+			$block
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+
+		$this->assertSame(
+			$current_image[0],
+			$processor->get_attribute( 'src' )
+		);
+	}
+
+	/**
+	 * @ticket 65960
+	 *
+	 * @covers ::render_block_core_image
+	 */
+	public function test_should_not_replace_unrelated_image_src() {
+		$attachment_id = self::factory()->post->create(
+			array(
+				'post_type'      => 'attachment',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attached_file',
+			'2026/09/canola-e1234567890123.jpg'
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			array(
+				'file'   => '2026/09/canola-e1234567890123.jpg',
+				'width'  => 1200,
+				'height' => 900,
+				'sizes'  => array(
+					'medium' => array(
+						'file'      => 'canola-e1234567890123-300x225.jpg',
+						'width'     => 300,
+						'height'    => 225,
+						'mime-type' => 'image/jpeg',
+					),
+				),
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attachment_backup_sizes',
+			array(
+				'medium-orig' => array(
+					'file'      => 'canola-300x225.jpg',
+					'width'     => 300,
+					'height'    => 225,
+					'mime-type' => 'image/jpeg',
+				),
+			)
+		);
+
+		$custom_src =
+		'https://example.org/custom-image.jpg';
+
+		$attributes = array(
+			'id'       => $attachment_id,
+			'sizeSlug' => 'medium',
+		);
+
+		$content =
+		'<figure class="wp-block-image size-medium">' .
+		'<img src="' . esc_url( $custom_src ) . '" class="wp-image-' . $attachment_id . '"/>' .
+		'</figure>';
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+
+		$parsed_block = $parsed_blocks[0];
+		$block        = new WP_Block( $parsed_block );
+
+		$rendered_block =
+		gutenberg_render_block_core_image(
+			$attributes,
+			$content,
+			$block
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+
+		$this->assertSame(
+			$custom_src,
+			$processor->get_attribute( 'src' )
+		);
+	}
+
+	/**
+	 * @ticket 65960
+	 *
+	 * @covers ::render_block_core_image
+	 */
+	public function test_should_replace_stale_numeric_backed_up_intermediate_image_src() {
+		$attachment_id = self::factory()->post->create(
+			array(
+				'post_type'      => 'attachment',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attached_file',
+			'2026/09/canola-e1234567890123.jpg'
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			array(
+				'file'   => '2026/09/canola-e1234567890123.jpg',
+				'width'  => 1200,
+				'height' => 900,
+				'sizes'  => array(
+					'medium' => array(
+						'file'      => 'canola-e1234567890123-300x225.jpg',
+						'width'     => 300,
+						'height'    => 225,
+						'mime-type' => 'image/jpeg',
+					),
+				),
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attachment_backup_sizes',
+			array(
+				'medium-1720000000123' => array(
+					'file'      => 'canola-pre-edit-300x225.jpg',
+					'width'     => 300,
+					'height'    => 225,
+					'mime-type' => 'image/jpeg',
+				),
+			)
+		);
+
+		$current_image = wp_get_attachment_image_src( $attachment_id, 'medium' );
+		$this->assertIsArray( $current_image );
+
+		$attachment_url = wp_get_attachment_url( $attachment_id );
+		$this->assertIsString( $attachment_url );
+
+		$stale_src =
+			trailingslashit( dirname( $attachment_url ) ) .
+			'canola-pre-edit-300x225.jpg';
+
+		$attributes = array(
+			'id'       => $attachment_id,
+			'sizeSlug' => 'medium',
+		);
+
+		$content =
+			'<figure class="wp-block-image size-medium">' .
+			'<img src="' . esc_url( $stale_src ) . '" class="wp-image-' . $attachment_id . '"/>' .
+			'</figure>';
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+
+		$parsed_block = $parsed_blocks[0];
+		$block        = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image(
+			$attributes,
+			$content,
+			$block
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+
+		$this->assertSame(
+			$current_image[0],
+			$processor->get_attribute( 'src' )
+		);
+	}
+
+	/**
+	 * @ticket 65960
+	 *
+	 * @covers ::render_block_core_image
+	 */
+	public function test_should_not_replace_prefix_colliding_different_image_size_backup() {
+		$attachment_id = self::factory()->post->create(
+			array(
+				'post_type'      => 'attachment',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attached_file',
+			'2026/09/canola-e1234567890123.jpg'
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			array(
+				'file'   => '2026/09/canola-e1234567890123.jpg',
+				'width'  => 1200,
+				'height' => 900,
+				'sizes'  => array(
+					'medium' => array(
+						'file'      => 'canola-e1234567890123-300x225.jpg',
+						'width'     => 300,
+						'height'    => 225,
+						'mime-type' => 'image/jpeg',
+					),
+				),
+			)
+		);
+
+		update_post_meta(
+			$attachment_id,
+			'_wp_attachment_backup_sizes',
+			array(
+				'medium-custom-orig' => array(
+					'file'      => 'canola-custom-300x225.jpg',
+					'width'     => 300,
+					'height'    => 225,
+					'mime-type' => 'image/jpeg',
+				),
+			)
+		);
+
+		$current_image = wp_get_attachment_image_src( $attachment_id, 'medium' );
+		$this->assertIsArray( $current_image );
+
+		$attachment_url = wp_get_attachment_url( $attachment_id );
+		$this->assertIsString( $attachment_url );
+
+		$stale_src =
+			trailingslashit( dirname( $attachment_url ) ) .
+			'canola-custom-300x225.jpg';
+
+		$this->assertNotSame( $current_image[0], $stale_src );
+
+		$attributes = array(
+			'id'       => $attachment_id,
+			'sizeSlug' => 'medium',
+		);
+
+		$content =
+			'<figure class="wp-block-image size-medium">' .
+			'<img src="' . esc_url( $stale_src ) . '" class="wp-image-' . $attachment_id . '"/>' .
+			'</figure>';
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+
+		$parsed_block = $parsed_blocks[0];
+		$block        = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image(
+			$attributes,
+			$content,
+			$block
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+
+		$this->assertSame(
+			$stale_src,
+			$processor->get_attribute( 'src' )
+		);
+	}
 }
