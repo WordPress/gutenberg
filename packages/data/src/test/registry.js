@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
+
+const REGISTER_GENERIC_STORE_DEPRECATION =
+	'wp.data.registerGenericStore is deprecated since version 5.9. Please use wp.data.register( storeDescriptor ) instead.';
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -27,6 +31,7 @@ describe( 'createRegistry', () => {
 
 	beforeEach( () => {
 		vi.useFakeTimers();
+		logged[ REGISTER_GENERIC_STORE_DEPRECATION ] = true;
 		registry = createRegistry();
 	} );
 
@@ -35,6 +40,7 @@ describe( 'createRegistry', () => {
 		while ( ( unsubscribe = unsubscribes.shift() ) ) {
 			unsubscribe();
 		}
+		delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 		vi.useRealTimers();
 	} );
 
@@ -50,6 +56,7 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should throw if not all required config elements are present', () => {
+			delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 			expect( () =>
 				registry.registerGenericStore( 'grocer', {} )
 			).toThrow();
@@ -65,7 +72,9 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} )
 			).toThrow();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith(
+				REGISTER_GENERIC_STORE_DEPRECATION
+			);
 		} );
 
 		describe( 'getSelectors', () => {

@@ -1,5 +1,6 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
@@ -314,9 +315,10 @@ class MediaUpload extends Component {
 			value = DEFAULT_EMPTY_GALLERY,
 		} = this.props;
 
-		// If the value did not change there is no need to rebuild the frame,
+		const isFrameAttached = !! this.frame?.el?.isConnected;
+		// If the value did not change and the existing frame is still attached,
 		// we can continue to use the existing one.
-		if ( value === this.lastGalleryValue ) {
+		if ( value === this.lastGalleryValue && isFrameAttached ) {
 			return;
 		}
 
@@ -565,9 +567,24 @@ class MediaUpload extends Component {
 	openModal() {
 		const {
 			gallery = false,
-			unstableFeaturedImageFlow = false,
+			featuredImageFlow,
+			unstableFeaturedImageFlow,
 			modalClass,
 		} = this.props;
+
+		if (
+			unstableFeaturedImageFlow !== undefined &&
+			featuredImageFlow === undefined
+		) {
+			deprecated(
+				'wp.mediaUtils.MediaUpload unstableFeaturedImageFlow prop',
+				{
+					since: '7.2',
+					alternative: 'featuredImageFlow',
+					version: '7.4',
+				}
+			);
+		}
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
@@ -579,7 +596,7 @@ class MediaUpload extends Component {
 			this.frame.$el.addClass( modalClass );
 		}
 
-		if ( unstableFeaturedImageFlow ) {
+		if ( featuredImageFlow ?? unstableFeaturedImageFlow ) {
 			this.buildAndSetFeatureImageFrame();
 		}
 		this.initializeListeners();

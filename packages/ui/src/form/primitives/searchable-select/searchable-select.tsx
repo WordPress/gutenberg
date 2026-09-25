@@ -59,6 +59,8 @@ function warnSearchableSelectProps(
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
+ *
+ * Prefer `SearchableSelectControl` when using with a standard label and description.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
@@ -83,7 +85,11 @@ export const SearchableSelect = forwardRef<
 	warnSearchableSelectProps( items, children );
 
 	return (
-		<Combobox.Root< Item, false > items={ items } { ...restProps }>
+		<Combobox.Root< Item, false >
+			items={ items }
+			{ ...restProps }
+			grid={ undefined }
+		>
 			<Combobox.Trigger
 				ref={ ref }
 				placeholder={ placeholder }

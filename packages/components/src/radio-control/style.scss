@@ -68,6 +68,7 @@
 .components-radio-control__label {
 	grid-column: 2;
 	grid-row: 1;
+	color: var(--wpds-color-foreground-content-neutral);
 
 	.components-radio-control__input:not(:disabled) + & {
 		cursor: var(--wpds-cursor-control);

@@ -4,6 +4,9 @@ const { readdir, stat, readFile } = require( 'fs/promises' );
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
+// The collections an icon may be shipped in.
+const VALID_ICON_COLLECTIONS = [ 'core', 'core-admin' ];
+
 function isStrokeBasedSvg( svgContent ) {
 	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
 	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
@@ -13,7 +16,8 @@ function isStrokeBasedSvg( svgContent ) {
  * Validating the icons collection checks that:
  *
  * - Each manifest entry has a matching SVG in library/, and vice versa.
- * - Each manifest entry's `public` property, if present, is a boolean.
+ * - Each manifest entry's `collections` property, if present, is a non-empty array of
+ *   known collection slugs.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
@@ -62,16 +66,28 @@ async function validateCollection() {
 		manifestPaths.push( icon.filePath );
 
 		/*
-		 * Verify that `public`, if present, is a boolean.
+		 * Verify that `collections`, if present, lists known collection slugs. An icon
+		 * without the property stays in the JS library and is not shipped to core.
 		 */
-		if ( 'public' in icon && typeof icon.public !== 'boolean' ) {
-			problems.push(
-				`- Invalid icon definition for icon '${
-					icon.slug
-				}': expected 'public' to be true or false, saw ${ JSON.stringify(
-					icon.public
-				) }`
-			);
+		if ( 'collections' in icon ) {
+			const { collections } = icon;
+			const isValid =
+				Array.isArray( collections ) &&
+				collections.length > 0 &&
+				collections.every( ( collection ) =>
+					VALID_ICON_COLLECTIONS.includes( collection )
+				) &&
+				new Set( collections ).size === collections.length;
+
+			if ( ! isValid ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'collections' to be a non-empty array of unique slugs out of ${ VALID_ICON_COLLECTIONS.map(
+						( collection ) => `'${ collection }'`
+					).join( ', ' ) }, saw ${ JSON.stringify( collections ) }`
+				);
+			}
 		}
 
 		/*
