@@ -2,7 +2,7 @@ import {
 	Flex,
 	FlexItem,
 	Modal,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	SearchControl,
 } from '@wordpress/components';
 import { Stack, Tabs, Text } from '@wordpress/ui';
@@ -262,7 +262,7 @@ function StartPageOptionsModal( { onClose } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<CheckboxControl
+					<WCCheckboxControl
 						checked={ showStartPatterns }
 						label={ __(
 							'Always show starter patterns for new pages'

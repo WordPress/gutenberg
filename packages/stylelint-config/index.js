@@ -80,13 +80,13 @@ export default {
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
 		/*
-		 * Ban @wordpress/ui's private global CSS defense prefix (--_gcd-*). The pattern is matched against the name without the leading `--`. Projects that already set custom-property-pattern will override this entirely and must merge `(?!_gcd-)` into their own pattern if they want to keep the ban.
+		 * Ban private prefixes (--_gcd-*, --_wp-*). The pattern is matched against the name without the leading `--`. Projects that already set custom-property-pattern will override this entirely and must merge `(?!_(?:gcd|wp)-)` into their own pattern if they want to keep the ban.
 		 */
 		'custom-property-pattern': [
-			'^(?!_gcd-).+',
+			'^(?!_(?:gcd|wp)-).+',
 			{
 				message: ( name ) =>
-					`Do not use "${ name }". \`--_gcd-*\` variables are an internal @wordpress/ui global CSS defense detail.`,
+					`Do not use "${ name }". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time.`,
 			},
 		],
 		'plugin-wpds/no-setting-wpds-custom-properties': true,

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/element';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	Flex,
 	FlexItem,
 	Icon as WCIcon,
@@ -246,7 +246,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 					</legend>
 					<ul className="block-editor-block-visibility-modal__options">
 						<li className="block-editor-block-visibility-modal__options-item block-editor-block-visibility-modal__options-item--everywhere">
-							<CheckboxControl
+							<WCCheckboxControl
 								className="block-editor-block-visibility-modal__options-checkbox--everywhere"
 								label={ __( 'Omit from published content' ) }
 								checked={ hideEverywhere === true }
@@ -267,7 +267,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 												key={ key }
 												className="block-editor-block-visibility-modal__options-item"
 											>
-												<CheckboxControl
+												<WCCheckboxControl
 													label={ sprintf(
 														// translators: %s: The viewport name.
 														__( 'Hide on %s' ),

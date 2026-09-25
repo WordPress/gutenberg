@@ -2,15 +2,22 @@
 
 ## Unreleased
 
+## 27.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Switch `test-unit` from Jest to `@vitest/eslint-plugin` recommended rules with explicit imports at the 27.0.0 boundary. Jest consumers must configure `eslint-plugin-jest` directly. ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 
 ### Enhancements
 
+-   Update `use-recommended-components` deprecation message for `__experimentalZStack` to point to writing CSS ([#83344](https://github.com/WordPress/gutenberg/pull/83344)).
+-   Update `use-recommended-components` deprecation message for `ResponsiveWrapper` to point to the CSS `aspect-ratio` property ([#83347](https://github.com/WordPress/gutenberg/pull/83347)).
+-   Update `use-recommended-components` deprecation message for `__experimentalScrollable` to point to writing CSS ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
+-   Update `use-recommended-components` deprecation message for `__experimentalDivider` to point to `Separator` subcomponents and design tokens ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
 -   Update `use-recommended-components` rule to mark `Select` and `SelectControl` from `@wordpress/ui` as recommended ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `recommended`: Apply the TypeScript rules and parser to `.mts` and `.cts` files ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   `recommended`: Resolve imports through `.mjs`, `.cjs`, `.mts` and `.cts`, and exempt `.d.mts` and `.d.cts` from the TypeScript resolver settings alongside `.d.ts` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   `recommended`: Report type-only imports of undeclared packages in `import/no-extraneous-dependencies` ([#83336](https://github.com/WordPress/gutenberg/pull/83336)).
 -   `no-i18n-in-save`: Recognise the `.mjs`, `.cjs`, `.mts` and `.cts` spellings of `save` and `deprecated` ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 
 ## 26.0.0 (2026-09-10)

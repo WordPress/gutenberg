@@ -127,7 +127,8 @@ const sourceCode = `registerBlockType( 'my-plugin/my-block', {
 } );`;
 
 const meta = {
-	title: 'BlockEditor/InnerBlocks',
+	id: 'blockeditor-innerblocks',
+	title: 'Editor/Block Editor/InnerBlocks',
 	component: InnerBlocks,
 	parameters: {
 		docs: {
