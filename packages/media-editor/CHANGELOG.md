@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Rotation ruler: Disable the unit-less `line-height` rule for the active label, which matches a fixed pixel height rather than following font metrics, per the WordPress CSS Coding Standards ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ## 0.18.0 (2026-09-10)
 
 ### Internal
