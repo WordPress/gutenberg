@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Embed: Cap the minimum width an embed is given inside a Cover block at the space available, and drop the minimum height for responsive embeds. A Cover narrower than 320px, one inside a column say, clipped its own embed ([#83106](https://github.com/WordPress/gutenberg/pull/83106)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
