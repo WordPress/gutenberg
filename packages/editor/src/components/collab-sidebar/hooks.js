@@ -547,6 +547,16 @@ export function useFloatingBoard( {
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
+	// Notices shift the canvas down without resizing the block-list root, so
+	// the resize observer below misses them; recalc when their count changes.
+	const noticeCount = useSelect(
+		( select ) =>
+			select( noticesStore )
+				.getNotices()
+				.filter( ( notice ) => notice.type === 'default' ).length,
+		[]
+	);
+
 	// Notes are positioned in canvas content-space; CSS inherits
 	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
@@ -606,7 +616,15 @@ export function useFloatingBoard( {
 			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
-	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+	}, [
+		sidebarRef,
+		heights,
+		isFloating,
+		selectedNoteId,
+		store,
+		threads,
+		noticeCount,
+	] );
 
 	return {
 		notePositions,
