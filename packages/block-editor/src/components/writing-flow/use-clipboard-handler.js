@@ -14,6 +14,7 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { useNotifyPaste } from '../../utils/use-notify-paste';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
@@ -66,6 +67,7 @@ export default function useClipboardHandler() {
 		__unstableSplitSelection,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+	const notifyPaste = useNotifyPaste();
 
 	return useRefEffect( ( node ) => {
 		function handler( event ) {
@@ -230,6 +232,7 @@ export default function useClipboardHandler() {
 						blocks.length - 1,
 						-1
 					);
+					notifyPaste( blocks );
 					event.preventDefault();
 					return;
 				}
@@ -302,6 +305,7 @@ export default function useClipboardHandler() {
 				}
 
 				__unstableSplitSelection( newBlocks );
+				notifyPaste( newBlocks );
 				event.preventDefault();
 			}
 		}
