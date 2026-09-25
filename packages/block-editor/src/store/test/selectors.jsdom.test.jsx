@@ -25,6 +25,7 @@ import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
 import { sectionRootClientIdKey } from '../private-keys';
+import { isFiltered } from '../utils';
 
 const {
 	getBlockName,
@@ -3932,6 +3933,56 @@ describe( 'selectors', () => {
 			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual(
 				[ 'core/test-block-b' ]
 			);
+		} );
+
+		it( 'should reuse item objects across roots', async () => {
+			await dispatch( store ).resetBlocks( [
+				{
+					clientId: 'block3',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'block4',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				},
+			] );
+			await dispatch( store ).updateBlockListSettings( 'block3', {} );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
+
+			const forFirstRoot = select( store ).getInserterItems( 'block3' );
+			const forSecondRoot = select( store ).getInserterItems( 'block4' );
+			expect( forFirstRoot ).not.toBe( forSecondRoot );
+			expect( forFirstRoot.length ).toBeGreaterThan( 0 );
+			forFirstRoot.forEach( ( item, index ) => {
+				expect( item ).toBe( forSecondRoot[ index ] );
+			} );
+
+			// The copies carrying `isAllowedInCurrentRoot` are shared too.
+			const allForFirstRoot = select( store ).getInserterItems(
+				'block3',
+				{
+					[ isFiltered ]: false,
+				}
+			);
+			const allForSecondRoot = select( store ).getInserterItems(
+				'block4',
+				{ [ isFiltered ]: false }
+			);
+			allForFirstRoot.forEach( ( item, index ) => {
+				expect( item ).toBe( allForSecondRoot[ index ] );
+			} );
+
+			// A change under another root does not rebuild the items either.
+			await dispatch( store ).updateBlockListSettings( 'block4', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+			const afterChange = select( store ).getInserterItems( 'block3' );
+			afterChange.forEach( ( item, index ) => {
+				expect( item ).toBe( forFirstRoot[ index ] );
+			} );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', async () => {
