@@ -15,6 +15,28 @@ This README is the entry point for package consumers. It covers how to load desi
 - To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 - To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
+## Public API
+
+| Entrypoint | Supported use |
+| --- | --- |
+| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
+| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
+| Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
+| Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
+
+The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
+
+Runtime APIs supplied by WordPress follow its [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Installing a newer npm package does not upgrade the runtime supplied by WordPress. Check the target WordPress version before using a runtime API. Tooling subpaths use the installed npm package. Removing or renaming semantic tokens is a compatibility change; meaningful value changes belong in the changelog.
+
+To inspect token names in development tooling:
+
+```js
+import tokenNames from '@wordpress/theme/design-tokens.js';
+
+const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+```
+
 ## Design Tokens
 
 Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
@@ -101,6 +123,10 @@ function App() {
 }
 ```
 
+When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
 The `color` prop accepts an object with the following optional properties:
 
 - `primary`: The primary/accent seed color (default: `'#3858e9'`).
@@ -128,15 +154,38 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 
 The callback reports failures from the generated ramp checks and a defined set of semantic foreground/background pairs. It does not validate every possible token pairing. It receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
+### TypeScript props and warnings
+
+Derive types from the public component instead of importing package internals:
+
+```ts
+import type { ComponentProps } from 'react';
+import { ThemeProvider } from '@wordpress/theme';
+
+type ThemeProviderProps = ComponentProps< typeof ThemeProvider >;
+type OnColorWarnings = NonNullable< ThemeProviderProps[ 'onColorWarnings' ] >;
+type ThemeProviderColorWarning = Parameters< OnColorWarnings >[ 0 ][ number ];
+
+const onColorWarnings: OnColorWarnings = ( warnings ) => {
+	for ( const warning of warnings ) {
+		if ( warning.type === 'contrast' ) {
+			console.log( warning.foregroundToken, warning.achievedContrast );
+		} else {
+			console.log( warning.ramp, warning.step );
+		}
+	}
+};
+```
+
+The derived warning type is a union. Check `type` before accessing the fields specific to ramp or contrast warnings. Derive individual settings in the same way, for example `ThemeProviderProps[ 'cornerRadius' ]`.
+
+### Cursor and corner radius
+
 The `cursor` prop accepts an object with the following optional properties:
 
 - `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
-
-When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
-
-`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Light and dark themes
 
