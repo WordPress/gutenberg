@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 
 test( 'imports the editor style transformer without browser-externalized warnings', async () => {
-	// Import inside the test so the console assertions include module initialization.
+	// Import inside the test so the shared console checks include module initialization.
 	const { default: transformStyles } =
 		await import( '../../../packages/block-editor/src/utils/transform-styles' );
 
@@ -18,5 +18,4 @@ test( 'imports the editor style transformer without browser-externalized warning
 	).toEqual( [
 		'.editor p { background: url(https://example.com/theme/image.png); }',
 	] );
-	expect( console ).not.toHaveWarned();
 } );
