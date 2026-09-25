@@ -561,18 +561,13 @@ mark.wp-note {
 }
 
 // The row's grid track sets the cell width; the Design System item
-// supplies the flex centering, radius, and cursor.
+// supplies the flex centering, radius, cursor, and the highlight that
+// follows the arrow keys and pointer.
 .editor-collab-sidebar-panel__picker-emoji {
 	justify-content: center;
 	height: var(--emoji-picker-cell-size);
 	padding: 0;
 	font-size: 24px;
-
-	// The highlight follows the arrow keys and the pointer while DOM
-	// focus stays in the search field.
-	&[data-highlighted] {
-		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-	}
 }
 
 // Mention chips, both in the note input and the rendered note content. A
