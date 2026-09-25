@@ -3,7 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 // Floating notes overlay the space reserved at the inline-end edge of the
-// canvas (see `useReservedCanvasSpace`). The overlay itself must not
+// canvas (see `FloatingNotes`). The overlay itself must not
 // intercept pointer events aimed at the canvas; individual note threads
 // and the new-note form restore them.
 .editor-collab-sidebar-overlay {

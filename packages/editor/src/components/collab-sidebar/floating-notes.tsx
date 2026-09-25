@@ -124,9 +124,18 @@ type FloatingNotesProps = {
 	notes: ComponentProps< typeof Notes >[ 'notes' ];
 	/** Ref to the "All notes" sidebar, used to move focus between surfaces. */
 	sidebarRef: ComponentProps< typeof Notes >[ 'sidebarRef' ];
+	/** Whether there are notes to show in the floating panel. */
+	isVisible: boolean;
+	/** Called when the canvas gains or loses room for the floating panel. */
+	onRoomChange: ( hasRoom: boolean ) => void;
 };
 
-export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
+export function FloatingNotes( {
+	notes,
+	sidebarRef,
+	isVisible,
+	onRoomChange,
+}: FloatingNotesProps ) {
 	const overlayRef = useRef< HTMLDivElement >( null );
 	const isDevicePreview = useSelect(
 		( select ) => select( editorStore ).getDeviceType() !== 'Desktop',
@@ -141,6 +150,12 @@ export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
 	const { canvasWidth, editorWidth } = useCanvasWidths( overlayRef );
 	const availableWidth = isDevicePreview ? editorWidth : canvasWidth;
 	const hasRoom = availableWidth >= MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES;
+	// Note actions route to the "All notes" sidebar while the canvas has no
+	// room, so the room is reported even when no notes are shown.
+	useEffect( () => {
+		onRoomChange( hasRoom );
+	}, [ hasRoom, onRoomChange ] );
+	const isShown = isVisible && hasRoom;
 
 	// Reserve matching space at the inline end of the canvas so content never
 	// flows under the panel. The padding lives inside the canvas document, so
@@ -165,7 +180,7 @@ export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
 	useStyleOverride( {
 		id: 'core-note-reserved-space',
 		css:
-			hasRoom && ! isDevicePreview
+			isShown && ! isDevicePreview
 				? `:root{padding-inline-end:${ NOTES_PANEL_WIDTH }px}` +
 					`body{overflow-x:clip}` +
 					`:root::after{content:"";position:fixed;top:0;bottom:0;` +
@@ -182,15 +197,16 @@ export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
 			role="region"
 			aria-label={ __( 'Notes' ) }
 			className="editor-collab-sidebar-overlay"
-			// Keep the overlay mounted while the canvas is too narrow so its
-			// observer keeps measuring, but hide it so the notes don't sit on
-			// top of the content.
+			// Keep the overlay mounted while hidden so its observer keeps
+			// measuring the canvas.
 			style={ {
 				width: NOTES_PANEL_WIDTH,
-				display: hasRoom ? undefined : 'none',
+				display: isShown ? undefined : 'none',
 			} }
 		>
-			<Notes notes={ notes } sidebarRef={ sidebarRef } isFloating />
+			{ isShown && (
+				<Notes notes={ notes } sidebarRef={ sidebarRef } isFloating />
+			) }
 		</div>
 	);
 }

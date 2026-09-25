@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -66,8 +66,11 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	// Only show the floating notes for large viewports.
-	const showFloatingNotes = isLargeViewport;
+	// The canvas can be too narrow for the floating notes even on a large
+	// viewport (e.g. with a sidebar open); `FloatingNotes` measures it.
+	const [ canvasHasRoom, setCanvasHasRoom ] = useState( true );
+	// Only show the floating notes for large viewports with room to spare.
+	const showFloatingNotes = isLargeViewport && canvasHasRoom;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingNotes;
 	// The floating notes are part of the canvas surface: they don't occupy
@@ -184,11 +187,13 @@ function NotesSidebar( { postId } ) {
 					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
-			{ hasVisibleFloatingNotes && (
+			{ isLargeViewport && (
 				<FloatingNotesFill>
 					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
+						isVisible={ hasVisibleFloatingNotes }
+						onRoomChange={ setCanvasHasRoom }
 					/>
 				</FloatingNotesFill>
 			) }
