@@ -209,4 +209,4 @@ The content to display within the panel row.
 
 ## Related components
 
--   To divide related sections of content accessed by a horizontal menu, use `TabPanel`
+-   To divide related sections of content accessed by a horizontal menu, use [`Tabs` from `@wordpress/ui`](/packages/ui/src/tabs/stories/best-practices.mdx).
