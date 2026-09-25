@@ -1090,6 +1090,19 @@ describe( 'getNoteAnchorRect', () => {
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 100 );
 	} );
 
+	it( 'stops at the outermost block when no block is visible', () => {
+		const outerEl = document.createElement( 'div' );
+		outerEl.dataset.block = 'outer';
+		outerEl.innerHTML = '<p data-block="inner">Hidden</p>';
+		const blockEl = outerEl.querySelector( 'p' );
+		mockRect( outerEl, 40 );
+		mockRect( blockEl, 100 );
+		outerEl.checkVisibility = () => false;
+		blockEl.checkVisibility = () => false;
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 40 );
+	} );
+
 	describe( 'pending new note', () => {
 		let blockEl;
 

@@ -318,6 +318,43 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expectAligned( thread, noted );
 	} );
 
+	test( 'anchors to a closed Details block', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Summary' },
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Inside' } },
+			],
+		} );
+		const details = editor.canvas.getByRole( 'document', {
+			name: 'Block: Details',
+		} );
+		// Collapsed content isn't exposed by role, so select it by type.
+		await editor.selectBlocks(
+			details.locator( '[data-type="core/paragraph"]' )
+		);
+		await blockNoteUtils.addNote( 'Collapsed note' );
+
+		const thread = getThread( page, 'Collapsed note' );
+		const inside = getParagraph( editor, 'Inside' );
+		await expectAligned( thread, inside );
+
+		// The hidden block still reports a box below the summary, so aligning
+		// to it would fail.
+		const summary = details.getByText( 'Summary' );
+		await summary.click();
+		await expect( details ).not.toHaveAttribute( 'open' );
+		await expectAligned( thread, details );
+
+		await summary.click();
+		await expect( details ).toHaveAttribute( 'open' );
+		await expectAligned( thread, inside );
+	} );
+
 	test( 'follows its block when an editor notice shifts the canvas', async ( {
 		editor,
 		page,

@@ -87,7 +87,8 @@ Registering never measures directly. `requestMeasure()` re-observes the root; a 
 `getNoteAnchorRect(noteId, blockEl)` resolves the anchor at read time, because rich-text re-renders replace the marker element:
 - an inline note anchors to its in-content `mark.wp-note[data-id]` marker (its first run when the marker is split across several runs);
 - the pending `new` note has no marker yet, so it anchors to the text selection it is about to wrap;
-- a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`.
+- a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`;
+- an anchor inside collapsed content (e.g. a closed Details) fails `checkVisibility()`, so it climbs to the closest visible block. Collapsed content still reports the box it would have when expanded, so its size can't tell it apart.
 
 ### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
 
