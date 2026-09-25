@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Notes Sidebar: Show the Notes icon on the "Add note" item in the block Options menu ([#83460](https://github.com/WordPress/gutenberg/pull/83460)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 
 ### Bug Fixes
