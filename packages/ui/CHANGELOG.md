@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
+-   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
 
 ## 0.23.0 (2026-09-23)
 
@@ -49,7 +50,6 @@
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   `Autocomplete`, `Combobox`, `Menu`, and `Select`: Restore the highlighted item indicator in forced-colors mode, which wp-admin's global CSS was suppressing. ([#82772](https://github.com/WordPress/gutenberg/pull/82772))
--   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
 
 ### Internal
 
