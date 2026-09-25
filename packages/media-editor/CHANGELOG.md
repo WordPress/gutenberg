@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.19.0 (2026-09-23)
+
 ### Bug Fixes
 
 -   Stop mirroring the crop canvas in RTL. The camera and the resize maths address it in physical pixels, so a mirrored sheet left the handle drawn at the top right resizing the left edge, and pinned the image to the stage edge instead of centring it ([#83304](https://github.com/WordPress/gutenberg/pull/83304)).

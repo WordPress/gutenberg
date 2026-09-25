@@ -319,7 +319,9 @@ describe( 'buildBlockHighlightCss', () => {
 	const leafSelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
 	const overlaySelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(:has(> [data-block]))::after`;
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block]))::after`;
+	const emptyContainerSelectorFor = ( clientId ) =>
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`;
 
 	it( 'tints each text block with its author color at the tint alpha (0x40)', () => {
 		const css = buildBlockHighlightCss( [
@@ -355,7 +357,7 @@ describe( 'buildBlockHighlightCss', () => {
 				`text-decoration-color:color-mix(in srgb, currentColor 30%, ${ color });` +
 				'text-decoration-thickness:1.5px;'
 		);
-		expect( css ).not.toContain( 'border' );
+		expect( css ).not.toMatch( /editable\{[^}]*border/ );
 	} );
 
 	/*
@@ -381,28 +383,34 @@ describe( 'buildBlockHighlightCss', () => {
 	 * overlay above it instead - all the way around, since a non-text block has
 	 * no text baseline for a bottom edge to relate to. The overlay must ignore
 	 * pointer events or it would swallow every click on the block.
+	 *
+	 * A container with no editable text (a gallery, columns of images) has
+	 * nothing for the leaf rule to tint, so it takes the overlay too.
+	 *
+	 * The rule is a border, not a box-shadow: the editor's selection outline
+	 * sets `box-shadow` on the same `::after`, and the two must not compete.
 	 */
-	it( 'overlays non-text blocks with the tint and an all-around rule at rest', () => {
+	it( 'overlays non-text blocks and text-free containers with the tint and an all-around rule at rest', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 		] );
 		const color = getAvatarBorderColor( 1 );
 		expect( css ).toContain(
-			`${ overlaySelectorFor(
+			`${ overlaySelectorFor( 'abc-1' ) },${ emptyContainerSelectorFor(
 				'abc-1'
-			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;box-shadow:inset 0 0 0 1.5px color-mix(in srgb, currentColor 30%, ${ color });}`
+			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;border:1.5px solid color-mix(in srgb, currentColor 30%, ${ color });}`
 		);
+		expect( css ).not.toContain( 'box-shadow' );
 	} );
 
 	/*
-	 * Forced colors strips background tints and box-shadows, which would leave
-	 * an annotated block with no marking at all. The dashed outline fallback
-	 * survives (its color is forced to the system text color), and dashed keeps
-	 * it distinct from the solid outline the editor draws on selection.
-	 *
-	 * The underline is the one part the forcing leaves alone - an author
-	 * `color-mix()` is not remapped - so it is restated in the system text
-	 * color rather than left on a palette color the mode never chose.
+	 * Forced colors strips background tints, which would leave an annotated
+	 * block with little marking. The dashed outline fallback survives (its
+	 * color is forced to the system text color), and dashed keeps it distinct
+	 * from the solid outline the editor draws on selection. The forcing already
+	 * paints the underline in the system text color; it is restated so the
+	 * intent is visible. The overlay's border is dropped so it does not become
+	 * a second, solid ring beside the dashed outline.
 	 */
 	it( 'falls back to a dashed outline and a system-colored underline under forced colors', () => {
 		const css = buildBlockHighlightCss( [
@@ -415,7 +423,12 @@ describe( 'buildBlockHighlightCss', () => {
 					'abc-1'
 				) },${ textSelectorFor( 'abc-2' ) },${ leafSelectorFor(
 					'abc-2'
-				) }{text-decoration-color:CanvasText;}}`
+				) }{text-decoration-color:CanvasText;}` +
+				`${ overlaySelectorFor( 'abc-1' ) },${ emptyContainerSelectorFor(
+					'abc-1'
+				) },${ overlaySelectorFor(
+					'abc-2'
+				) },${ emptyContainerSelectorFor( 'abc-2' ) }{border:none;}}`
 		);
 	} );
 

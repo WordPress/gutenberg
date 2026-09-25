@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.56.0 (2026-09-23)
+
 ### Bug Fixes
 
 -   `useRichText`: Show the boundary of the active format or object when the editing host around the element has focus, not only when the element itself does ([#83385](https://github.com/WordPress/gutenberg/pull/83385)).

@@ -4,14 +4,30 @@
 
 ### Enhancements
 
+-   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#72860](https://github.com/WordPress/gutenberg/issues/72860)).
+-   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+
+### Bug Fixes
+
+-   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+-   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
+-   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
+
+## 15.1.0 (2026-09-23)
+
+### Enhancements
+
 -   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
 -   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 -   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
+-   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
+-   Tags and other flat taxonomies: Chip remove buttons are named Remove and described by the term, instead of repeating the term in the button name ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
 -   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
@@ -120,7 +136,6 @@
 
 ### Enhancements
 
--   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#72860](https://github.com/WordPress/gutenberg/issues/72860)).
 -   Notes: Remove "Add note" from the rich-text formatting toolbar's "More" (inline styles) dropdown. Adding a note is not an inline style, the item duplicated the block options entry, and the dropdown's chevron rendered as pressed whenever the caret sat inside a note ([#80531](https://github.com/WordPress/gutenberg/pull/80531)).
 
 ### New Features
@@ -130,7 +145,6 @@
 
 ### Bug Fixes
 
--   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ### Internal

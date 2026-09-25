@@ -27,6 +27,13 @@ export function withDeprecations( Component ) {
 				);
 		}
 
+		if ( props.onSplit ) {
+			deprecated( 'wp.blockEditor.RichText onSplit prop', {
+				since: '6.4',
+				alternative: 'block.json support key: "splitting"',
+			} );
+		}
+
 		const NewComponent = props.multiline ? RichTextMultiline : Component;
 
 		return (
