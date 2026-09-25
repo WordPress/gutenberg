@@ -7,6 +7,7 @@ import type {
 	OnLoadResult,
 	PluginBuild,
 } from 'esbuild';
+import { build as esbuildBuild } from 'esbuild';
 import { transform as lightningcssTransform } from 'lightningcss';
 import postcss from 'postcss';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
@@ -189,6 +190,46 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( esbuildResult?.loader ).toBe( 'tsx' );
 		expect( esbuildResult?.contents ).toBe( viteResult?.code );
 		expect( viteResult?.code ).toMatchSnapshot();
+	} );
+
+	it( 'leaves virtual modules to the plugin that owns their namespace', async () => {
+		const result = await esbuildBuild( {
+			bundle: true,
+			format: 'esm',
+			stdin: {
+				contents: 'import value from "virtual"; export default value;',
+				loader: 'js',
+				resolveDir: fixturesDirectory,
+			},
+			write: false,
+			plugins: [
+				esbuildPlugin,
+				{
+					name: 'virtual-module',
+					setup( build ) {
+						build.onResolve( { filter: /^virtual$/ }, () => ( {
+							path: 'virtual-module.ts',
+							namespace: 'virtual-test',
+						} ) );
+						build.onLoad(
+							{
+								filter: /.*/,
+								namespace: 'virtual-test',
+							},
+							() => ( {
+								contents:
+									'const value = "var(--wpds-dimension-gap-sm)"; export default value;',
+								loader: 'ts',
+							} )
+						);
+					},
+				},
+			],
+		} );
+
+		expect( result.outputFiles[ 0 ].text ).toContain(
+			'var(--wpds-dimension-gap-sm)'
+		);
 	} );
 
 	it.each( [ '.js', '.jsx', '.ts', '.tsx', '.mjs', '.mts', '.cjs', '.cts' ] )(

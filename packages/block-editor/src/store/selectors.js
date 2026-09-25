@@ -23,6 +23,7 @@ import {
 	getParsedPattern,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2530,30 +2531,48 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
-				const { getClosestAllowedInsertionPoint } = unlock(
-					select( STORE_NAME )
+				// Unmemoized checks: the memoized ones search their cache entry
+				// by entry, and each block type adds one, so they slow down as
+				// the list grows.
+				const fallbackRoots = getFallbackInsertionRoots(
+					state,
+					rootClientId
 				);
-				blockTypeInserterItems = blockTypeInserterItems
-					.filter(
-						( blockType ) =>
-							isBlockVisibleInTheInserter(
-								state,
-								blockType,
-								rootClientId
-							) &&
-							getClosestAllowedInsertionPoint(
-								blockType.name,
-								rootClientId
-							) !== null
-					)
-					.map( ( blockType ) => ( {
-						...blockType,
-						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+				const allowedItems = [];
+				for ( const blockType of blockTypeInserterItems ) {
+					if (
+						! isBlockVisibleInTheInserter(
 							state,
 							blockType,
 							rootClientId
-						),
-					} ) );
+						)
+					) {
+						continue;
+					}
+					const isAllowedInCurrentRoot =
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						);
+					if (
+						! isAllowedInCurrentRoot &&
+						! fallbackRoots.some( ( id ) =>
+							canInsertBlockTypeUnmemoized(
+								state,
+								blockType.name,
+								id
+							)
+						)
+					) {
+						continue;
+					}
+					allowedItems.push( {
+						...blockType,
+						isAllowedInCurrentRoot,
+					} );
+				}
+				blockTypeInserterItems = allowedItems;
 			}
 
 			const items = blockTypeInserterItems.reduce(

@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
 
@@ -21,6 +22,17 @@ const COLOR_PALETTE = [
 	{ color: '#000000', name: 'Black', slug: 'black' },
 	{ color: '#ffffff', name: 'White', slug: 'white' },
 ];
+
+const DEPRECATION_MESSAGE =
+	'`asButtons` prop in wp.components.DuotonePicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
 
 describe( 'DuotonePicker', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
@@ -60,6 +72,7 @@ describe( 'DuotonePicker', () => {
 	} );
 
 	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		await render(
 			<DuotonePicker
 				aria-label="Duotones"
@@ -78,9 +91,7 @@ describe( 'DuotonePicker', () => {
 				name: 'Duotone: Dark Background',
 			} )
 		).not.toHaveAttribute( 'aria-pressed' );
-		expect( console ).toHaveWarnedWith(
-			'`asButtons` prop in wp.components.DuotonePicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( 'should preserve asButtons as a toggle-button alias', async () => {

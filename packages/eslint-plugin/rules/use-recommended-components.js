@@ -84,8 +84,7 @@ const DENYLIST = {
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalZStack:
-			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		BaseControl:

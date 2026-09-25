@@ -19,6 +19,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
+import type { BlockType } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
@@ -42,6 +43,7 @@ const {
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasBackgroundPanel,
+	searchItems,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -206,7 +208,6 @@ interface BlockListProps {
 function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const { isMatchingSearchTerm } = useSelect( blocksStore );
 	const { user } = useContext( GlobalStylesContext );
 
 	// Computed once for the whole list rather than per row, so the list does
@@ -225,11 +226,13 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		return names;
 	}, [ user ] );
 
-	const searchedBlockTypes = ! filterValue
-		? sortedBlockTypes
-		: sortedBlockTypes.filter( ( blockType ) =>
-				isMatchingSearchTerm( blockType, filterValue )
-			);
+	// Ranks title matches above keyword, category and description matches, the
+	// same way the inserter does. Without a search value the list keeps its
+	// registration order.
+	const searchedBlockTypes: BlockType[] = searchItems(
+		sortedBlockTypes,
+		filterValue
+	);
 
 	const filteredBlockTypes =
 		styleFilter === 'customized'
