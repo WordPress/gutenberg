@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Navigation: Lay the submenus of a custom overlay out in the flow of the menu. Inside a navigation overlay template part a submenu set to open on click or on hover kept the absolute positioning of a flyout, so expanding it covered the items that follow: the rest of the submenu a nested one sits in, and the items after its parent ([#83391](https://github.com/WordPress/gutenberg/pull/83391)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
