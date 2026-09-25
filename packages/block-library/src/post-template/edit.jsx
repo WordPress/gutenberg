@@ -233,6 +233,24 @@ export default function PostTemplateEdit( {
 						'taxonomy-post_format-post-format-',
 						''
 					);
+				} else if ( templateSlug?.startsWith( 'taxonomy-' ) ) {
+					// Custom taxonomy templates should preview the post type
+					// the taxonomy is registered for, not plain posts. The
+					// longest match wins so `taxonomy-product-cat` isn't
+					// read as the `product` taxonomy.
+					const templateTaxonomy = getTaxonomies( {
+						per_page: -1,
+						context: 'view',
+					} )
+						?.filter(
+							( { slug } ) =>
+								templateSlug === `taxonomy-${ slug }` ||
+								templateSlug.startsWith( `taxonomy-${ slug }-` )
+						)
+						.sort( ( a, b ) => b.slug.length - a.slug.length )[ 0 ];
+					if ( templateTaxonomy?.types?.length ) {
+						currentPostType = templateTaxonomy.types[ 0 ];
+					}
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
