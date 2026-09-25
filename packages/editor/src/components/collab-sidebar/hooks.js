@@ -526,7 +526,7 @@ export function useFloatingBoard( {
 
 	// Only floating mode needs measurements; without a subscriber the store
 	// drops its observer.
-	const { heights, anchorRects, canvas } = useSyncExternalStore(
+	const { heights, anchorRects, canvas, frameOffset } = useSyncExternalStore(
 		isFloating ? store.subscribe : subscribeNoop,
 		store.getSnapshot
 	);
@@ -576,6 +576,16 @@ export function useFloatingBoard( {
 			panel.style.removeProperty( '--canvas-scroll' );
 		};
 	}, [ sidebarRef, isFloating, canvas ] );
+
+	// Shifts the threads by the canvas frame's offset from the panel.
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel ) {
+			return;
+		}
+		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
+		return () => panel.style.removeProperty( '--canvas-offset' );
+	}, [ sidebarRef, isFloating, frameOffset ] );
 
 	return {
 		notePositions,

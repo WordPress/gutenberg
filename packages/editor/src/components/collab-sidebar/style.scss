@@ -49,9 +49,10 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
-		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
-		// so each thread tracks the canvas scroll.
-		transform: translateY(var(--canvas-scroll, 0));
+		// Inherits `--canvas-offset` and `--canvas-scroll` from the panel (set
+		// by `useFloatingBoard`) so each thread tracks the canvas frame and its
+		// scroll.
+		transform: translateY(calc(var(--canvas-offset, 0px) + var(--canvas-scroll, 0px)));
 		will-change: transform;
 		// Keep the reply input reachable when a thread is taller than the viewport
 		// (e.g. many replies on short content where the canvas can't scroll).
