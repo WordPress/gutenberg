@@ -41,6 +41,7 @@
 	// Don't allow iframe to overflow it's container.
 	iframe {
 		max-width: 100%;
+		min-height: 200px;
 	}
 }
 
