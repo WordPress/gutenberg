@@ -218,7 +218,6 @@ function Edit( {
 					}
 					value={ value }
 					onChange={ onChange }
-					contentRef={ contentRef }
 					focusOnMount={ shouldAutoFocus ? 'firstElement' : false }
 				/>
 			) }

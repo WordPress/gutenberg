@@ -15,3 +15,10 @@ KeyboardShortcutContext.displayName = 'KeyboardShortcutContext';
  */
 export const InputEventContext = createContext();
 InputEventContext.displayName = 'InputEventContext';
+
+/**
+ * Holds the editable element of the rich text field, once it is mounted, so
+ * that `useAnchor` can position popovers without being handed the element.
+ */
+export const EditableContentElementContext = createContext( null );
+EditableContentElementContext.displayName = 'EditableContentElementContext';

@@ -46,6 +46,7 @@ const {
 	useRichText,
 	KeyboardShortcutContext,
 	InputEventContext,
+	EditableContentElementContext,
 	shortcutsListener,
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
@@ -206,6 +207,8 @@ export default function RichTextControl( {
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
 	const anchorRef = useRef< HTMLElement | undefined >( undefined );
+	const [ editableContentElement, setEditableContentElement ] =
+		useState< HTMLElement | null >( null );
 	const inputEvents = useRef( new Set< ( event: Event ) => void >() );
 	const keyboardShortcuts = useRef(
 		new Set< ( event: KeyboardEvent ) => void >()
@@ -438,6 +441,7 @@ export default function RichTextControl( {
 		enterRef,
 		focusOnMountRef,
 		autocompleteRef,
+		setEditableContentElement,
 	] );
 
 	return (
@@ -488,14 +492,18 @@ export default function RichTextControl( {
 					>
 						<InputEventContext.Provider value={ inputEvents }>
 							{ /* Format types gate their inline UIs on `isVisible`. */ }
-							<FormatEdit
-								value={ value }
-								onChange={ onRichTextChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-								isVisible
-							/>
+							<EditableContentElementContext.Provider
+								value={ editableContentElement }
+							>
+								<FormatEdit
+									value={ value }
+									onChange={ onRichTextChange }
+									onFocus={ onFocus }
+									formatTypes={ formatTypes }
+									forwardedRef={ anchorRef }
+									isVisible
+								/>
+							</EditableContentElementContext.Provider>
 						</InputEventContext.Provider>
 					</KeyboardShortcutContext.Provider>
 				) }

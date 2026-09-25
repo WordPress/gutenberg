@@ -9,12 +9,8 @@ import type { FormatEditProps } from '../types';
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
 
-function PopoverAnchor( {
-	contentRef,
-}: Pick< FormatEditProps, 'contentRef' > ) {
+function PopoverAnchor() {
 	const popoverAnchor = useAnchor( {
-		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current,
 		settings: nonBreakingSpace,
 	} );
 
@@ -32,7 +28,7 @@ export const nonBreakingSpace = {
 	title,
 	tagName: 'span',
 	className: 'non-breaking-space',
-	edit( { value, onChange, contentRef }: FormatEditProps ) {
+	edit( { value, onChange }: FormatEditProps ) {
 		function addNonBreakingSpace() {
 			onChange( insert( value, '\u00a0' ) );
 		}
@@ -49,9 +45,7 @@ export const nonBreakingSpace = {
 					character=" "
 					onUse={ addNonBreakingSpace }
 				/>
-				{ selectedValue === '\u00a0' && (
-					<PopoverAnchor contentRef={ contentRef } />
-				) }
+				{ selectedValue === '\u00a0' && <PopoverAnchor /> }
 			</>
 		);
 	},

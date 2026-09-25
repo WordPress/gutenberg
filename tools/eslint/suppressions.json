@@ -4543,14 +4543,9 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
-		"react-hooks/refs": {
-			"count": 6
-		}
-	},
 	"packages/components/src/autocomplete/index.tsx": {
 		"react-hooks/refs": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {

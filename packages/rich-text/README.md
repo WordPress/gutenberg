@@ -464,17 +464,17 @@ _Returns_
 
 ### useAnchor
 
-This hook, to be used in a format type's Edit component, returns the active element that is formatted, or a virtual element for the selection range if no format is active. The returned value is meant to be used for positioning UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+This hook, to be used in a format type's Edit component, returns an anchor for the formatted element, or for the selection range if no format is active. The returned value is meant to be used for positioning UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
 
 _Parameters_
 
-- _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
-- _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+- _obj_ `{ editableContentElement?: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+- _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content. Defaults to the element of the surrounding rich text field.
 - _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
-- `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
+- `VirtualAnchorElement | undefined`: The anchor.
 
 ### useAnchorRef
 

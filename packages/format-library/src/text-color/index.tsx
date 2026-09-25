@@ -114,8 +114,6 @@ function TextColorEdit( {
 					onClose={ () => setIsAddingColor( false ) }
 					value={ value }
 					onChange={ onChange }
-					contentRef={ contentRef }
-					isActive={ isActive }
 				/>
 			) }
 		</>

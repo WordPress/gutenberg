@@ -43,6 +43,7 @@ const {
 	useRichText,
 	KeyboardShortcutContext,
 	InputEventContext,
+	EditableContentElementContext,
 	RichTextShortcut,
 	RichTextInputEvent,
 } = unlock( richTextPrivateApis );
@@ -485,13 +486,17 @@ function RichTextWrapper(
 							{ children &&
 								children( { value, onChange, onFocus } ) }
 
-							<FormatEdit
-								value={ value }
-								onChange={ onChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-							/>
+							<EditableContentElementContext.Provider
+								value={ anchorElement }
+							>
+								<FormatEdit
+									value={ value }
+									onChange={ onChange }
+									onFocus={ onFocus }
+									formatTypes={ formatTypes }
+									forwardedRef={ anchorRef }
+								/>
+							</EditableContentElementContext.Provider>
 						</Popover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useRef } from '@wordpress/element';
 import { AutocompleterUI } from '../autocompleter-ui';
 import { useLastDifferentValue } from '..';
 
@@ -159,8 +158,6 @@ describe( 'AutocompleterUI', () => {
 			const OtherElement = <div>Other Element</div>;
 
 			const Container = () => {
-				const contentRef = useRef< HTMLElement >( null );
-
 				return (
 					<div>
 						<AutocompleterUI
@@ -172,7 +169,7 @@ describe( 'AutocompleterUI', () => {
 							selectedIndex={ 0 }
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }
-							contentRef={ contentRef }
+							contentElement={ null }
 							reset={ resetSpy }
 						/>
 						{ OtherElement }

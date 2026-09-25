@@ -1,8 +1,7 @@
-import { usePrevious } from '@wordpress/compose';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import type { WPFormat } from '../register-format-type';
-import { ownsSelection } from '../owns-selection';
+import { EditableContentElementContext } from '../contexts';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -20,33 +19,32 @@ function getFormatElement(
 	tagName: string,
 	className: string
 ): HTMLElement | undefined {
-	let element = range.startContainer;
+	let node: Node = range.startContainer;
 
 	// Even if the active format is defined, the actually DOM range's start
 	// container may be outside of the format's DOM element:
 	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
 	// So at a given selection index, start with the deepest format DOM element.
 	if (
-		element.nodeType === element.TEXT_NODE &&
-		element instanceof window.Text &&
-		range.startOffset === element.length &&
-		element.nextSibling
+		node.nodeType === node.TEXT_NODE &&
+		range.startOffset === ( node as Text ).length &&
+		node.nextSibling
 	) {
-		element = element.nextSibling;
+		node = node.nextSibling;
 
-		while ( element.firstChild ) {
-			element = element.firstChild;
+		while ( node.firstChild ) {
+			node = node.firstChild;
 		}
 	}
 
-	if ( element.nodeType !== element.ELEMENT_NODE ) {
-		if ( ! element.parentElement ) {
-			return;
-		}
-		element = element.parentElement;
-	}
+	// The element may belong to another document than this module, so the
+	// node type decides, not instanceof.
+	const element =
+		node.nodeType === node.ELEMENT_NODE
+			? ( node as HTMLElement )
+			: node.parentElement;
 
-	if ( element === editableContentElement ) {
+	if ( ! element || element === editableContentElement ) {
 		return;
 	}
 
@@ -58,10 +56,6 @@ function getFormatElement(
 
 	// Element#matches will throw SyntaxError on an empty selector
 	if ( ! selector ) {
-		return;
-	}
-
-	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
 	}
 
@@ -90,162 +84,81 @@ interface VirtualAnchorElement {
 }
 
 /**
- * Creates a virtual anchor element for a range.
- *
- * @param range                  The range to create a virtual anchor element for.
- * @param editableContentElement The editable wrapper.
- * @return                       The virtual anchor element.
- */
-function createVirtualAnchorElement(
-	range: Range,
-	editableContentElement: HTMLElement
-): VirtualAnchorElement {
-	return {
-		contextElement: editableContentElement,
-		getBoundingClientRect() {
-			if ( editableContentElement.contains( range.startContainer ) ) {
-				return (
-					getRectangleFromRange( range ) ??
-					range.getBoundingClientRect()
-				);
-			}
-
-			return editableContentElement.getBoundingClientRect();
-		},
-	};
-}
-
-/**
- * Get the anchor: a format element if there is a matching one based on the
- * tagName and className or a range otherwise.
- *
- * @param editableContentElement The editable wrapper.
- * @param tagName                The tag name of the format element.
- * @param className              The class name of the format element.
- * @return                       The anchor.
- */
-function getAnchor(
-	editableContentElement: HTMLElement | null,
-	tagName: string,
-	className: string
-): HTMLElement | VirtualAnchorElement | undefined {
-	if ( ! editableContentElement ) {
-		return;
-	}
-
-	const { ownerDocument } = editableContentElement;
-	const { defaultView } = ownerDocument;
-	const selection = defaultView?.getSelection();
-
-	if ( ! selection ) {
-		return;
-	}
-	if ( ! selection.rangeCount ) {
-		return;
-	}
-
-	const range = selection.getRangeAt( 0 );
-
-	if ( ! range || ! range.startContainer ) {
-		return;
-	}
-
-	if ( ! tagName && ! className ) {
-		return createVirtualAnchorElement( range, editableContentElement );
-	}
-
-	return (
-		getFormatElement( range, editableContentElement, tagName, className ) ??
-		createVirtualAnchorElement( range, editableContentElement )
-	);
-}
-
-const DEFAULT_SETTINGS = {
-	tagName: '',
-	className: '',
-};
-
-/**
- * This hook, to be used in a format type's Edit component, returns the active
- * element that is formatted, or a virtual element for the selection range if
- * no format is active. The returned value is meant to be used for positioning
- * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+ * This hook, to be used in a format type's Edit component, returns an anchor
+ * for the formatted element, or for the selection range if no format is
+ * active. The returned value is meant to be used for positioning UI, e.g. by
+ * passing it to the `Popover` component via the `anchor` prop.
  *
  * @param obj                        Named parameters.
- * @param obj.editableContentElement The element containing the editable content.
+ * @param obj.editableContentElement The element containing the editable content. Defaults to the element of the surrounding rich text field.
  * @param obj.settings               The format type's settings.
- * @return                           The active element or selection range.
+ * @return                           The anchor.
  */
 export function useAnchor( {
-	editableContentElement,
+	editableContentElement: editableContentElementProp,
 	settings,
 }: {
-	editableContentElement: HTMLElement | null;
+	editableContentElement?: HTMLElement | null;
 	settings?: WPFormat;
-} ): Element | VirtualAnchorElement | undefined | null {
-	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
-
-	// `isActive` is not a property of `WPFormat`, but it has made its way into
-	// `settings` in certain cases (see `core/link` format). Avoid making this
-	// exception "public" in the function signature: tell TS how to look for it
-	// dynamically.
-	const isActive = !! (
-		settings &&
-		'isActive' in settings &&
-		settings.isActive
+} = {} ): VirtualAnchorElement | undefined {
+	const editableContentElementContext = useContext(
+		EditableContentElementContext
 	);
+	const editableContentElement =
+		editableContentElementProp ?? editableContentElementContext;
+	const tagName = settings?.tagName ?? '';
+	const className = settings?.className ?? '';
 
-	const [ anchor, setAnchor ] = useState( () =>
-		getAnchor( editableContentElement, tagName, className ?? '' )
-	);
-	const wasActive = usePrevious( isActive );
-
-	useLayoutEffect( () => {
+	return useMemo( () => {
 		if ( ! editableContentElement ) {
 			return;
 		}
 
-		function callback() {
-			setAnchor(
-				getAnchor( editableContentElement, tagName, className ?? '' )
-			);
-		}
+		let lastRange: Range | null = null;
 
-		function attach() {
-			ownerDocument.addEventListener( 'selectionchange', callback );
-		}
+		return {
+			contextElement: editableContentElement,
+			getBoundingClientRect() {
+				const selection =
+					editableContentElement.ownerDocument.defaultView?.getSelection();
+				const range = selection?.rangeCount
+					? selection.getRangeAt( 0 )
+					: undefined;
 
-		function detach() {
-			ownerDocument.removeEventListener( 'selectionchange', callback );
-		}
+				// Remember the selection while it is inside the editable
+				// element, so that the anchor stays put when the selection moves
+				// into the popover itself. The browser's range moves with the
+				// selection; store a copy.
+				if (
+					range &&
+					editableContentElement.contains( range.startContainer )
+				) {
+					lastRange = range.cloneRange();
+				}
 
-		const { ownerDocument } = editableContentElement;
+				if ( ! lastRange ) {
+					return editableContentElement.getBoundingClientRect();
+				}
 
-		if (
-			ownsSelection( editableContentElement ) ||
-			// When a link is created, we need to attach the popover to the newly created anchor.
-			( ! wasActive && isActive ) ||
-			// Sometimes we're _removing_ an active anchor, such as the inline color popover.
-			// When we add the color, it switches from a virtual anchor to a `<mark>` element.
-			// When we _remove_ the color, it switches from a `<mark>` element to a virtual anchor.
-			( wasActive && ! isActive )
-		) {
-			setAnchor(
-				getAnchor( editableContentElement, tagName, className ?? '' )
-			);
-			attach();
-		}
+				const formatElement =
+					tagName || className
+						? getFormatElement(
+								lastRange,
+								editableContentElement,
+								tagName,
+								className
+							)
+						: undefined;
 
-		editableContentElement.addEventListener( 'focusin', attach );
-		editableContentElement.addEventListener( 'focusout', detach );
+				if ( formatElement ) {
+					return formatElement.getBoundingClientRect();
+				}
 
-		return () => {
-			detach();
-
-			editableContentElement.removeEventListener( 'focusin', attach );
-			editableContentElement.removeEventListener( 'focusout', detach );
+				return (
+					getRectangleFromRange( lastRange ) ??
+					lastRange.getBoundingClientRect()
+				);
+			},
 		};
-	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
-
-	return anchor;
+	}, [ editableContentElement, tagName, className ] );
 }

@@ -45,7 +45,6 @@ interface InlineLinkUIProps {
 	onChange: ( newValue: RichTextValue ) => void;
 	onFocusOutside: () => void;
 	stopAddingLink: () => void;
-	contentRef: React.RefObject< HTMLElement >;
 	focusOnMount?: 'firstElement' | false;
 }
 
@@ -79,7 +78,6 @@ function InlineLinkUI( {
 	onChange,
 	onFocusOutside,
 	stopAddingLink,
-	contentRef,
 	focusOnMount,
 }: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
@@ -283,16 +281,8 @@ function InlineLinkUI( {
 		}
 	}
 
-	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
-	 * dynamically. Hoisting the object out of the call avoids excess property
-	 * checking, which only applies to object literals passed inline.
-	 */
-	const anchorSettings = { ...settings, isActive };
 	const popoverAnchor = useAnchor( {
-		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current,
-		settings: anchorSettings,
+		settings,
 	} );
 
 	async function handleCreate( pageTitle: string ) {

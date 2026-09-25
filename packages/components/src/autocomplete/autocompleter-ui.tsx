@@ -78,7 +78,7 @@ export function AutocompleterUI( {
 	onChangeOptions,
 	onSelect,
 	reset,
-	contentRef,
+	contentElement,
 }: AutocompleterUIProps ) {
 	// The useItems hook is derived from the autocompleter prop. This is safe
 	// because the parent renders this component with key={autocompleter.name},
@@ -87,7 +87,7 @@ export function AutocompleterUI( {
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 	const [ items ] = useItems( filterValue );
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentElement: contentElement,
 	} );
 
 	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
@@ -96,7 +96,7 @@ export function AutocompleterUI( {
 		popoverRef,
 		useRefEffect(
 			( node ) => {
-				if ( ! contentRef.current ) {
+				if ( ! contentElement ) {
 					return;
 				}
 
@@ -105,10 +105,10 @@ export function AutocompleterUI( {
 				// content document so that it's available to the screen
 				// readers, which check the DOM ID based aria-* attributes.
 				setNeedsA11yCompat(
-					node.ownerDocument !== contentRef.current.ownerDocument
+					node.ownerDocument !== contentElement.ownerDocument
 				);
 			},
-			[ contentRef ]
+			[ contentElement ]
 		),
 	] );
 
@@ -183,7 +183,7 @@ export function AutocompleterUI( {
 					className={ className }
 				/>
 			</Popover>
-			{ contentRef.current &&
+			{ contentElement &&
 				needsA11yCompat &&
 				createPortal(
 					<ListBox
@@ -195,7 +195,7 @@ export function AutocompleterUI( {
 						className={ className }
 						Component={ VisuallyHidden }
 					/>,
-					contentRef.current.ownerDocument.body
+					contentElement.ownerDocument.body
 				) }
 		</>
 	);
