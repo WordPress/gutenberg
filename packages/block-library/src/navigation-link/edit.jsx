@@ -12,7 +12,7 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
-	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -352,7 +352,11 @@ export default function NavigationLinkEdit( {
 	// Color serialization is skipped so the block's own colors land on the
 	// anchor rather than the list item, which also wraps the submenu. Colors
 	// inherited from the parent Navigation block stay on the list item.
-	const contentColorProps = getColorClassesAndStyles( attributes );
+	//
+	// `useColorProps` rather than `getColorClassesAndStyles`: it resolves a
+	// preset to an inline value as well as a class, so the color still shows
+	// in editor contexts that don't load the theme's palette stylesheet.
+	const contentColorProps = useColorProps( attributes );
 
 	const classes = clsx(
 		'wp-block-navigation-item__content',
