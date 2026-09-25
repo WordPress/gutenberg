@@ -8,6 +8,10 @@
 
 -   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
+### Bug Fixes
+
+-   Open the "View revisions" action in the site editor revisions view instead of the `revision.php` screen. ([#81366](https://github.com/WordPress/gutenberg/pull/81366))
+
 ## 7.4.0 (2026-09-10)
 
 ### Enhancements
