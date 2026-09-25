@@ -128,6 +128,8 @@ function render_block_core_media_text( $attributes, $content, $block = null ) {
 /**
  * Adds the Image block's lightbox to the Media & Text image.
  *
+ * @since 7.2.0
+ *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block rendered content.
  * @param WP_Block $block      Optional. The block instance. Default null.
