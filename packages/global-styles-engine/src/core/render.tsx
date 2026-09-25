@@ -490,7 +490,13 @@ const getFeatureDeclarations = (
 
 	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
 		// We're only processing features/subfeatures that have styles.
-		if ( feature === 'root' || ! styles?.[ feature ] ) {
+		// `css` isn't a style feature; it identifies the selector to use for
+		// custom CSS and is handled separately by `renderStylesNode`.
+		if (
+			feature === 'root' ||
+			feature === 'css' ||
+			! styles?.[ feature ]
+		) {
 			return;
 		}
 
@@ -1137,6 +1143,15 @@ export const getNodesWithStyles = (
 			);
 			const typedNode = node as BlockNode;
 
+			// Custom CSS is not a `STYLE_KEYS` entry, so re-add it: it must render
+			// in the same node as this block's other default-state declarations,
+			// ahead of its viewport/pseudo-state nodes, so it wins over the
+			// block's own defaults but loses to a more specific state (matching
+			// the PHP renderer's per-node ordering).
+			if ( typedNode?.css ) {
+				blockStyles.css = typedNode.css;
+			}
+
 			// Store variation child nodes so they can be inserted after the block's own elements.
 			const variationNodesToAdd: typeof nodes = [];
 			const variationStyleNodesToAdd: typeof nodes = [];
@@ -1723,10 +1738,39 @@ function renderStylesNode(
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {
-		ruleset += processCSSNesting(
-			styles.css,
-			`:root :where(${ effectiveSelector })`
-		);
+		// A block can declare a dedicated selector for custom CSS (e.g. to
+		// target a different element than its other styles); fall back to
+		// this node's own selector otherwise. Mirrors the PHP renderer.
+		const cssFeatureSelector =
+			featureSelectors && typeof featureSelectors === 'object'
+				? ( featureSelectors as Record< string, unknown > ).css
+				: undefined;
+		let resolvedCssSelector: string | undefined;
+		if ( typeof cssFeatureSelector === 'string' ) {
+			resolvedCssSelector = cssFeatureSelector;
+		} else if (
+			cssFeatureSelector &&
+			typeof cssFeatureSelector === 'object'
+		) {
+			resolvedCssSelector = ( cssFeatureSelector as { root?: string } )
+				.root;
+		}
+		// A variation's dedicated custom-CSS selector is defined on the base
+		// block and targets its feature element; scope it to this specific
+		// variation the same way the other feature selectors are scoped
+		// above (getBlockStyleVariationFeatureSelector), rather than the
+		// base block's own instances of that element.
+		if ( resolvedCssSelector && variationName ) {
+			resolvedCssSelector = getBlockStyleVariationFeatureSelector(
+				variationName,
+				resolvedCssSelector
+			);
+		}
+		const cssBaseSelector = resolvedCssSelector ?? selector;
+		const cssSelector = selectorSuffix
+			? appendToSelector( cssBaseSelector, selectorSuffix )
+			: cssBaseSelector;
+		ruleset += processCSSNesting( styles.css, cssSelector );
 	}
 
 	if ( mediaQuery && ruleset ) {
@@ -2159,6 +2203,7 @@ export function generateGlobalStyles(
 		styleOptions
 	);
 	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
+
 	const styles = [
 		{
 			css: customProperties,
@@ -2179,35 +2224,6 @@ export function generateGlobalStyles(
 			isGlobalStyles: true,
 		},
 	];
-
-	// Loop through the blocks to check if there are custom CSS values.
-	// If there are, get the block selector and push the selector together with
-	// the CSS value to the 'stylesheets' array.
-	blocks.forEach( ( blockType: BlockType ) => {
-		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
-		if ( blockStyles?.css ) {
-			const { featureSelectors } = blockSelectors[ blockType.name ];
-			const cssFeatureSelector =
-				typeof featureSelectors === 'object'
-					? featureSelectors?.css
-					: undefined;
-			let resolvedCssSelector: string | undefined;
-			if ( typeof cssFeatureSelector === 'string' ) {
-				resolvedCssSelector = cssFeatureSelector;
-			} else if ( typeof cssFeatureSelector === 'object' ) {
-				resolvedCssSelector = (
-					cssFeatureSelector as Record< string, string >
-				 )?.root;
-			}
-			const selector =
-				resolvedCssSelector ??
-				blockSelectors[ blockType.name ].selector;
-			styles.push( {
-				css: processCSSNesting( blockStyles.css, selector ),
-				isGlobalStyles: true,
-			} );
-		}
-	} );
 
 	return [ styles, updatedConfig.settings ];
 }

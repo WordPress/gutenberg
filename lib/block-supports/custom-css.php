@@ -6,6 +6,75 @@
  */
 
 /**
+ * Collects the raw custom CSS strings defined for a block instance, across the
+ * default state, pseudo-states (e.g. `:hover`), and viewport states (e.g.
+ * `@mobile`), including combinations of the two.
+ *
+ * @since 7.1.0
+ *
+ * @param array  $style      The block's `style` attribute.
+ * @param string $block_name Block name.
+ * @return array[] List of entries, each with `css`, `pseudo` (string|null),
+ *                 and `media_query` (string|null) keys.
+ */
+function gutenberg_get_custom_css_state_entries( $style, $block_name ) {
+	$entries = array();
+	if ( empty( $style ) || ! is_array( $style ) ) {
+		return $entries;
+	}
+
+	$add_entry = function ( $css, $pseudo, $media_query ) use ( &$entries ) {
+		if ( is_string( $css ) && '' !== trim( $css ) ) {
+			$entries[] = array(
+				'css'         => $css,
+				'pseudo'      => $pseudo,
+				'media_query' => $media_query,
+			);
+		}
+	};
+
+	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
+
+	static $responsive_media_queries = null;
+	if ( null === $responsive_media_queries ) {
+		// Viewport settings are request-wide, not per-block; compute once and
+		// reuse across every block instance rendered in the request.
+		$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+			gutenberg_get_global_settings( array( 'viewport' ) )
+		);
+	}
+
+	$add_entry( $style['css'] ?? null, null, null );
+
+	foreach ( $supported_pseudo_states as $pseudo_state ) {
+		$pseudo_style = $style[ $pseudo_state ] ?? null;
+		if ( ! is_array( $pseudo_style ) ) {
+			continue;
+		}
+		$add_entry( $pseudo_style['css'] ?? null, $pseudo_state, null );
+	}
+
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$breakpoint_style = $style[ $breakpoint ] ?? null;
+		if ( ! is_array( $breakpoint_style ) ) {
+			continue;
+		}
+
+		$add_entry( $breakpoint_style['css'] ?? null, null, $media_query );
+
+		foreach ( $supported_pseudo_states as $pseudo_state ) {
+			$breakpoint_pseudo_style = $breakpoint_style[ $pseudo_state ] ?? null;
+			if ( ! is_array( $breakpoint_pseudo_style ) ) {
+				continue;
+			}
+			$add_entry( $breakpoint_pseudo_style['css'] ?? null, $pseudo_state, $media_query );
+		}
+	}
+
+	return $entries;
+}
+
+/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @since 7.0.0
@@ -27,8 +96,8 @@
  * } $parsed_block
  */
 function gutenberg_render_custom_css_support_styles( $parsed_block ) {
-	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
-	if ( ! is_string( $custom_css ) || '' === trim( $custom_css ) ) {
+	$style = $parsed_block['attrs']['style'] ?? null;
+	if ( empty( $style ) || ! is_array( $style ) ) {
 		return $parsed_block;
 	}
 
@@ -37,9 +106,17 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
-	if ( preg_match( '#</?\w+#', $custom_css ) ) {
+	$state_entries = gutenberg_get_custom_css_state_entries( $style, $parsed_block['blockName'] );
+	if ( empty( $state_entries ) ) {
 		return $parsed_block;
+	}
+
+	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
+	// A single invalid state invalidates all of the block's custom CSS.
+	foreach ( $state_entries as $entry ) {
+		if ( preg_match( '#</?\w+#', $entry['css'] ) ) {
+			return $parsed_block;
+		}
 	}
 
 	// Generate a unique class name for this block instance.
@@ -51,9 +128,21 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 	$parsed_block['attrs']['className'] = $updated_class_name;
 
-	// Process the custom CSS using the same method as global styles.
+	// Process the custom CSS using the same method as global styles, for every state.
 	$selector      = '.' . $class_name;
-	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
+	$processed_css = '';
+	foreach ( $state_entries as $entry ) {
+		$entry_selector = null !== $entry['pseudo'] ? $selector . $entry['pseudo'] : $selector;
+		$entry_css      = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $entry['css'], $entry_selector );
+
+		if ( empty( $entry_css ) ) {
+			continue;
+		}
+
+		$processed_css .= null !== $entry['media_query']
+			? $entry['media_query'] . '{' . $entry_css . '}'
+			: $entry_css;
+	}
 
 	if ( ! empty( $processed_css ) ) {
 		/**
@@ -182,6 +271,36 @@ function gutenberg_register_custom_css_support( $block_type ) {
 }
 
 /**
+ * Removes `css` keys from a block's `style` attribute, including any nested
+ * under pseudo-state (`:hover`) or viewport-state (`@mobile`) sub-objects.
+ *
+ * @since 7.1.0
+ *
+ * @param array $style The block's `style` attribute.
+ * @return array The style attribute with all `css` keys removed.
+ */
+function gutenberg_strip_custom_css_from_style_array( $style ) {
+	if ( ! is_array( $style ) ) {
+		return $style;
+	}
+
+	unset( $style['css'] );
+
+	foreach ( $style as $key => $value ) {
+		if ( is_array( $value ) && ( str_starts_with( $key, ':' ) || str_starts_with( $key, '@' ) ) ) {
+			$nested_style = gutenberg_strip_custom_css_from_style_array( $value );
+			if ( empty( $nested_style ) ) {
+				unset( $style[ $key ] );
+			} else {
+				$style[ $key ] = $nested_style;
+			}
+		}
+	}
+
+	return $style;
+}
+
+/**
  * Strips `style.css` attributes from all blocks in post content.
  *
  * Uses WP_Block_Parser::next_token() to scan block tokens and surgically
@@ -220,14 +339,20 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 			continue;
 		}
 
-		if ( ! isset( $attrs['style']['css'] ) ) {
+		if ( ! isset( $attrs['style'] ) || ! is_array( $attrs['style'] ) ) {
+			continue;
+		}
+
+		$stripped_style = gutenberg_strip_custom_css_from_style_array( $attrs['style'] );
+		if ( $stripped_style === $attrs['style'] ) {
 			continue;
 		}
 
 		// Remove css and clean up empty style.
-		unset( $attrs['style']['css'] );
-		if ( empty( $attrs['style'] ) ) {
+		if ( empty( $stripped_style ) ) {
 			unset( $attrs['style'] );
+		} else {
+			$attrs['style'] = $stripped_style;
 		}
 
 		// Locate the JSON portion within the token.
