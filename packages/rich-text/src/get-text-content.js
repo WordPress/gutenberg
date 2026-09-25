@@ -1,10 +1,5 @@
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
-const OBJECT_REPLACEMENT_CHARACTERS = new RegExp(
-	OBJECT_REPLACEMENT_CHARACTER,
-	'g'
-);
-
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
@@ -16,5 +11,5 @@ const OBJECT_REPLACEMENT_CHARACTERS = new RegExp(
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text.replace( OBJECT_REPLACEMENT_CHARACTERS, '' );
+	return text.replaceAll( OBJECT_REPLACEMENT_CHARACTER, '' );
 }
