@@ -1858,11 +1858,29 @@ export function generateThumbnails( id: QueueItemId ) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
-					const bitmap = await createImageBitmap( thumbnailSource );
-					const needsScaling =
-						bitmap.width > bigImageSizeThreshold ||
-						bitmap.height > bigImageSizeThreshold;
-					bitmap.close();
+					//
+					// Some browsers cannot decode every image that the wasm-vips
+					// pipeline above was able to decode (e.g. certain JPEGs), which
+					// makes createImageBitmap() reject. Treat that as "no scaling
+					// needed" rather than letting the rejection bubble up and skip
+					// finishOperation() below, which would otherwise leave the item
+					// stuck in THUMBNAIL_GENERATION and cause it to be reprocessed
+					// (and its sub-sizes re-queued) indefinitely.
+					let needsScaling = false;
+					try {
+						const bitmap =
+							await createImageBitmap( thumbnailSource );
+						needsScaling =
+							bitmap.width > bigImageSizeThreshold ||
+							bitmap.height > bigImageSizeThreshold;
+						bitmap.close();
+					} catch ( err ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							'Could not determine whether the image exceeds the big image size threshold; skipping the scaled version.',
+							err
+						);
+					}
 
 					if ( needsScaling ) {
 						// Rename sourceFile to match the server attachment filename.
