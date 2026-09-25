@@ -318,7 +318,7 @@ export interface BoundSelector {
 	/**
 	 * Optional function to normalize the arguments.
 	 */
-	__unstableNormalizeArgs?: ( args: any[] ) => any[];
+	normalizeArgs?: ( args: any[] ) => any[];
 	/**
 	 * Whether this selector is a registry selector.
 	 */

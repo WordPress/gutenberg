@@ -48,7 +48,6 @@ describe( 'VisuallyHidden', () => {
 				>
 					My label
 				</VisuallyHidden>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<input id="input-id" />
 			</>
 		);

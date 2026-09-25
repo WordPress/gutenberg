@@ -7,12 +7,14 @@ import type {
 	OnLoadResult,
 	PluginBuild,
 } from 'esbuild';
+import { build as esbuildBuild } from 'esbuild';
 import { transform as lightningcssTransform } from 'lightningcss';
 import postcss from 'postcss';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
 import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
 import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
 import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
@@ -36,10 +38,7 @@ type EsbuildOnLoad = (
 	| null
 	| undefined;
 
-type ViteTransform = (
-	code: string,
-	id: string
-) => { code: string; map: null } | null;
+type ViteTransform = typeof transformDsTokenFallbacks;
 
 function getEsbuildHook(): {
 	options: OnLoadOptions;
@@ -174,9 +173,7 @@ describe( 'design token fallback build plugin parity', () => {
 		const source = await readFile( emptyFallbackJsFixture, 'utf8' );
 		const result = getViteTransform()( source, emptyFallbackJsFixture );
 
-		expect( result?.code ).toContain(
-			'gap: var(--wpds-dimension-gap-sm,);'
-		);
+		expect( result ).toBeNull();
 	} );
 
 	it( 'keeps esbuild and Vite source-text transforms aligned', async () => {
@@ -186,9 +183,51 @@ describe( 'design token fallback build plugin parity', () => {
 		} as OnLoadArgs );
 		const viteResult = getViteTransform()( source, validJsFixture );
 
-		expect( esbuildResult?.loader ).toBe( 'tsx' );
-		expect( esbuildResult?.contents ).toBe( viteResult?.code );
+		expect( esbuildResult?.loader ).toBe( 'ts' );
+		expect( esbuildResult?.contents ).toBe(
+			`${ viteResult?.code }\n//# sourceMappingURL=${ viteResult?.map.toUrl() }`
+		);
 		expect( viteResult?.code ).toMatchSnapshot();
+	} );
+
+	it( 'leaves virtual modules to the plugin that owns their namespace', async () => {
+		const result = await esbuildBuild( {
+			bundle: true,
+			format: 'esm',
+			stdin: {
+				contents: 'import value from "virtual"; export default value;',
+				loader: 'js',
+				resolveDir: fixturesDirectory,
+			},
+			write: false,
+			plugins: [
+				esbuildPlugin,
+				{
+					name: 'virtual-module',
+					setup( build ) {
+						build.onResolve( { filter: /^virtual$/ }, () => ( {
+							path: 'virtual-module.ts',
+							namespace: 'virtual-test',
+						} ) );
+						build.onLoad(
+							{
+								filter: /.*/,
+								namespace: 'virtual-test',
+							},
+							() => ( {
+								contents:
+									'const value = "var(--wpds-dimension-gap-sm)"; export default value;',
+								loader: 'ts',
+							} )
+						);
+					},
+				},
+			],
+		} );
+
+		expect( result.outputFiles[ 0 ].text ).toContain(
+			'var(--wpds-dimension-gap-sm)'
+		);
 	} );
 
 	it.each( [ '.js', '.jsx', '.ts', '.tsx', '.mjs', '.mts', '.cjs', '.cts' ] )(

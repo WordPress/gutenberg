@@ -410,13 +410,13 @@ describe( 'resolveSelect', () => {
 } );
 
 describe( 'normalizing args', () => {
-	it( 'should call the __unstableNormalizeArgs method of the selector for both the selector and the resolver', async () => {
+	it( 'should call the normalizeArgs method of the selector for both the selector and the resolver', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
 		const normalizingFunction = vi.fn( ( ...args ) => args );
 
-		selector.__unstableNormalizeArgs = normalizingFunction;
+		selector.normalizeArgs = normalizingFunction;
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -438,11 +438,11 @@ describe( 'normalizing args', () => {
 		expect( normalizingFunction ).toHaveBeenCalledTimes( 3 );
 	} );
 
-	it( 'should not call the __unstableNormalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
+	it( 'should not call the normalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.__unstableNormalizeArgs = vi.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -454,22 +454,46 @@ describe( 'normalizing args', () => {
 			},
 		} );
 
-		// Called with no args so the __unstableNormalizeArgs method should not be called.
+		// Called with no args so the normalizeArgs method should not be called.
 		registry.select( 'store' ).getItems();
 
-		expect( selector.__unstableNormalizeArgs ).not.toHaveBeenCalled();
+		expect( selector.normalizeArgs ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call the __unstableNormalizeArgs method on the selectors without resolvers', async () => {
+	it( 'should call the normalizeArgs method on the selectors without resolvers', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.__unstableNormalizeArgs = vi.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
 			selectors: {
 				getItems: selector,
+			},
+		} );
+
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( selector.normalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
+		] );
+	} );
+
+	it( 'should call the legacy __unstableNormalizeArgs method', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = vi.fn( ( args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
 			},
 		} );
 
@@ -581,14 +605,11 @@ describe( 'resolution args', () => {
 		expect( suspend.getItem( 'a', 7 ) ).toBeUndefined();
 	} );
 
-	it( 'should apply getResolutionArgs after __unstableNormalizeArgs', async () => {
+	it( 'should apply getResolutionArgs after normalizeArgs', async () => {
 		const registry = createRegistry();
 		const selector = ( state, field, id ) => state[ id ]?.[ field ];
 		// Coerce the numeric id, then drop the field.
-		selector.__unstableNormalizeArgs = ( [ field, id ] ) => [
-			field,
-			Number( id ),
-		];
+		selector.normalizeArgs = ( [ field, id ] ) => [ field, Number( id ) ];
 		const fulfill = vi.fn( () => () => {} );
 
 		registry.registerStore( 'store', {

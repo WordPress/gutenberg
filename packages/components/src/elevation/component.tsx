@@ -5,7 +5,7 @@ import { View } from '../view';
 import { useElevation } from './hook';
 import type { ElevationProps } from './types';
 
-function UnconnectedElevation(
+export function UnconnectedElevation(
 	props: WordPressComponentProps< ElevationProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {

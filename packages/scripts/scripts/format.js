@@ -95,10 +95,12 @@ if ( fileArgs.length === 0 ) {
 const globArgs = dirGlob( fileArgs, {
 	extensions: [
 		'cjs',
+		'cts',
 		'js',
 		'json',
 		'jsx',
 		'mjs',
+		'mts',
 		'ts',
 		'tsx',
 		'yml',

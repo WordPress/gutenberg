@@ -120,6 +120,7 @@ describe( 'test infrastructure policy', () => {
 					'@jest/globals': '^30.0.0',
 					'@testing-library/jest-dom': '^6.9.1',
 					'@types/jest': '^30.0.0',
+					'eslint-plugin-jest-dom': '^5.10.1',
 					'legacy-test': 'npm:@types/jest@^30.0.0',
 					'test-runner': 'npm:jest@^30.0.0',
 				},
@@ -146,12 +147,13 @@ describe( 'test infrastructure policy', () => {
 			'config:packages/example/package.json:jest',
 			'dependency:packages/example/package.json:devDependencies.@jest/globals',
 			'dependency:packages/example/package.json:devDependencies.@types/jest',
+			'dependency:packages/example/package.json:devDependencies.eslint-plugin-jest-dom',
 			'dependency:packages/example/package.json:devDependencies.legacy-test',
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );
 	} );
 
-	it( 'requires deterministic file-order shuffling', () => {
+	it( 'requires file and test-order shuffling without a fixed seed', () => {
 		const validRootPackageJson = {
 			scripts: {
 				'test:unit:vitest:shuffled':
@@ -161,7 +163,7 @@ describe( 'test infrastructure policy', () => {
 		const validUnitTestPackageJson = {
 			scripts: {
 				'test:unit:vitest:shuffled':
-					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855',
+					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests',
 			},
 		};
 
@@ -178,16 +180,20 @@ describe( 'test infrastructure policy', () => {
 		).toEqual( [
 			'package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --`',
 		] );
-		expect(
-			validateVitestShuffleScripts( validRootPackageJson, {
-				scripts: {
-					'test:unit:vitest:shuffled':
-						'npm run test:unit:vitest -- --sequence.shuffle --sequence.seed=80855',
-				},
-			} )
-		).toEqual( [
-			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855`',
-		] );
+		for ( const command of [
+			'npm run test:unit:vitest -- --sequence.shuffle.files',
+			'npm run test:unit:vitest -- --sequence.shuffle.tests',
+			'npm run test:unit:vitest -- --sequence.shuffle',
+			'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests --sequence.seed=80855',
+		] ) {
+			expect(
+				validateVitestShuffleScripts( validRootPackageJson, {
+					scripts: { 'test:unit:vitest:shuffled': command },
+				} )
+			).toEqual( [
+				'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests`',
+			] );
+		}
 		expect(
 			validateVitestShuffleScripts(
 				validRootPackageJson,

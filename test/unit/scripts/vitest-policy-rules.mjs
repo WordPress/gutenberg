@@ -2264,7 +2264,7 @@ export function validateVitestPolicy( {
 		}
 
 		if (
-			/\.tsx?$/.test( file ) &&
+			/\.[cm]?tsx?$/.test( file ) &&
 			node.type === 'CallExpression' &&
 			node.callee?.type === 'MemberExpression' &&
 			isImportedApiReference(

@@ -195,4 +195,80 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	public function test_unregister_unknown_collection() {
 		$this->assertFalse( $this->collections->unregister( 'ghost' ) );
 	}
+
+	/**
+	 * Should register collections as public by default.
+	 */
+	public function test_register_collection_defaults_to_public() {
+		$this->collections->register( 'my-collection', array( 'label' => 'My Collection' ) );
+
+		$this->assertTrue( $this->collections->get_registered( 'my-collection' )['public'] );
+	}
+
+	/**
+	 * Should preserve explicitly configured collection visibility.
+	 *
+	 * @dataProvider data_boolean_public_properties
+	 *
+	 * @param bool $is_public Whether the collection is public.
+	 */
+	public function test_register_collection_accepts_boolean_public_property( $is_public ) {
+		$result = $this->collections->register(
+			'my-collection',
+			array(
+				'label'  => 'My Collection',
+				'public' => $is_public,
+			)
+		);
+
+		$this->assertTrue( $result );
+		$this->assertSame( $is_public, $this->collections->get_registered( 'my-collection' )['public'] );
+	}
+
+	/**
+	 * Provides supported collection visibility values.
+	 *
+	 * @return array[]
+	 */
+	public function data_boolean_public_properties() {
+		return array(
+			'public collection'     => array( true ),
+			'non-public collection' => array( false ),
+		);
+	}
+
+	/**
+	 * Should reject collection visibility values that are not booleans.
+	 *
+	 * @dataProvider data_non_boolean_public_properties
+	 * @expectedIncorrectUsage WP_Icon_Collections_Registry_Gutenberg::register
+	 *
+	 * @param mixed $is_public Invalid collection visibility value.
+	 */
+	public function test_register_collection_rejects_non_boolean_public_property( $is_public ) {
+		$result = $this->collections->register(
+			'my-collection',
+			array(
+				'label'  => 'My Collection',
+				'public' => $is_public,
+			)
+		);
+
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->collections->is_registered( 'my-collection' ) );
+	}
+
+	/**
+	 * Provides unsupported collection visibility values.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_boolean_public_properties() {
+		return array(
+			'null'    => array( null ),
+			'string'  => array( 'false' ),
+			'integer' => array( 0 ),
+			'array'   => array( array() ),
+		);
+	}
 }

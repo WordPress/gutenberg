@@ -9,7 +9,8 @@ import { Link } from '../../link';
 import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
-	title: 'Design System/Components/Popover',
+	title: 'Components/@wordpress-ui/Popover',
+	id: 'design-system-components-popover',
 	component: Popover.Root,
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,
@@ -310,7 +311,6 @@ export const Modal: Story = {
 					>
 						Name
 						<input
-							// eslint-disable-next-line no-restricted-syntax
 							id="popover-test-name-id"
 							type="text"
 							placeholder="Enter your name"
@@ -327,7 +327,6 @@ export const Modal: Story = {
 					>
 						Email
 						<input
-							// eslint-disable-next-line no-restricted-syntax
 							id="popover-test-email-id"
 							type="email"
 							placeholder="Enter your email"

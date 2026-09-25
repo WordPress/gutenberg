@@ -13,6 +13,12 @@ const config = [
 		ignores: [ '**/build/**', '**/node_modules/**', '**/vendor/**' ],
 	},
 
+	/*
+	 * ESLint's default file discovery covers only `.js`, `.mjs` and `.cjs`.
+	 * Every other extension has to be named before any config below applies.
+	 */
+	{ files: [ '**/*.jsx', '**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts' ] },
+
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
 
@@ -20,8 +26,8 @@ const config = [
 	...wpPlugin.configs[ 'test-unit' ].map( ( c ) => ( {
 		...c,
 		files: [
-			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs}',
-			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs}',
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs,mts,cts}',
 		],
 	} ) ),
 ];

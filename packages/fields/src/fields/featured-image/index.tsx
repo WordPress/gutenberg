@@ -1,6 +1,6 @@
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import MediaEdit from '../../components/media-edit';
+import FeaturedImageEdit from './edit';
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 import { FeaturedImageView } from './featured-image-view';
 
@@ -9,7 +9,7 @@ const featuredImageField: Field< BasePostWithEmbeddedFeaturedMedia > = {
 	type: 'media',
 	label: __( 'Featured Image' ),
 	placeholder: __( 'Set featured image' ),
-	Edit: ( props ) => <MediaEdit { ...props } isExpanded />,
+	Edit: FeaturedImageEdit,
 	render: FeaturedImageView,
 	setValue: ( { value } ) => ( {
 		featured_media: value ?? 0,

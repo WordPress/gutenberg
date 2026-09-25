@@ -57,7 +57,6 @@ describe( 'SearchableSelect', () => {
 					aria-describedby="searchable-select-description"
 					items={ ITEMS }
 				/>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-description">My description</p>
 			</>
 		);
@@ -82,7 +81,6 @@ describe( 'SearchableSelect', () => {
 
 		await render(
 			<>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-label">My label</p>
 				<SearchableSelect
 					aria-labelledby="searchable-select-label"

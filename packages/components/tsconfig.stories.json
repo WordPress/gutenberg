@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	/*
-	 * Type checks stories against sources without jest types. Kept out of the
+	 * Type checks stories against sources without test types. Kept out of the
 	 * package tsconfig.json so Storybook's meta extractor stays on its inferred
 	 * project.
 	 */

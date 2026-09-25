@@ -19,7 +19,7 @@ import {
 	DropdownMenu,
 	SearchControl,
 	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
@@ -418,7 +418,7 @@ function FontCollection( { slug }: { slug: string } ) {
 								{ __( 'Select font variants to install.' ) }
 							</WCText>
 							<Spacer margin={ 4 } />
-							<CheckboxControl
+							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
 								checked={ isSelectAllChecked }

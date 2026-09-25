@@ -7,79 +7,83 @@
  * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
  */
 function gutenberg_get_allowed_icon_svg_tags(): array {
-	$stroke_attributes = array(
-		'style'             => true,
-		'stroke'            => true,
-		'stroke-width'      => true,
-		'stroke-linecap'    => true,
-		'stroke-linejoin'   => true,
-		'stroke-miterlimit' => true,
-		'vector-effect'     => true,
+	$allow_attributes = static function ( string ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	};
+
+	$stroke_attributes = $allow_attributes(
+		'style',
+		'stroke',
+		'stroke-width',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'vector-effect',
 	);
 
 	return array(
 		'svg'     => array_merge(
-			array(
-				'class'       => true,
-				'xmlns'       => true,
-				'width'       => true,
-				'height'      => true,
-				'viewbox'     => true,
-				'aria-hidden' => true,
-				'role'        => true,
-				'focusable'   => true,
-				'fill'        => true,
-				'fill-rule'   => true,
-				'clip-rule'   => true,
+			$allow_attributes(
+				'class',
+				'xmlns',
+				'width',
+				'height',
+				'viewbox',
+				'aria-hidden',
+				'role',
+				'focusable',
+				'fill',
+				'fill-rule',
+				'clip-rule',
 			),
 			$stroke_attributes
 		),
 		'path'    => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'd'         => true,
-				'opacity'   => true,
-				'transform' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'd',
+				'opacity',
+				'transform',
 			),
 			$stroke_attributes
 		),
 		'polygon' => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'points'    => true,
-				'transform' => true,
-				'focusable' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'points',
+				'transform',
+				'focusable',
 			),
 			$stroke_attributes
 		),
 		'rect'    => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'x'         => true,
-				'y'         => true,
-				'width'     => true,
-				'height'    => true,
-				'rx'        => true,
-				'ry'        => true,
-				'transform' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'x',
+				'y',
+				'width',
+				'height',
+				'rx',
+				'ry',
+				'transform',
 			),
 			$stroke_attributes
 		),
 		'circle'  => array_merge(
-			array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'clip-rule' => true,
-				'cx'        => true,
-				'cy'        => true,
-				'r'         => true,
-				'transform' => true,
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'cx',
+				'cy',
+				'r',
+				'transform',
 			),
 			$stroke_attributes
 		),
@@ -108,10 +112,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *                             If not provided, the content will be retrieved from the `file_path` if set.
 	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
 	 *     @type string $file_path Optional. The full path to the file containing the icon content.
-	 *     @type bool   $public    Optional. Whether the icon is exposed through the REST API, and
-	 *                             therefore selectable in the editor's Icon block. Non-public icons
-	 *                             stay available to server-side code via {@see wp_get_icon()}.
-	 *                             Default true.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -154,7 +154,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'public' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -188,15 +188,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				__METHOD__,
 				__( 'Icon label must be a string.', 'gutenberg' ),
 				'7.0.0'
-			);
-			return false;
-		}
-
-		if ( isset( $icon_properties['public'] ) && ! is_bool( $icon_properties['public'] ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'Icon public property must be a boolean.', 'gutenberg' ),
-				'7.2.0'
 			);
 			return false;
 		}
@@ -373,7 +364,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * The base `$instance` slot is intentionally not redefined, so both
 	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
 	 * one instance. An existing base registry is upgraded, replaying any
-	 * non-`core/` icons so they are not lost.
+	 * non-`core/` and non-`core-admin/` icons so they are not lost.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -382,7 +373,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 			if ( null !== $original_registry ) {
 				foreach ( $original_registry->get_registered_icons() as $icon ) {
-					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) || str_starts_with( $icon['name'], 'core-admin/' ) ) {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );
@@ -392,9 +383,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 						$icon_properties['file_path'] = $icon['file_path'];
 					} else {
 						continue;
-					}
-					if ( isset( $icon['public'] ) ) {
-						$icon_properties['public'] = $icon['public'];
 					}
 					$gutenberg_registry->register( $icon['name'], $icon_properties );
 				}

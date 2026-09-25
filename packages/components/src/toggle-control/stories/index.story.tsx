@@ -6,7 +6,7 @@ import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/ToggleControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/ToggleControl',
 	id: 'components-togglecontrol',
 	component: ToggleControl,
 	argTypes: {

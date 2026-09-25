@@ -9,7 +9,8 @@ import {
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableSelect > = {
-	title: 'Design System/Components/Form/Primitives/SearchableSelect',
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableSelect',
+	id: 'design-system-components-form-primitives-searchableselect',
 	component: SearchableSelect,
 	subcomponents: {
 		'SearchableSelect.Group': SearchableSelect.Group,
