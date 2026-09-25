@@ -2,7 +2,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
@@ -57,7 +57,13 @@ export default function WelcomeBanner() {
 		<Stack className={ styles.root } direction="column" gap="lg">
 			<Banner />
 
-			<Stack className={ styles.columns }>
+			<Stack className={ styles[ 'section-heading' ] }>
+				<Text variant="heading-lg" render={ <h2 /> }>
+					{ __( 'Get started with WordPress' ) }
+				</Text>
+			</Stack>
+
+			<Stack className={ styles.columns } align="start">
 				<FeatureHighlight
 					icon={ pencil }
 					title={ __(
