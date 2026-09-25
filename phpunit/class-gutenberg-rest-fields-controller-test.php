@@ -58,7 +58,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
-	 * the defaults; the next read fires `gutenberg_fields_init` again and
+	 * the defaults; the next read fires `gutenberg_fields_api_init` again and
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
