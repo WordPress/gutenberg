@@ -133,7 +133,7 @@ function InputField(
 		( dragProps ) => {
 			const { distance, dragging, event, target } = dragProps;
 
-			// The drag gesture is not offered on touch devices, where there is
+			// The drag gesture is not offered for touch input, where there is
 			// no cursor affordance for it, and where it's easy to accidentally
 			// change the value when only meaning to tap or move the caret.
 			if (

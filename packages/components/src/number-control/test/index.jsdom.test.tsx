@@ -580,9 +580,8 @@ describe( 'NumberControl', () => {
 			fireEvent( type === 'touchstart' ? input : window, event );
 		};
 
-		it( 'should not change the value when dragging on a touch device', () => {
-			const onChange = vi.fn();
-			render( <NumberControl value="5" onChange={ onChange } /> );
+		it( 'should not change the value when dragging with touch input', () => {
+			render( <StatefulNumberControl value="5" /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			fireTouchEvent( 'touchstart', input, 0 );
@@ -590,7 +589,6 @@ describe( 'NumberControl', () => {
 			fireTouchEvent( 'touchmove', input, -60 );
 			fireTouchEvent( 'touchend', input, -60 );
 
-			expect( onChange ).not.toHaveBeenCalled();
 			expect( input ).toHaveValue( 5 );
 		} );
 	} );
