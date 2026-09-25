@@ -19,6 +19,7 @@
 -   Media & Text: Replace deprecated `word-break: break-word` and prevent long content from widening the text column. Nested blocks that only override `word-break` can now wrap long unbroken text mid-word ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
+-   Post Template: preview the taxonomy's post type instead of posts when the Query Loop inherits the query in a custom taxonomy template ([#64692](https://github.com/WordPress/gutenberg/issues/64692)).
 
 ## 11.2.0 (2026-10-07)
 
