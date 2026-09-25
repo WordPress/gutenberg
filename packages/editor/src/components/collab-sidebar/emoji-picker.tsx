@@ -1,5 +1,6 @@
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Composite, SearchControl } from '@wordpress/components';
+import { Autocomplete, Icon, Input, InputLayout } from '@wordpress/ui';
+import { search } from '@wordpress/icons';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -36,7 +37,7 @@ interface EmojiPickerProps {
  */
 export const SKIN_TONE_PREFERENCE_KEY = 'emojiPickerSkinTone';
 
-const COLUMNS = 8;
+const COLUMNS = 6;
 
 /*
  * Unicode's Component group holds the skin-tone swatches and hair
@@ -255,8 +256,8 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const isSearching = !! query.trim();
 
 	/*
-	 * One flat grid: per-category sections would leave ragged rows that
-	 * dead-end keyboard navigation, under mostly-empty headers.
+	 * One flat grid of results, as in the macOS picker: per-category
+	 * sections would scatter a few hits under mostly-empty headers.
 	 */
 	const searchRows = useMemo(
 		() =>
@@ -353,9 +354,8 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	 * @return The rendered row.
 	 */
 	const renderRow = ( row: EmojibaseEntry[], rowKey: string ) => (
-		<Composite.Row
+		<Autocomplete.Row
 			key={ rowKey }
-			role="row"
 			className="editor-collab-sidebar-panel__picker-row"
 		>
 			{ row.map( ( emoji ) => {
@@ -365,105 +365,152 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 				 */
 				const display = applySkinTone( emoji, skinTone );
 				return (
-					<Composite.Item
+					<Autocomplete.Item
 						key={ emoji.hexcode }
-						role="gridcell"
+						value={ display.emoji }
 						className="editor-collab-sidebar-panel__picker-emoji"
 						aria-label={ labelFor( display ) }
+						// Enter on the highlighted cell clicks it too.
 						onClick={ () => {
 							recordUse( normalizeHexcode( emoji.hexcode ) );
 							onSelect( display.emoji );
 						} }
 					>
 						{ display.emoji }
-					</Composite.Item>
+					</Autocomplete.Item>
 				);
 			} ) }
-		</Composite.Row>
+		</Autocomplete.Row>
 	);
 
 	return (
 		<div className="editor-collab-sidebar-panel__picker">
-			<div className="editor-collab-sidebar-panel__picker-search">
-				<SearchControl
-					ref={ searchRef }
-					value={ query }
-					onChange={ setQuery }
-					placeholder={ __( 'Search emoji' ) }
-					label={ __( 'Search emoji' ) }
-				/>
-				<SkinTonePicker
-					value={ skinTone }
-					onChange={ ( tone ) =>
-						setPreference( 'core', SKIN_TONE_PREFERENCE_KEY, tone )
+			{ /*
+			 * An always-open inline autocomplete: focus stays in the search
+			 * field while the arrow keys move a highlight through the grid
+			 * (`aria-activedescendant`), and Enter picks the highlighted
+			 * emoji. Filtering stays ours (`mode="none"`), since it matches
+			 * label overrides and Emojibase tags.
+			 */ }
+			<Autocomplete.Root
+				inline
+				open
+				grid
+				mode="none"
+				// Enter picks the top hit once the user has typed.
+				autoHighlight
+				value={ query }
+				onValueChange={ ( value, { reason } ) => {
+					// Picking a cell would otherwise copy the emoji into the field.
+					if ( reason !== 'item-press' ) {
+						setQuery( value );
 					}
-				/>
-			</div>
-			<div
-				ref={ viewportRef }
-				className="editor-collab-sidebar-panel__picker-viewport"
+				} }
 			>
-				{ isLoading && (
-					<div className="editor-collab-sidebar-panel__picker-status">
-						{ __( 'Loading…' ) }
-					</div>
-				) }
-				{ error && ! isLoading && (
-					<div className="editor-collab-sidebar-panel__picker-status">
-						{ __( 'Couldn’t load emojis.' ) }
-					</div>
-				) }
-				{ ! isLoading && ! error && matchCount === 0 && (
-					<div className="editor-collab-sidebar-panel__picker-status">
-						{ __( 'No emoji found.' ) }
-					</div>
-				) }
-				{ ! isLoading && ! error && matchCount > 0 && (
-					<Composite
-						role="grid"
-						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
-						/*
-						 * Results rarely fill a whole last row, so arrowing
-						 * down into a missing column shifts to the nearest
-						 * cell instead of dead-ending.
-						 */
-						focusShift
-						className="editor-collab-sidebar-panel__picker-list"
-					>
-						{ isSearching &&
-							searchRows.map( ( row, rowIndex ) =>
-								renderRow( row, `search-${ rowIndex }` )
+				<div className="editor-collab-sidebar-panel__picker-search">
+					<Autocomplete.InputGroup className="editor-collab-sidebar-panel__picker-input">
+						<Autocomplete.Input
+							ref={ searchRef }
+							aria-label={ __( 'Search emoji' ) }
+							placeholder={ __( 'Search emoji' ) }
+							render={
+								<Input
+									prefix={
+										<InputLayout.Slot padding="minimal">
+											<Icon icon={ search } />
+										</InputLayout.Slot>
+									}
+									suffix={
+										isSearching ? (
+											<InputLayout.Slot padding="minimal">
+												<Autocomplete.Clear
+													aria-label={ __(
+														'Reset search'
+													) }
+												/>
+											</InputLayout.Slot>
+										) : undefined
+									}
+								/>
+							}
+						/>
+					</Autocomplete.InputGroup>
+					<SkinTonePicker
+						value={ skinTone }
+						onChange={ ( tone ) =>
+							setPreference(
+								'core',
+								SKIN_TONE_PREFERENCE_KEY,
+								tone
+							)
+						}
+					/>
+				</div>
+				<div
+					ref={ viewportRef }
+					className="editor-collab-sidebar-panel__picker-viewport"
+				>
+					{ isLoading && (
+						<div className="editor-collab-sidebar-panel__picker-status">
+							{ __( 'Loading…' ) }
+						</div>
+					) }
+					{ error && ! isLoading && (
+						<div className="editor-collab-sidebar-panel__picker-status">
+							{ __( 'Couldn’t load emojis.' ) }
+						</div>
+					) }
+					{ ! isLoading && ! error && matchCount === 0 && (
+						<div className="editor-collab-sidebar-panel__picker-status">
+							{ __( 'No emoji found.' ) }
+						</div>
+					) }
+					{ ! isLoading && ! error && matchCount > 0 && (
+						<Autocomplete.List
+							aria-label={ _x(
+								'Emoji',
+								'emoji picker grid label'
 							) }
-						{ ! isSearching && frequentRows.length > 0 && (
-							<Composite.Group role="rowgroup">
-								<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
-									{ __( 'Frequently used' ) }
-								</Composite.GroupLabel>
-								{ frequentRows.map( ( row, rowIndex ) =>
-									renderRow( row, `frequent-${ rowIndex }` )
+							className="editor-collab-sidebar-panel__picker-list"
+						>
+							{ isSearching &&
+								searchRows.map( ( row, rowIndex ) =>
+									renderRow( row, `search-${ rowIndex }` )
 								) }
-							</Composite.Group>
-						) }
-						{ ! isSearching &&
-							visibleGroups.map( ( group ) => (
-								<Composite.Group
-									key={ group.key }
-									role="rowgroup"
-								>
-									<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
-										{ getGroupLabel( group.key ) }
-									</Composite.GroupLabel>
-									{ group.rows.map( ( row, rowIndex ) =>
+							{ ! isSearching && frequentRows.length > 0 && (
+								<Autocomplete.Group className="editor-collab-sidebar-panel__picker-group">
+									<Autocomplete.GroupLabel className="editor-collab-sidebar-panel__picker-category">
+										{ __( 'Frequently used' ) }
+									</Autocomplete.GroupLabel>
+									{ frequentRows.map( ( row, rowIndex ) =>
 										renderRow(
 											row,
-											`${ group.key }-${ rowIndex }`
+											`frequent-${ rowIndex }`
 										)
 									) }
-								</Composite.Group>
-							) ) }
-					</Composite>
-				) }
-			</div>
+								</Autocomplete.Group>
+							) }
+							{ ! isSearching &&
+								visibleGroups.map( ( group ) => (
+									<Autocomplete.Group
+										key={ group.key }
+										className="editor-collab-sidebar-panel__picker-group"
+									>
+										<Autocomplete.GroupLabel className="editor-collab-sidebar-panel__picker-category">
+											{ getGroupLabel( group.key ) }
+										</Autocomplete.GroupLabel>
+										{ group.rows.map( ( row, rowIndex ) =>
+											renderRow(
+												row,
+												`${ group.key }-${ rowIndex }`
+											)
+										) }
+									</Autocomplete.Group>
+								) ) }
+						</Autocomplete.List>
+					) }
+				</div>
+			</Autocomplete.Root>
 		</div>
 	);
 }

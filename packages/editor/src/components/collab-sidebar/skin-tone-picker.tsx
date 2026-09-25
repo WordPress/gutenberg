@@ -178,7 +178,7 @@ export default function SkinTonePicker( {
 			focusOnMount={ false }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					size="compact"
+					__next40pxDefaultSize
 					className="editor-collab-sidebar-panel__skin-tone-toggle"
 					onClick={ onToggle }
 					aria-haspopup="dialog"

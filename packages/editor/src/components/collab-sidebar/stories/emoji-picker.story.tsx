@@ -6,7 +6,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import EmojiPicker from '../emoji-picker';
 
 /**
- * The full searchable emoji picker used by Notes reactions: an 8-column
+ * The full searchable emoji picker used by Notes reactions: a 6-column
  * grid grouped by category, filtered by label and tag search.
  *
  * The dataset comes from the `noteEmojibaseUrl` editor setting. Storybook
