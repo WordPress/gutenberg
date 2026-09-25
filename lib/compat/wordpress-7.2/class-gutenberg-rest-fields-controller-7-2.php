@@ -10,7 +10,7 @@
  * registered for a given entity type.
  *
  * The fields are the ones registered on the server on the
- * `gutenberg_fields_api_init` action: the serializable part of each field, plus
+ * `fields_api_init` action: the serializable part of each field, plus
  * the script modules that provide the JavaScript parts (render callbacks,
  * components, value getters and setters), each with the ids of the fields
  * it applies to. The client merges both into the fields it derives itself.
