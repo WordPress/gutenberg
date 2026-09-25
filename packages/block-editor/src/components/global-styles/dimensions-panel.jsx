@@ -30,31 +30,6 @@ import {
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-/**
- * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
- * renders its linked/unlink toggle button, which the local-override reset dot
- * offsets itself against.
- *
- * @param {string[]|undefined} sides            Configurable sides for the control.
- * @param {boolean}            isPresetsControl Whether the presets-based
- *                                              `SpacingSizesControl` is used.
- *
- * @return {boolean} Whether the toggle button is rendered.
- */
-function hasSpacingToggle( sides, isPresetsControl ) {
-	if ( sides?.length === 1 ) {
-		return false;
-	}
-	if ( isPresetsControl ) {
-		const hasOnlyAxialSides =
-			sides?.includes( 'horizontal' ) &&
-			sides?.includes( 'vertical' ) &&
-			sides?.length === 2;
-		return ! hasOnlyAxialSides;
-	}
-	return true;
-}
-
 export function useHasDimensionsPanel(
 	settings,
 	styleState = DEFAULT_BLOCK_STYLE_STATE
@@ -760,6 +735,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showContentSizeControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="layout.contentSize"
 					{ ...inheritanceProps(
 						isContentSizePlaceholder,
 						hasUserSetContentSizeValue() &&
@@ -806,6 +782,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showWideSizeControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="layout.wideSize"
 					{ ...inheritanceProps(
 						isWideSizePlaceholder,
 						hasUserSetWideSizeValue() &&
@@ -851,14 +828,11 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						paddingSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
+					inheritancePath="spacing.padding"
 					{ ...inheritanceProps(
 						isPaddingInherited,
 						hasPaddingValue() && hasInheritedPadding,
@@ -905,14 +879,11 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						marginSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
+					inheritancePath="spacing.margin"
 					{ ...inheritanceProps(
 						isMarginInherited,
 						hasMarginValue() && hasInheritedMargin,
@@ -968,11 +939,11 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
-					hasInlineEndToggle={ isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
+					inheritancePath="spacing.blockGap"
 					{ ...inheritanceProps(
 						isGapPlaceholder,
 						hasGapValue() && inheritedGapRaw !== undefined,
@@ -1043,6 +1014,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showMinHeightControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="dimensions.minHeight"
 					{ ...inheritanceProps(
 						isMinHeightPlaceholder,
 						hasMinHeightValue() &&
@@ -1078,6 +1050,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showMinWidthControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="dimensions.minWidth"
 					{ ...inheritanceProps(
 						isMinWidthPlaceholder,
 						hasMinWidthValue() &&
@@ -1112,6 +1085,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showHeightControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="dimensions.height"
 					{ ...inheritanceProps(
 						isHeightPlaceholder,
 						hasHeightValue() && inheritedHeightValue !== undefined
@@ -1139,6 +1113,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showWidthControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="dimensions.width"
 					{ ...inheritanceProps(
 						isWidthPlaceholder,
 						hasWidthValue() && inheritedWidthValue !== undefined
@@ -1168,6 +1143,7 @@ export default function DimensionsPanel( {
 					value={ aspectRatioValue }
 					onChange={ setAspectRatioValue }
 					panelId={ panelId }
+					inheritancePath="dimensions.aspectRatio"
 					{ ...inheritanceProps(
 						isAspectRatioPlaceholder,
 						hasAspectRatioValue() &&

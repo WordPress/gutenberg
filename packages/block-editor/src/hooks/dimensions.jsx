@@ -9,6 +9,7 @@ import {
 	useHasDimensionsPanel,
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { InheritanceSourceContext } from '../components/global-styles/inheritance';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -86,11 +87,8 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyle(
-		name,
-		className,
-		selectedState
-	);
+	const resolvedStyle = useResolvedStyle( name, className, selectedState );
+	const { value: inheritedValue } = resolvedStyle;
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
@@ -132,23 +130,25 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 
 	return (
 		<>
-			<StylesDimensionsPanel
-				as={ DimensionsInspectorControl }
-				panelId={ clientId }
-				settings={ settings }
-				allowAxialBlockGap={ isAxialBlockGapAllowed(
-					layout,
-					defaultLayout
-				) }
-				value={ value }
-				onChange={ onChange }
-				defaultControls={ defaultControls }
-				styleState={ selectedState }
-				onVisualize={
-					isStateSelected ? undefined : setVisualizedProperty
-				}
-				inheritedValue={ inheritedValue }
-			/>
+			<InheritanceSourceContext.Provider value={ resolvedStyle }>
+				<StylesDimensionsPanel
+					as={ DimensionsInspectorControl }
+					panelId={ clientId }
+					settings={ settings }
+					allowAxialBlockGap={ isAxialBlockGapAllowed(
+						layout,
+						defaultLayout
+					) }
+					value={ value }
+					onChange={ onChange }
+					defaultControls={ defaultControls }
+					styleState={ selectedState }
+					onVisualize={
+						isStateSelected ? undefined : setVisualizedProperty
+					}
+					inheritedValue={ inheritedValue }
+				/>
+			</InheritanceSourceContext.Provider>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (

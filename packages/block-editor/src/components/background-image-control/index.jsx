@@ -28,10 +28,6 @@ import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
 import { getResolvedValue } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import {
-	InheritanceResetButton,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -185,7 +181,6 @@ function BackgroundControlsPanel( {
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 	onReset,
-	hasLocalOverride,
 	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
@@ -218,38 +213,24 @@ function BackgroundControlsPanel( {
 							as="button"
 							onToggleCallback={ onToggleCallback }
 						/>
-						{ onReset &&
-							( hasLocalOverride ? (
-								<InheritanceResetButton
-									className="block-editor-global-styles-background-panel__reset"
-									onResetToInherited={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) : (
-								<Button
-									__next40pxDefaultSize
-									label={ __( 'Reset' ) }
-									className="block-editor-global-styles-background-panel__reset"
-									size="small"
-									icon={ resetIcon }
-									onClick={ () => {
-										onReset();
-										// Close the dropdown if open.
-										if ( isOpen ) {
-											onToggle();
-										}
-										// Focus the toggle button.
-										focusToggleButton( containerRef );
-									} }
-								/>
-							) ) }
+						{ onReset && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
+								} }
+							/>
+						) }
 					</>
 				);
 			} }
@@ -687,7 +668,9 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	// Still accepted so callers keep working; it only gated the removed reset dot.
+	// eslint-disable-next-line no-unused-vars
+	showInheritanceLabelIndicators,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -736,14 +719,6 @@ export default function BackgroundImagePanel( {
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
-	// The blue-dot local-override affordance is part of the inherited-value
-	// treatment. When that treatment is disabled (e.g. in the Global Styles
-	// panel, where the edited value *is* the global style rather than a local
-	// override of it), fall back to the plain reset control.
-	const hasLocalOverride =
-		showInheritanceLabelIndicators &&
-		localHasImageValue &&
-		hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue =
 		value?.background?.backgroundImage ||
@@ -776,7 +751,6 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
-					hasLocalOverride={ hasLocalOverride }
 					onReset={ localHasImageValue ? resetBackground : undefined }
 					containerRef={ containerRef }
 				>

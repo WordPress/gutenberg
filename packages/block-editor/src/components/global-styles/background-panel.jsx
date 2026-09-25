@@ -351,12 +351,12 @@ export default function BackgroundImagePanel( {
 		>
 			{ showBackgroundImageControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="background.backgroundImage"
 					{ ...inheritanceProps(
 						inheritedBackgroundImage && ! hasLocalBackgroundImage,
 						hasLocalBackgroundImage && inheritedBackgroundImage,
 						'block-editor-color-gradient-item'
 					) }
-					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -392,6 +392,7 @@ export default function BackgroundImagePanel( {
 						backgroundColor !== undefined
 					}
 					hasInheritedValue={ backgroundColor !== undefined }
+					inheritancePath="color.background"
 					tabs={ [
 						{
 							key: 'background',
@@ -438,6 +439,7 @@ export default function BackgroundImagePanel( {
 						inheritedGradient !== undefined
 					}
 					hasInheritedValue={ inheritedGradient !== undefined }
+					inheritancePath="color.gradient"
 					tabs={ [
 						{
 							key: 'gradient',
@@ -485,6 +487,7 @@ export default function BackgroundImagePanel( {
 						legacyColorGradient !== undefined
 					}
 					hasInheritedValue={ legacyColorGradient !== undefined }
+					inheritancePath="color.gradient"
 					tabs={ [
 						{
 							key: 'gradient',

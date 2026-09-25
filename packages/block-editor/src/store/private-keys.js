@@ -17,3 +17,5 @@ export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
 export const mediaSideloadFromUrlKey = Symbol( 'mediaSideloadFromUrl' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
+export const styleOriginUrlKey = Symbol( 'styleOriginUrl' );
+export const globalStylesUserDataKey = Symbol( 'globalStylesUserData' );

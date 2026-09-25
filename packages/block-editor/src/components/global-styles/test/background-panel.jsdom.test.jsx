@@ -248,10 +248,10 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
+				screen.queryAllByRole( 'button', {
 					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				} )
+			).toHaveLength( 0 );
 		} );
 
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {
@@ -278,7 +278,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Background image slot', () => {
-		it( 'exposes an accessible reset-to-inherited button when size/position/repeat settings are enabled', () => {
+		it( 'renders no reset dot when size/position/repeat settings are enabled', () => {
 			const inheritedValue = {
 				background: {
 					backgroundImage: {
@@ -312,10 +312,10 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
+				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
 				} )
-			).toBeInTheDocument();
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {

@@ -53,7 +53,7 @@ const baseSettings = {
 };
 
 describe( 'FiltersPanel — visual treatment and display-without-commit', () => {
-	it( 'renders the InheritanceResetButton for a local override', () => {
+	it( 'renders no reset dot for a local override', () => {
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};
@@ -72,10 +72,10 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 		);
 
 		expect(
-			screen.getByRole( 'button', {
+			screen.queryByRole( 'button', {
 				name: /reset to inherited value/i,
 			} )
-		).toBeInTheDocument();
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders the default reset button for a locally-set duotone with no inherited value', () => {

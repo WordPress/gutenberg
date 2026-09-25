@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { addQueryArgs } from '@wordpress/url';
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -114,7 +115,20 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	styleOriginUrlKey,
+	globalStylesUserDataKey,
 } = unlock( privateApis );
+
+/**
+ * Builds the link to a Global Styles screen in the Site Editor, so the block
+ * inspector can link an inherited value to where it is defined.
+ *
+ * @param {string} section Global Styles screen path, e.g. `/blocks/core%2Fheading`.
+ * @return {string} Site Editor URL for that screen.
+ */
+function getStyleOriginUrl( section ) {
+	return addQueryArgs( 'site-editor.php', { p: '/styles', section } );
+}
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -136,6 +150,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
+		canEditGlobalStyles,
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
@@ -170,6 +185,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			);
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
+			const globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
@@ -222,6 +239,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
 				focusMode: get( 'core', 'focusMode' ),
+				canEditGlobalStyles:
+					!! globalStylesId &&
+					!! canUser( 'update', {
+						kind: 'root',
+						name: 'globalStyles',
+						id: globalStylesId,
+					} ),
 				hasFixedToolbar:
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
@@ -263,8 +287,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStyles();
+	const { merged: mergedGlobalStyles, user: userGlobalStyles } =
+		useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
+	// The site's own Styles changes, so the block inspector can tell a value
+	// customized in Styles apart from one that comes from the theme.
+	const globalStylesUserData = userGlobalStyles?.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
 	const settingsBlockPatterns =
@@ -363,6 +391,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			[ globalStylesUserDataKey ]: globalStylesUserData,
 			allImageSizes,
 			bigImageSizeThreshold,
 			imageStripMeta,
@@ -370,6 +399,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode,
+			[ styleOriginUrlKey ]:
+				canEditGlobalStyles && settings.__unstableIsBlockBasedTheme
+					? getStyleOriginUrl
+					: undefined,
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
@@ -461,6 +494,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,
+		canEditGlobalStyles,
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
@@ -480,6 +514,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
+		globalStylesUserData,
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,

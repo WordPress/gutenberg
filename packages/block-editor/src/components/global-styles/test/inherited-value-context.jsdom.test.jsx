@@ -250,9 +250,9 @@ describe( 'useResolvedStyle hook', () => {
 	test( 'returns empty value and sources during hydration', () => {
 		mockStores( null );
 		render( <Probe blockName="core/heading" /> );
-		expect( screen.getByTestId( 'probe' ) ).toHaveTextContent(
-			'{"value":{},"sources":{}}'
-		);
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value ).toEqual( {} );
+		expect( parsed.sources ).toEqual( {} );
 	} );
 
 	test( 'reads the block element passthrough from the merged payload', () => {

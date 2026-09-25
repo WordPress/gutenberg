@@ -27,7 +27,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-global-styles-inheritance-ui',
 					'label'       => __( 'Global Styles inheritance indicators in the block inspector', 'gutenberg' ),
-					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds a shortcut to clear a value you set back to the inherited one. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
+					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds an info button to each panel that says where every value comes from: the theme, the site’s Styles, the block, a parent block, or custom CSS. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-grid-interactivity',

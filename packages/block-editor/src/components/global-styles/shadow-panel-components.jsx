@@ -13,7 +13,6 @@ import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
 import { Tooltip } from '@wordpress/ui';
-import { InheritanceResetButton } from './inheritance';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -167,7 +166,7 @@ export function ShadowPopover( {
 }
 
 function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
-	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+	const { hasLocalValue, onReset } = resetConfig;
 	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
@@ -202,22 +201,16 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							__next40pxDefaultSize
-							size="small"
-							icon={ reset }
-							label={ __( 'Remove' ) }
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						__next40pxDefaultSize
+						size="small"
+						icon={ reset }
+						label={ __( 'Remove' ) }
+						className="block-editor-global-styles__shadow-editor__remove-button"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};

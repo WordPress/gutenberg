@@ -22,7 +22,6 @@ import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
@@ -121,7 +120,7 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 
 const renderToggle = ( duotone, resetConfig ) =>
 	function Toggle( { onToggle, isOpen } ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, onReset } = resetConfig;
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
@@ -151,21 +150,15 @@ const renderToggle = ( duotone, resetConfig ) =>
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							size="small"
-							icon={ resetIcon }
-							label={ __( 'Reset' ) }
-							className="block-editor-panel-duotone-settings__reset"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-duotone-settings__reset"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};
@@ -267,6 +260,7 @@ export default function FiltersPanel( {
 		>
 			{ hasDuotoneEnabled && (
 				<InheritanceToolsPanelItem
+					inheritancePath="filter.duotone"
 					{ ...inheritanceProps(
 						isDuotonePlaceholder,
 						localDuotone !== undefined &&
@@ -278,7 +272,6 @@ export default function FiltersPanel( {
 					isShownByDefault={ defaultControls.duotone }
 					// Toggle renders its own reset dot, so the item must not
 					// add a second.
-					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<Dropdown

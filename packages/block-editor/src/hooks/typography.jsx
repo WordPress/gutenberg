@@ -8,6 +8,7 @@ import {
 	useHasTypographyPanel,
 } from '../components/global-styles/typography-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { InheritanceSourceContext } from '../components/global-styles/inheritance';
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
@@ -195,11 +196,8 @@ export function TypographyPanel( {
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-	const { value: inheritedValue } = useResolvedStyle(
-		name,
-		className,
-		selectedState
-	);
+	const resolvedStyle = useResolvedStyle( name, className, selectedState );
+	const { value: inheritedValue } = resolvedStyle;
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
@@ -280,16 +278,18 @@ export function TypographyPanel( {
 	const Wrapper = asWrapper || TypographyInspectorControl;
 
 	return (
-		<StylesTypographyPanel
-			as={ Wrapper }
-			panelId={ clientId }
-			settings={ settings }
-			value={ value }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
-			contrastWarning={ contrastWarning }
-			inheritedValue={ inheritedValue }
-		/>
+		<InheritanceSourceContext.Provider value={ resolvedStyle }>
+			<StylesTypographyPanel
+				as={ Wrapper }
+				panelId={ clientId }
+				settings={ settings }
+				value={ value }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				contrastWarning={ contrastWarning }
+				inheritedValue={ inheritedValue }
+			/>
+		</InheritanceSourceContext.Provider>
 	);
 }
 
