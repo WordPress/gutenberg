@@ -656,6 +656,7 @@ describe( 'getFontStylesAndWeights', () => {
 			isVariableFont: false,
 		} );
 	} );
+
 	it( 'should resolve an oblique range descriptor to a style the property accepts', () => {
 		// Roboto Flex: a `slnt` axis of -10 to 0 declared as a descriptor range.
 		const fontFamilyFaces = [
@@ -711,6 +712,113 @@ describe( 'getFontStylesAndWeights', () => {
 		).toEqual( {
 			name: 'oblique 40deg',
 			value: 'oblique 40deg',
+		} );
+	} );
+
+	describe( 'variable font weight ranges', () => {
+		const weightsFor = ( fontWeight ) =>
+			getFontStylesAndWeights( [
+				{
+					fontFamily: 'Example Variable',
+					fontStyle: 'normal',
+					fontWeight,
+					src: 'https://example.org/example.woff2',
+				},
+			] ).fontWeights.map( ( weight ) => weight.value );
+
+		it( 'lists the hundreds inside a range that starts between hundreds', () => {
+			expect( weightsFor( '250 750' ) ).toEqual( [
+				'300',
+				'400',
+				'500',
+				'600',
+				'700',
+			] );
+		} );
+
+		it( 'lists the hundreds inside a range that starts below 100', () => {
+			expect( weightsFor( '50 900' ) ).toEqual( [
+				'100',
+				'200',
+				'300',
+				'400',
+				'500',
+				'600',
+				'700',
+				'800',
+				'900',
+			] );
+		} );
+
+		it( 'lists the hundreds up to a range that ends between hundreds', () => {
+			expect( weightsFor( '100 950' ) ).toEqual( [
+				'100',
+				'200',
+				'300',
+				'400',
+				'500',
+				'600',
+				'700',
+				'800',
+				'900',
+			] );
+		} );
+
+		it( 'reads the absolute keywords a range may use', () => {
+			expect( weightsFor( 'normal 900' ) ).toEqual( [
+				'400',
+				'500',
+				'600',
+				'700',
+				'800',
+				'900',
+			] );
+			expect( weightsFor( '100 bold' ) ).toEqual( [
+				'100',
+				'200',
+				'300',
+				'400',
+				'500',
+				'600',
+				'700',
+			] );
+			expect( weightsFor( 'NORMAL BOLD' ) ).toEqual( [
+				'400',
+				'500',
+				'600',
+				'700',
+			] );
+		} );
+
+		it( 'offers no weights for a range it cannot read, and does not call the face variable', () => {
+			const result = getFontStylesAndWeights( [
+				{
+					fontFamily: 'Example Variable',
+					fontStyle: 'normal',
+					fontWeight: 'lighter bolder',
+					src: 'https://example.org/example.woff2',
+				},
+			] );
+
+			expect( result.isVariableFont ).toBe( false );
+			expect(
+				result.fontWeights.map( ( weight ) => weight.value )
+			).toEqual( [ 'lighter bolder' ] );
+		} );
+
+		it( 'includes 1000 when the range reaches it', () => {
+			expect( weightsFor( '100 1000' ) ).toEqual( [
+				'100',
+				'200',
+				'300',
+				'400',
+				'500',
+				'600',
+				'700',
+				'800',
+				'900',
+				'1000',
+			] );
 		} );
 	} );
 } );
