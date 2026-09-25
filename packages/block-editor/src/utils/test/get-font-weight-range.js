@@ -37,4 +37,26 @@ describe( 'getFontWeightRange', () => {
 			] )
 		).toEqual( { min: 100, max: 900 } );
 	} );
+	it( 'reads a range named with the keywords the property accepts', () => {
+		expect(
+			getFontWeightRange( [
+				{ fontStyle: 'normal', fontWeight: 'normal 900' },
+			] )
+		).toEqual( { min: 400, max: 900 } );
+		expect(
+			getFontWeightRange( [
+				{ fontStyle: 'normal', fontWeight: '100 bold' },
+			] )
+		).toEqual( { min: 100, max: 700 } );
+	} );
+
+	it( 'skips a range naming a keyword the property does not accept', () => {
+		// `lighter` and `bolder` are relative to the parent, so `@font-face`
+		// does not take them and the face declares no range this can read.
+		expect(
+			getFontWeightRange( [
+				{ fontStyle: 'normal', fontWeight: 'lighter bolder' },
+			] )
+		).toBeUndefined();
+	} );
 } );

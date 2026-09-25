@@ -1,3 +1,4 @@
+import { parseFontWeightValue } from './parse-font-weight';
 import type { FontFamilyFace } from './types';
 
 /**
@@ -31,9 +32,10 @@ export function getFontWeightRange(
 		if ( parts.length < 2 ) {
 			return;
 		}
-		const start = parseInt( parts[ 0 ], 10 );
-		const end = parseInt( parts[ 1 ], 10 );
-		if ( Number.isNaN( start ) || Number.isNaN( end ) ) {
+		// Either end may be a keyword: "normal 900" is the range 400 to 900.
+		const start = parseFontWeightValue( parts[ 0 ] );
+		const end = parseFontWeightValue( parts[ 1 ] );
+		if ( start === undefined || end === undefined ) {
 			return;
 		}
 		const min = Math.min( start, end );
