@@ -1119,7 +1119,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1212,7 +1211,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1246,6 +1244,89 @@
             - render
             - style
       - name: SearchableChipSelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
+- name: SearchableSelectControl
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - className
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - label
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - placeholder
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - statusContent
+      - triggerContent
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableSelectControl.Collection
+        props:
+            - children
+      - name: SearchableSelectControl.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableSelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Item
         props:
             - children
             - className

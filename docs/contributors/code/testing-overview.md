@@ -177,6 +177,20 @@ Vitest resets mock implementations and call history, restores spies, resets stub
 
 `wpVitest` is an explicit opt-in for jsdom suites that need hoist-safe helpers inside `vi.hoisted()`.
 
+### Expected console calls
+
+Gutenberg's internal Vitest setup fails a test when `console.error`, `console.warn`, `console.info`, or `console.log` has calls that the test did not explicitly expect. Use `toHaveErroredWith`, `toHaveWarnedWith`, `toHaveInformedWith`, or `toHaveLoggedWith` with specific arguments. Asymmetric matchers such as `expect.objectContaining` are supported.
+
+```js
+expect( console ).toHaveWarnedWith( 'The setting is deprecated.' );
+```
+
+A successful positive assertion accounts for every matching call already in the mock history, including duplicates. It leaves the history intact, so repeated assertions and separate call-count checks still work. Other calls, including a later call with the same arguments, need their own assertion. Negative assertions and failed assertions do not account for any calls.
+
+The argument-free matchers, such as `toHaveWarned()`, remain supported for compatibility and account for all calls to that method already in the history. A broad assertion can therefore still hide an unrelated call. Prefer specific arguments so only matching calls are accounted for. Standard spy assertions such as `toHaveBeenCalledWith` do not account for console calls in this helper.
+
+The check runs after the test and its cleanup hooks, so assertions in `afterEach` are supported. Clearing, resetting, or restoring a mock does not excuse unaccounted calls. Assert expected calls before clearing their history. Accounting starts fresh for each test, including after a failed check.
+
 ### Mocking dependencies
 
 #### Dependency injection

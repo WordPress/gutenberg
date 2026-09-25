@@ -27,18 +27,6 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 	 * The content to be rendered inside the notice.
 	 */
 	children?: ReactNode;
-
-	/**
-	 * The message to be announced to screen readers. Defaults to the children content.
-	 * Used by the `speak()` function from `@wordpress/a11y`.
-	 */
-	spokenMessage?: ReactNode;
-
-	/**
-	 * The politeness level for screen reader announcements.
-	 * Defaults to 'assertive' for error intent, 'polite' for others.
-	 */
-	politeness?: 'polite' | 'assertive';
 }
 
 export interface TitleProps extends ComponentProps< 'span' > {
