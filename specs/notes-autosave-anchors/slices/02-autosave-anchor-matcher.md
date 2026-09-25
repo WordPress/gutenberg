@@ -19,7 +19,8 @@ type AnchorMatch = {
 
 function findAutosaveAnchors( args: {
 	orphanNoteIds: number[];
-	autosaves: Array< { content: string; modified_gmt: string } >;
+	// The current user's autosave only, or undefined when there is none.
+	autosave?: { content: string; modified_gmt: string };
 	postModifiedGmt: string;
 	blocks: BlockInstance[]; // current editor blocks
 } ): AnchorMatch[];
@@ -27,9 +28,9 @@ function findAutosaveAnchors( args: {
 
 Rules, in order:
 
-1. Skip autosaves that aren't newer than the post (`modified_gmt <= postModifiedGmt`). A newer save wins. That covers a block that was later deleted on purpose.
-2. Sort the rest newest first. Parse each one's `content` once.
-3. For each orphan id, find the first autosave block whose ids (read with `getNoteIdsFromMetadata`) include it.
+1. Return nothing when there's no autosave, or when it isn't newer than the post (`modified_gmt <= postModifiedGmt`). A newer save wins. That covers a block that was later deleted on purpose.
+2. Parse the autosave's `content` once.
+3. For each orphan id, find the autosave block whose ids (read with `getNoteIdsFromMetadata`) include it.
 4. Find the same block in the current tree:
    - **Same path**: same index path, same `name`, and the same attributes once `metadata.noteId` and `core/note` markers are stripped. Use that block.
    - **Unique content**: otherwise, if exactly one current block has the same `name` and stripped attributes, use it.
@@ -48,7 +49,7 @@ Vitest fixtures only. This slice has no UI.
   - A block moved to another index but still unique: matched.
   - Duplicate identical blocks at a moved index: not matched.
   - An autosave older than the post: ignored.
-  - Two autosaves from different users: the newest wins.
+  - No autosave: returns nothing.
   - An inline note with unchanged text: `inline` set. With changed text: a block-level match only.
   - A nested block (inside a group or columns): path matching works.
   - A note id not found in any autosave: not returned.

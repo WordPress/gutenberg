@@ -64,7 +64,7 @@ Yes, with limits. What the code says:
 | An autosave by the post author, on a draft, with no post lock, updates the post itself instead of making a revision. | `WP_REST_Autosaves_Controller::create_item()` | Slice 01 alone fixes the most common case (an author notes their own draft). No reload logic needed. |
 | core-data treats that response as a regular save. | `saveEntityRecord` in `packages/core-data/src/actions.js` ("An autosave may be processed by the server as a regular save") | The post is clean afterwards, so the unsaved changes warning goes away too. |
 | For published posts, or drafts by another author, the autosave is a revision owned by the current user. | Same controller | The anchor survives, but only in the autosave. Slice 03 is needed. |
-| `GET /wp/v2/posts/:id/autosaves` returns autosaves from **all** users. | `WP_REST_Autosaves_Controller::get_items()` | A reviewer's autosave can re-attach a note for the author. Not limited to the same user. |
+| The editor reads the current user's autosave with `getAutosave( postType, postId, currentUserId )`. | `isEditedPostAutosaveable` | Re-attaching only uses the current user's own autosave. Don't use other users' autosaves: `GET /autosaves` returning every user's autosave is expected to change to the current user only. |
 | Autosave only fires when the post is autosaveable (saveable, not locked, type supports `autosave`, existing autosave fetched). | `isEditedPostAutosaveable` | The immediate autosave is best-effort. When it can't run, behavior matches trunk. |
 | Orphans are already computed in one place. | `useNoteThreads` in `collab-sidebar/hooks.js` | Slice 03 has a clear input: root threads with no `blockClientId`. |
 
@@ -73,6 +73,7 @@ Yes, with limits. What the code says:
 - Autosave writes every pending edit, not just the anchor. That's what the 60 second autosave does anyway, but here it happens sooner.
 - Re-attaching depends on finding the block again. If the block changed a lot after the autosave, the note stays orphaned, like today.
 - Post types without `autosave` support get no benefit.
+- On published posts and other authors' drafts, only the user who added the note can re-attach it, because autosaves are per user. If a reviewer adds a note and leaves without saving, the author sees it as an orphan until the reviewer opens the post again.
 - Published posts still show the unsaved changes warning after adding a note. See [Deferred](#deferred-not-dirtying-the-post).
 
 #81718 persists just the anchor to the saved post. That's more robust, but it needs six stacked PRs of new core-data and CRDT machinery. This spec only uses what autosave already does, and gets most of the benefit.
@@ -83,7 +84,7 @@ Yes, with limits. What the code says:
 | --- | --- | --- | --- |
 | 01 | [Autosave after anchor change](slices/01-autosave-after-anchor-change.md) | Author drafts keep anchors without a save | e2e: add a note, reload, still attached |
 | 02 | [Autosave anchor matcher](slices/02-autosave-anchor-matcher.md) | A pure, tested answer to "where does this orphan belong?" | Vitest fixtures |
-| 03 | [Re-attach on load](slices/03-reattach-on-load.md) | Published posts and other users' drafts | e2e: published post, reload, still attached |
+| 03 | [Re-attach on load](slices/03-reattach-on-load.md) | Published posts and other authors' drafts, for the user who added the note | e2e: published post, reload, still attached |
 
 01 ships on its own. 02 and 03 ship together or 02 first.
 
@@ -93,6 +94,7 @@ Yes, with limits. What the code says:
 - **One owner for orphans.** `useNoteThreads` decides which notes are orphans. Slice 03 uses that result and does not compute orphans again.
 - **Re-attaching never overwrites.** It only adds a note id to a block that doesn't already have it, and only for notes that are orphaned right now.
 - **No new REST endpoints, no PHP.** Only `/comments` and `/autosaves`, which the editor already calls.
+- **Only the current user's autosave.** Never read another user's autosave, even though the endpoint returns them today.
 
 ## Firewalls
 
