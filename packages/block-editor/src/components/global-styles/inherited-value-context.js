@@ -226,7 +226,9 @@ function useVariationAndElements( blockName, className ) {
  * @param {?string} blockName       Selected block name (e.g. `core/heading`).
  * @param {?string} className       Block `className` used to detect an applied variation.
  * @param {?Object} [selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
+ * @return {{ value: Object, sources: Object, blockName?: string, variationName?: ?string, elements?: string[] }}
+ * Merged panel-scoped payload and source map, plus the block, variation and
+ * element layers they were resolved against, to name where a value comes from.
  */
 export function useResolvedStyle( blockName, className, selectedState = null ) {
 	const { variationName, headingLevel } = useVariationAndElements(
@@ -239,13 +241,19 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return resolveStyle( globalStyles, {
+		const elements = getElementLayers( blockName, headingLevel );
+		return {
+			...resolveStyle( globalStyles, {
+				blockName,
+				variationName,
+				elements,
+				viewport: selectedState?.viewport ?? null,
+				pseudoState: selectedState?.pseudo ?? null,
+			} ),
 			blockName,
 			variationName,
-			elements: getElementLayers( blockName, headingLevel ),
-			viewport: selectedState?.viewport ?? null,
-			pseudoState: selectedState?.pseudo ?? null,
-		} );
+			elements,
+		};
 	}, [
 		blockName,
 		variationName,

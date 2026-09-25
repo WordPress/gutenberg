@@ -320,6 +320,7 @@ export default function ColorPanel( {
 				( linkColor !== undefined || hoverLinkColor !== undefined ),
 			hasInheritedValue:
 				linkColor !== undefined || hoverLinkColor !== undefined,
+			inheritancePath: 'elements.link',
 			contrastWarning,
 			tabs: [
 				{
@@ -481,6 +482,7 @@ export default function ColorPanel( {
 				: [ elementTextUserColor ?? elementTextColor ],
 			isPlaceholder: isElementPlaceholder,
 			hasInheritedValue: hasElementInheritedValue,
+			inheritancePath: `elements.${ name }`,
 			tabs: [
 				hasSolidColors && {
 					key: 'text',

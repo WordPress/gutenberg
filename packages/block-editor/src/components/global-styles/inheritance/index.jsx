@@ -1,11 +1,15 @@
 import clsx from 'clsx';
-import {
-	Button,
-	Icon as WCIcon,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
-import { reset as resetIcon } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useBlockEditContext } from '../../block-edit/context';
+import { InheritanceSourceContext, InheritanceSourceHelp } from './source';
+
+export {
+	InheritanceSourceContext,
+	InheritanceSourceHelp,
+	InheritedCustomCSSHelp,
+} from './source';
 
 /**
  * Whether the inspector marks up which controls are showing an inherited
@@ -37,8 +41,8 @@ export const isGlobalStylesInheritanceIndicatorUIEnabled = () =>
  * label text receives the inherited-from-Global-Styles treatment
  * (dotted underline). No dot is shown.
  *
- * When `hasLocalOverride` is true, a small reset dot is rendered as a
- * sibling of the control exposing a "Reset to inherited value" action.
+ * When `hasLocalOverride` is true, the item gets the local-override class and
+ * no inherited treatment.
  *
  * The two states are mutually exclusive at the source. If both are passed,
  * only the local-override class is returned.
@@ -79,59 +83,6 @@ export function getInheritanceProps(
 }
 
 /**
- * Renders the small always-visible reset button shown next to a control
- * that holds a local override of an inherited Global Styles value. Used by
- * `<InheritanceToolsPanelItem>` and the color/gradient controls.
- *
- * At rest the button shows a blue dot signalling the local override. On
- * hover/focus the dot morphs into the `reset` (dash) icon and the button
- * exposes a "Reset to inherited value" tooltip. Activating it clears the
- * override so the control falls back to its inherited value — the same
- * action the `ToolsPanel` menu performs via `onDeselect`.
- *
- * @param {Object}   props
- * @param {Function} props.onResetToInherited Reset handler.
- * @param {string}   [props.className]        Optional className for the button.
- *
- * @return {Element} The reset button.
- */
-export function InheritanceResetButton( { onResetToInherited, className } ) {
-	return (
-		// Intentionally small (14×14) circular control; exempt from the
-		// 40px default-size enforcement rule.
-		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-		<Button
-			__next40pxDefaultSize={ false }
-			label={ __( 'Reset to inherited value' ) }
-			// The button has children (the dot + reset icon), so the tooltip
-			// is not shown automatically; opt in explicitly.
-			showTooltip
-			className={ clsx(
-				'has-local-override-from-global-styles__reset',
-				className
-			) }
-			onClick={ ( event ) => {
-				// Prevent the click from reaching any wrapping
-				// `<label htmlFor>` association, which would otherwise
-				// focus/activate the inner control.
-				event.preventDefault();
-				event.stopPropagation();
-				onResetToInherited?.();
-			} }
-		>
-			<span
-				aria-hidden="true"
-				className="has-local-override-from-global-styles__dot"
-			/>
-			<WCIcon
-				className="has-local-override-from-global-styles__reset-icon"
-				icon={ resetIcon }
-			/>
-		</Button>
-	);
-}
-
-/**
  * A `ToolsPanelItem` that reflects whether its control's value is inherited
  * from Global Styles or locally overridden. The two states are mutually
  * exclusive.
@@ -139,61 +90,200 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  * - Inherited: the control label receives the inherited-from-Global-Styles
  *   treatment (dotted underline) via the `is-inherited-from-global-styles`
  *   class applied through `getInheritanceProps`. No dot is shown.
- * - Local override: a reset dot is rendered as a plain sibling of the control
- *   at the item's inline-end — never nested in the label — exposing the same
- *   one-click reset the `ToolsPanel` options menu performs via `onDeselect`.
- *
- * Controls that render their own reset control next to a custom toggle (color,
- * background image) pass `showLocalOverrideActionsInLabel={ false }` so the
- * item does not render a second reset dot.
+ * - Local override: the label keeps its plain treatment. A value set on the
+ *   block is reset from the `ToolsPanel` options menu, or the control's own
+ *   Reset, as without the experiment.
  *
  * @param {Object}                    props
- * @param {?string}                   props.className                         Item className.
- * @param {boolean}                   props.isInherited                       Value is inherited at rest. Accepted so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; the inherited treatment is applied via `className`.
- * @param {boolean}                   props.hasLocalOverride                  Local override is set.
- * @param {import('react').ReactNode} props.label                             Control label.
- * @param {?Function}                 props.onDeselect                        Reset handler.
- * @param {boolean}                   [props.showLocalOverrideActionsInLabel] Render the reset dot here (default true).
- * @param {boolean}                   [props.hasInlineEndToggle]              The control renders a 24x24 toggle (linked/unlink, units switch) at its inline-end; offset the reset dot to sit just to its inline-start (default false).
- * @param {import('react').ReactNode} props.children                          The control.
+ * @param {?string}                   props.className                  Item className.
+ * @param {boolean}                   props.isInherited                Value is inherited at rest. Accepted so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; the inherited treatment is applied via `className`.
+ * @param {boolean}                   props.hasLocalOverride           Local override is set.
+ * @param {import('react').ReactNode} props.label                      Control label.
+ * @param {?Function}                 props.onDeselect                 Reset handler.
+ * @param {string|string[]}           [props.inheritancePath]          Global Styles path(s) the control edits. When set, a line under the control names where its value comes from.
+ * @param {boolean}                   [props.inheritanceHelpInPopover] The control shows the line in its picker popover; the item keeps it only as the control's description, and after a reset.
+ * @param {import('react').ReactNode} props.children                   The control.
  *
  * @return {Element} The panel item.
  */
+/**
+ * Tracks whether a control's value was just reset to the inherited one: it
+ * held a local value, and now shows an inherited value, on the same block.
+ * Covers every way back (the panel's options menu, a control's own Reset,
+ * Reset all, undo). Cleared by a click outside the item or by focus moving
+ * into another panel item.
+ *
+ * @param {Object}   ref         Ref to the item element.
+ * @param {boolean}  isInherited Control shows an inherited value.
+ * @param {Function} hasValue    Whether the control holds a local value.
+ * @return {boolean} Whether to show the line as just reset.
+ */
+function useJustReset( ref, isInherited, hasValue ) {
+	const { clientId } = useBlockEditContext();
+	const hasLocalValue = !! hasValue?.();
+	const previousRef = useRef( { clientId, hasLocalValue } );
+	const [ isJustReset, setIsJustReset ] = useState( false );
+
+	useEffect( () => {
+		const { clientId: previousClientId, hasLocalValue: hadLocalValue } =
+			previousRef.current;
+		previousRef.current = { clientId, hasLocalValue };
+		if ( previousClientId !== clientId ) {
+			setIsJustReset( false );
+		} else if ( hadLocalValue && ! hasLocalValue && isInherited ) {
+			setIsJustReset( true );
+		}
+	}, [ clientId, hasLocalValue, isInherited ] );
+
+	useEffect( () => {
+		const element = ref.current;
+		if ( ! isJustReset || ! element ) {
+			return;
+		}
+		const { ownerDocument } = element;
+		const clear = ( event ) => {
+			const target = event.target;
+			if ( element.contains( target ) ) {
+				return;
+			}
+			// Focus returning to the panel's options menu after a reset from
+			// it keeps the line; focus moving to another control clears it.
+			if (
+				event.type === 'focusin' &&
+				! target.closest?.( '.components-tools-panel-item' )
+			) {
+				return;
+			}
+			setIsJustReset( false );
+		};
+		ownerDocument.addEventListener( 'pointerdown', clear, true );
+		ownerDocument.addEventListener( 'focusin', clear, true );
+		return () => {
+			ownerDocument.removeEventListener( 'pointerdown', clear, true );
+			ownerDocument.removeEventListener( 'focusin', clear, true );
+		};
+	}, [ isJustReset, ref ] );
+
+	return isJustReset;
+}
+
+// Focusable parts of a control that should carry its description.
+const DESCRIBED_CONTROLS =
+	'input, select, textarea, button:not([aria-hidden="true"]), [role="radio"], [role="slider"]';
+
+/**
+ * Points the item's focusable controls at the origin line with
+ * `aria-describedby`, so screen readers read where the value comes from when
+ * focus enters the control, even while the line is collapsed or hidden. The
+ * controls are rendered by many components, so the attribute is added to the
+ * DOM rather than threaded through each one; ids a control sets itself are
+ * kept.
+ *
+ * @param {Object}  ref     Ref to the item element.
+ * @param {boolean} enabled Whether the control has an origin line.
+ * @param {string}  helpId  Id of the origin line.
+ */
+function useDescribedControls( ref, enabled, helpId ) {
+	useEffect( () => {
+		const element = ref.current;
+		if ( ! enabled || ! element ) {
+			return;
+		}
+		const update = () => {
+			element
+				.querySelectorAll( DESCRIBED_CONTROLS )
+				.forEach( ( control ) => {
+					const ids = (
+						control.getAttribute( 'aria-describedby' ) ?? ''
+					)
+						.split( ' ' )
+						.filter( Boolean );
+					if ( ! ids.includes( helpId ) ) {
+						control.setAttribute(
+							'aria-describedby',
+							[ ...ids, helpId ].join( ' ' )
+						);
+					}
+				} );
+		};
+		update();
+		// Controls mount and remount inside the item (e.g. a custom size
+		// input replacing the size buttons), so keep new ones described.
+		const observer = new element.ownerDocument.defaultView.MutationObserver(
+			update
+		);
+		observer.observe( element, { childList: true, subtree: true } );
+		return () => {
+			observer.disconnect();
+			element
+				.querySelectorAll( '[aria-describedby]' )
+				.forEach( ( control ) => {
+					const ids = control
+						.getAttribute( 'aria-describedby' )
+						.split( ' ' )
+						.filter( ( id ) => id && id !== helpId );
+					if ( ids.length ) {
+						control.setAttribute(
+							'aria-describedby',
+							ids.join( ' ' )
+						);
+					} else {
+						control.removeAttribute( 'aria-describedby' );
+					}
+				} );
+		};
+	}, [ ref, enabled, helpId ] );
+}
+
 export function InheritanceToolsPanelItem( {
 	className,
-	// Destructured (and unused) so the `getInheritanceProps` spread does not
-	// leak `isInherited` onto the underlying `ToolsPanelItem`. The inherited
-	// treatment is applied purely via `className`
-	// (`is-inherited-from-global-styles`).
+	// Destructured so the `getInheritanceProps` spread does not leak
+	// `isInherited` onto the underlying `ToolsPanelItem`. The label treatment
+	// is applied via `className` (`is-inherited-from-global-styles`).
 	isInherited,
+	// Also destructured so it does not leak onto `ToolsPanelItem`; the local
+	// override treatment is applied via `className`.
 	hasLocalOverride,
 	label,
 	onDeselect,
-	showLocalOverrideActionsInLabel = true,
-	hasInlineEndToggle = false,
+	inheritancePath,
+	inheritanceHelpInPopover = false,
 	children,
 	...rest
 } ) {
-	const showResetAffordance =
-		hasLocalOverride && showLocalOverrideActionsInLabel;
+	const ref = useRef();
+	const helpId = useInstanceId(
+		InheritanceToolsPanelItem,
+		'global-styles-inheritance-help'
+	);
+	const isJustReset = useJustReset( ref, isInherited, rest.hasValue );
+	const resolved = useContext( InheritanceSourceContext );
+	// Every control with a path gets a line in the block inspector: where an
+	// inherited value comes from, or that the value is set on the block.
+	const hasHelp = !! inheritancePath && !! resolved;
+	useDescribedControls( ref, hasHelp, helpId );
 
 	return (
 		<ToolsPanelItem
+			ref={ ref }
 			className={ className }
 			label={ label }
 			onDeselect={ onDeselect }
 			{ ...rest }
 		>
 			{ children }
-			{ showResetAffordance && (
-				<div
-					className={ clsx( 'global-styles-inheritance-affordance', {
-						'global-styles-inheritance-affordance--offset-toggle':
-							hasInlineEndToggle,
-					} ) }
-				>
-					<InheritanceResetButton onResetToInherited={ onDeselect } />
-				</div>
+			{ inheritancePath && (
+				<InheritanceSourceHelp
+					id={ helpId }
+					path={ inheritancePath }
+					isInherited={ isInherited }
+					hasLocalValue={ !! rest.hasValue?.() }
+					isJustReset={ isJustReset }
+					// Controls with a picker show the line in the picker; here
+					// it describes the control, and shows after a reset or
+					// with the panel's style origins toggle.
+					isDescriptionOnly={ inheritanceHelpInPopover }
+				/>
 			) }
 		</ToolsPanelItem>
 	);

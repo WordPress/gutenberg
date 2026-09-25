@@ -218,10 +218,10 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( radiusInput ).toHaveValue( 12 );
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
 			expect(
-				screen.getByRole( 'button', {
+				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
 				} )
-			).toBeInTheDocument();
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited radius is present (display-without-commit)', () => {
@@ -306,7 +306,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Border box (compound archetype)', () => {
-		it( 'surfaces the accessible reset affordance when a local border is defined', () => {
+		it( 'renders no reset dot when a local border is defined', () => {
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -336,10 +336,10 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			// The local override surfaces the accessible reset affordance.
 			expect(
-				screen.getAllByRole( 'button', {
+				screen.queryAllByRole( 'button', {
 					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				} )
+			).toHaveLength( 0 );
 		} );
 
 		it( 'does not bake the inherited radius into the local override when only color/style/width are customised (regression)', async () => {
@@ -413,7 +413,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Shadow (popover-trigger archetype)', () => {
-		it( 'surfaces the accessible reset affordance when a local shadow is set', () => {
+		it( 'renders no reset dot when a local shadow is set', () => {
 			const inheritedValue = {
 				shadow: 'var:preset|shadow|soft',
 			};
@@ -430,10 +430,10 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
+				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
 				} )
-			).toBeInTheDocument();
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited shadow is present', () => {
@@ -480,7 +480,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+		it( 'renders the plain remove button, not a reset dot, for a local override', () => {
 			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
 			const value = { shadow: 'var:preset|shadow|hard' };
 
@@ -494,16 +494,16 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// The local override renders the blue-dot reset (mirroring the
-			// color/gradient controls), not the plain remove button.
+			// The blue-dot reset is gone: a local override gets the same plain
+			// remove button as any locally-set shadow.
 			expect(
-				screen.getByRole( 'button', {
+				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
 				} )
-			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'button', { name: /^remove$/i } )
 			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: /^remove$/i } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'renders the default remove button for a locally-set shadow with no inherited value', () => {

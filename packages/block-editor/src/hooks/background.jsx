@@ -20,6 +20,7 @@ import {
 	useBlockStyleState,
 } from './block-style-state';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { InheritanceSourceContext } from '../components/global-styles/inheritance';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -182,11 +183,8 @@ export function BackgroundImagePanel( {
 		[ clientId ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyle(
-		name,
-		className,
-		selectedState
-	);
+	const resolvedStyle = useResolvedStyle( name, className, selectedState );
+	const { value: inheritedValue } = resolvedStyle;
 
 	const backgroundGradientSupported =
 		hasBackgroundSupport( name, 'gradient' ) &&
@@ -369,21 +367,23 @@ export function BackgroundImagePanel( {
 	const Wrapper = asWrapper || BackgroundInspectorControl;
 
 	return (
-		<StylesBackgroundPanel
-			as={ Wrapper }
-			panelId={ clientId }
-			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-			settings={ updatedSettings }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
-			value={
-				isStateSelected
-					? getStyleForState( style, selectedState )
-					: styleValue
-			}
-			contrastWarning={ contrastWarning }
-			inheritedValue={ inheritedValue }
-		/>
+		<InheritanceSourceContext.Provider value={ resolvedStyle }>
+			<StylesBackgroundPanel
+				as={ Wrapper }
+				panelId={ clientId }
+				defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+				settings={ updatedSettings }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				value={
+					isStateSelected
+						? getStyleForState( style, selectedState )
+						: styleValue
+				}
+				contrastWarning={ contrastWarning }
+				inheritedValue={ inheritedValue }
+			/>
+		</InheritanceSourceContext.Provider>
 	);
 }
 

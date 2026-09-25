@@ -13,6 +13,7 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { InheritanceSourceContext } from '../components/global-styles/inheritance';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
@@ -153,11 +154,8 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const { value: inheritedValue } = useResolvedStyle(
-		name,
-		className,
-		selectedState
-	);
+	const resolvedStyle = useResolvedStyle( name, className, selectedState );
+	const { value: inheritedValue } = resolvedStyle;
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -194,15 +192,17 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	};
 
 	return (
-		<StylesBorderPanel
-			as={ BordersInspectorControl }
-			panelId={ clientId }
-			settings={ settings }
-			value={ value }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
-			inheritedValue={ inheritedValue }
-		/>
+		<InheritanceSourceContext.Provider value={ resolvedStyle }>
+			<StylesBorderPanel
+				as={ BordersInspectorControl }
+				panelId={ clientId }
+				settings={ settings }
+				value={ value }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				inheritedValue={ inheritedValue }
+			/>
+		</InheritanceSourceContext.Provider>
 	);
 }
 

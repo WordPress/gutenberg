@@ -146,13 +146,12 @@ function renderPanel( props ) {
 	);
 }
 
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
+// A local override has no reset dot any more (the panel options menu resets
+// it), so assert on the item's local-override class hook.
 function expectLocalOverride() {
 	expect(
-		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} )
+		// eslint-disable-next-line testing-library/no-node-access
+		document.querySelector( '.has-local-override-from-global-styles' )
 	).toBeInTheDocument();
 }
 

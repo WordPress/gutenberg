@@ -25,6 +25,7 @@ import { findAspectRatioOption } from './utils';
  * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
  * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
  * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
+ * @property {string}                       [inheritancePath]  Global Styles path the control edits, to describe where an inherited value comes from.
  */
 
 export default function AspectRatioTool( {
@@ -38,6 +39,7 @@ export default function AspectRatioTool( {
 	className,
 	isInherited,
 	hasLocalOverride,
+	inheritancePath,
 } ) {
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
@@ -92,6 +94,7 @@ export default function AspectRatioTool( {
 			className={ className }
 			isInherited={ isInherited }
 			hasLocalOverride={ hasLocalOverride }
+			inheritancePath={ inheritancePath }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}

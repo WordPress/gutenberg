@@ -12,16 +12,17 @@ import { Stack, Tabs } from '@wordpress/ui';
 import ColorGradientControl from '../colors-gradients/control';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
+	InheritanceSourceHelp,
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 /**
  * @typedef {Object} DropdownContentProps
- * @property {Array}  tabs                         Tab configurations to render.
- * @property {Object} colorGradientControlSettings Settings passed to ColorGradientControl.
- * @property {string} [contrastWarning]            Contrast warning message for the color value.
+ * @property {Array}   tabs                         Tab configurations to render.
+ * @property {Object}  colorGradientControlSettings Settings passed to ColorGradientControl.
+ * @property {string}  [contrastWarning]            Contrast warning message for the color value.
+ * @property {Element} [inheritanceHelp]            Line naming where an inherited color comes from, shown under the picker.
  */
 
 /**
@@ -33,6 +34,7 @@ function DropdownContent( {
 	tabs,
 	colorGradientControlSettings,
 	contrastWarning,
+	inheritanceHelp,
 } ) {
 	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	const defaultTabId = (
@@ -85,6 +87,7 @@ function DropdownContent( {
 						} ) }
 					</Tabs.Root>
 				) }
+				{ inheritanceHelp }
 			</div>
 		</DropdownContentWrapper>
 	);
@@ -201,6 +204,7 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	inheritancePath,
 } ) {
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
@@ -215,7 +219,8 @@ export default function ColorGradientDropdownItem( {
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
-			showLocalOverrideActionsInLabel={ false }
+			inheritancePath={ inheritancePath }
+			inheritanceHelpInPopover
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -247,34 +252,22 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) : (
-									<Button
-										__next40pxDefaultSize
-										label={ __( 'Reset' ) }
-										className="block-editor-panel-color-gradient-settings__reset"
-										size="small"
-										icon={ resetIcon }
-										onClick={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) ) }
+							{ hasValue() && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;
@@ -301,6 +294,16 @@ export default function ColorGradientDropdownItem( {
 							colorGradientControlSettings
 						}
 						contrastWarning={ contrastWarning }
+						inheritanceHelp={
+							inheritancePath && (
+								<InheritanceSourceHelp
+									path={ inheritancePath }
+									isInherited={ inheritanceProps.isInherited }
+									hasLocalValue={ hasValue() }
+									isInPopover
+								/>
+							)
+						}
 					/>
 				) }
 			/>

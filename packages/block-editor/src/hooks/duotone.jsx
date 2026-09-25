@@ -31,6 +31,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { InheritanceSourceContext } from '../components/global-styles/inheritance';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
@@ -108,7 +109,8 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 				: undefined,
 		[ clientId ]
 	);
-	const { value: inheritedValue } = useResolvedStyle( name, className );
+	const resolvedStyle = useResolvedStyle( name, className );
+	const { value: inheritedValue } = resolvedStyle;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -143,29 +145,31 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	return (
 		<>
 			<InspectorControls group="filter">
-				<StylesFiltersPanel
-					// The raw value, not the resolved colors. The panel
-					// decodes it for display, but needs the preset reference
-					// to know which preset is applied: two presets can hold
-					// the same pair of colors, and resolving first throws the
-					// slug away.
-					value={ {
-						filter: { duotone: duotoneStyle },
-					} }
-					onChange={ ( newDuotone ) => {
-						const newStyle = {
-							...style,
-							color: {
-								...newDuotone?.filter,
-							},
-						};
-						setAttributes( {
-							style: cleanEmptyObject( newStyle ),
-						} );
-					} }
-					settings={ settings }
-					inheritedValue={ inheritedValue }
-				/>
+				<InheritanceSourceContext.Provider value={ resolvedStyle }>
+					<StylesFiltersPanel
+						// The raw value, not the resolved colors. The panel
+						// decodes it for display, but needs the preset reference
+						// to know which preset is applied: two presets can hold
+						// the same pair of colors, and resolving first throws the
+						// slug away.
+						value={ {
+							filter: { duotone: duotoneStyle },
+						} }
+						onChange={ ( newDuotone ) => {
+							const newStyle = {
+								...style,
+								color: {
+									...newDuotone?.filter,
+								},
+							};
+							setAttributes( {
+								style: cleanEmptyObject( newStyle ),
+							} );
+						} }
+						settings={ settings }
+						inheritedValue={ inheritedValue }
+					/>
+				</InheritanceSourceContext.Provider>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl

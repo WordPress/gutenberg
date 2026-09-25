@@ -379,6 +379,7 @@ export default function BorderPanel( {
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
 				<InheritanceToolsPanelItem
+					inheritancePath="border"
 					{ ...inheritanceProps(
 						isBorderPlaceholder,
 						isDefinedBorder( value?.border ) &&
@@ -387,7 +388,6 @@ export default function BorderPanel( {
 					) }
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
-					hasInlineEndToggle
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
@@ -414,13 +414,13 @@ export default function BorderPanel( {
 			) }
 			{ showBorderRadius && (
 				<InheritanceToolsPanelItem
+					inheritancePath="border.radius"
 					{ ...inheritanceProps(
 						isBorderRadiusPlaceholder,
 						hasBorderRadius() && inheritedBorderRadius !== undefined
 					) }
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
-					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
 					panelId={ panelId }
@@ -436,6 +436,7 @@ export default function BorderPanel( {
 			) }
 			{ hasShadowControl && (
 				<InheritanceToolsPanelItem
+					inheritancePath="shadow"
 					{ ...inheritanceProps(
 						isShadowPlaceholder,
 						hasShadow() && inheritedShadow !== undefined
@@ -448,7 +449,6 @@ export default function BorderPanel( {
 					// dot for a local override, default reset otherwise) inside
 					// the control, mirroring the color/gradient controls, so the
 					// panel item must not render a second sibling reset dot.
-					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<BaseControl.VisualLabel>
