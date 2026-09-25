@@ -55,6 +55,14 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The callbacks a test hooked to `fields_api_init`, removed on tear
+	 * down.
+	 *
+	 * @var callable[]
+	 */
+	private $callbacks = array();
+
+	/**
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
@@ -62,14 +70,23 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
+		foreach ( $this->callbacks as $callback ) {
+			remove_action( 'fields_api_init', $callback );
+		}
+		$this->callbacks = array();
 		Gutenberg_Fields_Registry::get_instance()->reset();
 
 		parent::tear_down();
 	}
 
 	/**
-	 * Registers fields for the duration of the test: the registry is reset
-	 * on tear down.
+	 * Registers fields on `fields_api_init` for the duration of the test:
+	 * the registry is reset on tear down.
+	 *
+	 * Registering only runs on the action, so the registration is hooked to
+	 * it, as a plugin does, and the action fired anew: the registry is reset
+	 * and read, which registers the defaults again and replays the
+	 * registrations made so far, in order.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
@@ -78,7 +95,18 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		return Gutenberg_Fields_Registry::get_instance()->register( $kind, $name, $fields, $module );
+		$registered = false;
+		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
+			$registered = $registry->register( $kind, $name, $fields, $module );
+		};
+		add_action( 'fields_api_init', $callback );
+		$this->callbacks[] = $callback;
+
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
+		$registry->get_all_registered();
+
+		return $registered;
 	}
 
 	/**

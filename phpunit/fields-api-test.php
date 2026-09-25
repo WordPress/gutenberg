@@ -10,9 +10,19 @@
  * @covers ::_gutenberg_register_posttype_wp_template_part_fields
  * @covers ::_gutenberg_register_posttype_attachment_fields
  * @covers Gutenberg_Fields_Registry::initialize
+ * @covers Gutenberg_Fields_Registry::register
+ * @covers Gutenberg_Fields_Registry::unregister
  * @covers Gutenberg_Fields_Registry::reset
  */
 class Tests_Fields_API extends WP_UnitTestCase {
+
+	/**
+	 * The callbacks a test hooked to `fields_api_init`, as callback and
+	 * priority pairs, removed on tear down.
+	 *
+	 * @var array[]
+	 */
+	private $callbacks = array();
 
 	/**
 	 * Tears down each test.
@@ -22,9 +32,35 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
+		foreach ( $this->callbacks as list( $callback, $priority ) ) {
+			remove_action( 'fields_api_init', $callback, $priority );
+		}
+		$this->callbacks = array();
 		Gutenberg_Fields_Registry::get_instance()->reset();
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Hooks a callback to `fields_api_init` for the duration of the test
+	 * and fires the action anew, so the registry reflects it right away.
+	 *
+	 * Registering and unregistering only run on the action, so this is how a
+	 * test alters the registry, as a plugin does. The registry is reset and
+	 * read, which fires the action: the defaults are registered again and
+	 * the callbacks hooked so far replay, in order. The callbacks are
+	 * removed on tear down.
+	 *
+	 * @param callable $callback The callback, receiving the registry.
+	 * @param int      $priority The priority. Default 10, after the defaults.
+	 */
+	private function on_fields_api_init( $callback, $priority = 10 ) {
+		add_action( 'fields_api_init', $callback, $priority );
+		$this->callbacks[] = array( $callback, $priority );
+
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
+		$registry->get_all_registered();
 	}
 
 	/**
@@ -33,11 +69,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * on tear down.
 	 */
 	private function unregister_all_field_modules() {
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		foreach ( array_keys( $registry->get_all_registered_field_modules() ) as $entity ) {
-			list( $kind, $name ) = explode( '/', $entity, 2 );
-			$registry->unregister( $kind, $name );
-		}
+		$this->on_fields_api_init(
+			static function ( $registry ) {
+				foreach ( array_keys( $registry->get_all_registered_field_modules() ) as $entity ) {
+					list( $kind, $name ) = explode( '/', $entity, 2 );
+					$registry->unregister( $kind, $name );
+				}
+			}
+		);
 	}
 
 	/**
@@ -58,8 +97,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers fields for the duration of the test: the registry is reset
-	 * on tear down.
+	 * Registers fields on `fields_api_init` for the duration of the test:
+	 * the registry is reset on tear down.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
@@ -68,7 +107,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * @return bool Whether the fields were registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		return Gutenberg_Fields_Registry::get_instance()->register( $kind, $name, $fields, $module );
+		$registered = false;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
+				$registered = $registry->register( $kind, $name, $fields, $module );
+			}
+		);
+		return $registered;
 	}
 
 	/**
@@ -323,51 +368,57 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * Templates and template parts support authors but have their own
 	 * client-side author field, so the default one is removed.
 	 *
-	 * The action registers the defaults and adjusts them in one go, so the
-	 * intermediate state is not observable through the getters: the test
-	 * reads once, then replays the two steps by hand.
+	 * The defaults are registered at priority 0 and adjusted at priority 9,
+	 * so a callback in between sees the default author field the adjustment
+	 * then removes.
 	 *
 	 * @dataProvider data_template_post_types
 	 *
-	 * @param string   $post_type The post type.
-	 * @param callable $callback  The callback adjusting its fields.
+	 * @param string $post_type The post type.
+	 * @param string $callback  The function adjusting its fields.
 	 */
 	public function test_templates_do_not_get_the_default_author_field( $post_type, $callback ) {
-		$registry = Gutenberg_Fields_Registry::get_instance();
 		$this->assertTrue( post_type_supports( $post_type, 'author' ), 'The post type supports authors.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', $callback ), 'The adjustment runs right after the defaults.' );
+
+		$before = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$before, $post_type ) {
+				$before = array_column( $registry->get_registered( 'postType', $post_type ), 'id' );
+			},
+			5
+		);
+
+		$this->assertContains( 'author', $before, 'The default author field is registered first.' );
 		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The action leaves no author field.' );
-
-		_gutenberg_register_posttype_supports_fields( $registry );
-		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The default author field is registered first.' );
-
-		$callback( $registry );
-		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ) );
 	}
 
 	/**
 	 * Attachments support authors and comments but the media editor has its
 	 * own fields, so the defaults derived from the supports are replaced.
 	 *
-	 * The action registers the defaults and adjusts them in one go, so the
-	 * intermediate state is not observable through the getters: the test
-	 * reads once, then replays the two steps by hand.
+	 * The defaults are registered at priority 0 and adjusted at priority 9,
+	 * so a callback in between sees the default fields the adjustment then
+	 * replaces.
 	 */
 	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$ids      = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_attachment_fields' ), 'The adjustment runs right after the defaults.' );
+
+		$before = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$before ) {
+				$before = array_column( $registry->get_registered( 'postType', 'attachment' ), 'id' );
+			},
+			5
+		);
+
+		$this->assertContains( 'author', $before, 'The default author field is registered first.' );
+		$this->assertContains( 'comment_status', $before, 'The default comment status field is registered first.' );
+
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
 		$this->assertNotContains( 'author', $ids, 'The action leaves no author field.' );
+		$this->assertNotContains( 'comment_status', $ids, 'The action leaves no comment status field.' );
 		$this->assertContains( 'date', $ids, 'The action registers the media fields.' );
-
-		_gutenberg_register_posttype_supports_fields( $registry );
-		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
-		$this->assertContains( 'author', $ids, 'The default author field is registered first.' );
-		$this->assertContains( 'comment_status', $ids, 'The default comment status field is registered first.' );
-
-		_gutenberg_register_posttype_attachment_fields( $registry );
-		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
-		$this->assertNotContains( 'author', $ids );
-		$this->assertNotContains( 'comment_status', $ids );
-		$this->assertContains( 'date', $ids );
 		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'attachment' ), 'The media fields registered so far are plain data: no script module.' );
 	}
 
@@ -446,16 +497,39 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registering does not read the registry, so a registration made before
-	 * the action fires does not fire it early.
+	 * Registering only runs on the action: elsewhere it is refused and the
+	 * registry is left untouched. Before the action a registration would be
+	 * merged over by the defaults; after it the fields have been read and
+	 * the import map of the editor script built from them.
 	 */
-	public function test_registering_does_not_fire_the_action() {
-		Gutenberg_Fields_Registry::get_instance()->reset();
+	public function test_registering_outside_the_action_is_refused() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
 		$fired = did_action( 'fields_api_init' );
 
-		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ) );
+		$this->assertFalse( $registry->register( 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
+		$this->assertSame( $fired, did_action( 'fields_api_init' ), 'Refusing does not fire the action.' );
+		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertArrayNotHasKey( 'plugin/color', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+	}
 
-		$this->assertSame( $fired, did_action( 'fields_api_init' ) );
+	/**
+	 * Unregistering only runs on the action: elsewhere it is refused before
+	 * reading the registry, so a stray call, from an `init` callback say,
+	 * neither drops a default field nor fires the action early against
+	 * post types still being registered.
+	 */
+	public function test_unregistering_outside_the_action_is_refused() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
+		$fired = did_action( 'fields_api_init' );
+
+		$this->assertFalse( $registry->unregister( 'postType', 'page', array( 'author' ) ), 'Unregistering fields by id is refused.' );
+		$this->assertFalse( $registry->unregister( 'postType', 'page' ), 'Unregistering every field is refused.' );
+		$this->assertSame( $fired, did_action( 'fields_api_init' ), 'Refusing does not fire the action.' );
+		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
 	}
 
 	/**

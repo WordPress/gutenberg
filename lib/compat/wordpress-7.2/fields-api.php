@@ -12,8 +12,8 @@
  * that are JavaScript. An entity can have several modules. Each module applies to
  * the fields it was registered with, see gutenberg_get_registered_field_modules().
  *
- * Fields are registered on the `fields_api_init` action, on the
- * registry its callbacks receive, see Gutenberg_Fields_Registry::register()
+ * Fields are registered on the `fields_api_init` action, and only there, on
+ * the registry its callbacks receive, see Gutenberg_Fields_Registry::register()
  * and Gutenberg_Fields_Registry::unregister(). The functions below read the
  * registry.
  *
@@ -91,7 +91,8 @@ function gutenberg_get_all_registered_field_modules() {
  * for the supports the default fields derive from to be final, and it runs
  * early on `admin_init`: before the pages rendered outside the admin
  * template, which render and exit on `admin_init` at the default priority.
- * A field registered later is not covered.
+ * The registry only accepts registrations while the action fires, so the
+ * modules declared here are the modules of every field the page can show.
  *
  * When called by the `admin_init` action, which passes no arguments,
  * `$scripts` is an empty string and the global registry is used.
