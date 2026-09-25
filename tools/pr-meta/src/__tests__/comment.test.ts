@@ -524,7 +524,7 @@ describe( 'collapsing', () => {
 		let comment = bodyOf(
 			mergeSection(
 				undefined,
-				{ id: 'flaky-tests', body: 'Traces.', sha: HEAD },
+				{ id: 'performance', body: 'Tables.', sha: HEAD },
 				HEAD
 			)
 		);
@@ -537,9 +537,27 @@ describe( 'collapsing', () => {
 
 		expect( comment.match( /<details>/g ) ).toHaveLength( 1 );
 		expect(
-			parseSections( comment ).find( ( s ) => s.id === 'flaky-tests' )
+			parseSections( comment ).find( ( s ) => s.id === 'performance' )
 				?.body
-		).toBe( 'Traces.' );
+		).toBe( 'Tables.' );
+	} );
+
+	/* Its body folds each test already, and a fold in a fold renders badly. */
+	it( 'leaves a section that folds its own items open', () => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'flaky-tests',
+					body: '<details>\n<summary>A test</summary>\n\nTrace.\n\n</details>',
+					sha: HEAD,
+				},
+				HEAD
+			)
+		);
+
+		expect( merged.match( /<details>/g ) ).toHaveLength( 1 );
+		expect( merged ).not.toContain( '<summary>Show' );
 	} );
 } );
 
