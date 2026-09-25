@@ -1,11 +1,18 @@
 import {
 	renderToString,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useReducer,
 	useRef,
+	useState,
 } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useEvent,
+	useInstanceId,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -97,9 +104,11 @@ export function useAutocomplete( {
 	onChange,
 	onReplace,
 	completers,
-	contentRef,
 }: UseAutocompleteProps ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
+	const contentRef = useRef< HTMLElement >( null );
+	const [ contentElement, setContentElement ] =
+		useState< HTMLElement | null >( null );
 	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
@@ -314,6 +323,8 @@ export function useAutocomplete( {
 	const showPopover = !! textContent && hasSelection && !! autocompleter;
 
 	return {
+		// Attach to the editable element; the popover is anchored to it.
+		ref: useMergeRefs( [ contentRef, setContentElement ] ),
 		listBoxId,
 		activeId,
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
@@ -329,6 +340,7 @@ export function useAutocomplete( {
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
 				contentRef={ contentRef }
+				contentElement={ contentElement }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
 		),
@@ -372,43 +384,37 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
-// The popover is anchored to the element this hook's own `ref` lands on, so it
-// owns `contentRef` and callers don't provide one.
-export function useAutocompleteProps(
-	options: Omit< UseAutocompleteProps, 'contentRef' >
-) {
-	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef =
-		useRef< ( event: KeyboardEvent ) => void >( undefined );
+export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
-	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
-		...options,
-		contentRef: ref,
-	} );
-	onKeyDownRef.current = onKeyDown;
+	const { ref, popover, listBoxId, activeId, onKeyDown } =
+		useAutocomplete( options );
+	const onKeyDownEvent = useEvent( onKeyDown );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: Event ) {
-				onKeyDownRef.current?.( event as KeyboardEvent );
-			}
-			// Capture phase. When the autocomplete popover is open,
-			// Up/Down/Enter/Escape must navigate the completion list —
-			// they shouldn't be consumed by ancestor handlers (e.g.
-			// block-editor's writing-flow) for block navigation, block
-			// splitting, or "move out of parent" actions. Those handlers
-			// fire at bubble phase and gate on `event.defaultPrevented`,
-			// so firing in capture lets us preventDefault first when the
-			// popover is active.
-			return subscribeOwnedListener(
-				element,
-				'keydown',
-				_onKeyDown,
-				true
-			);
-		}, [] ),
+		useRefEffect(
+			( element: HTMLElement ) => {
+				function _onKeyDown( event: Event ) {
+					onKeyDownEvent( event as KeyboardEvent );
+				}
+				// Capture phase. When the autocomplete popover is open,
+				// Up/Down/Enter/Escape must navigate the completion list —
+				// they shouldn't be consumed by ancestor handlers (e.g.
+				// block-editor's writing-flow) for block navigation, block
+				// splitting, or "move out of parent" actions. Those handlers
+				// fire at bubble phase and gate on `event.defaultPrevented`,
+				// so firing in capture lets us preventDefault first when the
+				// popover is active.
+				return subscribeOwnedListener(
+					element,
+					'keydown',
+					_onKeyDown,
+					true
+				);
+			},
+			[ onKeyDownEvent ]
+		),
 	] );
 
 	// We only want to show the popover if the user has typed something.
@@ -437,7 +443,7 @@ export function useAutocompleteProps(
 }
 
 export function useDeprecatedAutocompleteProps(
-	options: Omit< UseAutocompleteProps, 'contentRef' >
+	options: UseAutocompleteProps
 ) {
 	deprecated(
 		'`__unstableUseAutocompleteProps` from `@wordpress/components`',
@@ -451,13 +457,19 @@ export function useDeprecatedAutocompleteProps(
 export default function Autocomplete( {
 	children,
 	isSelected,
+	contentRef,
 	...options
 }: AutocompleteProps ) {
 	deprecated( 'wp.components.Autocomplete', {
 		since: '7.2',
 		hint: 'The block editor’s RichText component accepts completers through its autocompleters prop.',
 	} );
-	const { popover, ...props } = useAutocomplete( options );
+	const { popover, ref, ...props } = useAutocomplete( options );
+	// The caller attaches `contentRef` to the element itself; hand that element
+	// to the hook once the children have rendered it.
+	useLayoutEffect( () => {
+		ref( contentRef.current );
+	}, [ ref, contentRef ] );
 	return (
 		<>
 			{ children( props ) }

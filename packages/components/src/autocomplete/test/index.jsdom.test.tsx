@@ -173,6 +173,7 @@ describe( 'AutocompleterUI', () => {
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }
 							contentRef={ contentRef }
+							contentElement={ null }
 							reset={ resetSpy }
 						/>
 						{ OtherElement }

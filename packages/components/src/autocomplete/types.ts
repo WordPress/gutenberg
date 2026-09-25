@@ -136,10 +136,14 @@ export type AutocompleterUIProps = {
 	 */
 	reset: ( event: Event ) => void;
 	/**
-	 * A ref containing the editable element that will serve as the anchor for
-	 * `Autocomplete`'s `Popover`.
+	 * A ref containing the editable element.
 	 */
 	contentRef: ContentRef;
+	/**
+	 * The editable element, once the hook's `ref` has been attached to it. The
+	 * popover is anchored to it.
+	 */
+	contentElement: HTMLElement | null;
 };
 
 export type CancelablePromise< T = void > = Promise< T > & {
@@ -168,11 +172,6 @@ export type UseAutocompleteProps = {
 	 * An array of all of the completers to apply to the current element.
 	 */
 	completers: Array< WPCompleter >;
-	/**
-	 * A ref containing the editable element that will serve as the anchor for
-	 * `Autocomplete`'s `Popover`.
-	 */
-	contentRef: ContentRef;
 };
 
 export type AutocompleteState = {
@@ -190,10 +189,15 @@ export type AutocompleteAction =
 
 export type AutocompleteProps = UseAutocompleteProps & {
 	/**
+	 * A ref containing the editable element that will serve as the anchor for
+	 * `Autocomplete`'s `Popover`.
+	 */
+	contentRef: ContentRef;
+	/**
 	 * A function that returns nodes to be rendered within the Autocomplete.
 	 */
 	children: (
-		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
+		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' | 'ref' >
 	) => React.ReactNode;
 	/**
 	 * Whether or not the Autocomplete component is selected, and if its

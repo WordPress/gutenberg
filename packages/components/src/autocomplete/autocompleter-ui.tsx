@@ -79,6 +79,7 @@ export function AutocompleterUI( {
 	onSelect,
 	reset,
 	contentRef,
+	contentElement,
 }: AutocompleterUIProps ) {
 	// The useItems hook is derived from the autocompleter prop. This is safe
 	// because the parent renders this component with key={autocompleter.name},
@@ -86,7 +87,9 @@ export function AutocompleterUI( {
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 	const [ items ] = useItems( filterValue );
-	const popoverAnchor = useAnchor();
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentElement,
+	} );
 
 	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
 	const popoverRef = useRef< HTMLElement >( null );

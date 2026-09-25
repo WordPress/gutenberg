@@ -478,7 +478,7 @@ function RichTextWrapper(
 
 	const TagName = tagName;
 	return (
-		<EditableContentElementContext.Provider value={ anchorElement }>
+		<>
 			{ isSelected && (
 				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<InputEventContext.Provider value={ inputEvents }>
@@ -486,13 +486,17 @@ function RichTextWrapper(
 							{ children &&
 								children( { value, onChange, onFocus } ) }
 
-							<FormatEdit
-								value={ value }
-								onChange={ onChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-							/>
+							<EditableContentElementContext.Provider
+								value={ anchorElement }
+							>
+								<FormatEdit
+									value={ value }
+									onChange={ onChange }
+									onFocus={ onFocus }
+									formatTypes={ formatTypes }
+									forwardedRef={ anchorRef }
+								/>
+							</EditableContentElementContext.Provider>
 						</Popover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
@@ -563,7 +567,7 @@ function RichTextWrapper(
 				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
-		</EditableContentElementContext.Provider>
+		</>
 	);
 }
 

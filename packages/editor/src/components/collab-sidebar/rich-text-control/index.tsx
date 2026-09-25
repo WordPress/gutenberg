@@ -459,45 +459,42 @@ export default function RichTextControl( {
 			 * they can't reach a surrounding block toolbar.
 			 */ }
 			<SlotFillProvider>
-				<EditableContentElementContext.Provider
-					value={ editableContentElement }
-				>
-					<RichTextControlShell
-						label={ label }
-						id={ id }
-						className={ clsx(
-							'editor-rich-text-control',
-							className
-						) }
-						// The shell draws this while the element is empty, and the
-						// rich-text hook below renders its own placeholder element
-						// once it takes over the contents; either way the attribute
-						// keeps `aria-placeholder` exposed to assistive technology.
-						placeholder={ placeholder }
-						hideLabelFromVision={ hideLabelFromVision }
-						help={ help }
-						disabled={ disabled }
-						required={ required }
-						markWhenOptional={ markWhenOptional }
-						customValidity={ customValidity }
-						// The shell manages the editable content through the ref; the
-						// plain text only drives its hidden validity delegate.
-						value={ value.text }
-						aria-multiline={ ! disableLineBreaks }
-						{ ...autocompleteProps }
-						ref={ editableRef }
-					/>
-					{ /*
-					 * The format assembly mounts only while the field is selected —
-					 * the shell is presentational and knows nothing about selection,
-					 * so this module owns both the state and the gating.
-					 */ }
-					{ isSelected && ! disabled && (
-						<KeyboardShortcutContext.Provider
-							value={ keyboardShortcuts }
-						>
-							<InputEventContext.Provider value={ inputEvents }>
-								{ /* Format types gate their inline UIs on `isVisible`. */ }
+				<RichTextControlShell
+					label={ label }
+					id={ id }
+					className={ clsx( 'editor-rich-text-control', className ) }
+					// The shell draws this while the element is empty, and the
+					// rich-text hook below renders its own placeholder element
+					// once it takes over the contents; either way the attribute
+					// keeps `aria-placeholder` exposed to assistive technology.
+					placeholder={ placeholder }
+					hideLabelFromVision={ hideLabelFromVision }
+					help={ help }
+					disabled={ disabled }
+					required={ required }
+					markWhenOptional={ markWhenOptional }
+					customValidity={ customValidity }
+					// The shell manages the editable content through the ref; the
+					// plain text only drives its hidden validity delegate.
+					value={ value.text }
+					aria-multiline={ ! disableLineBreaks }
+					{ ...autocompleteProps }
+					ref={ editableRef }
+				/>
+				{ /*
+				 * The format assembly mounts only while the field is selected —
+				 * the shell is presentational and knows nothing about selection,
+				 * so this module owns both the state and the gating.
+				 */ }
+				{ isSelected && ! disabled && (
+					<KeyboardShortcutContext.Provider
+						value={ keyboardShortcuts }
+					>
+						<InputEventContext.Provider value={ inputEvents }>
+							{ /* Format types gate their inline UIs on `isVisible`. */ }
+							<EditableContentElementContext.Provider
+								value={ editableContentElement }
+							>
 								<FormatEdit
 									value={ value }
 									onChange={ onRichTextChange }
@@ -506,10 +503,10 @@ export default function RichTextControl( {
 									forwardedRef={ anchorRef }
 									isVisible
 								/>
-							</InputEventContext.Provider>
-						</KeyboardShortcutContext.Provider>
-					) }
-				</EditableContentElementContext.Provider>
+							</EditableContentElementContext.Provider>
+						</InputEventContext.Provider>
+					</KeyboardShortcutContext.Provider>
+				) }
 			</SlotFillProvider>
 		</div>
 	);
