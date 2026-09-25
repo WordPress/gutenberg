@@ -49,7 +49,7 @@ const MAX_HEADING_LEVEL = 6;
  * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
  * so no line would match and the body would be left half demoted.
  */
-const HEADING = /^( {0,3})(#{1,6})([ \t].*|)$/s;
+const HEADING = /^( {0,3})(#{1,6})([ \t].*|\r?)$/s;
 /* A fence opens on three or more backticks or tildes, indented at most three. */
 const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
 
@@ -424,7 +424,10 @@ export function mergeSection(
 		}
 	}
 
-	const body = demoteHeadings( sanitizeBody( update.body ) ).trim();
+	/* Blank lines only: trimming spaces would turn indented code into a fence. */
+	const body = demoteHeadings( sanitizeBody( update.body ) )
+		.replace( /^\n+/, '' )
+		.replace( /\s+$/, '' );
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);

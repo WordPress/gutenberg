@@ -383,6 +383,10 @@ describe( 'budgets', () => {
 		}
 
 		expect( comment!.length ).toBeLessThan( COMMENT_LIMIT );
+		// Fitting by dropping sections would pass the length check too.
+		expect( parseSections( comment! ).map( ( s ) => s.id ) ).toEqual(
+			SECTIONS.map( ( s ) => s.id )
+		);
 	} );
 } );
 
@@ -650,6 +654,12 @@ describe( 'demoteHeadings', () => {
 
 		expect( demoteHeadings( body ) ).toBe(
 			'##### Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n##### After'
+		);
+	} );
+
+	it( 'demotes a heading with no text among carriage returns', () => {
+		expect( demoteHeadings( '#\r\n\r\n## After' ) ).toBe(
+			'#####\r\n\r\n###### After'
 		);
 	} );
 
