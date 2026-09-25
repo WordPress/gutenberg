@@ -8,6 +8,10 @@
 
 -   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
+### Enhancements
+
+-   Paste handling: Unwrap tables used purely for layout (every row has exactly one cell), such as those found in HTML emails, so their content pastes as normal blocks instead of a Table block. Nested layout tables are unwrapped one level at a time, so a real data table nested inside them is preserved ([#83131](https://github.com/WordPress/gutenberg/pull/83131)).
+
 ## 16.0.0 (2026-09-10)
 
 ### Breaking Changes
