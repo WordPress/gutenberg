@@ -27,7 +27,10 @@ const {
 
 const result = spawn(
 	'node',
-	[ require.resolve( 'playwright-core/cli' ), 'install' ],
+	[
+		resolve( require.resolve( 'playwright-core' ), '..', 'cli.js' ),
+		'install',
+	],
 	{
 		stdio: 'inherit',
 	}
