@@ -59,6 +59,7 @@
 .dataviews-view-grid-infinite-scroll {
 
 	.dataviews-view-grid__card {
+		container-type: inline-size;
 		height: 100%;
 		justify-content: flex-start;
 		position: relative;
@@ -189,6 +190,15 @@
 
 			&:not(:has(.dataviews-view-grid__field-value:not(:empty))) {
 				display: none;
+			}
+
+			@container (max-width: 200px) {
+				flex-direction: column;
+
+				.dataviews-view-grid__field-name,
+				.dataviews-view-grid__field-value {
+					width: 100%;
+				}
 			}
 		}
 	}
