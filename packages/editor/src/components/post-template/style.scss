@@ -41,7 +41,8 @@
 	}
 }
 
-.editor-post-template__dropdown {
+.editor-post-template__dropdown,
+.editor-post-template__dropdown .components-popover__content {
 	min-width: 240px;
 }
 
