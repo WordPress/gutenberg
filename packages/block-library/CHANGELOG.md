@@ -14,7 +14,7 @@
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
 -   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
--   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
+-   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown. The Navigation rule that makes menu items inherit their color now applies only to a Navigation block that sets a color of its own, so it no longer outranks a Navigation Link color set in Global Styles ([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
 
 ### Bug Fixes
 
