@@ -104,7 +104,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ themeRatios }
+							aspectRatios={ themeRatios.map(
+								presetRatioAsNumber
+							) }
 						/>
 					) }
 					{ showDefaultRatios && (
