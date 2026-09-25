@@ -49,9 +49,19 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.locator( 'iframe[name="editor-canvas"]' ).waitFor();
 	} );
 
+	/*
+	 * These tests move focus into the search box with `focus()` rather than
+	 * `click()`. On this branch, the list layout hides each row's actions with
+	 * `position: fixed` inside a scroll container, which can leave Chromium's
+	 * paint and hit-testing stale once the first row becomes active: the page
+	 * renders blank and every click lands on `<html>`, even though the DOM is
+	 * correct. Keyboard focus and key presses don't depend on hit-testing, and
+	 * these tests only need the search box as the starting point of a keyboard
+	 * sequence. Upstream fixed the underlying styles in WordPress/gutenberg#63299.
+	 */
 	test( 'Items list is reachable via TAB', async ( { page } ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -79,7 +89,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -108,7 +118,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -131,7 +141,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -172,7 +182,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
