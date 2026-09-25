@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Remove the unused Jest peer dependency from the fixture package ([#83505](https://github.com/WordPress/gutenberg/pull/83505)).
+-   Remove the unused Jest peer dependency from the fixture package ([#83502](https://github.com/WordPress/gutenberg/pull/83502)).
 
 ## 9.21.0 (2026-09-23)
 

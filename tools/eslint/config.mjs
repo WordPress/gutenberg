@@ -621,11 +621,28 @@ export default dedupePlugins( [
 			// Vitest has no no-jasmine-globals equivalent.
 			'no-restricted-globals': [
 				'error',
-				'jasmine',
-				'spyOn',
-				'spyOnProperty',
-				'fail',
-				'pending',
+				{
+					name: 'jasmine',
+					message: 'Use the vi and expect APIs from Vitest instead.',
+				},
+				{
+					name: 'spyOn',
+					message: 'Use vi.spyOn() from Vitest instead.',
+				},
+				{
+					name: 'spyOnProperty',
+					message:
+						'Use vi.spyOn() from Vitest with a get or set accessor instead.',
+				},
+				{
+					name: 'fail',
+					message: 'Use expect.fail() from Vitest instead.',
+				},
+				{
+					name: 'pending',
+					message:
+						'Use the Vitest test context skip() method instead.',
+				},
 			],
 		},
 	} ) ),
