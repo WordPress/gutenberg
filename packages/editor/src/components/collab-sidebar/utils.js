@@ -277,7 +277,8 @@ export function getSelectionRect( blockEl ) {
  * the noted text rather than the block. A marker split into several runs
  * (crossing overlaps) resolves to its first run. The pending new note has no
  * marker yet, so it anchors to the text selection it will attach to. Anything
- * else falls back to the block itself.
+ * else falls back to the block itself. An anchor inside collapsed content
+ * (e.g. a closed Details) falls back to the closest visible block.
  *
  * Resolved at read time, because rich-text re-renders replace the marker.
  *
@@ -289,8 +290,17 @@ export function getNoteAnchorRect( noteId, blockEl ) {
 	if ( noteId === 'new' ) {
 		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
 	}
-	const anchor =
+	let anchor =
 		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
+	// Collapsed content still reports the box it would have when expanded,
+	// so its size can't tell it apart. Safari < 17.4 lacks `checkVisibility`.
+	while ( anchor.checkVisibility?.() === false ) {
+		const parentBlock = anchor.parentElement?.closest( '[data-block]' );
+		if ( ! parentBlock ) {
+			break;
+		}
+		anchor = parentBlock;
+	}
 	return anchor.getBoundingClientRect();
 }
 
