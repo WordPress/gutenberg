@@ -11,5 +11,5 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
+	return text.replaceAll( OBJECT_REPLACEMENT_CHARACTER, '' );
 }
