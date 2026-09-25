@@ -15,7 +15,13 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	isFiltered = false,
+	styles,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -185,17 +191,19 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	// In the "All notes" view, find where the resolved notes begin so a
-	// "Resolved" divider can be rendered above them. Resolved notes (status
-	// 'approved' with a still-present block) always sort after the active
-	// ones, so the first match marks the boundary. The floating view only
-	// lists unresolved notes, so it needs no divider.
-	const firstResolvedIndex = isFloating
-		? -1
-		: threads.findIndex(
-				( thread ) =>
-					thread.status === 'approved' && !! thread.blockClientId
-			);
+	// In the unfiltered "All notes" view, find where the resolved notes begin
+	// so a "Resolved" divider can be rendered above them. Resolved notes
+	// (status 'approved' with a still-present block) always sort after the
+	// active ones, so the first match marks the boundary. The floating view
+	// only lists unresolved notes, and a filtered list is already all one
+	// status, so neither needs a divider.
+	const firstResolvedIndex =
+		isFloating || isFiltered
+			? -1
+			: threads.findIndex(
+					( thread ) =>
+						thread.status === 'approved' && !! thread.blockClientId
+				);
 
 	return (
 		<Stack
@@ -216,7 +224,16 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
 			}
 		>
-			{ ! hasThreads && ! isFloating ? (
+			{ ! hasThreads && ! isFloating && isFiltered && (
+				<Text
+					variant="body-sm"
+					render={ <p /> }
+					className="editor-collab-sidebar-panel__empty-message"
+				>
+					{ __( 'No notes match this filter.' ) }
+				</Text>
+			) }
+			{ ! hasThreads && ! isFloating && ! isFiltered ? (
 				<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
 			) : (
 				<>

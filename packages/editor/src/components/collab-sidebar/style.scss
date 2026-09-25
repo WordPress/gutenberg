@@ -275,3 +275,16 @@ mark.wp-note {
 .editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
 	border-radius: $radius-round;
 }
+
+// Appearance menu trigger in the "All notes" sidebar header.
+.editor-collab-sidebar__appearance-button {
+	color: var(--wp-admin-theme-color);
+	flex-shrink: 0;
+}
+
+// Shown in place of the note composer when a filter matches nothing.
+.editor-collab-sidebar-panel__empty-message {
+	margin: 0;
+	color: $gray-700;
+	text-align: center;
+}

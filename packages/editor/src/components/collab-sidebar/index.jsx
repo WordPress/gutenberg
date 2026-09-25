@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -12,7 +12,10 @@ import {
 	ALL_NOTES_SIDEBAR,
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
+	NOTES_FILTER_ALL,
+	NOTES_FILTER_RESOLVED,
 } from './constants';
+import { NotesAppearancePopover } from './appearance-popover';
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
@@ -33,6 +36,7 @@ function NotesSidebar( { postId } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
+	const [ notesFilter, setNotesFilter ] = useState( NOTES_FILTER_ALL );
 
 	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -62,6 +66,26 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+
+	/*
+	 * A note counts as resolved once it is approved and still anchored to a
+	 * block, matching the boundary the "Resolved" separator is drawn at.
+	 * Orphans stay with the active notes, so they survive the "Unresolved"
+	 * filter. The filter is deliberately not persisted: a filter left on from
+	 * a previous session would hide notes without explaining why.
+	 */
+	const filteredNotes = useMemo( () => {
+		if ( notesFilter === NOTES_FILTER_ALL ) {
+			return notes;
+		}
+		const isResolved = ( note ) =>
+			note.status === 'approved' && !! note.blockClientId;
+		return notes.filter( ( note ) =>
+			notesFilter === NOTES_FILTER_RESOLVED
+				? isResolved( note )
+				: ! isResolved( note )
+		);
+	}, [ notes, notesFilter ] );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -174,14 +198,24 @@ function NotesSidebar( { postId } ) {
 					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
-						<h2 className="interface-complementary-area-header__title">
-							{ __( 'All notes' ) }
-						</h2>
+						<>
+							<h2 className="interface-complementary-area-header__title">
+								{ __( 'All notes' ) }
+							</h2>
+							<NotesAppearancePopover
+								notesFilter={ notesFilter }
+								setNotesFilter={ setNotesFilter }
+							/>
+						</>
 					}
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<Notes
+						notes={ filteredNotes }
+						sidebarRef={ sidebarRef }
+						isFiltered={ notesFilter !== NOTES_FILTER_ALL }
+					/>
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
