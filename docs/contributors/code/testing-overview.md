@@ -75,6 +75,8 @@ npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=node --proj
 npm run test:unit:vitest:shuffled -- --sequence.seed=12345 --project=browser
 ```
 
+A new seed can expose an existing test-order dependency on an unrelated pull request. When this happens, reproduce the failure with the logged seed and fix the shared state or missing setup and cleanup. Do not push an unrelated change just to get a different seed. If a fix cannot be made promptly, report the failure with its seed, commit, Node.js version, project, and shard, and agree on a temporary quarantine with the maintainers. Keep any quarantine limited to the affected test and link a tracking issue for the fix and removal of the quarantine. Rerun the original failing seed to verify the fix.
+
 #### Public tooling consumers
 
 Run `npm run test:unit:consumers` to pack the public tooling, install it outside the workspace, and exercise the documented configuration and commands. The check covers Vitest and the maintenance-only Jest adapter independently of Gutenberg's unit-test runner. Preserve the dependencies that these isolated consumers install, including the published WordPress Jest preset and Babel transformer.

@@ -129,7 +129,6 @@ jobs:
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   # New workflow runs vary the seed; reruns keep the original seed.
-                  echo "Shuffle seed: $GITHUB_RUN_NUMBER"
                   echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=node --project=jsdom --shard=$SHARD"
                   npm run test:unit:vitest:shuffled -- \
                     --sequence.seed="$GITHUB_RUN_NUMBER" \
@@ -176,7 +175,6 @@ jobs:
                   FK_ENV_NODEJS: '24'
                   BROWSER_TRACE_FILE: ${{ inputs.browser-trace-file }}
               run: |
-                  echo "Shuffle seed: $GITHUB_RUN_NUMBER"
                   if [[ -n "$BROWSER_TRACE_FILE" ]]; then
                     if [[ ! -f "$BROWSER_TRACE_FILE" ]] || [[ "$BROWSER_TRACE_FILE" != packages/*.browser.test.* && "$BROWSER_TRACE_FILE" != test/*.browser.test.* ]]; then
                       echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
