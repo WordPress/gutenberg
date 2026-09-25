@@ -116,7 +116,22 @@ wp.mediaUtils.utils.uploadMedia( {
 } );
 ```
 
-Beware that first onFileChange is called with temporary blob URLs and then with the final URL's this allows to show the result in an optimistic UI as if the upload was already completed. E.g.: when uploading an image, one can show the image right away in the UI even before the upload is complete.
+The `additionalData` parameter can be used to pass attachment fields supported by the WordPress REST API. For example, the following code uploads an image and stores editor-facing metadata on the media item:
+
+```js
+wp.mediaUtils.utils.uploadMedia( {
+	filesList: [ imageFile ],
+	additionalData: {
+		alt_text: 'Close-up of a mountain trail marker',
+		caption: 'Trail marker on the Lycian Way.',
+		title: 'Lycian Way trail marker',
+	},
+	onFileChange: handleFileChange,
+	onError: console.error,
+} );
+```
+
+Beware that first onFileChange is called with temporary blob URLs and then with the final URLs. This allows showing the result in an optimistic UI as if the upload was already completed. E.g.: when uploading an image, one can show the image right away in the UI even before the upload is complete.
 
 ### MediaUpload
 
