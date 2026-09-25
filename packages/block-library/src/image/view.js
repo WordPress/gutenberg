@@ -621,18 +621,18 @@ const { state, actions, callbacks } = store(
 				// The image is not necessarily a direct child of the figure, as
 				// plugins can wrap it, so it uses the container the button is
 				// positioned against rather than the image's parent element.
-				const figure = ref.closest( '.wp-lightbox-container' );
-				if ( ! figure ) {
+				const container = ref.closest( '.wp-lightbox-container' );
+				if ( ! container ) {
 					return;
 				}
-				const figureWidth = figure.clientWidth;
+				const containerWidth = container.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
-				// the figure to be taller than the image, which means it needs to
+				// the container to be taller than the image, which means it needs to
 				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
-				let figureHeight = figure.clientHeight;
-				const caption = figure.querySelector( 'figcaption' );
+				let containerHeight = container.clientHeight;
+				const caption = container.querySelector( 'figcaption' );
 				if ( caption ) {
 					const captionComputedStyle =
 						window.getComputedStyle( caption );
@@ -641,16 +641,16 @@ const { state, actions, callbacks } = store(
 							captionComputedStyle.position
 						)
 					) {
-						figureHeight =
-							figureHeight -
+						containerHeight =
+							containerHeight -
 							caption.offsetHeight -
 							parseFloat( captionComputedStyle.marginTop ) -
 							parseFloat( captionComputedStyle.marginBottom );
 					}
 				}
 
-				const buttonOffsetTop = figureHeight - offsetHeight;
-				const buttonOffsetRight = figureWidth - offsetWidth;
+				const buttonOffsetTop = containerHeight - offsetHeight;
+				const buttonOffsetRight = containerWidth - offsetWidth;
 
 				let buttonTop = buttonOffsetTop + 16;
 				let buttonRight = buttonOffsetRight + 16;
