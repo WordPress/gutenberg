@@ -52,7 +52,10 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 			if ( file_exists( $content_asset_path ) ) {
 				$content_asset = require $content_asset_path;
 				$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
-				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				$extension = '.min.js';
+				if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+					$extension = '.js';
+				}
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
 				wp_deregister_script_module( $content_handle );
@@ -71,7 +74,10 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 			if ( file_exists( $route_asset_path ) ) {
 				$route_asset = require $route_asset_path;
 				$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
-				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				$extension = '.min.js';
+				if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+					$extension = '.js';
+				}
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
 				wp_deregister_script_module( $route_handle );

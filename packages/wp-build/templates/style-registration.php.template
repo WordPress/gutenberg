@@ -42,8 +42,12 @@ function {{PREFIX}}_override_style( $styles, $handle, $src, $deps = array(), $ve
 function {{PREFIX}}_register_package_styles( $styles ) {
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
-	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
-	$suffix          = SCRIPT_DEBUG ? '' : '.min';
+	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
+
+	$suffix = '.min';
+	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+		$suffix = '';
+	}
 
 	$styles_dir  = __DIR__ . '/styles';
 	$styles_file = $styles_dir . '/registry.php';
