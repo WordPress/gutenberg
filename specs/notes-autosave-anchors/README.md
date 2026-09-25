@@ -64,7 +64,7 @@ Yes, with limits. What the code says:
 | An autosave by the post author, on a draft, with no post lock, updates the post itself instead of making a revision. | `WP_REST_Autosaves_Controller::create_item()` | Slice 01 alone fixes the most common case (an author notes their own draft). No reload logic needed. |
 | core-data treats that response as a regular save. | `saveEntityRecord` in `packages/core-data/src/actions.js` ("An autosave may be processed by the server as a regular save") | The post is clean afterwards, so the unsaved changes warning goes away too. |
 | For published posts, or drafts by another author, the autosave is a revision owned by the current user. | Same controller | The anchor survives, but only in the autosave. Slice 03 is needed. |
-| The editor reads the current user's autosave with `getAutosave( postType, postId, currentUserId )`. | `isEditedPostAutosaveable` | Re-attaching only uses the current user's own autosave. Don't use other users' autosaves: `GET /autosaves` returning every user's autosave is expected to change to the current user only. |
+| The editor reads the current user's autosave with `getAutosave( postType, postId, currentUserId )`. | `isEditedPostAutosaveable` | Re-attaching only uses the current user's own autosave. Don't use other users' autosaves: `GET /autosaves` returning every user's autosave is expected to change to the current user only ([Trac #62057](https://core.trac.wordpress.org/ticket/62057)). |
 | Autosave only fires when the post is autosaveable (saveable, not locked, type supports `autosave`, existing autosave fetched). | `isEditedPostAutosaveable` | The immediate autosave is best-effort. When it can't run, behavior matches trunk. |
 | Orphans are already computed in one place. | `useNoteThreads` in `collab-sidebar/hooks.js` | Slice 03 has a clear input: root threads with no `blockClientId`. |
 
@@ -94,7 +94,7 @@ Yes, with limits. What the code says:
 - **One owner for orphans.** `useNoteThreads` decides which notes are orphans. Slice 03 uses that result and does not compute orphans again.
 - **Re-attaching never overwrites.** It only adds a note id to a block that doesn't already have it, and only for notes that are orphaned right now.
 - **No new REST endpoints, no PHP.** Only `/comments` and `/autosaves`, which the editor already calls.
-- **Only the current user's autosave.** Never read another user's autosave, even though the endpoint returns them today.
+- **Only the current user's autosave.** Never read another user's autosave, even though the endpoint returns them today. See [Trac #62057](https://core.trac.wordpress.org/ticket/62057).
 
 ## Firewalls
 
