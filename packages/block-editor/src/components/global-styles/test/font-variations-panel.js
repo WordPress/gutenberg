@@ -42,14 +42,34 @@ describe( 'getFontVariationAxes', () => {
 	} );
 
 	it( 'leaves out the axes OpenType registers', () => {
-		const tags = getFontVariationAxes(
-			getSettings(),
-			'var:preset|font-family|roboto-flex'
-		).map( ( { tag } ) => tag );
+		/*
+		 * A face declaring all five, so none of them passes for want of being
+		 * there. Writing a registered axis into `font-variation-settings` takes
+		 * it away from the property that owns it: with `"slnt" 0` alongside
+		 * `font-style: oblique 10deg`, the text renders upright.
+		 */
+		const everyAxis = {
+			...robotoFlex,
+			fontFace: [
+				{
+					axes: [
+						{ tag: 'wght', min: 100, default: 400, max: 1000 },
+						{ tag: 'wdth', min: 25, default: 100, max: 151 },
+						{ tag: 'slnt', min: -10, default: 0, max: 0 },
+						{ tag: 'ital', min: 0, default: 0, max: 1 },
+						{ tag: 'opsz', min: 8, default: 14, max: 144 },
+						{ tag: 'FILL', min: 0, default: 0, max: 1 },
+					],
+				},
+			],
+		};
 
-		[ 'wght', 'wdth', 'slnt', 'ital', 'opsz' ].forEach( ( registered ) => {
-			expect( tags ).not.toContain( registered );
-		} );
+		expect(
+			getFontVariationAxes(
+				getSettings( true, [ everyAxis ] ),
+				'var:preset|font-family|roboto-flex'
+			).map( ( { tag } ) => tag )
+		).toEqual( [ 'FILL' ] );
 	} );
 
 	it( 'resolves the font family from each value format', () => {
