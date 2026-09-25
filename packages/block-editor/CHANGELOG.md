@@ -84,6 +84,7 @@
 
 ### Bug Fixes
 
+-   Inner block controllers rendering one entity, such as two Template Parts on the same slug or two Navigation blocks on the same menu, no longer split typing in one of them into an undo level per character, lose keystrokes, or move the selection into the other one. A controller now updates its existing clones in place when only attributes changed, and a history-ignored change to other blocks no longer ends a typing run ([#82706](https://github.com/WordPress/gutenberg/pull/82706)).
 -   `NavigableToolbar`: Preserve toolbar semantics while it is hidden, so asynchronous control changes do not remount custom block toolbars ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
 -   `ListView`: Drop the block icon's variation colors while the row is selected, so the icon keeps contrast against the selection background ([#82498](https://github.com/WordPress/gutenberg/pull/82498)).
 -   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).

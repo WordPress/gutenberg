@@ -445,7 +445,7 @@ function RichTextWrapper(
 		ariaActiveDescendant,
 	] );
 
-	useMarkPersistent( { html: adjustedValue, value } );
+	useMarkPersistent( { html: adjustedValue, value, getValue } );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
