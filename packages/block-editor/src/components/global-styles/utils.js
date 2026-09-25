@@ -1,16 +1,29 @@
 import { useViewportMatch } from '@wordpress/compose';
+import { createContext, useContext } from '@wordpress/element';
+
+/**
+ * Overrides the ToolsPanel dropdown menu props returned by
+ * `useToolsPanelDropdownMenuProps` on non-mobile viewports.
+ */
+export const ToolsPanelDropdownMenuPropsContext = createContext( undefined );
 
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-			}
-		: {};
+	const contextDropdownMenuProps = useContext(
+		ToolsPanelDropdownMenuPropsContext
+	);
+	if ( isMobile ) {
+		return {};
+	}
+	return (
+		contextDropdownMenuProps ?? {
+			popoverProps: {
+				placement: 'left-start',
+				// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+				offset: 259,
+			},
+		}
+	);
 }
 
 /**

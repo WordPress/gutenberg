@@ -15,6 +15,10 @@ const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
+// The Styles page has no sidebar to open the dropdown menus beside, so use
+// the default placement.
+const TOOLS_PANEL_DROPDOWN_MENU_PROPS = {};
+
 const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
 	setIsStyleBookOpened,
@@ -103,6 +107,9 @@ export default function SidebarGlobalStyles() {
 					path={ section }
 					onPathChange={ onChangeSection }
 					settings={ settings }
+					toolsPanelDropdownMenuProps={
+						TOOLS_PANEL_DROPDOWN_MENU_PROPS
+					}
 				/>
 			</div>
 		</Page>

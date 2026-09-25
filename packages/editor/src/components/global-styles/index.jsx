@@ -1,3 +1,4 @@
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -5,6 +6,9 @@ import { GlobalStylesUI } from '@wordpress/global-styles-ui';
 import { uploadMedia } from '@wordpress/media-utils';
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
+import { unlock } from '../../lock-unlock';
+
+const { ToolsPanelDropdownMenuPropsContext } = unlock( blockEditorPrivateApis );
 
 /**
  * Hook to fetch server CSS and settings for BlockEditorProvider that are not Global Styles.
@@ -83,6 +87,7 @@ export default function GlobalStylesUIWrapper( {
 	settings,
 	selectedViewport,
 	showResponsiveStateControls = true,
+	toolsPanelDropdownMenuProps,
 } ) {
 	const {
 		user: userConfig,
@@ -104,7 +109,9 @@ export default function GlobalStylesUIWrapper( {
 	}
 
 	return (
-		<>
+		<ToolsPanelDropdownMenuPropsContext.Provider
+			value={ toolsPanelDropdownMenuProps }
+		>
 			<GlobalStylesUI
 				value={ userConfig }
 				baseValue={ baseConfig || {} }
@@ -124,7 +131,7 @@ export default function GlobalStylesUIWrapper( {
 				path={ path }
 				onPathChange={ onPathChange }
 			/>
-		</>
+		</ToolsPanelDropdownMenuPropsContext.Provider>
 	);
 }
 

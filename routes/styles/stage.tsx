@@ -25,6 +25,10 @@ import './style.scss';
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
 
+// The Styles page has no sidebar to open the dropdown menus beside, so use
+// the default placement.
+const TOOLS_PANEL_DROPDOWN_MENU_PROPS = {};
+
 function Stage() {
 	const navigate = useNavigate();
 	const search = useSearch( { strict: false } ) as any;
@@ -173,6 +177,9 @@ function Stage() {
 					path={ section }
 					onPathChange={ onChangeSection }
 					settings={ editorSettings }
+					toolsPanelDropdownMenuProps={
+						TOOLS_PANEL_DROPDOWN_MENU_PROPS
+					}
 				/>
 			</div>
 			{ isActivatePanelOpen && (

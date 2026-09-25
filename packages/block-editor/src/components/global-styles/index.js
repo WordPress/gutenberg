@@ -1,4 +1,5 @@
 export { useSettingsForBlockElement } from './hooks';
+export { ToolsPanelDropdownMenuPropsContext } from './utils';
 export {
 	default as TypographyPanel,
 	useHasTypographyPanel,
