@@ -38,7 +38,7 @@ Root-level key for the map that holds the entity record data.
 
 ### createSyncManager
 
-Creates the sync manager, which orchestrates the lifecycle of syncing entity records: it creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store.
+Creates the sync manager, which orchestrates the lifecycle of syncing entity records: it creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store. Exported for `@wordpress/core-data`; plugins don't need it.
 
 ### Delta
 
@@ -54,7 +54,7 @@ Origin string for CRDT document changes that should be synced but not recorded i
 
 ### retrySyncConnection
 
-Immediately retries the HTTP polling sync connection instead of waiting for the next automatic retry.
+Retries the HTTP polling connection now instead of waiting for the next automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
 
 ### Y
 
