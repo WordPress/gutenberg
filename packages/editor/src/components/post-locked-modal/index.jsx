@@ -17,19 +17,22 @@ import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
-	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
-		( select ) => {
-			const {
-				isCollaborationSupported: isSupported,
-				getSyncConnectionStatus,
-			} = unlock( select( coreStore ) );
-			return {
-				isCollaborationSupported: isSupported(),
-				syncConnectionStatus: getSyncConnectionStatus(),
-			};
-		},
-		[]
-	);
+	const {
+		isCollaborationSupported,
+		syncConnectionStatus,
+		incompatiblePlugins,
+	} = useSelect( ( select ) => {
+		const {
+			isCollaborationSupported: isSupported,
+			getSyncConnectionStatus,
+			getCollaborationIncompatiblePlugins,
+		} = unlock( select( coreStore ) );
+		return {
+			isCollaborationSupported: isSupported(),
+			syncConnectionStatus: getSyncConnectionStatus(),
+			incompatiblePlugins: getCollaborationIncompatiblePlugins(),
+		};
+	}, [] );
 
 	if ( isCollaborationSupported ) {
 		return null;
@@ -40,6 +43,26 @@ function CollaborationContext() {
 			<p>
 				{ __(
 					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
+	}
+
+	/*
+	 * Naming the plugins saves the reader from deactivating plugins one by one
+	 * to find the one holding collaboration back. The names are unavailable
+	 * when the lock-out came from somewhere other than a meta box, so the
+	 * unqualified sentence remains the fallback.
+	 */
+	if ( incompatiblePlugins.length ) {
+		return (
+			<p>
+				{ sprintf(
+					/* translators: %s: Comma-separated list of plugin names. */
+					__(
+						'Because this post uses plugins that aren’t compatible with real-time collaboration (%s), only one person can edit at a time.'
+					),
+					incompatiblePlugins.join( ', ' )
 				) }
 			</p>
 		);

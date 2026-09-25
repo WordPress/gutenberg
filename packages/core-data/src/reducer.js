@@ -730,6 +730,40 @@ export function collaborationSupported( state = true, action ) {
 	return state;
 }
 
+/*
+ * Shared so an unchanged empty list keeps its reference and does not
+ * retrigger consumers.
+ */
+const NO_INCOMPATIBLE_PLUGINS = Object.freeze( [] );
+
+/**
+ * Reducer tracking which plugins make collaboration unsupported.
+ *
+ * Only meaningful while `collaborationSupported` is false. A meta box title
+ * stands in where the plugin behind it cannot be resolved.
+ *
+ * @param {string[]} state  Current state.
+ * @param {Object}   action Dispatched action.
+ *
+ * @return {string[]} Updated state.
+ */
+export function collaborationIncompatiblePlugins(
+	state = NO_INCOMPATIBLE_PLUGINS,
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATION_SUPPORTED':
+			if ( action.supported ) {
+				return NO_INCOMPATIBLE_PLUGINS;
+			}
+
+			return action.incompatiblePlugins?.length
+				? action.incompatiblePlugins
+				: NO_INCOMPATIBLE_PLUGINS;
+	}
+	return state;
+}
+
 /**
  * Reducer managing view configs, keyed by `kind/name`.
  *
@@ -781,5 +815,6 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	collaborationIncompatiblePlugins,
 	viewConfigs,
 } );

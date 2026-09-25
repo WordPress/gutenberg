@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 import { SECOND_USER } from './fixtures/collaboration-utils';
 
@@ -30,6 +30,26 @@ async function waitForCollaborationEnabledForCurrentPost(
 		},
 		{ timeout: 15000 }
 	);
+}
+
+async function openPostAsSecondUser( browser: Browser, postId: number ) {
+	const context = await browser.newContext( { baseURL: BASE_URL } );
+	const page = await context.newPage();
+
+	await page.goto( '/wp-login.php' );
+	await page.locator( '#user_login' ).fill( SECOND_USER.username );
+	await page.locator( '#user_pass' ).fill( SECOND_USER.password );
+	await page.getByRole( 'button', { name: 'Log In' } ).click();
+	await page.waitForURL( '**/wp-admin/**' );
+
+	await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+	await page.waitForFunction(
+		() => window?.wp?.data && window?.wp?.blocks,
+		undefined,
+		{ timeout: 15000 }
+	);
+
+	return { context, page };
 }
 
 test.describe( 'Collaboration with meta boxes', () => {
@@ -109,10 +129,13 @@ test.describe( 'Collaboration with meta boxes', () => {
 				} );
 				await expect( modal ).toBeVisible( { timeout: 15000 } );
 
-				// Assert the explanation about meta box incompatibility.
+				// Assert the explanation about meta box incompatibility. The
+				// test meta boxes share a plugin directory, so the plugin
+				// behind them cannot be resolved unambiguously and the meta
+				// box title stands in.
 				await expect(
 					modal.getByText(
-						'Because this post uses plugins that aren\u2019t compatible with real-time collaboration, only one person can edit at a time.'
+						'Because this post uses plugins that aren\u2019t compatible with real-time collaboration (Gutenberg Test Meta Box), only one person can edit at a time.'
 					)
 				).toBeVisible();
 
@@ -211,6 +234,69 @@ test.describe( 'Collaboration with meta boxes', () => {
 				name: 'This post is already being edited',
 			} );
 			await expect( modal ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'incompatible and compatible meta boxes together', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-plugin-meta-box'
+			);
+			await requestUtils.activatePlugin(
+				'gutenberg-test-plugin-rtc-compatible-meta-box'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-meta-box'
+			);
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-rtc-compatible-meta-box'
+			);
+		} );
+
+		test( 'names only the meta box that is incompatible', async ( {
+			collaborationUtils,
+			requestUtils,
+			admin,
+			page,
+		} ) => {
+			const post = await requestUtils.createPost( {
+				title: 'Meta Box Naming Test',
+				status: 'draft',
+				date_gmt: new Date().toISOString(),
+			} );
+
+			await admin.editPost( post.id );
+			await collaborationUtils.waitForEntityReady( page );
+			await waitForCollaborationEnabledForCurrentPost( page, false );
+
+			const { context, page: page2 } = await openPostAsSecondUser(
+				admin.browser,
+				post.id
+			);
+
+			try {
+				const modal = page2.getByRole( 'dialog', {
+					name: 'This post is already being edited',
+				} );
+				await expect( modal ).toBeVisible( { timeout: 15000 } );
+
+				await expect(
+					modal.getByText(
+						'Because this post uses plugins that aren\u2019t compatible with real-time collaboration (Gutenberg Test Meta Box), only one person can edit at a time.'
+					)
+				).toBeVisible();
+
+				// The compatible meta box is not what blocked collaboration,
+				// so it must not be named alongside the one that did.
+				await expect( modal ).not.toContainText(
+					'RTC Compatible Test Meta Box'
+				);
+			} finally {
+				await context.close();
+			}
 		} );
 	} );
 } );
