@@ -7,7 +7,9 @@
  * Extends the fields of Pages through the fields API, one self-contained
  * function per case. Every case registers its fields on
  * `gutenberg_fields_api_init`, the action the registry fires the first time its
- * fields are read, after `init`, once the default fields are registered:
+ * fields are read, after `init`, once the default fields are registered. The
+ * callbacks register on the registry they receive: there is no function
+ * wrapping its `register()` and `unregister()` methods.
  *
  * 1. `add_field_declarative`: a declarative field (`menu_order`), plain data,
  *    no JavaScript.
@@ -34,8 +36,8 @@
  * Case 1: a declarative field (`menu_order`), whose value is a property of
  * the record. No JavaScript, no styles.
  */
-function gutenberg_test_fields_api_add_field_declarative() {
-	gutenberg_register_fields(
+function gutenberg_test_fields_api_add_field_declarative( $registry ) {
+	$registry->register(
 		'postType',
 		'page',
 		array(
@@ -66,7 +68,7 @@ add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_add_field_de
  *   registers the field and nothing else.
  *
  * The module also exports a complete `word_count` field, id and label
- * included, that no `gutenberg_register_fields()` call names. A module only
+ * included, that no registration names. A module only
  * augments the fields it was registered with, so the entry is ignored and
  * the field is not registered.
  */
@@ -98,8 +100,8 @@ function gutenberg_test_fields_api_register_reading_time_assets() {
 }
 add_action( 'init', 'gutenberg_test_fields_api_register_reading_time_assets' );
 
-function gutenberg_test_fields_api_add_field_with_script_module() {
-	gutenberg_register_fields(
+function gutenberg_test_fields_api_add_field_with_script_module( $registry ) {
+	$registry->register(
 		'postType',
 		'page',
 		array(
@@ -152,8 +154,8 @@ function gutenberg_test_fields_api_register_comment_status_assets() {
 }
 add_action( 'init', 'gutenberg_test_fields_api_register_comment_status_assets' );
 
-function gutenberg_test_fields_api_update_field() {
-	gutenberg_register_fields(
+function gutenberg_test_fields_api_update_field( $registry ) {
+	$registry->register(
 		'postType',
 		'page',
 		array(
@@ -174,9 +176,9 @@ add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_update_field
  * follows is the whole field. The default priority runs after the default
  * fields: there is nothing to unregister before.
  */
-function gutenberg_test_fields_api_replace_field() {
-	gutenberg_unregister_fields( 'postType', 'page', array( 'author' ) );
-	gutenberg_register_fields(
+function gutenberg_test_fields_api_replace_field( $registry ) {
+	$registry->unregister( 'postType', 'page', array( 'author' ) );
+	$registry->register(
 		'postType',
 		'page',
 		array(
@@ -209,8 +211,8 @@ add_action( 'gutenberg_fields_api_init', 'gutenberg_test_fields_api_replace_fiel
  *   field to the end of the form. Filtered from the moment the plugin
  *   loads, whenever the view configuration is read.
  */
-function gutenberg_test_fields_api_add_field_with_data() {
-	gutenberg_register_fields(
+function gutenberg_test_fields_api_add_field_with_data( $registry ) {
+	$registry->register(
 		'postType',
 		'page',
 		array(
