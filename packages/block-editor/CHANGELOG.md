@@ -10,6 +10,10 @@
 
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 
+### Internal
+
+-   Remove the private `toggleBlockSpotlight` action, the state it set, and the private `hasBlockSpotlight` selector. Notes were the only thing that dispatched the action and they now mark their block with the block highlight instead. `BlockList` reads `getEditedContentOnlySection` directly for the one case that still dims the canvas ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes
