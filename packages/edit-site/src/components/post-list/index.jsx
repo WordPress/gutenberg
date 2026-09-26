@@ -1,4 +1,5 @@
-import { Page } from '@wordpress/admin-ui';
+import { BreadcrumbPath, Page } from '@wordpress/admin-ui';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
 	store as coreStore,
@@ -29,7 +30,8 @@ import {
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, usePageAncestorPaths } =
+	unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
@@ -84,7 +86,15 @@ export default function PostList( { postType } ) {
 	} );
 
 	const onChangeView = useEvent( ( newView ) => {
-		updateView( newView );
+		updateView(
+			newView.descriptionField === 'pageAncestorPath'
+				? {
+						...newView,
+						descriptionField: view.descriptionField,
+						showDescription: view.showDescription,
+					}
+				: newView
+		);
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
@@ -108,7 +118,7 @@ export default function PostList( { postType } ) {
 		setSelection( newSelection );
 	}, [ postId ] );
 
-	const fields = usePostFields( {
+	const allFields = usePostFields( {
 		postType,
 	} );
 
@@ -228,6 +238,53 @@ export default function PostList( { postType } ) {
 		permissions: hierarchyPermissions[ index ],
 	} ) );
 	const displayedRecords = isPageHierarchy ? hierarchyRecords : records;
+	const showPagePaths =
+		postType === 'page' && view.type === 'table' && !! view.search;
+	const ancestors = usePageAncestorPaths( records, showPagePaths );
+	const displayedView = useMemo(
+		() =>
+			showPagePaths
+				? {
+						...view,
+						descriptionField: 'pageAncestorPath',
+						showDescription: true,
+					}
+				: view,
+		[ view, showPagePaths ]
+	);
+	const fields = useMemo( () => {
+		if ( ! showPagePaths ) {
+			return allFields;
+		}
+		return [
+			...allFields,
+			{
+				id: 'pageAncestorPath',
+				label: __( 'Page location' ),
+				type: 'text',
+				filterBy: false,
+				enableHiding: false,
+				render: ( { item } ) => {
+					const ancestorPath = ancestors.paths[ item.id ];
+					if ( ancestorPath?.length ) {
+						return (
+							<BreadcrumbPath
+								items={ ancestorPath.map( ( label ) => ( {
+									label,
+								} ) ) }
+							/>
+						);
+					}
+					return !! item.parent && ! ancestors.loading ? (
+						<small>
+							{ ancestors.error ??
+								__( 'Page location unavailable.' ) }
+						</small>
+					) : null;
+				},
+			},
+		];
+	}, [ allFields, showPagePaths, ancestors ] );
 
 	const postIds = useMemo(
 		() => displayedRecords?.map( ( record ) => record.id ) ?? [],
@@ -359,7 +416,7 @@ export default function PostList( { postType } ) {
 						: isLoadingData || ! hasResolved ) ||
 					isLoadingNotesCount
 				}
-				view={ view }
+				view={ displayedView }
 				onChangeView={ onChangeView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
@@ -368,7 +425,9 @@ export default function PostList( { postType } ) {
 					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
 				getItemId={ getItemId }
-				getItemLevel={ getItemLevel }
+				getItemLevel={ ( item ) =>
+					showPagePaths ? 0 : getItemLevel( item )
+				}
 				{ ...( isPageHierarchy && {
 					getItemParentId: ( item ) => item.parent || null,
 					getItemHasChildren: ( item ) => {
