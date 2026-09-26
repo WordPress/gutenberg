@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `TypographyPanel`: Read a font family written inline in a block's style, not only the one an attribute names. A block of the first kind reached the panel without a family, so the styles, weights and widths it was offered were the inherited font's rather than its own ([#83462](https://github.com/WordPress/gutenberg/pull/83462)).
+
 ### Enhancements
 
 -   `TypographyPanel`: Add an optional `capabilityFontFamily`, the family the text is drawn in when neither the panel's value nor the value it inherits names one. It decides which styles and weights Appearance offers and nothing else, so a block that draws its text in the root font is no longer offered the built-in weight list ([#83462](https://github.com/WordPress/gutenberg/pull/83462)).
