@@ -1,4 +1,9 @@
-import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	DropdownMenu,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -13,8 +18,16 @@ import { useViewportMatch } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
+import MoreMenuWithUI from './ui-menu';
 
 export default function MoreMenu() {
+	const toolsFills = useSlotFills( 'EditWidgetsToolsMoreMenuGroup' );
+	// Existing fills may contain arbitrary legacy controls. Preserve their menu
+	// context and keyboard navigation.
+	return toolsFills?.length ? <LegacyMoreMenu /> : <MoreMenuWithUI />;
+}
+
+function LegacyMoreMenu() {
 	const [
 		isKeyboardShortcutsModalActive,
 		setIsKeyboardShortcutsModalVisible,
