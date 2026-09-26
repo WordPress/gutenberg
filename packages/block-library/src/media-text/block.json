@@ -66,6 +66,12 @@
 			"selector": "figure a",
 			"attribute": "class"
 		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"mediaType": {
 			"type": "string",
 			"role": "content"

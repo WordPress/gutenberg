@@ -11,6 +11,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	useSettings,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
@@ -190,6 +191,7 @@ function MediaTextEdit( {
 		href,
 		imageFill,
 		isStackedOnMobile,
+		lightbox,
 		linkClass,
 		linkDestination,
 		linkTarget,
@@ -271,6 +273,7 @@ function MediaTextEdit( {
 			linkClass: undefined,
 			rel: undefined,
 			href: undefined,
+			lightbox: undefined,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
 	};
@@ -288,6 +291,23 @@ function MediaTextEdit( {
 
 	const onSetHref = ( props ) => {
 		setAttributes( props );
+	};
+
+	// Opt-in: follows the Image block's `allowEditing`, not its `enabled` default.
+	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
+	const lightboxEnabled = !! lightbox?.enabled;
+	// Stay visible while enabled, so it can always be turned off.
+	const showLightboxSetting =
+		lightboxEnabled || !! lightboxSetting?.allowEditing;
+
+	const onSetLightbox = ( enable ) => {
+		setAttributes( {
+			lightbox: enable ? { enabled: true } : undefined,
+		} );
+	};
+
+	const resetLightbox = () => {
+		setAttributes( { lightbox: undefined } );
 	};
 
 	const onWidthChange = ( width ) => {
@@ -564,6 +584,10 @@ function MediaTextEdit( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
+						showLightboxSetting={ showLightboxSetting }
+						lightboxEnabled={ lightboxEnabled }
+						onSetLightbox={ onSetLightbox }
+						resetLightbox={ resetLightbox }
 					/>
 				) }
 			</BlockControls>
