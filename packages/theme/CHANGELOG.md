@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
+-   Make JavaScript token fallback transforms syntax-aware, preserve tagged-template values and source maps, and support Vite query-string module IDs. Use the TypeScript loader for `.ts`, `.mts`, and `.cts` files handled by the esbuild plugin, including files whose token values are unchanged. ([#83356](https://github.com/WordPress/gutenberg/pull/83356))
+-   Preserve Lightning CSS `from global` references and keep nested fallback variables global when injecting design token fallbacks ([#83359](https://github.com/WordPress/gutenberg/pull/83359)).
+
+### Internal
+
+-   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
+
+### Documentation
+
+-   Document public entrypoints and derived provider and warning types ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
+
 ## 2.2.0 (2026-09-23)
 
 ### Internal

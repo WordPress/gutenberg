@@ -364,6 +364,12 @@ describe( 'vips utilities', () => {
 	} );
 
 	describe( 'vipsCancelOperations', () => {
+		beforeEach( async () => {
+			// Cancellation only delegates to the worker after an image operation loads it.
+			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
+			await vipsCompressImage( 'item-1', jpegFile );
+		} );
+
 		it( 'calls worker cancelOperations with item ID', async () => {
 			mockCancelOperations.mockResolvedValue( true );
 
@@ -378,6 +384,7 @@ describe( 'vips utilities', () => {
 
 			const result = await vipsCancelOperations( 'item-456' );
 
+			expect( mockCancelOperations ).toHaveBeenCalledWith( 'item-456' );
 			expect( result ).toBe( false );
 		} );
 	} );

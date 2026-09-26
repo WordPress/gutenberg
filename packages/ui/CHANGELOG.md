@@ -2,11 +2,26 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now announce dynamic updates explicitly, for example with `speak()` from `@wordpress/a11y` ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+### New Features
+
+-   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
+
+### Bug Fixes
+
+-   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
+-   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
+-   `CollapsibleCard`: Only show the header's focus ring when its own trigger is keyboard-focused ([#81314](https://github.com/WordPress/gutenberg/pull/81314)).
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes
 
 -   `Combobox.Root`: `filteredItems` now uses the selected value type instead of `any`. Consumers that pass object items with primitive selected values must use matching item and value types. ([#82835](https://github.com/WordPress/gutenberg/pull/82835))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Remove the `readOnly` prop ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   `Select.Item`, `SelectControl.Item`: Children must start with `ItemLabel`, followed by zero or more `ItemDescription` components. Pass `ItemLabel` instead of a string. For `SelectControl` `items`, set `label` and optional `description` on each item. ([#82369](https://github.com/WordPress/gutenberg/pull/82369))
 
 ### New Features
@@ -31,6 +46,7 @@
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`, `Combobox.ChipWithRemove`: Assistive technology now hears selected chip names, how to remove them, and how to move to them from the input ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   `Autocomplete`: Use valid grid and rowgroup semantics without local accessibility overrides ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   `Menu`: Center labels, descriptions, suffixes, shortcuts, and submenu chevrons within items, including items with taller prefix or suffix content. ([#82847](https://github.com/WordPress/gutenberg/pull/82847))
 -   `Menu`: vertically center single-line item labels while preserving first-line alignment for wrapped content. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
@@ -42,7 +58,7 @@
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
-- `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
+-   `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
 
 ## 0.22.0 (2026-09-10)
 
