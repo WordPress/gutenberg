@@ -123,21 +123,6 @@ export function createBoardStore() {
 		}
 	}
 
-	function observeRoot() {
-		if ( ! observer || ! rootEl ) {
-			return;
-		}
-		observer.observe( rootEl );
-		// Content above the canvas moves the frame and shrinks it.
-		if ( frameEl ) {
-			observer.observe( frameEl );
-		}
-		styleObserver.observe( rootEl, {
-			subtree: true,
-			attributeFilter: [ 'style' ],
-		} );
-	}
-
 	// Watch the block-list root, so editing, adding or removing any block
 	// re-anchors the threads after it. Climbing to the root also keeps nested
 	// scroll containers (e.g. a Group with overflow:auto) from shadowing the
@@ -149,26 +134,39 @@ export function createBoardStore() {
 		if ( nextRootEl === rootEl ) {
 			return;
 		}
-		if ( observer && rootEl ) {
-			observer.unobserve( rootEl );
-			if ( frameEl ) {
-				observer.unobserve( frameEl );
-			}
-			styleObserver.disconnect();
-		}
 		rootEl = nextRootEl;
 		canvas = rootEl ? getScrollContainer( rootEl ) : null;
 		frameEl = rootEl?.ownerDocument.defaultView?.frameElement ?? null;
-		observeRoot();
+		// Root changes are rare, so start over rather than swap targets.
+		if ( observer ) {
+			disconnect();
+			connect();
+		}
 	}
 
 	function connect() {
 		observer = new window.ResizeObserver( onResize );
 		styleObserver = new window.MutationObserver( onStyleChange );
-		for ( const floatingEl of floatingRefs.values() ) {
-			observer.observe( floatingEl );
+		const targets = [
+			...floatingRefs.values(),
+			rootEl,
+			// Content above the root (e.g. the post title) moves it without
+			// resizing it, but grows its parent.
+			rootEl?.parentElement,
+			// Content above the canvas moves the frame and shrinks it.
+			frameEl,
+		];
+		for ( const target of targets ) {
+			if ( target ) {
+				observer.observe( target );
+			}
 		}
-		observeRoot();
+		if ( rootEl ) {
+			styleObserver.observe( rootEl, {
+				subtree: true,
+				attributeFilter: [ 'style' ],
+			} );
+		}
 	}
 
 	function disconnect() {
@@ -176,6 +174,15 @@ export function createBoardStore() {
 		styleObserver.disconnect();
 		observer = null;
 		styleObserver = null;
+	}
+
+	function untrackFloating( id ) {
+		const floatingEl = floatingRefs.get( id );
+		if ( floatingEl ) {
+			observer?.unobserve( floatingEl );
+			idByElement.delete( floatingEl );
+			floatingRefs.delete( id );
+		}
 	}
 
 	return {
@@ -200,13 +207,8 @@ export function createBoardStore() {
 
 		registerThread( id, blockEl, floatingEl ) {
 			blockRefs.set( id, blockEl );
-			const prev = floatingRefs.get( id );
-			if ( prev && prev !== floatingEl ) {
-				observer?.unobserve( prev );
-				idByElement.delete( prev );
-				floatingRefs.delete( id );
-			}
-			if ( floatingEl && prev !== floatingEl ) {
+			if ( floatingRefs.get( id ) !== floatingEl ) {
+				untrackFloating( id );
 				floatingRefs.set( id, floatingEl );
 				idByElement.set( floatingEl, id );
 				observer?.observe( floatingEl );
@@ -217,12 +219,7 @@ export function createBoardStore() {
 
 		unregisterThread( id ) {
 			blockRefs.delete( id );
-			const prev = floatingRefs.get( id );
-			if ( prev ) {
-				observer?.unobserve( prev );
-				idByElement.delete( prev );
-				floatingRefs.delete( id );
-			}
+			untrackFloating( id );
 			delete heights[ id ];
 			syncRoot();
 			requestMeasure();

@@ -69,10 +69,17 @@ A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
 - `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`.
+- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`. When the root changes, the observers are rebuilt.
 - `snapshot: { heights, anchorRects, canvas, frameOffset }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it. `frameOffset` is the canvas frame's top minus the top of the threads' container (their `offsetParent`): anchors are read in the frame's viewport, threads are positioned in the container, and anything above the canvas (e.g. an editor notice or the device preview inset) separates the two.
 
-One `ResizeObserver` watches every floating element, the root and the canvas frame. Watching the root means editing, adding or removing any block re-anchors the threads after it. Content above the canvas moves the frame and shrinks it, so watching the frame keeps `frameOffset` current; a frame that moves without resizing isn't detected. Every callback runs `measure()`, which reads the heights and each thread's anchor via `getNoteAnchorRect()` (in `utils.js`), and emits only when a value changed.
+One `ResizeObserver` watches:
+
+- each floating element, for thread heights;
+- the root, so editing, adding or removing a block re-anchors the threads below it;
+- the root's parent, which grows when content above the root (e.g. a wrapping post title) moves the root without resizing it;
+- the canvas frame, which shrinks when content above the canvas moves it. A frame that moves without resizing isn't detected.
+
+Each callback runs `measure()`, which reads the heights and anchors (via `getNoteAnchorRect()` in `utils.js`) and emits only when a value changed.
 
 A `MutationObserver` watches `style` attributes under the root. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions. The observer calls `requestMeasure()` once a changed element has no transform, so threads move when the animation ends rather than on every frame.
 

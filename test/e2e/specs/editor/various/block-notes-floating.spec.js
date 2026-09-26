@@ -318,6 +318,39 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expectAligned( thread, noted );
 	} );
 
+	test( 'follows its block when the title grows', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Title note',
+		} );
+
+		const thread = getThread( page, 'Title note' );
+		const noted = getParagraph( editor, 'Noted' );
+		const title = editor.canvas.getByRole( 'textbox', {
+			name: 'Add title',
+		} );
+		// Focus the title first: deselecting the block collapses the thread,
+		// which re-measures on its own.
+		await title.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// The title sits outside the block list, so the list moves without
+		// resizing. A few lines, so the block stays in the viewport.
+		await title.fill( 'Lorem ipsum dolor sit amet, consectetur' );
+
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 50 );
+		await expectAligned( thread, noted );
+	} );
+
 	test( 'anchors to a closed Details block', async ( {
 		editor,
 		page,
