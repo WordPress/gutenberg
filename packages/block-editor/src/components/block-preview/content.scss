@@ -1,6 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+
 // Hide inserter from previews.
 .block-editor-block-preview__content-iframe .block-list-appender {
 	display: none;
+}
+
+.block-editor-block-preview__content-iframe {
+	// Ensure a white backing layer for consistent semi-transparent color blending
+	background-color: $white;
 }
 
 .block-editor-block-preview__live-content {
