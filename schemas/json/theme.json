@@ -396,6 +396,10 @@
 							"description": "Defines whether the lightbox is enabled or not.",
 							"type": "boolean"
 						},
+						"overlayBackgroundColor": {
+							"description": "The background color of the lightbox overlay. Accepts any valid CSS color value.",
+							"type": "string"
+						},
 						"allowEditing": {
 							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
 							"type": "boolean"
