@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+-   Navigation Link: Add color support for text and background. Serialization is skipped so the colors are applied to the link itself rather than to the list item wrapping it, which also contains the submenu and would paint a background behind the dropdown ([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
 
 ### Bug Fixes
 

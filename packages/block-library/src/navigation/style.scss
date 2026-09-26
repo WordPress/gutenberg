@@ -53,6 +53,15 @@ $navigation-icon-size: 24px;
 	// Otherwise, a link color set by a parent group can override the value.
 	// This also fixes an issue where a navigation with an explicitly set color is overridden
 	// by link colors defined in Global Styles.
+	//
+	// This is why Navigation Link's `selectors.color` only moves `background` to
+	// the anchor and leaves `text` on the list item: a text color generated from
+	// Global Styles sits inside `:root :where()` and so carries a single class
+	// worth of specificity, the same as a parent group's link color. No
+	// specificity sits both above the group and below this rule, so a Navigation
+	// Link text color has to land on the list item and reach the anchor through
+	// the `inherit` below. Per-instance colors are unaffected either way: a
+	// preset class carries `!important` and a custom color is inline.
 	.wp-block-navigation-item__content.wp-block-navigation-item__content {
 		color: inherit;
 	}
