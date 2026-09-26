@@ -40,8 +40,10 @@
 	}
 
 	&:focus {
-		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		outline:
+			var(--wp-admin-border-width-focus) solid
+			var(--wp-admin-theme-color);
+		outline-offset: calc(( -1 * var(--wp-admin-border-width-focus) ));
 	}
 
 	&.is-floating {
@@ -95,6 +97,11 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+	// Keep clear of the add-reaction trigger floating in the note's top
+	// corner. Reserved on every note, selected or not, so the text does not
+	// rewrap under the reader as a note is selected or gains its first
+	// reaction.
+	padding-right: $button-size-small + $grid-unit-10;
 
 	p:last-child {
 		margin-bottom: 0;
@@ -250,6 +257,151 @@
 mark.wp-note {
 	border-radius: 1px;
 	transition: background-color 0.1s ease-in-out;
+}
+
+// Emoji Reactions
+//
+// The add-reaction trigger and the reaction pills are Design System
+// Buttons: the pill shape comes from the row's `pronounced` corner
+// radius, the neutral minimal treatment marks the trigger and reactions
+// left by others, and the brand outline marks the current user's own.
+// Only the row layout and the emoji's own metrics live here.
+.editor-collab-sidebar-panel__add-reaction {
+	// `Dropdown` wraps its trigger in an inline-block container. As a
+	// flex item that becomes a block, leaving the inline-flex trigger on
+	// a line box whose descender space makes the wrapper taller than the
+	// 24px button and stretches the pills beside it to match. A flex
+	// wrapper has no line box, so the whole row stays at button height.
+	display: flex;
+}
+
+// The note's text and, below it, the reaction row. Anchors the trigger while
+// it floats, so it lands on the note itself rather than on whatever else the
+// card carries underneath.
+.editor-collab-sidebar-panel__note-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+}
+
+.editor-collab-sidebar-panel__reactions {
+	// Until the note has a reaction to show, the trigger is the whole row, and
+	// it floats in the note's top corner rather than making every note taller
+	// for an option nobody has taken up. Once a reaction lands, the row drops
+	// into the flow and the trigger trails the pills.
+	//
+	// The top corner lines up with the Resolve and Actions buttons in the
+	// header above, so the trigger reads as one more action in that column
+	// rather than a control parked wherever the text happened to end. The
+	// note's text keeps a safe area on that side (see `__note-content`), so
+	// nothing runs underneath it.
+	&.is-floating {
+		position: absolute;
+		right: 0;
+		// Centered on the first line of text, so a one-line note reads as a
+		// single row with its trigger. The row shares the text's font and
+		// line height, so its own `lh` is the text's line box.
+		top: calc((1lh - #{$button-size-small}) / 2);
+	}
+}
+
+// While it floats alone, the trigger stays out of the way until the note is
+// hovered, so reacting costs no standing real estate. Once the note has
+// reactions, the trigger trails the pills and stays visible as part of the set.
+//
+// Only where a pointer can hover: a touch device would otherwise be left
+// with a control it has no way to reveal.
+@media (hover: hover) {
+	.editor-collab-sidebar-panel__reactions.is-floating
+	.editor-collab-sidebar-panel__add-reaction {
+		// Fading rather than removing keeps the button in the tab order and
+		// keeps the action row from reflowing as the pointer moves over it.
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	// Scoped to the note under the pointer, not the thread around it: a
+	// reaction belongs to one note, so a thread-wide reveal would offer the
+	// option on every note in it at once.
+	.editor-collab-sidebar-panel__note:hover
+	.editor-collab-sidebar-panel__add-reaction,
+	// Reveal on the trigger itself rather than on the thread: the thread is
+	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
+	// long as the note is selected and the fade would never take effect.
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction:focus-within,
+	// While the picker is open the pointer is over the popover, not the
+	// thread, and focus has moved into the popover's own portal.
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction:has([aria-expanded="true"]) {
+		opacity: 1;
+	}
+}
+
+.editor-collab-sidebar-panel__reaction-button {
+	// The glyph and its count are one unit, closer than the Button's
+	// default gap between an icon and a label.
+	gap: $grid-unit-05;
+	// A count is at most a few characters, so the Button's four-character
+	// minimum would leave the pill padded out around it.
+	min-width: 0;
+}
+
+// Opening the picker with a pointer leaves DOM focus on the trigger once
+// it closes, parking a focus ring on the note at rest. Keep the ring for
+// keyboard focus and while the picker is open, and drop it otherwise.
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([aria-expanded="true"]) {
+	outline: none;
+}
+
+.editor-collab-sidebar-panel__reaction-button-emoji {
+	// Render the emoji glyph larger than the button's text size so it
+	// visually balances with the 24px reaction icon next to it.
+	font-size: 16px;
+	line-height: 1;
+}
+
+// Split the Dropdown's default 8px `.components-popover__content` padding
+// between the popover and the scrolling emoji group below, so the emoji buttons
+// keep the same breathing room while their focus ring stays inside the
+// scroll container instead of being clipped by it.
+.editor-collab-sidebar-panel__add-reaction-popover .components-popover__content {
+	padding: $grid-unit-05;
+}
+
+.editor-collab-sidebar-panel__emoji-picker {
+	display: flex;
+	// The emoji list is filterable server-side, so it can grow well
+	// beyond the 5 defaults. Wrap into rows of 8 (32px compact
+	// buttons) and scroll past 6 rows instead of letting the popover
+	// grow unbounded.
+	flex-wrap: wrap;
+	// `.components-popover__content` is `width: min-content`, which would
+	// otherwise squeeze this wrapping row down to one column per emoji.
+	width: max-content;
+	// Scrolling clips on both axes, so leave room for the focus ring of
+	// the buttons on the edges. The padding is added to the row and column
+	// caps below, which are border-box measurements.
+	padding: $grid-unit-05;
+	max-width: 8 * 32px + 2 * $grid-unit-05;
+	max-height: 6 * 32px + 2 * $grid-unit-05;
+	overflow-y: auto;
+}
+
+.editor-collab-sidebar-panel__emoji-option {
+	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
+	// per row; the compact Button's own padding and minimum size would
+	// otherwise widen the flex item past the 32px width.
+	flex: 0 0 32px;
+	min-width: 0;
+	padding: 0;
+	font-size: 18px;
+	justify-content: center;
 }
 
 // Mention chips, both in the note input and the rendered note content. A

@@ -131,6 +131,22 @@ class BlockNoteUtils {
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
+	async addReactionToComment( emoji ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
+
+		// Wait for the emoji picker popover to appear.
+		const emojiPicker = this.#page.locator(
+			'.editor-collab-sidebar-panel__emoji-picker'
+		);
+		await expect( emojiPicker ).toBeVisible();
+
+		// Click the specific emoji within the picker.
+		await emojiPicker
+			.getByRole( 'button', { name: new RegExp( emoji, 'i' ) } )
+			.click();
+	}
 }
 
 module.exports = { BlockNoteUtils };
