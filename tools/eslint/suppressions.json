@@ -715,6 +715,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-toolbar/test/remove-block-button.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-tools/block-toolbar-popover.jsx": {
 		"react-hooks/refs": {
 			"count": 4

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Block Toolbar: Add a Delete button to the block toolbar of every block, next to the Options menu. It is disabled when the selected block or blocks cannot be removed.
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 
 ### Bug Fixes
