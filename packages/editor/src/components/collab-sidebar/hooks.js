@@ -282,7 +282,8 @@ export function useNoteActions() {
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { selectionChange, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -341,8 +342,9 @@ export function useNoteActions() {
 
 				// Inline path: also wrap the selected text with a core/note
 				// marker so the anchor survives later edits.
+				let wrapped = null;
 				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
+					wrapped = wrapInlineNote(
 						attributes?.[ inlineSelection.attributeKey ],
 						savedRecord.id,
 						inlineSelection.start,
@@ -354,6 +356,38 @@ export function useNoteActions() {
 				}
 
 				updateBlockAttributes( clientId, newAttributes );
+
+				/*
+				 * The anchoring range has done its job once the marker is
+				 * written, but it lingers as the canvas's (inactive) native
+				 * selection - and browsers paint text decorations inside a
+				 * selected range with the selection's text color, so the fresh
+				 * marker's underline would read as plain text-colored until
+				 * the user happens to click somewhere. Collapse the selection
+				 * to the end of the range so the marker shows its author
+				 * color right away.
+				 *
+				 * This reaches the canvas although focus is in the sidebar:
+				 * the iframe's `document.activeElement` still points at the
+				 * noted editable, and rich text applies a selection from
+				 * state whenever that is its element (see
+				 * `packages/rich-text/src/hook`). Skip it if the user moved
+				 * the selection elsewhere while the save was in flight.
+				 */
+				const selectionStart = getSelectionStart();
+				if (
+					wrapped &&
+					selectionStart?.clientId === clientId &&
+					selectionStart?.attributeKey ===
+						inlineSelection.attributeKey
+				) {
+					selectionChange(
+						clientId,
+						inlineSelection.attributeKey,
+						inlineSelection.end,
+						inlineSelection.end
+					);
+				}
 			}
 
 			createNotice(

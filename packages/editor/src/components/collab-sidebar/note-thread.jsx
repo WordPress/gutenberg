@@ -39,7 +39,7 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+	const { toggleBlockHighlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -129,7 +129,7 @@ export function NoteThread( {
 
 		selectNote( note.id );
 		focusNoteThread( note.id, sidebarRef.current );
-		toggleBlockSpotlight( note.blockClientId, true );
+		toggleBlockHighlight( note.blockClientId, true );
 		if ( !! note.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
 			selectBlock( note.blockClientId, null );
@@ -138,7 +138,7 @@ export function NoteThread( {
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockSpotlight( note.blockClientId, false );
+		toggleBlockHighlight( note.blockClientId, false );
 	}
 
 	function handleResolve() {

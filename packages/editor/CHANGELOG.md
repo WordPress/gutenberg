@@ -4,10 +4,12 @@
 
 ### Enhancements
 
+-   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#72860](https://github.com/WordPress/gutenberg/issues/72860)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 
 ### Bug Fixes
 
+-   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
