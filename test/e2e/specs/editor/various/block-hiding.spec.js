@@ -187,7 +187,7 @@ test.describe( 'Block Hiding', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should ghost hidden blocks while responsive styles is on', async ( {
+	test( 'should ghost hidden blocks while hidden blocks are revealed', async ( {
 		page,
 		editor,
 	} ) => {
@@ -210,19 +210,19 @@ test.describe( 'Block Hiding', () => {
 			attributes: { content: 'Visible content' },
 		} );
 
-		// With responsive styles off (the default), the hidden block is not
-		// in the canvas once deselected, like on trunk.
+		// With hidden blocks not revealed (the default), the hidden block is
+		// not in the canvas once deselected, like on trunk.
 		await expect(
 			editor.canvas.getByText( 'Hidden content' )
 		).toBeHidden();
 
-		// Turn on responsive styles from the View menu.
+		// Reveal hidden blocks from the View menu.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Reveal hidden blocks' } )
 			.click();
 		// The View menu stays open after toggling the checkbox.
 		await page.keyboard.press( 'Escape' );
@@ -264,13 +264,13 @@ test.describe( 'Block Hiding', () => {
 			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
-		// Turn on responsive styles from the View menu.
+		// Reveal hidden blocks from the View menu.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Reveal hidden blocks' } )
 			.click();
 		// The View menu stays open after toggling the checkbox.
 		await page.keyboard.press( 'Escape' );

@@ -617,3 +617,19 @@ export function setResponsiveEditing( enabled ) {
 		enabled,
 	};
 }
+
+/**
+ * Sets whether hidden blocks are revealed in the canvas. When enabled, blocks
+ * that visibility rules would hide render ghosted instead of being removed.
+ * Session-only.
+ *
+ * @param {boolean} enabled Whether hidden blocks are revealed.
+ *
+ * @return {Object} Action object.
+ */
+export function setRevealHiddenBlocks( enabled ) {
+	return {
+		type: 'SET_REVEAL_HIDDEN_BLOCKS',
+		enabled,
+	};
+}

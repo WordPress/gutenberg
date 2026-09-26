@@ -30,6 +30,7 @@ import {
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
 	isBlockGhosted,
+	isRevealingHiddenBlocks,
 	getViewportModalClientIds,
 	isSectionBlock,
 	isSyncedBlock,
@@ -2197,9 +2198,20 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
+	describe( 'isRevealingHiddenBlocks', () => {
+		it( 'returns the stored flag', () => {
+			expect(
+				isRevealingHiddenBlocks( { isRevealingHiddenBlocks: true } )
+			).toBe( true );
+			expect(
+				isRevealingHiddenBlocks( { isRevealingHiddenBlocks: false } )
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'isBlockGhosted', () => {
-		const createState = ( blockVisibility, deviceType, responsive ) => ( {
-			isResponsiveEditing: responsive,
+		const createState = ( blockVisibility, deviceType, revealed ) => ( {
+			isRevealingHiddenBlocks: revealed,
 			settings: {
 				[ deviceTypeKey ]: deviceType,
 			},
@@ -2213,7 +2225,7 @@ describe( 'private selectors', () => {
 			},
 		} );
 
-		it( 'returns false for everything while responsive editing is off', () => {
+		it( 'returns false for everything while hidden blocks are not revealed', () => {
 			expect(
 				isBlockGhosted(
 					createState( false, 'Desktop', false ),

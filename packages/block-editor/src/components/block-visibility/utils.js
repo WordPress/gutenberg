@@ -70,9 +70,10 @@ function isBlockHiddenForViewport( block, viewport ) {
  * Returns the visibility condition that hides a block in the given viewport
  * context, or null when nothing hides it there.
  *
- * Each condition type maps to a short human label used by the canvas ghost
- * chip and accessible names. New condition types (for example date or role
- * based visibility) should be added here so every consumer picks them up.
+ * Each condition type maps to a short human label used by the block toolbar
+ * and accessible names of ghosted blocks. New condition types (for example
+ * date or role based visibility) should be added here so every consumer picks
+ * them up.
  *
  * @param {boolean|Object} blockVisibility  The block's visibility metadata.
  * @param {string}         currentViewport  The viewport context to check ('desktop', 'tablet', 'mobile').

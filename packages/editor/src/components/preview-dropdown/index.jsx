@@ -35,6 +35,8 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		templateId,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
+		isRevealingHiddenBlocks,
+		canRevealHiddenBlocks,
 		hasBlockSelection,
 		activeComplementaryArea,
 	} = useSelect( ( select ) => {
@@ -47,6 +49,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		} = unlock( select( editorStore ) );
 		const {
 			isResponsiveEditing: _isResponsiveEditing,
+			isRevealingHiddenBlocks: _isRevealingHiddenBlocks,
 			getBlockSelectionStart,
 			getSettings,
 		} = unlock( select( blockEditorStore ) );
@@ -70,6 +73,11 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
 				getEditorSettings().responsiveEditingEnabled,
+			isRevealingHiddenBlocks: _isRevealingHiddenBlocks(),
+			// Themes can turn off block visibility editing in theme.json.
+			canRevealHiddenBlocks:
+				getSettings().__experimentalFeatures?.blockVisibility
+					?.allowEditing !== false,
 			hasBlockSelection: !! getBlockSelectionStart(),
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
@@ -78,8 +86,12 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
 		useDispatch( editorStore )
 	);
-	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
-		unlock( useDispatch( blockEditorStore ) );
+	const {
+		resetZoomLevel,
+		setStyleStateViewport,
+		setResponsiveEditing,
+		setRevealHiddenBlocks,
+	} = unlock( useDispatch( blockEditorStore ) );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
@@ -209,6 +221,28 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 								<Menu.ItemDescription>
 									{ __(
 										'Style changes apply only to the selected viewport.'
+									) }
+								</Menu.ItemDescription>
+							</Menu.CheckboxItem>
+						</Menu.Group>
+					</>
+				) }
+				{ canRevealHiddenBlocks && (
+					<>
+						<Menu.Separator />
+						<Menu.Group>
+							<Menu.CheckboxItem
+								checked={ isRevealingHiddenBlocks }
+								onCheckedChange={ ( checked ) =>
+									setRevealHiddenBlocks( checked )
+								}
+							>
+								<Menu.ItemLabel>
+									{ __( 'Reveal hidden blocks' ) }
+								</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									{ __(
+										'Show hidden blocks dimmed on the canvas.'
 									) }
 								</Menu.ItemDescription>
 							</Menu.CheckboxItem>

@@ -1144,9 +1144,9 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
 };
 
 /**
- * Returns true if the block renders ghosted in the canvas: responsive editing
- * is on and the block's visibility rules hide it in the previewed device
- * context. Always false while responsive editing is off.
+ * Returns true if the block renders ghosted in the canvas: hidden blocks are
+ * revealed and the block's visibility rules hide it in the previewed device
+ * context. Always false while hidden blocks are not revealed.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1154,7 +1154,7 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
  * @return {boolean} Whether the block is ghosted.
  */
 export const isBlockGhosted = ( state, clientId ) => {
-	if ( ! state.isResponsiveEditing ) {
+	if ( ! state.isRevealingHiddenBlocks ) {
 		return false;
 	}
 
@@ -1423,6 +1423,19 @@ export function getStyleStateViewport( state ) {
  */
 export function isResponsiveEditing( state ) {
 	return state.isResponsiveEditing;
+}
+
+/**
+ * Returns whether hidden blocks are revealed in the canvas. When enabled,
+ * blocks that visibility rules would hide render ghosted instead of being
+ * removed from the canvas.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether hidden blocks are revealed.
+ */
+export function isRevealingHiddenBlocks( state ) {
+	return state.isRevealingHiddenBlocks;
 }
 
 /**

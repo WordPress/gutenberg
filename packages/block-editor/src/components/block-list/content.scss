@@ -126,7 +126,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 
 	// Ghosted blocks.
-	// While responsive editing is on, blocks the previewed context would hide
+	// While hidden blocks are revealed, blocks the previewed context would hide
 	// stay in the canvas dimmed but fully editable. Selecting a ghosted block
 	// (or one of its children) restores full opacity. The dashed outline is a
 	// redundant cue so the state doesn't rely on contrast alone; an outline

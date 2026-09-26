@@ -2419,6 +2419,24 @@ export function isResponsiveEditing( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer for whether hidden blocks are revealed in the canvas. When enabled,
+ * blocks that visibility rules would hide render ghosted instead of being
+ * removed from the canvas.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isRevealingHiddenBlocks( state = false, action ) {
+	if ( action.type === 'SET_REVEAL_HIDDEN_BLOCKS' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2457,6 +2475,7 @@ const combinedReducers = combineReducers( {
 	selectedBlockStyleState,
 	styleStateViewport,
 	isResponsiveEditing,
+	isRevealingHiddenBlocks,
 } );
 
 /**

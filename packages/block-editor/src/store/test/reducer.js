@@ -22,6 +22,7 @@ import {
 	isBlockInterfaceHidden,
 	isTyping,
 	isDragging,
+	isRevealingHiddenBlocks,
 	draggedBlocks,
 	selection,
 	initialPosition,
@@ -2846,6 +2847,27 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isRevealingHiddenBlocks', () => {
+		it( 'should default to false', () => {
+			expect( isRevealingHiddenBlocks( undefined, {} ) ).toBe( false );
+		} );
+
+		it( 'should set the flag from the action', () => {
+			expect(
+				isRevealingHiddenBlocks( false, {
+					type: 'SET_REVEAL_HIDDEN_BLOCKS',
+					enabled: true,
+				} )
+			).toBe( true );
+			expect(
+				isRevealingHiddenBlocks( true, {
+					type: 'SET_REVEAL_HIDDEN_BLOCKS',
+					enabled: false,
+				} )
+			).toBe( false );
 		} );
 	} );
 
