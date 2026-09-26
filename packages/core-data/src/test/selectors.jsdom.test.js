@@ -70,8 +70,8 @@ describe( 'hasUndo/hasRedo', () => {
 
 describe( 'getEntityRecord', () => {
 	describe( 'normalizing Post ID passed as recordKey', () => {
-		it( 'normalizes any Post ID recordKey argument to a Number via `__unstableNormalizeArgs` method', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+		it( 'normalizes any Post ID recordKey argument to a Number via `normalizeArgs` method', async () => {
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'123',
@@ -80,7 +80,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'i-am-a-slug-with-a-number-123',

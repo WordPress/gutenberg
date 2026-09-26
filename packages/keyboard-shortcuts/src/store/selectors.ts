@@ -61,7 +61,7 @@ function getKeyCombinationRepresentation(
 	return shortcut.modifier
 		? FORMATTING_METHODS[ representation ][ shortcut.modifier ](
 				shortcut.character
-		  )
+			)
 		: shortcut.character;
 }
 

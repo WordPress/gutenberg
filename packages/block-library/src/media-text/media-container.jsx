@@ -15,11 +15,11 @@ import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
 import { imageFillStyles } from './image-fill';
+import { ALLOWED_MEDIA_TYPES } from './constants';
 
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const noop = () => {};
 
 const ResizableBoxContainer = forwardRef(

@@ -32,9 +32,8 @@ const POST_TYPES: Record< string, unknown > = {
 };
 
 vi.mock( import( '@wordpress/core-data' ), async () => {
-	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } = await import(
-		'@wordpress/private-apis'
-	);
+	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
+		await import( '@wordpress/private-apis' );
 	const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/core-data'
@@ -50,7 +49,7 @@ vi.mock( import( '@wordpress/core-data' ), async () => {
 		store: {
 			name: 'core',
 		},
-	} as unknown as typeof import('@wordpress/core-data');
+	} as unknown as typeof import( '@wordpress/core-data' );
 } );
 
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
@@ -206,9 +205,9 @@ describe( 'MediaUploadModal', () => {
 
 		const { rerender } = renderModal();
 
-		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
-			'option'
-		);
+		const options = within(
+			await screen.findByRole( 'listbox' )
+		).getAllByRole( 'option' );
 		await user.click( options[ 0 ] );
 		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
 
@@ -218,11 +217,15 @@ describe( 'MediaUploadModal', () => {
 		rerender( { isOpen: true } );
 
 		const reopenedOptions = within(
-			screen.getByRole( 'listbox' )
+			await screen.findByRole( 'listbox' )
 		).getAllByRole( 'option' );
 		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
 			'aria-selected',
 			'false'
+		);
+		// Ariakit checks layout to validate virtual focus. jsdom has no layout.
+		expect( console ).toHaveWarnedWith(
+			'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
 		);
 	} );
 
@@ -232,9 +235,9 @@ describe( 'MediaUploadModal', () => {
 		// Opens with item 1 pre-selected via `value`.
 		const { rerender } = renderModal( { value: 1 } );
 
-		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
-			'option'
-		);
+		const options = within(
+			await screen.findByRole( 'listbox' )
+		).getAllByRole( 'option' );
 		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
 
@@ -247,7 +250,7 @@ describe( 'MediaUploadModal', () => {
 		rerender( { isOpen: true, value: 2 } );
 
 		const reopenedOptions = within(
-			screen.getByRole( 'listbox' )
+			await screen.findByRole( 'listbox' )
 		).getAllByRole( 'option' );
 		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
 			'aria-selected',
@@ -432,6 +435,9 @@ describe( 'MediaUploadModal', () => {
 					expect.not.objectContaining( { parent: expect.anything() } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'queries both options together as a single `parent` list', async () => {
@@ -462,6 +468,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 42, 0 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'queries media uploaded to the post as its `parent`', async () => {
@@ -489,6 +498,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 42 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'does not persist the filter', async () => {
@@ -526,6 +538,9 @@ describe( 'MediaUploadModal', () => {
 					.select( preferencesStore )
 					.get( 'core/views', preferenceKey )
 			).toBeUndefined();
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'keeps the filter while the picker stays on screen', async () => {
@@ -558,6 +573,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 0 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'ignores an `attached_to` filter left in the persisted view', async () => {

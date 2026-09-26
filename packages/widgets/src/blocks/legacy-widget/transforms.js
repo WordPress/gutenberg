@@ -169,7 +169,7 @@ const legacyWidgetTransforms = [
 				: createBlock(
 						block,
 						transform ? transform( instance.raw ) : undefined
-				  );
+					);
 			if ( ! instance.raw?.title ) {
 				return transformedBlock;
 			}

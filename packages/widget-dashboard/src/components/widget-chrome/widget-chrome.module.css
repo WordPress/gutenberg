@@ -9,8 +9,8 @@
 	/* Host-tunable tile spacing; resolved here because Card.Root re-declares
 	   its layout properties. The header gap follows the padding so the
 	   header/content seam stays a single space. */
-	--wp-ui-card-padding: var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-padding-2xl));
-	--wp-ui-card-header-content-gap: var(--wp-widget-dashboard-tile-header-gap, var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-gap-xl)));
+	--wp-ui-card-padding: var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-padding-lg));
+	--wp-ui-card-header-content-gap: var(--wp-widget-dashboard-tile-header-gap, var(--wp-widget-dashboard-tile-padding, var(--wpds-dimension-gap-lg)));
 }
 
 /* Outward tile focus ring; paint space reserved on `.grid`. */

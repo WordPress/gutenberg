@@ -25,6 +25,7 @@ import {
 	getInsertBlockTypeDependants,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -400,7 +401,7 @@ export const getListViewClientIdsTree = createSelector(
 					state.blocks.attributes,
 					state.blockListSettings,
 					state.settings,
-			  ]
+				]
 			: [] ),
 	]
 );
@@ -633,11 +634,11 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				? [
 						unlock( select( STORE_NAME ) ).getReusableBlocks(),
 						state.settings.__experimentalReusableBlocks,
-				  ]
+					]
 				: [
 						state.settings.__experimentalBlockPatterns,
 						state.settings[ selectBlockPatternsKey ]?.( select ),
-				  ]
+					]
 	)
 );
 
@@ -963,31 +964,15 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 			canInsertBlockType( state, currentName, id )
 		);
 
-	// If we're trying to insert at the root level and it's not allowed
-	// Try the section root instead.
-	if ( ! clientId ) {
-		if ( areBlockNamesAllowedInClientId( clientId ) ) {
-			return clientId;
-		}
-
-		const sectionRootClientId = getSectionRootClientId( state );
-		if (
-			sectionRootClientId &&
-			areBlockNamesAllowedInClientId( sectionRootClientId )
-		) {
-			return sectionRootClientId;
-		}
-		return null;
+	if ( areBlockNamesAllowedInClientId( clientId ) ) {
+		return clientId;
 	}
 
-	// Traverse the block tree up until we find a place where we can insert.
-	let current = clientId;
-	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
-		const parentClientId = getBlockRootClientId( state, current );
-		current = parentClientId;
-	}
-
-	return current;
+	return (
+		getFallbackInsertionRoots( state, clientId ).find(
+			areBlockNamesAllowedInClientId
+		) ?? null
+	);
 }
 
 export function getClosestAllowedInsertionPointForPattern(
@@ -1386,7 +1371,7 @@ export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
 }
 
-const DEFAULT_BLOCK_STYLE_STATE = {
+export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: 'default',
 	pseudo: 'default',
 };
@@ -1413,51 +1398,6 @@ export function getStyleStateViewport( state ) {
  */
 export function isResponsiveEditing( state ) {
 	return state.isResponsiveEditing;
-}
-
-/**
- * Returns the selected style state for a block's style controls.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {Object} The selected block style state.
- */
-export const getSelectedBlockStyleState = createSelector(
-	( state, clientId ) => {
-		const perBlockState =
-			state.selectedBlockStyleState?.clientId === clientId
-				? state.selectedBlockStyleState.value ??
-				  DEFAULT_BLOCK_STYLE_STATE
-				: DEFAULT_BLOCK_STYLE_STATE;
-
-		return {
-			...perBlockState,
-			// The viewport is tracked globally, so inject it here. This way
-			// consumers receive a single combined state object instead of
-			// merging the global viewport themselves, and selectors derived
-			// from this stay consistent.
-			viewport: getStyleStateViewport( state ),
-		};
-	},
-	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
-);
-
-/**
- * Returns whether a non-default style state is selected for a block.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {boolean} Whether a non-default block style state is selected.
- */
-export function hasSelectedStyleState( state, clientId ) {
-	const selectedState = getSelectedBlockStyleState( state, clientId );
-
-	return (
-		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
-		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
-	);
 }
 
 /**

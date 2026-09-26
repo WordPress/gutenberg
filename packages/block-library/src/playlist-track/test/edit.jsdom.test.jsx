@@ -8,9 +8,8 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 let mockMediaReplaceFlowProps;
 
 vi.mock( '@wordpress/block-editor', async () => {
-	const { default: PlainText } = await import(
-		'../../../../block-editor/src/components/plain-text'
-	);
+	const { default: PlainText } =
+		await import( '../../../../block-editor/src/components/plain-text' );
 
 	return {
 		BlockControls: ( { children } ) => <div>{ children }</div>,

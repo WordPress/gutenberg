@@ -153,8 +153,7 @@ export const getSupportedStyles = createSelector(
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
 		const supports = blockType?.supports as
-			| Record< string, unknown >
-			| undefined;
+			Record< string, unknown > | undefined;
 		if (
 			( supports?.spacing as Record< string, unknown > | undefined )
 				?.blockGap

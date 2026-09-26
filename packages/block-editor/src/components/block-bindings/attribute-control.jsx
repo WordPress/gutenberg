@@ -9,18 +9,17 @@ import {
 	__experimentalText as WCText,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import BlockContext from '../block-context';
 import BlockBindingsSourceFieldsList from './source-fields-list';
 import useBlockBindingsUtils from './use-block-bindings-utils';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Renders a control for viewing and editing a block attribute binding.
@@ -132,11 +131,8 @@ export default function BlockBindingsAttributeControl( {
 				} )
 			}
 		>
-			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-				<Menu.TriggerButton
-					render={ <Item /> }
-					disabled={ ! hasCompatibleFields }
-				>
+			<Menu.Root disabled={ ! hasCompatibleFields }>
+				<Menu.Trigger render={ <Item /> }>
 					<VStack
 						className="block-editor-bindings__item"
 						spacing={ 0 }
@@ -150,29 +146,31 @@ export default function BlockBindingsAttributeControl( {
 							{ displayText }
 						</WCText>
 					</VStack>
-				</Menu.TriggerButton>
+				</Menu.Trigger>
 				{ ! isAttributeReadOnly && (
-					<Menu.Popover gutter={ isMobile ? 8 : 36 }>
-						<Menu
-							placement={
-								isMobile ? 'bottom-start' : 'left-start'
-							}
-						>
-							{ Object.entries( compatibleFields ).map(
-								( [ sourceKey, fields ] ) => (
-									<BlockBindingsSourceFieldsList
-										key={ sourceKey }
-										args={ binding?.args }
-										attribute={ attribute }
-										sourceKey={ sourceKey }
-										fields={ fields }
-									/>
-								)
-							) }
-						</Menu>
-					</Menu.Popover>
+					<Menu.Popup
+						positioner={
+							<Menu.Positioner
+								side={ isMobile ? 'bottom' : 'inline-start' }
+								align="start"
+								sideOffset={ isMobile ? 8 : 36 }
+							/>
+						}
+					>
+						{ Object.entries( compatibleFields ).map(
+							( [ sourceKey, fields ] ) => (
+								<BlockBindingsSourceFieldsList
+									key={ sourceKey }
+									args={ binding?.args }
+									attribute={ attribute }
+									sourceKey={ sourceKey }
+									fields={ fields }
+								/>
+							)
+						) }
+					</Menu.Popup>
 				) }
-			</Menu>
+			</Menu.Root>
 		</ToolsPanelItem>
 	);
 }

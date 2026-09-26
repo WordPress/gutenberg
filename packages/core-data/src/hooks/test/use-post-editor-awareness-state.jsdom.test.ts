@@ -87,11 +87,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		getAwareness: Mock;
 	};
 	let stateChangeCallback:
-		| ( ( newState: PostEditorAwarenessState[] ) => void )
-		| null;
+		( ( newState: PostEditorAwarenessState[] ) => void ) | null;
 	let stateMapObserver:
-		| ( ( event: { keysChanged: Set< string > } ) => void )
-		| null;
+		( ( event: { keysChanged: Set< string > } ) => void ) | null;
 	let mockStateMapData: Record< string, unknown >;
 	let mockRecordMapData: Record< string, unknown >;
 

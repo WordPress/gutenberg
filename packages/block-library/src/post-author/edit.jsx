@@ -11,7 +11,7 @@ import {
 import {
 	Button,
 	ComboboxControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -255,7 +255,7 @@ function PostAuthorEdit( {
 								setAttributes( { avatarSize: 48 } )
 							}
 						>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }

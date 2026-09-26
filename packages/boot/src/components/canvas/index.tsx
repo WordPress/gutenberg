@@ -60,8 +60,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		( select ) =>
 			(
 				select( coreStore ).getCurrentTheme() as
-					| { is_block_theme?: boolean }
-					| undefined
+					{ is_block_theme?: boolean } | undefined
 			 )?.is_block_theme,
 		[]
 	);
@@ -150,7 +149,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	const backButton = ! canvas.isPreview
 		? ( { length }: { length: number } ) => (
 				<BootBackButton length={ length } />
-		  )
+			)
 		: undefined;
 
 	// Render the editor with canvas data

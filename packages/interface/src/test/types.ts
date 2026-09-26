@@ -10,10 +10,10 @@ import type { ActionItem, store } from '..';
 type Expect< A, B > = 0 extends 1 & A
 	? never
 	: [ A ] extends [ B ]
-	? [ B ] extends [ A ]
-		? true
-		: never
-	: never;
+		? [ B ] extends [ A ]
+			? true
+			: never
+		: never;
 
 type Selectors = CurriedSelectorsOf< typeof store >;
 type ActionItemOnClick = ComponentProps< typeof ActionItem >[ 'onClick' ];

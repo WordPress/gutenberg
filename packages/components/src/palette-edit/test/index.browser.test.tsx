@@ -6,9 +6,16 @@ import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
 } from '..';
+import Modal from '../../modal';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
+
+function getCompatibilityOverlaySlot() {
+	return document.querySelector< HTMLDivElement >(
+		'[data-wp-compat-overlay-slot]'
+	);
+}
 
 async function clearInput( input: HTMLInputElement ) {
 	await userEvent.clear( input );
@@ -346,7 +353,7 @@ describe( 'PaletteEdit', () => {
 
 		await waitFor( () => {
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'menuitem', {
 					name: 'Remove all colors',
 				} )
 			).toBeVisible();
@@ -365,7 +372,7 @@ describe( 'PaletteEdit', () => {
 		);
 		await waitFor( () => {
 			expect(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'menuitem', {
 					name: 'Reset colors',
 				} )
 			).toBeVisible();
@@ -381,10 +388,102 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		expect(
-			screen.queryByRole( 'button', {
+			screen.queryByRole( 'menuitem', {
 				name: 'Reset colors',
 			} )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'moves through palette options with arrow keys and activates a menu item with Enter', async () => {
+		const onChange = vi.fn();
+
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'button', {
+			name: 'Color options',
+		} );
+		trigger.focus();
+		await userEvent.keyboard( '{ArrowDown}' );
+
+		const showDetails = await screen.findByRole( 'menuitem', {
+			name: 'Show details',
+		} );
+		const removeAll = screen.getByRole( 'menuitem', {
+			name: 'Remove all colors',
+		} );
+
+		expect( showDetails ).toHaveFocus();
+		await userEvent.keyboard( '{ArrowDown}' );
+		expect( removeAll ).toHaveFocus();
+
+		await userEvent.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledWith();
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps the options menu usable above a Components modal for direct package consumers', async () => {
+		const compatibilityWindow = window as typeof window & {
+			wp?: unknown;
+			__wpUiCompatOverlaySlotEnabled?: boolean;
+		};
+		const hadWp = Object.hasOwn( compatibilityWindow, 'wp' );
+		const hadOptIn = Object.hasOwn(
+			compatibilityWindow,
+			'__wpUiCompatOverlaySlotEnabled'
+		);
+		const originalWp = compatibilityWindow.wp;
+		const originalOptIn =
+			compatibilityWindow.__wpUiCompatOverlaySlotEnabled;
+		const originalSlot = getCompatibilityOverlaySlot();
+		delete compatibilityWindow.wp;
+		delete compatibilityWindow.__wpUiCompatOverlaySlotEnabled;
+
+		try {
+			await render(
+				<Modal title="Palette" onRequestClose={ noop }>
+					<PaletteEdit { ...defaultProps } colors={ colors } />
+				</Modal>
+			);
+
+			await userEvent.click(
+				screen.getByRole( 'button', {
+					name: 'Color options',
+				} )
+			);
+			const menu = await screen.findByRole( 'menu' );
+			const slot = getCompatibilityOverlaySlot();
+			expect( slot ).toContainElement( menu );
+			await waitFor( () => expect( menu ).toBeVisible() );
+
+			await userEvent.click(
+				within( menu ).getByRole( 'menuitem', {
+					name: 'Show details',
+				} )
+			);
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} finally {
+			if ( hadWp ) {
+				compatibilityWindow.wp = originalWp;
+			} else {
+				delete compatibilityWindow.wp;
+			}
+			if ( hadOptIn ) {
+				compatibilityWindow.__wpUiCompatOverlaySlotEnabled =
+					originalOptIn;
+			} else {
+				delete compatibilityWindow.__wpUiCompatOverlaySlotEnabled;
+			}
+			const currentSlot = getCompatibilityOverlaySlot();
+			if ( currentSlot !== originalSlot ) {
+				currentSlot?.remove();
+			}
+		}
 	} );
 
 	it( 'calls the `onChange` with the new color appended', async () => {
@@ -610,7 +709,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await userEvent.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'menuitem', {
 				name: 'Show details',
 			} )
 		);
@@ -645,7 +744,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await userEvent.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'menuitem', {
 				name: 'Show details',
 			} )
 		);

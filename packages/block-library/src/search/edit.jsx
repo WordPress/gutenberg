@@ -13,7 +13,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -236,7 +236,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 			...typographyProps.style,
 			textDecoration: undefined,
@@ -287,7 +287,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 		};
 		return (
@@ -373,7 +373,7 @@ export default function SearchEdit( {
 						} }
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							value={ buttonPosition }
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
@@ -490,7 +490,7 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'HTML element' ) }
 					value={ tagName ?? '' }
 					options={ [
@@ -536,7 +536,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomLeftRadius,
 					borderBottomRightRadius:
 						borderProps.style?.borderBottomRightRadius,
-			  };
+				};
 
 		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.

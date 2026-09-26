@@ -42,12 +42,14 @@ function mockInputs() {
 }
 
 async function mockFlakyTestsArtifact() {
-	const playwrightFlakyTest = await import(
-		'../__fixtures__/should copy only partial selection of text blocks.json'
-	).then( ( json ) => json.default );
-	const jestFlakyTest = await import(
-		'../__fixtures__/Should insert new template part on creation.json'
-	).then( ( json ) => json.default );
+	const playwrightFlakyTest =
+		await import( '../__fixtures__/should copy only partial selection of text blocks.json' ).then(
+			( json ) => json.default
+		);
+	const jestFlakyTest =
+		await import( '../__fixtures__/Should insert new template part on creation.json' ).then(
+			( json ) => json.default
+		);
 
 	mockInputs();
 

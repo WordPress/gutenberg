@@ -57,7 +57,6 @@ export default function StateControlBadges( {
 					<WCBadge
 						key={ state.key }
 						className="block-editor-global-styles-state-control__badge"
-						intent="info"
 					>
 						{ state.label }
 						{ !! state.tooltipText && (

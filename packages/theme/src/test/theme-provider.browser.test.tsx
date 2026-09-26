@@ -262,6 +262,43 @@ describe( 'ThemeProvider', () => {
 			);
 		} );
 
+		it.each( [ '#123456', ' ' ] )(
+			'restores the previous document-root value "%s" and priority on unmount',
+			async ( value ) => {
+				const root = document.documentElement;
+				root.style.setProperty( BRAND_BG, value, 'important' );
+				let unmount: undefined | ( () => void );
+
+				try {
+					( { unmount } = await render(
+						<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+							<div>x</div>
+						</ThemeProvider>
+					) );
+
+					expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
+						PRIMARY
+					);
+					expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe(
+						''
+					);
+
+					await unmount();
+					unmount = undefined;
+
+					expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
+						value.trim()
+					);
+					expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe(
+						'important'
+					);
+				} finally {
+					await unmount?.();
+					root.style.removeProperty( BRAND_BG );
+				}
+			}
+		);
+
 		it( "forwards tokens to the wrapper's own document, not the top document", async () => {
 			const iframe = document.createElement( 'iframe' );
 			document.body.appendChild( iframe );
@@ -308,10 +345,6 @@ describe( 'ThemeProvider', () => {
 		} );
 
 		it( 'warns when multiple root providers share a document', async () => {
-			const warn = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			// Competing root providers intentionally conflict. Keep their document
 			// separate so their cleanup order cannot change later tests' tokens.
 			const iframe = document.createElement( 'iframe' );
@@ -320,8 +353,7 @@ describe( 'ThemeProvider', () => {
 			const container = iframeDoc.createElement( 'div' );
 			iframeDoc.body.appendChild( container );
 			let unmount:
-				| Awaited< ReturnType< typeof render > >[ 'unmount' ]
-				| undefined;
+				Awaited< ReturnType< typeof render > >[ 'unmount' ] | undefined;
 
 			try {
 				( { unmount } = await render(
@@ -339,30 +371,23 @@ describe( 'ThemeProvider', () => {
 					{ container }
 				) );
 
-				expect( warn ).toHaveBeenCalledWith(
+				expect( console ).toHaveWarnedWith(
 					expect.stringContaining( 'More than one root provider' )
 				);
 			} finally {
 				await unmount?.();
 				iframe.remove();
-				warn.mockRestore();
 			}
 		} );
 
 		it( 'does not warn for a single root provider', async () => {
-			const warn = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			await render(
 				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
 					<div>x</div>
 				</ThemeProvider>
 			);
 
-			expect( warn ).not.toHaveBeenCalled();
-
-			warn.mockRestore();
+			expect( console ).not.toHaveWarned();
 		} );
 		describe( 'cornerRadius forwarding', () => {
 			it( 'forwards the preset attributes and tokens to the document root when isRoot is set', async () => {

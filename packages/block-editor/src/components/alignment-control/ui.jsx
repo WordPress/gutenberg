@@ -54,7 +54,7 @@ function AlignmentUI( {
 		: {
 				toggleProps: description ? { description } : {},
 				popoverProps: POPOVER_PROPS,
-		  };
+			};
 
 	return (
 		<UIComponent

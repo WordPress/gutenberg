@@ -120,7 +120,7 @@ const getTransformCommands = () =>
 					! icon?.src || icon?.src === 'block-default'
 						? {
 								src: blockDefaultIcon,
-						  }
+							}
 						: icon;
 
 				return {

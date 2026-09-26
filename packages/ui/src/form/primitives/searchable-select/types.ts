@@ -29,6 +29,9 @@ export type ItemGroup = {
 };
 
 export type SearchableSelectItemProps = Omit< ComboboxItemProps, 'value' > & {
+	/**
+	 * The option item this list item represents.
+	 */
 	value: Item;
 };
 

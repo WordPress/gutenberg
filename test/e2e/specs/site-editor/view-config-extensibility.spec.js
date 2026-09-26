@@ -158,10 +158,7 @@ test.describe( 'View config extensibility', () => {
 		).toBeVisible();
 	} );
 
-	// v2 gap: the extensible site editor's Pages screen consumes the view
-	// config for its views and layouts, but its Quick Edit form does not
-	// consume the form section yet.
-	test( 'applies the filtered form to the Quick Edit DataForm @site-editor-v1-only', async ( {
+	test( 'applies the filtered form to the Quick Edit DataForm', async ( {
 		admin,
 		page,
 	} ) => {

@@ -181,7 +181,7 @@ const LayoutCardComponent = ( {
 						withHeader: true as const,
 						isCollapsible: collapsible,
 						isOpened: opened,
-				  } ),
+					} ),
 		};
 	};
 

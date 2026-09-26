@@ -7,7 +7,6 @@
 	flex-direction: column;
 	flex-grow: 1;
 	min-height: 0;
-	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	.font-library-page:has(.font-library__footer) & {
 		padding-bottom: 90px;

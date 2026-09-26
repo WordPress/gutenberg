@@ -138,7 +138,7 @@ function prepareResponse(
 						status: 200,
 						statusText: 'OK',
 						headers: responseData.headers,
-				  } )
+					} )
 		);
 	}
 }

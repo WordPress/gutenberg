@@ -30,7 +30,7 @@ vi.mock(
 		( {
 			useDispatch: vi.fn(),
 			useSelect: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/data')
+		} ) as unknown as typeof import( '@wordpress/data' )
 );
 
 vi.mock(
@@ -38,7 +38,7 @@ vi.mock(
 	() =>
 		( {
 			Modal: ( { children }: { children: ReactNode } ) => children,
-		} ) as unknown as typeof import('@wordpress/components')
+		} ) as unknown as typeof import( '@wordpress/components' )
 );
 
 vi.mock(
@@ -47,7 +47,7 @@ vi.mock(
 		( {
 			ShortcutProvider: ( { children }: { children: ReactNode } ) =>
 				children,
-		} ) as unknown as typeof import('@wordpress/keyboard-shortcuts')
+		} ) as unknown as typeof import( '@wordpress/keyboard-shortcuts' )
 );
 
 vi.mock(
@@ -55,7 +55,7 @@ vi.mock(
 	() =>
 		( {
 			store: { name: 'notices' },
-		} ) as unknown as typeof import('@wordpress/notices')
+		} ) as unknown as typeof import( '@wordpress/notices' )
 );
 
 vi.mock(
@@ -63,12 +63,12 @@ vi.mock(
 	() =>
 		( {
 			store: { name: 'media-editor' },
-		} ) as unknown as typeof import('../../../store')
+		} ) as unknown as typeof import( '../../../store' )
 );
 
 vi.mock( import( '../../media-editor' ), async () => {
 	const { createElement } =
-		await vi.importActual< typeof import('@wordpress/element') >(
+		await vi.importActual< typeof import( '@wordpress/element' ) >(
 			'@wordpress/element'
 		);
 
@@ -80,7 +80,7 @@ vi.mock( import( '../../media-editor' ), async () => {
 				'Save result'
 			)
 		),
-	} as unknown as typeof import('../../media-editor');
+	} as unknown as typeof import( '../../media-editor' );
 } );
 
 describe( 'MediaEditorModal', () => {

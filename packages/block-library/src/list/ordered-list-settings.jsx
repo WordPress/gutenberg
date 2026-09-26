@@ -3,7 +3,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import {
 	TextControl,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -58,7 +58,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 						} )
 					}
 				>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'List style' ) }
 						options={ LIST_STYLE_OPTIONS }
 						value={ type || 'decimal' }

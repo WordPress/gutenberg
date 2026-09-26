@@ -83,7 +83,7 @@ const iframeSrcCache = new WeakMap();
 const iframeSrcCleanup = globalThis.FinalizationRegistry
 	? new globalThis.FinalizationRegistry( ( url ) =>
 			URL.revokeObjectURL( url )
-	  )
+		)
 	: undefined;
 
 function getIframeSrc( resolvedAssets ) {

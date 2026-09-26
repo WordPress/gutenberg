@@ -550,7 +550,7 @@ export function MediaUploadModal( {
 										uploadedToLabel ??
 										__( 'Uploaded to this item' ),
 								},
-						  ]
+							]
 						: [] ),
 					{
 						value: 'unattached',
