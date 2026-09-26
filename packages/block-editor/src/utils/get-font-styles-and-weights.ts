@@ -35,6 +35,46 @@ function parseWeightValue( value: string ): number | undefined {
 	return isValidWeight( weight ) ? weight : undefined;
 }
 
+/*
+ * Read a `@font-face` style descriptor as a value the `font-style` property accepts.
+ * The two-angle oblique form is allowed in the descriptor only: it says which slant
+ * requests the face can match, not a style an element may ask for, and the property
+ * discards it. It resolves to the end of the range nearest upright, which is the slant
+ * the face gives a `normal` request, leaving any control over the rest of the range to
+ * a font axis UI rather than an appearance list.
+ */
+function parseFontStyleValue( value: string ): string | undefined {
+	const style = value.trim().toLowerCase().replace( /\s+/g, ' ' );
+
+	if ( style === 'normal' || style === 'italic' || style === 'oblique' ) {
+		return style;
+	}
+
+	const angles = style.match(
+		/^oblique (-?\d*\.?\d+)deg(?: (-?\d*\.?\d+)deg)?$/
+	);
+
+	if ( ! angles ) {
+		return undefined;
+	}
+
+	// A single angle is already a style an element can use.
+	if ( angles[ 2 ] === undefined ) {
+		return style;
+	}
+
+	const start = Number( angles[ 1 ] );
+	const end = Number( angles[ 2 ] );
+	const nearest =
+		Math.min( start, end ) <= 0 && Math.max( start, end ) >= 0
+			? 0
+			: [ start, end ].sort(
+					( a, b ) => Math.abs( a ) - Math.abs( b )
+				)[ 0 ];
+
+	return nearest === 0 ? 'normal' : `oblique ${ nearest }deg`;
+}
+
 const FONT_STYLES = [
 	{
 		name: _x( 'Regular', 'font style' ),
@@ -145,7 +185,11 @@ export function getFontStylesAndWeights(
 				? face.fontWeight.toString()
 				: face.fontWeight
 		);
-		const fontStyle = formatFontStyle( face.fontStyle );
+		const fontStyle = formatFontStyle(
+			face.fontStyle === undefined
+				? face.fontStyle
+				: parseFontStyleValue( face.fontStyle )
+		);
 
 		// Create font style and font weight lists without duplicates.
 		if ( fontStyle && Object.keys( fontStyle ).length ) {
