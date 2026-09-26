@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
@@ -67,7 +64,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	if ( ! container.isContentEditable ) {
+	// Only place a caret if the container is itself an editable element.
+	// It may also be content editable by inheriting it from an editing
+	// host ancestor (e.g. an editable canvas wrapper), but placing a caret
+	// for e.g. a focusable block element is then not intended.
+	if ( container.contentEditable !== 'true' ) {
 		return;
 	}
 

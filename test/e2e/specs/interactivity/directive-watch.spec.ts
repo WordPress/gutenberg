@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-watch', () => {
@@ -42,5 +39,11 @@ test.describe( 'data-wp-watch', () => {
 		await expect( el ).toContainText( '1' );
 		await page.getByTestId( 'increment' ).click();
 		await expect( el ).toContainText( '3' );
+	} );
+
+	test( 'multiple watches', async ( { page } ) => {
+		const el = page.getByTestId( 'multiple watches' );
+		await expect( el ).toHaveAttribute( 'data-watch-one', 'true' );
+		await expect( el ).toHaveAttribute( 'data-watch-two', 'true' );
 	} );
 } );

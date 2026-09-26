@@ -1,10 +1,10 @@
 .wp-block-post-title {
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: anywhere;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
 	:where(a) {
-		display: inline-block;
 		font-family: inherit;
 		font-size: inherit;
 		font-style: inherit;

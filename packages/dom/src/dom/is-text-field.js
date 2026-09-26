@@ -1,9 +1,5 @@
-/**
- * Internal dependencies
- */
 import isHTMLInputElement from './is-html-input-element';
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is a text field, where text field is defined
  * by the ability to select within the input, or that it is contenteditable.
@@ -14,7 +10,6 @@ import isHTMLInputElement from './is-html-input-element';
  * @return {node is HTMLElement} True if the element is an text field, false if not.
  */
 export default function isTextField( node ) {
-	/* eslint-enable jsdoc/valid-types */
 	const nonTextInputs = [
 		'button',
 		'checkbox',

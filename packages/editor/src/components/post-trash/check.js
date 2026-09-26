@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { GLOBAL_POST_TYPES } from '../../store/constants';
 
@@ -31,7 +24,7 @@ export default function PostTrashCheck( { children } ) {
 					kind: 'postType',
 					name: postType,
 					id: postId,
-			  } )
+				} )
 			: false;
 
 		return {

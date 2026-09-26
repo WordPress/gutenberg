@@ -11,12 +11,22 @@
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "code",
-			"__unstablePreserveWhiteSpace": true
+			"__unstablePreserveWhiteSpace": true,
+			"role": "content"
 		}
 	},
 	"supports": {
 		"align": [ "wide" ],
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -57,6 +67,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

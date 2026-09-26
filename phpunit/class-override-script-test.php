@@ -2,7 +2,7 @@
 /**
  * Test `gutenberg_override_script`.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class Override_Script_Test extends WP_UnitTestCase {

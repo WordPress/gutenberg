@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	transformMatchingBlock,
 	getPatternTransformedBlocks,
@@ -14,6 +8,7 @@ import {
 describe( 'use-transformed-patterns', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block-1', {
+			apiVersion: 3,
 			attributes: {
 				align: {
 					type: 'string',
@@ -36,6 +31,7 @@ describe( 'use-transformed-patterns', () => {
 			title: 'test block 1',
 		} );
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {
 				align: { type: 'string' },
 				content: { type: 'boolean' },

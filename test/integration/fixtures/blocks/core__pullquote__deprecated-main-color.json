@@ -5,13 +5,13 @@
 		"attributes": {
 			"value": "Pullquote custom color",
 			"className": "is-style-default",
+			"citation": "my citation",
+			"textColor": "subtle-background",
 			"style": {
 				"border": {
 					"color": "#2207d0"
 				}
-			},
-			"citation": "my citation",
-			"textColor": "subtle-background"
+			}
 		},
 		"innerBlocks": []
 	}

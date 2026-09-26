@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/query-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/query-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/query-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

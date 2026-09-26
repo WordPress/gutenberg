@@ -24,6 +24,6 @@ npm run test:e2e:storybook -- --update-snapshots
 
 ## How to write tests
 
-Any stories matching the glob patterns listed in the [E2E Storybook config](./storybook/main.js) will be included in the special build. Note that these are exclusive fixtures for our tests, and are separate from the stories included in the [main Storybook build](../../storybook/main.js) to be [published online](https://wordpress.github.io/gutenberg/).
+Any stories matching the glob patterns listed in the [E2E Storybook config](./storybook/main.ts) will be included in the special build. Note that these are exclusive fixtures for our tests, and are separate from the stories included in the [main Storybook build](../../storybook/main.ts) to be [published online](https://wordpress.github.io/gutenberg/).
 
 The Playwright test files live in the [`specs`](./specs/) folder. See the [E2E Tests README](../e2e/README.md) for general best practices.

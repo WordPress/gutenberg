@@ -4,8 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"align": "full",
 			"backgroundColor": "secondary",
+			"align": "full",
 			"layout": {
 				"type": "constrained"
 			}

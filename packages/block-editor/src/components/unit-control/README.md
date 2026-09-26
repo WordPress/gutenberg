@@ -1,6 +1,6 @@
 # UnitControl
 
-UnitControl component allows the user to set a value as well as a unit (e.g. `px`). The allowed units are derived from the (experimental) `theme.json` settings file .
+UnitControl component allows the user to set a value as well as a unit (e.g. `px`). The allowed units are derived from the (experimental) `theme.json` settings file.
 
 ```js
 // theme.json

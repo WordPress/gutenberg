@@ -57,7 +57,6 @@ const defaultConfig = {
 				'main',
 				'module',
 				'exports',
-				'react-native',
 				'wpScript',
 				'wpScriptModuleExports',
 				'types',

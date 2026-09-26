@@ -1,0 +1,175 @@
+{
+	"id": 71,
+	"date": "2025-11-03T05:34:25",
+	"date_gmt": "2025-11-03T05:34:25",
+	"guid": {
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141.jpeg",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141.jpeg"
+	},
+	"modified": "2025-11-12T23:17:38",
+	"modified_gmt": "2025-11-12T23:17:38",
+	"slug": "img_8141",
+	"status": "inherit",
+	"type": "attachment",
+	"link": "http://localhost:8888/?attachment_id=71",
+	"title": {
+		"raw": "IMG_8141",
+		"rendered": "IMG_8141"
+	},
+	"author": 1,
+	"featured_media": 0,
+	"comment_status": "open",
+	"ping_status": "closed",
+	"template": "",
+	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=71",
+	"generated_slug": "img_8141",
+	"class_list": [
+		"post-71",
+		"attachment",
+		"type-attachment",
+		"status-inherit",
+		"hentry"
+	],
+	"description": {
+		"raw": "",
+		"rendered": "<p class=\"attachment\"><a href='http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-scaled.jpeg'><img loading=\"lazy\" decoding=\"async\" width=\"300\" height=\"225\" src=\"http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-300x225.jpeg\" class=\"attachment-medium size-medium\" alt=\"\" srcset=\"http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-300x225.jpeg 300w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1024x768.jpeg 1024w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-768x576.jpeg 768w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1536x1152.jpeg 1536w, http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-2048x1536.jpeg 2048w\" sizes=\"auto, (max-width: 300px) 100vw, 300px\" /></a></p>\n"
+	},
+	"caption": {
+		"raw": "A caption for the image",
+		"rendered": "<p>A caption for the image</p>\n"
+	},
+	"alt_text": "",
+	"media_type": "image",
+	"mime_type": "image/jpeg",
+	"media_details": {
+		"width": 2560,
+		"height": 1920,
+		"file": "2025/11/IMG_8141-scaled.jpeg",
+		"filesize": 751579,
+		"sizes": {
+			"medium": {
+				"file": "IMG_8141-300x225.jpeg",
+				"width": 300,
+				"height": 225,
+				"filesize": 22105,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-300x225.jpeg"
+			},
+			"large": {
+				"file": "IMG_8141-1024x768.jpeg",
+				"width": 1024,
+				"height": 768,
+				"filesize": 155739,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1024x768.jpeg"
+			},
+			"thumbnail": {
+				"file": "IMG_8141-150x150.jpeg",
+				"width": 150,
+				"height": 150,
+				"filesize": 10260,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-150x150.jpeg"
+			},
+			"medium_large": {
+				"file": "IMG_8141-768x576.jpeg",
+				"width": 768,
+				"height": 576,
+				"filesize": 97570,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-768x576.jpeg"
+			},
+			"1536x1536": {
+				"file": "IMG_8141-1536x1152.jpeg",
+				"width": 1536,
+				"height": 1152,
+				"filesize": 303572,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-1536x1152.jpeg"
+			},
+			"2048x2048": {
+				"file": "IMG_8141-2048x1536.jpeg",
+				"width": 2048,
+				"height": 1536,
+				"filesize": 502729,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-2048x1536.jpeg"
+			},
+			"full": {
+				"file": "IMG_8141-scaled.jpeg",
+				"width": 2560,
+				"height": 1920,
+				"mime_type": "image/jpeg",
+				"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-scaled.jpeg"
+			}
+		},
+		"image_meta": {
+			"aperture": "1.78",
+			"credit": "",
+			"camera": "iPhone 14 Pro",
+			"caption": "",
+			"created_timestamp": "1761765212",
+			"copyright": "",
+			"focal_length": "6.86",
+			"iso": "1600",
+			"shutter_speed": "0.058823529411765",
+			"title": "",
+			"orientation": "1",
+			"keywords": []
+		},
+		"original_image": "IMG_8141.jpeg"
+	},
+	"post": 49,
+	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/IMG_8141-scaled.jpeg",
+	"missing_image_sizes": [],
+	"_links": {
+		"self": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/71",
+				"targetHints": {
+					"allow": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
+				}
+			}
+		],
+		"collection": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media"
+			}
+		],
+		"about": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/types/attachment"
+			}
+		],
+		"author": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/users/1"
+			}
+		],
+		"replies": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=71"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/71"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/71"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
+			}
+		]
+	}
+}

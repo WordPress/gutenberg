@@ -1,0 +1,239 @@
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
+import rule from '../components-no-missing-40px-size-prop';
+
+const RuleTester = configureRuleTester( { describe, it } );
+
+const ruleTester = new RuleTester( {
+	languageOptions: {
+		sourceType: 'module',
+		ecmaVersion: 6,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
+		},
+	},
+} );
+
+ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+	valid: [
+		// Component with __next40pxDefaultSize (boolean attribute)
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button __next40pxDefaultSize />
+			`,
+		},
+		// Component with non-default size prop
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button size="small" />
+			`,
+		},
+		// SelectControl no longer requires __next40pxDefaultSize
+		{
+			code: `
+				import { SelectControl } from '@wordpress/components';
+				<SelectControl />
+			`,
+		},
+		// Component with size="compact"
+		{
+			code: `
+				import { SelectControl } from '@wordpress/components';
+				<SelectControl size="compact" />
+			`,
+		},
+		// Component from @wordpress/ui (should not be checked)
+		{
+			code: `
+				import { Button } from '@wordpress/ui';
+				<Button />
+			`,
+		},
+		// Local component (should not be checked)
+		{
+			code: `
+				const Button = () => <button />;
+				<Button />
+			`,
+		},
+		// Component from another package (should not be checked)
+		{
+			code: `
+				import { Button } from 'some-other-package';
+				<Button />
+			`,
+		},
+		// Aliased import with correct prop
+		{
+			code: `
+				import { Button as WPButton } from '@wordpress/components';
+				<WPButton __next40pxDefaultSize />
+			`,
+		},
+		// Component with dynamic size prop (assumes it could be non-default)
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button size={buttonSize} />
+			`,
+		},
+		// Button with variant="link" (doesn't need __next40pxDefaultSize)
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button variant="link" />
+			`,
+		},
+		// Non-targeted component (should not be checked)
+		{
+			code: `
+				import { Modal } from '@wordpress/components';
+				<Modal />
+			`,
+		},
+		// All targeted components with __next40pxDefaultSize
+		{
+			code: `
+				import {
+					InputControl,
+					NumberControl,
+					RangeControl,
+					SelectControl,
+					ToggleGroupControl,
+				} from '@wordpress/components';
+				<>
+					<FormTokenField />
+					<InputControl />
+					<NumberControl />
+					<RangeControl />
+					<SelectControl />
+					<ToggleGroupControl />
+				</>
+			`,
+		},
+	],
+	invalid: [
+		// Button without __next40pxDefaultSize
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button />
+			`,
+			errors: [
+				{
+					messageId: 'missingProp',
+					data: { component: 'Button' },
+				},
+			],
+		},
+		// Component with __next40pxDefaultSize={false}
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button __next40pxDefaultSize={false} />
+			`,
+			errors: [
+				{
+					messageId: 'missingProp',
+					data: { component: 'Button' },
+				},
+			],
+		},
+		// Component with size="default" (should still require __next40pxDefaultSize)
+		{
+			code: `
+				import { Button } from '@wordpress/components';
+				<Button size="default" />
+			`,
+			errors: [
+				{
+					messageId: 'missingProp',
+					data: { component: 'Button' },
+				},
+			],
+		},
+		// Multiple invalid components
+		{
+			code: `
+				import { Button, SelectControl } from '@wordpress/components';
+				<>
+					<Button />
+					<SelectControl />
+				</>
+			`,
+			errors: [
+				{
+					messageId: 'missingProp',
+					data: { component: 'Button' },
+				},
+			],
+		},
+		// Relative import with checkLocalImports enabled
+		{
+			code: `
+				import { Button } from '../button';
+				<Button />
+			`,
+			options: [ { checkLocalImports: true } ],
+			errors: [
+				{
+					messageId: 'missingProp',
+					data: { component: 'Button' },
+				},
+			],
+		},
+	],
+} );
+
+// Additional tests for checkLocalImports option
+ruleTester.run(
+	'components-no-missing-40px-size-prop (checkLocalImports)',
+	rule,
+	{
+		valid: [
+			// Relative import with correct props
+			{
+				code: `
+				import { Button } from '../button';
+				<Button __next40pxDefaultSize />
+			`,
+				options: [ { checkLocalImports: true } ],
+			},
+			// Default import with correct props
+			{
+				code: `
+				import InputControl from './input-control';
+				<InputControl />
+			`,
+				options: [ { checkLocalImports: true } ],
+			},
+			// Relative import with non-default size
+			{
+				code: `
+				import { Button } from '../button';
+				<Button size="small" />
+			`,
+				options: [ { checkLocalImports: true } ],
+			},
+			// Relative import without checkLocalImports (should not be checked)
+			{
+				code: `
+				import { Button } from '../button';
+				<Button />
+			`,
+			},
+			// Default import without checkLocalImports (should not be checked)
+			{
+				code: `
+				import InputControl from '../input-control';
+				<InputControl />
+			`,
+			},
+		],
+		invalid: [],
+	}
+);

@@ -1,22 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getComputedFluidTypographyValue,
 	getTypographyValueAndUnit,
 } from '../fluid-utils';
 
 describe( 'getComputedFluidTypographyValue()', () => {
-	afterEach( () => {
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
-	} );
 	it( 'should return `null` when given a font size is not a support value+unit', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize:

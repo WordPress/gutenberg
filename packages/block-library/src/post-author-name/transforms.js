@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -9,15 +6,9 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/post-author' ],
 			transform: ( { textAlign } ) =>
-				createBlock( 'core/post-author-name', { textAlign } ),
-		},
-	],
-	to: [
-		{
-			type: 'block',
-			blocks: [ 'core/post-author' ],
-			transform: ( { textAlign } ) =>
-				createBlock( 'core/post-author', { textAlign } ),
+				createBlock( 'core/post-author-name', {
+					style: { typography: { textAlign } },
+				} ),
 		},
 	],
 };

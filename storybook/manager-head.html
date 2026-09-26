@@ -5,19 +5,41 @@
 			'borderboxcontrol',
 			'bordercontrol',
 			'boxcontrol',
-			'customselectcontrol-v2',
+			'confirmdialog',
 			'dimensioncontrol',
+			'heading',
+			'hstack',
+			'inputcontrol',
 			'menu',
 			'navigation',
 			'navigator',
+			'numbercontrol',
 			'progressbar',
 			'tabs',
+			'text',
 			'theme',
+			'togglegroupcontrol',
+			'treegrid',
+			'truncate',
+			'unitcontrol',
+			'vstack',
 		];
 		const REDIRECTS = [
 			{
+				from: /^\/docs\/docs-introduction--/,
+				to: '/docs/introduction--',
+			},
+			{
 				from: /\/components-deprecated-/,
 				to: '/components-',
+			},
+			{
+				from: /\/components-experimental-validated-form-controls-/,
+				to: '/components-',
+			},
+			{
+				from: /\/(?:docs|story)\/components-(?:experimental-)?customselectcontrol-v2\b.*/,
+				to: '/docs/components-customselectcontrol--docs',
 			},
 			{
 				from: new RegExp(

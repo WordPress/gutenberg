@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-block-rename-modal {
 	z-index: z-index(".block-editor-block-rename-modal");
 }

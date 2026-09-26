@@ -1,30 +1,21 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 const json2php = require( 'json2php' );
 const chalk = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const { getArgFromCLI } = require( '../utils' );
 
-// Set default paths
+// Parses command line arguments.
 const defaultInputDir = 'build';
-const defaultOutputFile = path.join( 'build', 'blocks-manifest.php' );
-
-// Parse command line arguments
 const inputDir = getArgFromCLI( '--input' ) || defaultInputDir;
+const defaultOutputFile = path.join( inputDir, 'blocks-manifest.php' );
 const outputFile = getArgFromCLI( '--output' ) || defaultOutputFile;
 
 const resolvedInputDir = path.resolve( process.cwd(), inputDir );
 if ( ! fs.existsSync( resolvedInputDir ) ) {
 	const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 	process.stdout.write(
-		`${ ERROR } Input directory "${ inputDir }" does not exist.\n`
+		`${ ERROR } Input directory "${ resolvedInputDir }" does not exist.\n`
 	);
 	process.exit( 1 );
 }

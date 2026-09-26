@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-directory-downloadable-block-notice {
 	margin: $grid-unit-10 0 0;
 	color: $alert-red;

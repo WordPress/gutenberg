@@ -2,7 +2,7 @@
 /**
  * Tests script and style loading.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Script_Loader_Test extends WP_UnitTestCase {

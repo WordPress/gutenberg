@@ -1,26 +1,8 @@
-/**
- * External dependencies
- */
-import type { CSSProperties, ReactText } from 'react';
-
-/**
- * Internal dependencies
- */
+import type { CSSProperties } from 'react';
 import CONFIG from './config-values';
 
 export type HeadingSize =
-	| 1
-	| 2
-	| 3
-	| 4
-	| 5
-	| 6
-	| '1'
-	| '2'
-	| '3'
-	| '4'
-	| '5'
-	| '6';
+	1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6';
 
 export const BASE_FONT_SIZE = 13;
 
@@ -61,7 +43,7 @@ export function getFontSize(
 	return `calc(${ ratio } * ${ CONFIG.fontSize })`;
 }
 
-export function getHeadingFontSize( size: ReactText = 3 ): string {
+export function getHeadingFontSize( size: number | string = 3 ): string {
 	if ( ! HEADING_FONT_SIZES.includes( size as HeadingSize ) ) {
 		return getFontSize( size );
 	}

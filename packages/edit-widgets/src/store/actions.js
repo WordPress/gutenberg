@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
@@ -431,3 +424,61 @@ export const moveBlockToWidgetArea =
 				destinationIndex
 			);
 	};
+
+/**
+ * Returns an action object used to signal that widget saving is unlocked.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```js
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const { unlockWidgetSaving } = useDispatch( widgetStore );
+ * 	return (
+ * 		<Button onClick={ () => unlockWidgetSaving( 'lockName' ) }>
+ * 			{ __( 'Unlock Widget Saving' ) }
+ * 		</Button>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function unlockWidgetSaving( lockName ) {
+	return {
+		type: 'UNLOCK_WIDGET_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that widget saving is locked.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```js
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const { lockWidgetSaving } = useDispatch( widgetStore );
+ * 	return (
+ * 		<Button onClick={ () => lockWidgetSaving( 'lockName' ) }>
+ * 			{ __( 'Lock Widget Saving' ) }
+ * 		</Button>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function lockWidgetSaving( lockName ) {
+	return {
+		type: 'LOCK_WIDGET_SAVING',
+		lockName,
+	};
+}

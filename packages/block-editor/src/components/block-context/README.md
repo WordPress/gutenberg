@@ -24,7 +24,6 @@ Internal to the `@wordpress/block-editor` module, a component can access the [fu
 
 ```js
 import { useContext } from 'react';
-
 // Only available internally within `@wordpress/block-editor`!
 import BlockContext from '../block-context';
 

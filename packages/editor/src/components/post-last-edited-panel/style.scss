@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .editor-post-last-edited-panel {
 	color: $gray-700;
 	& .components-text {

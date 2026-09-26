@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getQueryArg } from '@wordpress/url';
 
 export function isPreviewingTheme() {

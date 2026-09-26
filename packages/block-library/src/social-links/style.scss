@@ -1,3 +1,6 @@
+@use "../social-link/socials-with-bg.scss" as *;
+@use "../social-link/socials-without-bg.scss" as *;
+
 .wp-block-social-links {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
@@ -109,7 +112,7 @@
 // Provide colors for a range of icons.
 :where(.wp-block-social-links:not(.is-style-logos-only)) {
 	// Generic items such as mail, feed, etc.
-	@import "../social-link/socials-with-bg.scss";
+	@include socials-with-bg;
 }
 
 // Treatment for logos only style.
@@ -127,7 +130,7 @@
 		}
 	}
 
-	@import "../social-link/socials-without-bg.scss";
+	@include socials-without-bg;
 }
 
 // Treatment for pill shape style.

@@ -1,7 +1,7 @@
 ( function () {
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 
 	const divProps = {
 		className: 'product',
@@ -16,34 +16,38 @@
 		return el( 'div', divProps, el( InnerBlocks.Content ) );
 	};
 	registerBlockType( 'test/prioritized-inserter-blocks-unset', {
+		apiVersion: 3,
 		title: 'Prioritized Inserter Blocks Unset',
 		icon: 'carrot',
 		category: 'text',
 
-		edit() {
-			return el( 'div', divProps, el( InnerBlocks, { template } ) );
+		edit: function Edit() {
+			const blockProps = useBlockProps( divProps );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				template,
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save,
 	} );
 
 	registerBlockType( 'test/prioritized-inserter-blocks-set', {
+		apiVersion: 3,
 		title: 'Prioritized Inserter Blocks Set',
 		icon: 'carrot',
 		category: 'text',
-		edit() {
-			return el(
-				'div',
-				divProps,
-				el( InnerBlocks, {
-					template,
-					prioritizedInserterBlocks: [
-						'core/audio',
-						'core/spacer',
-						'core/code',
-					],
-				} )
-			);
+		edit: function Edit() {
+			const blockProps = useBlockProps( divProps );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				template,
+				prioritizedInserterBlocks: [
+					'core/audio',
+					'core/spacer',
+					'core/code',
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save,
@@ -52,28 +56,27 @@
 	registerBlockType(
 		'test/prioritized-inserter-blocks-set-with-conflicting-allowed-blocks',
 		{
+			apiVersion: 3,
 			title: 'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks',
 			icon: 'carrot',
 			category: 'text',
-			edit() {
-				return el(
-					'div',
-					divProps,
-					el( InnerBlocks, {
-						template,
-						allowedBlocks: [
-							'core/spacer',
-							'core/code',
-							'core/paragraph',
-							'core/heading',
-						],
-						prioritizedInserterBlocks: [
-							'core/audio', // this is **not** in the allowedBlocks list
-							'core/spacer',
-							'core/code',
-						],
-					} )
-				);
+			edit: function Edit() {
+				const blockProps = useBlockProps( divProps );
+				const innerBlocksProps = useInnerBlocksProps( blockProps, {
+					template,
+					allowedBlocks: [
+						'core/spacer',
+						'core/code',
+						'core/paragraph',
+						'core/heading',
+					],
+					prioritizedInserterBlocks: [
+						'core/audio', // this is **not** in the allowedBlocks list
+						'core/spacer',
+						'core/code',
+					],
+				} );
+				return el( 'div', innerBlocksProps );
 			},
 
 			save,

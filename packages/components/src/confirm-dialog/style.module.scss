@@ -1,0 +1,7 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+// Match the previous Emotion `&&` specificity so this rule continues to
+// override the Modal overlay's default z-index regardless of source order.
+.wrapper.wrapper {
+	z-index: z-index(".components-confirm-dialog");
+}

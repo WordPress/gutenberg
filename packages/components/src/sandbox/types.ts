@@ -1,5 +1,37 @@
 export type SandBoxProps = {
 	/**
+	 * Whether to include `allow-same-origin` in the iframe's sandbox
+	 * attribute. When true, nested iframes (such as third-party embeds)
+	 * can access their own origin's cookies and storage.
+	 *
+	 * Only enable this for content that is NOT directly user-controlled,
+	 * such as server-fetched oEmbed previews.
+	 *
+	 * @default false
+	 */
+	allowSameOrigin?: boolean;
+	/**
+	 * Whether to include `allow-popups` in the iframe's sandbox attribute.
+	 * When true, content inside the iframe is allowed to open new browsing
+	 * contexts (e.g. links that open in a new tab, or `window.open`).
+	 *
+	 * Enable this for previews whose content includes links that should be
+	 * followable, such as embeds.
+	 *
+	 * @default false
+	 */
+	allowPopups?: boolean;
+	/**
+	 * Whether to include `allow-forms` in the iframe's sandbox attribute.
+	 * When true, content inside the iframe is allowed to submit forms.
+	 *
+	 * Enable this for previews whose content includes forms that should be
+	 * submittable.
+	 *
+	 * @default false
+	 */
+	allowForms?: boolean;
+	/**
 	 * The HTML to render in the body of the iframe document.
 	 *
 	 * @default ''

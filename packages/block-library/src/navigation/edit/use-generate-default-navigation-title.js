@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const DRAFT_MENU_PARAMS = [
@@ -53,9 +46,9 @@ export default function useGenerateDefaultNavigationTitle( clientId ) {
 					// translators: %s: the name of a menu (e.g. Header menu).
 					__( '%s menu' ),
 					area
-			  )
+				)
 			: // translators: 'menu' as in website navigation menu.
-			  __( 'Menu' );
+				__( 'Menu' );
 
 		// Determine how many menus start with the automatic title.
 		const matchingMenuTitleCount = [

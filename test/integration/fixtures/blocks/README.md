@@ -81,5 +81,5 @@ and the block is still valid (`isValid` is `true`).
 ## Related
 
 See the
-[`full-content.test.js`](../../../../test/integration/full-content/full-content.test.js)
+[`full-content.jsdom.test.js`](../../../../test/integration/full-content/full-content.jsdom.test.js)
 test file for the code that runs these tests.

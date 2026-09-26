@@ -8,7 +8,7 @@ In the classic editor, notices hooked onto the `admin_notices` action can render
 
 In the classic editor, here's an example of the "Post draft updated" notice:
 
-![Post draft updated in the classic editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/notices/classic-editor-notice.png)
+![Post draft updated in the classic editor](https://developer.wordpress.org/files/2026/06/classic-editor-notice.png)
 
 Producing an equivalent "Post draft updated" notice would require code like this:
 
@@ -24,11 +24,13 @@ function myguten_admin_notice() {
 		return;
 	}
 	// Render the notice's HTML.
-	// Each notice should be wrapped in a <div>
-	// with a 'notice' class.
-	echo '<div class="notice notice-success is-dismissible"><p>';
-	echo sprintf( __( 'Post draft updated. <a href="%s" target="_blank">Preview post</a>' ), get_preview_post_link() );
-	echo '</p></div>';
+	wp_admin_notice(
+		sprintf( __( 'Post draft updated. <a href="%s" target="_blank">Preview post</a>' ), get_preview_post_link() ),
+		array(
+			'type'        => 'success',
+			'dismissible' => true,
+		)
+	);
 };
 add_action( 'admin_notices', 'myguten_admin_notice' );
 ```
@@ -39,7 +41,7 @@ Importantly, the `admin_notices` hook allows a developer to render whatever HTML
 
 In the block editor, here's an example of the "Post published" notice:
 
-![Post published in the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/notices/block-editor-notice.png)
+![Post published in the block editor](https://developer.wordpress.org/files/2026/06/block-editor-notice.png)
 
 Producing an equivalent "Post published" notice would require code like this:
 

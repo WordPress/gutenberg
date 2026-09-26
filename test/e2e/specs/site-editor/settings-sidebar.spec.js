@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Settings sidebar', () => {
@@ -38,8 +35,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Template' );
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 
 		test( `should show the currently selected template's title and description`, async ( {
@@ -87,8 +89,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Block' );
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 	} );
 
@@ -102,8 +109,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Template' );
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 
 			// By inserting the block is also selected.
 			await editor.insertBlock( { name: 'core/heading' } );
@@ -111,8 +123,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Block' );
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 
 		test( 'should switch to Template tab when a block was selected and we select the Template', async ( {
@@ -127,8 +144,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Block' );
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 
 			await page.evaluate( () => {
 				window.wp.data
@@ -139,8 +161,13 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'tab', { selected: true } )
-			).toHaveText( 'Template' );
+					.getByRole( 'tab', { name: 'Template' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'tab', { name: 'Block' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 	} );
 } );

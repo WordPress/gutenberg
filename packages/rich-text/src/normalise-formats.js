@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { isFormatEqual } from './is-format-equal';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */

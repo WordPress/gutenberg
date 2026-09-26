@@ -1,36 +1,20 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Utilities/Composite',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Group': Composite.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.GroupLabel': Composite.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Row': Composite.Row,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Hover': Composite.Hover,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Typeahead': Composite.Typeahead,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,
@@ -53,6 +37,10 @@ const meta: Meta< typeof Composite > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 	decorators: [
 		( Story ) => {
@@ -72,7 +60,6 @@ const meta: Meta< typeof Composite > = {
 							fontStyle: 'italic',
 						} }
 					>
-						{ /* eslint-disable-next-line no-restricted-syntax */ }
 						<p id="list-title">Notes</p>
 						<ul aria-labelledby="list-title">
 							<li>
@@ -241,7 +228,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 
 				// Render all context providers forwarded by the Slot via fillProps.
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

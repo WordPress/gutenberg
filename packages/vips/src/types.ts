@@ -4,8 +4,56 @@ export interface ImageSizeCrop {
 	width: number;
 	height: number;
 	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+		boolean | [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+}
+
+/**
+ * Options for converting or compressing an image.
+ */
+export interface ConvertImageOptions {
+	/**
+	 * Desired quality (0-1). Defaults to 0.82.
+	 */
+	quality?: number;
+	/**
+	 * Whether to use interlaced/progressive mode. Only used if the output type
+	 * supports it. Defaults to false.
+	 */
+	interlaced?: boolean;
+	/**
+	 * Whether to strip metadata (except color profiles), from the
+	 * `image_strip_meta` filter. Defaults to true.
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth, from the `image_max_bit_depth` filter.
+	 * Defaults to 16.
+	 */
+	maxBitdepth?: number;
+}
+
+/**
+ * Options for resizing an image.
+ */
+export interface ResizeImageOptions {
+	/**
+	 * Whether to use smart cropping (i.e. saliency-aware). Defaults to false.
+	 */
+	smartCrop?: boolean;
+	/**
+	 * Desired quality (0-1). Defaults to 0.82.
+	 */
+	quality?: number;
+	/**
+	 * Whether to strip metadata (except color profiles), from the
+	 * `image_strip_meta` filter. Defaults to true.
+	 */
+	stripMeta?: boolean;
+	/**
+	 * Maximum output bit depth, from the `image_max_bit_depth` filter.
+	 * Defaults to 16.
+	 */
+	maxBitdepth?: number;
 }
 
 /**
@@ -18,13 +66,7 @@ export interface ImageSizeCrop {
  * all: Everything is interesting.
  */
 type Interesting =
-	| 'none'
-	| 'centre'
-	| 'entropy'
-	| 'attention'
-	| 'low'
-	| 'high'
-	| 'all';
+	'none' | 'centre' | 'entropy' | 'attention' | 'low' | 'high' | 'all';
 
 /**
  * none: Don't attach metadata.
@@ -33,9 +75,14 @@ type Interesting =
  * iptc: Keep IPTC metadata.
  * icc: Keep ICC metadata.
  * other: Keep other metadata (e.g. PNG comments and some TIFF tags).
+ * gainmap: Keep gainmap metadata (UltraHDR JPEG).
  * all: Keep all metadata.
+ *
+ * Multiple values can be combined with `|`, e.g. `'icc|gainmap'`.
  */
-type ForeignKeep = 'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'all';
+type ForeignKeepValue =
+	'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'gainmap' | 'all';
+type ForeignKeep = ForeignKeepValue | `${ ForeignKeepValue }|${ string }`;
 
 /**
  * The rendering intent.'absolute' is best for
@@ -81,8 +128,8 @@ export interface LoadOptions< T extends string > {
 	n?: T extends 'image/gif'
 		? number
 		: T extends 'image/webp'
-		? number
-		: never;
+			? number
+			: never;
 	/**
 	 * Required access pattern for this file.
 	 */
@@ -123,6 +170,21 @@ export interface SaveOptions< T extends string > {
 	 * it is most relevant for AVIF, as it is slow by default.
 	 */
 	effort?: number;
+	/**
+	 * Number of bits per sample to write (e.g. 8, 10, or 12).
+	 *
+	 * Used for AVIF/HEIF to preserve high-bit-depth (HDR) images instead of
+	 * flattening them to 8-bit.
+	 */
+	bitdepth?: number;
+	/**
+	 * Quantise to an 8bpp palette. Only supported by PNG.
+	 * Do not provide for any other type!
+	 *
+	 * Used to keep indexed (palette) sources indexed instead of writing them
+	 * back out as truecolour RGB/RGBA.
+	 */
+	palette?: boolean;
 }
 
 export interface ThumbnailOptions {

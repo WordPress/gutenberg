@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-text', () => {
@@ -8,9 +5,11 @@ test.describe( 'data-wp-text', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/directive-text' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/directive-text' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();
@@ -41,5 +40,14 @@ test.describe( 'data-wp-text', () => {
 		await expect( elNumber ).toHaveText( '1' );
 		const elBool = page.getByTestId( 'show state boolean' );
 		await expect( elBool ).toHaveText( 'true' );
+	} );
+
+	test( 'should ignore suffixes and unique-ids in text directive', async ( {
+		page,
+	} ) => {
+		const ignoresSuffixes = page.getByTestId( 'ignores suffixes' );
+		await expect( ignoresSuffixes ).not.toHaveText( 'Text 1' );
+		const ignoresUniqueIds = page.getByTestId( 'ignores unique-ids' );
+		await expect( ignoresUniqueIds ).not.toHaveText( 'Text 1' );
 	} );
 } );

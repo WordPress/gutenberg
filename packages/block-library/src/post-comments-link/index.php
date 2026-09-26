@@ -8,10 +8,12 @@
 /**
  * Renders the `core/post-comments-link` block on the server.
  *
- * @param  array    $attributes Block attributes.
- * @param  string   $content    Block default content.
- * @param  WP_Block $block      Block instance.
- * @return string   Returns the rendered link.
+ * @since 6.9.0
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
+ * @return string Returns the rendered link.
  */
 function render_block_core_post_comments_link( $attributes, $content, $block ) {
 	if (
@@ -59,6 +61,8 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-comments-link` block on the server.
+ *
+ * @since 6.9.0
  */
 function register_block_core_post_comments_link() {
 	register_block_type_from_metadata(

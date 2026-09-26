@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { withFakeTimers } from './with-fake-timers';
 
 /**
@@ -25,7 +18,9 @@ export async function waitForStoreResolvers( fn ) {
 		const result = fn();
 
 		// Advance all timers allowing store resolvers to resolve.
-		act( () => jest.runAllTimers() );
+		act( () =>
+			( globalThis.wpVitest?.timers ?? globalThis.wpJest ).runAllTimers()
+		);
 
 		// The store resolvers perform several API fetches during editor
 		// initialization. The most straightforward approach to ensure all of them

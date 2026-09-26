@@ -1,13 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
+
+// Attachments / media
+export const ATTACHMENT_POST_TYPE = 'attachment';
 
 // Navigation
 export const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -55,3 +51,5 @@ export const OPERATOR_IS = 'is';
 export const OPERATOR_IS_NOT = 'isNot';
 export const OPERATOR_IS_ANY = 'isAny';
 export const OPERATOR_IS_NONE = 'isNone';
+export const OPERATOR_BEFORE = 'before';
+export const OPERATOR_AFTER = 'after';

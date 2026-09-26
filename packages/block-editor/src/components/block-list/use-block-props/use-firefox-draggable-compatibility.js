@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 
 const nodesByDocument = new Map();
@@ -41,12 +38,15 @@ function restore( node ) {
 
 function down( event ) {
 	const { target } = event;
-	const { ownerDocument, isContentEditable } = target;
+	const { ownerDocument, isContentEditable, tagName } = target;
+	const isInputOrTextArea = [ 'INPUT', 'TEXTAREA' ].includes( tagName );
+
 	const nodes = nodesByDocument.get( ownerDocument );
 
-	if ( isContentEditable ) {
-		// Whenever an editable element is clicked, check which draggable
-		// blocks contain this element, and temporarily disable draggability.
+	if ( isContentEditable || isInputOrTextArea ) {
+		// Whenever an editable element or an input or textarea is clicked,
+		// check which draggable blocks contain this element, and temporarily
+		// disable draggability.
 		for ( const node of nodes ) {
 			if (
 				node.getAttribute( 'draggable' ) === 'true' &&
@@ -57,8 +57,8 @@ function down( event ) {
 			}
 		}
 	} else {
-		// Whenever a non-editable element is clicked, re-enable draggability
-		// for any blocks that were previously disabled.
+		// Whenever a non-editable element or an input or textarea is clicked,
+		// re-enable draggability for any blocks that were previously disabled.
 		for ( const node of nodes ) {
 			restore( node );
 		}
@@ -66,11 +66,11 @@ function down( event ) {
 }
 
 /**
- * In Firefox, the `draggable` and `contenteditable` attributes don't play well
- * together. When `contenteditable` is within a `draggable` element, selection
- * doesn't get set in the right place. The only solution is to temporarily
- * remove the `draggable` attribute clicking inside `contenteditable` elements.
- *
+ * In Firefox, the `draggable` and `contenteditable` or `input` or `textarea`
+ * elements don't play well together. When these elements are within a
+ * `draggable` element, selection doesn't get set in the right place. The only
+ * solution is to temporarily remove the `draggable` attribute clicking inside
+ * these elements.
  * @return {Function} Cleanup function.
  */
 export function useFirefoxDraggableCompatibility() {

@@ -4,8 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"align": "full",
-			"backgroundColor": "secondary"
+			"backgroundColor": "secondary",
+			"align": "full"
 		},
 		"innerBlocks": [
 			{

@@ -1,0 +1,180 @@
+name: Verify package CHANGELOG updates
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+        branches:
+            - trunk
+        paths:
+            - 'packages/admin-ui/**'
+            - 'packages/components/**'
+            - 'packages/dataviews/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
+            - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
+            - 'packages/wp-build/**'
+            - 'packages/*/CHANGELOG.md'
+            - 'tools/validation/validate-changelogs.ts'
+            - '.github/workflows/check-package-changelogs.yml'
+            - '!packages/*/src/**/stories/**'
+            - '!packages/*/src/**/test/**'
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    # Presence: The allowlisted packages listed in the matrix have stricter
+    # expectations around changes having an accompanying changelog note.
+    presence:
+        name: Check CHANGELOG presence (${{ matrix.package }})
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                package:
+                    # Bundled packages
+                    # Keep in sync with dependency-extraction-webpack-plugin
+                    - admin-ui
+                    - dataviews
+                    - fields
+                    - grid
+                    - icons
+                    - interface
+                    - style-runtime
+                    - ui
+                    - undo-manager
+                    - views
+                    # Other packages
+                    - theme
+                    - components
+                    - private-apis
+                    - widget-dashboard
+                    - widget-primitives
+                    - wp-build
+        steps:
+            - name: 'Get PR commit count'
+              env:
+                  PR_COUNT: ${{ github.event.pull_request.commits }}
+              run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
+            - name: Determine if package has relevant changes
+              id: filter
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
+              run: |
+                  # The workflow's `paths:` filter triggers on the union of all
+                  # tracked packages, so this matrix entry may run on a PR that
+                  # doesn't touch its package. Short-circuit if that's the case.
+                  relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
+                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
+
+                  if [ -z "$relevant_changes" ]; then
+                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
+                      echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  fi
+            # This intentionally doesn't use `.github/setup-node`, because we
+            # don't currently need to `npm ci` install any dependencies.
+            - name: Use desired version of Node.js
+              if: steps.filter.outputs.has_changes == 'true'
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  package-manager-cache: false
+            - name: Set up npm
+              if: steps.filter.outputs.has_changes == 'true'
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+            - name: Check CHANGELOG cites this PR
+              if: steps.filter.outputs.has_changes == 'true'
+              env:
+                  PR_NUMBER: ${{ github.event.number }}
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
+              run: |
+                  changelog_path="${PACKAGE_PATH}/CHANGELOG.md"
+                  optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
+
+                  # Fail if the PR doesn't touch the changelog
+                  if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
+                      echo "Please add a CHANGELOG entry to $changelog_path"
+                      echo
+                      echo "${optional_check_notice}"
+                      exit 1
+                  fi
+
+                  # Confirm that the CHANGELOG has a valid entry for the current PR
+                  npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+
+    # Structure: For any revisions to CHANGELOGs (regardless of package),
+    # validate that the contents follow the expected format.
+    structure:
+        name: Validate CHANGELOG structure
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        steps:
+            - name: 'Get PR commit count'
+              env:
+                  PR_COUNT: ${{ github.event.pull_request.commits }}
+              run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
+            # This intentionally doesn't use `.github/setup-node`, because we
+            # don't currently need to `npm ci` install any dependencies.
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  package-manager-cache: false
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+            - name: Validate touched CHANGELOG files
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PR_NUMBER: ${{ github.event.number }}
+              run: |
+                  changelogs=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
+
+                  if [ -z "$changelogs" ]; then
+                      echo "No package CHANGELOG.md files changed; skipping structure check."
+                      exit 0
+                  fi
+
+                  echo "Validating:"
+                  echo "$changelogs"
+                  echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"

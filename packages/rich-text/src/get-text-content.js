@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */

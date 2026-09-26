@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isTemplatePart } from '@wordpress/blocks';
 
 const EMPTY_ARRAY = [];
@@ -21,13 +18,13 @@ export default function getFilteredTemplatePartBlocks(
 ) {
 	const templatePartsById = templateParts
 		? // Key template parts by their ID.
-		  templateParts.reduce(
+			templateParts.reduce(
 				( newTemplateParts, part ) => ( {
 					...newTemplateParts,
 					[ part.id ]: part,
 				} ),
 				{}
-		  )
+			)
 		: {};
 
 	const result = [];

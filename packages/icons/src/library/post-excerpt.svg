@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
+	<path d="M4 15H20M4 19H13" vector-effect="non-scaling-stroke" />
+	<path d="M7.75 7.25H4.75V6M7.75 7.25V9.5C7.75 10.3921 7.08772 11.25 5 11.25M7.75 7.25V6M4.75 6V4.75H7.75V6M4.75 6H7.75M13 7.25H10V6M13 7.25V9.5C13 10.3921 12.3377 11.25 10.25 11.25M13 7.25V6M10 6V4.75H13V6M10 6H13" vector-effect="non-scaling-stroke" />
+</svg>

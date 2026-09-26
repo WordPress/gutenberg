@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { SyntheticEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DragProps } from '../types';
 
 export const CHANGE = 'CHANGE';
@@ -52,7 +45,4 @@ export type DragEventAction = DragStartAction | DragEndAction | DragAction;
 export type KeyEventAction = PressDownAction | PressUpAction | PressEnterAction;
 
 export type InputAction =
-	| ChangeEventAction
-	| KeyEventAction
-	| DragEventAction
-	| InvalidateAction;
+	ChangeEventAction | KeyEventAction | DragEventAction | InvalidateAction;

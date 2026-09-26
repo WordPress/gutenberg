@@ -59,7 +59,7 @@ registerBlockType( 'myplugin/template', {
 } );
 ```
 
-See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-finishing-touches) for a full example of a template in use.
+See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-use-block-templates-optional) for a full example of a template in use.
 
 ## Block attributes
 
@@ -176,7 +176,7 @@ $template = array(
 		) ),
 		array( 'core/column', array(), array(
 			array( 'core/paragraph', array(
-				'placeholder' => 'Add a inner paragraph'
+				'placeholder' => 'Add an inner paragraph'
 			) ),
 		) ),
 	) )

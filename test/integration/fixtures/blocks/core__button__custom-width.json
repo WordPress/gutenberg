@@ -1,0 +1,17 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "Custom Width Button",
+			"style": {
+				"dimensions": {
+					"width": "150px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

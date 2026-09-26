@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { join } from 'path';
-
-/**
- * Internal dependencies
- */
 import type { Admin } from './';
 
 /**

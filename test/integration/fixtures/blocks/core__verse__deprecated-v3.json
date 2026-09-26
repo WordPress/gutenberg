@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/verse",
+		"isValid": true,
+		"attributes": {
+			"content": "A <em>verse</em>…<br>And more!",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/verse",
+		"isValid": true,
+		"attributes": {
+			"content": "A <em>verse</em>…<br>And more!",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/verse",
+		"isValid": true,
+		"attributes": {
+			"content": "A <em>verse</em>…<br>And more!",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

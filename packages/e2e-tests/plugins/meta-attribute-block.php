@@ -33,6 +33,7 @@ function enqueue_test_meta_attribute_block() {
 		plugins_url( 'meta-attribute-block/early.js', __FILE__ ),
 		array(
 			'wp-blocks',
+			'wp-block-editor',
 			'wp-element',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'meta-attribute-block/early.js' )
@@ -43,6 +44,7 @@ function enqueue_test_meta_attribute_block() {
 		plugins_url( 'meta-attribute-block/late.js', __FILE__ ),
 		array(
 			'wp-blocks',
+			'wp-block-editor',
 			'wp-element',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'meta-attribute-block/late.js' ),

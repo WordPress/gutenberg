@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getDistanceFromPointToEdge, getDistanceToNearestEdge } from '../math';
 
 describe( 'getDistanceFromPointToEdge', () => {

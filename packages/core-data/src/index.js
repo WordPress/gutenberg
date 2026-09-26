@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createReduxStore, register } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
@@ -21,6 +14,7 @@ import {
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { dynamicActions, dynamicSelectors } from './dynamic-entities';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -33,26 +27,50 @@ const entitiesConfig = [
 
 const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name, plural } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
-		selectors.getEntityRecord( state, kind, name, key, query );
+
+	const getEntityRecordMethodName = getMethodName( kind, name );
+	result[ getEntityRecordMethodName ] = ( state, key, query ) => {
+		logEntityDeprecation( kind, name, getEntityRecordMethodName, {
+			isShorthandSelector: true,
+			alternativeFunctionName: 'getEntityRecord',
+		} );
+		return selectors.getEntityRecord( state, kind, name, key, query );
+	};
 
 	if ( plural ) {
-		result[ getMethodName( kind, plural, 'get' ) ] = ( state, query ) =>
-			selectors.getEntityRecords( state, kind, name, query );
+		const getEntityRecordsMethodName = getMethodName( kind, plural, 'get' );
+		result[ getEntityRecordsMethodName ] = ( state, query ) => {
+			logEntityDeprecation( kind, name, getEntityRecordsMethodName, {
+				isShorthandSelector: true,
+				alternativeFunctionName: 'getEntityRecords',
+			} );
+			return selectors.getEntityRecords( state, kind, name, query );
+		};
 	}
 	return result;
 }, {} );
 
 const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name, plural } = entity;
-	result[ getMethodName( kind, name ) ] = ( key, query ) =>
-		resolvers.getEntityRecord( kind, name, key, query );
+	const getEntityRecordMethodName = getMethodName( kind, name );
+	result[ getEntityRecordMethodName ] = ( key, query ) => {
+		logEntityDeprecation( kind, name, getEntityRecordMethodName, {
+			isShorthandSelector: true,
+			alternativeFunctionName: 'getEntityRecord',
+		} );
+		return resolvers.getEntityRecord( kind, name, key, query );
+	};
 
 	if ( plural ) {
-		const pluralMethodName = getMethodName( kind, plural, 'get' );
-		result[ pluralMethodName ] = ( ...args ) =>
-			resolvers.getEntityRecords( kind, name, ...args );
-		result[ pluralMethodName ].shouldInvalidate = ( action ) =>
+		const getEntityRecordsMethodName = getMethodName( kind, plural, 'get' );
+		result[ getEntityRecordsMethodName ] = ( ...args ) => {
+			logEntityDeprecation( kind, plural, getEntityRecordsMethodName, {
+				isShorthandSelector: true,
+				alternativeFunctionName: 'getEntityRecords',
+			} );
+			return resolvers.getEntityRecords( kind, name, ...args );
+		};
+		result[ getEntityRecordsMethodName ].shouldInvalidate = ( action ) =>
 			resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
 	}
 	return result;
@@ -60,10 +78,25 @@ const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
 
 const entityActions = entitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name, 'save' ) ] = ( record, options ) =>
-		actions.saveEntityRecord( kind, name, record, options );
-	result[ getMethodName( kind, name, 'delete' ) ] = ( key, query, options ) =>
-		actions.deleteEntityRecord( kind, name, key, query, options );
+
+	const saveEntityRecordMethodName = getMethodName( kind, name, 'save' );
+	result[ saveEntityRecordMethodName ] = ( record, options ) => {
+		logEntityDeprecation( kind, name, saveEntityRecordMethodName, {
+			isShorthandSelector: true,
+			alternativeFunctionName: 'saveEntityRecord',
+		} );
+		return actions.saveEntityRecord( kind, name, record, options );
+	};
+
+	const deleteEntityRecordMethodName = getMethodName( kind, name, 'delete' );
+	result[ deleteEntityRecordMethodName ] = ( key, query, options ) => {
+		logEntityDeprecation( kind, name, deleteEntityRecordMethodName, {
+			isShorthandSelector: true,
+			alternativeFunctionName: 'deleteEntityRecord',
+		} );
+		return actions.deleteEntityRecord( kind, name, key, query, options );
+	};
+
 	return result;
 }, {} );
 
@@ -96,6 +129,8 @@ register( store ); // Register store after unlocking private selectors to allow 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
 export * from './entity-types';
+export * from './awareness/types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
+export * from './types';

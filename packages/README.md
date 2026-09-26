@@ -2,6 +2,40 @@
 
 This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
+## Package Guidelines
+
+Packages are the first layer of architecture and organization in Gutenberg. They exist to separate concerns, provide clarity, and establish a shared mental model across teams. To maintain good package hygiene, follow these guidelines when creating new packages or iterating on existing ones:
+
+1. **Each package should have a single, clear purpose.**
+
+    It should be immediately obvious why the package exists.
+
+2. **Every package must include a README.**
+
+    This is the first place contributors look to understand scope and usage.
+
+3. **Any prerequisites must be documented.**
+
+    Generic packages without prerequisites are better, but packages with some prerequisites are acceptable. Examples of prerequisites: API endpoints that must exist, authentication assumptions, environment dependencies. These should be clearly stated in the README.
+
+4. **Public APIs should have documentation.**
+
+    Either inline in the README or linked to external docs.
+
+5. **Avoid utility and kitchen-sink packages.**
+
+    They tend to grow without a coherent domain and become junk drawers.
+
+6. **Avoid broad, catch-all scopes.**
+
+    For example: "Reusable WordPress components" or "Utilities for different use cases." These create unclear ownership and encourage uncontrolled growth. Instead, define a specific domain or purpose.
+
+7. **Default to bundled packages (no globals, no modules) unless necessary.**
+
+    In Gutenberg, we should default to "bundled" packages unless there's a specific need for globals or modules. See the [@wordpress/build README](../wp-build/README.md) for more information on package configuration.
+
+For more information on the build system and package configuration, see the [@wordpress/build README](../wp-build/README.md).
+
 ## Creating a New Package
 
 When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
@@ -26,28 +60,23 @@ When creating a new package, you need to provide at least the following. Package
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
     	"engines": {
-    		"node": ">=18.12.0",
-    		"npm": ">=8.19.2"
+    		"node": ">=18.12.0"
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
-    	"react-native": "src/index",
     	// Include this line to include the package as a WordPress script.
     	"wpScript": true,
     	// Include this line to include the package as a WordPress script module.
     	"wpScriptModuleExports": "./build-module/index.js",
     	"types": "build-types",
     	"sideEffects": false,
-    	"dependencies": {
-    		"@babel/runtime": "7.25.7"
-    	},
     	"publishConfig": {
     		"access": "public"
     	}
     }
     ```
 
-    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+    This assumes that your code is located in the `src` folder and will be transpiled by the build system.
 
     For production packages that will ship as a WordPress script, include `wpScript: true` in the `package.json` file. This tells the build system to bundle the package for use as a WordPress script.
 
@@ -72,6 +101,8 @@ When creating a new package, you need to provide at least the following. Package
 
     Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module. These fields are also essential when performing a license check for all their dependencies, because they trigger strict validation against compatibility with GPL v2. All remaining dependencies WordPress doesn't distribute but uses for development purposes can contain also a few other OSS compatible licenses.
 
+    For more details on package configuration options, see the [@wordpress/build README](../wp-build/README.md).
+
 1. `README.md` file containing at least:
     - Package name
     - Package description
@@ -91,6 +122,45 @@ When creating a new package, you need to provide at least the following. Package
     ```
 
 To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
+
+## When to Omit or Set `wpScript` to `false`
+
+By default, packages do not expose as WordPress scripts/modules (not accessible via the `wp` global). Only packages that should be directly available in WordPress should set `wpScript: true`.
+
+Omit `wpScript` (or explicitly set to `false`) for packages designed solely as dependencies for other packages:
+
+```json
+{
+	"wpScript": false
+}
+```
+
+**Examples of packages that should not expose to the `wp` global:**
+
+-   Utility packages used internally by other packages
+-   Shared logic or helpers without a direct WordPress use case
+-   Intermediate packages intended only as dependencies of other `@wordpress/*` packages
+
+When a package omits `wpScript` or sets it to `false`, it:
+
+-   Will not be exposed as a WordPress script (not available via the `wp` global)
+-   Can still be used as a dependency by other packages (via npm imports)
+-   Should still be published to npm to support backporting to WordPress core releases
+
+### Truly Private Packages
+
+In rare cases, if a package is only used internally within Gutenberg and should never be published to npm, mark it as private:
+
+```json
+{
+	"private": true,
+	"wpScript": false
+}
+```
+
+Private packages will be excluded from npm publication and should only be used for development-only utilities (such as build tools or internal development helpers). They should not be used as dependencies for other packages, as this could break the backporting process to WordPress core.
+
+Note: You can safely include the `publishConfig` field in private packages—it will be ignored by npm since the `private` flag takes precedence.
 
 ## Managing Dependencies
 
@@ -179,43 +249,86 @@ Content within the HTML comment will be replaced by the generated documentation.
 
 It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and [ensure it is well documented](#maintaining-api-documentation).
 
+## Maintaining cross-version compatibility
+
+A plugin can bundle one `@wordpress/*` package while loading its dependencies from WordPress. The bundled package and its WordPress dependencies can then come from different releases.
+
+For example, a plugin might bundle a newer `@wordpress/dataviews` package but run on a WordPress version that provides an older `@wordpress/components` package. The reverse can also happen: an older plugin bundle can run on a newer WordPress version.
+
+Before changing an API or dependency in this setup:
+
+-   Confirm which packages the application bundles and which ones WordPress supplies.
+-   Test both mixed-version combinations: the new bundle with each supported WordPress version, and older supported bundles with the new WordPress package.
+-   Keep production public APIs compatible. Follow the [backward compatibility policy](/docs/contributors/code/backward-compatibility.md) if a break is unavoidable.
+-   Do not use private APIs in bundled packages. Private APIs can be removed, but first check that supported bundles no longer depend on them.
+-   Test the built package, not only its source. The built result can load dependencies and shared state differently.
+
+See [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md) for the test matrix and release procedure.
+
 ## Maintaining Changelogs
 
-When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
+Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
 
-For each pull request, you should always include relevant changes under an "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
+Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
 
-_Example:_
+### Changelog Entry Format
+
+Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period.
+
+Example:
 
 ```md
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
-### Bug Fix
+### Bug Fixes
 
--   Fixed an off-by-one error with the `sum` function.
+-   Fixed an off-by-one error with the `sum` function ([#12347](https://github.com/WordPress/gutenberg/pull/12347)).
 ```
+
+You can verify the structure locally by running `npm run lint:changelogs`.
+
+### Promoting a Pre-Release Package to Stable (1.0.0)
+
+The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
+
+A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** section.
+
+```md
+## Unreleased
+
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
+### Breaking Changes
+
+-   Final API adjustments before 1.0.0 release ([#12345](https://github.com/WordPress/gutenberg/pull/12345)).
+```
+
+The presence of the "Stable Release" heading will cause the automated release process to bump a pre-1.0 package to 1.0.0. The "Stable Release" heading should only be used for pre-1.0 packages, and from that point forward breaking changes will result in major version bumps as expected.
+
+### Changelog Subsections
 
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
--   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+Use the following standardized section headings and ordering based on the type of change you are making:
+
+-   "Stable Release" - Marks a pre-1.0 package as stable and production-ready. This should only be used for packages currently published as a 0.x pre-release, to intentionally communicate that a package's API is now stable and ready for production use.
+-   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump for stable packages).
 -   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
 -   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
 -   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
 -   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
+-   "Documentation" - Changes affecting consumer documentation.
 
-While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
-
-When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
-
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 
 The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
-Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
 
@@ -228,32 +341,53 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted in and will be included in the TypeScript build process.
+A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages that emit declarations through this standard layout and have TypeScript test or story files split into two projects:
 
-A `tsconfig.json` file should look like the following (comments are not necessary):
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume. `npm run build` emits those declarations with `--noCheck`, so it only reports parse and declaration emit errors; `npm run typecheck` is where type errors surface.
+-   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
+
+Both extend shared base configurations (comments are not necessary):
 
 ```jsonc
+// tsconfig.build.json
 {
-	// Extends a base configuration common to most packages
-	"extends": "../../tsconfig.base.json",
+	// Extends a base configuration common to most packages.
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 
-	// Options for the TypeScript compiler
-	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
-	// to each project.
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-
-	// Which source files should be included
-	"include": [ "src/**/*" ],
-
-	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
-	// here. In this case, our package depends on `@wordpress/dom-ready`.
-	"references": [ { "path": "../dom-ready" } ]
+	// Dependencies that have opted in to TypeScript are referenced here: a
+	// split one by its build project, one on a single config by its
+	// directory.
+	"references": [
+		{ "path": "../dom-ready/tsconfig.build.json" },
+		{ "path": "../hooks" }
+	]
 }
 ```
+
+```jsonc
+// tsconfig.json
+{
+	// Extends the shared dev project configuration (noEmit, Vitest matcher types,
+	// test and story includes).
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
+
+	// The dev project checks against the build project's declarations.
+	"references": [ { "path": "./tsconfig.build.json" } ]
+}
+```
+
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` and widgets under `widgets/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. An entry with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
+
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without test types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
+
+Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
+
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `gutenberg-vitest-test-env` or `vitest/globals` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `gutenberg-vitest-test-env`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+
+The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:
@@ -268,9 +402,9 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
-## Supported Node.js and npm versions
+## Supported Node.js versions
 
-WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required versions of Node.js and npm are specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
+WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required version of Node.js is specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
 ## Optimizing for bundlers
 
@@ -301,4 +435,4 @@ Please consult the [side effects documentation](https://github.com/WordPress/gut
 
 ## Publishing to npm
 
-Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates).
+Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release/README.md#packages-releases-to-npm-and-wordpress-core-updates).
