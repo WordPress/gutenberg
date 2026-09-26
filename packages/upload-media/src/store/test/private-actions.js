@@ -1380,6 +1380,130 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'generateThumbnails big image size threshold', () => {
+		const ALL_IMAGE_SIZES = {
+			thumbnail: { width: 150, height: 150, crop: true },
+		};
+
+		const makeItem = ( attachmentOverrides = {} ) => ( {
+			id: 'threshold-parent',
+			file: new File( [ 'fake' ], 'photo.jpg', { type: 'image/jpeg' } ),
+			sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: {
+				id: 99,
+				filename: 'photo.jpg',
+				missing_image_sizes: [ 'thumbnail' ],
+				exif_orientation: 1,
+				...attachmentOverrides,
+			},
+		} );
+
+		const runGenerate = ( item ) => {
+			const dispatch = {
+				addSideloadItem: vi.fn(),
+				finishOperation: vi.fn(),
+				addItem: vi.fn(),
+			};
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: ALL_IMAGE_SIZES,
+					bigImageSizeThreshold: 2560,
+				} ),
+			};
+			return generateThumbnails( item.id )( { select, dispatch } ).then(
+				() => dispatch
+			);
+		};
+
+		let originalCreateImageBitmap;
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+			originalCreateImageBitmap = global.createImageBitmap;
+		} );
+
+		afterEach( () => {
+			global.createImageBitmap = originalCreateImageBitmap;
+		} );
+
+		const mockUndecodable = () => {
+			global.createImageBitmap = vi.fn( async () => {
+				throw new DOMException(
+					'The source image could not be decoded.',
+					'InvalidStateError'
+				);
+			} );
+			return vi.spyOn( console, 'warn' ).mockImplementation( () => {} );
+		};
+
+		it( 'still finishes the operation when the browser cannot decode the image for the threshold check', async () => {
+			const warnSpy = mockUndecodable();
+
+			try {
+				const item = makeItem();
+				const dispatch = await runGenerate( item );
+
+				expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+					item.id,
+					{}
+				);
+			} finally {
+				warnSpy.mockRestore();
+			}
+		} );
+
+		it( 'still sideloads the regular sub-sizes when the threshold check fails to decode the image', async () => {
+			const warnSpy = mockUndecodable();
+
+			try {
+				const item = makeItem();
+				const dispatch = await runGenerate( item );
+
+				const sizes = dispatch.addSideloadItem.mock.calls.map(
+					( [ args ] ) => args.additionalData.image_size
+				);
+				expect( sizes ).toContain( 'thumbnail' );
+			} finally {
+				warnSpy.mockRestore();
+			}
+		} );
+
+		it( 'does not sideload a -scaled version when the threshold check fails to decode the image', async () => {
+			const warnSpy = mockUndecodable();
+
+			try {
+				const item = makeItem();
+				const dispatch = await runGenerate( item );
+
+				const scaledCall = dispatch.addSideloadItem.mock.calls.find(
+					( [ args ] ) => args.additionalData.image_size === 'scaled'
+				);
+				expect( scaledCall ).toBeUndefined();
+			} finally {
+				warnSpy.mockRestore();
+			}
+		} );
+
+		it( 'still sideloads a -scaled version when the image can be decoded and exceeds the threshold', async () => {
+			global.createImageBitmap = vi.fn( async () => ( {
+				width: 5000,
+				height: 4000,
+				close: vi.fn(),
+			} ) );
+
+			const item = makeItem();
+			const dispatch = await runGenerate( item );
+
+			const scaledCall = dispatch.addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === 'scaled'
+			);
+			expect( scaledCall ).toBeDefined();
+		} );
+	} );
+
 	describe( 'generateThumbnails EXIF orientation', () => {
 		// `image_size: 'original'` is only sideloaded when the source is
 		// actually rotated, so its presence is a reliable proxy for
