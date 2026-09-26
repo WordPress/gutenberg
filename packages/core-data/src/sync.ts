@@ -1,10 +1,4 @@
 import {
-	privateApis as syncPrivateApis,
-	type SyncManager,
-} from '@wordpress/sync';
-import { unlock } from './lock-unlock';
-
-const {
 	ConnectionErrorCode,
 	createSyncManager,
 	Delta,
@@ -13,7 +7,8 @@ const {
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	retrySyncConnection,
-} = unlock( syncPrivateApis );
+	type SyncManager,
+} from '@wordpress/sync';
 
 export {
 	ConnectionErrorCode,

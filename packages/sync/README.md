@@ -24,15 +24,43 @@ The Awareness protocol should not be considered a public API. It is a third-part
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 
-### privateApis
+### ConnectionErrorCode
 
-Private @wordpress/sync APIs.
+Error codes reported by a sync provider when its connection fails.
+
+### CRDT_DOC_META_PERSISTENCE_KEY
+
+Key of the in-memory meta entry marking a CRDT document as loaded from persistence. It is not synced or persisted.
+
+### CRDT_RECORD_MAP_KEY
+
+Root-level key for the map that holds the entity record data.
+
+### createSyncManager
+
+Creates the sync manager, which orchestrates the lifecycle of syncing entity records: it creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store. Exported for `@wordpress/core-data`; plugins don't need it.
+
+### Delta
+
+Quill Delta implementation used to describe rich text changes.
+
+### LOCAL_EDITOR_ORIGIN
+
+Origin string for CRDT document changes originating from the local editor.
+
+### LOCAL_UNDO_IGNORED_ORIGIN
+
+Origin string for CRDT document changes that should be synced but not recorded in the undo history (e.g. status changes during publish).
+
+### retrySyncConnection
+
+Retries the HTTP polling connection now instead of waiting for the next automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
 
 ### Y
 
 Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future.
 
-Two Yjs instances operating on the same document cause silent data corruption:
+`@wordpress/sync` is a bundled package: each consumer bundles its own copy, and no `wp.sync` global or `wp-sync` script handle is exposed by WordPress. Two Yjs instances operating on the same document cause silent data corruption:
 
 <https://github.com/yjs/yjs/issues/438>
 
@@ -77,8 +105,6 @@ const createProvider = async ( { awareness, ydoc, Y } ) => {
 ```
 
 See `packages/e2e-tests/plugins/rtc-websocket-provider` for a complete working example.
-
-Deprecated: `@wordpress/sync` is currently also exposed as the `wp-sync` WordPress script, which provides the same Yjs module as the `wp.sync.Y` global. This global will be removed in a future release, and it is already unavailable in WordPress core. Providers that still resolve `yjs` to `wp.sync.Y` through webpack externals should migrate to the `Y` option described above.
 
 ### YJS_VERSION
 

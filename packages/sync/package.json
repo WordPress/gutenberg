@@ -38,13 +38,11 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"diff": "^8.0.3",
 		"fast-deep-equal": "^3.1.3",

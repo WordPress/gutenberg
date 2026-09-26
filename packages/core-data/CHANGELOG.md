@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Import the sync manager, `Delta`, and the CRDT constants from `@wordpress/sync` directly instead of unlocking them from its removed `privateApis` export ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
 ## 8.1.0 (2026-09-23)
 
 ### Bug Fixes

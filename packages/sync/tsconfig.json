@@ -8,7 +8,6 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../hooks" },
-		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }
 	]
 }
