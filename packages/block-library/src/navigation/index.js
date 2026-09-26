@@ -8,6 +8,8 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import getNavigationMenuBySlug from './get-navigation-menu-by-slug';
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 const { name } = metadata;
 
@@ -48,9 +50,30 @@ export const settings = {
 	},
 	edit,
 	save,
-	__experimentalLabel: ( { ref } ) => {
-		if ( ! ref ) {
+	__experimentalLabel: ( { ref, slug } ) => {
+		if ( ! ref && ! slug ) {
 			return;
+		}
+
+		// A slug resolves against the Navigation Menus collection, whose
+		// records are returned in the `view` context and so carry a rendered
+		// title rather than the raw title an edited record carries.
+		if ( slug ) {
+			const navigationMenus = select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_navigation',
+				PRELOADED_NAVIGATION_MENUS_QUERY
+			);
+			const navigationMenu = getNavigationMenuBySlug(
+				navigationMenus,
+				slug
+			);
+
+			if ( ! navigationMenu?.title?.rendered ) {
+				return;
+			}
+
+			return decodeEntities( navigationMenu.title.rendered );
 		}
 
 		const navigation = select( coreStore ).getEditedEntityRecord(

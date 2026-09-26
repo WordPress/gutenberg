@@ -176,6 +176,101 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	test.describe( 'As a user I want to reference a menu by slug', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+		} );
+
+		test( 'renders the menu matching the slug in the editor and on the frontend', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				slug: 'header',
+				content:
+					'<!-- wp:navigation-link {"label":"Header link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Footer Menu',
+				slug: 'footer',
+				content:
+					'<!-- wp:navigation-link {"label":"Footer link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { slug: 'footer' },
+			} );
+
+			await expect(
+				editor.canvas.locator(
+					`role=textbox[name="Navigation link text"i] >> text="Footer link"`
+				)
+			).toBeVisible();
+
+			// The slug reference is kept as authored, with no post ID added.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { slug: 'footer' },
+				},
+			] );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.locator(
+					`role=navigation >> role=link[name="Footer link"i]`
+				)
+			).toBeVisible();
+			await expect(
+				page.locator(
+					`role=navigation >> role=link[name="Header link"i]`
+				)
+			).toBeHidden();
+		} );
+
+		test( 'creates the missing menu under the referenced slug', async ( {
+			admin,
+			editor,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { slug: 'header' },
+			} );
+
+			await editor.canvas
+				.getByRole( 'button', { name: 'Create a new Menu?' } )
+				.click();
+
+			// The block keeps referencing the menu by the slug it was authored
+			// with, rather than switching to a post ID.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { slug: 'header' },
+				},
+			] );
+
+			await expect
+				.poll( async () => {
+					const menus = await requestUtils.rest( {
+						path: '/wp/v2/navigation',
+						data: { status: [ 'publish', 'draft' ] },
+					} );
+					return menus.map( ( menu ) => menu.slug );
+				} )
+				.toContain( 'header' );
+		} );
+	} );
+
 	test.describe( 'As a user I want to create submenus using the navigation block', () => {
 		test( 'create a submenu', async ( {
 			admin,

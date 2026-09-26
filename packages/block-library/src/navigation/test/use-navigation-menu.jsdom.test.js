@@ -135,6 +135,7 @@ describe( 'useNavigationMenus', () => {
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus: null,
 			navigationMenu: undefined,
+			navigationMenuId: undefined,
 			canSwitchNavigationMenu: false,
 			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: undefined,
@@ -157,6 +158,7 @@ describe( 'useNavigationMenus', () => {
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
 			navigationMenu: undefined,
+			navigationMenuId: undefined,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: true,
 			canUserDeleteNavigationMenu: undefined,
@@ -176,6 +178,7 @@ describe( 'useNavigationMenus', () => {
 		resolveRecords( registry, navigationMenus );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
+			navigationMenuId: 1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: false,
@@ -198,6 +201,7 @@ describe( 'useNavigationMenus', () => {
 		resolveRecords( registry, testMenus );
 		expect( useNavigationMenu( 4 ) ).toEqual( {
 			navigationMenu: navigationMenuDraft,
+			navigationMenuId: 4,
 			navigationMenus: testMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: false,
@@ -214,6 +218,83 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
+	describe( 'slug references', () => {
+		const headerMenu = {
+			id: 10,
+			title: 'Header',
+			slug: 'header',
+			status: 'publish',
+		};
+		const footerMenu = {
+			id: 11,
+			title: 'Footer',
+			slug: 'footer',
+			status: 'publish',
+		};
+		const slugMenus = [ headerMenu, footerMenu ];
+
+		it( 'Should resolve the menu matching the slug', () => {
+			resolveRecords( registry, slugMenus );
+
+			const result = useNavigationMenu( undefined, 'footer' );
+
+			expect( result.navigationMenuId ).toBe( 11 );
+			expect( result.navigationMenu ).toEqual( footerMenu );
+			expect( result.isNavigationMenuMissing ).toBe( false );
+		} );
+
+		it( 'Should prefer the slug over the ref when both are given', () => {
+			resolveRecords( registry, slugMenus );
+
+			const result = useNavigationMenu( 11, 'header' );
+
+			expect( result.navigationMenuId ).toBe( 10 );
+			expect( result.navigationMenu ).toEqual( headerMenu );
+		} );
+
+		it( 'Should report a slug matching no menu as missing', () => {
+			resolveRecords( registry, slugMenus );
+
+			const result = useNavigationMenu( undefined, 'sidebar' );
+
+			expect( result.navigationMenuId ).toBeUndefined();
+			expect( result.isNavigationMenuMissing ).toBe( true );
+			expect( result.isNavigationMenuResolved ).toBe( true );
+		} );
+
+		it( 'Should not report a slug as missing before the menus resolve', () => {
+			const result = useNavigationMenu( undefined, 'header' );
+
+			expect( result.navigationMenuId ).toBeUndefined();
+			expect( result.isNavigationMenuMissing ).toBe( false );
+			expect( result.isNavigationMenuResolved ).toBe( false );
+		} );
+
+		it( 'Should resolve a slug that is not yet normalized', () => {
+			resolveRecords( registry, slugMenus );
+
+			expect(
+				useNavigationMenu( undefined, 'Header' ).navigationMenuId
+			).toBe( 10 );
+		} );
+
+		it( 'Should read permissions for the slug resolved menu', () => {
+			resolveRecords( registry, slugMenus );
+			resolveCreatePermission( registry, true );
+			resolveReadRecordPermission( registry, 10, true );
+			resolveUpdatePermission( registry, 10, true );
+			resolveDeletePermission( registry, 10, false );
+
+			const result = useNavigationMenu( undefined, 'header' );
+
+			expect( result.canUserUpdateNavigationMenu ).toBe( true );
+			expect( result.canUserDeleteNavigationMenu ).toBe( false );
+			expect( result.hasResolvedCanUserUpdateNavigationMenu ).toBe(
+				true
+			);
+		} );
+	} );
+
 	it( 'Should return correct permissions (create, update)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
@@ -222,6 +303,7 @@ describe( 'useNavigationMenus', () => {
 		resolveDeletePermission( registry, 1, false );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
+			navigationMenuId: 1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: true,
@@ -246,6 +328,7 @@ describe( 'useNavigationMenus', () => {
 		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
+			navigationMenuId: 1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: false,
@@ -271,6 +354,7 @@ describe( 'useNavigationMenus', () => {
 
 		expect( useNavigationMenu( requestedMenu.id ) ).toEqual( {
 			navigationMenu: requestedMenu,
+			navigationMenuId: requestedMenu.id,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenus: false,
