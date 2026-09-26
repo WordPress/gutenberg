@@ -5,6 +5,13 @@ import type { DataRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '../';
 
+const DEPRECATION_MESSAGES = [
+	"dispatch( 'core/interface' ).setFeatureDefaults is deprecated since version 6.0. Please use dispatch( 'core/preferences' ).setDefaults instead.",
+	"dispatch( 'core/interface' ).setFeatureValue is deprecated since version 6.0. Please use dispatch( 'core/preferences' ).set instead.",
+	"dispatch( 'core/interface' ).toggleFeature is deprecated since version 6.0. Please use dispatch( 'core/preferences' ).toggle instead.",
+	"select( 'core/interface' ).isFeatureActive( scope, featureName ) is deprecated since version 6.0. Please use select( 'core/preferences' ).get( scope, featureName ) instead.",
+];
+
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
@@ -15,10 +22,15 @@ function createRegistryWithStores() {
 describe( 'actions', () => {
 	let registry: DataRegistry;
 	beforeEach( () => {
+		for ( const message of DEPRECATION_MESSAGES ) {
+			delete logged[ message ];
+		}
 		registry = createRegistryWithStores();
 	} );
 	afterEach( () => {
-		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+		for ( const message of DEPRECATION_MESSAGES ) {
+			delete logged[ message ];
+		}
 	} );
 
 	describe( 'enableComplementaryArea', () => {
