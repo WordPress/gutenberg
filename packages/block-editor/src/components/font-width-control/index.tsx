@@ -161,7 +161,6 @@ export default function FontWidthControl( {
 							value={ width }
 							min={ 0 }
 							step={ 1 }
-							spinControls="custom"
 							onChange={ ( next?: string ) => setWidth( next ) }
 						/>
 					</Stack>

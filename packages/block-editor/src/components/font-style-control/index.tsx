@@ -157,7 +157,12 @@ export default function FontStyleControl( {
 				}
 			/>
 			{ isOblique && slantRange && (
-				<Stack direction="row" gap="md" align="flex-end">
+				<Stack
+					direction="row"
+					gap="md"
+					align="flex-end"
+					className="block-editor-font-style-control__slant"
+				>
 					<RangeControl
 						className="block-editor-font-style-control__slant-slider"
 						label={ __( 'Slant' ) }
@@ -179,7 +184,6 @@ export default function FontStyleControl( {
 						hideLabelFromVision
 						value={ angle }
 						step={ 1 }
-						spinControls="custom"
 						onChange={ ( next?: string ) => setAngle( next ) }
 					/>
 				</Stack>
