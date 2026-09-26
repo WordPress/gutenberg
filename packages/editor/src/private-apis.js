@@ -12,6 +12,7 @@ import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import usePostFields from './components/post-fields';
+import usePageAncestorPaths from './components/post-fields/use-page-ancestor-paths';
 import MoreMenuItem from './components/more-menu/more-menu-item';
 import MoreMenuPreferenceItem from './components/more-menu/more-menu-preference-item';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
@@ -39,6 +40,7 @@ lock( privateApis, {
 	PreferencesModal,
 	usePostActions,
 	usePostFields,
+	usePageAncestorPaths,
 	MoreMenuItem,
 	MoreMenuPreferenceItem,
 	ToolsMoreMenuGroup,

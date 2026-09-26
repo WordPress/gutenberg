@@ -7,7 +7,7 @@ import {
 } from '@wordpress/route';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Page } from '@wordpress/admin-ui';
+import { BreadcrumbPath, Page } from '@wordpress/admin-ui';
 import type {
 	View,
 	Action,
@@ -39,7 +39,8 @@ import { QuickEditModal } from './quick-edit-modal';
 import usePageHierarchy from './use-page-hierarchy';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, usePageAncestorPaths } =
+	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
@@ -162,7 +163,15 @@ function PostListView( {
 		invalidate();
 	};
 	const onChangeView = ( newView: View ) => {
-		updateView( newView );
+		updateView(
+			newView.descriptionField === 'pageAncestorPath'
+				? {
+						...newView,
+						descriptionField: view.descriptionField,
+						showDescription: view.showDescription,
+					}
+				: newView
+		);
 		if ( newView.type !== view.type ) {
 			// The rendered surfaces depend on the view type,
 			// so we need to retrigger the router loader when switching the view type.
@@ -246,25 +255,62 @@ function PostListView( {
 	const allFields = usePostFields( {
 		postType,
 	} );
+	const showPagePaths =
+		postType === 'page' && view.type === 'table' && !! view.search;
+	const ancestors = usePageAncestorPaths( flatPosts, showPagePaths );
+	const displayedView = useMemo(
+		() =>
+			showPagePaths
+				? {
+						...view,
+						descriptionField: 'pageAncestorPath',
+						showDescription: true,
+					}
+				: view,
+		[ view, showPagePaths ]
+	);
 
 	// Hide status column except in 'All' tab, and disable status filtering
 	const fields = useMemo( () => {
-		return allFields
+		const visible = allFields
 			.filter( ( field: { id: string } ) => {
-				// Hide status column in specific status tabs
-				if ( field.id === 'status' && slug !== 'all' ) {
-					return false;
-				}
-				return true;
+				// Hide status column except in 'All' tab.
+				return field.id !== 'status' || slug === 'all';
 			} )
-			.map( ( field: { id: string; filterBy?: any } ) => {
-				// Disable status field filtering since we use tabs
-				if ( field.id === 'status' ) {
-					return { ...field, filterBy: false };
-				}
-				return field;
-			} );
-	}, [ allFields, slug ] );
+			.map( ( field: ( typeof allFields )[ number ] ) =>
+				field.id === 'status' ? { ...field, filterBy: false } : field
+			);
+		if ( ! showPagePaths ) {
+			return visible;
+		}
+		return [
+			...visible,
+			{
+				id: 'pageAncestorPath',
+				label: __( 'Page location' ),
+				type: 'text' as const,
+				filterBy: false,
+				enableHiding: false,
+				render: ( { item }: { item: Post } ) => {
+					const path: string[] | undefined =
+						ancestors.paths[ item.id ];
+					if ( path?.length ) {
+						return (
+							<BreadcrumbPath
+								items={ path.map( ( label ) => ( { label } ) ) }
+							/>
+						);
+					}
+					return !! getPageParentId( item ) && ! ancestors.loading ? (
+						<small>
+							{ ancestors.error ??
+								__( 'Page location unavailable.' ) }
+						</small>
+					) : null;
+				},
+			},
+		];
+	}, [ allFields, slug, showPagePaths, ancestors ] );
 
 	// Helper function to clean up postIds from URL after deletion
 	const cleanupDeletedPostIdsFromUrl = useCallback(
@@ -466,7 +512,7 @@ function PostListView( {
 			<DataViews
 				data={ posts }
 				fields={ fields }
-				view={ view }
+				view={ displayedView }
 				onChangeView={ onChangeView }
 				actions={ actions }
 				isLoading={
@@ -480,7 +526,9 @@ function PostListView( {
 				} }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
-				getItemLevel={ getItemLevel }
+				getItemLevel={ ( item ) =>
+					showPagePaths ? 0 : getItemLevel( item )
+				}
 				{ ...( isPageHierarchy && {
 					getItemParentId: getPageParentId,
 					getItemHasChildren: ( item: Post ) => {
