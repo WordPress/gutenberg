@@ -73,7 +73,9 @@ export default function NavigationOverlayCloseEdit( {
 			<button
 				{ ...blockProps }
 				type="button"
-				aria-label={ ! showText ? __( 'Close' ) : undefined }
+				// Without visible text the label is the button's only name, so it follows what the
+				// author wrote rather than a fixed string.
+				aria-label={ ! showText ? displayText : undefined }
 			>
 				{ showIcon && <Icon icon={ close } /> }
 				{ showText && (
