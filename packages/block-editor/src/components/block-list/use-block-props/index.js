@@ -149,7 +149,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ariaLabel,
 		ghostBlock,
 		rootClientId,
-		isRevealingHiddenBlocks,
+		showHiddenBlocks,
 	} = useContext( PrivateBlockContext );
 	const ghostRef = useGhostMaterialize( rootClientId, ghostBlock );
 
@@ -204,9 +204,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		view: defaultViewRef.current,
 	} );
 
-	// Hidden blocks are only ghosted while hidden blocks are revealed;
-	// otherwise they are visually hidden like on the front end.
-	const isGhosted = !! isRevealingHiddenBlocks && isBlockCurrentlyHidden;
+	// Hidden blocks are only ghosted while the "Show hidden blocks" preference
+	// is on; otherwise they are visually hidden like on the front end.
+	const isGhosted = !! showHiddenBlocks && isBlockCurrentlyHidden;
 	const visibilityReason = isGhosted
 		? getBlockVisibilityReason( blockVisibility, viewportSettings )
 		: null;
@@ -271,8 +271,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden':
-					isBlockCurrentlyHidden && ! isRevealingHiddenBlocks,
+				'is-block-hidden': isBlockCurrentlyHidden && ! showHiddenBlocks,
 				'is-block-ghosted': isGhosted,
 			},
 			className,

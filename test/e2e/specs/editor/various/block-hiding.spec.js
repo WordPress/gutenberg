@@ -19,6 +19,12 @@ test.describe( 'Block Hiding', () => {
 		}
 	} );
 
+	test.afterEach( async ( { editor } ) => {
+		// "Show hidden blocks" is a persisted preference; reset it so it
+		// cannot leak into other tests.
+		await editor.setPreferences( 'core', { showHiddenBlocks: false } );
+	} );
+
 	test( 'should hide a block completely by selecting "Omit from published content"', async ( {
 		page,
 		editor,
@@ -187,7 +193,7 @@ test.describe( 'Block Hiding', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should ghost hidden blocks while hidden blocks are revealed', async ( {
+	test( 'should ghost hidden blocks while hidden blocks are shown', async ( {
 		page,
 		editor,
 	} ) => {
@@ -210,19 +216,19 @@ test.describe( 'Block Hiding', () => {
 			attributes: { content: 'Visible content' },
 		} );
 
-		// With hidden blocks not revealed (the default), the hidden block is
-		// not in the canvas once deselected, like on trunk.
+		// With hidden blocks not shown (the default), the hidden block is not
+		// in the canvas once deselected, like on trunk.
 		await expect(
 			editor.canvas.getByText( 'Hidden content' )
 		).toBeHidden();
 
-		// Reveal hidden blocks from the View menu.
+		// Show hidden blocks from the View menu.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Reveal hidden blocks' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Show hidden blocks' } )
 			.click();
 		// The View menu stays open after toggling the checkbox.
 		await page.keyboard.press( 'Escape' );
@@ -265,13 +271,13 @@ test.describe( 'Block Hiding', () => {
 			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
-		// Reveal hidden blocks from the View menu.
+		// Show hidden blocks from the View menu.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Reveal hidden blocks' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Show hidden blocks' } )
 			.click();
 		// The View menu stays open after toggling the checkbox.
 		await page.keyboard.press( 'Escape' );

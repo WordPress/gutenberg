@@ -29,7 +29,7 @@ import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
-import { deviceTypeKey } from '../../store/private-keys';
+import { deviceTypeKey, showHiddenBlocksKey } from '../../store/private-keys';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -614,7 +614,6 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
-				isRevealingHiddenBlocks,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId ) ??
@@ -779,7 +778,7 @@ function BlockListBlockProvider( props ) {
 					'splitting',
 					false
 				),
-				isRevealingHiddenBlocks: isRevealingHiddenBlocks(),
+				showHiddenBlocks: !! settings?.[ showHiddenBlocksKey ],
 			};
 		},
 		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
@@ -864,7 +863,7 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		viewportSettings,
 		supportsSplitting,
-		isRevealingHiddenBlocks = false,
+		showHiddenBlocks = false,
 	} = selectedProps;
 
 	const privateContext = {
@@ -908,15 +907,15 @@ function BlockListBlockProvider( props ) {
 		deviceType,
 		viewportSettings,
 		supportsSplitting,
-		isRevealingHiddenBlocks,
+		showHiddenBlocks,
 	};
 
-	// Unless hidden blocks are revealed, they stay out of the canvas so
-	// editing matches the front end. When revealed, they render ghosted
-	// instead (see useBlockProps) so authors can find and edit them.
+	// Unless hidden blocks are shown, they stay out of the canvas so editing
+	// matches the front end. When shown, they render ghosted instead (see
+	// useBlockProps) so authors can find and edit them.
 	if (
 		isBlockCurrentlyHidden &&
-		! isRevealingHiddenBlocks &&
+		! showHiddenBlocks &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected

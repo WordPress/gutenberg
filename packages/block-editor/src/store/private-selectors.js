@@ -1143,6 +1143,22 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
 };
 
 /**
+ * Returns true if any block in the editor has a visibility rule that hides it
+ * somewhere: everywhere, or at a viewport the theme configures.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether any block is hidden somewhere.
+ */
+export const hasHiddenBlocks = createSelector(
+	( state ) =>
+		getClientIdsWithDescendants( state ).some( ( clientId ) =>
+			isBlockHiddenAnywhere( state, clientId )
+		),
+	( state ) => [ state.blocks.order, state.blocks.attributes, state.settings ]
+);
+
+/**
  * Returns true if there is a spotlighted block.
  *
  * The spotlight is also active when a contentOnly section is being edited, the selector
@@ -1398,19 +1414,6 @@ export function getStyleStateViewport( state ) {
  */
 export function isResponsiveEditing( state ) {
 	return state.isResponsiveEditing;
-}
-
-/**
- * Returns whether hidden blocks are revealed in the canvas. When enabled,
- * blocks that visibility rules would hide render ghosted instead of being
- * removed from the canvas.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether hidden blocks are revealed.
- */
-export function isRevealingHiddenBlocks( state ) {
-	return state.isRevealingHiddenBlocks;
 }
 
 /**
