@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
@@ -155,7 +156,10 @@
 .components-form-token-field__token-text {
 	border-radius: $radius-x-small 0 0 $radius-x-small;
 	padding: 0 0 0 8px;
-	line-height: 24px;
+	// Inherits font-size: $default-font-size (13px) from the parent
+	// .components-form-token-field__token. Unit-less equivalent of 24px
+	// at that font-size.
+	line-height: math.div(24, 13);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -164,6 +168,7 @@
 .components-form-token-field__remove-token.components-button {
 	border-radius: 0 $radius-x-small $radius-x-small 0;
 	color: $gray-900;
+	// stylelint-disable-next-line declaration-property-unit-allowed-list -- Icon-only close button (no text); 10px vertically centers the icon rather than following font metrics.
 	line-height: 10px;
 	overflow: initial;
 

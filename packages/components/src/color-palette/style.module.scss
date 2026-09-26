@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .color-heading {
 	text-transform: uppercase;
 
@@ -6,7 +8,7 @@
 	// selector is repeated via interpolation to produce the same specificity.
 	&#{&}#{&} {
 		font-size: 11px;
-		line-height: 24px;
+		line-height: math.div(24, 11); // Unit-less equivalent of 24px at this 11px font-size.
 		margin-bottom: 0;
 	}
 }

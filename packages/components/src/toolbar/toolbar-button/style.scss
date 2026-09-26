@@ -14,6 +14,7 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
+		// stylelint-disable-next-line declaration-property-unit-allowed-list -- A single decorative digit (via content: attr(...)), not readable text, sized to fit the small subscript badge rather than following font metrics.
 		line-height: 12px;
 		position: absolute;
 		right: 8px;

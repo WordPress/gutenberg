@@ -31,6 +31,15 @@ exports[`flags warnings with invalid values css > snapshot matches warnings 1`] 
   },
   {
     "column": 15,
+    "endColumn": 19,
+    "endLine": 14,
+    "line": 14,
+    "rule": "declaration-property-unit-allowed-list",
+    "severity": "error",
+    "text": "Disallowed unit "px" for property "line-height" (declaration-property-unit-allowed-list)",
+  },
+  {
+    "column": 15,
     "endColumn": 30,
     "endLine": 11,
     "line": 11,

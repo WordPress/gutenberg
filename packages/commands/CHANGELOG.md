@@ -8,6 +8,10 @@
 
 -   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
 
+### Internal
+
+-   Use a unit-less `line-height` value in the command palette input per the WordPress CSS Coding Standards. The rendered line height is unchanged ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ## 1.55.0 (2026-09-10)
 
 ### Internal
