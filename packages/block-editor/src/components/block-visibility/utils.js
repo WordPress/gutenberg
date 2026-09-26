@@ -1,5 +1,5 @@
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
 	BLOCK_VISIBILITY_VIEWPORTS,
@@ -67,6 +67,94 @@ function isBlockHiddenForViewport( block, viewport ) {
 }
 
 /**
+ * Returns a short reason describing why a block is hidden, or null when no
+ * rule hides it: "Omitted from published content" when hidden everywhere, or
+ * "Hidden on mobile and tablet" listing the configured viewports it is hidden
+ * on. The same string is used by the block toolbar, List View and the
+ * accessible name of ghosted blocks. New hiding conditions (for example date
+ * or role based visibility) should be added here so every consumer picks them
+ * up.
+ *
+ * @param {boolean|Object} blockVisibility  The block's visibility metadata.
+ * @param {Object}         viewportSettings Viewport breakpoint settings.
+ * @return {string|null} The reason, or null.
+ */
+export function getBlockVisibilityReason( blockVisibility, viewportSettings ) {
+	if ( blockVisibility === false ) {
+		return __( 'Omitted from published content' );
+	}
+
+	if (
+		typeof blockVisibility?.viewport !== 'object' ||
+		blockVisibility.viewport === null
+	) {
+		return null;
+	}
+
+	const viewportNames = {
+		desktop: _x( 'desktop', 'viewport name in a sentence' ),
+		tablet: _x( 'tablet', 'viewport name in a sentence' ),
+		mobile: _x( 'mobile', 'viewport name in a sentence' ),
+	};
+	const hiddenViewports = getBlockVisibilityViewportEntries(
+		viewportSettings
+	)
+		.filter( ( [ key ] ) => blockVisibility.viewport[ key ] === false )
+		.map( ( [ key ] ) => viewportNames[ key ] );
+
+	switch ( hiddenViewports.length ) {
+		case 0:
+			return null;
+		case 1:
+			return sprintf(
+				/* translators: %s: viewport name, e.g. mobile. */
+				__( 'Hidden on %s' ),
+				hiddenViewports[ 0 ]
+			);
+		case 2:
+			return sprintf(
+				/* translators: 1: viewport name, e.g. tablet. 2: viewport name, e.g. mobile. */
+				__( 'Hidden on %1$s and %2$s' ),
+				hiddenViewports[ 0 ],
+				hiddenViewports[ 1 ]
+			);
+		default:
+			return sprintf(
+				/* translators: 1: viewport name, e.g. desktop. 2: viewport name, e.g. tablet. 3: viewport name, e.g. mobile. */
+				__( 'Hidden on %1$s, %2$s and %3$s' ),
+				hiddenViewports[ 0 ],
+				hiddenViewports[ 1 ],
+				hiddenViewports[ 2 ]
+			);
+	}
+}
+
+/**
+ * Appends a hiding reason to an accessible block label as a new sentence,
+ * for example "Block: Column (1 of 2). Hidden on mobile".
+ *
+ * @param {string|undefined} label  The block's accessible label.
+ * @param {string|null}      reason The reason from getBlockVisibilityReason.
+ * @return {string|undefined} The combined label.
+ */
+export function appendVisibilityReason( label, reason ) {
+	if ( ! reason ) {
+		return label;
+	}
+	if ( ! label ) {
+		return reason;
+	}
+	return sprintf(
+		/* translators: 1: Accessible block label, e.g. "Block: Paragraph". 2: Reason the block is hidden, e.g. "Hidden on mobile". */
+		__( '%1$s. %2$s' ),
+		// Drop a sentence terminator the label already ends with so the
+		// template's full stop is not doubled.
+		label.replace( /[.!?]+$/, '' ),
+		reason
+	);
+}
+
+/**
  * Gets the checkbox state for a viewport across multiple blocks.
  * Returns `true` if all blocks are hidden, `null` if some are hidden, `false` if none are hidden.
  *
@@ -118,44 +206,4 @@ export function getHideEverywhereCheckboxState( blocks ) {
 	}
 
 	return null; // Indeterminate: some but not all
-}
-
-/**
- * Get a human-readable label describing which viewports a block is hidden on.
- *
- * @param {boolean|Object} blockVisibility  The block's visibility metadata.
- * @param {Object}         viewportSettings Viewport breakpoint settings.
- * @return {string|null} A descriptive label, or null if the block is not hidden.
- */
-export function getBlockVisibilityLabel( blockVisibility, viewportSettings ) {
-	// Not hidden at all
-	if ( ! blockVisibility && blockVisibility !== false ) {
-		return null;
-	}
-
-	if ( blockVisibility === false ) {
-		// Hidden on all viewports
-		return __( 'Block is hidden' );
-	}
-
-	if ( blockVisibility?.viewport ) {
-		// Hidden on specific viewports - list them
-		const hiddenViewports = getBlockVisibilityViewportEntries(
-			viewportSettings
-		)
-			.filter(
-				( [ key ] ) => blockVisibility.viewport?.[ key ] === false
-			)
-			.map( ( [ , viewport ] ) => viewport.label );
-
-		if ( hiddenViewports.length > 0 ) {
-			return sprintf(
-				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				hiddenViewports.join( ', ' )
-			);
-		}
-	}
-
-	return null;
 }

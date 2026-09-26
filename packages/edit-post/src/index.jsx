@@ -65,6 +65,7 @@ export function initializeEditor(
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
+		showHiddenBlocks: false,
 		showIconLabels: false,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,

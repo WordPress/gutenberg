@@ -63,6 +63,7 @@ export function initializeEditor( id, settings ) {
 		keepCaretInsideBlock: false,
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
+		showHiddenBlocks: false,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,

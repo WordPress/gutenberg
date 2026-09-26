@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+-   Block visibility: While the "Show hidden blocks" preference is on, blocks that visibility rules hide render dimmed in the canvas with the `is-block-ghosted` class instead of being removed and stay editable. The block toolbar's visibility button, List View and the accessible name of a ghosted block state why it is hidden ("Omitted from published content", "Hidden on mobile") ([#80439](https://github.com/WordPress/gutenberg/pull/80439)).
 
 ### Bug Fixes
 

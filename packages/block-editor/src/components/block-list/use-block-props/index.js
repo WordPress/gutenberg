@@ -22,7 +22,11 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { useBlockVisibility } from '../../block-visibility/';
+import {
+	useBlockVisibility,
+	getBlockVisibilityReason,
+	appendVisibilityReason,
+} from '../../block-visibility/';
 
 /**
  * Returns a ref that inserts a ghost block when the user enters it: the
@@ -145,6 +149,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ariaLabel,
 		ghostBlock,
 		rootClientId,
+		showHiddenBlocks,
 	} = useContext( PrivateBlockContext );
 	const ghostRef = useGhostMaterialize( rootClientId, ghostBlock );
 
@@ -158,8 +163,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 	}, [] );
 
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
@@ -201,6 +204,23 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		view: defaultViewRef.current,
 	} );
 
+	// Hidden blocks are only ghosted while the "Show hidden blocks" preference
+	// is on; otherwise they are visually hidden like on the front end.
+	const isGhosted = !! showHiddenBlocks && isBlockCurrentlyHidden;
+	const visibilityReason = isGhosted
+		? getBlockVisibilityReason( blockVisibility, viewportSettings )
+		: null;
+
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const baseLabel =
+		ariaLabel ??
+		( clientId === ghostBlock?.clientId
+			? __( 'Add default block' )
+			: undefined ) ??
+		props[ 'aria-label' ] ??
+		blockLabel;
+
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
 		warning(
@@ -226,13 +246,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label':
-			ariaLabel ??
-			( clientId === ghostBlock?.clientId
-				? __( 'Add default block' )
-				: undefined ) ??
-			props[ 'aria-label' ] ??
-			blockLabel,
+		// A ghosted block announces why it is hidden after whatever name it
+		// would otherwise have, so blocks that supply their own label (like
+		// Paragraph or Column) keep it and still announce the reason.
+		'aria-label': appendVisibilityReason( baseLabel, visibilityReason ),
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
@@ -254,7 +271,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockCurrentlyHidden,
+				'is-block-hidden': isBlockCurrentlyHidden && ! showHiddenBlocks,
+				'is-block-ghosted': isGhosted,
 			},
 			className,
 			props.className,

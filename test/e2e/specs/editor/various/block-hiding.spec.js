@@ -19,6 +19,12 @@ test.describe( 'Block Hiding', () => {
 		}
 	} );
 
+	test.afterEach( async ( { editor } ) => {
+		// "Show hidden blocks" is a persisted preference; reset it so it
+		// cannot leak into other tests.
+		await editor.setPreferences( 'core', { showHiddenBlocks: false } );
+	} );
+
 	test( 'should hide a block completely by selecting "Omit from published content"', async ( {
 		page,
 		editor,
@@ -184,6 +190,116 @@ test.describe( 'Block Hiding', () => {
 		// The visibility modal SHOULD appear now.
 		await expect(
 			page.getByRole( 'dialog', { name: 'Hide block' } )
+		).toBeVisible();
+	} );
+
+	test( 'should ghost hidden blocks while hidden blocks are shown', async ( {
+		page,
+		editor,
+	} ) => {
+		// Insert a hidden paragraph and a visible one.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hidden content' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Hide' );
+		await page
+			.getByRole( 'dialog', { name: 'Hide block' } )
+			.getByRole( 'checkbox', { name: 'Omit from published content' } )
+			.check();
+		await page
+			.getByRole( 'dialog', { name: 'Hide block' } )
+			.getByRole( 'button', { name: 'Apply' } )
+			.click();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Visible content' },
+		} );
+
+		// With hidden blocks not shown (the default), the hidden block is not
+		// in the canvas once deselected, like on trunk.
+		await expect(
+			editor.canvas.getByText( 'Hidden content' )
+		).toBeHidden();
+
+		// Show hidden blocks from the View menu.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show hidden blocks' } )
+			.click();
+		// The View menu stays open after toggling the checkbox.
+		await page.keyboard.press( 'Escape' );
+
+		// The hidden block now renders ghosted, and its accessible name
+		// announces why it's hidden.
+		const ghostedBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph. Omitted from published content',
+		} );
+		await expect( ghostedBlock ).toBeVisible();
+		await expect( ghostedBlock ).toHaveClass( /is-block-ghosted/ );
+
+		// Selecting the ghosted block keeps it editable, and the visibility
+		// button in the block toolbar states why it's hidden.
+		await editor.selectBlocks( ghostedBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', {
+					name: 'Omitted from published content',
+				} )
+		).toBeVisible();
+	} );
+
+	test( 'should ghost viewport-hidden blocks only at the matching device preview', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Mobile hidden content' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Hide' );
+		await page
+			.getByRole( 'dialog', { name: 'Hide block' } )
+			.getByRole( 'checkbox', { name: 'Mobile' } )
+			.check();
+		await page
+			.getByRole( 'dialog', { name: 'Hide block' } )
+			.getByRole( 'button', { name: 'Apply' } )
+			.click();
+
+		// Show hidden blocks from the View menu.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show hidden blocks' } )
+			.click();
+		// The View menu stays open after toggling the checkbox.
+		await page.keyboard.press( 'Escape' );
+
+		// At the Desktop preview the block renders normally.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		// At the Mobile preview it ghosts.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph. Hidden on mobile',
+			} )
 		).toBeVisible();
 	} );
 

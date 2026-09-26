@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	getBlockVisibilityViewportEntries,
+	getBlockVisibilityReason,
+	appendVisibilityReason,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from '../utils';
@@ -286,6 +288,93 @@ describe( 'block-visibility utils', () => {
 				},
 			];
 			expect( getHideEverywhereCheckboxState( blocks ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getBlockVisibilityReason', () => {
+		it( 'returns null when no rule hides the block', () => {
+			expect( getBlockVisibilityReason( undefined ) ).toBe( null );
+			expect( getBlockVisibilityReason( true ) ).toBe( null );
+			expect(
+				getBlockVisibilityReason( { viewport: { mobile: true } } )
+			).toBe( null );
+		} );
+
+		it( 'names the control when hidden everywhere', () => {
+			expect( getBlockVisibilityReason( false ) ).toBe(
+				'Omitted from published content'
+			);
+		} );
+
+		it( 'names a single viewport', () => {
+			expect(
+				getBlockVisibilityReason( { viewport: { mobile: false } } )
+			).toBe( 'Hidden on mobile' );
+		} );
+
+		it( 'joins two viewports', () => {
+			expect(
+				getBlockVisibilityReason( {
+					viewport: { tablet: false, mobile: false },
+				} )
+			).toBe( 'Hidden on tablet and mobile' );
+		} );
+
+		it( 'joins three viewports', () => {
+			expect(
+				getBlockVisibilityReason( {
+					viewport: { desktop: false, tablet: false, mobile: false },
+				} )
+			).toBe( 'Hidden on desktop, tablet and mobile' );
+		} );
+
+		it( 'ignores viewports the theme does not configure', () => {
+			expect(
+				getBlockVisibilityReason(
+					{ viewport: { mobile: false } },
+					{ tablet: '64rem' }
+				)
+			).toBe( null );
+		} );
+	} );
+
+	describe( 'appendVisibilityReason', () => {
+		it( 'returns the label unchanged without a reason', () => {
+			expect( appendVisibilityReason( 'Block: Paragraph', null ) ).toBe(
+				'Block: Paragraph'
+			);
+		} );
+
+		it( 'returns the reason when there is no label', () => {
+			expect(
+				appendVisibilityReason( undefined, 'Hidden on mobile' )
+			).toBe( 'Hidden on mobile' );
+		} );
+
+		it( 'appends the reason as a new sentence', () => {
+			expect(
+				appendVisibilityReason(
+					'Block: Column (1 of 2)',
+					'Hidden on mobile'
+				)
+			).toBe( 'Block: Column (1 of 2). Hidden on mobile' );
+			expect(
+				appendVisibilityReason(
+					'Empty block; start writing or type forward slash to choose a block',
+					'Omitted from published content'
+				)
+			).toBe(
+				'Empty block; start writing or type forward slash to choose a block. Omitted from published content'
+			);
+		} );
+
+		it( 'does not double punctuation the label already ends with', () => {
+			expect(
+				appendVisibilityReason(
+					'Added block: Paragraph.',
+					'Hidden on mobile'
+				)
+			).toBe( 'Added block: Paragraph. Hidden on mobile' );
 		} );
 	} );
 } );
