@@ -66,6 +66,7 @@ export interface Style {
 		fontSize?: CSSProperties[ 'fontSize' ];
 		fontFamily?: CSSProperties[ 'fontFamily' ];
 		fontWeight?: CSSProperties[ 'fontWeight' ];
+		fontStretch?: CSSProperties[ 'fontStretch' ];
 		fontStyle?: CSSProperties[ 'fontStyle' ];
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];

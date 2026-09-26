@@ -284,6 +284,87 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a width is serialized when the block supports it, whether it
+	 * names a keyword or a percentage.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_font_stretch() {
+		$this->test_block_name = 'test/font-stretch';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontStretch' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+
+		$this->assertSame(
+			array( 'style' => 'font-stretch:condensed;' ),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => 'condensed' ) ) )
+			),
+			'A width named with a keyword should be serialized.'
+		);
+
+		$this->assertSame(
+			array( 'style' => 'font-stretch:75%;' ),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => '75%' ) ) )
+			),
+			'A width named as a percentage should be serialized.'
+		);
+	}
+
+	/**
+	 * Tests that a width is left alone when the block does not support it.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_skip_font_stretch_without_support() {
+		$this->test_block_name = 'test/font-stretch-without-support';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontSize' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+
+		$this->assertSame(
+			array(),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => 'condensed' ) ) )
+			)
+		);
+	}
+
+	/**
 	 * Tests that a classname is generated for a text shadow preset.
 	 *
 	 * @covers ::wp_apply_typography_support

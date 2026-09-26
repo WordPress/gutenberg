@@ -15,6 +15,16 @@ describe( 'generate', () => {
 		).toEqual( '' );
 	} );
 
+	it( 'should generate a width from a keyword or a percentage', () => {
+		// Both forms select a width the font provides, one face or one `wdth` coordinate.
+		expect(
+			compileCSS( { typography: { fontStretch: 'condensed' } } )
+		).toEqual( 'font-stretch: condensed;' );
+		expect( compileCSS( { typography: { fontStretch: '75%' } } ) ).toEqual(
+			'font-stretch: 75%;'
+		);
+	} );
+
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
 			compileCSS( {

@@ -67,6 +67,7 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"__experimentalFontFamily": true,
+			"fontStretch": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,

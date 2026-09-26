@@ -300,6 +300,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-family' => 'font-family',
 					),
 				),
+				/*
+				 * `font-stretch` rather than its newer name `font-width`, which
+				 * browsers do not implement yet. CSS Fonts 4 keeps `font-stretch`
+				 * as the legacy alias.
+				 */
+				'fontStretch'    => array(
+					'property_keys' => array(
+						'default' => 'font-stretch',
+					),
+					'path'          => array( 'typography', 'fontStretch' ),
+				),
 				'fontStyle'      => array(
 					'property_keys' => array(
 						'default' => 'font-style',

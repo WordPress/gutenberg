@@ -194,6 +194,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', 'fontSize' ],
 		useEngine: true,
 	},
+	fontStretch: {
+		value: [ 'typography', 'fontStretch' ],
+		support: [ 'typography', 'fontStretch' ],
+		useEngine: true,
+	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
 		support: [ 'typography', '__experimentalFontStyle' ],

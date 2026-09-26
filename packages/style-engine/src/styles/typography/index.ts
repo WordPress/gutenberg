@@ -37,6 +37,22 @@ const fontWeight = {
 	},
 };
 
+/*
+ * `font-stretch` rather than its newer name `font-width`, which browsers do
+ * not implement yet. CSS Fonts 4 keeps `font-stretch` as the legacy alias.
+ */
+const fontStretch = {
+	name: 'fontStretch',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontStretch' ],
+			'fontStretch'
+		);
+	},
+};
+
 const fontFamily = {
 	name: 'fontFamily',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -148,6 +164,7 @@ const textShadow = {
 export default [
 	fontFamily,
 	fontSize,
+	fontStretch,
 	fontStyle,
 	fontWeight,
 	letterSpacing,

@@ -61,6 +61,7 @@
 			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
+			"fontStretch": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,

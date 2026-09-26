@@ -200,6 +200,7 @@ Settings related to typography.
 | -------- | ----------- | ---- | ------- |
 | defaultFontSizes | Allow users to choose font sizes from the default font size presets. | `boolean` | `true` |
 | customFontSize | Allow users to set custom font sizes. | `boolean` | `true` |
+| fontStretch | Allow users to set custom font widths. | `boolean` | `true` |
 | fontStyle | Allow users to set custom font styles. | `boolean` | `true` |
 | fontWeight | Allow users to set custom font weights. | `boolean` | `true` |
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
@@ -355,6 +356,7 @@ Typography styles.
 | -------- | ----------- | ---- |
 | fontFamily | Sets the `font-family` CSS property. | `string`, `{ ref }` |
 | fontSize | Sets the `font-size` CSS property. | `string`, `{ ref }` |
+| fontStretch | Sets the `font-stretch` CSS property. | `string`, `{ ref }` |
 | fontStyle | Sets the `font-style` CSS property. | `string`, `{ ref }` |
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |

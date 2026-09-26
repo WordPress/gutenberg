@@ -617,6 +617,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"fontStretch": {
+							"description": "Allow users to set custom font widths.",
+							"type": "boolean",
+							"default": true
+						},
 						"fontStyle": {
 							"description": "Allow users to set custom font styles.",
 							"type": "boolean",
@@ -1846,6 +1851,13 @@
 						},
 						"fontSize": {
 							"description": "Sets the `font-size` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"fontStretch": {
+							"description": "Sets the `font-stretch` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }

@@ -210,6 +210,36 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_font_stretch_style'              => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontStretch' => 'condensed',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-stretch:condensed;',
+					'declarations' => array(
+						'font-stretch' => 'condensed',
+					),
+				),
+			),
+
+			'inline_valid_font_stretch_percentage_style'   => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontStretch' => '75%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-stretch:75%;',
+					'declarations' => array(
+						'font-stretch' => '75%',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(
