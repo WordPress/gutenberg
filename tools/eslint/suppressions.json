@@ -1182,6 +1182,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/global-styles/test/typography-panel-axes.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/global-styles/test/typography-panel-core.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
