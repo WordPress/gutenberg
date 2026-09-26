@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `BreadcrumbPath`: Add a compact, non-interactive ancestor trail without a route dependency.
+
 ## 2.10.0 (2026-09-10)
 
 ### Internal
