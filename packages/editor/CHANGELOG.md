@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
--   View menu: Add a "Reveal hidden blocks" item that shows blocks hidden by visibility rules as dimmed, editable ghosts in the canvas ([#80439](https://github.com/WordPress/gutenberg/pull/80439)).
+-   View menu: Add a "Show hidden blocks" item, persisted as the `core` preference `showHiddenBlocks`, that shows blocks hidden by visibility rules as dimmed, editable ghosts in the canvas ([#80439](https://github.com/WordPress/gutenberg/pull/80439)).
 
 ### Bug Fixes
 
