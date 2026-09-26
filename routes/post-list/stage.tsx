@@ -23,7 +23,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -36,6 +36,7 @@ import {
 	type ViewOverrides,
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
+import usePageHierarchy from './use-page-hierarchy';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -49,6 +50,10 @@ const LAYOUT_LIST = 'list';
 
 function getItemId( item: Post ) {
 	return item.id.toString();
+}
+
+function getPageParentId( item: Post ) {
+	return ( item as Post & { parent?: number } ).parent || null;
 }
 
 function getItemLevel( item: Post ) {
@@ -170,13 +175,73 @@ function PostListView( {
 		() => viewToQuery( view, postType ),
 		[ view, postType ]
 	);
+	const isPageHierarchy =
+		postType === 'page' &&
+		view.type === 'table' &&
+		!! view.showLevels &&
+		! view.groupBy &&
+		! view.search &&
+		! view.filters?.length;
+	const hierarchyQuery = useMemo(
+		() => ( {
+			...postTypeQuery,
+			page: undefined,
+			orderby_hierarchy: undefined,
+			per_page: postTypeQuery.per_page ?? 20,
+		} ),
+		[ postTypeQuery ]
+	);
+	const [ refreshToken, setRefreshToken ] = useState( 0 );
+	const hierarchyKey = JSON.stringify( [
+		postType,
+		slug,
+		hierarchyQuery,
+		refreshToken,
+	] );
+	const hierarchy = usePageHierarchy(
+		isPageHierarchy,
+		hierarchyQuery,
+		hierarchyKey
+	);
+	const [ expansion, setExpansion ] = useState( {
+		key: hierarchyKey,
+		ids: [] as string[],
+	} );
+	const expandedItemIds = expansion.key === hierarchyKey ? expansion.ids : [];
+	const onChangeExpandedItemIds = ( ids: string[] ) => {
+		setExpansion( { key: hierarchyKey, ids } );
+		ids.filter( ( id ) => ! expandedItemIds.includes( id ) ).forEach(
+			( id ) => {
+				if ( ! hierarchy.getPaginationInfo( id ) ) {
+					hierarchy.load( id );
+				}
+			}
+		);
+	};
 	const {
-		records: posts,
+		records: flatPosts,
 		totalItems,
 		totalPages,
 		isResolving,
 		hasResolved,
-	} = useEntityRecordsWithPermissions( 'postType', postType, postTypeQuery );
+	} = useEntityRecordsWithPermissions( 'postType', postType, postTypeQuery, {
+		enabled: ! isPageHierarchy,
+	} );
+	const hierarchyPermissions = useSelect(
+		( select ) =>
+			unlock( select( coreStore ) ).getEntityRecordsPermissions(
+				'postType',
+				postType,
+				hierarchy.records.map( ( item ) => item.id.toString() )
+			),
+		[ postType, hierarchy.records ]
+	);
+	const posts = isPageHierarchy
+		? hierarchy.records.map( ( item, index ) => ( {
+				...item,
+				permissions: hierarchyPermissions[ index ],
+			} ) )
+		: flatPosts;
 
 	const allFields = usePostFields( {
 		postType,
@@ -234,6 +299,9 @@ function PostListView( {
 		postType,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: Post[] ) => {
+			if ( isPageHierarchy ) {
+				setRefreshToken( ( previous ) => previous + 1 );
+			}
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
@@ -401,7 +469,11 @@ function PostListView( {
 				view={ view }
 				onChangeView={ onChangeView }
 				actions={ actions }
-				isLoading={ isResolving || ! hasResolved }
+				isLoading={
+					isPageHierarchy
+						? hierarchy.isLoading
+						: isResolving || ! hasResolved
+				}
 				paginationInfo={ {
 					totalItems,
 					totalPages,
@@ -409,6 +481,34 @@ function PostListView( {
 				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
+				{ ...( isPageHierarchy && {
+					getItemParentId: getPageParentId,
+					getItemHasChildren: ( item: Post ) => {
+						if (
+							hierarchy.records.some(
+								( child ) =>
+									getPageParentId( child ) === item.id
+							)
+						) {
+							return true;
+						}
+						const level = hierarchy.getPaginationInfo(
+							getItemId( item )
+						);
+						return level &&
+							! level.hasMore &&
+							! level.isLoading &&
+							! level.error
+							? false
+							: undefined;
+					},
+					expandedItemIds,
+					onChangeExpandedItemIds,
+					hierarchyPagination: {
+						getPaginationInfo: hierarchy.getPaginationInfo,
+						onLoadMore: hierarchy.load,
+					},
+				} ) }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
@@ -452,6 +552,11 @@ function PostListView( {
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
 						quickEditForm={ quickEditForm }
+						onSaved={ () => {
+							if ( isPageHierarchy ) {
+								setRefreshToken( ( previous ) => previous + 1 );
+							}
+						} }
 					/>
 				) }
 		</Page>
