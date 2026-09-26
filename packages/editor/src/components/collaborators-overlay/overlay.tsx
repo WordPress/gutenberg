@@ -1,4 +1,8 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Avatar from '../collaborators-presence/avatar';
@@ -44,6 +48,16 @@ export function Overlay( {
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
+
+	// Avatars sit above the line they annotate, so they cover the text while
+	// it is being written. Hide them for as long as the local user is typing,
+	// matching how the block toolbar gets out of the way. Carets and selection
+	// highlights stay put: they are what tells you where someone else is
+	// working, and they never overlap the text.
+	const isTyping = useSelect(
+		( select ) => select( blockEditorStore ).isTyping(),
+		[]
+	);
 
 	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
 		useRenderCursors(
@@ -184,15 +198,19 @@ export function Overlay( {
 									} }
 								/>
 							) }
-							<Avatar
-								className="collaborators-overlay-user-label"
-								variant="badge"
-								size="small"
-								src={ cursor.avatarUrl }
-								name={ cursor.userName }
-								label={ cursor.isMe ? __( 'You' ) : undefined }
-								borderColor={ cursor.color }
-							/>
+							{ ! isTyping && (
+								<Avatar
+									className="collaborators-overlay-user-label"
+									variant="badge"
+									size="small"
+									src={ cursor.avatarUrl }
+									name={ cursor.userName }
+									label={
+										cursor.isMe ? __( 'You' ) : undefined
+									}
+									borderColor={ cursor.color }
+								/>
+							) }
 						</div>
 					) }
 				</div>
@@ -207,14 +225,16 @@ export function Overlay( {
 						top: `${ highlight.y }px`,
 					} }
 				>
-					<Avatar
-						className="collaborators-overlay-block-label"
-						variant="badge"
-						size="small"
-						src={ highlight.avatarUrl }
-						name={ highlight.userName }
-						borderColor={ highlight.color }
-					/>
+					{ ! isTyping && (
+						<Avatar
+							className="collaborators-overlay-block-label"
+							variant="badge"
+							size="small"
+							src={ highlight.avatarUrl }
+							name={ highlight.userName }
+							borderColor={ highlight.color }
+						/>
+					) }
 				</div>
 			) ) }
 		</div>
