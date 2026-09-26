@@ -285,6 +285,108 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div>Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background clip alone does not add has-background' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-is-output',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'border-box',
+				),
+				'expected_wrapper'    => '<div style="background-clip:border-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip text style is applied with vendor prefixes' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-is-output',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div style="background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip alone does not add has-background for block with only backgroundClip support' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-only-support',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'padding-box',
+				),
+				'expected_wrapper'    => '<p style="background-clip:padding-box;-webkit-text-fill-color:currentColor;">Content</p>',
+				'wrapper'             => '<p>Content</p>',
+			),
+			'background clip style is not applied if the block does not support it' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-not-supported',
+				'background_settings' => array(
+					'backgroundClip' => false,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div>Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip keeps has-background when a background is painted into a box' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-with-gradient',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'padding-box',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:padding-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clipped to text drops has-background from a gradient' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-with-gradient',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clipped to text keeps has-background when the block does not support the clip' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-without-clip-support',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => false,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip style is appended to existing styles' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-appends-styles',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'content-box',
+				),
+				'expected_wrapper'    => '<div class="wp-block-test" style="color: red;background-clip:content-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div class="wp-block-test" style="color: red">Content</div>',
+			),
 		);
 	}
 
