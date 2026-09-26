@@ -2,6 +2,7 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -15,8 +16,13 @@ export default function RemoveBlockButton( {
 }: {
 	clientIds: string[];
 } ) {
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlocks( clientIds ),
+	const { canRemove, shortcut } = useSelect(
+		( select ) => ( {
+			canRemove: select( blockEditorStore ).canRemoveBlocks( clientIds ),
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/block-editor/remove' ),
+		} ),
 		[ clientIds ]
 	);
 	const { removeBlocks } = useDispatch( blockEditorStore );
@@ -38,6 +44,7 @@ export default function RemoveBlockButton( {
 				icon={ trash }
 				label={ label }
 				onClick={ () => removeBlocks( clientIds ) }
+				shortcut={ shortcut }
 			/>
 		</ToolbarGroup>
 	);

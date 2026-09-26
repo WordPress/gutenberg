@@ -13,10 +13,14 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 describe( 'RemoveBlockButton', () => {
 	const removeBlocks = vi.fn();
 
-	const setupSelectors = ( { canRemoveBlocks = true } = {} ) => {
+	const setupSelectors = ( {
+		canRemoveBlocks = true,
+		shortcutRepresentation = 'Shift+Alt+Z',
+	} = {} ) => {
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				canRemoveBlocks: () => canRemoveBlocks,
+				getShortcutRepresentation: () => shortcutRepresentation,
 			} ) )
 		);
 		useDispatch.mockReturnValue( { removeBlocks } );
@@ -45,6 +49,19 @@ describe( 'RemoveBlockButton', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Delete' } ) );
 
 		expect( removeBlocks ).toHaveBeenCalledWith( [ 'block-1' ] );
+	} );
+
+	it( 'should show the removal keyboard shortcut in the tooltip', async () => {
+		const user = userEvent.setup();
+		setupSelectors();
+
+		render( <RemoveBlockButton clientIds={ [ 'block-1' ] } /> );
+
+		await user.hover( screen.getByRole( 'button', { name: 'Delete' } ) );
+
+		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent(
+			'Shift+Alt+Z'
+		);
 	} );
 
 	it( 'should label the button with the block count for a multi-selection', () => {
