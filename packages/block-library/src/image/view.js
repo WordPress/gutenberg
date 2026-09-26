@@ -627,6 +627,12 @@ const { state, actions, callbacks } = store(
 				}
 
 				const figure = ref.parentElement;
+				const caption = figure.querySelector( 'figcaption' );
+				state.metadata[ imageId ].caption = (
+					caption?.innerText ||
+					caption?.textContent ||
+					''
+				).trim();
 				const figureWidth = ref.parentElement.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
@@ -634,7 +640,6 @@ const { state, actions, callbacks } = store(
 				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
 				let figureHeight = ref.parentElement.clientHeight;
-				const caption = figure.querySelector( 'figcaption' );
 				if ( caption ) {
 					const captionComputedStyle =
 						window.getComputedStyle( caption );
