@@ -1773,21 +1773,18 @@ class WP_Theme_JSON_Gutenberg {
 	 *     {
 	 *       'core/paragraph': {
 	 *         'selector': 'p',
-	 *         'elements': {
-	 *           'link' => 'link selector',
-	 *           'etc'  => 'element selector'
-	 *         }
 	 *       },
 	 *       'core/heading': {
 	 *         'selector': 'h1',
-	 *         'elements': {}
 	 *       },
 	 *       'core/image': {
 	 *         'selector': '.wp-block-image',
 	 *         'duotone': 'img',
-	 *         'elements': {}
 	 *       }
 	 *     }
+	 *
+	 * Block element selectors are generated lazily for block style nodes that
+	 * contain element styles.
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added `duotone` key with CSS selector.
@@ -1831,11 +1828,6 @@ class WP_Theme_JSON_Gutenberg {
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
-
-			$elements = static::get_block_element_selectors( $root_selector );
-			if ( ! empty( $elements ) ) {
-				static::$blocks_metadata[ $block_name ]['elements'] = $elements;
-			}
 
 			// The block may or may not have a duotone selector.
 			$duotone_selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
@@ -3579,6 +3571,43 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Determines whether a block style node contains element styles.
+	 *
+	 * @param array $node               A theme.json block styles node.
+	 * @param bool  $include_variations Whether variation nodes will be included.
+	 * @return bool Whether the block node contains element styles.
+	 */
+	private static function block_node_has_element_styles( $node, $include_variations = false ) {
+		if ( isset( $node['elements'] ) ) {
+			return true;
+		}
+
+		foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+			if ( isset( $node[ $breakpoint ]['elements'] ) ) {
+				return true;
+			}
+		}
+
+		if ( ! $include_variations || ! isset( $node['variations'] ) ) {
+			return false;
+		}
+
+		foreach ( $node['variations'] as $variation_node ) {
+			if ( isset( $variation_node['elements'] ) ) {
+				return true;
+			}
+
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+				if ( isset( $variation_node[ $breakpoint ]['elements'] ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
 	 * @since 6.1.0
@@ -3643,10 +3672,18 @@ class WP_Theme_JSON_Gutenberg {
 					$feature_selectors = $selectors[ $name ]['selectors'];
 				}
 
+				$block_elements = $selectors[ $name ]['elements'] ?? array();
+				if ( empty( $block_elements ) && null !== $selector && static::block_node_has_element_styles( $node, $include_variations ) ) {
+					$block_elements = static::get_block_element_selectors( $selector );
+					if ( isset( static::$blocks_metadata[ $name ] ) && $selector === static::$blocks_metadata[ $name ]['selector'] ) {
+						static::$blocks_metadata[ $name ]['elements'] = $block_elements;
+					}
+				}
+
 				$variation_selectors = array();
 
 				if ( $include_variations && isset( $node['variations'] ) ) {
-					foreach ( $node['variations'] as $variation => $node ) {
+					foreach ( $node['variations'] as $variation => $variation_node ) {
 						$variation_selectors[] = array(
 							'name'     => $variation,
 							'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
@@ -3660,7 +3697,7 @@ class WP_Theme_JSON_Gutenberg {
 					'path'       => $node_path,
 					'selector'   => $selector,
 					'selectors'  => $feature_selectors,
-					'elements'   => $selectors[ $name ]['elements'] ?? array(),
+					'elements'   => $block_elements,
 					'duotone'    => $duotone_selector,
 					'variations' => $variation_selectors,
 					'css'        => $selector,
@@ -3677,7 +3714,7 @@ class WP_Theme_JSON_Gutenberg {
 							'media_query' => $responsive_media_queries[ $breakpoint ],
 							'selector'    => $selector,
 							'selectors'   => $feature_selectors,
-							'elements'    => $selectors[ $name ]['elements'] ?? array(),
+							'elements'    => $block_elements,
 							'variations'  => $variation_selectors,
 							'css'         => $selector,
 						);
@@ -3724,7 +3761,7 @@ class WP_Theme_JSON_Gutenberg {
 								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
 								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
 								'selectors'  => $pseudo_feature_selectors,
-								'elements'   => $selectors[ $name ]['elements'] ?? array(),
+								'elements'   => $block_elements,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
@@ -3742,7 +3779,7 @@ class WP_Theme_JSON_Gutenberg {
 									'media_query' => $responsive_media_queries[ $breakpoint ],
 									'selector'    => static::append_to_selector( $selector, $pseudo_selector ),
 									'selectors'   => $pseudo_feature_selectors,
-									'elements'    => $selectors[ $name ]['elements'] ?? array(),
+									'elements'    => $block_elements,
 									'variations'  => $variation_selectors,
 									'css'         => static::append_to_selector( $selector, $pseudo_selector ),
 								);
@@ -3764,7 +3801,7 @@ class WP_Theme_JSON_Gutenberg {
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
 								'selectors'  => $feature_selectors,
-								'elements'   => $selectors[ $name ]['elements'] ?? array(),
+								'elements'   => $block_elements,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => $custom_css_selector,
@@ -3780,7 +3817,7 @@ class WP_Theme_JSON_Gutenberg {
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
 											'selectors'  => $feature_selectors,
-											'elements'   => $selectors[ $name ]['elements'] ?? array(),
+											'elements'   => $block_elements,
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,
 											'css'        => $compound_css_selector,
@@ -3823,7 +3860,7 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$element_selector = $selectors[ $name ]['elements'][ $element ];
+					$element_selector = $block_elements[ $element ];
 
 					if ( isset( $block_node['elements'][ $element ] ) ) {
 						$nodes[] = array(
