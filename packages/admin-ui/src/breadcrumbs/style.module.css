@@ -19,6 +19,25 @@
 	min-width: 0;
 }
 
+/* A static path may be nested in a narrow table cell. */
+.container,
+.path {
+	max-width: 100%;
+	min-width: 0;
+}
+
+.path > li {
+	flex-shrink: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.path > li > span {
+	white-space: nowrap;
+}
+
 /* @TODO: Remove truncation styles once `Text` supports truncation natively. */
 .current {
 	overflow: hidden;
