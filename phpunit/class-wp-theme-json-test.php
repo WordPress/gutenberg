@@ -8565,6 +8565,108 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Resets the cached block metadata so a change to a registered block type's
+	 * selectors is picked up. `get_blocks_metadata` only builds metadata for
+	 * blocks it has not seen before, so an already-cached block keeps its old
+	 * selectors otherwise.
+	 */
+	private function reset_blocks_metadata() {
+		$property = new ReflectionProperty( WP_Theme_JSON_Gutenberg::class, 'blocks_metadata' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
+		$property->setValue( null, array() );
+	}
+
+	/**
+	 * Test that a feature selector is scoped to the custom state's selector.
+	 *
+	 * A feature selector targets an inner element, e.g. the anchor inside a
+	 * Navigation Link's list item. Left unscoped it would style that element in
+	 * every instance of the block rather than only the ones in the custom state.
+	 */
+	public function test_block_custom_states_scope_feature_selectors() {
+		$block_type         = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
+		$original_selectors = $block_type->selectors;
+
+		$block_type->selectors = array_merge(
+			$original_selectors,
+			array( 'color' => '.wp-block-navigation-item__content' )
+		);
+		$this->reset_blocks_metadata();
+
+		try {
+			$theme_json = new WP_Theme_JSON_Gutenberg(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/navigation-link' => array(
+								'-current' => array(
+									'color' => array(
+										'text' => 'red',
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+
+			$expected = ':root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content){color: red;}';
+			$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+		} finally {
+			$block_type->selectors = $original_selectors;
+			$this->reset_blocks_metadata();
+		}
+	}
+
+	/**
+	 * Test that a feature selector is scoped to a custom state compounded with
+	 * a pseudo-selector, e.g. the current menu item while hovered.
+	 */
+	public function test_block_custom_states_scope_feature_selectors_with_pseudo_selectors() {
+		$block_type         = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
+		$original_selectors = $block_type->selectors;
+
+		$block_type->selectors = array_merge(
+			$original_selectors,
+			array( 'color' => '.wp-block-navigation-item__content' )
+		);
+		$this->reset_blocks_metadata();
+
+		try {
+			$theme_json = new WP_Theme_JSON_Gutenberg(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/navigation-link' => array(
+								'-current' => array(
+									'color'  => array(
+										'text' => 'red',
+									),
+									':hover' => array(
+										'color' => array(
+											'text' => 'blue',
+										),
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+
+			$expected = ':root :where(.wp-block-navigation .current-menu-item .wp-block-navigation-item__content){color: red;}:root :where(.wp-block-navigation .current-menu-item:hover .wp-block-navigation-item__content){color: blue;}';
+			$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+		} finally {
+			$block_type->selectors = $original_selectors;
+			$this->reset_blocks_metadata();
+		}
+	}
+
+	/**
 	 * Test that non-whitelisted custom states are ignored, and that custom states
 	 * are ignored on blocks that do not declare support for them.
 	 */

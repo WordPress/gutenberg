@@ -2804,18 +2804,40 @@ class WP_Theme_JSON_Gutenberg {
 			return $node;
 		}
 
-		foreach ( $node['selectors'] as $feature => $selector ) {
+		$node['selectors'] = static::scope_feature_selectors( $scope, $node['selectors'] );
+
+		return $node;
+	}
+
+	/**
+	 * Scopes a block's feature selectors, e.g. `$selectors['border']`, to a
+	 * given selector. Handles both a feature's own selector and the selectors
+	 * of any of its subfeatures.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $scope             Selector to scope to.
+	 * @param array  $feature_selectors Map of feature selectors to scope.
+	 *
+	 * @return array Map of scoped feature selectors.
+	 */
+	protected static function scope_feature_selectors( $scope, $feature_selectors ) {
+		if ( empty( $feature_selectors ) ) {
+			return $feature_selectors;
+		}
+
+		foreach ( $feature_selectors as $feature => $selector ) {
 			if ( is_string( $selector ) ) {
-				$node['selectors'][ $feature ] = static::scope_selector( $scope, $selector );
+				$feature_selectors[ $feature ] = static::scope_selector( $scope, $selector );
 			}
 			if ( is_array( $selector ) ) {
 				foreach ( $selector as $subfeature => $subfeature_selector ) {
-					$node['selectors'][ $feature ][ $subfeature ] = static::scope_selector( $scope, $subfeature_selector );
+					$feature_selectors[ $feature ][ $subfeature ] = static::scope_selector( $scope, $subfeature_selector );
 				}
 			}
 		}
 
-		return $node;
+		return $feature_selectors;
 	}
 
 	/**
@@ -3759,11 +3781,21 @@ class WP_Theme_JSON_Gutenberg {
 							isset( $selectors[ $name ]['states'][ $custom_state ] )
 						) {
 							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
-							$nodes[]             = array(
+
+							/*
+							 * A custom state's selector replaces the block's root selector
+							 * rather than being appended to it, so a feature selector that
+							 * targets an inner element has to be scoped to it. Left as is,
+							 * the feature's styles would apply to every instance of the
+							 * block instead of only those in the custom state.
+							 */
+							$custom_state_feature_selectors = static::scope_feature_selectors( $custom_css_selector, $feature_selectors );
+
+							$nodes[] = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
-								'selectors'  => $feature_selectors,
+								'selectors'  => $custom_state_feature_selectors,
 								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
@@ -3779,7 +3811,7 @@ class WP_Theme_JSON_Gutenberg {
 											'name'       => $name,
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
-											'selectors'  => $feature_selectors,
+											'selectors'  => static::scope_feature_selectors( $compound_css_selector, $feature_selectors ),
 											'elements'   => $selectors[ $name ]['elements'] ?? array(),
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,
