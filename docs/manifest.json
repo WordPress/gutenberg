@@ -252,6 +252,12 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Extending the Editor",
+		"slug": "extend-editor",
+		"markdown_source": "../docs/how-to-guides/extend-editor.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
