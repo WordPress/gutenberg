@@ -600,7 +600,7 @@ End-to-end tests use [Playwright](https://playwright.dev/) as the testing framew
 
 ### Using wp-env
 
-If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test:e2e
@@ -650,7 +650,7 @@ A test is considered to be **flaky** when it can pass and fail across multiple r
 
 ## PHP testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test:php
