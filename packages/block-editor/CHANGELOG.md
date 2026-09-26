@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
+-   `ContrastChecker`: Show the transparency warning when a text or link color is both semi-transparent and low-contrast, instead of showing no warning at all ([#80612](https://github.com/WordPress/gutenberg/pull/80612)).
 
 ## 18.0.0 (2026-09-23)
 
