@@ -396,6 +396,7 @@ export default dedupePlugins( [
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 			'import/default': 'error',
 			'import/named': 'error',
+			'import/no-cycle': 'error',
 			'import/order': [
 				'error',
 				{
