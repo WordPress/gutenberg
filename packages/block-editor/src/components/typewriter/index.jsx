@@ -5,6 +5,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
+// A field is editable on its own, or through the editing host while its
+// block is selected (no contenteditable attribute of its own then).
+const editableSelector =
+	'[contenteditable="true"],[data-wp-block-attribute-key]';
 
 export function useTypewriter() {
 	return useRefEffect( ( node ) => {
@@ -100,8 +104,8 @@ export function useTypewriter() {
 				: ( caretRect.top - scrollContainerY ) /
 					( defaultView.innerHeight - scrollContainerY );
 
-			// If the scroll position is at the start, the active editable element
-			// is the last one, and the caret is positioned within the initial
+			// If the scroll position is at the start, the caret is in the last
+			// editable element, and it is positioned within the initial
 			// trigger percentage of the page, do not scroll the page.
 			// The typewriter effect should not kick in until an empty page has been
 			// filled with the initial trigger percentage or the user scrolls
@@ -174,28 +178,12 @@ export function useTypewriter() {
 		}
 
 		/**
-		 * Returns the editable element owning the selection: the active
-		 * element, or, when a focused editing host contains the node
-		 * (a selected block supports `editableRoot`), the editable
-		 * element containing the selection.
+		 * Returns the editable element containing the selection, if any.
 		 */
-		function getActiveEditableElement() {
-			const { activeElement } = ownerDocument;
-
-			if ( ! activeElement ) {
-				return null;
-			}
-
-			if (
-				! activeElement.isContentEditable ||
-				! activeElement.contains( node )
-			) {
-				return activeElement;
-			}
-
+		function getSelectionEditableElement() {
 			const { anchorNode } = defaultView.getSelection();
 
-			if ( ! anchorNode ) {
+			if ( ! anchorNode || ! node.contains( anchorNode ) ) {
 				return null;
 			}
 
@@ -203,29 +191,23 @@ export function useTypewriter() {
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			return element?.closest( '[contenteditable="true"]' ) ?? null;
+			const editable = element?.closest( editableSelector );
+			return editable?.isContentEditable ? editable : null;
 		}
 
 		/**
 		 * Checks if the current situation is eligible for scroll:
 		 * - The component must contain the selection.
-		 * - The active element must be contenteditable.
+		 * - The selection must be within editable content.
 		 */
 		function isSelectionEligibleForScroll() {
-			const activeEditableElement = getActiveEditableElement();
-			return (
-				!! activeEditableElement &&
-				node.contains( activeEditableElement ) &&
-				activeEditableElement.isContentEditable
-			);
+			return !! getSelectionEditableElement();
 		}
 
 		function isLastEditableNode() {
-			const editableNodes = node.querySelectorAll(
-				'[contenteditable="true"]'
-			);
+			const editableNodes = node.querySelectorAll( editableSelector );
 			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			return lastEditableNode === getActiveEditableElement();
+			return lastEditableNode === getSelectionEditableElement();
 		}
 
 		// When the user scrolls or resizes, the scroll position should be

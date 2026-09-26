@@ -55,9 +55,21 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	const editable = element?.closest( '[contenteditable="true"]' );
+	let editable = element?.closest( '[contenteditable="true"]' );
 
-	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
+	// While the root is the editing host, the selected block's field is
+	// editable through it and has no contenteditable attribute of its own:
+	// the block element is the editable element.
+	if ( editable === root ) {
+		editable = element?.closest( BLOCK_SELECTOR );
+	}
+
+	if (
+		! editable ||
+		editable === root ||
+		! ( editable as HTMLElement ).isContentEditable ||
+		! editable.contains( focusNode )
+	) {
 		return;
 	}
 

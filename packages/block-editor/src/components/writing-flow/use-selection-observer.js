@@ -184,20 +184,36 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons) or editables outside the block (e.g.
-						// the post title). The rich text instance owning the
-						// selection syncs it to the store itself.
+						// across browsers). Any focused element containing the
+						// caret hands over, including an ancestor block wrapper
+						// (Firefox focuses the nearest focusable ancestor on a
+						// click in the inert field). UI elements (e.g. buttons)
+						// and editables outside the block (e.g. the post title)
+						// do not contain the caret and keep focus. The rich
+						// text instance owning the selection syncs it to the
+						// store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							getBlockClientId( activeElement ) ===
-								collapsedClientId
+							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
+						} else if (
+							// A click on the inert field, or the field turning
+							// inert while focused, leaves focus on the default
+							// target (the wrapper as the iframe body, or the
+							// page body in an inline editor) without focusing
+							// it: take it for the host.
+							( activeElement === node ||
+								activeElement === ownerDocument.body ) &&
+							ownerDocument.hasFocus() &&
+							! activeElement.matches( ':focus' )
+						) {
+							node.focus( { preventScroll: true } );
 						}
+
 						return;
 					}
 
@@ -219,7 +235,20 @@ export default function useSelectionObserver() {
 									? startNode
 									: startNode.parentElement;
 							element = element?.closest( '[contenteditable]' );
-							element?.focus();
+							// Only move focus into the editable when it belongs
+							// to the selected block. The collapsed selection can
+							// be a stale caret from before the block selection
+							// moved through the store (e.g. select all promoting
+							// the selection to the parent block): focusing an
+							// editable of a deselected block would make its
+							// focus handler hijack the block selection back.
+							if (
+								element &&
+								getBlockClientId( element ) ===
+									getSelectedBlockClientId()
+							) {
+								element.focus();
+							}
 						}
 					}
 					return;
