@@ -29,6 +29,17 @@
 			"onFail": "error"
 		}
 	},
+	"allowScripts": {
+		"@parcel/watcher": true,
+		"core-js": true,
+		"core-js-pure": true,
+		"esbuild": true,
+		"fs-ext": true,
+		"fsevents": true,
+		"leveldown": true,
+		"nx": true,
+		"unrs-resolver": true
+	},
 	"wpPlugin": {
 		"name": "gutenberg",
 		"scriptGlobal": "wp",
