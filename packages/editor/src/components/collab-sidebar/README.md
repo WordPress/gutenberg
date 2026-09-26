@@ -74,7 +74,7 @@ A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It 
 
 One `ResizeObserver` watches every floating element, the root and the canvas frame. Watching the root means editing, adding or removing any block re-anchors the threads after it. Content above the canvas moves the frame and shrinks it, so watching the frame keeps `frameOffset` current; a frame that moves without resizing isn't detected. Every callback runs `measure()`, which reads the heights and each thread's anchor via `getNoteAnchorRect()` (in `utils.js`), and emits only when a value changed.
 
-A `MutationObserver` watches `style` attributes under the root and calls `requestMeasure()`. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions; this keeps the threads following the blocks until the transform is cleared.
+A `MutationObserver` watches `style` attributes under the root. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions. The observer calls `requestMeasure()` once a changed element has no transform, so threads move when the animation ends rather than on every frame.
 
 API:
 - `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. The observers only exist while there are subscribers: the first subscriber creates them and observes everything already registered, the last one disconnects them.

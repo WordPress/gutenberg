@@ -115,6 +115,14 @@ export function createBoardStore() {
 		}
 	}
 
+	// The block move animation offsets blocks with a transform, which resizes
+	// nothing. Measure once it clears, not on every animation frame.
+	function onStyleChange( records ) {
+		if ( records.some( ( { target } ) => ! target.style.transform ) ) {
+			requestMeasure();
+		}
+	}
+
 	function observeRoot() {
 		if ( ! observer || ! rootEl ) {
 			return;
@@ -124,8 +132,6 @@ export function createBoardStore() {
 		if ( frameEl ) {
 			observer.observe( frameEl );
 		}
-		// The block move animation offsets blocks with a transform, which
-		// resizes nothing, so the first pass reads their old positions.
 		styleObserver.observe( rootEl, {
 			subtree: true,
 			attributeFilter: [ 'style' ],
@@ -158,7 +164,7 @@ export function createBoardStore() {
 
 	function connect() {
 		observer = new window.ResizeObserver( onResize );
-		styleObserver = new window.MutationObserver( requestMeasure );
+		styleObserver = new window.MutationObserver( onStyleChange );
 		for ( const floatingEl of floatingRefs.values() ) {
 			observer.observe( floatingEl );
 		}
