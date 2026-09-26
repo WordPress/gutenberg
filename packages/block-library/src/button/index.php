@@ -51,12 +51,17 @@ function render_block_core_button( $attributes, $content ) {
 		}
 	}
 
+	$has_text_binding = isset( $attributes['metadata']['bindings']['text'] );
+
 	/*
 	 * When there's no text, render nothing for the block.
 	 * See https://github.com/WordPress/gutenberg/issues/17221 for the
 	 * reasoning behind this.
+	 *
+	 * Skip when text binding exists. The content is hydrated after
+	 * this callback.
 	 */
-	if ( $is_empty ) {
+	if ( $is_empty && ! $has_text_binding ) {
 		return '';
 	}
 
