@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the public `Menu` from `@wordpress/ui` for moving widgets between areas ([#82966](https://github.com/WordPress/gutenberg/pull/82966)).
+
 ## 4.56.0 (2026-09-23)
 
 ## 4.55.0 (2026-09-10)
