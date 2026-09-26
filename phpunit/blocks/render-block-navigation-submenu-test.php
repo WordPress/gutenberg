@@ -51,6 +51,30 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_apply_current_menu_item_for_custom_kind_link_with_id() {
+		$page_id = self::$page->ID;
+		$this->go_to( get_permalink( $page_id ) );
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","kind":"custom","id":' . $page_id . ',"url":"' . get_permalink( $page_id ) . '"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"' . get_permalink( $page_id ) . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$navigation_submenu_block = new WP_Block( $parsed_blocks[0], array() );
+		$rendered_html            = gutenberg_render_block_core_navigation_submenu(
+			$navigation_submenu_block->attributes,
+			array(),
+			$navigation_submenu_block
+		);
+
+		$this->assertStringContainsString( 'current-menu-item', $rendered_html );
+		$this->assertStringContainsString( 'aria-current="page"', $rendered_html );
+	}
+
+	/**
 	 * @group submenu-color-inheritance
 	 * @covers ::gutenberg_render_block_core_navigation_submenu
 	 */
