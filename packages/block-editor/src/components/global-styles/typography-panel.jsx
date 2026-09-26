@@ -11,6 +11,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import VariableFontAppearanceControl from '../variable-font-appearance-control';
+import FontStyleControl from '../font-style-control';
 import FontWidthControl from '../font-width-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
@@ -1034,28 +1035,11 @@ export default function TypographyPanel( {
 					) }
 					panelId={ panelId }
 				>
-					{ isVariableFont ? (
-						<VariableFontAppearanceControl
-							value={ { fontStyle, fontWeight } }
-							onChange={ ( next ) =>
-								setFontStyle( next.fontStyle )
-							}
-							hasFontStyles
-							hasFontWeights={ false }
-							fontFamilyFaces={ fontFamilyFaces }
-						/>
-					) : (
-						<FontAppearanceControl
-							value={ { fontStyle, fontWeight } }
-							onChange={ ( next ) =>
-								setFontStyle( next.fontStyle )
-							}
-							label={ __( 'Style' ) }
-							hasFontStyles
-							hasFontWeights={ false }
-							fontFamilyFaces={ fontFamilyFaces }
-						/>
-					) }
+					<FontStyleControl
+						value={ fontStyle }
+						onChange={ setFontStyle }
+						fontFamilyFaces={ fontFamilyFaces }
+					/>
 				</InheritanceToolsPanelItem>
 			) }
 			{ hasFontWeightControl && (

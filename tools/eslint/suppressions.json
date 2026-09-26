@@ -1073,6 +1073,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/font-style-control/test/index.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/global-styles/advanced-panel.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
