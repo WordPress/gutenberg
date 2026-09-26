@@ -35,6 +35,8 @@ import {
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 import { getFontWeightRange } from '../../utils/get-font-weight-range';
+import { getFontStretchRange } from '../../utils/get-font-stretch-range';
+import { parseFontStretchValue } from '../../utils/parse-font-stretch';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
@@ -141,6 +143,35 @@ function useHasFontWeightControl( settings ) {
 
 function useHasFontStretchControl( settings ) {
 	return !! settings?.typography?.fontStretch;
+}
+
+/**
+ * Whether the family in use can be drawn at more than one width.
+ *
+ * A setting says the site allows this editing; it does not say the font can do
+ * it. Unlike a weight or a slant, a width the font does not have is never
+ * synthesised, so offering the control for a family with one width would offer
+ * nothing. A variable face declares a range, and a static family declares a
+ * width per face.
+ *
+ * @param {Array} fontFamilyFaces The faces of the family in use.
+ * @return {boolean} Whether there is more than one width to choose from.
+ */
+function hasFontStretchCapability( fontFamilyFaces ) {
+	if ( getFontStretchRange( fontFamilyFaces ) ) {
+		return true;
+	}
+	const declared = new Set();
+	fontFamilyFaces?.forEach( ( { fontStretch } ) => {
+		if ( 'string' !== typeof fontStretch ) {
+			return;
+		}
+		const width = parseFontStretchValue( fontStretch );
+		if ( width !== undefined ) {
+			declared.add( width );
+		}
+	} );
+	return declared.size > 1;
 }
 
 /**
@@ -500,7 +531,11 @@ export default function TypographyPanel( {
 	// Style, Weight and Width
 	const hasFontStyleControl = useHasFontStyleControl( settings );
 	const hasFontWeightControl = useHasFontWeightControl( settings );
-	const hasFontStretchControl = useHasFontStretchControl( settings );
+	// The setting allows the control; the font decides whether it has
+	// anything to offer.
+	const hasFontStretchControl =
+		useHasFontStretchControl( settings ) &&
+		hasFontStretchCapability( fontFamilyFaces );
 	// A family with a weight range is variable: the weight takes any value in
 	// the range rather than one of fixed style and weight combinations.
 	const isVariableFont = useMemo(
@@ -1080,6 +1115,7 @@ export default function TypographyPanel( {
 					<FontWidthControl
 						value={ fontStretch }
 						onChange={ setFontStretch }
+						fontFamilyFaces={ fontFamilyFaces }
 					/>
 				</InheritanceToolsPanelItem>
 			) }

@@ -21,18 +21,36 @@ afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
 } );
 
+// A family with widths, so the Width item is not gated out. Which fonts
+// offer it is its own concern, covered below.
+const WIDE_FAMILY = {
+	theme: [
+		{
+			name: 'Test',
+			slug: 'test',
+			fontFamily: 'Test',
+			fontFace: [ { fontStretch: '25% 151%', fontWeight: '100 1000' } ],
+		},
+	],
+};
+
 const ALL_AXES = {
 	typography: {
 		fontStyle: true,
 		fontWeight: true,
 		fontStretch: true,
+		fontFamilies: WIDE_FAMILY,
 	},
+};
+
+const WITH_FAMILY = {
+	typography: { fontFamily: 'var:preset|font-family|test' },
 };
 
 async function renderPanel( props ) {
 	return await render(
 		<TypographyPanel
-			value={ {} }
+			value={ WITH_FAMILY }
 			settings={ ALL_AXES }
 			onChange={ vi.fn() }
 			panelId="test-panel"
@@ -105,6 +123,7 @@ describe( 'Typography axes as separate panel items', () => {
 		await renderPanel( {
 			value: {
 				typography: {
+					...WITH_FAMILY.typography,
 					fontStyle: 'italic',
 					fontWeight: '700',
 					fontStretch: 'condensed',
@@ -140,6 +159,62 @@ describe( 'Typography axes as separate panel items', () => {
 				fontStretch: 'condensed',
 			} )
 		);
+	} );
+} );
+
+describe( 'Width is offered only when the font has widths', () => {
+	// The panel reads the faces from the settings and the family in use, so
+	// the family has to be registered and chosen rather than passed in.
+	const withFaces = ( fontFace ) => ( {
+		settings: {
+			typography: {
+				fontStyle: true,
+				fontWeight: true,
+				fontStretch: true,
+				fontFamilies: {
+					theme: [
+						{
+							name: 'Test',
+							slug: 'test',
+							fontFamily: 'Test',
+							fontFace,
+						},
+					],
+				},
+			},
+		},
+		value: {
+			typography: { fontFamily: 'var:preset|font-family|test' },
+		},
+	} );
+
+	it( 'offers it for a variable face that declares a range', async () => {
+		await renderPanel( withFaces( [ { fontStretch: '25% 151%' } ] ) );
+		expect( await menuNames() ).toContain( 'Width' );
+	} );
+
+	it( 'offers it for a static family with more than one width', async () => {
+		await renderPanel(
+			withFaces( [
+				{ fontStretch: 'normal' },
+				{ fontStretch: 'condensed' },
+			] )
+		);
+		expect( await menuNames() ).toContain( 'Width' );
+	} );
+
+	it( 'leaves it out when no face declares a width', async () => {
+		await renderPanel(
+			withFaces( [ { fontWeight: '400' }, { fontWeight: '700' } ] )
+		);
+		expect( await menuNames() ).not.toContain( 'Width' );
+	} );
+
+	it( 'leaves it out when every face has the same width', async () => {
+		await renderPanel(
+			withFaces( [ { fontStretch: 'normal' }, { fontStretch: '100%' } ] )
+		);
+		expect( await menuNames() ).not.toContain( 'Width' );
 	} );
 } );
 
@@ -193,7 +268,7 @@ describe( 'Inheritance is read per axis', () => {
 		'marks only the inherited axes when %s is inherited',
 		async ( _name, typography, inherited ) => {
 			await renderPanel( {
-				value: {},
+				value: WITH_FAMILY,
 				inheritedValue: { typography },
 				defaultControls: {
 					fontStyle: true,
