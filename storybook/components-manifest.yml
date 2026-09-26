@@ -437,6 +437,16 @@
       - onConfirm
       - size
       - title
+- name: ControlWithError
+  props:
+      - children
+      - className
+      - customValidity
+      - getValidityTarget
+      - markWhenOptional
+      - render
+      - required
+      - style
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
@@ -1829,6 +1839,43 @@
       - step
       - unit
       - units
+      - value
+- name: ValidatedInputControl
+  props:
+      - className
+      - customValidity
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - hideLabelFromVision
+      - label
+      - markWhenOptional
+      - onValueChange
+      - prefix
+      - render
+      - required
+      - size
+      - style
+      - suffix
+      - type
+      - value
+- name: ValidatedTextareaControl
+  props:
+      - className
+      - customValidity
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - hideLabelFromVision
+      - label
+      - markWhenOptional
+      - onValueChange
+      - render
+      - required
+      - rows
+      - style
       - value
 - name: ValidityIndicator
   props:

@@ -7,6 +7,7 @@ import { InputLayout } from '../../../primitives/input-layout';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedInputControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/With Validation/ValidatedInputControl',
 	id: 'design-system-components-form-with-validation-validatedinputcontrol',
 	component: ValidatedInputControl,
@@ -22,9 +23,8 @@ const meta: Meta< typeof ValidatedInputControl > = {
 	decorators: [ formDecorator ],
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'APIs and behavior are still prone to change.',
 		},
 	},
 };
