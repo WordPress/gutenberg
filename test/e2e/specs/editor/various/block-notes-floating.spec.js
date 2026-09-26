@@ -236,6 +236,52 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expectAligned( thread, noted );
 	} );
 
+	test.describe( 'Block move animation', () => {
+		// Moved blocks animate from their old position with a transform.
+		test.use( { reducedMotion: 'no-preference' } );
+
+		test( 'reorders threads when noted blocks swap', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Alpha' },
+				comment: 'Alpha note',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Bravo' },
+				comment: 'Bravo note',
+			} );
+
+			const alphaThread = getThread( page, 'Alpha note' );
+			const bravoThread = getThread( page, 'Bravo note' );
+			const alpha = getParagraph( editor, 'Alpha' );
+			const bravo = getParagraph( editor, 'Bravo' );
+			await expect( alphaThread ).toHaveClass( /is-floating/ );
+			await expect( bravoThread ).toHaveClass( /is-floating/ );
+			await editor.selectBlocks( bravo );
+
+			// The top thread aligns with its block; the other stacks below.
+			await editor.clickBlockToolbarButton( 'Move up' );
+			await expectStacked( bravo, alpha );
+			await expectAligned( bravoThread, bravo );
+			await expectStacked( bravoThread, alphaThread );
+
+			await editor.clickBlockToolbarButton( 'Move down' );
+			await expectStacked( alpha, bravo );
+			await expectAligned( alphaThread, alpha );
+			await expectStacked( alphaThread, bravoThread );
+
+			await editor.clickBlockToolbarButton( 'Move up' );
+			await expectStacked( bravo, alpha );
+			await expectAligned( bravoThread, bravo );
+			await expectStacked( bravoThread, alphaThread );
+		} );
+	} );
+
 	test( 'follows its block when content above grows', async ( {
 		editor,
 		page,
@@ -269,6 +315,147 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await expect
 			.poll( async () => ( await noted.boundingBox() ).y )
 			.toBeGreaterThan( initialTop + 50 );
+		await expectAligned( thread, noted );
+	} );
+
+	test( 'follows its block when the title grows', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Title note',
+		} );
+
+		const thread = getThread( page, 'Title note' );
+		const noted = getParagraph( editor, 'Noted' );
+		const title = editor.canvas.getByRole( 'textbox', {
+			name: 'Add title',
+		} );
+		// Focus the title first: deselecting the block collapses the thread,
+		// which re-measures on its own.
+		await title.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// The title sits outside the block list, so the list moves without
+		// resizing. A few lines, so the block stays in the viewport.
+		await title.fill( 'Lorem ipsum dolor sit amet, consectetur' );
+
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 50 );
+		await expectAligned( thread, noted );
+	} );
+
+	test( 'anchors to a closed Details block', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Summary' },
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Inside' } },
+			],
+		} );
+		const details = editor.canvas.getByRole( 'document', {
+			name: 'Block: Details',
+		} );
+		// Collapsed content isn't exposed by role, so select it by type.
+		await editor.selectBlocks(
+			details.locator( '[data-type="core/paragraph"]' )
+		);
+		await blockNoteUtils.addNote( 'Collapsed note' );
+
+		const thread = getThread( page, 'Collapsed note' );
+		const inside = getParagraph( editor, 'Inside' );
+		await expectAligned( thread, inside );
+
+		// The hidden block still reports a box below the summary, so aligning
+		// to it would fail.
+		const summary = details.getByText( 'Summary' );
+		await summary.click();
+		await expect( details ).not.toHaveAttribute( 'open' );
+		await expectAligned( thread, details );
+
+		await summary.click();
+		await expect( details ).toHaveAttribute( 'open' );
+		await expectAligned( thread, inside );
+	} );
+
+	test( 'follows its block when an editor notice shifts the canvas', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Notice note',
+		} );
+
+		const thread = getThread( page, 'Notice note' );
+		const noted = getParagraph( editor, 'Noted' );
+		const notice = page
+			.getByRole( 'region', { name: 'Editor content' } )
+			.getByText( 'Test notice', { exact: true } );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// Moves the canvas without resizing anything inside it.
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/notices' )
+				.createNotice( 'warning', 'Test notice', {
+					id: 'floating-notes-notice',
+				} )
+		);
+
+		await expect( notice ).toBeVisible();
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 20 );
+		await expectAligned( thread, noted );
+
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/notices' )
+				.removeNotice( 'floating-notes-notice' )
+		);
+
+		await expect( notice ).toBeHidden();
+		await expectAligned( thread, noted );
+	} );
+
+	test( 'follows its block in the tablet preview', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Preview note',
+		} );
+
+		const thread = getThread( page, 'Preview note' );
+		const noted = getParagraph( editor, 'Noted' );
+		await expectAligned( thread, noted );
+		const { y: initialTop } = await noted.boundingBox();
+
+		// The device preview insets the canvas frame.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).setDeviceType( 'Tablet' )
+		);
+
+		await expect
+			.poll( async () => ( await noted.boundingBox() ).y )
+			.toBeGreaterThan( initialTop + 20 );
 		await expectAligned( thread, noted );
 	} );
 

@@ -49,10 +49,16 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
-		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
-		// so each thread tracks the canvas scroll.
-		transform: translateY(var(--canvas-scroll, 0));
+		// Inherits `--canvas-offset` and `--canvas-scroll` from the panel (set
+		// by `useFloatingBoard`) so each thread tracks the canvas frame and its
+		// scroll.
+		transform: translateY(calc(var(--canvas-offset, 0px) + var(--canvas-scroll, 0px)));
 		will-change: transform;
+		// Ease reflows, e.g. on selection change. The first positioning starts
+		// from `top: auto`, which doesn't animate.
+		@media (prefers-reduced-motion: no-preference) {
+			transition: top 0.2s ease-out;
+		}
 		// Keep the reply input reachable when a thread is taller than the viewport
 		// (e.g. many replies on short content where the canvas can't scroll).
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
