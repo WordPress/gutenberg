@@ -71,6 +71,30 @@ describe( 'Navigation layout custom properties', () => {
 	} );
 
 	describe( 'responsive styles', () => {
+		it.each( [ 'space-around', 'space-evenly' ] )(
+			'supports %s justification',
+			( justifyContent ) => {
+				renderHook( () =>
+					useLayoutCustomProperties( {
+						clientId: 'test',
+						style: {
+							'@mobile': {
+								layout: { justifyContent },
+							},
+						},
+					} )
+				);
+
+				const { css } = useStyleOverride.mock.calls.at( -1 )[ 0 ];
+				expect( css ).toContain(
+					`--navigation-layout-justification-setting: ${ justifyContent };`
+				);
+				expect( css ).toContain(
+					`--navigation-layout-justify: ${ justifyContent };`
+				);
+			}
+		);
+
 		it( 'merges viewport overrides with the base layout', () => {
 			renderHook( () =>
 				useLayoutCustomProperties( {

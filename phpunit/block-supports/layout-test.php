@@ -373,6 +373,28 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;justify-content:flex-start;align-items:flex-end;}',
 			),
+			'horizontal flex layout with space-around justification' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'flex',
+						'orientation'    => 'horizontal',
+						'justifyContent' => 'space-around',
+					),
+				),
+				'expected_output' => '.wp-layout{justify-content:space-around;}',
+			),
+			'horizontal flex layout with space-evenly justification' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'flex',
+						'orientation'    => 'horizontal',
+						'justifyContent' => 'space-evenly',
+					),
+				),
+				'expected_output' => '.wp-layout{justify-content:space-evenly;}',
+			),
 			'flex layout with properties and block gap'    => array(
 				'args'            => array(
 					'selector'              => '.wp-layout',

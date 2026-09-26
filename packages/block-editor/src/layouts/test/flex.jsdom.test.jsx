@@ -87,9 +87,29 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
+	it( 'should describe each justification option', async () => {
+		const user = userEvent.setup();
+		renderInspectorControls();
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Left' } )
+		);
+
+		for ( const description of [
+			'Space after the items.',
+			'Space on both sides.',
+			'Space before the items.',
+			'No space at the edges.',
+			'Half space at the edges.',
+			'Equal space at the edges.',
+		] ) {
+			expect( await screen.findByText( description ) ).toBeVisible();
+		}
+	} );
+
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
-		await screen.findByRole( 'radio', { name: 'Justify items left' } );
+		await screen.findByRole( 'button', { name: 'Left' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {

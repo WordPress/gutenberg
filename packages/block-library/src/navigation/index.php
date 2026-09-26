@@ -54,6 +54,8 @@ function block_core_navigation_get_layout_custom_property_declarations( $layout 
 		'center'        => 'center',
 		'right'         => 'flex-end',
 		'space-between' => 'space-between',
+		'space-around'  => 'space-around',
+		'space-evenly'  => 'space-evenly',
 	);
 	$justify_content      = is_array( $layout ) ? ( $layout['justifyContent'] ?? 'left' ) : 'left';
 	if ( ! is_string( $justify_content ) || ! isset( $justification_values[ $justify_content ] ) ) {
@@ -619,6 +621,8 @@ class WP_Navigation_Block_Renderer {
 			'right'         => 'items-justified-right',
 			'center'        => 'items-justified-center',
 			'space-between' => 'items-justified-space-between',
+			'space-around'  => 'items-justified-space-around',
+			'space-evenly'  => 'items-justified-space-evenly',
 		);
 
 		$layout_class        = '';

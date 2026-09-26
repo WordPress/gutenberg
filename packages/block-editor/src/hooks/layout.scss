@@ -16,6 +16,18 @@
 .layout-block-support-panel {
 	.block-editor-hooks__flex-layout-controls {
 		grid-column: 1 / -1;
+
+		> * {
+			min-width: 0;
+		}
+
+		.block-editor-hooks__flex-layout-justification-item {
+			flex: 1;
+		}
+
+		.block-editor-hooks__flex-layout-orientation-item {
+			flex: none;
+		}
 	}
 }
 
@@ -24,6 +36,23 @@
 	margin-bottom: $grid-unit-15;
 	legend {
 		margin-bottom: $grid-unit-10;
+	}
+}
+
+.block-editor-hooks__flex-layout-justification-controls {
+	display: grid;
+	gap: $grid-unit-10;
+
+	.block-editor-hooks__flex-layout-justification-trigger {
+		width: 100%;
+	}
+
+	.block-editor-hooks__flex-layout-justification-label {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-align: start;
+		text-overflow: ellipsis;
 	}
 }
 

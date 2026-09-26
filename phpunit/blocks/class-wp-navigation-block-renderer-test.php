@@ -9,6 +9,43 @@
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 	/**
+	 * Test that distributed justification values receive layout classes.
+	 *
+	 * @dataProvider data_distributed_justification_values
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_layout_class
+	 *
+	 * @param string $justification Justification value.
+	 */
+	public function test_get_layout_class_with_distributed_justification( $justification ) {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_layout_class' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$this->assertSame(
+			'items-justified-' . $justification,
+			$method->invoke(
+				$reflection,
+				array( 'layout' => array( 'justifyContent' => $justification ) )
+			)
+		);
+	}
+
+	/**
+	 * Data provider for distributed Navigation justification values.
+	 *
+	 * @return array
+	 */
+	public function data_distributed_justification_values() {
+		return array(
+			'space around' => array( 'space-around' ),
+			'space evenly' => array( 'space-evenly' ),
+		);
+	}
+
+	/**
 	 * Test that navigation links are wrapped in list items to preserve accessible markup
 	 *
 	 * @group navigation-renderer

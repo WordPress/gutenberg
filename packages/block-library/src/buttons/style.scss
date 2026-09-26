@@ -46,6 +46,14 @@ $blocks-block__margin: 0.5em;
 		justify-content: space-between;
 	}
 
+	&.is-content-justification-space-around {
+		justify-content: space-around;
+	}
+
+	&.is-content-justification-space-evenly {
+		justify-content: space-evenly;
+	}
+
 	// Kept for backward compatibility.
 	&.aligncenter {
 		text-align: center;
@@ -60,6 +68,8 @@ $blocks-block__margin: 0.5em;
 	/* stylelint-disable @stylistic/indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
 	&:not(
 		.is-content-justification-space-between,
+		.is-content-justification-space-around,
+		.is-content-justification-space-evenly,
 		.is-content-justification-right,
 		.is-content-justification-left,
 		.is-content-justification-center
