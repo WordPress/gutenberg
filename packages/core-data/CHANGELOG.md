@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+
 ## 8.1.0 (2026-09-23)
 
 ### Bug Fixes
