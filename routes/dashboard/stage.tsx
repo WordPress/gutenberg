@@ -3,7 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
+import { InlineNotices, store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 import {
 	WidgetDashboard,
@@ -14,7 +14,11 @@ import {
 	type WidgetModuleRecord,
 } from '@wordpress/widget-primitives';
 import { registerDashboardFieldTypes } from './field-types';
-import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+import {
+	useDashboardGridSettings,
+	useDashboardLayout,
+	useDashboardUnseenWidgets,
+} from './hooks';
 import { DashboardWidgetHostProvider } from './widget-host';
 
 registerDashboardFieldTypes();
@@ -29,11 +33,19 @@ function Dashboard() {
 	const widgetsModules = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
-				WidgetModuleRecord[] | null,
+				| WidgetModuleRecord[]
+				| null,
 		[]
 	);
 
 	const [ widgetTypes, isResolving ] = useWidgetTypes( widgetsModules );
+
+	useDashboardUnseenWidgets( {
+		widgetTypes,
+		isResolvingWidgetTypes: isResolving,
+		layout,
+		onLayoutChange: setLayout,
+	} );
 
 	const [ editMode, setEditMode ] = useState( false );
 
@@ -79,6 +91,7 @@ function Dashboard() {
 					actions={ <WidgetDashboard.Actions /> }
 					hasPadding
 				>
+					<InlineNotices />
 					<WidgetDashboard.NoWidgetsState />
 					<WidgetDashboard.Widgets />
 				</Page>

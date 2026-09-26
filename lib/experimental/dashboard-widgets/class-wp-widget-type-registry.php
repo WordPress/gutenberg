@@ -95,6 +95,10 @@ if ( ! class_exists( 'WP_Widget_Type_Registry' ) ) {
 				$widget_type = new WP_Widget_Type( $name, $args );
 			}
 
+			if ( empty( $widget_type->provenance ) ) {
+				$widget_type->provenance = $this->resolve_provenance( $name );
+			}
+
 			$this->registered_widget_types[ $name ] = $widget_type;
 
 			return $widget_type;
@@ -163,6 +167,55 @@ if ( ! class_exists( 'WP_Widget_Type_Registry' ) ) {
 		 */
 		public function is_registered( $name ) {
 			return isset( $this->registered_widget_types[ $name ] );
+		}
+
+		/**
+		 * Resolves the provenance of a widget type when not explicitly supplied.
+		 *
+		 * @param string $name Widget type name including namespace.
+		 * @return string Provenance string (plugin name, slug, or 'core').
+		 */
+		private function resolve_provenance( $name ) {
+			list( $namespace ) = explode( '/', $name, 2 );
+			if ( 'core' === $namespace ) {
+				return 'core';
+			}
+
+			$trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
+			foreach ( $trace as $frame ) {
+				if ( empty( $frame['file'] ) ) {
+					continue;
+				}
+				$file = wp_normalize_path( $frame['file'] );
+				if ( wp_normalize_path( __FILE__ ) === $file || str_ends_with( $file, '/widget-types.php' ) ) {
+					continue;
+				}
+				if ( defined( 'WP_PLUGIN_DIR' ) && str_starts_with( $file, wp_normalize_path( WP_PLUGIN_DIR ) ) ) {
+					$plugin_file = plugin_basename( $file );
+					$parts       = explode( '/', $plugin_file );
+					$plugin_slug = $parts[0];
+
+					if ( 'gutenberg' === $plugin_slug ) {
+						continue;
+					}
+
+					if ( function_exists( 'wp_get_active_and_valid_plugins' ) && function_exists( 'get_plugin_data' ) ) {
+						foreach ( wp_get_active_and_valid_plugins() as $active_plugin ) {
+							$active_basename = plugin_basename( $active_plugin );
+							if ( str_starts_with( $active_basename, $plugin_slug . '/' ) || $active_basename === $plugin_slug ) {
+								$data = get_plugin_data( $active_plugin, false, false );
+								if ( ! empty( $data['Name'] ) ) {
+									return $data['Name'];
+								}
+							}
+						}
+					}
+
+					return $plugin_slug;
+				}
+			}
+
+			return $namespace;
 		}
 
 		/**

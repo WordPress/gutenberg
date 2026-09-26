@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `createDashboardWidget` utility to create widget instances from a widget type with default placement and attributes ([#83517](https://github.com/WordPress/gutenberg/pull/83517)).
+
 ### Bug Fixes
 
 -   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).

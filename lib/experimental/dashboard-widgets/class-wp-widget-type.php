@@ -30,6 +30,13 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		const PRESENTATION_VALUES = array( 'framed', 'content-bleed', 'full-bleed' );
 
 		/**
+		 * Allowed values for the `presence` field. Treated as the
+		 * single source of truth across the registry, REST schema, and
+		 * any consumer that needs to validate or enumerate the set.
+		 */
+		const PRESENCE_VALUES = array( 'offer', 'auto' );
+
+		/**
 		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
 		 *
 		 * @var string
@@ -66,6 +73,25 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var string|null
 		 */
 		public $presentation = null;
+
+		/**
+		 * How the widget wants to appear when first discovered on a
+		 * user's dashboard.
+		 *
+		 * One of {@see self::PRESENCE_VALUES} (first entry is the
+		 * default).
+		 *
+		 * @var string
+		 */
+		public $presence = 'offer';
+
+		/**
+		 * Provenance of the widget type: name or identifier of the plugin or
+		 * source that registered it.
+		 *
+		 * @var string|null
+		 */
+		public $provenance = null;
 
 		/**
 		 * Widget types are grouped into categories to help users browse and
@@ -189,6 +215,10 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 
 			foreach ( $args as $property_name => $property_value ) {
 				$this->$property_name = $property_value;
+			}
+
+			if ( ! in_array( $this->presence, self::PRESENCE_VALUES, true ) ) {
+				$this->presence = 'offer';
 			}
 		}
 	}

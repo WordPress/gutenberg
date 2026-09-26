@@ -396,4 +396,28 @@ describe( 'useWidgetTypes', () => {
 		} );
 		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBeUndefined();
 	} );
+
+	it( 'passes presence and provenance from record', async () => {
+		const presenceRecords: WidgetModuleRecord[] = [
+			{
+				name: 'test/custom',
+				widget_module: null,
+				render_module: 'test/render',
+				presence: 'auto',
+				provenance: 'My Plugin',
+			},
+		];
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( presenceRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).toMatchObject( {
+			name: 'test/custom',
+			presence: 'auto',
+			provenance: 'My Plugin',
+		} );
+	} );
 } );
