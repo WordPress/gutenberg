@@ -216,8 +216,11 @@ html
 
 /**
  * Provide baseline responsiveness for images.
+ * The second rule covers images pasted into block RichText fields that may
+ * lack the wp-image- class (e.g. images copy/pasted into table cells).
  */
-html :where(img[class*="wp-image-"]) {
+html :where(img[class*="wp-image-"]),
+html :where([class*="wp-block-"] img) {
 	height: auto;
 	max-width: 100%;
 }
