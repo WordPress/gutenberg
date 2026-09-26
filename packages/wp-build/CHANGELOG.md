@@ -10,6 +10,10 @@
 -   Build `.cjs`, `.mts` and `.cts` source files, including route and widget entry points, and rewrite their local imports to the emitted `.mjs` or `.cjs` extension ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 -   Import route stage, inspector and canvas files by their full file name, so a route entry no longer depends on esbuild extending an extensionless path ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
 
+### Bug Fixes
+
+-   Widgets: regenerate `build/widgets/registry.php` after an incremental widget rebuild, so `widget.json` metadata changes reach PHP in watch mode instead of silently requiring a full build ([#82535](https://github.com/WordPress/gutenberg/pull/82535)).
+
 ### Internal
 
 -   Declare `@wordpress/theme` as a dev dependency, so the types of the optional peer dependency resolve when dependencies are isolated ([#83129](https://github.com/WordPress/gutenberg/pull/83129)).
