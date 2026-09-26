@@ -104,6 +104,7 @@ class WP_Navigation_Block_Renderer {
 		'core/site-title',
 		'core/site-logo',
 		'core/social-links',
+		'core/page-list',
 	);
 
 	/**
