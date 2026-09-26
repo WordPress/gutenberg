@@ -17,6 +17,7 @@
 		.input {
 			--_gcd-input-padding: var(--wpds-dimension-padding-md);
 			--_gcd-input-min-height: var(--wpds-dimension-size-lg);
+			--_gcd-input-font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
 
 			border: none;
 			outline: none;
@@ -26,6 +27,10 @@
 			font-size: inherit;
 			line-height: inherit;
 			background-color: transparent;
+
+			@media (min-width: 600px) {
+				--_gcd-input-font-size: inherit;
+			}
 
 			&:disabled,
 			&[aria-disabled="true"] {
