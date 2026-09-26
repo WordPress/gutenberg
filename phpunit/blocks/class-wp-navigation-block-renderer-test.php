@@ -195,6 +195,90 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the list element does not repeat the block wrapper's anchor id.
+	 *
+	 * The list reuses the block wrapper attributes so that Core's layout styles
+	 * keep applying, but the `anchor` support's id belongs to the outer `<nav>`
+	 * alone. Repeating it would produce duplicate ids, which are invalid HTML.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_list_open_tag
+	 */
+	public function test_gutenberg_get_list_open_tag_removes_the_anchor_id() {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_list_open_tag' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$actual = $method->invoke(
+			$reflection,
+			'class="wp-block-navigation__container wp-block-navigation" id="header-navigation"'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $actual );
+		$processor->next_tag( 'UL' );
+
+		$this->assertNull(
+			$processor->get_attribute( 'id' ),
+			'The list element should not carry the block wrapper\'s anchor id.'
+		);
+	}
+
+	/**
+	 * Test that stripping the anchor id leaves the other wrapper attributes intact.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_list_open_tag
+	 */
+	public function test_gutenberg_get_list_open_tag_preserves_other_attributes() {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_list_open_tag' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$actual = $method->invoke(
+			$reflection,
+			'class="wp-block-navigation__container wp-block-navigation" style="color:red" id="header-navigation"'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $actual );
+		$processor->next_tag( 'UL' );
+
+		$this->assertTrue(
+			$processor->has_class( 'wp-block-navigation__container' ),
+			'The container class should be preserved.'
+		);
+		$this->assertSame(
+			'color:red',
+			$processor->get_attribute( 'style' ),
+			'Inline styles should be preserved.'
+		);
+	}
+
+	/**
+	 * Test that a list element without an anchor id is left unchanged.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_list_open_tag
+	 */
+	public function test_gutenberg_get_list_open_tag_without_an_anchor_is_unchanged() {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
+		$method     = $reflection->getMethod( 'get_list_open_tag' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$actual = $method->invoke( $reflection, 'class="wp-block-navigation__container"' );
+
+		$this->assertSame( '<ul class="wp-block-navigation__container">', $actual );
+	}
+
+	/**
 	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type finds a block at the top level.
 	 *
 	 * @group navigation-renderer
