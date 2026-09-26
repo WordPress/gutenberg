@@ -184,17 +184,20 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons) or editables outside the block (e.g.
-						// the post title). The rich text instance owning the
-						// selection syncs it to the store itself.
+						// across browsers). Any focused element containing the
+						// caret hands over, including an ancestor block wrapper
+						// (Firefox focuses the nearest focusable ancestor on a
+						// click in the inert field). UI elements (e.g. buttons)
+						// and editables outside the block (e.g. the post title)
+						// do not contain the caret and keep focus. The rich
+						// text instance owning the selection syncs it to the
+						// store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							getBlockClientId( activeElement ) ===
-								collapsedClientId
+							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
 						} else if (
@@ -211,33 +214,6 @@ export default function useSelectionObserver() {
 							node.focus( { preventScroll: true } );
 						}
 
-						// The host holds focus, so the field gets no focus event
-						// and does not sync the click's caret to the store.
-						// Without the field identity in the store the rich
-						// text handlers never attach: sync it here.
-						if ( ! getSelectionStart().attributeKey ) {
-							const richTextElement =
-								getRichTextElement( startNode );
-							const attributeKey =
-								richTextElement?.dataset.wpBlockAttributeKey;
-
-							if ( attributeKey ) {
-								const richTextData = create( {
-									element: richTextElement,
-									range: selection.getRangeAt( 0 ),
-									__unstableIsEditableTree: true,
-								} );
-								const position = {
-									clientId: collapsedClientId,
-									attributeKey,
-									offset: richTextData.start ?? 0,
-								};
-								selectionChange( {
-									start: position,
-									end: position,
-								} );
-							}
-						}
 						return;
 					}
 
