@@ -13,6 +13,11 @@
 
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+
 ### Bug Fixes
 
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
