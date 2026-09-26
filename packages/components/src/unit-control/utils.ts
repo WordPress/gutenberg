@@ -200,6 +200,18 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
 		step: 0.1,
 	},
+	lh: {
+		value: 'lh',
+		label: isWeb ? 'lh' : __( 'Line height (lh)' ),
+		a11yLabel: __( 'Line height (lh)' ),
+		step: 0.01,
+	},
+	rlh: {
+		value: 'rlh',
+		label: isWeb ? 'rlh' : __( 'Root line height (rlh)' ),
+		a11yLabel: __( 'Root line height (rlh)' ),
+		step: 0.01,
+	},
 };
 
 /**
