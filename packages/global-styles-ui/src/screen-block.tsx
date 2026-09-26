@@ -81,6 +81,7 @@ const {
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
+	FontVariationsPanel: StylesFontVariationsPanel,
 	DimensionsPanel: StylesDimensionsPanel,
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
@@ -158,6 +159,24 @@ function ScreenBlock( {
 	);
 	const inheritedStyleWithResolvedBackground =
 		useStyleWithResolvedBackground( inheritedStyle );
+	// Font family is inherited from the root when the block sets none.
+	const [ rootFontFamily ] = useStyle(
+		'typography.fontFamily',
+		'',
+		'merged',
+		false
+	);
+	const fontVariationsInheritedStyle = useMemo(
+		() => ( {
+			...inheritedStyle,
+			typography: {
+				...inheritedStyle?.typography,
+				fontFamily:
+					inheritedStyle?.typography?.fontFamily ?? rootFontFamily,
+			},
+		} ),
+		[ inheritedStyle, rootFontFamily ]
+	);
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -402,6 +421,14 @@ function ScreenBlock( {
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
 					showInheritanceLabelIndicators={ false }
+				/>
+			) }
+			{ ! hasSelectedState && (
+				<StylesFontVariationsPanel
+					inheritedValue={ fontVariationsInheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
 				/>
 			) }
 			{ hasBackgroundPanel && (

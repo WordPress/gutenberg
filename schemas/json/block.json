@@ -680,6 +680,11 @@
 							"description": "This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for textShadow, its attributes definition is extended to include the style attribute.",
 							"type": "boolean",
 							"default": false
+						},
+						"fontVariationSettings": {
+							"description": "This value signals that a block supports the font-variation-settings CSS style property. When it does, the block editor shows controls for the variable font axes the theme exposes in `settings.typography.fontVariations`.\n\nWhen the block declares support for fontVariationSettings, its attributes definition is extended to include the style attribute.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},

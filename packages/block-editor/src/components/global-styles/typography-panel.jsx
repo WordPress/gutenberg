@@ -327,6 +327,16 @@ export default function TypographyPanel( {
 			hasValue( nextFontFamily ) ? nextFontFamily : undefined
 		);
 
+		// Axis values are chosen for one family's axes and ranges, and the
+		// style engine can't check them against another family's.
+		if ( newValue !== fontFamily ) {
+			updatedValue = setImmutably(
+				updatedValue,
+				[ 'typography', 'fontVariationSettings' ],
+				undefined
+			);
+		}
+
 		// Check if current font style/weight are available in the new font family.
 		const newFontFamilyFaces =
 			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
@@ -801,15 +811,20 @@ export default function TypographyPanel( {
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
+			// Axis values belong to the Font variations panel.
+			const typography = {
+				fontVariationSettings:
+					previousValue?.typography?.fontVariationSettings,
+			};
 			if ( ! hasTextColorEnabled ) {
 				return {
 					...previousValue,
-					typography: {},
+					typography,
 				};
 			}
 			return {
 				...previousValue,
-				typography: {},
+				typography,
 				color: {
 					...previousValue?.color,
 					text: undefined,

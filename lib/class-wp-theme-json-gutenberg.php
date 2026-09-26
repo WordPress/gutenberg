@@ -292,6 +292,7 @@ class WP_Theme_JSON_Gutenberg {
 		'font-size'                         => array( 'typography', 'fontSize' ),
 		'font-style'                        => array( 'typography', 'fontStyle' ),
 		'font-weight'                       => array( 'typography', 'fontWeight' ),
+		'font-variation-settings'           => array( 'typography', 'fontVariationSettings' ),
 		'letter-spacing'                    => array( 'typography', 'letterSpacing' ),
 		'line-height'                       => array( 'typography', 'lineHeight' ),
 		'margin'                            => array( 'spacing', 'margin' ),
@@ -489,6 +490,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontFamilies'             => null,
 			'fontSizes'                => null,
 			'fontStyle'                => null,
+			'fontVariations'           => null,
 			'fontWeight'               => null,
 			'letterSpacing'            => null,
 			'lineHeight'               => null,
@@ -516,6 +518,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontFace'   => array(
 				array(
 					'ascentOverride'        => null,
+					'axes'                  => null,
 					'descentOverride'       => null,
 					'fontDisplay'           => null,
 					'fontFamily'            => null,
@@ -597,19 +600,20 @@ class WP_Theme_JSON_Gutenberg {
 			'blockGap' => null,
 		),
 		'typography' => array(
-			'fontFamily'     => null,
-			'fontSize'       => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textAlign'      => null,
-			'textColumns'    => null,
-			'textDecoration' => null,
-			'textIndent'     => null,
-			'textShadow'     => null,
-			'textTransform'  => null,
-			'writingMode'    => null,
+			'fontFamily'            => null,
+			'fontSize'              => null,
+			'fontStyle'             => null,
+			'fontVariationSettings' => null,
+			'fontWeight'            => null,
+			'letterSpacing'         => null,
+			'lineHeight'            => null,
+			'textAlign'             => null,
+			'textColumns'           => null,
+			'textDecoration'        => null,
+			'textIndent'            => null,
+			'textShadow'            => null,
+			'textTransform'         => null,
+			'writingMode'           => null,
 		),
 		'css'        => null,
 	);
@@ -3153,6 +3157,17 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			/*
+			 * Variation settings are stored as an object keyed by axis tag;
+			 * the style engine serializes the axes it accepts.
+			 */
+			if ( 'font-variation-settings' === $css_property && is_array( $value ) ) {
+				$variation_styles = gutenberg_style_engine_get_styles(
+					array( 'typography' => array( 'fontVariationSettings' => $value ) )
+				);
+				$value            = $variation_styles['declarations'][ $css_property ] ?? null;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
@@ -5131,7 +5146,22 @@ class WP_Theme_JSON_Gutenberg {
 				// Check the value isn't an array before adding so as to not
 				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
-				if ( ! is_array( $value ) ) {
+				if ( 'font-variation-settings' === $declaration['name'] && is_array( $value ) ) {
+					// The value is an object keyed by axis tag. Keep only the
+					// entries the style engine serializes.
+					$value = array_filter(
+						$value,
+						static function ( $axis_value, $tag ) {
+							return is_string( $tag ) &&
+								preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) &&
+								! in_array( $tag, array( 'wght', 'wdth', 'slnt', 'ital' ), true ) &&
+								( is_int( $axis_value ) || is_float( $axis_value ) ) &&
+								is_finite( $axis_value );
+						},
+						ARRAY_FILTER_USE_BOTH
+					);
+					_wp_array_set( $output, $path, $value );
+				} elseif ( ! is_array( $value ) ) {
 					_wp_array_set( $output, $path, $value );
 				}
 			}

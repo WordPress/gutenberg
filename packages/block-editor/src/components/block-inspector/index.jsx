@@ -55,6 +55,10 @@ function StyleInspectorSlots( {
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot
+				group="fontVariations"
+				label={ __( 'Font variations' ) }
+			/>
+			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
@@ -117,6 +121,10 @@ function StyleStateInspectorSlots( {
 					<InspectorControls.Slot
 						group="typography"
 						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						group="fontVariations"
+						label={ __( 'Font variations' ) }
 					/>
 					<InspectorControls.Slot
 						group="color"

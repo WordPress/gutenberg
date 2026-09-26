@@ -199,6 +199,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalFontStyle' ],
 		useEngine: true,
 	},
+	fontVariationSettings: {
+		value: [ 'typography', 'fontVariationSettings' ],
+		support: [ 'typography', 'fontVariationSettings' ],
+		useEngine: true,
+	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],

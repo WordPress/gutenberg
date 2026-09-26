@@ -18,6 +18,9 @@ const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
+const InspectorControlsFontVariations = createSlotFill(
+	'InspectorControlsFontVariations'
+);
 const InspectorControlsViewport = createSlotFill( 'InspectorControlsViewport' );
 const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
 const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
@@ -36,6 +39,7 @@ const groups = {
 	effects: InspectorControlsEffects,
 	elements: InspectorControlsElements,
 	filter: InspectorControlsFilter,
+	fontVariations: InspectorControlsFontVariations,
 	layout: InspectorControlsLayout,
 	list: InspectorControlsListView,
 	position: InspectorControlsPosition,

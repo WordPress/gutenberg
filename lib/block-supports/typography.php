@@ -20,23 +20,25 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
-	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
-	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
-	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
-	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
-	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
-	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
-	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
-	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
-	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_font_family_support             = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_size_support               = $typography_supports['fontSize'] ?? false;
+	$has_font_style_support              = $typography_supports['__experimentalFontStyle'] ?? false;
+	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
+	$has_font_weight_support             = $typography_supports['__experimentalFontWeight'] ?? false;
+	$has_letter_spacing_support          = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_line_height_support             = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support              = $typography_supports['textAlign'] ?? false;
+	$has_text_columns_support            = $typography_supports['textColumns'] ?? false;
+	$has_text_decoration_support         = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_transform_support          = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_text_indent_support             = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support             = $typography_supports['textShadow'] ?? false;
+	$has_writing_mode_support            = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
 		|| $has_font_style_support
+		|| $has_font_variation_settings_support
 		|| $has_font_weight_support
 		|| $has_letter_spacing_support
 		|| $has_line_height_support
@@ -101,34 +103,36 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
-	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
-	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
-	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
-	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
-	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
-	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
-	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
-	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
-	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_font_family_support             = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_size_support               = $typography_supports['fontSize'] ?? false;
+	$has_font_style_support              = $typography_supports['__experimentalFontStyle'] ?? false;
+	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
+	$has_font_weight_support             = $typography_supports['__experimentalFontWeight'] ?? false;
+	$has_letter_spacing_support          = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_line_height_support             = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support              = $typography_supports['textAlign'] ?? false;
+	$has_text_columns_support            = $typography_supports['textColumns'] ?? false;
+	$has_text_decoration_support         = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_transform_support          = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_text_indent_support             = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support             = $typography_supports['textShadow'] ?? false;
+	$has_writing_mode_support            = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
-	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
-	$should_skip_font_family     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' );
-	$should_skip_font_style      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
-	$should_skip_font_weight     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
-	$should_skip_line_height     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
-	$should_skip_text_align      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
-	$should_skip_text_columns    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
-	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
-	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
-	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
-	$should_skip_text_indent     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
-	$should_skip_text_shadow     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textShadow' );
-	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
+	$should_skip_font_size               = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
+	$should_skip_font_family             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' );
+	$should_skip_font_style              = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
+	$should_skip_font_variation_settings = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontVariationSettings' );
+	$should_skip_font_weight             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
+	$should_skip_line_height             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
+	$should_skip_text_align              = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
+	$should_skip_text_columns            = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
+	$should_skip_text_decoration         = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
+	$should_skip_text_transform          = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
+	$should_skip_letter_spacing          = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
+	$should_skip_text_indent             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
+	$should_skip_text_shadow             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textShadow' );
+	$should_skip_writing_mode            = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
@@ -190,6 +194,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_text_indent_support && ! $should_skip_text_indent && isset( $block_attributes['style']['typography']['textIndent'] ) ) {
 		$typography_block_styles['textIndent'] = $block_attributes['style']['typography']['textIndent'] ?? null;
+	}
+
+	if ( $has_font_variation_settings_support && ! $should_skip_font_variation_settings && isset( $block_attributes['style']['typography']['fontVariationSettings'] ) ) {
+		$typography_block_styles['fontVariationSettings'] = $block_attributes['style']['typography']['fontVariationSettings'];
 	}
 
 	if ( $has_text_shadow_support && ! $should_skip_text_shadow ) {
