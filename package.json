@@ -175,6 +175,7 @@
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
 		"test": "npm run lint && npm run test:unit",
+		"storybook:story-id-snapshot": "npm run --workspace @wordpress/storybook story-id-snapshot",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
 		"test:e2e": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:e2e:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",

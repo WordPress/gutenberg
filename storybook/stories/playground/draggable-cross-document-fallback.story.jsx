@@ -8,6 +8,7 @@ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 export default {
 	title: 'Playground/Debug fixtures/Draggable cross-document fallback',
+	id: 'playground-debug-fixtures-draggable-cross-document-fallback',
 	component: Draggable,
 	decorators: [ WithWpCompatOverlaySlot ],
 };

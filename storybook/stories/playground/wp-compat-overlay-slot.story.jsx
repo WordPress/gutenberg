@@ -77,6 +77,7 @@ function UiPopoverFixture() {
 // of scope.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+	id: 'playground-debug-fixtures-wp-compat-overlay-slot',
 	decorators: [ WithWpCompatOverlaySlot ],
 };
 

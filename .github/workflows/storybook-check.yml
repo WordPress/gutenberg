@@ -35,6 +35,20 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            # Every story URL is built from a declared ID. Regenerating the
+            # committed list of them fails when one is gone, so losing a
+            # published URL has to be deliberate. The story index is read from
+            # source, so this runs before the build rather than after it.
+            - name: Check no story URL disappeared
+              run: npm run storybook:story-id-snapshot
+
+            - name: Check story ID snapshot is up to date
+              run: |
+                  if ! git diff --exit-code -- storybook/story-ids.txt; then
+                      echo "::error::The Storybook story ID snapshot is out of date. Review the diff above to confirm the change is expected, then run 'npm run storybook:story-id-snapshot' locally and commit the updated storybook/story-ids.txt."
+                      exit 1
+                  fi
+
             - name: Build Storybook
               env:
                   NODE_OPTIONS: --max-old-space-size=8192
