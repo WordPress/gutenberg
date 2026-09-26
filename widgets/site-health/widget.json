@@ -9,7 +9,7 @@
 	"icon": "core/shield",
 	"category": "site",
 	"presentation": "framed",
-	"textdomain": "default",
+	"textdomain": "gutenberg",
 	"actions": [
 		{
 			"id": "site-health-details",
