@@ -195,7 +195,7 @@ export default function FontStyleControl( {
 						{ sprintf(
 							/* translators: 1: Saved slant angle. 2: Smallest angle the font supports. 3: Largest angle the font supports. */
 							__(
-								'%1$s° is outside this font’s slant range (%2$s°–%3$s°). It is kept until you choose another angle.'
+								'%1$s° is outside this font’s oblique range (%2$s°–%3$s°). The browser may synthesize the style rather than use the font’s own slant.'
 							),
 							String( angle ),
 							String( slantRange.min ),
