@@ -3,7 +3,9 @@ import { renderHook, waitFor } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import usePageAncestorPaths from '../use-page-ancestor-paths';
 
-vi.mock( '@wordpress/api-fetch', () => ( { default: vi.fn() } ) );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn() as unknown as typeof apiFetch,
+} ) );
 const fetchPages = vi.mocked( apiFetch );
 
 afterEach( () => fetchPages.mockReset() );
