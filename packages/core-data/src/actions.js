@@ -1,4 +1,3 @@
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -8,76 +7,11 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import {
-	CRDT_AUTOSAVE_SNAPSHOT_KEY,
-	LOCAL_EDITOR_ORIGIN,
-	LOCAL_UNDO_IGNORED_ORIGIN,
-	getSyncManager,
-} from './sync';
+import { getEntitySyncManager } from './entity-sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
-import {
-	getRawValue,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-} from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
-}
-
-// Post meta is applied to the CRDT one subkey at a time, so compare the save
-// response at the same granularity to avoid carrying stale sibling values.
-function getServerMutatedMetaFields( updatedMeta, persistedMeta, syncedMeta ) {
-	const baseline = { ...persistedMeta, ...syncedMeta };
-
-	return Object.fromEntries(
-		Object.entries( updatedMeta ?? {} ).filter( ( [ key, value ] ) => {
-			if ( key === POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ) {
-				// The persisted CRDT snapshot may change on save and is
-				// intentionally excluded from CRDT meta synchronization, so it
-				// is not a server mutation.
-				return false;
-			}
-
-			return ! fastDeepEqual( value, baseline[ key ] );
-		} )
-	);
-}
-
-function getServerMutatedFields(
-	updatedRecord,
-	persistedRecord,
-	syncedChanges
-) {
-	return Object.fromEntries(
-		Object.entries( updatedRecord ).flatMap( ( [ key, value ] ) => {
-			if ( key === 'meta' ) {
-				const serverMutatedMeta = getServerMutatedMetaFields(
-					value,
-					persistedRecord.meta,
-					syncedChanges.meta
-				);
-
-				return Object.keys( serverMutatedMeta ).length
-					? [ [ key, serverMutatedMeta ] ]
-					: [];
-			}
-
-			const baseline =
-				key in syncedChanges
-					? syncedChanges[ key ]
-					: persistedRecord[ key ];
-
-			// The save response nests raw attributes as `{ raw, rendered }`
-			// while the baseline holds raw strings; compare raw values so the
-			// shape difference does not read as a server mutation.
-			const wasServerMutated = ! fastDeepEqual(
-				getRawValue( value ) ?? value,
-				getRawValue( baseline ) ?? baseline
-			);
-
-			return wasServerMutated ? [ [ key, value ] ] : [];
-		} )
-	);
 }
 
 /**
@@ -383,12 +317,7 @@ export const deleteEntityRecord =
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
 
-				if ( entityConfig.syncConfig ) {
-					const objectType = `${ kind }/${ name }`;
-					const objectId = recordId;
-
-					getSyncManager()?.unload( objectType, objectId );
-				}
+				getEntitySyncManager()?.unload( kind, name, recordId );
 			} catch ( _error ) {
 				hasError = true;
 				error = _error;
@@ -464,41 +393,13 @@ export const editEntityRecord =
 			// so that the property is not considered dirty.
 			edits: clearUnchangedEdits( editsWithMerges, record ),
 		};
-		if ( entityConfig.syncConfig ) {
-			const objectType = `${ kind }/${ name }`;
-			const objectId = recordId;
-
-			// Determine whether this edit should create a new undo level.
-			//
-			// In Gutenberg, block changes flow through two callbacks:
-			// - `onInput`: For transient/in-progress changes (e.g., typing each
-			//   character). These use `isCached: true` and get merged into
-			//   the current undo item.
-			// - `onChange`: For persistent/completed changes (e.g., formatting
-			//   transforms, block insertions). These use `isCached: false` and
-			//   should create a new undo level.
-			//
-			// Additionally, `undoIgnore: true` means the change should not
-			// affect the undo history at all (e.g., selection-only changes).
-			const isNewUndoLevel = options.undoIgnore
-				? false
-				: ! options.isCached;
-
-			// Use an untracked origin for undoIgnore changes so the Yjs
-			// UndoManager does not capture them as undo levels, while
-			// still syncing them to the CRDT document and other peers.
-			const origin = options.undoIgnore
-				? LOCAL_UNDO_IGNORED_ORIGIN
-				: LOCAL_EDITOR_ORIGIN;
-
-			getSyncManager()?.update(
-				objectType,
-				objectId,
-				editsWithMerges,
-				origin,
-				{ isNewUndoLevel }
-			);
-		}
+		// Tell the entity sync manager about the edit before it arrives in the
+		// store. It receives merged edits and the edit's intent, and decides
+		// what to do with them.
+		getEntitySyncManager()?.update( kind, name, recordId, editsWithMerges, {
+			isCached: Boolean( options.isCached ),
+			undoIgnore: Boolean( options.undoIgnore ),
+		} );
 		if ( ! options.undoIgnore ) {
 			select.getUndoManager().addRecord(
 				[
@@ -636,7 +537,6 @@ export const saveEntityRecord =
 		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
-			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
 		} = options;
 
@@ -697,24 +597,20 @@ export const saveEntityRecord =
 					? select.getRawEntityRecord( kind, name, recordId )
 					: {};
 
-				// `saveEntityRecord` can be called directly, bypassing
-				// `editEntityRecord`, so make sure its changes enter the
-				// CRDT first. An autosave snapshots the document below, and
-				// a regular save creates the persisted document from it, so
-				// both must see these changes.
-				if (
-					entityConfig.syncConfig &&
-					! __unstableSkipSyncUpdate &&
-					! isNewRecord &&
-					persistedRecord
-				) {
-					getSyncManager()?.update(
-						`${ kind }/${ name }`,
-						recordId,
-						record,
-						LOCAL_UNDO_IGNORED_ORIGIN
-					);
-				}
+				// Let the entity sync manager see the edits about to be saved
+				// and add anything it needs to the request. For example,
+				// metadata about a shared document that should be saved with
+				// the post.
+				const syncManager = getEntitySyncManager();
+				const syncEdits = isNewRecord
+					? undefined
+					: await syncManager?.beforeSave?.(
+							kind,
+							name,
+							recordId,
+							record,
+							{ persistedRecord, isAutosave }
+						);
 
 				// Most of this autosave logic is very specific to posts.
 				// This is fine for now as it is the only supported autosave,
@@ -749,25 +645,10 @@ export const saveEntityRecord =
 									: undefined,
 						}
 					);
-					// Capture the CRDT snapshot in the same tick as the
-					// payload so it describes exactly the content being
-					// autosaved.
-					if ( entityConfig.syncConfig ) {
-						const crdtSnapshot =
-							getSyncManager()?.getEntitySnapshot(
-								`${ kind }/${ name }`,
-								recordId
-							);
-
-						if ( crdtSnapshot ) {
-							data[ CRDT_AUTOSAVE_SNAPSHOT_KEY ] = crdtSnapshot;
-						}
-					}
-
 					updatedRecord = await __unstableFetch( {
 						path: `${ path }/autosaves`,
 						method: 'POST',
-						data,
+						data: { ...data, ...syncEdits },
 					} );
 
 					// An autosave may be processed by the server as a regular save
@@ -822,7 +703,7 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
-					let edits = record;
+					let edits = { ...record, ...syncEdits };
 					if ( entityConfig.__unstablePrePersist ) {
 						edits = {
 							...edits,
@@ -837,12 +718,9 @@ export const saveEntityRecord =
 						method: recordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
-					// Pass the pre-`__unstablePrePersist` edits so the reducer
-					// can clear the persisted edits from state. The values
-					// added by `__unstablePrePersist` (e.g. a fresh CRDT
-					// snapshot in `meta`) never exist in the state edits, so
-					// comparing against them would fail to match and leave the
-					// record dirty after a successful save.
+					// Pass the original edits (before the sync manager and
+					// `__unstablePrePersist` added to them) so the reducer
+					// can clear the persisted edits from state.
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
@@ -851,30 +729,13 @@ export const saveEntityRecord =
 						true,
 						record
 					);
-					if ( entityConfig.syncConfig ) {
-						let syncChanges;
-						if ( __unstableSkipSyncUpdate ) {
-							syncChanges = {};
-						} else if ( isNewRecord || ! persistedRecord ) {
-							syncChanges = updatedRecord;
-						} else {
-							syncChanges = getServerMutatedFields(
-								updatedRecord,
-								persistedRecord,
-								record
-							);
-						}
-
-						// Use an untracked origin so that the save
-						// response does not create undo levels.
-						getSyncManager()?.update(
-							`${ kind }/${ name }`,
-							recordId,
-							syncChanges,
-							LOCAL_UNDO_IGNORED_ORIGIN,
-							{ isSave: true }
-						);
-					}
+					syncManager?.afterSave?.( kind, name, recordId, {
+						savedRecord: updatedRecord,
+						persistedRecord: isNewRecord
+							? undefined
+							: persistedRecord,
+						edits: record,
+					} );
 				}
 			} catch ( _error ) {
 				hasError = true;

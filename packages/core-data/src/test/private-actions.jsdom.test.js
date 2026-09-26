@@ -5,14 +5,13 @@ import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '..';
 import { editMediaEntity, setCollaborationSupported } from '../private-actions';
-import { getSyncManager, hasSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 import { unlock } from '../lock-unlock';
 
 vi.mock( '@wordpress/api-fetch' );
-vi.mock( '../sync', async ( importOriginal ) => ( {
+vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	getSyncManager: vi.fn(),
-	hasSyncManager: vi.fn(),
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'editMediaEntity', () => {
@@ -219,8 +218,7 @@ describe( 'editMediaEntity', () => {
 
 describe( 'setCollaborationSupported', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
-		hasSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
@@ -230,8 +228,7 @@ describe( 'setCollaborationSupported', () => {
 		const dispatch = Object.assign( vi.fn(), {
 			__unstableNotifySyncUndoManagerChange: vi.fn(),
 		} );
-		hasSyncManager.mockReturnValue( true );
-		getSyncManager.mockReturnValue( syncManager );
+		getEntitySyncManager.mockReturnValue( syncManager );
 
 		setCollaborationSupported( false )( { dispatch } );
 

@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getUndoManager } from '../private-selectors';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 
-vi.mock( '../sync', () => ( {
-	getSyncManager: vi.fn(),
+vi.mock( '../entity-sync', () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'getUndoManager', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'returns the sync undo manager when one is available', () => {
@@ -26,7 +26,7 @@ describe( 'getUndoManager', () => {
 			redo: vi.fn(),
 			undo: vi.fn(),
 		};
-		getSyncManager.mockReturnValue( {
+		getEntitySyncManager.mockReturnValue( {
 			undoManager: syncUndoManager,
 		} );
 
@@ -49,7 +49,7 @@ describe( 'getUndoManager', () => {
 			redo: vi.fn(),
 			undo: vi.fn(),
 		};
-		getSyncManager.mockReturnValue( undefined );
+		getEntitySyncManager.mockReturnValue( undefined );
 
 		expect(
 			getUndoManager( {

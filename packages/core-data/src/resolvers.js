@@ -4,7 +4,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
-import { getSyncManager } from './sync';
+import { getEntitySyncManager } from './entity-sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -14,11 +14,9 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
-	saveCRDTDoc,
 	getPaginationMeta,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
@@ -134,11 +132,23 @@ export const getEntityRecord =
 			// four actions.
 			const canUserResolutionsArgs = [ [ { kind, name, id: key } ] ];
 
-			// Entity supports syncing.
-			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
-				const objectType = `${ kind }/${ name }`;
-				const objectId = key;
+			// A registered entity sync manager is notified about records
+			// fetched without a query and decides whether to sync them. The
+			// no-query fetch is the one the editor uses for the main record
+			// it edits, and it is guaranteed to carry the full editable
+			// record. A fetch with a query may ask for specific fields or a
+			// different context, so it is not a safe base for syncing.
+			const syncManager =
+				select?.isCollaborationSupported?.() === false
+					? undefined
+					: getEntitySyncManager();
 
+			if (
+				syncManager &&
+				isNumericID( key ) &&
+				! query &&
+				false !== syncManager.shouldSync?.( kind, name, key )
+			) {
 				// Use the new transient "read/write" config to compute transients for
 				// the sync manager. Otherwise these transients are not available
 				// if / until the record is edited. Use a copy of the record so that
@@ -175,134 +185,53 @@ export const getEntityRecord =
 					);
 				}
 
-				const syncManager =
-					select?.isCollaborationSupported?.() === false
-						? undefined
-						: getSyncManager();
-
 				// Load the entity record for syncing. Do not await promise.
 				// NOTE: when this resolver runs before block types register,
 				// `recordWithTransients.blocks` was parsed as empty. The cache
 				// above discards such an entry; the sync manager receives it
 				// as-is, and seeding a collaborative document from it is an
 				// open problem of the collaboration path.
-				void syncManager?.load(
-					entityConfig.syncConfig,
-					objectType,
-					objectId,
-					recordWithTransients,
-					{
-						// Handle edits sourced from the sync manager.
-						editRecord: ( edits, options = {} ) => {
-							if ( ! Object.keys( edits ).length ) {
-								return;
-							}
+				void syncManager.load( kind, name, key, recordWithTransients, {
+					// Handle edits sourced from the sync manager.
+					editRecord: ( edits, options = {} ) => {
+						if ( ! Object.keys( edits ).length ) {
+							return;
+						}
 
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits,
-								meta: {
-									undo: undefined,
-								},
-								options,
-							} );
-						},
-						// Get the current entity record (with edits)
-						getEditedRecord: async () =>
-							await resolveSelect.getEditedEntityRecord(
-								kind,
-								name,
-								key
-							),
-						// Handle sync connection status changes.
-						onStatusChange: ( status ) => {
-							dispatch.setSyncConnectionStatus(
-								kind,
-								name,
-								key,
-								status
-							);
-						},
-						// Refetch the current entity record from the database.
-						refetchRecord: async () => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								await apiFetch( { path, parse: true } ),
-								query
-							);
-						},
-						// Persist the CRDT document.
-						//
-						// TODO: Currently, persisted CRDT documents are stored in post meta.
-						// This effectively means that only post entities support CRDT
-						// persistence. As we add support for syncing additional entity,
-						// we'll need to revisit where persisted CRDT documents are stored.
-						persistCRDTDoc: () => {
-							if (
-								! entityConfig.syncConfig?.supportsPersistence
-							) {
-								return;
-							}
-
-							return resolveSelect
-								.getEditedEntityRecord( kind, name, key )
-								.then( async ( editedRecord ) => {
-									// Don't persist the CRDT document if the record is still an
-									// auto-draft or if the entity does not support meta.
-									const { meta, status } = editedRecord;
-									if ( 'auto-draft' === status || ! meta ) {
-										return;
-									}
-
-									const entityIdKey =
-										entityConfig.key || DEFAULT_ENTITY_KEY;
-									const entityId =
-										editedRecord[ entityIdKey ];
-
-									await saveCRDTDoc(
-										`${ kind }/${ name }`,
-										entityId
-									);
-								} );
-						},
-						addUndoMeta: ( ydoc, meta ) => {
-							const selectionHistory =
-								getSelectionHistory( ydoc );
-
-							if ( selectionHistory ) {
-								meta.set(
-									'selectionHistory',
-									selectionHistory
-								);
-							}
-						},
-						onUndoStackChange: ( undoState ) => {
-							dispatch.__unstableNotifySyncUndoManagerChange(
-								undoState
-							);
-						},
-						restoreUndoMeta: ( ydoc, meta ) => {
-							const selectionHistory =
-								meta.get( 'selectionHistory' );
-
-							if ( selectionHistory ) {
-								// Because Yjs initiates an undo, we need to
-								// wait until the content is restored before
-								// we can update the selection.
-								// Use setTimeout() to wait until content is
-								// finished updating, and then set the correct
-								// selection.
-								setTimeout( () => {
-									restoreSelection( selectionHistory, ydoc );
-								}, 0 );
-							}
-						},
-					}
-				);
+						dispatch( {
+							type: 'EDIT_ENTITY_RECORD',
+							kind,
+							name,
+							recordId: key,
+							edits,
+							meta: {
+								undo: undefined,
+							},
+							options,
+						} );
+					},
+					// Get the current entity record (with edits)
+					getEditedRecord: async () =>
+						await resolveSelect.getEditedEntityRecord(
+							kind,
+							name,
+							key
+						),
+					// Refetch the current entity record from the database.
+					refetchRecord: async () => {
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							await apiFetch( { path, parse: true } ),
+							query
+						);
+					},
+					onUndoStackChange: ( undoState ) => {
+						dispatch.__unstableNotifySyncUndoManagerChange(
+							undoState
+						);
+					},
+				} );
 			}
 
 			registry.batch( () => {
@@ -469,30 +398,26 @@ export const getEntityRecords =
 				};
 			}
 
-			if ( entityConfig.syncConfig && -1 === query.per_page ) {
-				const objectType = `${ kind }/${ name }`;
-				getSyncManager()?.loadCollection(
-					entityConfig.syncConfig,
-					objectType,
-					{
-						onStatusChange: ( status ) => {
-							dispatch.setSyncConnectionStatus(
-								kind,
-								name,
-								null,
-								status
-							);
-						},
-						refetchRecords: async () => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								await apiFetch( { path, parse: true } ),
-								query
-							);
-						},
-					}
-				);
+			// A registered entity sync manager hears about whole collections,
+			// meaning fetches that ask for every record of a type at once.
+			// Paginated lists are not covered. The manager gets one handler,
+			// `refetchRecords`, which reloads the same list from the REST
+			// API. For example, the real-time collaboration manager watches
+			// a shared document for the collection and calls the handler
+			// when another user saves a record of that type, so lists such
+			// as templates, navigation menus, or a post's notes pick up the
+			// change.
+			if ( -1 === query.per_page ) {
+				void getEntitySyncManager()?.loadCollection?.( kind, name, {
+					refetchRecords: async () => {
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							await apiFetch( { path, parse: true } ),
+							query
+						);
+					},
+				} );
 			}
 
 			// If we request fields but the result doesn't contain the fields,

@@ -6,6 +6,19 @@ import type {
 
 export type { ConnectionStatus } from '@wordpress/sync';
 
+export type {
+	EntitySyncAfterSaveContext,
+	EntitySyncBeforeSaveContext,
+	EntitySyncCollectionHandlers,
+	EntitySyncEditOptions,
+	EntitySyncManager,
+	EntitySyncRecord,
+	EntitySyncRecordHandlers,
+	EntitySyncRecordId,
+	EntitySyncUndoManager,
+	EntitySyncUndoStackState,
+} from './entity-sync';
+
 export type ConnectionError = NonNullable<
 	ConnectionStatusDisconnected[ 'error' ]
 >;
