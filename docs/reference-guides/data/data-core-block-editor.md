@@ -1561,6 +1561,36 @@ _Properties_
 - _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
 - _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
 
+### registerInspectorTab
+
+Registers a new tab in the block inspector, alongside the built-in Content, List View, Settings and Styles tabs.
+
+Like the built-in tabs, a registered tab only actually appears for a given block once something fills its `group` for that block — registering it on its own adds no visible UI.
+
+_Usage_
+
+```js
+import { dispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+
+dispatch( blockEditorStore ).registerInspectorTab( {
+	name: 'my-plugin/swiper-settings',
+	title: __( 'Swiper' ),
+	blocks: [ 'my-plugin/swiper' ],
+} );
+```
+
+```jsx
+<InspectorControls group="my-plugin/swiper-settings">
+	<TextareaControl label={ __( 'Configuration (JSON)' ) } ... />
+</InspectorControls>
+```
+
+_Parameters_
+
+- _tab_ `InspectorTab`: The tab to register.
+
 ### removeBlock
 
 Returns an action object used in signalling that the block with the specified client ID is to be removed.
@@ -1857,6 +1887,18 @@ Action that enables or disables block selection.
 _Parameters_
 
 - _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
+
+_Returns_
+
+- `Object`: Action object.
+
+### unregisterInspectorTab
+
+Unregisters a previously registered custom inspector tab.
+
+_Parameters_
+
+- _name_ `string`: The registered tab's `name`.
 
 _Returns_
 

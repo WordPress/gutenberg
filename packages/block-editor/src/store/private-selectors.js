@@ -500,6 +500,19 @@ export function getRegisteredInserterMediaCategories( state ) {
 	return state.registeredInserterMediaCategories;
 }
 
+/** @typedef {import('./actions').InspectorTab} InspectorTab */
+/**
+ * Returns the custom inspector tabs registered via `registerInspectorTab()`,
+ * keyed by tab name.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Record<string, Omit<InspectorTab, 'name'>>} Registered inspector tabs.
+ */
+export function getRegisteredInspectorTabs( state ) {
+	return state.registeredInspectorTabs;
+}
+
 /**
  * Returns an array containing the allowed inserter media categories.
  * It merges the registered media categories from extenders with the

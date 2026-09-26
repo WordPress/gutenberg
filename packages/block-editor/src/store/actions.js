@@ -2314,6 +2314,102 @@ export const registerInserterMediaCategory =
 		} );
 	};
 
+// Tab names owned by the block inspector's own built-in tabs. Kept in sync
+// with `TAB_CONTENT`, `TAB_LIST_VIEW`, `TAB_SETTINGS` and `TAB_STYLES` in
+// `components/inspector-controls-tabs/utils.js`.
+const CORE_INSPECTOR_TAB_NAMES = [ 'content', 'list', 'settings', 'styles' ];
+
+/**
+ * @typedef {Object} InspectorTab
+ * @property {string}   name     A unique name for the tab, also used as the
+ *                               `InspectorControls` `group` that fills its
+ *                               content: `<InspectorControls group={ name } />`.
+ * @property {string}   title    The tab's visible label.
+ * @property {WPIcon}   [icon]   An icon shown instead of the label when the
+ *                               "Show button text labels" preference is off.
+ * @property {number}   [order]  Where to place the tab relative to other
+ *                               registered custom tabs. Lower numbers appear
+ *                               first. Custom tabs are placed after the
+ *                               built-in Content, List View, Settings and
+ *                               Styles tabs regardless of this value.
+ *                               Defaults to registration order.
+ * @property {string[]} [blocks] Block type names the tab is limited to. When
+ *                               omitted, the tab is available to every block
+ *                               type that fills its group.
+ */
+
+/**
+ * Registers a new tab in the block inspector, alongside the built-in
+ * Content, List View, Settings and Styles tabs.
+ *
+ * Like the built-in tabs, a registered tab only actually appears for a given
+ * block once something fills its `group` for that block — registering it
+ * on its own adds no visible UI.
+ *
+ * @example
+ * ```js
+ * import { dispatch } from '@wordpress/data';
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * dispatch( blockEditorStore ).registerInspectorTab( {
+ * 	name: 'my-plugin/swiper-settings',
+ * 	title: __( 'Swiper' ),
+ * 	blocks: [ 'my-plugin/swiper' ],
+ * } );
+ * ```
+ *
+ * ```jsx
+ * <InspectorControls group="my-plugin/swiper-settings">
+ * 	<TextareaControl label={ __( 'Configuration (JSON)' ) } ... />
+ * </InspectorControls>
+ * ```
+ *
+ * @param {InspectorTab} tab The tab to register.
+ */
+export function registerInspectorTab( tab ) {
+	return ( { select, dispatch } ) => {
+		if ( ! tab || typeof tab !== 'object' ) {
+			console.error( 'Tab should be an `InspectorTab` object.' );
+			return;
+		}
+		if ( ! tab.name ) {
+			console.error(
+				'Tab should have a `name` that is unique among all inspector tabs.'
+			);
+			return;
+		}
+		if ( CORE_INSPECTOR_TAB_NAMES.includes( tab.name ) ) {
+			console.error(
+				`"${ tab.name }" is a built-in inspector tab name and can't be used to register a custom tab.`
+			);
+			return;
+		}
+		if ( ! tab.title ) {
+			console.error( 'Tab should have a `title`.' );
+			return;
+		}
+		if ( select.getRegisteredInspectorTabs()[ tab.name ] ) {
+			console.error(
+				`A tab is already registered with the name "${ tab.name }".`
+			);
+			return;
+		}
+		dispatch( { type: 'REGISTER_INSPECTOR_TAB', tab } );
+	};
+}
+
+/**
+ * Unregisters a previously registered custom inspector tab.
+ *
+ * @param {string} name The registered tab's `name`.
+ *
+ * @return {Object} Action object.
+ */
+export function unregisterInspectorTab( name ) {
+	return { type: 'UNREGISTER_INSPECTOR_TAB', name };
+}
+
 /**
  * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
  */

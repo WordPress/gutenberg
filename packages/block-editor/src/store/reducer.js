@@ -2104,6 +2104,34 @@ export function registeredInserterMediaCategories( state = [], action ) {
 }
 
 /**
+ * Reducer returning a map of the registered custom inspector tabs, keyed by
+ * tab name.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function registeredInspectorTabs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_INSPECTOR_TAB': {
+			const { name, ...tab } = action.tab;
+			return { ...state, [ name ]: tab };
+		}
+		case 'UNREGISTER_INSPECTOR_TAB': {
+			if ( ! ( action.name in state ) ) {
+				return state;
+			}
+			const newState = { ...state };
+			delete newState[ action.name ];
+			return newState;
+		}
+	}
+
+	return state;
+}
+
+/**
  * Reducer setting last focused element
  *
  * @param {boolean} state  Current state.
@@ -2448,6 +2476,7 @@ const combinedReducers = combineReducers( {
 	removalPromptData,
 	blockRemovalRules,
 	registeredInserterMediaCategories,
+	registeredInspectorTabs,
 	zoomLevel,
 	hasBlockSpotlight,
 	openedListViewPanels,

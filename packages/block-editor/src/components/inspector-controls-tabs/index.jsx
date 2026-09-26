@@ -17,6 +17,13 @@ import { store as blockEditorStore } from '../../store';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
+const CORE_TAB_NAMES = [
+	TAB_CONTENT.name,
+	TAB_LIST_VIEW.name,
+	TAB_SETTINGS.name,
+	TAB_STYLES.name,
+];
+
 export default function InspectorControlsTabs( {
 	blockName,
 	clientId,
@@ -205,6 +212,17 @@ export default function InspectorControlsTabs( {
 						contentClientIds={ contentClientIds }
 					/>
 				</Tabs.TabPanel>
+				{ tabs
+					.filter( ( tab ) => ! CORE_TAB_NAMES.includes( tab.name ) )
+					.map( ( tab ) => (
+						<Tabs.TabPanel
+							key={ tab.name }
+							tabId={ tab.name }
+							focusable={ false }
+						>
+							<InspectorControls.Slot group={ tab.name } />
+						</Tabs.TabPanel>
+					) ) }
 			</Tabs>
 		</div>
 	);

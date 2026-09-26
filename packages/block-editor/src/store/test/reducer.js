@@ -42,6 +42,7 @@ import {
 	viewportModalClientIds,
 	selectedBlockStyleState,
 	styleStateViewport,
+	registeredInspectorTabs,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -6373,6 +6374,63 @@ describe( 'state', () => {
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );
+		} );
+	} );
+
+	describe( 'registeredInspectorTabs', () => {
+		it( 'returns an empty object by default', () => {
+			expect(
+				registeredInspectorTabs( undefined, { type: 'UNKNOWN' } )
+			).toEqual( {} );
+		} );
+
+		it( 'adds a tab on REGISTER_INSPECTOR_TAB, keyed by name', () => {
+			const state = registeredInspectorTabs( undefined, {
+				type: 'REGISTER_INSPECTOR_TAB',
+				tab: { name: 'my-plugin/tab', title: 'My Tab' },
+			} );
+			expect( state ).toEqual( {
+				'my-plugin/tab': { title: 'My Tab' },
+			} );
+		} );
+
+		it( 'keeps previously registered tabs when adding another', () => {
+			const initialState = {
+				'my-plugin/first': { title: 'First' },
+			};
+			const state = registeredInspectorTabs( initialState, {
+				type: 'REGISTER_INSPECTOR_TAB',
+				tab: { name: 'my-plugin/second', title: 'Second' },
+			} );
+			expect( state ).toEqual( {
+				'my-plugin/first': { title: 'First' },
+				'my-plugin/second': { title: 'Second' },
+			} );
+		} );
+
+		it( 'removes a tab on UNREGISTER_INSPECTOR_TAB', () => {
+			const initialState = {
+				'my-plugin/first': { title: 'First' },
+				'my-plugin/second': { title: 'Second' },
+			};
+			const state = registeredInspectorTabs( initialState, {
+				type: 'UNREGISTER_INSPECTOR_TAB',
+				name: 'my-plugin/first',
+			} );
+			expect( state ).toEqual( {
+				'my-plugin/second': { title: 'Second' },
+			} );
+		} );
+
+		it( 'returns the same state when unregistering an unknown tab', () => {
+			const initialState = {
+				'my-plugin/first': { title: 'First' },
+			};
+			const state = registeredInspectorTabs( initialState, {
+				type: 'UNREGISTER_INSPECTOR_TAB',
+				name: 'my-plugin/unknown',
+			} );
+			expect( state ).toBe( initialState );
 		} );
 	} );
 } );

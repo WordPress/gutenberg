@@ -24,7 +24,7 @@ const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
 const InspectorControlsEffects = createSlotFill( 'InspectorControlsEffects' );
 const InspectorControlsContent = createSlotFill( 'InspectorControlsContent' );
 
-const groups = {
+const coreGroups = {
 	default: InspectorControlsDefault,
 	advanced: InspectorControlsAdvanced,
 	background: InspectorControlsBackground,
@@ -44,6 +44,26 @@ const groups = {
 	typography: InspectorControlsTypography,
 	viewport: InspectorControlsViewport,
 };
+
+/**
+ * A Slot/Fill pair exists for every core group ahead of time, but a custom
+ * group registered via `registerInspectorTab()` (see
+ * `components/inspector-controls-tabs`) can use any group name. This proxy
+ * lazily creates (and caches) a Slot/Fill pair the first time an unknown
+ * group name is looked up, so `groups[name]` keeps working exactly as
+ * before at every existing call site for any group name, core or custom.
+ */
+const groups = new Proxy( coreGroups, {
+	get( target, name ) {
+		if ( typeof name !== 'string' ) {
+			return target[ name ];
+		}
+		if ( ! ( name in target ) ) {
+			target[ name ] = createSlotFill( `InspectorControls-${ name }` );
+		}
+		return target[ name ];
+	},
+} );
 
 export default groups;
 

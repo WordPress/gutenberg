@@ -1,11 +1,20 @@
-import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import {
+	__experimentalUseSlotFills as useSlotFills,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useSlotFillsForNames } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 function getShowTabs( blockName, tabSettings = {} ) {
 	// Block specific setting takes precedence over generic default.
@@ -111,6 +120,59 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_STYLES );
 	}
 
+	// Custom tabs registered via `registerInspectorTab()`. They're placed
+	// after the built-in tabs, and — like those — only actually show up once
+	// something fills their group for this block.
+	const registeredTabs = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getRegisteredInspectorTabs(),
+		[]
+	);
+
+	const eligibleCustomTabs = useMemo( () => {
+		return Object.entries( registeredTabs ?? EMPTY_OBJECT )
+			.filter(
+				( [ , tab ] ) =>
+					! tab.blocks || tab.blocks.includes( blockName )
+			)
+			.sort(
+				( [ , a ], [ , b ] ) => ( a.order ?? 0 ) - ( b.order ?? 0 )
+			);
+	}, [ registeredTabs, blockName ] );
+
+	const eligibleCustomTabNames = useMemo(
+		() => eligibleCustomTabs.map( ( [ name ] ) => name ),
+		[ eligibleCustomTabs ]
+	);
+
+	const customTabNamesWithFills = useSlotFillsForNames(
+		eligibleCustomTabNames
+	);
+
+	for ( const [ name, tab ] of eligibleCustomTabs ) {
+		if ( customTabNamesWithFills.has( name ) ) {
+			tabs.push( {
+				name,
+				value: name,
+				title: tab.title,
+				icon: tab.icon,
+			} );
+		}
+	}
+
+	// Lets a plugin add, remove or reorder tabs beyond what
+	// `registerInspectorTab()` alone allows — e.g. hiding a tab for a block
+	// it doesn't own, or reordering tabs relative to the built-in ones — the
+	// same way PHP's block-related filters can adjust output another
+	// component already produced. Runs on the fully assembled tab list, so a
+	// filter sees (and can act on) core, custom and previously-filtered
+	// entries alike.
+	const filteredTabs = applyFilters(
+		'editor.InspectorControlsTabs',
+		tabs,
+		blockName
+	);
+
 	const showTabs = getShowTabs( blockName, tabSettings );
-	return showTabs ? tabs : EMPTY_ARRAY;
+	return showTabs ? filteredTabs : EMPTY_ARRAY;
 }

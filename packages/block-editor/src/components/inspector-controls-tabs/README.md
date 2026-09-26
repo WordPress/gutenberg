@@ -6,9 +6,28 @@ _Note:_ This component is internal to the `@wordpress/block-editor` package. It 
 
 ## Development guidelines
 
-The tabs are not authored by the block. Each tab renders [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) slots, so a block populates a tab simply by rendering `InspectorControls` with the matching `group`. There are four tabs, rendered in this order when available: Content (the `content` group), List View (the `list` group), Settings (the default and `bindings` groups, plus the Advanced panel) and Styles (the `typography`, `color`, `background`, `filter`, `layout`, `dimensions`, `border`, `elements`, `position` and `styles` groups).
+The tabs are not authored by the block. Each tab renders [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) slots, so a block populates a tab simply by rendering `InspectorControls` with the matching `group`. There are four built-in tabs, rendered in this order when available: Content (the `content` group), List View (the `list` group), Settings (the default and `bindings` groups, plus the Advanced panel) and Styles (the `typography`, `color`, `background`, `filter`, `layout`, `dimensions`, `border`, `elements`, `position` and `styles` groups).
 
-Which tabs exist is determined by the `useInspectorControlsTabs` hook, which returns a tab when fills have been rendered into its groups. `BlockInspector` renders this component only when the hook returns more than one tab; with a single tab the sections are rendered flat instead. The hook also honors the `blockInspectorTabs` block editor setting, which can disable tabs globally or per block name.
+A plugin can add further tabs by calling `registerInspectorTab()` (a `@wordpress/block-editor` store action) with a unique `name`, and rendering `<InspectorControls group={ name } />` in a block's `edit` to fill it — any group name works, not just the built-in ones. Custom tabs are appended after the built-in tabs, in `order` (lower first, default registration order), and can be limited to specific block types via the registration's `blocks` option. See [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md#custom-tabs) for the full API.
+
+Which tabs exist is determined by the `useInspectorControlsTabs` hook, which returns a tab when fills have been rendered into its groups — built-in or custom. `BlockInspector` renders this component only when the hook returns more than one tab; with a single tab the sections are rendered flat instead. The hook also honors the `blockInspectorTabs` block editor setting, which can disable tabs globally or per block name.
+
+The fully assembled list — built-in and registered custom tabs alike — also passes through the `editor.InspectorControlsTabs` filter (`applyFilters` from `@wordpress/hooks`) before `useInspectorControlsTabs` returns it, called with the tabs array and the block name:
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'editor.InspectorControlsTabs',
+	'my-plugin/hide-styles-tab-for-my-block',
+	( tabs, blockName ) =>
+		blockName === 'my-plugin/my-block'
+			? tabs.filter( ( tab ) => tab.name !== 'styles' )
+			: tabs
+);
+```
+
+`registerInspectorTab()` is enough for the common case of adding a new tab; reach for this filter for anything registration alone can't do — hiding or reordering a tab (built-in or custom) for specific blocks, or adding a tab whose presence depends on something registration's static `blocks`/`order` options can't express. A tab this filter adds renders the same way as a registered one: any tab `name` other than `content`, `list`, `settings` or `styles` gets an `InspectorControls.Slot` for that name.
 
 Tab labels are rendered as icons with a tooltip. When the `showIconLabels` preference from `@wordpress/preferences` is enabled, the tab title is rendered as text instead.
 
@@ -73,7 +92,7 @@ Whether the block has registered block styles. When `true`, the Styles tab rende
 
 -   **Type:** `Array`
 
-The tabs to render in the tab list, in display order. Each entry is an object with `name`, `title` and `icon`. Pass the value returned by `useInspectorControlsTabs`; only tabs matching the `content`, `list`, `settings` and `styles` names have a corresponding panel.
+The tabs to render in the tab list, in display order. Each entry is an object with `name`, `title` and `icon`. Pass the value returned by `useInspectorControlsTabs`. The `content`, `list`, `settings` and `styles` names render their dedicated panel; any other name is treated as a custom tab and renders an `InspectorControls.Slot` for that group.
 
 #### `isSectionBlock`
 

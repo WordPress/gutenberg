@@ -48,6 +48,8 @@ const {
 	validateBlocksToTemplate,
 	__unstableMarkNextChangeAsNotPersistent,
 	registerInserterMediaCategory,
+	registerInspectorTab,
+	unregisterInspectorTab,
 	setBlockEditingMode,
 	unsetBlockEditingMode,
 } = actions;
@@ -1668,6 +1670,74 @@ describe( 'actions', () => {
 			expect( dispatch ).toHaveBeenLastCalledWith( {
 				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
 				category: { ...category, isExternalResource: true },
+			} );
+		} );
+	} );
+
+	describe( 'registerInspectorTab', () => {
+		describe( 'should log errors when invalid', () => {
+			it( 'valid object', () => {
+				registerInspectorTab()( {} );
+				expect( console ).toHaveErroredWith(
+					'Tab should be an `InspectorTab` object.'
+				);
+			} );
+			it( 'has name', () => {
+				registerInspectorTab( {} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Tab should have a `name` that is unique among all inspector tabs.'
+				);
+			} );
+			it( 'is not a built-in tab name', () => {
+				registerInspectorTab( { name: 'styles', title: 'Styles' } )(
+					{}
+				);
+				expect( console ).toHaveErroredWith(
+					'"styles" is a built-in inspector tab name and can\'t be used to register a custom tab.'
+				);
+			} );
+			it( 'has title', () => {
+				registerInspectorTab( { name: 'my-plugin/tab' } )( {} );
+				expect( console ).toHaveErroredWith(
+					'Tab should have a `title`.'
+				);
+			} );
+			it( 'has unique name', () => {
+				registerInspectorTab( {
+					name: 'my-plugin/tab',
+					title: 'My Tab',
+				} )( {
+					select: {
+						getRegisteredInspectorTabs: () => ( {
+							'my-plugin/tab': { title: 'My Tab' },
+						} ),
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A tab is already registered with the name "my-plugin/tab".'
+				);
+			} );
+		} );
+
+		it( 'should register a tab', () => {
+			const tab = { name: 'my-plugin/tab', title: 'My Tab' };
+			const dispatch = vi.fn();
+			registerInspectorTab( tab )( {
+				select: { getRegisteredInspectorTabs: () => ( {} ) },
+				dispatch,
+			} );
+			expect( dispatch ).toHaveBeenLastCalledWith( {
+				type: 'REGISTER_INSPECTOR_TAB',
+				tab,
+			} );
+		} );
+	} );
+
+	describe( 'unregisterInspectorTab', () => {
+		it( 'should return the UNREGISTER_INSPECTOR_TAB action', () => {
+			expect( unregisterInspectorTab( 'my-plugin/tab' ) ).toEqual( {
+				type: 'UNREGISTER_INSPECTOR_TAB',
+				name: 'my-plugin/tab',
 			} );
 		} );
 	} );
