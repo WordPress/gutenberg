@@ -23,7 +23,6 @@
 		"node": ">=18.12.0"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-types",
