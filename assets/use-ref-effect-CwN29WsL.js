@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DiifJuVD.js";import{n as t,t as r}from"./react-jbyP5ryc.js";function useRefEffect(e,t){const f=(0,r.useRef)(void 0);return(0,r.useCallback)(t=>{t?f.current=e(t):f.current&&f.current()},t)}function init_use_ref_effect(){return(init_use_ref_effect=e(()=>{t()}))()}export{useRefEffect as n,init_use_ref_effect as t};

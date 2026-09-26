@@ -1,0 +1,1 @@
+import{n as t,o as e}from"./rolldown-runtime-DiifJuVD.js";import{t as n}from"./react-BoNh7UIS.js";function useCSPContext(){return o.useContext(r)??i}var o,r,i;function init_CSPContext(){return(init_CSPContext=t(()=>{o=e(n(),1),r=o.createContext(void 0),i={disableStyleElements:!1}}))()}export{useCSPContext as n,init_CSPContext as t};

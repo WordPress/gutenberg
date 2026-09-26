@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";var n;function init_box_sizing(){return(init_box_sizing=i(()=>{n={name:"kv6lnz",styles:"box-sizing:border-box;*,*::before,*::after{box-sizing:inherit;}"}}))()}export{init_box_sizing as n,n as t};

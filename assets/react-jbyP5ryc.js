@@ -1,0 +1,1 @@
+import{n as t}from"./rolldown-runtime-DiifJuVD.js";import{t as r}from"./react-BoNh7UIS.js";var i;function init_react(){return(init_react=t(()=>{i=r()}))()}export{init_react as n,i as t};

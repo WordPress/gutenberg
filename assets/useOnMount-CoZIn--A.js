@@ -1,0 +1,1 @@
+import{n,o as t}from"./rolldown-runtime-DiifJuVD.js";import{t as o}from"./react-BoNh7UIS.js";import{_ as s,m as e}from"./useRenderElement-Cenhia9I.js";function useOnMount(n){u.useEffect(n,e)}var u;function init_useOnMount(){return(init_useOnMount=n(()=>{u=t(o(),1),s()}))()}export{useOnMount as n,init_useOnMount as t};
