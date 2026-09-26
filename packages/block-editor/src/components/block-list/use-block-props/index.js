@@ -211,7 +211,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				blockVisibility,
 				currentViewport,
 				viewportSettings
-		  )
+			)
 		: null;
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -258,7 +258,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					__( '%1$s. %2$s.' ),
 					baseLabel,
 					ghostCondition.label
-			  )
+				)
 			: baseLabel,
 		'data-block': clientId,
 		'data-type': name,
