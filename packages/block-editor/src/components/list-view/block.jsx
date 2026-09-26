@@ -39,7 +39,7 @@ import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { getBlockVisibilityLabel } from '../block-visibility';
+import { getBlockVisibilityReason } from '../block-visibility';
 
 function ListViewBlock( {
 	clientId,
@@ -551,8 +551,9 @@ function ListViewBlock( {
 		isLocked
 	);
 
-	// Determine label based on where block is hidden (not when/current viewport)
-	const blockVisibilityDescription = getBlockVisibilityLabel(
+	// Describe where the block is hidden (not whether it is hidden now), with
+	// the same wording the block toolbar uses.
+	const blockVisibilityDescription = getBlockVisibilityReason(
 		blockVisibility,
 		viewportSettings
 	);

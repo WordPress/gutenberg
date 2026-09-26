@@ -24,7 +24,8 @@ import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
 import {
 	useBlockVisibility,
-	getBlockVisibilityCondition,
+	getBlockVisibilityReason,
+	appendVisibilityReason,
 } from '../../block-visibility/';
 
 /**
@@ -196,7 +197,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		: {};
 
 	// Use block visibility hook with data from context to avoid extra subscription.
-	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
@@ -206,12 +207,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	// Hidden blocks are only ghosted while hidden blocks are revealed;
 	// otherwise they are visually hidden like on the front end.
 	const isGhosted = !! isRevealingHiddenBlocks && isBlockCurrentlyHidden;
-	const ghostCondition = isGhosted
-		? getBlockVisibilityCondition(
-				blockVisibility,
-				currentViewport,
-				viewportSettings
-			)
+	const visibilityReason = isGhosted
+		? getBlockVisibilityReason( blockVisibility, viewportSettings )
 		: null;
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -251,15 +248,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		role: 'document',
 		// A ghosted block announces why it is hidden after whatever name it
 		// would otherwise have, so blocks that supply their own label (like
-		// Paragraph) keep it and still announce the reason.
-		'aria-label': ghostCondition
-			? sprintf(
-					/* translators: %1$s: Accessible block name, e.g. "Block: Paragraph". %2$s: Reason the block is hidden, e.g. "Hidden on Mobile". */
-					__( '%1$s. %2$s.' ),
-					baseLabel,
-					ghostCondition.label
-				)
-			: baseLabel,
+		// Paragraph or Column) keep it and still announce the reason.
+		'aria-label': appendVisibilityReason( baseLabel, visibilityReason ),
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
@@ -284,7 +274,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-block-hidden':
 					isBlockCurrentlyHidden && ! isRevealingHiddenBlocks,
 				'is-block-ghosted': isGhosted,
-				'is-block-ghosted-always': ghostCondition?.type === 'always',
 			},
 			className,
 			props.className,

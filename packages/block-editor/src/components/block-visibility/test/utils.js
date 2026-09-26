@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	getBlockVisibilityViewportEntries,
-	getBlockVisibilityCondition,
+	getBlockVisibilityReason,
+	appendVisibilityReason,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from '../utils';
@@ -290,52 +291,90 @@ describe( 'block-visibility utils', () => {
 		} );
 	} );
 
-	describe( 'getBlockVisibilityCondition', () => {
-		it( 'returns null when the block has no visibility rule', () => {
-			expect( getBlockVisibilityCondition( undefined, 'mobile' ) ).toBe(
-				null
-			);
-			expect( getBlockVisibilityCondition( true, 'mobile' ) ).toBe(
-				null
-			);
-		} );
-
-		it( 'returns the always condition when hidden everywhere', () => {
-			expect( getBlockVisibilityCondition( false, 'desktop' ) ).toEqual( {
-				type: 'always',
-				label: 'Always hidden',
-			} );
-		} );
-
-		it( 'returns the viewport condition at a matching viewport', () => {
+	describe( 'getBlockVisibilityReason', () => {
+		it( 'returns null when no rule hides the block', () => {
+			expect( getBlockVisibilityReason( undefined ) ).toBe( null );
+			expect( getBlockVisibilityReason( true ) ).toBe( null );
 			expect(
-				getBlockVisibilityCondition(
-					{ viewport: { mobile: false } },
-					'mobile'
-				)
-			).toEqual( {
-				type: 'viewport',
-				label: 'Hidden on Mobile',
-			} );
-		} );
-
-		it( 'returns null at a non-matching viewport', () => {
-			expect(
-				getBlockVisibilityCondition(
-					{ viewport: { mobile: false } },
-					'tablet'
-				)
+				getBlockVisibilityReason( { viewport: { mobile: true } } )
 			).toBe( null );
+		} );
+
+		it( 'names the control when hidden everywhere', () => {
+			expect( getBlockVisibilityReason( false ) ).toBe(
+				'Omitted from published content'
+			);
+		} );
+
+		it( 'names a single viewport', () => {
+			expect(
+				getBlockVisibilityReason( { viewport: { mobile: false } } )
+			).toBe( 'Hidden on mobile' );
+		} );
+
+		it( 'joins two viewports', () => {
+			expect(
+				getBlockVisibilityReason( {
+					viewport: { tablet: false, mobile: false },
+				} )
+			).toBe( 'Hidden on tablet and mobile' );
+		} );
+
+		it( 'joins three viewports', () => {
+			expect(
+				getBlockVisibilityReason( {
+					viewport: { desktop: false, tablet: false, mobile: false },
+				} )
+			).toBe( 'Hidden on desktop, tablet and mobile' );
 		} );
 
 		it( 'ignores viewports the theme does not configure', () => {
 			expect(
-				getBlockVisibilityCondition(
+				getBlockVisibilityReason(
 					{ viewport: { mobile: false } },
-					'mobile',
 					{ tablet: '64rem' }
 				)
 			).toBe( null );
+		} );
+	} );
+
+	describe( 'appendVisibilityReason', () => {
+		it( 'returns the label unchanged without a reason', () => {
+			expect( appendVisibilityReason( 'Block: Paragraph', null ) ).toBe(
+				'Block: Paragraph'
+			);
+		} );
+
+		it( 'returns the reason when there is no label', () => {
+			expect(
+				appendVisibilityReason( undefined, 'Hidden on mobile' )
+			).toBe( 'Hidden on mobile' );
+		} );
+
+		it( 'appends the reason as a new sentence', () => {
+			expect(
+				appendVisibilityReason(
+					'Block: Column (1 of 2)',
+					'Hidden on mobile'
+				)
+			).toBe( 'Block: Column (1 of 2). Hidden on mobile' );
+			expect(
+				appendVisibilityReason(
+					'Empty block; start writing or type forward slash to choose a block',
+					'Omitted from published content'
+				)
+			).toBe(
+				'Empty block; start writing or type forward slash to choose a block. Omitted from published content'
+			);
+		} );
+
+		it( 'does not double punctuation the label already ends with', () => {
+			expect(
+				appendVisibilityReason(
+					'Added block: Paragraph.',
+					'Hidden on mobile'
+				)
+			).toBe( 'Added block: Paragraph. Hidden on mobile' );
 		} );
 	} );
 } );

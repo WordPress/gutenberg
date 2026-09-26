@@ -228,21 +228,22 @@ test.describe( 'Block Hiding', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// The hidden block now renders ghosted, and its accessible name
-		// announces why it's hidden. Blocks omitted from published content
-		// get a distinct ghost style from viewport-conditional ones.
+		// announces why it's hidden.
 		const ghostedBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Paragraph. Always hidden.',
+			name: 'Block: Paragraph. Omitted from published content',
 		} );
 		await expect( ghostedBlock ).toBeVisible();
-		await expect( ghostedBlock ).toHaveClass( /is-block-ghosted-always/ );
+		await expect( ghostedBlock ).toHaveClass( /is-block-ghosted/ );
 
-		// Selecting the ghosted block keeps it editable, and the block
-		// toolbar states why it's hidden.
+		// Selecting the ghosted block keeps it editable, and the visibility
+		// button in the block toolbar states why it's hidden.
 		await editor.selectBlocks( ghostedBlock );
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByText( 'Always hidden' )
+				.getByRole( 'button', {
+					name: 'Omitted from published content',
+				} )
 		).toBeVisible();
 	} );
 
@@ -291,7 +292,7 @@ test.describe( 'Block Hiding', () => {
 		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph. Hidden on Mobile.',
+				name: 'Block: Paragraph. Hidden on mobile',
 			} )
 		).toBeVisible();
 	} );
