@@ -1011,30 +1011,6 @@ export default function TypographyPanel( {
 					/>
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isFontSizePlaceholder,
-						hasFontSize() && rawInheritedFontSize !== undefined
-					) }
-					label={ __( 'Size' ) }
-					hasValue={ hasFontSize }
-					hasInlineEndToggle
-					onDeselect={ resetFontSize }
-					isShownByDefault={ defaultControls.fontSize }
-					panelId={ panelId }
-				>
-					<FontSizePicker
-						value={ currentFontSizeSlug || fontSize }
-						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
-						onChange={ setFontSizeWithInheritedCommit }
-						fontSizes={ mergedFontSizes }
-						disableCustomFontSizes={ disableCustomFontSizes }
-						withReset={ false }
-						withSlider
-					/>
-				</InheritanceToolsPanelItem>
-			) }
 			{ hasFontStyleControl && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
@@ -1115,6 +1091,30 @@ export default function TypographyPanel( {
 						value={ fontStretch }
 						onChange={ setFontStretch }
 						fontFamilyFaces={ fontFamilyFaces }
+					/>
+				</InheritanceToolsPanelItem>
+			) }
+			{ hasFontSizeEnabled && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isFontSizePlaceholder,
+						hasFontSize() && rawInheritedFontSize !== undefined
+					) }
+					label={ __( 'Size' ) }
+					hasValue={ hasFontSize }
+					hasInlineEndToggle
+					onDeselect={ resetFontSize }
+					isShownByDefault={ defaultControls.fontSize }
+					panelId={ panelId }
+				>
+					<FontSizePicker
+						value={ currentFontSizeSlug || fontSize }
+						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
+						onChange={ setFontSizeWithInheritedCommit }
+						fontSizes={ mergedFontSizes }
+						disableCustomFontSizes={ disableCustomFontSizes }
+						withReset={ false }
+						withSlider
 					/>
 				</InheritanceToolsPanelItem>
 			) }
