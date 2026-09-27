@@ -63,14 +63,16 @@ export type FontVariationAxis = {
 };
 
 /**
- * The axes OpenType registers, which this panel leaves alone. Four are set
- * through font weight, width and style. `opsz` is the fifth: `font-optical-sizing`
- * is `auto` by default, so the browser already tracks the font size, and writing
- * a coordinate here would pin it. Offering these in typography, `opsz` included,
- * is the subject of #83148; what is left for this panel is the axes only
- * `font-variation-settings` can reach.
+ * The axes a CSS property already owns, which this panel leaves alone: they are
+ * set through font weight, width and style, and a coordinate written here would
+ * take the axis away from the control that owns it.
+ *
+ * `opsz` is not among them. `font-optical-sizing` switches the browser's own
+ * tracking on and off rather than taking a coordinate, so nothing else can ask
+ * for a particular optical size, and this is where it would be asked for. The
+ * browser keeps tracking the font size until something is set here.
  */
-const REGISTERED_AXES = [ 'wght', 'wdth', 'slnt', 'ital', 'opsz' ];
+const AXES_A_PROPERTY_OWNS = [ 'wght', 'wdth', 'slnt', 'ital' ];
 
 const EMPTY_AXES: FontVariationAxis[] = [];
 
@@ -210,7 +212,7 @@ export function getFontVariationAxes(
 	} );
 
 	return [ ...capabilities.values() ].flatMap( ( axis ) => {
-		if ( REGISTERED_AXES.includes( axis.tag ) ) {
+		if ( AXES_A_PROPERTY_OWNS.includes( axis.tag ) ) {
 			return [];
 		}
 		const { min, max } = axis;

@@ -36,17 +36,20 @@ describe( 'getFontVariationAxes', () => {
 				'var:preset|font-family|roboto-flex'
 			)
 		).toEqual( [
+			{ tag: 'opsz', name: undefined, min: 8, max: 144, default: 14 },
 			{ tag: 'GRAD', name: undefined, min: -200, max: 150, default: 0 },
 			{ tag: 'XTRA', name: undefined, min: 323, max: 603, default: 468 },
 		] );
 	} );
 
-	it( 'leaves out the axes OpenType registers', () => {
+	it( 'leaves out the axes a CSS property owns', () => {
 		/*
-		 * A face declaring all five, so none of them passes for want of being
-		 * there. Writing a registered axis into `font-variation-settings` takes
-		 * it away from the property that owns it: with `"slnt" 0` alongside
-		 * `font-style: oblique 10deg`, the text renders upright.
+		 * A face declaring all five registered axes. The four a property owns
+		 * do not pass: writing one into `font-variation-settings` takes it away
+		 * from that property, and with `"slnt" 0` alongside `font-style:
+		 * oblique 10deg` the text renders upright. `opsz` does pass, since
+		 * `font-optical-sizing` switches the browser's tracking rather than
+		 * taking a coordinate, so nothing else can ask for a size.
 		 */
 		const everyAxis = {
 			...robotoFlex,
@@ -69,7 +72,7 @@ describe( 'getFontVariationAxes', () => {
 				getSettings( true, [ everyAxis ] ),
 				'var:preset|font-family|roboto-flex'
 			).map( ( { tag } ) => tag )
-		).toEqual( [ 'FILL' ] );
+		).toEqual( [ 'opsz', 'FILL' ] );
 	} );
 
 	it( 'resolves the font family from each value format', () => {
@@ -80,7 +83,7 @@ describe( 'getFontVariationAxes', () => {
 		].forEach( ( fontFamily ) => {
 			expect(
 				getFontVariationAxes( getSettings(), fontFamily )
-			).toHaveLength( 2 );
+			).toHaveLength( 3 );
 		} );
 	} );
 
