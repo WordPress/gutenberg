@@ -884,6 +884,15 @@ describe( 'isKeyboardEvent', () => {
 				isKeyboardEvent.primaryShift( event, 'z', isAppleOSFalse )
 			).toBe( true );
 		} );
+
+		it( 'should not treat plain typing as a letter shortcut', () => {
+			const event = new window.KeyboardEvent( 'keydown', {
+				key: 'ы',
+				keyCode: 83,
+			} );
+
+			expect( isKeyboardEvent.undefined( event, 's' ) ).toBe( false );
+		} );
 	} );
 } );
 
