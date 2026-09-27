@@ -271,9 +271,13 @@ export function ImageEdit( {
 			};
 		}
 
-		// Check if default link setting should be used.
+		// Check if default link setting should be used. Images inside a
+		// gallery are left unset so the gallery can apply its own link
+		// setting (including the lightbox) once the upload has finished.
 		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
+		const isInGallery =
+			getBlockName( getBlockRootClientId( clientId ) ) === 'core/gallery';
+		if ( ! linkDestination && ! isInGallery ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			switch (
