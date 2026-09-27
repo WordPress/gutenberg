@@ -79,19 +79,19 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run build` - builds the code for production.
--   `npm run build:custom` - builds the code for production with two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
--   `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
--   `npm run build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
+- `npm run build` - builds the code for production.
+- `npm run build:custom` - builds the code for production with two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
+- `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
+- `npm run build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
--   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
--   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
--   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
--   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
--   `--output-path` – allows customization of the output directory. The default is the `build` folder.
+- `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+- `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
+- `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+- `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
+- `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
+- `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
 Experimental support for the block.json `viewScriptModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
@@ -112,8 +112,8 @@ Usage: `wp-scripts build-blocks-manifest [options]`
 
 Options:
 
--   `--input`: Specify the input directory (default: 'build')
--   `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
+- `--input`: Specify the input directory (default: 'build')
+- `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
 
 Example:
 
@@ -167,11 +167,11 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run check-engines` - checks installed version of `node` and `npm`.
+- `npm run check-engines` - checks installed versions of the tools listed in the `engines` field of your project's `package.json`, falling back to the `node` version required by this package.
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. When your project has no `engines` field, it checks the Node.js version required by this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -189,10 +189,10 @@ _Example:_
 
 _Flags_:
 
--   `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
--   `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
--   `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
--   `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
+- `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
+- `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
+- `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
+- `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
 ### `format`
 
@@ -211,8 +211,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run format` - formats files in the entire project’s directories.
--   `npm run format:src` - formats files in the project’s `src` subfolder’s directories.
+- `npm run format` - formats files in the entire project’s directories.
+- `npm run format:src` - formats files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
@@ -235,8 +235,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
--   `npm run lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
+- `npm run lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
+- `npm run lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
@@ -248,9 +248,9 @@ It uses [ESLint](https://eslint.org/) with the set of recommended rules defined 
 
 **Breaking changes in ESLint v10:**
 
--   The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.
--   The `--ignore-path` CLI flag was removed along with the eslintrc system. Use `ignores` arrays in your flat config instead.
--   Legacy `.eslintrc.*` fallback detection is deprecated and will be removed in a future version. Migrate to `eslint.config.*` files.
+- The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.
+- The `--ignore-path` CLI flag was removed along with the eslintrc system. Use `ignores` arrays in your flat config instead.
+- Legacy `.eslintrc.*` fallback detection is deprecated and will be removed in a future version. Migrate to `eslint.config.*` files.
 
 ### `lint-pkg-json`
 
@@ -269,8 +269,8 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
--   `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
+- `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
+- `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
@@ -296,7 +296,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
+- `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
@@ -321,8 +321,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:style` - lints CSS, PCSS, and SCSS files in the entire project’s directories.
--   `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
+- `npm run lint:style` - lints CSS, PCSS, and SCSS files in the entire project’s directories.
+- `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
@@ -349,7 +349,7 @@ _Example:_
 
 This script provides the following custom options:
 
--   `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
+- `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
 
 #### Advanced information
 
@@ -385,11 +385,11 @@ It reuses the same logic as `npm pack` command to create an npm package tarball.
 
 This is how you create a custom root folder inside the zip file.
 
--   When updating a plugin, WordPress expects a folder in the root of the zip file which matches the plugin name. So be aware that this may affect the plugin update process.
--   `--root-folder` - Add a custom root folder to the zip file.
--   `npm run plugin-zip` - By default, unzipping your plugin’s zip file will result in a folder with the same name as your plugin.
--   `npm run plugin-zip --root-folder='custom-directory'` - Your plugin’s zip file will be unzipped into a folder named `custom-directory`.
--   `npm run plugin-zip --no-root-folder` - This will create a zip file that has no folder inside, your plugin files will be unzipped directly into the target directory.
+- When updating a plugin, WordPress expects a folder in the root of the zip file which matches the plugin name. So be aware that this may affect the plugin update process.
+- `--root-folder` - Add a custom root folder to the zip file.
+- `npm run plugin-zip` - By default, unzipping your plugin’s zip file will result in a folder with the same name as your plugin.
+- `npm run plugin-zip --root-folder='custom-directory'` - Your plugin’s zip file will be unzipped into a folder named `custom-directory`.
+- `npm run plugin-zip --no-root-folder` - This will create a zip file that has no folder inside, your plugin files will be unzipped directly into the target directory.
 
 ### `start`
 
@@ -415,23 +415,23 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm start` - starts the build for development.
--   `npm run start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the files.
--   `npm run start:custom` - starts the build for development which contains two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
--   `npm run start:copy-php` - starts the build for development and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
--   `npm run start:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
+- `npm start` - starts the build for development.
+- `npm run start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the files.
+- `npm run start:custom` - starts the build for development which contains two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
+- `npm run start:copy-php` - starts the build for development and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
+- `npm run start:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
--   `--no-watch` – Starts the build for development without starting the watcher.
--   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
--   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
--   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
--   `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
--   `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
--   `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
--   `--output-path` – allows customization of the output directory. The default is the `build` folder.
+- `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
+- `--no-watch` – Starts the build for development without starting the watcher.
+- `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+- `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
+- `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
+- `--webpack-no-externals` – disables scripts’ assets generation, and omits the list of default externals.
+- `--blocks-manifest` – generates a PHP file containing block metadata from all `block.json` files in the project. This is useful for enhancing performance when registering multiple block types, as it allows you to use `wp_register_block_metadata_collection()` and `wp_register_block_types_from_metadata_collection()` in WordPress.
+- `--source-path` – allows customization of the source directory. The default is the project root `.` when [entry points are listed](#listing-entry-points) in the command, or `src` otherwise.
+- `--output-path` – allows customization of the output directory. The default is the `build` folder.
 
 Experimental support for the block.json `viewScriptModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
@@ -446,11 +446,15 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-unit-js`
 
-_Alias_: `test-unit-jest`
+Runs the consumer's installed [Vitest](https://vitest.dev/) once. Install the test runner in the project that owns the tests.
 
-Launches the unit test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api).
+For a new test setup, install Vitest 5 and Vite 8:
 
-_Example:_
+```sh
+npm install --save-dev vitest@^5 vite@^8
+```
+
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`.
 
 ```json
 {
@@ -458,33 +462,31 @@ _Example:_
 		"test:unit": "wp-scripts test-unit-js",
 		"test:unit:help": "wp-scripts test-unit-js --help",
 		"test:unit:watch": "wp-scripts test-unit-js --watch",
-		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache"
+		"test:unit:debug": "wp-scripts test-unit-js --inspect-brk --no-file-parallelism",
+		"test:unit:update": "wp-scripts test-unit-js --update"
 	}
 }
 ```
 
-This is how you execute those scripts using the presented setup:
+The default environment is Node. Vitest APIs must be imported explicitly. Vitest discovers `*.test.*` and `*.spec.*` files. A file named `test/index.js` needs renaming or an explicit `test.include` pattern in the consumer config.
 
--   `npm run test:unit` - runs all unit tests.
--   `npm run test:unit:help` - prints all available options to configure unit tests runner.
--   `npm run test:unit:watch` - runs all unit tests in the watch mode.
--   `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
+Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working directory. A Vitest config takes precedence over a Vite config; it does not merge the two automatically. Use `--config path/to/config.mjs` to select another file. ESM and TypeScript configs use Vite's config loader. Jest config files and the `jest` field in `package.json` do not configure this command.
 
-Jest will look for test files with any of the following popular naming conventions:
+`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
 
--   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix located at any level of depth in `__tests__` folders.
--   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix directly located in `test` folders.
--   Files with `.test.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
+### `test-unit-jest`
 
-#### Advanced information
+Maintenance-only adapter for a project-installed Jest 30. It forwards Jest CLI arguments and preserves its exit status, with `NODE_ENV` and `BABEL_ENV` set to `test`. Vitest remains the default through `test-unit-js`. There is no scheduled removal of this adapter.
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+```sh
+npm install --save-dev jest@30.5.0
+```
 
-Should there be any situation where you want to provide your own Jest config, you can do so.
+Use `wp-scripts test-unit-jest` in your npm test command. Jest discovers your project's configuration; pass `--config` for custom filenames such as `jest-unit.config.js`. Scripts no longer bundles Jest, jsdom, the WordPress Jest preset, its Babel transformer, or its GitHub Actions reporter.
 
--   the command receives a `--config` argument. Example: `wp-scripts test-unit --config my-jest-config.js`.
--   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
--   a `jest` object can be provided in the `package.json` file with the test configuration.
+Existing suites can keep using the published WordPress Jest packages. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
+
+The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
 
 ### `test-e2e`
 
@@ -508,11 +510,11 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
--   `npm run test:e2e` - runs all tests.
--   `npm run test:e2e:help` - prints all available options to configure the test runner.
--   `npm run test:e2e:debug` - runs all tests interactively with the Playwright inspector.
--   `npm run test:e2e FILE_NAME` - runs a specific test file.
--   `npm run test:e2e -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
+- `npm run test:e2e` - runs all tests.
+- `npm run test:e2e:help` - prints all available options to configure the test runner.
+- `npm run test:e2e:debug` - runs all tests interactively with the Playwright inspector.
+- `npm run test:e2e FILE_NAME` - runs a specific test file.
+- `npm run test:e2e -- --watch` - runs all tests interactively with watch mode and enhanced debugging.
 
 By default, Playwright looks for JavaScript or TypeScript files with `.test` or `.spec` suffix in the project root-level `/specs` folder, for example `/specs/login-screen.wrong-credentials.spec.ts`.
 
@@ -539,27 +541,27 @@ wp-scripts [NODE_OPTIONS] script
 
 ### Debugging tests
 
-One common use-case for passing Node.js options is debugging your tests.
+For Vitest tests, pass `--inspect-brk --no-file-parallelism` after `test-unit-js`. Vitest then opens the inspector in the test worker. Passing `--inspect-brk` before the command inspects the wrapper process instead.
 
 Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
-Follow the instructions for debugging Node.js with your favorite supported browser or IDE. When the instructions say to use `node --inspect script.js` or `node --inspect-brk script.js`, simply use `wp-scripts --inspect script` or `wp-scripts --inspect-brk script` instead.
+For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for the complete command setup.
 
 Google Chrome and Visual Studio Code are used as examples below.
 
 #### Debugging in Google Chrome
 
-Place `debugger;` statements in any test and run `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` (or `npm run test:unit:debug` from above).
+Place `debugger;` statements in any test and run `wp-scripts test-unit-js --inspect-brk --no-file-parallelism` (or `npm run test:unit:debug` from above).
 
 Then open `about:inspect` in Google Chrome and select `inspect` on your process.
 
-A breakpoint will be set at the first line of the script (this is done to give you time to open the developer tools and to prevent Jest from executing before you have time to do so). Click the resume button in the upper right panel of the dev tools to continue execution. When Jest executes the test that contains the debugger statement, execution will pause and you can examine the current scope and call stack.
+The test worker pauses before execution so you can attach the debugger. Resume execution in the developer tools. When Vitest reaches a `debugger;` statement, execution pauses again so you can inspect the scope and call stack.
 
 #### Debugging in Visual Studio Code
 
-Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
+Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Vitest unit tests.
 
-Make sure `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
+Make sure `wp-scripts test-unit-js --inspect-brk --no-file-parallelism` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
 
 When debugging, set a breakpoint in your tests by clicking on a line in the editor’s left margin by the line numbers.
 
@@ -696,23 +698,23 @@ This package should generally be used with the set of recommended config files. 
 
 `@wordpress/scripts` bundles the default webpack config used as a base by the WordPress editor. These are the defaults:
 
--   [Entry](https://webpack.js.org/configuration/entry-context/#entry): the entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found.
--   [Output](https://webpack.js.org/configuration/output): `build/[name].js`, for example: `build/index.js`, or `build/my-block/index.js`.
--   [Loaders](https://webpack.js.org/loaders/):
-    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript and TypeScript files using Babel and webpack.
-    -   [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
-    -   [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
--   [Plugins](https://webpack.js.org/configuration/plugins) (among others):
-    -   [`CopyWebpackPlugin`](https://webpack.js.org/plugins/copy-webpack-plugin/) copies all `block.json` files discovered in the `src` directory to the build directory.
-    -   [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
-    -   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
+- [Entry](https://webpack.js.org/configuration/entry-context/#entry): the entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found.
+- [Output](https://webpack.js.org/configuration/output): `build/[name].js`, for example: `build/index.js`, or `build/my-block/index.js`.
+- [Loaders](https://webpack.js.org/loaders/):
+    - [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript and TypeScript files using Babel and webpack.
+    - [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
+    - [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
+- [Plugins](https://webpack.js.org/configuration/plugins) (among others):
+    - [`CopyWebpackPlugin`](https://webpack.js.org/plugins/copy-webpack-plugin/) copies all `block.json` files discovered in the `src` directory to the build directory.
+    - [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
+    - [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
 
 ### Provide your own webpack config
 
 Should there be any situation where you want to provide your own webpack config, you can do so. The `build` and `start` commands will use your provided file when:
 
--   the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
--   there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your project (at the same level as `package.json`).
+- the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
+- there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your project (at the same level as `package.json`).
 
 #### Extending the webpack config
 
@@ -744,8 +746,8 @@ module.exports = {
 
 If you follow this approach, please, be aware that:
 
--   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
--   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+- You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
+- Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 

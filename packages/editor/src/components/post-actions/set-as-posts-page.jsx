@@ -65,7 +65,7 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 					// translators: %s: title of the current posts page.
 					__( 'This will replace the current posts page: "%s"' ),
 					getItemTitle( currentPostsPage )
-			  )
+				)
 			: __( 'This page will show the latest posts.' );
 
 	const modalText = sprintf(

@@ -411,7 +411,7 @@ const UnforwardedPopover = (
 				// `placementToMotionAnimationProps` function.
 				x: computePopoverPosition( x ),
 				y: computePopoverPosition( y ),
-		  };
+			};
 
 	const shouldReduceMotion = useReducedMotion();
 	const shouldAnimate = animate && ! isExpanded && ! shouldReduceMotion;
@@ -432,14 +432,14 @@ const UnforwardedPopover = (
 				},
 				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
-		  }
+			}
 		: {
 				animate: false,
 				style: {
 					...contentStyle,
 					...style,
 				},
-		  };
+			};
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating
 	// the popover, add the `is-positioned` class to signal that all transitions have finished.

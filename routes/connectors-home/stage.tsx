@@ -111,10 +111,10 @@ function ConnectorsPage() {
 								{ isFileModDisabled
 									? __(
 											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-									  )
+										)
 									: __(
 											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									  ) }
+										) }
 							</Notice.Description>
 						</Notice.Root>
 					) }

@@ -1,10 +1,16 @@
 import path from 'node:path';
 import { globSync } from 'glob';
 
+/*
+ * Extension glob shared by every pattern below. Node runs `.mts` and `.cts`
+ * through type stripping, so they are discovered wherever `.ts` is.
+ */
+const TEST_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
+
 export const TEST_PATTERNS = [
-	'**/__tests__/**/*.[jt]s?(x)',
-	'**/test/*.[jt]s?(x)',
-	'**/?(*.)test.[jt]s?(x)',
+	`**/__tests__/**/*.${ TEST_EXT }`,
+	`**/test/*.${ TEST_EXT }`,
+	`**/?(*.)test.${ TEST_EXT }`,
 ];
 
 export const TEST_IGNORES = [
@@ -12,17 +18,26 @@ export const TEST_IGNORES = [
 	'**/node_modules/**',
 	'packages/e2e-tests/**',
 	'packages/e2e-test-utils-playwright/src/test.ts',
+	// Runs under `node --test`, not Vitest.
+	'test/ai-development/**',
 	'**/build/**',
 	'**/build-module/**',
 	'**/build-types/**',
 	'**/*.d.ts',
+	'**/*.d.mts',
+	'**/*.d.cts',
 	'vendor/**',
 ];
 
 export const VITEST_PROJECT_NAMES = [ 'node', 'jsdom', 'browser' ];
 
-const JSDOM_TEST_PATH_PATTERN = /\.jsdom\.test\.[jt]sx?$/;
-const BROWSER_TEST_PATH_PATTERN = /\.browser\.test\.[jt]sx?$/;
+const TEST_EXT_PATTERN = '(?:[cm]js|[cm]ts|js|jsx|ts|tsx)';
+const JSDOM_TEST_PATH_PATTERN = new RegExp(
+	`\\.jsdom\\.test\\.${ TEST_EXT_PATTERN }$`
+);
+const BROWSER_TEST_PATH_PATTERN = new RegExp(
+	`\\.browser\\.test\\.${ TEST_EXT_PATTERN }$`
+);
 
 function normalizeTestPath( testPath ) {
 	return testPath.split( path.sep ).join( '/' );
@@ -44,22 +59,6 @@ export function discoverTestFiles( rootDir ) {
 	].sort();
 }
 
-export function getVitestTests( discoveredTests, manifest ) {
-	const jestTests = new Set( manifest.jest.files );
-
-	return discoveredTests
-		.filter( ( testPath ) => ! jestTests.has( testPath ) )
-		.sort();
-}
-
-export function findAddedLegacyJestTests( currentTests, baselineTests ) {
-	const baselineTestSet = new Set( baselineTests );
-
-	return currentTests
-		.filter( ( testPath ) => ! baselineTestSet.has( testPath ) )
-		.sort();
-}
-
 export function getTestEnvironmentName( testPath ) {
 	if ( BROWSER_TEST_PATH_PATTERN.test( testPath ) ) {
 		return 'browser';
@@ -72,12 +71,12 @@ export function getTestEnvironmentName( testPath ) {
 	return 'node';
 }
 
-export function getVitestTestsByProject( discoveredTests, manifest ) {
+export function getVitestTestsByProject( discoveredTests ) {
 	const testsByProject = Object.fromEntries(
 		VITEST_PROJECT_NAMES.map( ( projectName ) => [ projectName, [] ] )
 	);
 
-	for ( const testPath of getVitestTests( discoveredTests, manifest ) ) {
+	for ( const testPath of discoveredTests ) {
 		testsByProject[ getTestEnvironmentName( testPath ) ].push( testPath );
 	}
 

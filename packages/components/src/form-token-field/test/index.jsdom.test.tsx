@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	render,
 	screen,
@@ -110,13 +110,16 @@ function unescapeAndFormatSpaces( str: string ) {
 	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
 
+const SHOW_HOW_TO_DEPRECATION =
+	'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.';
+
 describe( 'FormTokenField', () => {
+	beforeEach( () => {
+		delete logged[ SHOW_HOW_TO_DEPRECATION ];
+	} );
+
 	afterEach( () => {
-		// `@wordpress/deprecated` caches each warning message after the first
-		// log; reset it so multiple tests can assert the same deprecation.
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
+		delete logged[ SHOW_HOW_TO_DEPRECATION ];
 	} );
 
 	describe( 'basic usage', () => {
@@ -632,9 +635,7 @@ describe( 'FormTokenField', () => {
 				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
 			);
 
-			expect( console ).toHaveWarnedWith(
-				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
-			);
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 
 			expect(
 				screen.queryByText( 'Separate with commas or the Enter key.' )
@@ -652,7 +653,7 @@ describe( 'FormTokenField', () => {
 				/>
 			);
 
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( 'Help text' );

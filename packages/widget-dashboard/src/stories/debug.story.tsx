@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType } from 'react';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
-import { Button } from '@wordpress/components';
 import {
 	createContext,
 	useContext,
@@ -12,6 +7,8 @@ import {
 	useState,
 } from '@wordpress/element';
 import { lockOutline } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button } from '@wordpress/ui';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -207,14 +204,14 @@ function RogueTriggers() {
 			} }
 		>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () => onLayoutChange( [ ...layout ].reverse() ) }
 			>
 				Reverse the order
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () =>
 					onLayoutChange(
@@ -227,7 +224,7 @@ function RogueTriggers() {
 				Remove the Delta card
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () =>
 					onLayoutChange(
@@ -241,7 +238,7 @@ function RogueTriggers() {
 				Set every width to 4
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () =>
 					onLayoutChange(
@@ -261,7 +258,7 @@ function RogueTriggers() {
 				Rename every label
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () =>
 					insert( {
@@ -274,7 +271,7 @@ function RogueTriggers() {
 				Insert a goal (rejected)
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () =>
 					insert( {
@@ -287,7 +284,7 @@ function RogueTriggers() {
 				Insert a card (allowed)
 			</Button>
 			<Button
-				variant="secondary"
+				variant="outline"
 				size="compact"
 				onClick={ () => onLayoutChange( ENFORCEMENT_LAYOUT ) }
 			>
@@ -374,7 +371,8 @@ function StagingEnforcementStory( {
 }
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground/Debug',
+	id: 'widget-dashboard-playground-debug',
+	title: 'Widgets/Dashboard/Playground/Debug',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {

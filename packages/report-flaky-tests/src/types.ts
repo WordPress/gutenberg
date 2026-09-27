@@ -18,8 +18,7 @@ type PlaywrightTestFlakyTestResult = BaseFlakyTestResult & {
 };
 
 export type FlakyTestResult =
-	| JestCircusFlakyTestResult
-	| PlaywrightTestFlakyTestResult;
+	JestCircusFlakyTestResult | PlaywrightTestFlakyTestResult;
 
 export type ReportedFlakyTest = {
 	testTitle: string;

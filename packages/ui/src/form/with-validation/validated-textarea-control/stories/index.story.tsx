@@ -4,7 +4,8 @@ import { ValidatedTextareaControl } from '../index';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedTextareaControl > = {
-	title: 'Design System/Components/Form/With Validation/ValidatedTextareaControl',
+	title: 'Components/@wordpress-ui/Form/With Validation/ValidatedTextareaControl',
+	id: 'design-system-components-form-with-validation-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
 	argTypes: {
 		customValidity: { control: false },
@@ -54,7 +55,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

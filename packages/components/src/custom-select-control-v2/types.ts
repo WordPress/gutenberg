@@ -21,8 +21,7 @@ export type CustomSelectButtonSize = CustomSelectSize<
 >;
 
 export type CustomSelectContext =
-	| ( CustomSelectStore & CustomSelectButtonSize )
-	| undefined;
+	( CustomSelectStore & CustomSelectButtonSize ) | undefined;
 
 export type CustomSelectButtonProps = {
 	/**

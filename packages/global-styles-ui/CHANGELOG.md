@@ -2,16 +2,21 @@
 
 ## Unreleased
 
+## 1.23.0 (2026-09-23)
+
 ### Enhancements
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
 -   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+-   Blocks screen: rank search results so a block whose title matches the search is listed before blocks that only match by keyword, category or description. ([#83435](https://github.com/WordPress/gutenberg/pull/83435))
 
 ### Internal
 
+-   Palette preview: overlapping color dots no longer use `__experimentalZStack`, and the row uses `Stack` from `@wordpress/ui` instead of `Flex` / `HStack` / `VStack`. ([#83060](https://github.com/WordPress/gutenberg/pull/83060))
 -   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 
 ## 1.22.0 (2026-09-10)

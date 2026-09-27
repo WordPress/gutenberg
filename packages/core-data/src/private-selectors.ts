@@ -218,8 +218,9 @@ export const getTemplateId = createRegistrySelector(
 			if ( ! templates ) {
 				return;
 			}
-			const id = templates.find( ( { slug } ) => slug === 'front-page' )
-				?.id;
+			const id = templates.find(
+				( { slug } ) => slug === 'front-page'
+			)?.id;
 			if ( id ) {
 				return id;
 			}

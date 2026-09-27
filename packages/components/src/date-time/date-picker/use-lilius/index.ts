@@ -300,7 +300,7 @@ export const useLilius = ( {
 								! date
 									.map( ( d ) => d.getTime() )
 									.includes( s.getTime() )
-					  )
+						)
 					: selectedItems.filter( ( s ) => ! isEqual( s, date ) )
 			),
 		[]

@@ -35,13 +35,13 @@ const mapElements =
 							right,
 							bottom,
 							left,
-					  }
+						}
 					: {
 							top: left,
 							bottom: right,
 							left: top,
 							right: bottom,
-					  };
+						};
 			},
 		};
 	};

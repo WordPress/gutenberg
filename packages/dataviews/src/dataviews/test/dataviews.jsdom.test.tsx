@@ -751,7 +751,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in grid view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -759,14 +759,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getAllByText( item.title )[ 0 ]
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getAllByText( item.title )[ 0 ]
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render mediaField if defined', () => {
+		it( 'should render mediaField if defined', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -775,14 +777,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getByTestId( 'image-field-' + item.id )
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByTestId( 'image-field-' + item.id )
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each grid item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each grid item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -792,7 +796,11 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
@@ -827,7 +835,7 @@ describe( 'DataViews component', () => {
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
 		} );
 
-		it( 'labels the clickable media area with the title when the title is hidden', () => {
+		it( 'labels the clickable media area with the title when the title is hidden', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -840,17 +848,19 @@ describe( 'DataViews component', () => {
 					onClickItem={ () => {} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getByRole( 'button', { name: item.title } )
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByRole( 'button', { name: item.title } )
+					).toBeInTheDocument();
+				}
+			} );
 			expect(
 				screen.queryByRole( 'button', { name: 'Navigate to item' } )
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'labels the clickable media area by the visible title when the title is shown', () => {
+		it( 'labels the clickable media area by the visible title when the title is shown', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -865,11 +875,13 @@ describe( 'DataViews component', () => {
 			// Both the media area and the title are clickable and share the
 			// name; the media area points at the rendered title
 			// (`aria-labelledby`) rather than carrying a label of its own.
-			const mediaButton = screen
-				.getAllByRole( 'button', { name: data[ 0 ].title } )
-				.find( ( button ) =>
-					button.classList.contains( 'dataviews-view-grid__media' )
-				);
+			const mediaButton = (
+				await screen.findAllByRole( 'button', {
+					name: data[ 0 ].title,
+				} )
+			).find( ( button ) =>
+				button.classList.contains( 'dataviews-view-grid__media' )
+			);
 			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
 			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
 		} );
@@ -1129,19 +1141,29 @@ describe( 'DataViews component', () => {
 			// class the previews are styled from.
 			const getGrid = () => screen.getByRole( 'grid' );
 
-			it( 'crops previews by default', () => {
+			it( 'crops previews by default', async () => {
 				renderGrid();
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
-			it( 'fits previews when configured to contain', () => {
+			it( 'fits previews when configured to contain', async () => {
 				renderGrid( { mediaFit: 'contain' } );
-				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).toHaveClass( 'has-media-fit-contain' )
+				);
 			} );
 
-			it( 'ignores an unsupported value and falls back to cropping', () => {
+			it( 'ignores an unsupported value and falls back to cropping', async () => {
 				renderGrid( { mediaFit: 'fill' } );
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
 			it( 'hides the control unless the consumer opts in', async () => {
@@ -1170,7 +1192,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in list view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1180,12 +1202,12 @@ describe( 'DataViews component', () => {
 			);
 			for ( const item of data ) {
 				expect(
-					screen.getAllByText( item.title )[ 0 ]
+					( await screen.findAllByText( item.title ) )[ 0 ]
 				).toBeInTheDocument();
 			}
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each list item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each list item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1195,7 +1217,11 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
@@ -1209,14 +1235,16 @@ describe( 'DataViews component', () => {
 				layout: { density: 'compact' },
 			};
 
-			it( 'should apply the configured density', () => {
+			it( 'should apply the configured density', async () => {
 				const { container } = render(
 					<DataViewWrapper view={ view } />
 				);
-				expect(
-					// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-					container.querySelector( '.dataviews-view-list' )
-				).toHaveClass( 'has-compact-density' );
+				await waitFor( () =>
+					expect(
+						// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+						container.querySelector( '.dataviews-view-list' )
+					).toHaveClass( 'has-compact-density' )
+				);
 			} );
 
 			it( 'should become inert while loading and refreshing once the delay elapses', async () => {

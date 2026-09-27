@@ -75,7 +75,6 @@ export function PrivateBlockToolbar( {
 		const {
 			getBlockName,
 			getBlockMode,
-			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockEditingMode,
@@ -83,6 +82,7 @@ export function PrivateBlockToolbar( {
 			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
+			getEnabledBlockParents,
 			isZoomOut,
 			isSectionBlock,
 			isBlockHiddenAtViewport,
@@ -91,9 +91,13 @@ export function PrivateBlockToolbar( {
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( selectedBlockClientId );
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
-		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		// The parent is the nearest one shown in List View and the breadcrumb,
+		// skipping any disabled blocks in between.
+		const parentClientId = getEnabledBlockParents(
+			selectedBlockClientId,
+			true
+		)[ 0 ];
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
@@ -144,7 +148,7 @@ export function PrivateBlockToolbar( {
 			showParentSelector:
 				! _isZoomOut &&
 				parentBlockType &&
-				editingMode !== 'contentOnly' &&
+				( editingMode !== 'contentOnly' || !! parentSection ) &&
 				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
 					parentBlockType,

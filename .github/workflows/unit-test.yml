@@ -5,16 +5,24 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
     # Allow manually triggering the workflow.
     workflow_dispatch:
+        inputs:
+            browser-trace-file:
+                description: 'Optional repository-relative Browser test file to run with a failure trace'
+                type: string
+                default: ''
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    # or the commit hash for any other events. Keep each focused trace run separate
+    # so it cannot cancel full test runs or other diagnostics for the same commit.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}${{ inputs.browser-trace-file && format('-browser-trace-{0}', github.run_id) || '' }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -109,34 +117,21 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
-            - name: Run the remaining Jest partition
+            - name: Run the Vitest Node and jsdom projects
               env:
                   SHARD: ${{ matrix.shard }}
-                  # Record the Node.js major as a custom flakiness environment
-                  # dimension so flakiness.io keeps a separate history per Node
-                  # version in the matrix.
+                  # Keep a separate Flakiness.io history for each Node.js major.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
-                  npm run test:unit -- \
-                    --ci \
-                    --maxWorkers="$(nproc)" \
-                    --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache" \
-                    --passWithNoTests
-
-            - name: Run the migrated Vitest partition
-              env:
-                  SHARD: ${{ matrix.shard }}
-                  # Preserve the same Flakiness.io environment identity used
-                  # by the Jest partition.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
-              run: |
+                  # New workflow runs vary the seed; reruns keep the original seed.
+                  echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=node --project=jsdom --shard=$SHARD"
                   npm run test:unit:vitest:shuffled -- \
+                    --sequence.seed="$GITHUB_RUN_NUMBER" \
                     --project=node \
                     --project=jsdom \
                     --shard="$SHARD" \
@@ -178,7 +173,31 @@ jobs:
             - name: Run the Vitest Browser project
               env:
                   FK_ENV_NODEJS: '24'
-              run: npm run test:unit:vitest:shuffled -- --project=browser
+                  BROWSER_TRACE_FILE: ${{ inputs.browser-trace-file }}
+              run: |
+                  if [[ -n "$BROWSER_TRACE_FILE" ]]; then
+                    if [[ ! -f "$BROWSER_TRACE_FILE" ]] || [[ "$BROWSER_TRACE_FILE" != packages/*.browser.test.* && "$BROWSER_TRACE_FILE" != test/*.browser.test.* ]]; then
+                      echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
+                      exit 1
+                    fi
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser \"$BROWSER_TRACE_FILE\""
+                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser "$BROWSER_TRACE_FILE"
+                  else
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser"
+                    npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser
+                  fi
+
+            - name: Upload Browser Mode failure artifacts
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: vitest-browser-failures
+                  path: |
+                      test-results/vitest-attachments/failure-screenshots/
+                      test-results/vitest-browser-screenshots/
+                      test-results/vitest-browser-traces/**/*.trace.zip
+                  retention-days: 3
+                  if-no-files-found: ignore
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
@@ -207,8 +226,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
@@ -218,7 +237,7 @@ jobs:
                   # dimension so flakiness.io keeps a separate history per Node
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
-              run: npm run test:unit:date -- --maxWorkers="$(nproc)"
+              run: npm run test:unit:date
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version

@@ -3570,8 +3570,8 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 				url: 'https://example.com/my-page',
 				title: 'My Test Page',
 				badges: [
-					{ label: 'Draft', intent: 'warning' },
-					{ label: 'Page', intent: 'default' },
+					{ label: 'Draft', intent: 'low' },
+					{ label: 'Page', intent: 'none' },
 				],
 			};
 
@@ -3629,5 +3629,43 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 
 			expect( badgesContainer ).not.toBeInTheDocument();
 		} );
+	} );
+} );
+
+describe( 'Front page and blog home labelling', () => {
+	it( 'should not label a term that shares the front page id as the front page', async () => {
+		const user = userEvent.setup();
+		const aCategory = {
+			id: 1,
+			title: 'Uncategorized',
+			type: 'category',
+			kind: 'taxonomy',
+			url: '/category/uncategorized',
+		};
+
+		// Posts and terms are separate tables, so a term can share an id with
+		// the page set as the front page.
+		useSelect.mockImplementation( () => ( {
+			fetchSearchSuggestions: () => Promise.resolve( [ aCategory ] ),
+			fetchRichUrlData: mockFetchRichUrlData,
+			pageOnFront: 1,
+			pageForPosts: 2,
+		} ) );
+
+		render( <LinkControl /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Uncategorized'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		const option = within( searchResults ).getByRole( 'option' );
+
+		expect( option ).toHaveTextContent( 'Category' );
+		expect( option ).not.toHaveTextContent( 'Front page' );
 	} );
 } );

@@ -1,7 +1,7 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -106,7 +106,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						}
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [

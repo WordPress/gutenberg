@@ -16,7 +16,7 @@ const backgroundImage = {
 			typeof _backgroundImage === 'object' && _backgroundImage?.url
 				? `url( '${ encodeURI(
 						safeDecodeURI( _backgroundImage.url )
-				  ) }' )`
+					) }' )`
 				: getCSSValueFromRawStyle( _backgroundImage );
 		const cssValue = [ gradient, backgroundImageValue ]
 			.filter( Boolean )
@@ -29,7 +29,7 @@ const backgroundImage = {
 						key: 'backgroundImage',
 						value: cssValue,
 					},
-			  ]
+				]
 			: [];
 	},
 };

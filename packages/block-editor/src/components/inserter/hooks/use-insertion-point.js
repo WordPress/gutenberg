@@ -163,7 +163,7 @@ function useInsertionPoint( {
 								destinationIndex,
 								rootClientId: _rootClientId,
 								registry,
-						  } ),
+							} ),
 					isAppender || _rootClientId === undefined
 						? destinationRootClientId
 						: _rootClientId,

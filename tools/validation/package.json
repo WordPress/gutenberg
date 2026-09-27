@@ -25,9 +25,12 @@
 	},
 	"devDependencies": {
 		"@mawesome/dependency-audit": "^0.4.6",
+		"@types/node": "^24.13.3",
 		"@wordpress/create-block": "file:../../packages/create-block",
+		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/monorepo-tools": "file:../monorepo",
 		"@wordpress/scripts": "file:../../packages/scripts",
+		"@wordpress/ui": "file:../../packages/ui",
 		"chalk": "^4.1.1",
 		"esbuild": "^0.27.2",
 		"glob": "^13.0.6",
@@ -47,6 +50,8 @@
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
-		"validate-tsconfig": "node ./validate-tsconfig.mjs"
+		"validate-tsconfig": "node ./validate-tsconfig.mjs",
+		"validate-changelogs": "node ./validate-changelogs.ts",
+		"test-vitest-consumers": "node ./test-vitest-consumers.mjs"
 	}
 }

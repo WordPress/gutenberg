@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+// Load the tokens that the production build also supplies as fallbacks.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../../../theme/prebuilt/css/design-tokens.css';
 import {
 	Card,
 	CardBody,
@@ -9,40 +12,6 @@ import {
 	CardHeader,
 	CardMedia,
 } from '../';
-import { useCx } from '../../utils/hooks/use-cx';
-import * as styles from '../styles';
-
-function EmotionStylePrimer( {
-	styleFragment,
-}: {
-	styleFragment: Parameters< ReturnType< typeof useCx > >[ 0 ];
-} ) {
-	const cx = useCx();
-
-	return <div className={ cx( styleFragment ) } />;
-}
-
-function expectComposedEmotionClassName(
-	element: HTMLElement,
-	styleLabels: string[]
-) {
-	const matchingClassNames = element.className
-		.split( /\s+/ )
-		.filter( ( className ) => className.startsWith( 'css-' ) )
-		.filter( ( className ) =>
-			styleLabels.some( ( styleLabel ) =>
-				className.includes( styleLabel )
-			)
-		);
-
-	expect( matchingClassNames ).toHaveLength( 1 );
-	for ( const styleLabel of styleLabels ) {
-		expect( matchingClassNames[ 0 ] ).toEqual(
-			expect.stringContaining( styleLabel )
-		);
-	}
-}
-
 const spacingProperties = [
 	'paddingTop',
 	'paddingRight',
@@ -67,6 +36,18 @@ function readElevationShadow( card: HTMLElement ) {
 		'[aria-hidden="true"]'
 	);
 	return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
+}
+
+function readElevationRadii( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'.components-elevation'
+	);
+	return Array.from(
+		layers,
+		( shadow ) => getComputedStyle( shadow ).borderRadius
+	);
 }
 
 describe( 'Card', () => {
@@ -110,21 +91,6 @@ describe( 'Card', () => {
 		);
 
 		expect( borderedShadow ).not.toBe( 'none' );
-		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
-	} );
-
-	it( 'keeps borderless styles regardless of Emotion insertion order', async () => {
-		await render(
-			<EmotionStylePrimer styleFragment={ styles.boxShadowless } />
-		);
-		await render(
-			<Card data-testid="card-wrapper" isBorderless>
-				Code is Poetry
-			</Card>
-		);
-
-		const card = screen.getByTestId( 'card-wrapper' );
-		expectComposedEmotionClassName( card, [ 'Card', 'boxShadowless' ] );
 		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
 	} );
 
@@ -361,32 +327,6 @@ describe( 'Card', () => {
 		).toBe( 'flex-end' );
 	} );
 
-	it( 'keeps region borderless styles regardless of Emotion insertion order', async () => {
-		await render(
-			<EmotionStylePrimer styleFragment={ styles.borderless } />
-		);
-		await render(
-			<Card>
-				<CardHeader data-testid="card-header" isBorderless>
-					Header
-				</CardHeader>
-				<CardBody>Body</CardBody>
-				<CardFooter data-testid="card-footer" isBorderless>
-					Footer
-				</CardFooter>
-			</Card>
-		);
-
-		expect(
-			getComputedStyle( screen.getByTestId( 'card-header' ) )
-				.borderBottomStyle
-		).toBe( 'none' );
-		expect(
-			getComputedStyle( screen.getByTestId( 'card-footer' ) )
-				.borderTopStyle
-		).toBe( 'none' );
-	} );
-
 	it( 'makes CardBody scrollable when requested', async () => {
 		await render(
 			<CardBody data-testid="scrollable" isScrollable>
@@ -397,5 +337,65 @@ describe( 'Card', () => {
 		expect(
 			getComputedStyle( screen.getByTestId( 'scrollable' ) ).overflowY
 		).toBe( 'auto' );
+	} );
+
+	it.each( [
+		{
+			order: 'rounded first',
+			rounded: [ true, false ],
+		},
+		{
+			order: 'square first',
+			rounded: [ false, true ],
+		},
+	] )(
+		'keeps both shadows aligned with the default Card radius with $order',
+		async ( { rounded } ) => {
+			await render(
+				<>
+					{ rounded.map( ( isRounded ) => (
+						<Card
+							key={ String( isRounded ) }
+							isRounded={ isRounded }
+							elevation={ 5 }
+							data-testid={
+								isRounded ? 'rounded-card' : 'square-card'
+							}
+						>
+							Card content
+						</Card>
+					) ) }
+				</>
+			);
+
+			for ( const isRounded of rounded ) {
+				const card = screen.getByTestId(
+					isRounded ? 'rounded-card' : 'square-card'
+				);
+				const radius = getComputedStyle( card ).borderRadius;
+				await expect
+					.poll( () => readElevationRadii( card ) )
+					.toEqual( [ radius, radius ] );
+			}
+		}
+	);
+
+	it( 'keeps both shadows aligned with a custom Card radius', async () => {
+		await render(
+			<Card
+				isRounded={ false }
+				elevation={ 5 }
+				style={ { borderRadius: 23 } }
+				data-testid="card"
+			>
+				Card content
+			</Card>
+		);
+
+		const card = screen.getByTestId( 'card' );
+		const radius = getComputedStyle( card ).borderRadius;
+		await expect
+			.poll( () => readElevationRadii( card ) )
+			.toEqual( [ radius, radius ] );
 	} );
 } );

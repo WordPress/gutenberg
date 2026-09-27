@@ -126,7 +126,7 @@ export function createBlocksFromInnerBlocksTemplate(
 					innerBlock.attributes,
 					innerBlock.innerBlocks,
 					innerBlock.innerContent,
-			  ];
+				];
 		const [ name, attributes, innerBlocks = [], innerContent ] =
 			innerBlockTemplate;
 		return createBlock(
@@ -369,7 +369,7 @@ const getBlockTypesForPossibleToTransforms = (
 					? getBlockTypeWithTransformMetadata(
 							transformedBlockType,
 							transformation
-					  )
+						)
 					: undefined;
 			} );
 		} )

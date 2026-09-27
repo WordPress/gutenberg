@@ -87,8 +87,9 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
-	it( 'should not render the wrap toggle by default', () => {
+	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
+		await screen.findByRole( 'radio', { name: 'Justify items left' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {
@@ -97,13 +98,13 @@ describe( 'FlexLayoutInspectorControls', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the wrap toggle when it has a value', () => {
+	it( 'should render the wrap toggle when it has a value', async () => {
 		renderInspectorControls( {
 			layout: { flexWrap: 'nowrap' },
 		} );
 
 		expect(
-			screen.getByRole( 'checkbox', {
+			await screen.findByRole( 'checkbox', {
 				name: 'Allow to wrap to multiple lines',
 			} )
 		).toBeInTheDocument();

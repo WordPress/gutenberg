@@ -10,11 +10,11 @@ Start from what you are styling and the CSS property you are setting. For exampl
 
 Each segment of a public token name answers one question about the value being applied:
 
--   **Type** identifies the kind of value, like `color` or `dimension`. It is usually determined by the CSS property being set.
--   **Property** describes which aspect of the element the token applies to, such as `background`, `foreground`, `stroke`, `padding`, or `gap`.
--   **Target** describes the kind of element the token applies to, such as a `surface`, an `interactive` control, static `content`, or a `track` or `thumb`. The standalone focus-ring color token is documented below as an exception.
--   **Tone** describes the semantic intent of a color, such as `neutral`, `brand`, `success`, or `error`.
--   **Emphasis** and **state** are modifiers that adjust strength and reflect interactive states.
+- **Type** identifies the kind of value, like `color` or `dimension`. It is usually determined by the CSS property being set.
+- **Property** describes which aspect of the element the token applies to, such as `background`, `foreground`, `stroke`, `padding`, or `gap`.
+- **Target** describes the kind of element the token applies to, such as a `surface`, an `interactive` control, static `content`, or a `track` or `thumb`. The standalone focus-ring color token is documented below as an exception.
+- **Tone** describes the semantic intent of a color, such as `neutral`, `brand`, `success`, or `error`.
+- **Emphasis** and **state** are modifiers that adjust strength and reflect interactive states.
 
 ## Naming pattern
 
@@ -106,9 +106,9 @@ An optional size, intensity, state, or role modifier.
 
 Some public tokens intentionally use shortened or compound forms:
 
--   `--wpds-dimension-surface-width-*` keeps `surface-width` together as a compound role for layout surface widths.
--   `--wpds-border-width-focus` uses `focus` as the target because it describes the focus indicator width, not a size on the border scale.
--   `--wpds-color-stroke-focus` is the standalone color-token exception described below.
+- `--wpds-dimension-surface-width-*` keeps `surface-width` together as a compound role for layout surface widths.
+- `--wpds-border-width-focus` uses `focus` as the target because it describes the focus indicator width, not a size on the border scale.
+- `--wpds-color-stroke-focus` is the standalone color-token exception described below.
 
 ## Color token modifiers
 
@@ -164,9 +164,9 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 The semantic token set is role-based, not a complete matrix of every property, target, tone, emphasis, and state combination. A missing combination should stay omitted when it does not map to a supported design-system role.
 
--   Do not create a token only to fill a missing slot in the naming pattern.
--   Add a missing state token when the same target, tone, and emphasis already define the role in other states, and a component needs that state.
--   Treat emphasis and tone variants as separate roles. For example, do not add strong interactive stroke variants unless a component specifically needs a distinct strong stroke role.
+- Do not create a token only to fill a missing slot in the naming pattern.
+- Add a missing state token when the same target, tone, and emphasis already define the role in other states, and a component needs that state.
+- Treat emphasis and tone variants as separate roles. For example, do not add strong interactive stroke variants unless a component specifically needs a distinct strong stroke role.
 
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
 

@@ -717,7 +717,7 @@ function MediaEditorContent( {
 							/>
 						),
 					},
-			  ]
+				]
 			: [] ),
 		{
 			id: DETAILS_PANEL,
@@ -746,7 +746,7 @@ function MediaEditorContent( {
 					? fields.map( ( field ) => ( {
 							...field,
 							isDisabled: true,
-					  } ) )
+						} ) )
 					: fields,
 			} }
 		>

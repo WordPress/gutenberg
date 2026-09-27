@@ -22,7 +22,7 @@ function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 		element === 'link'
 			? {
 					textDecoration: 'underline',
-			  }
+				}
 			: {};
 
 	const [ fontFamily ] = useStyle< string >(

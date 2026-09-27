@@ -487,7 +487,7 @@ function getNpmReleaseGitRecoveryCommands( {
 						( tagName ) =>
 							`git ls-remote --tags origin "refs/tags/${ tagName }" "refs/tags/${ tagName }^{}"`
 					),
-			  ]
+				]
 			: [] ),
 	].join( '\n' );
 }
@@ -1771,7 +1771,7 @@ async function prepareNpmRelease( config, deps = {} ) {
 				? 'trunk'
 				: await findPluginReleaseBranchNameFn(
 						config.gitWorkingDirectoryPath
-				  );
+					);
 		await runNpmReleaseBranchSyncStepFn( pluginReleaseBranch, config );
 	} else {
 		await checkoutNpmReleaseBranchFn( config );

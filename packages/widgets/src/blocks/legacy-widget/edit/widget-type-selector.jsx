@@ -1,4 +1,7 @@
-import { Spinner, SelectControl } from '@wordpress/components';
+import {
+	Spinner,
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -23,7 +26,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Legacy widget' ) }
 			value={ selectedId ?? '' }
 			options={ [

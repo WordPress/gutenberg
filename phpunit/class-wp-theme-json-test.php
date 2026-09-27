@@ -1151,6 +1151,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_gutenberg_get_viewport_media_queries_returns_media_queries() {
+		$this->assertSame(
+			array(
+				'@mobile'  => '@media (width <= 640px)',
+				'@tablet'  => '@media (640px < width <= 960px)',
+				'@desktop' => '@media (width > 960px)',
+			),
+			gutenberg_get_viewport_media_queries(
+				array(
+					'mobile' => '640px',
+					'tablet' => '960px',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
 	public function test_get_viewport_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
 		$this->assertSame(
 			array(

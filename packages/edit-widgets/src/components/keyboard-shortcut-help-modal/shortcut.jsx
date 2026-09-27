@@ -5,12 +5,12 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 	const shortcut = keyCombination.modifier
 		? displayShortcutList[ keyCombination.modifier ](
 				keyCombination.character
-		  )
+			)
 		: keyCombination.character;
 	const ariaLabel = keyCombination.modifier
 		? shortcutAriaLabel[ keyCombination.modifier ](
 				keyCombination.character
-		  )
+			)
 		: keyCombination.character;
 	const shortcuts = Array.isArray( shortcut ) ? shortcut : [ shortcut ];
 

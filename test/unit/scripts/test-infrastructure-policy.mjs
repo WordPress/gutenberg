@@ -6,7 +6,7 @@ import typescript from 'typescript';
 const SOURCE_IGNORES = [ '**/node_modules/**', 'vendor/**' ];
 const JEST_CONFIG_FILE_PATTERN = /(?:^|\/)[^/]*jest[^/]*\.config\.[^/]+$/;
 const JEST_COMMAND_PATTERN =
-	/(?:^|[^\w-])(?:jest|test-unit-js)(?=$|[^\w-])|(?:^|\s)npm\s+run(?:\s+--workspace\s+\S+)?\s+test:unit(?::(?:debug|profile|update|watch))?(?=$|\s)/;
+	/(?:^|[^\w-])(?:jest|test-unit-jest)(?=$|[^\w-])|(?:^|\s)npm\s+run(?:\s+--workspace\s+\S+)?\s+test:unit:jest(?=$|\s)/;
 const JEST_DEPENDENCY_SECTIONS = [
 	'dependencies',
 	'devDependencies',
@@ -21,7 +21,7 @@ const WORKSPACE_ROUTING_COMMAND = 'node scripts/validate-test-routing.mjs';
 const ROOT_SHUFFLED_COMMAND =
 	'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --';
 const WORKSPACE_SHUFFLED_COMMAND =
-	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855';
+	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests';
 
 function normalizeShellCommand( command ) {
 	return command

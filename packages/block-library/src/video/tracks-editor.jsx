@@ -9,7 +9,7 @@ import {
 	Dropdown,
 	Button,
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
@@ -135,7 +135,7 @@ function SingleTrackEditor( {
 				/>
 			</Grid>
 			<VStack spacing="4">
-				<SelectControl
+				<WCSelectControl
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }

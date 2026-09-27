@@ -21,7 +21,7 @@ export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
 					// translators: %s: Position of selected block, e.g. "Sticky" or "Fixed".
 					__( 'Position: %s' ),
 					positionLabel
-			  ) }.`
+				) }.`
 			: undefined,
 		isLocked ? __( 'This block is locked.' ) : undefined,
 	]

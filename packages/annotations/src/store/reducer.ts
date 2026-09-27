@@ -59,9 +59,9 @@ function isValidAnnotationRange( annotation: {
 } ): boolean {
 	return Boolean(
 		annotation.range &&
-			typeof annotation.range.start === 'number' &&
-			typeof annotation.range.end === 'number' &&
-			annotation.range.start <= annotation.range.end
+		typeof annotation.range.start === 'number' &&
+		typeof annotation.range.end === 'number' &&
+		annotation.range.start <= annotation.range.end
 	);
 }
 

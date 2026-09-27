@@ -14,7 +14,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { isGlobalStylesInheritanceEnabled } from './inheritance';
+import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -143,7 +143,7 @@ export default function ColorPanel( {
 	children,
 	contrastWarning,
 	additionalElements,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const {
 		colors,
@@ -477,7 +477,7 @@ export default function ColorPanel( {
 							elementGradient ??
 							elementBackgroundUserColor ??
 							elementBackgroundColor,
-				  ]
+					]
 				: [ elementTextUserColor ?? elementTextColor ],
 			isPlaceholder: isElementPlaceholder,
 			hasInheritedValue: hasElementInheritedValue,
