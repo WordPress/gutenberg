@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Post Template: preview the taxonomy's post type instead of posts when the Query Loop inherits the query in a custom taxonomy template ([#64692](https://github.com/WordPress/gutenberg/issues/64692)).
+-   Post Template: preview the taxonomy's post type instead of posts when the Query Loop inherits the query in a custom taxonomy template ([#83523](https://github.com/WordPress/gutenberg/pull/83523)).
 
 ## 11.1.0 (2026-09-23)
 
