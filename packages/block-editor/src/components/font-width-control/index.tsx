@@ -1,14 +1,14 @@
-import {
-	Button,
-	CustomSelectControl,
-	RangeControl,
-	__experimentalNumberControl as NumberControl,
-} from '@wordpress/components';
+import { Button, CustomSelectControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { getFontStretchRange } from '../../utils/get-font-stretch-range';
+import FontAxisRangeControl from '../font-axis-range-control';
+import {
+	coveragePoints,
+	coverageRange,
+	resolveFontFaceCapabilities,
+} from '../../utils/font-face-capabilities';
 import {
 	FONT_STRETCH_KEYWORDS,
 	parseFontStretchValue,
@@ -70,22 +70,40 @@ export default function FontWidthControl( {
 	onChange,
 	fontFamilyFaces,
 }: FontWidthControlProps ) {
-	const range = getFontStretchRange( fontFamilyFaces );
+	const coverage = resolveFontFaceCapabilities( fontFamilyFaces ).stretch;
+	const range = coverageRange( coverage );
 	const width =
 		value === undefined ? undefined : parseFontStretchValue( value );
 
-	// A variable font offers the widths its range covers; a static one offers
-	// them all, since its faces are matched rather than interpolated.
-	const presets: Option[] = FONT_WIDTHS.filter(
-		( preset ) =>
-			! range ||
-			( FONT_STRETCH_KEYWORDS[ preset.value ] >= range.min &&
-				FONT_STRETCH_KEYWORDS[ preset.value ] <= range.max )
-	).map( ( preset ) => ( {
-		key: preset.value,
-		value: preset.value,
-		name: preset.name,
-	} ) );
+	/*
+	 * A variable face draws anything in its range, so the widths the property
+	 * names inside that range are offered as a quick way there. A static family
+	 * draws the widths its files have and nothing between them, so those are
+	 * what it offers: naming the rest would promise widths no file can draw.
+	 */
+	const presets: Option[] = range
+		? FONT_WIDTHS.filter(
+				( preset ) =>
+					FONT_STRETCH_KEYWORDS[ preset.value ] >= range.min &&
+					FONT_STRETCH_KEYWORDS[ preset.value ] <= range.max
+			).map( ( preset ) => ( {
+				key: preset.value,
+				value: preset.value,
+				name: preset.name,
+			} ) )
+		: coveragePoints( coverage ).map( ( point ) => {
+				const named = FONT_WIDTHS.find(
+					( preset ) =>
+						FONT_STRETCH_KEYWORDS[ preset.value ] === point
+				);
+				return named
+					? { key: named.value, value: named.value, name: named.name }
+					: {
+							key: `${ point }%`,
+							value: `${ point }%`,
+							name: `${ point }%`,
+						};
+			} );
 
 	const isPresetWidth =
 		value === undefined ||
@@ -116,57 +134,29 @@ export default function FontWidthControl( {
 		width !== undefined &&
 		( width < range.min || width > range.max );
 
-	const setWidth = ( next?: string | number ) =>
-		onChange(
-			next === undefined || next === '' ? undefined : `${ next }%`
-		);
+	const setWidth = ( next?: number ) =>
+		onChange( next === undefined ? undefined : `${ next }%` );
 
 	return (
 		<Stack direction="column" gap="xs">
 			<div className="block-editor-font-width-control__width">
 				{ isCustomWidth ? (
-					<Stack
-						direction="row"
-						gap="md"
-						align="flex-end"
+					<FontAxisRangeControl
+						label={ __( 'Width' ) }
+						value={ width }
+						min={ range ? range.min : 50 }
+						max={ range ? range.max : 200 }
+						initialPosition={
+							range
+								? Math.min(
+										Math.max( 100, range.min ),
+										range.max
+									)
+								: 100
+						}
+						onChange={ setWidth }
 						className="block-editor-font-width-control__custom-width"
-					>
-						<RangeControl
-							className="block-editor-font-width-control__width-slider"
-							label={ __( 'Width' ) }
-							value={ width }
-							initialPosition={
-								range
-									? Math.min(
-											Math.max( 100, range.min ),
-											range.max
-										)
-									: 100
-							}
-							min={ range ? range.min : 50 }
-							max={ range ? range.max : 200 }
-							step={ 1 }
-							withInputField={ false }
-							onChange={ ( next?: number ) => setWidth( next ) }
-						/>
-						{ /*
-						 * A separate number field, so a saved width outside
-						 * the range is shown as it is: RangeControl's own input
-						 * hides such a value rather than showing it. Typing
-						 * stays inside the range the font declares, as the
-						 * weight's field does.
-						 */ }
-						<NumberControl
-							className="block-editor-font-width-control__width-input"
-							label={ __( 'Width' ) }
-							hideLabelFromVision
-							value={ width }
-							min={ range ? range.min : 0 }
-							max={ range ? range.max : undefined }
-							step={ 1 }
-							onChange={ ( next?: string ) => setWidth( next ) }
-						/>
-					</Stack>
+					/>
 				) : (
 					<CustomSelectControl
 						label={ __( 'Width' ) }
@@ -181,18 +171,20 @@ export default function FontWidthControl( {
 						}
 					/>
 				) }
-				<Button
-					className="block-editor-font-width-control__width-toggle"
-					label={
-						isCustomWidth
-							? __( 'Use width preset' )
-							: __( 'Set custom width' )
-					}
-					icon={ settings }
-					size="small"
-					isPressed={ isCustomWidth }
-					onClick={ () => setIsCustomWidth( ! isCustomWidth ) }
-				/>
+				{ range && (
+					<Button
+						className="block-editor-font-width-control__width-toggle"
+						label={
+							isCustomWidth
+								? __( 'Use width preset' )
+								: __( 'Set custom width' )
+						}
+						icon={ settings }
+						size="small"
+						isPressed={ isCustomWidth }
+						onClick={ () => setIsCustomWidth( ! isCustomWidth ) }
+					/>
+				) }
 			</div>
 			{ isOutsideRange && (
 				<p className="block-editor-font-width-control__notice">

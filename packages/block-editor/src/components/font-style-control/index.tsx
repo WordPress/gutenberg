@@ -1,10 +1,7 @@
-import {
-	CustomSelectControl,
-	RangeControl,
-	__experimentalNumberControl as NumberControl,
-} from '@wordpress/components';
+import { CustomSelectControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
+import FontAxisRangeControl from '../font-axis-range-control';
 import {
 	DEFAULT_OBLIQUE_ANGLE,
 	getDefaultObliqueAngle,
@@ -112,13 +109,8 @@ export default function FontStyleControl( {
 		? options.find( ( option ) => option.key === 'oblique' )
 		: options.find( ( option ) => option.value === value );
 
-	const setAngle = ( next?: number | string ) => {
-		if ( next === undefined || next === '' ) {
-			onChange( 'oblique' );
-			return;
-		}
-		onChange( `oblique ${ next }deg` );
-	};
+	const setAngle = ( next?: number ) =>
+		onChange( next === undefined ? 'oblique' : `oblique ${ next }deg` );
 
 	const chooseStyle = ( nextKey: string ) => {
 		if ( nextKey === 'default' ) {
@@ -157,54 +149,27 @@ export default function FontStyleControl( {
 				}
 			/>
 			{ isOblique && slantRange && (
-				<Stack
-					direction="row"
-					gap="md"
-					align="flex-end"
-					className="block-editor-font-style-control__slant"
-				>
-					<RangeControl
-						className="block-editor-font-style-control__slant-slider"
-						label={ __( 'Slant' ) }
-						value={ angle }
-						min={ slantRange.min }
-						max={ slantRange.max }
-						step={ 1 }
-						withInputField={ false }
-						onChange={ ( next?: number ) => setAngle( next ) }
-					/>
-					{ /*
-					 * A separate number field, so an angle outside the range is
-					 * shown as it is: RangeControl's own input clamps what it
-					 * displays.
-					 */ }
-					<NumberControl
-						className="block-editor-font-style-control__slant-input"
-						label={ __( 'Slant' ) }
-						hideLabelFromVision
-						value={ angle }
-						min={ slantRange.min }
-						max={ slantRange.max }
-						step={ 1 }
-						onChange={ ( next?: string ) => setAngle( next ) }
-					/>
-				</Stack>
+				<FontAxisRangeControl
+					label={ __( 'Slant' ) }
+					value={ angle }
+					min={ slantRange.min }
+					max={ slantRange.max }
+					onChange={ setAngle }
+					outOfRangeNotice={
+						angle! < slantRange.min || angle! > slantRange.max
+							? sprintf(
+									/* translators: 1: Saved slant angle. 2: Smallest angle the font supports. 3: Largest angle the font supports. */
+									__(
+										'%1$s° is outside this font’s oblique range (%2$s°–%3$s°). The browser may synthesize the style rather than use the font’s own slant.'
+									),
+									String( angle ),
+									String( slantRange.min ),
+									String( slantRange.max )
+								)
+							: undefined
+					}
+				/>
 			) }
-			{ isOblique &&
-				slantRange &&
-				( angle! < slantRange.min || angle! > slantRange.max ) && (
-					<p className="block-editor-font-style-control__notice">
-						{ sprintf(
-							/* translators: 1: Saved slant angle. 2: Smallest angle the font supports. 3: Largest angle the font supports. */
-							__(
-								'%1$s° is outside this font’s oblique range (%2$s°–%3$s°). The browser may synthesize the style rather than use the font’s own slant.'
-							),
-							String( angle ),
-							String( slantRange.min ),
-							String( slantRange.max )
-						) }
-					</p>
-				) }
 		</Stack>
 	);
 }
