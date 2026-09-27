@@ -526,8 +526,9 @@ export const isKeyboardEvent: WPModifierHandler< WPEventKeyHandler > =
 
 			// Non-Latin layouts, like Cyrillic, report the localized character
 			// in `event.key`, so fall back to the key code for letters and
-			// digits.
+			// digits. Only with Ctrl/Cmd held, so plain typing isn't affected.
 			if (
+				( event.ctrlKey || event.metaKey ) &&
 				character.length === 1 &&
 				key.length === 1 &&
 				key.charCodeAt( 0 ) > 127 &&
