@@ -1073,6 +1073,16 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/font-style-control/test/index.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-width-control/test/index.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/global-styles/advanced-panel.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1178,6 +1188,11 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/test/state-control-badges.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/typography-panel-axes.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

@@ -302,6 +302,7 @@
 					"size": "42px"
 				}
 			],
+			"fontStretch": true,
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,

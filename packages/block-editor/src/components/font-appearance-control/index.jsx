@@ -42,11 +42,15 @@ export default function FontAppearanceControl( props ) {
 		hasFontStyles = true,
 		hasFontWeights = true,
 		fontFamilyFaces,
+		label: labelProp,
 		value: { fontStyle, fontWeight },
 		...otherProps
 	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
-	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
+	// A caller that gives the control its own panel item names it there, so
+	// the two agree; otherwise the label says which axes it is editing.
+	const label =
+		labelProp ?? getFontAppearanceLabel( hasFontStyles, hasFontWeights );
 	const defaultOption = {
 		key: 'default',
 		name: __( 'Default' ),

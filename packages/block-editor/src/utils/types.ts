@@ -14,6 +14,7 @@ export interface FormattedFont {
 export interface FontFamilyFace {
 	fontStyle?: string;
 	fontWeight?: string | number;
+	fontStretch?: string;
 }
 
 /**

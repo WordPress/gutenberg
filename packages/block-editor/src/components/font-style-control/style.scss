@@ -1,0 +1,20 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// The slider takes the room, as it does in the weight and width controls; the
+// number field stays narrow beside it.
+.block-editor-font-style-control__slant-slider {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-editor-font-style-control__slant-input {
+	flex: 0 0 35%;
+	min-width: 0;
+}
+
+.block-editor-font-style-control__notice {
+	margin: 0;
+	font-size: $helptext-font-size;
+	color: $gray-700;
+}

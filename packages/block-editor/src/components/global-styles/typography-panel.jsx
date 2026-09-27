@@ -10,6 +10,9 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
+import VariableFontAppearanceControl from '../variable-font-appearance-control';
+import FontStyleControl from '../font-style-control';
+import FontWidthControl from '../font-width-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
@@ -32,6 +35,9 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import { getFontWeightRange } from '../../utils/get-font-weight-range';
+import { getFontStretchRange } from '../../utils/get-font-stretch-range';
+import { parseFontStretchValue } from '../../utils/parse-font-stretch';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
@@ -70,7 +76,9 @@ function shouldSyncLinkColor( value, inheritedValue ) {
 export function useHasTypographyPanel( settings ) {
 	const hasFontFamily = useHasFontFamilyControl( settings );
 	const hasLineHeight = useHasLineHeightControl( settings );
-	const hasFontAppearance = useHasAppearanceControl( settings );
+	const hasFontStyle = useHasFontStyleControl( settings );
+	const hasFontWeight = useHasFontWeightControl( settings );
+	const hasFontStretch = useHasFontStretchControl( settings );
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
@@ -85,7 +93,9 @@ export function useHasTypographyPanel( settings ) {
 	return (
 		hasFontFamily ||
 		hasLineHeight ||
-		hasFontAppearance ||
+		hasFontStyle ||
+		hasFontWeight ||
+		hasFontStretch ||
 		hasLetterSpacing ||
 		hasTextAlign ||
 		hasTextTransform ||
@@ -119,18 +129,74 @@ function useHasLineHeightControl( settings ) {
 	return settings?.typography?.lineHeight;
 }
 
-function useHasAppearanceControl( settings ) {
-	return settings?.typography?.fontStyle || settings?.typography?.fontWeight;
+/*
+ * One axis, one panel item. The settings behind them were always separate;
+ * only the item was shared, which made its label change to say which axis had
+ * survived, and tied one reset and one default visibility to two axes.
+ */
+function useHasFontStyleControl( settings ) {
+	return !! settings?.typography?.fontStyle;
 }
 
-function useAppearanceControlLabel( settings ) {
-	if ( ! settings?.typography?.fontStyle ) {
-		return __( 'Font weight' );
+function useHasFontWeightControl( settings ) {
+	return !! settings?.typography?.fontWeight;
+}
+
+function useHasFontStretchControl( settings ) {
+	return !! settings?.typography?.fontStretch;
+}
+
+/**
+ * Whether the family in use can be drawn at more than one width.
+ *
+ * A setting says the site allows this editing; it does not say the font can do
+ * it. Unlike a weight or a slant, a width the font does not have is never
+ * synthesised, so offering the control for a family with one width would offer
+ * nothing. A variable face declares a range, and a static family declares a
+ * width per face.
+ *
+ * @param {Array} fontFamilyFaces The faces of the family in use.
+ * @return {boolean} Whether there is more than one width to choose from.
+ */
+function hasFontStretchCapability( fontFamilyFaces ) {
+	if ( getFontStretchRange( fontFamilyFaces ) ) {
+		return true;
 	}
-	if ( ! settings?.typography?.fontWeight ) {
-		return __( 'Font style' );
+	const declared = new Set();
+	fontFamilyFaces?.forEach( ( { fontStretch } ) => {
+		if ( 'string' !== typeof fontStretch ) {
+			return;
+		}
+		const width = parseFontStretchValue( fontStretch );
+		if ( width !== undefined ) {
+			declared.add( width );
+		}
+	} );
+	return declared.size > 1;
+}
+
+/**
+ * Reads whether an axis is shown by default, honouring `fontAppearance` as the
+ * name the style and weight items shared before they were separate. A default
+ * named for the axis itself wins, so a caller can keep the old name and still
+ * say something new about one of them.
+ *
+ * Width was never part of that name, so it is shown only when it is asked for
+ * by its own key.
+ *
+ * @param {Object} defaultControls The panel's default controls.
+ * @param {string} axis            The axis key.
+ * @return {boolean|undefined} Whether the axis is shown by default.
+ */
+const AXES_THE_APPEARANCE_NAME_COVERED = [ 'fontStyle', 'fontWeight' ];
+
+function isAxisShownByDefault( defaultControls, axis ) {
+	if ( defaultControls[ axis ] !== undefined ) {
+		return defaultControls[ axis ];
 	}
-	return __( 'Appearance' );
+	return AXES_THE_APPEARANCE_NAME_COVERED.includes( axis )
+		? defaultControls.fontAppearance
+		: undefined;
 }
 
 function useHasLetterSpacingControl( settings ) {
@@ -346,9 +412,18 @@ export default function TypographyPanel( {
 		const hasFontStyle = fontStyles?.some(
 			( { value: fs } ) => fs === fontStyle
 		);
-		const hasFontWeight = fontWeights?.some(
-			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
-		);
+		// A variable font can draw any weight in its range, not only the
+		// hundreds listed as presets.
+		const newFontWeightRange = getFontWeightRange( newFontFamilyFaces );
+		const numericFontWeight = Number( fontWeight );
+		const hasFontWeight =
+			fontWeights?.some(
+				( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+			) ||
+			( !! newFontWeightRange &&
+				hasValue( fontWeight ) &&
+				numericFontWeight >= newFontWeightRange.min &&
+				numericFontWeight <= newFontWeightRange.max );
 
 		// Find the nearest available font style/weight if not available.
 		if ( ! hasFontStyle || ! hasFontWeight ) {
@@ -464,92 +539,126 @@ export default function TypographyPanel( {
 	const hasFontSize = () => hasValue( value?.typography?.fontSize );
 	const resetFontSize = () => setFontSize( undefined );
 
-	// Appearance
-	const hasAppearanceControl = useHasAppearanceControl( settings );
-	const appearanceControlLabel = useAppearanceControlLabel( settings );
-	const hasFontStyles = settings?.typography?.fontStyle;
-	const hasFontWeights = settings?.typography?.fontWeight;
-	// Render local-then-inherited; placeholder fires only when both
-	// local leaves are unset and at least one inherited leaf exists.
+	// Style, Weight and Width
+	const hasFontStyleControl = useHasFontStyleControl( settings );
+	const hasFontWeightControl = useHasFontWeightControl( settings );
+	// The setting allows the control; the font decides whether it has
+	// anything to offer.
+	const hasFontStretchControl =
+		useHasFontStretchControl( settings ) &&
+		hasFontStretchCapability( fontFamilyFaces );
+	// A family with a weight range is variable: the weight takes any value in
+	// the range rather than one of fixed style and weight combinations.
+	const isVariableFont = useMemo(
+		() => !! getFontWeightRange( fontFamilyFaces ),
+		[ fontFamilyFaces ]
+	);
+
+	// Each axis reads its own local value, its own inherited value, and so
+	// decides its own placeholder state.
 	const inheritedFontStyle = decodeValue(
 		inheritedValue?.typography?.fontStyle
 	);
 	const inheritedFontWeight = decodeValue(
 		inheritedValue?.typography?.fontWeight
 	);
+	const inheritedFontStretch = decodeValue(
+		inheritedValue?.typography?.fontStretch
+	);
 	const fontStyle =
 		decodeValue( value?.typography?.fontStyle ) ?? inheritedFontStyle;
 	const fontWeight =
 		decodeValue( value?.typography?.fontWeight ) ?? inheritedFontWeight;
-	const isFontAppearancePlaceholder =
+	const fontStretch =
+		decodeValue( value?.typography?.fontStretch ) ?? inheritedFontStretch;
+	const isFontStylePlaceholder =
 		! hasValue( value?.typography?.fontStyle ) &&
+		hasValue( inheritedFontStyle );
+	const isFontWeightPlaceholder =
 		! hasValue( value?.typography?.fontWeight ) &&
-		( hasValue( inheritedFontStyle ) || hasValue( inheritedFontWeight ) );
-	const setFontAppearance = useCallback(
-		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
-			// Only update the font style and weight if they have changed.
-			if ( newFontStyle !== fontStyle || newFontWeight !== fontWeight ) {
-				onChange( {
-					...value,
-					typography: {
-						...value?.typography,
-						fontStyle: hasValue( newFontStyle )
-							? newFontStyle
-							: undefined,
-						fontWeight: hasValue( newFontWeight )
-							? newFontWeight
-							: undefined,
-					},
-				} );
-			}
+		hasValue( inheritedFontWeight );
+	const isFontStretchPlaceholder =
+		! hasValue( value?.typography?.fontStretch ) &&
+		hasValue( inheritedFontStretch );
+
+	const setAxis = useCallback(
+		( axis, next ) => {
+			onChange( {
+				...value,
+				typography: {
+					...value?.typography,
+					[ axis ]: hasValue( next ) ? next : undefined,
+				},
+			} );
 		},
-		[ fontStyle, fontWeight, onChange, value ]
+		[ onChange, value ]
 	);
-	// Display-without-commit interceptor for FontAppearance: when the
-	// control is at rest (no local override, displaying the inherited
-	// font style/weight), activating the already-preselected option
-	// would otherwise be swallowed by the equality short-circuit in
-	// `setFontAppearance`. Treat that activation as the user's
-	// "accept this inherited value" affordance and commit the
-	// inherited values to local explicitly.
-	const setFontAppearanceWithInheritedCommit = useCallback(
-		( next ) => {
-			if (
-				isFontAppearancePlaceholder &&
-				next.fontStyle === fontStyle &&
-				next.fontWeight === fontWeight
-			) {
-				onChange( {
-					...value,
-					typography: {
-						...value?.typography,
-						fontStyle: hasValue( fontStyle )
-							? fontStyle
-							: undefined,
-						fontWeight: hasValue( fontWeight )
-							? fontWeight
-							: undefined,
-					},
-				} );
+
+	/*
+	 * Display-without-commit interceptor: when an axis is at rest, showing an
+	 * inherited value with no local one, choosing the option already displayed
+	 * would otherwise change nothing. Treat that as the user accepting the
+	 * inherited value and write it locally.
+	 */
+	const setAxisWithInheritedCommit = useCallback(
+		( axis, next, displayed, isPlaceholder ) => {
+			if ( isPlaceholder && next === displayed ) {
+				setAxis( axis, displayed );
 				return;
 			}
-			setFontAppearance( next );
+			if ( next !== displayed ) {
+				setAxis( axis, next );
+			}
 		},
-		[
-			isFontAppearancePlaceholder,
-			fontStyle,
-			fontWeight,
-			onChange,
-			value,
-			setFontAppearance,
-		]
+		[ setAxis ]
 	);
-	const hasFontAppearance = () =>
-		hasValue( value?.typography?.fontStyle ) ||
-		hasValue( value?.typography?.fontWeight );
-	const resetFontAppearance = useCallback( () => {
-		setFontAppearance( {} );
-	}, [ setFontAppearance ] );
+
+	const setFontStyle = useCallback(
+		( next ) =>
+			setAxisWithInheritedCommit(
+				'fontStyle',
+				next,
+				fontStyle,
+				isFontStylePlaceholder
+			),
+		[ setAxisWithInheritedCommit, fontStyle, isFontStylePlaceholder ]
+	);
+	const setFontWeight = useCallback(
+		( next ) =>
+			setAxisWithInheritedCommit(
+				'fontWeight',
+				next,
+				fontWeight,
+				isFontWeightPlaceholder
+			),
+		[ setAxisWithInheritedCommit, fontWeight, isFontWeightPlaceholder ]
+	);
+	const setFontStretch = useCallback(
+		( next ) =>
+			setAxisWithInheritedCommit(
+				'fontStretch',
+				next,
+				fontStretch,
+				isFontStretchPlaceholder
+			),
+		[ setAxisWithInheritedCommit, fontStretch, isFontStretchPlaceholder ]
+	);
+
+	const hasFontStyle = () => hasValue( value?.typography?.fontStyle );
+	const hasFontWeight = () => hasValue( value?.typography?.fontWeight );
+	const hasFontStretch = () => hasValue( value?.typography?.fontStretch );
+	const resetFontStyle = useCallback(
+		() => setAxis( 'fontStyle', undefined ),
+		[ setAxis ]
+	);
+	const resetFontWeight = useCallback(
+		() => setAxis( 'fontWeight', undefined ),
+		[ setAxis ]
+	);
+	const resetFontStretch = useCallback(
+		() => setAxis( 'fontStretch', undefined ),
+		[ setAxis ]
+	);
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -902,6 +1011,89 @@ export default function TypographyPanel( {
 					/>
 				</InheritanceToolsPanelItem>
 			) }
+			{ hasFontStyleControl && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isFontStylePlaceholder,
+						hasFontStyle() && inheritedFontStyle !== undefined
+					) }
+					label={ __( 'Style' ) }
+					hasValue={ hasFontStyle }
+					onDeselect={ resetFontStyle }
+					isShownByDefault={ isAxisShownByDefault(
+						defaultControls,
+						'fontStyle'
+					) }
+					panelId={ panelId }
+				>
+					<FontStyleControl
+						value={ fontStyle }
+						onChange={ setFontStyle }
+						fontFamilyFaces={ fontFamilyFaces }
+					/>
+				</InheritanceToolsPanelItem>
+			) }
+			{ hasFontWeightControl && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isFontWeightPlaceholder,
+						hasFontWeight() && inheritedFontWeight !== undefined
+					) }
+					label={ __( 'Weight' ) }
+					hasValue={ hasFontWeight }
+					onDeselect={ resetFontWeight }
+					isShownByDefault={ isAxisShownByDefault(
+						defaultControls,
+						'fontWeight'
+					) }
+					panelId={ panelId }
+				>
+					{ isVariableFont ? (
+						<VariableFontAppearanceControl
+							value={ { fontStyle, fontWeight } }
+							onChange={ ( next ) =>
+								setFontWeight( next.fontWeight )
+							}
+							hasFontStyles={ false }
+							hasFontWeights
+							fontFamilyFaces={ fontFamilyFaces }
+						/>
+					) : (
+						<FontAppearanceControl
+							value={ { fontStyle, fontWeight } }
+							onChange={ ( next ) =>
+								setFontWeight( next.fontWeight )
+							}
+							label={ __( 'Weight' ) }
+							hasFontStyles={ false }
+							hasFontWeights
+							fontFamilyFaces={ fontFamilyFaces }
+						/>
+					) }
+				</InheritanceToolsPanelItem>
+			) }
+			{ hasFontStretchControl && (
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isFontStretchPlaceholder,
+						hasFontStretch() && inheritedFontStretch !== undefined
+					) }
+					label={ __( 'Width' ) }
+					hasValue={ hasFontStretch }
+					onDeselect={ resetFontStretch }
+					isShownByDefault={ isAxisShownByDefault(
+						defaultControls,
+						'fontStretch'
+					) }
+					panelId={ panelId }
+				>
+					<FontWidthControl
+						value={ fontStretch }
+						onChange={ setFontStretch }
+						fontFamilyFaces={ fontFamilyFaces }
+					/>
+				</InheritanceToolsPanelItem>
+			) }
 			{ hasFontSizeEnabled && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
@@ -923,32 +1115,6 @@ export default function TypographyPanel( {
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
-					/>
-				</InheritanceToolsPanelItem>
-			) }
-			{ hasAppearanceControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isFontAppearancePlaceholder,
-						hasFontAppearance() &&
-							( inheritedFontStyle !== undefined ||
-								inheritedFontWeight !== undefined )
-					) }
-					label={ appearanceControlLabel }
-					hasValue={ hasFontAppearance }
-					onDeselect={ resetFontAppearance }
-					isShownByDefault={ defaultControls.fontAppearance }
-					panelId={ panelId }
-				>
-					<FontAppearanceControl
-						value={ {
-							fontStyle,
-							fontWeight,
-						} }
-						onChange={ setFontAppearanceWithInheritedCommit }
-						hasFontStyles={ hasFontStyles }
-						hasFontWeights={ hasFontWeights }
-						fontFamilyFaces={ fontFamilyFaces }
 					/>
 				</InheritanceToolsPanelItem>
 			) }

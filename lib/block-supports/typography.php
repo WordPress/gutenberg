@@ -22,8 +22,8 @@ function gutenberg_register_typography_support( $block_type ) {
 
 	$has_font_family_support             = $typography_supports['__experimentalFontFamily'] ?? false;
 	$has_font_size_support               = $typography_supports['fontSize'] ?? false;
+	$has_font_stretch_support            = $typography_supports['fontStretch'] ?? false;
 	$has_font_style_support              = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
 	$has_font_weight_support             = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support          = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support             = $typography_supports['lineHeight'] ?? false;
@@ -34,9 +34,11 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_indent_support             = $typography_supports['textIndent'] ?? false;
 	$has_text_shadow_support             = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support            = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
+		|| $has_font_stretch_support
 		|| $has_font_style_support
 		|| $has_font_variation_settings_support
 		|| $has_font_weight_support
@@ -105,8 +107,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	$has_font_family_support             = $typography_supports['__experimentalFontFamily'] ?? false;
 	$has_font_size_support               = $typography_supports['fontSize'] ?? false;
+	$has_font_stretch_support            = $typography_supports['fontStretch'] ?? false;
 	$has_font_style_support              = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
 	$has_font_weight_support             = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support          = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support             = $typography_supports['lineHeight'] ?? false;
@@ -117,12 +119,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_indent_support             = $typography_supports['textIndent'] ?? false;
 	$has_text_shadow_support             = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support            = $typography_supports['__experimentalWritingMode'] ?? false;
-
-	// Whether to skip individual block support features.
 	$should_skip_font_size               = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
 	$should_skip_font_family             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' );
+	$should_skip_font_stretch            = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStretch' );
 	$should_skip_font_style              = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
-	$should_skip_font_variation_settings = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontVariationSettings' );
 	$should_skip_font_weight             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
 	$should_skip_line_height             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
 	$should_skip_text_align              = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
@@ -133,6 +133,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_indent             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
 	$should_skip_text_shadow             = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textShadow' );
 	$should_skip_writing_mode            = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
+	$has_font_variation_settings_support = $typography_supports['fontVariationSettings'] ?? false;
+	$should_skip_font_variation_settings = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontVariationSettings' );
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
@@ -149,6 +151,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$preset_font_family                    = array_key_exists( 'fontFamily', $block_attributes ) ? "var:preset|font-family|{$block_attributes['fontFamily']}" : null;
 		$custom_font_family                    = isset( $block_attributes['style']['typography']['fontFamily'] ) ? gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontFamily'], 'font-family' ) : null;
 		$typography_block_styles['fontFamily'] = $preset_font_family ? $preset_font_family : $custom_font_family;
+	}
+
+	if ( $has_font_stretch_support && ! $should_skip_font_stretch && isset( $block_attributes['style']['typography']['fontStretch'] ) ) {
+		$typography_block_styles['fontStretch'] = $block_attributes['style']['typography']['fontStretch'];
 	}
 
 	if ( $has_font_style_support && ! $should_skip_font_style && isset( $block_attributes['style']['typography']['fontStyle'] ) ) {

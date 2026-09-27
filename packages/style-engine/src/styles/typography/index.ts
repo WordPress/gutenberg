@@ -37,6 +37,22 @@ const fontWeight = {
 	},
 };
 
+/*
+ * `font-stretch` rather than its newer name `font-width`, which browsers do
+ * not implement yet. CSS Fonts 4 keeps `font-stretch` as the legacy alias.
+ */
+const fontStretch = {
+	name: 'fontStretch',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontStretch' ],
+			'fontStretch'
+		);
+	},
+};
+
 // These axes have high-level properties (`font-weight`, `font-stretch`,
 // `font-style`). Setting them in `font-variation-settings` would override those,
 // for example keeping a `<strong>` from getting bolder.
@@ -199,6 +215,7 @@ const textShadow = {
 export default [
 	fontFamily,
 	fontSize,
+	fontStretch,
 	fontStyle,
 	fontVariationSettings,
 	fontWeight,

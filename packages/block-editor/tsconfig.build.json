@@ -44,7 +44,11 @@
 		"src/lock-unlock.ts",
 		"src/components/block-context/index.jsx",
 		"src/components/block-visibility/constants.ts",
-		"src/components/block-visibility/use-block-visibility.ts"
+		"src/components/block-visibility/use-block-visibility.ts",
+		"src/components/font-axis-range-control/index.tsx",
+		"src/components/font-style-control/index.tsx",
+		"src/components/font-width-control/index.tsx",
+		"src/components/variable-font-appearance-control/index.tsx"
 	],
 	"include": [ "src/utils/**/*.ts" ]
 }
