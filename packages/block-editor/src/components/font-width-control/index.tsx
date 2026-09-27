@@ -196,7 +196,7 @@ export default function FontWidthControl( {
 					{ sprintf(
 						/* translators: 1: Saved font width. 2: Narrowest width the font supports. 3: Widest width the font supports. */
 						__(
-							'%1$s is outside this font’s width range (%2$s%%–%3$s%%). It is kept until you choose another width.'
+							'%1$s is outside this font’s width range (%2$s%%–%3$s%%). The font is drawn at the nearest width it has.'
 						),
 						value ?? '',
 						String( range?.min ?? '' ),
