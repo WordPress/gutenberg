@@ -1,3 +1,5 @@
+@use "../utils/css/mixins";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -50,6 +52,12 @@
 
 			/* For an outline that looks like `IconButton`'s */
 			border-radius: var(--wpds-border-radius-sm);
+		}
+
+		/* The whole header is the trigger, but the focus ring is shown only
+		   on the icon to visually emulate it being the button. */
+		.header:focus-visible .header-trigger-wrapper {
+			@include mixins.focus-ring();
 		}
 
 		.header-trigger {
