@@ -22,6 +22,10 @@ import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY } from './color';
 import { ElementsEdit } from './elements';
 import {
+	FONT_VARIATION_SETTINGS_SUPPORT_KEY,
+	FontVariationsPanel,
+} from './font-variations';
+import {
 	TypographyPanel,
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
@@ -887,6 +891,9 @@ function BlockStyleControls( {
 			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
+			{ hasBlockSupport( name, FONT_VARIATION_SETTINGS_SUPPORT_KEY ) && (
+				<FontVariationsPanel { ...passedProps } />
+			) }
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
 		</BlockStyleStateProvider>

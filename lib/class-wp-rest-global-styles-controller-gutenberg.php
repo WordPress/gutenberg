@@ -675,7 +675,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		foreach ( $variations as $variation ) {
 			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
 			$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
-			$data                 = rest_ensure_response( $variation );
+			if ( isset( $variation['settings'] ) ) {
+				$variation['settings'] = $variation['settings'];
+			}
+			$data = rest_ensure_response( $variation );
 			if ( ! empty( $resolved_theme_uris ) ) {
 				$data->add_links(
 					array(

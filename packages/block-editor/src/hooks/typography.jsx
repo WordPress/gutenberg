@@ -38,6 +38,7 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STRETCH_SUPPORT_KEY = 'typography.fontStretch';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+const FONT_VARIATION_SETTINGS_SUPPORT_KEY = 'typography.fontVariationSettings';
 const TEXT_SHADOW_SUPPORT_KEY = 'typography.textShadow';
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
@@ -47,6 +48,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STRETCH_SUPPORT_KEY,
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
+	FONT_VARIATION_SETTINGS_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,

@@ -42,6 +42,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `textIndent`: `true`
   - `fontStretch`: `true`
   - [`textShadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textshadow): `true`
+  - `fontVariationSettings`: `true`
   - `fitText`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
