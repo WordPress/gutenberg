@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/variables" as vars;
 @use "@wordpress/base-styles/mixins" as *;
 
@@ -247,7 +248,10 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		font-size: var(--wpds-typography-font-size-sm);
-		line-height: 16px;
+		// --wpds-typography-font-size-sm is 12px; a CSS custom property can't
+		// be divided at build time, so this is the unit-less equivalent of
+		// 16px computed against that documented value.
+		line-height: math.div(16, 12);
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 

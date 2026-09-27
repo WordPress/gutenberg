@@ -34,7 +34,13 @@ export default {
 			},
 		],
 		'declaration-property-unit-allowed-list': {
-			'line-height': [ 'px' ],
+			// Per the WordPress CSS Coding Standards, line-height values must
+			// be unit-less, except where a specific pixel value is necessary
+			// for a non-typographic element (e.g. matching an icon button's
+			// fixed control height). Such cases should disable this rule
+			// for that declaration with a comment explaining why.
+			// https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/#values
+			'line-height': [],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
 		'font-weight-notation': 'numeric',

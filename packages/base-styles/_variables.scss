@@ -31,7 +31,11 @@ $font-size-large: 15px;
 $font-size-x-large: 20px;
 $font-size-2x-large: 32px;
 
-// Line heights
+// Line heights.
+// These are kept in px purely as intermediate values: the heading-*/body-*
+// mixins in _mixins.scss divide them by the matching $font-size-* token to
+// produce a unit-less line-height, per the WordPress CSS Coding Standards.
+// Do not use these tokens directly as a `line-height` value.
 $font-line-height-x-small: 16px;
 $font-line-height-small: 20px;
 $font-line-height-medium: 24px;

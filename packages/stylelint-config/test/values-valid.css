@@ -2,7 +2,7 @@
 	background-image: url(images/bg.png);
 	font-family: "Helvetica Neue", sans-serif;
 	font-weight: 700;
-	line-height: 14px;
+	line-height: 1.2; /* Correct usage of a unit-less line-height */
 }
 
 .another-selector { /* Correct usage of zero values */

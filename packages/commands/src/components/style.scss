@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
@@ -66,7 +67,7 @@ $palette-header-height: 48px;
 		color: $gray-900;
 		margin: 0;
 		font-size: 15px;
-		line-height: 24px;
+		line-height: math.div(24, 15); // Unit-less equivalent of 24px at this 15px font-size.
 		border-radius: 0;
 
 		&::placeholder {

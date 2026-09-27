@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "../utils/grid-items.scss" as *;
 
 .dataviews-view-picker-grid {
@@ -114,7 +115,7 @@
 	.dataviews-view-picker-grid__fields {
 		position: relative;
 		font-size: 12px;
-		line-height: 16px;
+		line-height: math.div(16, 12); // Unit-less equivalent of 16px at this 12px font-size.
 
 		&:not(:empty) {
 			padding: 0 0 var(--wpds-dimension-padding-md);

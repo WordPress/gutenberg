@@ -9,6 +9,10 @@
 -   `checkbox-control`: Use the design system tokens for the default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
 -   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
 
+### Internal
+
+-   Typography mixins: Compute unit-less `line-height` values from the `$font-line-height-*`/`$font-size-*` tokens instead of emitting a fixed pixel value, per the WordPress CSS Coding Standards. The rendered line height is unchanged ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ## 13.1.0 (2026-09-10)
 
 ### Internal

@@ -39,6 +39,8 @@
 -   Post template panel: Remove the dead template read capability check. ([#82861](https://github.com/WordPress/gutenberg/pull/82861))
 -   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
+-   Collab sidebar: Use unit-less `line-height` values per the WordPress CSS Coding Standards, disabling the rule for the note form's fixed row-height calculation. The rendered line height is unchanged ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Table of contents: Use a unit-less `line-height` value per the WordPress CSS Coding Standards. The rendered line height is unchanged ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ## 15.0.0 (2026-09-10)
 

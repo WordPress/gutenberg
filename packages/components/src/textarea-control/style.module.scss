@@ -14,6 +14,7 @@
 	// Vertical padding is to match the standard 40px control height when rows=1,
 	// in conjunction with the 20px line-height.
 	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	// stylelint-disable-next-line declaration-property-unit-allowed-list -- input-control's font-size varies by breakpoint, so a single ratio can't represent this fixed 40px control height at every viewport.
 	line-height: 20px;
 	padding: 9px 11px;
 

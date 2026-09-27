@@ -140,6 +140,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	transform: translateX(-50%);
 	font-size: 12px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
+	// stylelint-disable-next-line declaration-property-unit-allowed-list -- Matches the fixed 14px label height above rather than following font metrics.
 	line-height: 14px;
 	color: $gray-900;
 	pointer-events: none;
