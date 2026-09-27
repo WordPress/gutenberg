@@ -854,6 +854,37 @@ describe( 'isKeyboardEvent', () => {
 			} );
 		} );
 	} );
+
+	describe( 'non-Latin keyboard layouts', () => {
+		it( 'should identify Ctrl + S on a Cyrillic layout', () => {
+			// On a Russian layout the S key produces "ы".
+			const event = new window.KeyboardEvent( 'keydown', {
+				ctrlKey: true,
+				key: 'ы',
+				keyCode: 83,
+			} );
+
+			expect(
+				isKeyboardEvent.primary( event, 's', isAppleOSFalse )
+			).toBe( true );
+			expect(
+				isKeyboardEvent.primary( event, 'd', isAppleOSFalse )
+			).toBe( false );
+		} );
+
+		it( 'should identify Ctrl + Shift + Z on a Cyrillic layout', () => {
+			const event = new window.KeyboardEvent( 'keydown', {
+				ctrlKey: true,
+				shiftKey: true,
+				key: 'Я',
+				keyCode: 90,
+			} );
+
+			expect(
+				isKeyboardEvent.primaryShift( event, 'z', isAppleOSFalse )
+			).toBe( true );
+		} );
+	} );
 } );
 
 describe( 'keyboardShortcut', () => {

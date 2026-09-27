@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   `isKeyboardEvent`: Match letter and digit shortcuts on non-Latin keyboard layouts, like Cyrillic, where `event.key` holds the localized character ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+
 ## 4.57.0 (2026-10-07)
 
 ## 4.56.0 (2026-09-23)
