@@ -129,6 +129,9 @@
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
 			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
+				"docs/how-to-guides/registering-block-templates-from-plugins.md": []
+			},
+			{
 				"docs/how-to-guides/themes/README.md": [
 					{
 						"docs/how-to-guides/themes/global-settings-and-styles.md": []
