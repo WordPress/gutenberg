@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Raw handling: drop the empty bookmark links Word adds to headings instead of pasting them as `<a></a>` ([#60746](https://github.com/WordPress/gutenberg/issues/60746)).
+-   Raw handling: drop the empty bookmark links Word adds to headings instead of pasting them as `<a></a>` ([#83524](https://github.com/WordPress/gutenberg/pull/83524)).
 
 ## 16.1.0 (2026-09-23)
 
