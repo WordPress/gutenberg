@@ -78,6 +78,21 @@ describe( 'utils', () => {
 			expect( hasFileArgInCLI() ).toBe( true );
 		} );
 
+		test( 'should treat a file after --require-pragma as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [
+				'--require-pragma',
+				'index.js',
+			] );
+
+			expect( hasFileArgInCLI() ).toBe( true );
+		} );
+
+		test( 'should not treat the stylelint --fix mode as a file arg', () => {
+			getArgsFromCLIMock.mockReturnValue( [ '--fix', 'lax' ] );
+
+			expect( hasFileArgInCLI() ).toBe( false );
+		} );
+
 		test( 'should not treat the value of --config as a file arg', () => {
 			getArgsFromCLIMock.mockReturnValue( [ '--config', 'custom.json' ] );
 
