@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import type { HslaColor } from 'react-colorful';
 import { InputWithSlider } from './input-with-slider';
 import type { HslInputProps } from './types';
@@ -17,7 +17,7 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 				min={ 0 }
 				max={ 359 }
 				label={ __( 'Hue (HSL H value)' ) }
-				abbreviation="H"
+				abbreviation={ _x( 'H', 'hue color channel abbreviation' ) }
 				value={ hsla.h }
 				onChange={ ( nextH: number ) => {
 					updateHSLAValue( { h: nextH } );
@@ -27,7 +27,10 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 				min={ 0 }
 				max={ 100 }
 				label={ __( 'Saturation' ) }
-				abbreviation="S"
+				abbreviation={ _x(
+					'S',
+					'saturation color channel abbreviation'
+				) }
 				value={ hsla.s }
 				onChange={ ( nextS: number ) => {
 					updateHSLAValue( { s: nextS } );
@@ -37,7 +40,10 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 				min={ 0 }
 				max={ 100 }
 				label={ __( 'Lightness' ) }
-				abbreviation="L"
+				abbreviation={ _x(
+					'L',
+					'lightness color channel abbreviation'
+				) }
 				value={ hsla.l }
 				onChange={ ( nextL: number ) => {
 					updateHSLAValue( { l: nextL } );
@@ -48,7 +54,10 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 					min={ 0 }
 					max={ 100 }
 					label={ __( 'Alpha (HSL A value)' ) }
-					abbreviation="A"
+					abbreviation={ _x(
+						'A',
+						'alpha color channel abbreviation'
+					) }
 					value={ Math.trunc( 100 * hsla.a ) }
 					onChange={ ( nextA: number ) => {
 						updateHSLAValue( { a: nextA / 100 } );
