@@ -271,49 +271,60 @@ export function ImageEdit( {
 			};
 		}
 
-		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
-			// Use the WordPress option to determine the proper default.
-			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			switch (
-				window?.wp?.media?.view?.settings?.defaultProps?.link ||
-				LINK_DESTINATION_NONE
-			) {
-				case 'file':
+		// New images inside a gallery get their link from the gallery, which
+		// applies its own link setting (including the lightbox) once the image
+		// has an ID. Leave their link attributes alone so they are not
+		// overwritten here, as this can run again after the gallery has
+		// updated them.
+		const isNewGalleryImage =
+			! attributes.linkDestination &&
+			getBlockName( getBlockRootClientId( clientId ) ) === 'core/gallery';
+		let linkAttributes;
+		if ( ! isNewGalleryImage ) {
+			// Check if default link setting should be used.
+			let linkDestination = attributes.linkDestination;
+			if ( ! linkDestination ) {
+				// Use the WordPress option to determine the proper default.
+				// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+				switch (
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE
+				) {
+					case 'file':
+					case LINK_DESTINATION_MEDIA:
+						linkDestination = LINK_DESTINATION_MEDIA;
+						break;
+					case 'post':
+					case LINK_DESTINATION_ATTACHMENT:
+						linkDestination = LINK_DESTINATION_ATTACHMENT;
+						break;
+					case LINK_DESTINATION_CUSTOM:
+						linkDestination = LINK_DESTINATION_CUSTOM;
+						break;
+					case LINK_DESTINATION_NONE:
+						linkDestination = LINK_DESTINATION_NONE;
+						break;
+				}
+			}
+
+			// Check if the image is linked to it's media.
+			let href;
+			switch ( linkDestination ) {
 				case LINK_DESTINATION_MEDIA:
-					linkDestination = LINK_DESTINATION_MEDIA;
+					href = media.url;
 					break;
-				case 'post':
 				case LINK_DESTINATION_ATTACHMENT:
-					linkDestination = LINK_DESTINATION_ATTACHMENT;
-					break;
-				case LINK_DESTINATION_CUSTOM:
-					linkDestination = LINK_DESTINATION_CUSTOM;
-					break;
-				case LINK_DESTINATION_NONE:
-					linkDestination = LINK_DESTINATION_NONE;
+					href = media.link;
 					break;
 			}
+			linkAttributes = { href, linkDestination };
 		}
-
-		// Check if the image is linked to it's media.
-		let href;
-		switch ( linkDestination ) {
-			case LINK_DESTINATION_MEDIA:
-				href = media.url;
-				break;
-			case LINK_DESTINATION_ATTACHMENT:
-				href = media.link;
-				break;
-		}
-		mediaAttributes.href = href;
 
 		setAttributes( {
 			blob: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
-			linkDestination,
+			...linkAttributes,
 		} );
 		setTemporaryURL();
 	}

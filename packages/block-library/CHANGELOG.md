@@ -10,6 +10,7 @@
 
 -   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Gallery: Apply the gallery's link setting, such as "Enlarge on click", to images uploaded into the gallery, as it already was for images added from the Media Library. Uploaded images previously kept the default link from the `image_default_link_type` option, and a repeated update after the upload could remove the link the gallery had set ([#83557](https://github.com/WordPress/gutenberg/pull/83557)).
 
 ## 11.1.0 (2026-09-23)
 

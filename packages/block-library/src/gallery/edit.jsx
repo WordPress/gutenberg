@@ -429,7 +429,9 @@ export default function GalleryEdit( props ) {
 			...getHrefAndDestination(
 				image,
 				linkTo,
-				imageAttributes?.linkDestination
+				imageAttributes?.linkDestination,
+				imageAttributes,
+				lightboxSetting
 			),
 			...newLinkTarget,
 			className: newClassName,
