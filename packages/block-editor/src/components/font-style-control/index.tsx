@@ -183,6 +183,8 @@ export default function FontStyleControl( {
 						label={ __( 'Slant' ) }
 						hideLabelFromVision
 						value={ angle }
+						min={ slantRange.min }
+						max={ slantRange.max }
 						step={ 1 }
 						onChange={ ( next?: string ) => setAngle( next ) }
 					/>

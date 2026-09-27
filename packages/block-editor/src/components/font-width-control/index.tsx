@@ -150,16 +150,19 @@ export default function FontWidthControl( {
 							onChange={ ( next?: number ) => setWidth( next ) }
 						/>
 						{ /*
-						 * A separate number field, so a saved width outside the
-						 * range is shown as it is: RangeControl's own input
-						 * clamps the value it displays.
+						 * A separate number field, so a saved width outside
+						 * the range is shown as it is: RangeControl's own input
+						 * hides such a value rather than showing it. Typing
+						 * stays inside the range the font declares, as the
+						 * weight's field does.
 						 */ }
 						<NumberControl
 							className="block-editor-font-width-control__width-input"
 							label={ __( 'Width' ) }
 							hideLabelFromVision
 							value={ width }
-							min={ 0 }
+							min={ range ? range.min : 0 }
+							max={ range ? range.max : undefined }
 							step={ 1 }
 							onChange={ ( next?: string ) => setWidth( next ) }
 						/>
