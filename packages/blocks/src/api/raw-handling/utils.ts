@@ -43,10 +43,39 @@ export function getBlockContentSchemaFromTransforms(
 		);
 	} );
 
+	type SeenPairs = WeakMap< object, WeakSet< object > >;
+
+	// Recursive paste schemas (e.g. core/list) point nested children back at
+	// the same tag objects. Track in-progress pairs so merging two such
+	// schemas cannot recurse forever.
+	function hasStartedMerging(
+		seen: SeenPairs,
+		a: unknown,
+		b: unknown
+	): boolean {
+		if ( ! a || ! b || typeof a !== 'object' || typeof b !== 'object' ) {
+			return false;
+		}
+
+		let mergedWith = seen.get( a );
+		if ( mergedWith?.has( b ) ) {
+			return true;
+		}
+
+		if ( ! mergedWith ) {
+			mergedWith = new WeakSet();
+			seen.set( a, mergedWith );
+		}
+
+		mergedWith.add( b );
+		return false;
+	}
+
 	function mergeTagNameSchemaProperties(
 		objValue: any,
 		srcValue: any,
-		key: string
+		key: string,
+		seen: SeenPairs
 	) {
 		switch ( key ) {
 			case 'children': {
@@ -56,7 +85,8 @@ export function getBlockContentSchemaFromTransforms(
 
 				return mergeSchemas(
 					{ ...( objValue || {} ) },
-					srcValue || {}
+					srcValue || {},
+					seen
 				);
 			}
 			case 'attributes':
@@ -92,8 +122,12 @@ export function getBlockContentSchemaFromTransforms(
 
 	// A tagName schema is an object with children, attributes, require, and
 	// isMatch properties.
-	function mergeTagNameSchemas( a: any, b: any ) {
+	function mergeTagNameSchemas( a: any, b: any, seen: SeenPairs ) {
 		if ( a === b ) {
+			return a;
+		}
+
+		if ( hasStartedMerging( seen, a, b ) ) {
 			return a;
 		}
 
@@ -102,7 +136,8 @@ export function getBlockContentSchemaFromTransforms(
 				a[ key ] = mergeTagNameSchemaProperties(
 					a[ key ],
 					b[ key ],
-					key
+					key,
+					seen
 				);
 			} else if ( Array.isArray( b[ key ] ) ) {
 				a[ key ] = b[ key ].slice();
@@ -115,14 +150,18 @@ export function getBlockContentSchemaFromTransforms(
 	}
 
 	// A schema is an object with tagName schemas by tag name.
-	function mergeSchemas( a: any, b: any ) {
+	function mergeSchemas( a: any, b: any, seen: SeenPairs = new WeakMap() ) {
 		if ( a === b ) {
+			return a;
+		}
+
+		if ( hasStartedMerging( seen, a, b ) ) {
 			return a;
 		}
 
 		for ( const key in b ) {
 			if ( a[ key ] ) {
-				a[ key ] = mergeTagNameSchemas( a[ key ], b[ key ] );
+				a[ key ] = mergeTagNameSchemas( a[ key ], b[ key ], seen );
 			} else if ( Array.isArray( b[ key ] ) ) {
 				a[ key ] = b[ key ].slice();
 			} else {
@@ -133,7 +172,7 @@ export function getBlockContentSchemaFromTransforms(
 		return a;
 	}
 
-	return schemas.reduce( mergeSchemas, {} );
+	return schemas.reduce( ( acc, schema ) => mergeSchemas( acc, schema ), {} );
 }
 
 /**
