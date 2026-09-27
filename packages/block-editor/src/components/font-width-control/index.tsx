@@ -70,7 +70,7 @@ export default function FontWidthControl( {
 	onChange,
 	fontFamilyFaces,
 }: FontWidthControlProps ) {
-	const coverage = resolveFontFaceCapabilities( fontFamilyFaces ).stretch;
+	const coverage = resolveFontFaceCapabilities( fontFamilyFaces ).width;
 	const range = coverageRange( coverage );
 	const width =
 		value === undefined ? undefined : parseFontStretchValue( value );

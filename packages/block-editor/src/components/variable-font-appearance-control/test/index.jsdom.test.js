@@ -9,6 +9,7 @@ globalThis.wpVitest.mockScrollIntoView();
 
 const faces = [
 	{ fontFamily: 'Range Test', fontStyle: 'normal', fontWeight: '250 750' },
+	{ fontFamily: 'Range Test', fontStyle: 'italic', fontWeight: '250 750' },
 ];
 
 async function renderControl( value, onChange = vi.fn() ) {

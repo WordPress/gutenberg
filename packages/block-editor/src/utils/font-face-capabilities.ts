@@ -19,7 +19,7 @@ export interface FontAxisCoverage {
 
 export interface FontFaceCapabilities {
 	weight: FontAxisCoverage[];
-	stretch: FontAxisCoverage[];
+	width: FontAxisCoverage[];
 	/**
 	 * Style is not a number, so it is not coverage. A face is upright, italic,
 	 * or oblique over a range of angles, and the three are a choice rather than
@@ -31,6 +31,19 @@ export interface FontFaceCapabilities {
 		oblique?: FontSlantRange;
 	};
 }
+
+const DEFAULT_FONT_WEIGHT_VALUES = [
+	'100',
+	'200',
+	'300',
+	'400',
+	'500',
+	'600',
+	'700',
+	'800',
+	'900',
+	'1000',
+];
 
 type Parser = ( value: string ) => number | undefined;
 
@@ -82,12 +95,14 @@ export function resolveFontFaceCapabilities(
 	return {
 		weight: coverageOf(
 			fontFamilyFaces,
-			( face ) => face.fontWeight,
+			// @font-face defaults an omitted descriptor to `normal` (400).
+			( face ) => face.fontWeight ?? 'normal',
 			parseFontWeightValue
 		),
-		stretch: coverageOf(
+		width: coverageOf(
 			fontFamilyFaces,
-			( face ) => face.fontStretch,
+			// @font-face defaults an omitted descriptor to `normal` (100%).
+			( face ) => face.fontStretch ?? 'normal',
 			parseFontStretchValue
 		),
 		style: {
@@ -150,4 +165,64 @@ export function coverageRange(
 		min: Math.min( ...intervals.map( ( { min } ) => min ) ),
 		max: Math.max( ...intervals.map( ( { max } ) => max ) ),
 	};
+}
+
+/**
+ * Returns the named weight values a control can offer for a family.
+ *
+ * A family without face metadata remains unknown, so it retains the ordinary
+ * CSS weights. Once faces are declared, the list is only their static points
+ * and the hundreds a variable interval can actually draw.
+ *
+ * @param fontFamilyFaces Font family faces from theme.json.
+ * @return Weight values in ascending order.
+ */
+export function getFontWeightValues(
+	fontFamilyFaces: FontFamilyFace[] | undefined
+): string[] {
+	if ( ! fontFamilyFaces?.length ) {
+		return DEFAULT_FONT_WEIGHT_VALUES;
+	}
+
+	const { weight } = resolveFontFaceCapabilities( fontFamilyFaces );
+	const values = new Set( coveragePoints( weight ).map( String ) );
+
+	weight.forEach( ( { min, max } ) => {
+		if ( min === max ) {
+			return;
+		}
+		for (
+			let value = Math.ceil( min / 100 ) * 100;
+			value <= max;
+			value += 100
+		) {
+			values.add( String( value ) );
+		}
+	} );
+
+	return [ ...values ].sort( ( a, b ) => Number( a ) - Number( b ) );
+}
+
+/**
+ * Returns the styles a control can offer for a family.
+ *
+ * An absent face list says nothing about a family, so it keeps the ordinary
+ * normal and italic choices. A declared list is capability-only.
+ *
+ * @param fontFamilyFaces Font family faces from theme.json.
+ * @return CSS font-style values.
+ */
+export function getFontStyleValues(
+	fontFamilyFaces: FontFamilyFace[] | undefined
+): string[] {
+	if ( ! fontFamilyFaces?.length ) {
+		return [ 'normal', 'italic' ];
+	}
+
+	const { style } = resolveFontFaceCapabilities( fontFamilyFaces );
+	return [
+		...( style.normal ? [ 'normal' ] : [] ),
+		...( style.italic ? [ 'italic' ] : [] ),
+		...( style.oblique ? [ 'oblique' ] : [] ),
+	];
 }

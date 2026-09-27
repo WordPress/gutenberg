@@ -1,7 +1,11 @@
 import { CustomSelectControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { formatFontStyle } from '../../utils/format-font-style';
+import { formatFontWeight } from '../../utils/format-font-weight';
+import {
+	getFontStyleValues,
+	getFontWeightValues,
+} from '../../utils/font-face-capabilities';
 
 /**
  * Adjusts font appearance field label in case either font styles or weights
@@ -56,8 +60,29 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
-	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
-		getFontStylesAndWeights( fontFamilyFaces );
+	const fontStyles =
+		getFontStyleValues( fontFamilyFaces ).map( formatFontStyle );
+	const fontWeights =
+		getFontWeightValues( fontFamilyFaces ).map( formatFontWeight );
+	const combinedStyleAndWeightOptions = fontStyles.flatMap(
+		( { name: styleName, value: styleValue } ) =>
+			fontWeights.map( ( { name: weightName, value: weightValue } ) => ( {
+				key: `${ styleValue }-${ weightValue }`,
+				name:
+					styleValue === 'normal'
+						? weightName
+						: sprintf(
+								/* translators: 1: Font weight name. 2: Font style name. */
+								_x( '%1$s %2$s', 'font' ),
+								weightName ?? '',
+								styleName ?? ''
+							),
+				style: {
+					fontStyle: styleValue,
+					fontWeight: weightValue,
+				},
+			} ) )
+	);
 
 	// Generates select options for combined font styles and weights.
 	const combineOptions = () => {
@@ -95,7 +120,7 @@ export default function FontAppearanceControl( props ) {
 	};
 
 	// Map font styles and weights to select options.
-	const selectOptions = useMemo( () => {
+	const selectOptions = ( () => {
 		// Display combined available font style and weight options.
 		if ( hasFontStyles && hasFontWeights ) {
 			return combineOptions();
@@ -103,12 +128,7 @@ export default function FontAppearanceControl( props ) {
 
 		// Display only font style options or font weight options.
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [
-		props.options,
-		fontStyles,
-		fontWeights,
-		combinedStyleAndWeightOptions,
-	] );
+	} )();
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.

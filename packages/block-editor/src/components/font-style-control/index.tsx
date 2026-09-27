@@ -5,9 +5,9 @@ import FontAxisRangeControl from '../font-axis-range-control';
 import {
 	DEFAULT_OBLIQUE_ANGLE,
 	getDefaultObliqueAngle,
-	getFontSlantRange,
 	type FontSlantRange,
 } from '../../utils/get-font-slant-range';
+import { resolveFontFaceCapabilities } from '../../utils/font-face-capabilities';
 import type { FontFamilyFace } from '../../utils/types';
 
 type Option = {
@@ -23,19 +23,6 @@ const DEFAULT_OPTION: Option = {
 };
 
 const OBLIQUE = /^oblique(?:\s+(-?\d*\.?\d+)deg)?$/;
-
-/**
- * Whether a family has a face drawn italic, which is a design of its own
- * rather than a slant applied to the upright one.
- *
- * @param fontFamilyFaces The faces of the family in use.
- * @return Whether italic is one of the faces.
- */
-function hasItalicFace( fontFamilyFaces?: FontFamilyFace[] ): boolean {
-	return !! fontFamilyFaces?.some(
-		( { fontStyle } ) => fontStyle?.trim().toLowerCase() === 'italic'
-	);
-}
 
 /**
  * Whether anything is known about the styles the family is drawn in.
@@ -109,7 +96,9 @@ export default function FontStyleControl( {
 	onChange,
 	fontFamilyFaces,
 }: FontStyleControlProps ) {
-	const slantRange = getFontSlantRange( fontFamilyFaces );
+	const styleCapabilities =
+		resolveFontFaceCapabilities( fontFamilyFaces ).style;
+	const slantRange = styleCapabilities.oblique;
 	const angle = getAngle( value, slantRange );
 	const isOblique = angle !== undefined;
 
@@ -120,8 +109,7 @@ export default function FontStyleControl( {
 	 * is offer an italic to a family whose faces are listed and include none.
 	 */
 	const offersItalic =
-		hasItalicFace( fontFamilyFaces ) ||
-		! hasDeclaredFaces( fontFamilyFaces );
+		styleCapabilities.italic || ! hasDeclaredFaces( fontFamilyFaces );
 
 	const options: Option[] = [
 		DEFAULT_OPTION,

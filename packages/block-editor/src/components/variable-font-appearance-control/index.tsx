@@ -8,8 +8,14 @@ import { useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import { getFontWeightRange } from '../../utils/get-font-weight-range';
+import { formatFontStyle } from '../../utils/format-font-style';
+import { formatFontWeight } from '../../utils/format-font-weight';
+import {
+	coverageRange,
+	getFontStyleValues,
+	getFontWeightValues,
+	resolveFontFaceCapabilities,
+} from '../../utils/font-face-capabilities';
 import type { FontFamilyFace } from '../../utils/types';
 
 interface FontAppearanceValue {
@@ -73,9 +79,14 @@ export default function VariableFontAppearanceControl( {
 	hasFontWeights = true,
 }: VariableFontAppearanceControlProps ) {
 	const { fontStyle, fontWeight } = value;
-	const { fontStyles, fontWeights } =
-		getFontStylesAndWeights( fontFamilyFaces );
-	const range = getFontWeightRange( fontFamilyFaces ) ?? FULL_RANGE;
+	const fontStyles =
+		getFontStyleValues( fontFamilyFaces ).map( formatFontStyle );
+	const fontWeights =
+		getFontWeightValues( fontFamilyFaces ).map( formatFontWeight );
+	const range =
+		coverageRange(
+			resolveFontFaceCapabilities( fontFamilyFaces ).weight
+		) ?? FULL_RANGE;
 
 	const weightValue =
 		fontWeight === undefined || fontWeight === null || fontWeight === ''

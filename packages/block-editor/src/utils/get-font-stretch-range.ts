@@ -27,6 +27,6 @@ export function getFontStretchRange(
 	fontFamilyFaces: FontFamilyFace[] | undefined
 ): FontStretchRange | undefined {
 	return coverageRange(
-		resolveFontFaceCapabilities( fontFamilyFaces ).stretch
+		resolveFontFaceCapabilities( fontFamilyFaces ).width
 	);
 }

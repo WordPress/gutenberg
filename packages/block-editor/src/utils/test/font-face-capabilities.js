@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
 	coveragePoints,
 	coverageRange,
+	getFontStyleValues,
+	getFontWeightValues,
 	isVariableCoverage,
 	resolveFontFaceCapabilities,
 } from '../font-face-capabilities';
@@ -25,7 +27,7 @@ describe( 'resolveFontFaceCapabilities', () => {
 	it( 'reads a variable family as one interval per axis', () => {
 		const capabilities = resolveFontFaceCapabilities( ROBOTO_FLEX );
 		expect( capabilities.weight ).toEqual( [ { min: 100, max: 1000 } ] );
-		expect( capabilities.stretch ).toEqual( [ { min: 25, max: 151 } ] );
+		expect( capabilities.width ).toEqual( [ { min: 25, max: 151 } ] );
 	} );
 
 	it( 'reads a static family as a point for each face', () => {
@@ -36,7 +38,7 @@ describe( 'resolveFontFaceCapabilities', () => {
 			{ min: 400, max: 400 },
 			{ min: 700, max: 700 },
 		] );
-		expect( capabilities.stretch ).toEqual( [
+		expect( capabilities.width ).toEqual( [
 			{ min: 75, max: 75 },
 			{ min: 100, max: 100 },
 		] );
@@ -64,7 +66,26 @@ describe( 'resolveFontFaceCapabilities', () => {
 	it( 'reads nothing from faces that declare nothing', () => {
 		const capabilities = resolveFontFaceCapabilities( undefined );
 		expect( capabilities.weight ).toEqual( [] );
-		expect( capabilities.stretch ).toEqual( [] );
+		expect( capabilities.width ).toEqual( [] );
+	} );
+
+	it( 'uses CSS descriptor defaults for a declared face', () => {
+		const capabilities = resolveFontFaceCapabilities( [ {} ] );
+		expect( capabilities.weight ).toEqual( [ { min: 400, max: 400 } ] );
+		expect( capabilities.width ).toEqual( [ { min: 100, max: 100 } ] );
+	} );
+} );
+
+describe( 'control values', () => {
+	it( 'does not add a faux bold to a declared face', () => {
+		expect( getFontWeightValues( [ { fontWeight: '400' } ] ) ).toEqual( [
+			'400',
+		] );
+	} );
+
+	it( 'keeps the ordinary CSS choices while a family is unknown', () => {
+		expect( getFontStyleValues() ).toEqual( [ 'normal', 'italic' ] );
+		expect( getFontWeightValues() ).toContain( '700' );
 	} );
 } );
 
@@ -78,9 +99,9 @@ describe( 'reading coverage', () => {
 	} );
 
 	it( 'gives the values a static family draws', () => {
-		expect( coveragePoints( statics.stretch ) ).toEqual( [ 75, 100 ] );
+		expect( coveragePoints( statics.width ) ).toEqual( [ 75, 100 ] );
 		// A range has no points to list: everything in it can be drawn.
-		expect( coveragePoints( variable.stretch ) ).toEqual( [] );
+		expect( coveragePoints( variable.width ) ).toEqual( [] );
 	} );
 
 	it( 'gives a range only where a face interpolates', () => {

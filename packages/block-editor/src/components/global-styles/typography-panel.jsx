@@ -34,10 +34,13 @@ import {
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestStyleAndWeight,
 } from './typography-utils';
-import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import { getFontWeightRange } from '../../utils/get-font-weight-range';
-import { getFontStretchRange } from '../../utils/get-font-stretch-range';
-import { parseFontStretchValue } from '../../utils/parse-font-stretch';
+import {
+	coveragePoints,
+	coverageRange,
+	getFontStyleValues,
+	getFontWeightValues,
+	resolveFontFaceCapabilities,
+} from '../../utils/font-face-capabilities';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
@@ -155,24 +158,14 @@ function useHasFontStretchControl( settings ) {
  * nothing. A variable face declares a range, and a static family declares a
  * width per face.
  *
- * @param {Array} fontFamilyFaces The faces of the family in use.
+ * @param {Array} stretchCoverage The widths the family in use covers.
  * @return {boolean} Whether there is more than one width to choose from.
  */
-function hasFontStretchCapability( fontFamilyFaces ) {
-	if ( getFontStretchRange( fontFamilyFaces ) ) {
-		return true;
-	}
-	const declared = new Set();
-	fontFamilyFaces?.forEach( ( { fontStretch } ) => {
-		if ( 'string' !== typeof fontStretch ) {
-			return;
-		}
-		const width = parseFontStretchValue( fontStretch );
-		if ( width !== undefined ) {
-			declared.add( width );
-		}
-	} );
-	return declared.size > 1;
+function hasFontStretchCapability( stretchCoverage ) {
+	return (
+		coverageRange( stretchCoverage ) !== undefined ||
+		coveragePoints( stretchCoverage ).length > 1
+	);
 }
 
 /**
@@ -379,6 +372,10 @@ export default function TypographyPanel( {
 	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
 		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
 	}, [ settings, fontFamily ] );
+	const fontFaceCapabilities = useMemo(
+		() => resolveFontFaceCapabilities( fontFamilyFaces ),
+		[ fontFamilyFaces ]
+	);
 
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
@@ -407,19 +404,17 @@ export default function TypographyPanel( {
 		const newFontFamilyFaces =
 			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
 				?.fontFace ?? [];
-		const { fontStyles, fontWeights } =
-			getFontStylesAndWeights( newFontFamilyFaces );
-		const hasFontStyle = fontStyles?.some(
-			( { value: fs } ) => fs === fontStyle
-		);
+		const fontStyles = getFontStyleValues( newFontFamilyFaces );
+		const fontWeights = getFontWeightValues( newFontFamilyFaces );
+		const hasFontStyle = fontStyles.includes( fontStyle );
 		// A variable font can draw any weight in its range, not only the
 		// hundreds listed as presets.
-		const newFontWeightRange = getFontWeightRange( newFontFamilyFaces );
+		const newFontWeightRange = coverageRange(
+			resolveFontFaceCapabilities( newFontFamilyFaces ).weight
+		);
 		const numericFontWeight = Number( fontWeight );
 		const hasFontWeight =
-			fontWeights?.some(
-				( { value: fw } ) => fw?.toString() === fontWeight?.toString()
-			) ||
+			fontWeights.includes( fontWeight?.toString() ) ||
 			( !! newFontWeightRange &&
 				hasValue( fontWeight ) &&
 				numericFontWeight >= newFontWeightRange.min &&
@@ -546,12 +541,12 @@ export default function TypographyPanel( {
 	// anything to offer.
 	const hasFontStretchControl =
 		useHasFontStretchControl( settings ) &&
-		hasFontStretchCapability( fontFamilyFaces );
+		hasFontStretchCapability( fontFaceCapabilities.width );
 	// A family with a weight range is variable: the weight takes any value in
 	// the range rather than one of fixed style and weight combinations.
 	const isVariableFont = useMemo(
-		() => !! getFontWeightRange( fontFamilyFaces ),
-		[ fontFamilyFaces ]
+		() => coverageRange( fontFaceCapabilities.weight ) !== undefined,
+		[ fontFaceCapabilities ]
 	);
 
 	// Each axis reads its own local value, its own inherited value, and so
@@ -1060,7 +1055,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<FontAppearanceControl
-							value={ { fontStyle, fontWeight } }
+							value={ { fontWeight } }
 							onChange={ ( next ) =>
 								setFontWeight( next.fontWeight )
 							}
