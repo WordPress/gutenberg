@@ -7,7 +7,7 @@ import {
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
-import type { FormatEditWithVisibilityProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -23,7 +23,7 @@ export const bold = {
 		onChange,
 		onFocus,
 		isVisible = true,
-	}: FormatEditWithVisibilityProps ): React.ReactNode {
+	}: FormatEditProps ): React.ReactNode {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}

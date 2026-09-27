@@ -65,7 +65,6 @@ import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
-import { unlock } from '../lock-unlock';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -238,7 +237,7 @@ export default function GalleryEdit( props ) {
 				getSettings: _getSettings,
 				getBlock: _getBlock,
 				getSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {

@@ -4,7 +4,9 @@
 
 ### Bug Fixes
 
--   `getBlockContentSchemaFromTransforms` no longer recurses infinitely when merging recursive list-like paste schemas.
+-   `getBlockContentSchemaFromTransforms` no longer recurses infinitely when merging recursive list-like paste schemas ([#83292](https://github.com/WordPress/gutenberg/pull/83292)).
+
+## 16.1.0 (2026-09-23)
 
 ### New Features
 
