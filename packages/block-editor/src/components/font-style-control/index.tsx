@@ -38,6 +38,20 @@ function hasItalicFace( fontFamilyFaces?: FontFamilyFace[] ): boolean {
 }
 
 /**
+ * Whether anything is known about the styles the family is drawn in.
+ *
+ * A family with no faces has not said it has no italic; it has said nothing. A
+ * system font has no faces to read, and a theme may register a family without
+ * them, so this is the ordinary case rather than an edge one.
+ *
+ * @param fontFamilyFaces The faces of the family in use.
+ * @return Whether there is a declaration to read.
+ */
+function hasDeclaredFaces( fontFamilyFaces?: FontFamilyFace[] ): boolean {
+	return !! fontFamilyFaces?.length;
+}
+
+/**
  * Reads the angle out of a saved oblique, or the angle a bare one means.
  *
  * @param value The saved `font-style`.
@@ -73,10 +87,16 @@ type FontStyleControlProps = {
 /**
  * Picks the style a font is drawn in, from the styles it actually has.
  *
- * Nothing synthesised is offered here. A browser will slant an upright face
- * when asked for an italic it does not have, but that is a fallback rather
- * than one of the font's styles, and naming it in a list of what the font
- * offers would be untrue. The toolbar's italic still asks for it.
+ * Nothing synthesised is offered here, as long as the font has said what it
+ * has. A browser will slant an upright face when asked for an italic it does
+ * not have, but that is a fallback rather than one of the font's styles, and
+ * naming it in a list of what the font offers would be untrue. The toolbar's
+ * italic still asks for it.
+ *
+ * A family that declares no faces is the exception, and it is the common case:
+ * a system font has none to read, and a theme need not write them. Nothing is
+ * known there, so Italic stays, as it did before this list was built from the
+ * faces.
  *
  * @param props                 Component props.
  * @param props.value           The current `font-style` value.
@@ -93,10 +113,20 @@ export default function FontStyleControl( {
 	const angle = getAngle( value, slantRange );
 	const isOblique = angle !== undefined;
 
+	/*
+	 * Italic is offered for a family that has an italic face, and for one whose
+	 * faces are not described at all, where leaving it out would take a style
+	 * away on the word of a font that never spoke. What this control does not do
+	 * is offer an italic to a family whose faces are listed and include none.
+	 */
+	const offersItalic =
+		hasItalicFace( fontFamilyFaces ) ||
+		! hasDeclaredFaces( fontFamilyFaces );
+
 	const options: Option[] = [
 		DEFAULT_OPTION,
 		{ key: 'normal', value: 'normal', name: __( 'Normal' ) },
-		...( hasItalicFace( fontFamilyFaces )
+		...( offersItalic
 			? [ { key: 'italic', value: 'italic', name: __( 'Italic' ) } ]
 			: [] ),
 		...( slantRange

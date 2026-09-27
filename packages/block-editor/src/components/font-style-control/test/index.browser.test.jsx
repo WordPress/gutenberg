@@ -59,6 +59,37 @@ describe( 'the styles offered', () => {
 		await renderControl( { fontFamilyFaces: [ { fontStyle: 'normal' } ] } );
 		expect( await openStyles() ).toEqual( [ 'Default', 'Normal' ] );
 	} );
+
+	it( 'keeps italic for a family that declares no faces', async () => {
+		// Nothing has been declared, which is not a font saying it has no
+		// italic: a system font has no faces to read, and a theme need not
+		// write them. Taking the style away here would take it away from most
+		// sites.
+		await renderControl( {} );
+		expect( await openStyles() ).toEqual( [
+			'Default',
+			'Normal',
+			'Italic',
+		] );
+	} );
+
+	it( 'keeps italic for a family whose faces list is empty', async () => {
+		await renderControl( { fontFamilyFaces: [] } );
+		expect( await openStyles() ).toEqual( [
+			'Default',
+			'Normal',
+			'Italic',
+		] );
+	} );
+
+	it( 'reads a face that declares a weight but no style as upright', async () => {
+		// `font-style` defaults to normal in an @font-face, so these faces do
+		// say what they are, and none of them is italic.
+		await renderControl( {
+			fontFamilyFaces: [ { fontWeight: '400' }, { fontWeight: '700' } ],
+		} );
+		expect( await openStyles() ).toEqual( [ 'Default', 'Normal' ] );
+	} );
 } );
 
 describe( 'starting an oblique', () => {
