@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `cleanForSlug`: keep combining marks so slugs in scripts like Devanagari, Tamil and Bengali are no longer mangled ([#40023](https://github.com/WordPress/gutenberg/issues/40023)).
+-   `cleanForSlug`: keep combining marks so slugs in scripts like Devanagari, Tamil and Bengali are no longer mangled ([#83525](https://github.com/WordPress/gutenberg/pull/83525)).
 
 ## 4.56.0 (2026-09-23)
 
