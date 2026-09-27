@@ -40,6 +40,7 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
+	useBlockStyleVariationProps,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -304,12 +305,25 @@ function VisualEditor( {
 		'core/post-content'
 	);
 
+	// Without the template there's no Post Content block to carry its style
+	// variation, so apply it to the root container instead.
+	const { className: postContentVariationClass } =
+		useBlockStyleVariationProps( {
+			name: 'core/post-content',
+			className:
+				renderingMode === 'post-only' && ! isDesignPostType
+					? newestPostContentAttributes?.className
+					: undefined,
+			clientId: 'post-content',
+		} );
+
 	const blockListLayoutClass = clsx(
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
 		themeSupportsLayout && postContentLayoutClasses,
-		align && `align${ align }`
+		align && `align${ align }`,
+		postContentVariationClass
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(

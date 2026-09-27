@@ -25,6 +25,7 @@ import {
 	useLayoutClasses,
 	useLayoutStyles,
 	BlockStyleVariationOverridesWithConfig,
+	useBlockStyleVariationProps,
 	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
@@ -128,6 +129,7 @@ lock( privateApis, {
 	useSpacingSizes,
 	useBlockDisplayTitle,
 	BlockStyleVariationOverridesWithConfig,
+	useBlockStyleVariationProps,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	NoteIconSlotFill,

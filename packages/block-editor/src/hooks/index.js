@@ -102,5 +102,8 @@ export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { setBackgroundStyleDefaults } from './background';
 export { useZoomOut } from './use-zoom-out';
-export { BlockStyleVariationOverridesWithConfig } from './block-style-variation';
+export {
+	BlockStyleVariationOverridesWithConfig,
+	useBlockStyleVariationProps,
+} from './block-style-variation';
 export { useStyleOverride } from './utils';

@@ -213,7 +213,7 @@ function useBlockStyleVariation( name, variation, clientId ) {
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
-function useBlockProps( { name, className, clientId } ) {
+export function useBlockStyleVariationProps( { name, className, clientId } ) {
 	const { getBlockStyles } = useSelect( blocksStore );
 
 	const registeredStyles = getBlockStyles( name );
@@ -275,5 +275,5 @@ export default {
 	hasSupport: () => true,
 	attributeKeys: [ 'className' ],
 	isMatch: ( { className } ) => getVariationMatches( className ).length > 0,
-	useBlockProps,
+	useBlockProps: useBlockStyleVariationProps,
 };
