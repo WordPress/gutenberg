@@ -4750,6 +4750,38 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Keeps the font variation settings a style engine would write.
+	 *
+	 * The value is an object keyed by OpenType axis tag. Which tags and values may
+	 * be written is the style engine's rule, documented where it serializes them,
+	 * so each entry is offered to the engine on its own rather than read a second
+	 * time here: an axis that has a CSS property of its own, a tag that is not four
+	 * letters or digits, and a value that is not a number are all left out.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $settings Axis values keyed by tag.
+	 * @return array The entries that may be written.
+	 */
+	protected static function filter_font_variation_settings( $settings ) {
+		if ( ! is_array( $settings ) ) {
+			return array();
+		}
+
+		$filtered = array();
+		foreach ( $settings as $tag => $value ) {
+			$styles = gutenberg_style_engine_get_styles(
+				array( 'typography' => array( 'fontVariationSettings' => array( $tag => $value ) ) )
+			);
+			if ( ! empty( $styles['declarations']['font-variation-settings'] ) ) {
+				$filtered[ $tag ] = $value;
+			}
+		}
+
+		return $filtered;
+	}
+
+	/**
 	 * Removes insecure data from theme.json.
 	 *
 	 * @since 5.9.0
@@ -5149,21 +5181,8 @@ class WP_Theme_JSON_Gutenberg {
 				// Check the value isn't an array before adding so as to not
 				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
-				if ( 'font-variation-settings' === $declaration['name'] && is_array( $value ) ) {
-					// The value is an object keyed by axis tag. Keep only the
-					// entries the style engine serializes.
-					$value = array_filter(
-						$value,
-						static function ( $axis_value, $tag ) {
-							return is_string( $tag ) &&
-								preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) &&
-								! in_array( $tag, array( 'wght', 'wdth', 'slnt', 'ital' ), true ) &&
-								( is_int( $axis_value ) || is_float( $axis_value ) ) &&
-								is_finite( $axis_value );
-						},
-						ARRAY_FILTER_USE_BOTH
-					);
-					_wp_array_set( $output, $path, $value );
+				if ( 'font-variation-settings' === $declaration['name'] ) {
+					_wp_array_set( $output, $path, static::filter_font_variation_settings( $value ) );
 				} elseif ( ! is_array( $value ) ) {
 					_wp_array_set( $output, $path, $value );
 				}
