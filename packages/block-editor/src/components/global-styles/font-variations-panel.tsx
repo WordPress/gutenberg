@@ -72,7 +72,7 @@ export type FontVariationAxis = {
  * for a particular optical size, and this is where it would be asked for. The
  * browser keeps tracking the font size until something is set here.
  */
-const AXES_A_PROPERTY_OWNS = [ 'wght', 'wdth', 'slnt', 'ital' ];
+const PROPERTY_OWNED_AXES = [ 'wght', 'wdth', 'slnt', 'ital' ];
 
 const EMPTY_AXES: FontVariationAxis[] = [];
 
@@ -212,7 +212,7 @@ export function getFontVariationAxes(
 	} );
 
 	return [ ...capabilities.values() ].flatMap( ( axis ) => {
-		if ( AXES_A_PROPERTY_OWNS.includes( axis.tag ) ) {
+		if ( PROPERTY_OWNED_AXES.includes( axis.tag ) ) {
 			return [];
 		}
 		const { min, max } = axis;
