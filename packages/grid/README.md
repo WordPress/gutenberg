@@ -381,6 +381,8 @@ preview update; the overhead is minor up to ~50 tiles and grows
 from there. For `DashboardLanes`, placement runs in a
 `useLayoutEffect` throttled to one frame per measurement burst.
 
+Each tile (`GridItem`, `LanesItem`) is wrapped in `memo()`, and every prop, including the resolved layout item, keeps its identity across gesture frames for tiles a drag or resize didn't touch, so a resize frame re-renders only the active tile and a drag frame only the tiles whose `order` changed, regardless of tile count.
+
 ### Size limits
 
 `itemLimits` declares per-item floors and ceilings in pixels, keyed by

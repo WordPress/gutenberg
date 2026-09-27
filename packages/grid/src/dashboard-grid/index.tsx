@@ -158,6 +158,25 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
 			new Map()
 		);
+		// Lets `sortedItems` return the same array when `activeLayout`
+		// changes reference but not order (e.g. a resize). Otherwise
+		// `<SortableContext items>` gets a new array every frame, and
+		// every `useSortable()` subscriber (every `GridItem`) re-renders
+		// despite `memo()`, since a context change can't be bailed out of.
+		const sortedItemsRef = useRef< string[] >( [] );
+		// Caches each key's last resolved object so a 'fill' item keeps
+		// its identity across gesture frames when its width hasn't
+		// changed, letting `memo()` on `GridItem` skip untouched tiles.
+		const resolvedItemCacheRef = useRef<
+			Map<
+				string,
+				{
+					sourceItem: DashboardGridLayoutItem;
+					fillWidth: number;
+					resolved: DashboardGridLayoutItem;
+				}
+			>
+		>( new Map() );
 
 		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
 			null
@@ -301,18 +320,25 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// unchanged. Avoids producing a fresh `items` array on every parent
 		// re-render so `<SortableContext>` doesn't update its context value
 		// and notify every `useSortable` subscriber unnecessarily.
-		const sortedItems = useMemo(
-			() =>
-				activeLayout
-					.map( ( item, index ) => ( { item, index } ) )
-					.sort(
-						( a, b ) =>
-							( a.item.order ?? a.index ) -
-							( b.item.order ?? b.index )
-					)
-					.map( ( { item } ) => item.key ),
-			[ activeLayout ]
-		);
+		const sortedItems = useMemo( () => {
+			const next = activeLayout
+				.map( ( item, index ) => ( { item, index } ) )
+				.sort(
+					( a, b ) =>
+						( a.item.order ?? a.index ) -
+						( b.item.order ?? b.index )
+				)
+				.map( ( { item } ) => item.key );
+			const prev = sortedItemsRef.current;
+			if (
+				prev.length === next.length &&
+				prev.every( ( key, index ) => key === next[ index ] )
+			) {
+				return prev;
+			}
+			sortedItemsRef.current = next;
+			return next;
+		}, [ activeLayout ] );
 		const items = sortedItems;
 
 		// Resolve `width: 'fill'` items to concrete column spans; the
@@ -324,17 +350,37 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				effectiveColumns,
 				spanBoundsByKey
 			);
+			const cache = resolvedItemCacheRef.current;
 			if ( fillWidths.size === 0 ) {
+				cache.clear();
 				return layoutMap;
 			}
 			const map = new Map< string, DashboardGridLayoutItem >();
+			const nextCache: typeof cache = new Map();
 			for ( const [ key, item ] of layoutMap ) {
 				const fillW = fillWidths.get( key );
-				map.set(
-					key,
-					fillW !== undefined ? { ...item, width: fillW } : item
-				);
+				if ( fillW === undefined ) {
+					map.set( key, item );
+					continue;
+				}
+				// Reuse the previous resolved object when nothing
+				// changed, so untouched tiles keep a stable `item` prop
+				// and `memo()` can skip them.
+				const cached = cache.get( key );
+				const resolved =
+					cached &&
+					cached.sourceItem === item &&
+					cached.fillWidth === fillW
+						? cached.resolved
+						: { ...item, width: fillW };
+				nextCache.set( key, {
+					sourceItem: item,
+					fillWidth: fillW,
+					resolved,
+				} );
+				map.set( key, resolved );
 			}
+			resolvedItemCacheRef.current = nextCache;
 			return map;
 		}, [ items, layoutMap, effectiveColumns, spanBoundsByKey ] );
 

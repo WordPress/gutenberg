@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `GridItem` and `LanesItem` are memoized, and `DashboardGrid` reuses a `'fill'` item's resolved object when its width hasn't changed, so a drag or resize frame reconciles only the tiles that actually changed instead of every tile on the surface ([#81959](https://github.com/WordPress/gutenberg/issues/81959)).
+
 ### Internal
 
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).

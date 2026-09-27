@@ -141,6 +141,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
 			new Map()
 		);
+		// Lets `sortedItems` return the same array when `activeLayout`
+		// changes reference but not order. Otherwise
+		// `<SortableContext items>` gets a new array every frame, and
+		// every `useSortable()` subscriber (every `LanesItem`) re-renders
+		// despite `memo()`, since a context change can't be bailed out of.
+		const sortedItemsRef = useRef< string[] >( [] );
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ container, setContainer ] = useState< HTMLDivElement | null >(
@@ -228,18 +234,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 
 		// Sorted item keys, identity-stable when the resulting sequence
 		// is unchanged (avoids invalidating SortableContext).
-		const sortedItems = useMemo(
-			() =>
-				activeLayout
-					.map( ( item, index ) => ( { item, index } ) )
-					.sort(
-						( a, b ) =>
-							( a.item.order ?? a.index ) -
-							( b.item.order ?? b.index )
-					)
-					.map( ( { item } ) => item.key ),
-			[ activeLayout ]
-		);
+		const sortedItems = useMemo( () => {
+			const next = activeLayout
+				.map( ( item, index ) => ( { item, index } ) )
+				.sort(
+					( a, b ) =>
+						( a.item.order ?? a.index ) -
+						( b.item.order ?? b.index )
+				)
+				.map( ( { item } ) => item.key );
+			const prev = sortedItemsRef.current;
+			if (
+				prev.length === next.length &&
+				prev.every( ( key, index ) => key === next[ index ] )
+			) {
+				return prev;
+			}
+			sortedItemsRef.current = next;
+			return next;
+		}, [ activeLayout ] );
 		const items = sortedItems;
 
 		// Span each item renders at: the stored width clamped to the lane
