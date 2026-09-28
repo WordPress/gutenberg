@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { contents as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import edit from './edit';
@@ -10,10 +9,7 @@ import metadata from './block.json';
  * inner blocks are empty). templateLock is false, so this is never applied to
  * existing blocks that already have tab panels saved.
  */
-const TAB_PANELS_TEMPLATE = [
-	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
-	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
-];
+const TAB_PANELS_TEMPLATE = [ [ 'core/tab-panel' ], [ 'core/tab-panel' ] ];
 
 const { name } = metadata;
 

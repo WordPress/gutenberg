@@ -1,16 +1,19 @@
-import { combineReducers } from '@wordpress/data';
+/**
+ * Deprecated reusable blocks store state kept only so the
+ * `core/reusable-blocks` store can still be registered for backward
+ * compatibility.
+ */
+const DEFAULT_STATE = {
+	isEditingReusableBlock: {},
+};
 
-export function isEditingReusableBlock( state = {}, action ) {
-	if ( action?.type === 'SET_EDITING_REUSABLE_BLOCK' ) {
-		return {
-			...state,
-			[ action.clientId ]: action.isEditing,
-		};
-	}
-
+/**
+ * Reducer that preserves the default state without responding to actions.
+ *
+ * @param {Object} state Current state.
+ *
+ * @return {Object} Current state.
+ */
+export default function reducer( state = DEFAULT_STATE ) {
 	return state;
 }
-
-export default combineReducers( {
-	isEditingReusableBlock,
-} );

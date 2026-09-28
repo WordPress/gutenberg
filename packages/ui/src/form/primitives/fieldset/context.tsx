@@ -5,9 +5,25 @@ type FieldsetContextType = {
 	unregisterDescriptionId: () => void;
 };
 
-export const FieldsetContext = createContext< FieldsetContextType >( {
+const fallbackContext: FieldsetContextType = {
 	registerDescriptionId: () => {},
 	unregisterDescriptionId: () => {},
-} );
+};
 
-export const useFieldsetContext = () => useContext( FieldsetContext );
+export const FieldsetContext = createContext< FieldsetContextType | null >(
+	null
+);
+
+export const useFieldsetContext = (
+	componentName: 'Fieldset.Description' | 'Fieldset.Details'
+) => {
+	const context = useContext( FieldsetContext );
+
+	if ( process.env.NODE_ENV !== 'production' && ! context ) {
+		throw new Error(
+			`${ componentName }: Missing parent <Fieldset.Root>. Render <${ componentName }> inside <Fieldset.Root>.`
+		);
+	}
+
+	return context ?? fallbackContext;
+};

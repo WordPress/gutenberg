@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	registerBlockType,
@@ -40,18 +49,38 @@ import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
-jest.mock( '@wordpress/data/src/select', () => {
-	const actualSelect = jest.requireActual( '@wordpress/data/src/select' );
+const { mockIsContentBlock } = vi.hoisted( () => ( {
+	mockIsContentBlock: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actualData = await importOriginal();
 
 	return {
-		select: jest.fn( ( ...args ) => actualSelect.select( ...args ) ),
+		...actualData,
+		select: vi.fn( ( ...args ) => actualData.select( ...args ) ),
 	};
 } );
 
-jest.mock( '@wordpress/blocks/src/api/utils', () => {
+vi.mock( import( '../../lock-unlock' ), async ( importOriginal ) => {
+	const actualLockUnlock = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
-		isContentBlock: jest.fn(),
+		...actualLockUnlock,
+		unlock: ( value ) => {
+			const unlocked = actualLockUnlock.unlock( value );
+			if (
+				unlocked &&
+				typeof unlocked === 'object' &&
+				'isContentBlock' in unlocked
+			) {
+				return {
+					...unlocked,
+					isContentBlock: mockIsContentBlock,
+				};
+			}
+			return unlocked;
+		},
 	};
 } );
 
@@ -3445,10 +3474,6 @@ describe( 'state', () => {
 
 	describe( 'settings', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
-			const consoleWarn = jest
-				.spyOn( global.console, 'warn' )
-				.mockImplementation();
-
 			const settingsObject = settings( undefined, {
 				type: 'UPDATE_SETTINGS',
 				reset: true,
@@ -3457,11 +3482,9 @@ describe( 'state', () => {
 			expect( settingsObject.__unstableIsPreviewMode ).toBeDefined();
 			expect( settingsObject.isPreviewMode ).toBeDefined();
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
 			);
-
-			consoleWarn.mockRestore();
 		} );
 	} );
 
@@ -4231,7 +4254,7 @@ describe( 'state', () => {
 
 		describe( 'edit mode', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -4285,7 +4308,7 @@ describe( 'state', () => {
 
 		describe( 'synced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the pattern is inserted with no inner blocks.
 				// - next the pattern is marked as a controlled block.
@@ -4850,7 +4873,7 @@ describe( 'state', () => {
 
 		describe( 'contentOnly template locking', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5108,7 +5131,7 @@ describe( 'state', () => {
 		describe( 'zoom out mode', () => {
 			let initialState;
 
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5299,7 +5322,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5461,7 +5484,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5569,7 +5592,7 @@ describe( 'state', () => {
 
 		describe( 'isIsolatedEditor setting', () => {
 			let stateWithUnsyncedPatternAndTemplatePart;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Set up a state with both an unsynced pattern and a template part.
 				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
 					[
@@ -5739,7 +5762,7 @@ describe( 'state', () => {
 
 		describe( 'template parts', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the template part is inserted with no inner blocks.
 				// - next the template part is marked as a controlled block.
@@ -5853,7 +5876,7 @@ describe( 'state', () => {
 
 		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{

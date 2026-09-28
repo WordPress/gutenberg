@@ -1,16 +1,45 @@
-jest.mock( '@octokit/rest' );
-jest.mock( '../../lib/milestone' );
-jest.mock( '../../lib/logger', () => ( {
-	log: jest.fn(),
-	warn: jest.fn(),
-	formats: {
-		title: jest.fn( ( message ) => message ),
-		error: jest.fn( ( message ) => message ),
-		warning: jest.fn( ( message ) => message ),
-	},
-} ) );
-
-import {
+import { createRequire } from 'node:module';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import _pullRequests from './fixtures/pull-requests.json';
+import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+const require = createRequire( import.meta.url );
+const octokitPath = require.resolve( '@octokit/rest' );
+const octokitModule = require( '@octokit/rest' );
+const Octokit = vi.fn();
+const milestonePath = require.resolve( '../../lib/milestone' );
+const milestoneModule = require( '../../lib/milestone' );
+const getMilestoneByTitle = vi.fn();
+const getIssuesByMilestone = vi.fn();
+const loggerPath = require.resolve( '../../lib/logger' );
+const loggerModule = require( '../../lib/logger' );
+const log = vi.fn();
+const warn = vi.fn();
+const changelogPath = require.resolve( '../changelog' );
+let changelog;
+try {
+	require.cache[ octokitPath ].exports = { ...octokitModule, Octokit };
+	require.cache[ milestonePath ].exports = {
+		getMilestoneByTitle,
+		getIssuesByMilestone,
+	};
+	require.cache[ loggerPath ].exports = {
+		log,
+		warn,
+		formats: {
+			title: vi.fn( ( message ) => message ),
+			error: vi.fn( ( message ) => message ),
+			warning: vi.fn( ( message ) => message ),
+			success: vi.fn( ( message ) => message ),
+		},
+	};
+	changelog = require( changelogPath );
+} finally {
+	require.cache[ octokitPath ].exports = octokitModule;
+	require.cache[ milestonePath ].exports = milestoneModule;
+	require.cache[ loggerPath ].exports = loggerModule;
+	delete require.cache[ changelogPath ];
+}
+const {
 	getNormalizedTitle,
 	reword,
 	addTrailingPeriod,
@@ -32,15 +61,7 @@ import {
 	createChangelog,
 	fetchAllPullRequests,
 	getManualChangelogInstructions,
-} from '../changelog';
-import _pullRequests from './fixtures/pull-requests.json';
-import botPullRequestFixture from './fixtures/bot-pull-requests.json';
-const { Octokit } = require( '@octokit/rest' );
-const {
-	getMilestoneByTitle,
-	getIssuesByMilestone,
-} = require( '../../lib/milestone' );
-const { log, warn } = require( '../../lib/logger' );
+} = changelog;
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -57,22 +78,24 @@ const pullRequests = _pullRequests.concat( botPullRequestFixture );
  *
  * @return {Object} Octokit stub.
  */
-const createOctokitWithoutReleases = () => ( {
-	repos: {
-		listReleases: {
-			endpoint: {
-				merge: jest.fn().mockReturnValue( {} ),
+function createOctokitWithoutReleases() {
+	return {
+		repos: {
+			listReleases: {
+				endpoint: {
+					merge: vi.fn().mockReturnValue( {} ),
+				},
 			},
 		},
-	},
-	paginate: {
-		iterator: jest.fn().mockReturnValue(
-			( async function* () {
-				yield { data: [] };
-			} )()
-		),
-	},
-} );
+		paginate: {
+			iterator: vi.fn().mockReturnValue(
+				( async function* () {
+					yield { data: [] };
+				} )()
+			),
+		},
+	};
+}
 
 describe( 'createChangelog', () => {
 	const settings = {
@@ -83,8 +106,10 @@ describe( 'createChangelog', () => {
 	};
 
 	beforeEach( () => {
-		jest.clearAllMocks();
-		Octokit.mockImplementation( () => ( {} ) );
+		vi.clearAllMocks();
+		Octokit.mockImplementation( function () {
+			return {};
+		} );
 	} );
 
 	it( 'keeps successful changelog output unchanged', async () => {
@@ -343,32 +368,47 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Tools' );
 	} );
+
+	it( 'returns the testing type for flaky test fixes', () => {
+		const result = getIssueType( {
+			labels: [ { name: '[Type] Flaky Test' } ],
+		} );
+
+		expect( result ).toBe( 'Tools' );
+	} );
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" as feature if there are no labels', () => {
+	it( 'returns "Uncategorized" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
 
 		expect( result ).toBe( 'Uncategorized' );
 	} );
 
-	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
+	it( 'falls back to "Uncategorized" when no label can classify the issue', () => {
 		const result = getIssueFeature( {
-			labels: [
-				{
-					name: 'Some Label',
-				},
-				{
-					name: '[Package] Example Package', // 1. has explicit mapping.
-				},
-				{
-					name: '[Package] Another One',
-				},
-			],
+			labels: [ { name: 'Some Label' } ],
 		} );
 
-		expect( result ).toEqual( 'Uncategorized' );
+		expect( result ).toBe( 'Uncategorized' );
 	} );
+
+	it.each( [
+		[ '[Package] Element', 'Element' ],
+		[ '[Package] Widget Dashboard', 'Widget Dashboard' ],
+		[ '[Package] Boot', 'Boot' ],
+		[ '[Tool] WP Scripts', 'WP Scripts' ],
+		[ '[Package] Interface', 'Interface' ],
+	] )(
+		'uses an otherwise-unmapped %s label as a fallback category',
+		( label, expected ) => {
+			const result = getIssueFeature( {
+				labels: [ { name: 'Some Label' }, { name: label } ],
+			} );
+
+			expect( result ).toEqual( expected );
+		}
+	);
 
 	it( 'gives precedence to manual feature mapping', () => {
 		const result = getIssueFeature( {
@@ -469,18 +509,20 @@ describe( 'getTypesByLabels', () => {
 } );
 
 describe( 'mapLabelsToFeatures', () => {
-	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+	it( 'returns all normalized feature candidates case-insensitively', () => {
 		const result = mapLabelsToFeatures( [
 			'[Package] Commands',
 			'[Package] Block Library',
 			'[Feature] Link Editing',
 			'[Feature] block Multi Selection',
+			'[Type] Flaky Test',
 		] );
 
 		expect( result ).toEqual( [
 			'Commands',
 			'Block Library',
 			'Block Editor',
+			'Testing',
 		] );
 	} );
 } );

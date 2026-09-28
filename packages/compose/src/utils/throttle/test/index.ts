@@ -1,14 +1,15 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { throttle } from '../index';
 
-const identity = ( value ) => value;
+const identity = < T >( value: T ) => value;
 
 describe( 'throttle', () => {
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'should throttle a function', () => {
@@ -24,7 +25,7 @@ describe( 'throttle', () => {
 		const lastCount = callCount;
 		expect( callCount ).toBeGreaterThan( 0 );
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		expect( callCount ).toBeGreaterThan( lastCount );
 	} );
@@ -35,7 +36,7 @@ describe( 'throttle', () => {
 
 		expect( results ).toStrictEqual( [ 'a', 'a' ] );
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		results = [ throttled( 'c' ), throttled( 'd' ) ];
 		expect( results[ 0 ] ).not.toBe( 'a' );
@@ -61,7 +62,7 @@ describe( 'throttle', () => {
 		throttled();
 		throttled();
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		expect( callCount ).toBe( 2 );
 		global.Date.now = globalDateNow;
@@ -76,7 +77,7 @@ describe( 'throttle', () => {
 		throttled();
 		expect( callCount ).toBe( 1 );
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		expect( callCount ).toBe( 1 );
 	} );
@@ -100,11 +101,11 @@ describe( 'throttle', () => {
 				const start = Date.now();
 				while ( Date.now() - start < limit ) {
 					throttled();
-					jest.advanceTimersByTime( 1 );
+					vi.advanceTimersByTime( 1 );
 				}
 				const actual = callCount;
 
-				jest.advanceTimersByTime( 1 );
+				vi.advanceTimersByTime( 1 );
 
 				expect( actual ).toBeGreaterThan( 1 );
 			}
@@ -124,16 +125,16 @@ describe( 'throttle', () => {
 
 		throttled();
 
-		jest.advanceTimersByTime( 192 );
+		vi.advanceTimersByTime( 192 );
 
 		expect( callCount ).toBe( 1 );
 		throttled();
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		expect( callCount ).toBe( 1 );
 
-		jest.advanceTimersByTime( 130 );
+		vi.advanceTimersByTime( 130 );
 
 		expect( callCount ).toBe( 2 );
 	} );
@@ -152,7 +153,7 @@ describe( 'throttle', () => {
 		throttled();
 		expect( callCount ).toBe( 1 );
 
-		jest.advanceTimersByTime( 128 );
+		vi.advanceTimersByTime( 128 );
 
 		expect( callCount ).toBe( 2 );
 	} );
@@ -193,7 +194,7 @@ describe( 'throttle', () => {
 		expect( withoutTrailing( 'a' ) ).toBe( 'a' );
 		expect( withoutTrailing( 'b' ) ).toBe( 'a' );
 
-		jest.advanceTimersByTime( 256 );
+		vi.advanceTimersByTime( 256 );
 
 		expect( withCount ).toBe( 2 );
 		expect( withoutCount ).toBe( 1 );
@@ -213,12 +214,12 @@ describe( 'throttle', () => {
 		throttled();
 		throttled();
 
-		jest.advanceTimersByTime( 96 );
+		vi.advanceTimersByTime( 96 );
 
 		throttled();
 		throttled();
 
-		jest.advanceTimersByTime( 96 );
+		vi.advanceTimersByTime( 96 );
 
 		expect( callCount ).toBeGreaterThan( 1 );
 	} );
@@ -245,7 +246,7 @@ describe( 'throttle', () => {
 		expect( results ).toStrictEqual( [ 'a', 'a', 'a' ] );
 		expect( callCount ).toBe( 1 );
 
-		jest.advanceTimersByTime( 64 );
+		vi.advanceTimersByTime( 64 );
 
 		expect( callCount ).toBe( 2 );
 		global.Date.now = globalDateNow;

@@ -184,20 +184,32 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons) or editables outside the block (e.g.
-						// the post title). The rich text instance owning the
-						// selection syncs it to the store itself.
+						// across browsers). Any focused element containing the
+						// caret hands over (Firefox focuses an ancestor block
+						// wrapper on a click in the inert field). UI elements
+						// and editables outside the block keep focus. The rich
+						// text instance owning the selection syncs it to the
+						// store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							getBlockClientId( activeElement ) ===
-								collapsedClientId
+							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
+						} else if (
+							// A click on the inert field leaves the default
+							// target (iframe body or page body) active but
+							// unfocused: take focus for the host.
+							( activeElement === node ||
+								activeElement === ownerDocument.body ) &&
+							ownerDocument.hasFocus() &&
+							! activeElement.matches( ':focus' )
+						) {
+							node.focus( { preventScroll: true } );
 						}
+
 						return;
 					}
 
@@ -206,12 +218,21 @@ export default function useSelectionObserver() {
 						! isMultiSelecting()
 					) {
 						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						// Only return focus to the field if the wrapper had
+						// it. If Escape moved focus to the canvas stop in the
+						// parent document, the wrapper is only the stale
+						// active element and focus must not come back.
+						if (
+							ownerDocument.activeElement === node &&
+							ownerDocument.hasFocus()
+						) {
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}

@@ -1,22 +1,32 @@
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
-import { DropdownContentWrapperDiv } from './styles';
 import type { DropdownContentWrapperProps } from './types';
+import styles from './style.module.scss';
 
 function UnconnectedDropdownContentWrapper(
 	props: WordPressComponentProps< DropdownContentWrapperProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { paddingSize = 'small', ...derivedProps } = useContextSystem(
-		props,
-		'DropdownContentWrapper'
-	);
+	const {
+		paddingSize = 'small',
+		className,
+		...derivedProps
+	} = useContextSystem( props, 'DropdownContentWrapper' );
 
 	return (
-		<DropdownContentWrapperDiv
+		<div
 			{ ...derivedProps }
-			paddingSize={ paddingSize }
+			className={ clsx(
+				styles[ 'content-wrapper' ],
+				{
+					[ styles[ 'padding-small' ] ]:
+						paddingSize !== 'none' && paddingSize !== 'medium',
+					[ styles[ 'padding-medium' ] ]: paddingSize === 'medium',
+				},
+				className
+			) }
 			ref={ forwardedRef }
 		/>
 	);

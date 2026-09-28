@@ -7,6 +7,8 @@ export type ComboboxControlOption = {
 	[ key: string ]: any;
 };
 
+type ComboboxControlValue = string | null;
+
 export type ComboboxControlProps = Pick<
 	BaseControlProps,
 	| '__nextHasNoMarginBottom'
@@ -65,7 +67,7 @@ export type ComboboxControlProps = Pick<
 	/**
 	 * Function called with the selected value changes.
 	 */
-	onChange?: ( value: ComboboxControlProps[ 'value' ] ) => void;
+	onChange?: ( value: ComboboxControlValue ) => void;
 	/**
 	 * Function called when the control's search input value changes. The argument contains the next input value.
 	 *
@@ -79,7 +81,7 @@ export type ComboboxControlProps = Pick<
 	/**
 	 * The current value of the control.
 	 */
-	value?: string | null;
+	value?: ComboboxControlValue;
 	/**
 	 * If passed, the combobox input will show a placeholder string if no values are present.
 	 */

@@ -119,14 +119,28 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 
 		/**
 		 * Declarative actions the widget exposes. Each entry carries `id`,
-		 * `label`, `href`, and optional `download`/`openInNewTab`. Labels are
-		 * translated at registration time using the widget's text domain.
+		 * `label`, `href`, and optional `download`/`openInNewTab`/`icon`/
+		 * `relevance`. Labels are translated at registration time using the
+		 * widget's text domain.
 		 *
 		 * Null when the widget did not declare the field.
 		 *
 		 * @var array|null
 		 */
 		public $actions = null;
+
+		/**
+		 * Attribute schema: the JSON-expressible subset of a DataViews
+		 * `Field` per entry (`id`, `type`, `label`, `elements`, ...) plus an
+		 * optional `relevance`. Labels, headers, descriptions, placeholders
+		 * and option strings are translated at registration time using the
+		 * widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $attributes = null;
 
 		/**
 		 * Alternative terms used to match the widget type when searching,

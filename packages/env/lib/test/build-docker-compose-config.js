@@ -1,10 +1,27 @@
-'use strict';
+import { createRequire } from 'node:module';
+import { afterAll, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const getHostUserPath = require.resolve( '../runtime/docker/get-host-user' );
+const originalGetHostUser = require( getHostUserPath );
+const getHostUser = vi.fn( () => ( {
+	name: 'test',
+	uid: 1,
+	gid: 2,
+	fullUser: '1:2',
+} ) );
+require.cache[ getHostUserPath ].exports = getHostUser;
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
 const {
 	wordpressDockerFileContents,
 	getLoopbackPortConfig,
 } = require( '../runtime/docker/docker-config' );
-const getHostUser = require( '../runtime/docker/get-host-user' );
+
+afterAll( () => {
+	require.cache[ getHostUserPath ].exports = originalGetHostUser;
+	delete require.cache[
+		require.resolve( '../runtime/docker/build-docker-compose-config' )
+	];
+} );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -14,16 +31,6 @@ const CONFIG = {
 	port: 8888,
 	configDirectoryPath: '/path/to/config',
 };
-
-jest.mock( '../runtime/docker/get-host-user', () => jest.fn() );
-getHostUser.mockImplementation( () => {
-	return {
-		name: 'test',
-		uid: 1,
-		gid: 2,
-		fullUser: '1:2',
-	};
-} );
 
 describe( 'buildDockerComposeConfig', () => {
 	it( 'should map directories before individual sources', () => {

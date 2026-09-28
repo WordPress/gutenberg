@@ -1,4 +1,11 @@
 import { forwardRef } from '@wordpress/element';
+import { toGamut } from 'colorjs.io/fn';
+import type {
+	ThemeProviderColorRampName,
+	ThemeProviderColorWarning,
+} from '../../theme-provider-color-warnings';
+import colorTokenAliases from '../../prebuilt/ts/color-tokens';
+import { getColorString, getContrast } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -28,24 +35,143 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 ];
 
 type RampTableProps = {
+	label: string;
 	ramps: {
+		name: ThemeProviderColorRampName;
 		seed: {
 			name: keyof Ramp;
 			value: string;
 		};
 		ramp: Record< keyof Ramp, string >;
-		warnings?: string[];
 	}[];
+	warnings?: readonly ThemeProviderColorWarning[];
 };
+
+function hasRampWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'ramp' &&
+			warning.ramp === ramp &&
+			warning.step === step
+	);
+}
+
+function getSemanticTokenAliases(
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+): readonly string[] {
+	const rampPrefix = ramp === 'background' ? 'bg' : ramp;
+	const primitiveToken = `${ rampPrefix }-${ step }`;
+
+	return (
+		colorTokenAliases[ primitiveToken as keyof typeof colorTokenAliases ] ??
+		[]
+	);
+}
+
+function hasContrastWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	const semanticTokenAliases = getSemanticTokenAliases( ramp, step );
+
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'contrast' &&
+			( semanticTokenAliases.includes(
+				warning.foregroundToken.replaceAll( '.', '-' )
+			) ||
+				semanticTokenAliases.includes(
+					warning.backgroundToken.replaceAll( '.', '-' )
+				) )
+	);
+}
+
+function hasColorWarningForStep(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return (
+		hasRampWarning( warnings, ramp, step ) ||
+		hasContrastWarning( warnings, ramp, step )
+	);
+}
+
+export function hasColorWarningForRamp(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName
+) {
+	return RAMP_TOKENS_ORDER.some( ( { tokenName } ) =>
+		hasColorWarningForStep( warnings, ramp, tokenName )
+	);
+}
+
+function isSeedAdjusted( seed: string, generatedAnchor: string ) {
+	return getColorString( seed ) !== getColorString( generatedAnchor );
+}
+
+function getSeedLabelColor( seed: string ) {
+	// CSS clips out-of-range RGB channels before painting the seed background.
+	const renderedSeed = toGamut( seed, { space: 'srgb', method: 'clip' } );
+	return getContrast( renderedSeed, '#000' ) >= 4.5 ? '#000' : '#fff';
+}
+
+function ColorSample( {
+	foreground,
+	background,
+	ramp,
+}: {
+	foreground: keyof Ramp;
+	background: keyof Ramp;
+	ramp: Record< keyof Ramp, string >;
+} ) {
+	const label = `${ foreground }: ${ ramp[ foreground ] } on ${ background }: ${ ramp[ background ] }`;
+	return (
+		<span
+			role="img"
+			aria-label={ label }
+			data-color-contrast-sample
+			title={ label }
+			style={ {
+				color: ramp[ foreground ],
+			} }
+		>
+			Aa
+		</span>
+	);
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { ramps }, forwardedRef ) {
+	function RampTable( { label, ramps, warnings = [] }, forwardedRef ) {
+		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
+			isSeedAdjusted( seed.value, ramp[ seed.name ] )
+		);
+		const hasAnyColorWarning = warnings.length > 0;
+
 		return (
-			<div
-				style={ { width: '100%', overflowX: 'scroll' } }
-				ref={ forwardedRef }
-			>
+			<div style={ { minWidth: 0 } }>
+				{ hasAdjustedSeed || hasAnyColorWarning ? (
+					<p style={ { marginBlock: '0 0.5rem' } }>
+						<strong>Markers:</strong>{ ' ' }
+						{ hasAnyColorWarning ? '! color warning' : null }
+						{ hasAnyColorWarning && hasAdjustedSeed ? ' · ' : null }
+						{ hasAdjustedSeed ? 'SEED ≠ generated anchor' : null }
+					</p>
+				) : null }
 				<div
+					role="region"
+					aria-label={ `${ label } color ramps` }
+					tabIndex={ 0 }
+					ref={ forwardedRef }
 					style={ {
+						width: '100%',
+						overflowX: 'auto',
 						display: 'grid',
 						gridTemplateColumns: `repeat(${ RAMP_TOKENS_ORDER.length }, minmax(max-content, 1fr))`,
 						fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -61,16 +187,25 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								fontSize: 11,
 								fontWeight:
 									'var(--wpds-typography-font-weight-emphasis)',
-								color: ramps[ 0 ].ramp.fgSurface4,
+								color: 'inherit',
 							} }
 						>
 							{ abbr }
 						</div>
 					) ) }
-					{ ramps.map( ( { seed, ramp, warnings = [] }, i ) =>
+					{ ramps.map( ( { name, seed, ramp }, i ) =>
 						RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
 							<div
-								key={ `${ seed }-${ i }-${ tokenName }` }
+								key={ `${ name }-${ tokenName }` }
+								title={
+									hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? `${ name } ramp, ${ tokenName } step: color warning`
+										: undefined
+								}
 								style={ {
 									marginBlockStart: i !== 0 ? 4 : 0,
 									backgroundColor: ramp[ tokenName ],
@@ -80,14 +215,55 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									height: tokenName === seed.name ? 60 : 40,
 									minWidth: 32,
 									fontSize: 14,
-									outline: warnings.includes( tokenName )
-										? '2px solid red'
+									outline: hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? '3px solid #d63638'
 										: '',
-									outlineOffset: '-2px',
+									outlineOffset: '-3px',
+									boxShadow: hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? 'inset 0 0 0 6px #fff'
+										: '',
+									position: 'relative',
 								} }
 							>
+								{ hasColorWarningForStep(
+									warnings,
+									name,
+									tokenName
+								) ? (
+									<strong
+										aria-hidden="true"
+										style={ {
+											background: '#d63638',
+											color: '#fff',
+											fontSize: 10,
+											insetBlockStart: 0,
+											insetInlineEnd: 0,
+											lineHeight: 1,
+											padding: 2,
+											position: 'absolute',
+										} }
+									>
+										!
+									</strong>
+								) : null }
 								{ tokenName === seed.name ? (
 									<div
+										title={
+											isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? `${ name } input seed ${ seed.value }; generated ${ tokenName } anchor ${ ramp[ tokenName ] }`
+												: undefined
+										}
 										style={ {
 											backgroundColor: seed.value,
 											height: 20,
@@ -99,13 +275,24 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											fontSize: 8,
 											fontWeight:
 												'var(--wpds-typography-font-weight-emphasis)',
-											color:
-												tokenName === 'surface2'
-													? ramp.fgSurface4
-													: ramp.fgFill,
+											outline: isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? '3px dashed currentColor'
+												: '',
+											outlineOffset: '-3px',
+											color: getSeedLabelColor(
+												seed.value
+											),
 										} }
 									>
-										SEED
+										{ isSeedAdjusted(
+											seed.value,
+											ramp[ tokenName ]
+										)
+											? 'SEED ≠'
+											: 'SEED' }
 									</div>
 								) : null }
 								{ [
@@ -127,62 +314,48 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									>
 										{ tokenName === 'surface3' ? (
 											<>
-												<span
-													style={ {
-														color: ramp.fgSurface1,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface2,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface3,
-													} }
-												>
-													Aa
-												</span>
-												<span
-													style={ {
-														color: ramp.fgSurface4,
-													} }
-												>
-													Aa
-												</span>
+												<ColorSample
+													foreground="fgSurface1"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface2"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface3"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
+												<ColorSample
+													foreground="fgSurface4"
+													background={ tokenName }
+													ramp={ ramp }
+												/>
 											</>
 										) : null }
 										{ tokenName === 'bgFill1' ? (
-											<span
-												style={ {
-													color: ramp.fgFill,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFill"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillInverted1' ? (
-											<span
-												style={ {
-													color: ramp.fgFillInverted,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillInverted"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 										{ tokenName === 'bgFillDark' ? (
-											<span
-												style={ {
-													color: ramp.fgFillDark,
-												} }
-											>
-												Aa
-											</span>
+											<ColorSample
+												foreground="fgFillDark"
+												background={ tokenName }
+												ramp={ ramp }
+											/>
 										) : null }
 									</span>
 								) : null }
@@ -190,6 +363,34 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 						) )
 					) }
 				</div>
+				<details>
+					<summary>Color values</summary>
+					<p>
+						The surface3 text samples show fgSurface1 through
+						fgSurface4 in order. The bgFill1, bgFillInverted1, and
+						bgFillDark text samples show fgFill, fgFillInverted, and
+						fgFillDark, respectively.
+					</p>
+					{ ramps.map( ( { name, ramp } ) => (
+						<table key={ name }>
+							<caption>{ name } ramp</caption>
+							<thead>
+								<tr>
+									<th scope="col">Step</th>
+									<th scope="col">Color</th>
+								</tr>
+							</thead>
+							<tbody>
+								{ RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
+									<tr key={ tokenName }>
+										<th scope="row">{ tokenName }</th>
+										<td>{ ramp[ tokenName ] }</td>
+									</tr>
+								) ) }
+							</tbody>
+						</table>
+					) ) }
+				</details>
 			</div>
 		);
 	}

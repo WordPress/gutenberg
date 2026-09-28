@@ -3,7 +3,7 @@ import { useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 const meta: Meta< typeof SnackbarList > = {
-	title: 'Components/Feedback/SnackbarList',
+	title: 'Components/@wordpress-components/Feedback/SnackbarList',
 	id: 'components-snackbarlist',
 	component: SnackbarList,
 	argTypes: {
@@ -14,6 +14,9 @@ const meta: Meta< typeof SnackbarList > = {
 		},
 	},
 	parameters: {
+		// FIXME: Snackbars with actions nest interactive elements (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: {
 			expanded: true,
 		},

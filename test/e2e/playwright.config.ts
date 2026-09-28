@@ -41,7 +41,7 @@ const config = defineConfig( {
 				[ './config/flaky-tests-reporter.ts' ],
 				[ 'blob' ],
 				[ '@flakiness/playwright', flakinessOptions ],
-		  ]
+			]
 		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
 	globalSetup: fileURLToPath(

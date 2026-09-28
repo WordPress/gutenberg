@@ -1,0 +1,35 @@
+name: 'PR meta comment'
+description: 'Writes one section of the unified automation comment on a pull request'
+inputs:
+    repo-token:
+        description: 'GitHub token with `pull-requests: write`'
+        required: true
+    section:
+        description: 'Section id, which must exist in the section registry'
+        required: true
+    body:
+        description: 'Markdown body of the section. Empty removes the section.'
+        required: false
+        default: ''
+    body-path:
+        description: 'File holding the markdown body, for content too large or too untrusted for a job output. Takes precedence over `body`.'
+        required: false
+    pr-number:
+        description: 'Pull request number. Required on events whose payload has none, such as `push`.'
+        required: false
+    commit-sha:
+        description: 'Head SHA the content was produced from. Required for commit-scoped sections.'
+        required: false
+    run-url:
+        description: 'URL of the workflow run that produced the content.'
+        required: false
+runs:
+    # Node 24 strips the types on the fly, so the action runs straight from its
+    # TypeScript sources without a build step. This requires every relative
+    # import to carry its `.ts` extension, and the syntax to be erasable, which
+    # rules out enums, namespaces, parameter properties and decorators.
+    #
+    # The sources deliberately import nothing, so a writer job needs only a
+    # checkout, not a full dependency install.
+    using: 'node24'
+    main: 'src/index.ts'

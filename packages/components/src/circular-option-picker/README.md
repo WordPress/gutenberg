@@ -77,16 +77,20 @@ The child elements.
 
 - Required: No
 
-### `asButtons`: `boolean`
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
 
-Whether the control should present as a set of buttons, each with its own tab stop.
+Controls the swatches' interaction and accessibility semantics.
+
+-   `listbox` uses one tab stop for the picker. Arrow keys move between options. Options expose selection with `aria-selected`.
+-   `toggle-buttons` uses a tab stop for each swatch. Swatches expose selection with `aria-pressed`.
+-   `command-buttons` uses a tab stop for each swatch. Swatches do not expose selection. Use this presentation when each swatch runs a command, such as opening an editor.
 
 - Required: No
-- Default: `false`
+- Default: `listbox`
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents arrow-key navigation from wrapping around. Only used with the `listbox` presentation.
 
 - Required: No
 - Default: `true`

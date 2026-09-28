@@ -1,17 +1,11 @@
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
+import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import type { DataFormControlProps, FormatTime } from '../../types';
 import { OPERATOR_BETWEEN } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import parseTime from '../../field-types/utils/parse-time';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 type TimeBetween = [ string, string ];
 
@@ -90,7 +84,7 @@ function BetweenControls( {
 					type="time"
 					label={ __( 'From' ) }
 					value={ from }
-					onChange={ onChangeFrom }
+					onValueChange={ onChangeFrom }
 					hideLabelFromVision={ hideLabelFromVision }
 					disabled={ disabled }
 					step={ step }
@@ -101,7 +95,7 @@ function BetweenControls( {
 					type="time"
 					label={ __( 'To' ) }
 					value={ to }
-					onChange={ onChangeTo }
+					onValueChange={ onChangeTo }
 					hideLabelFromVision={ hideLabelFromVision }
 					disabled={ disabled }
 					step={ step }
@@ -189,9 +183,14 @@ export default function Time< Item >( {
 			type="time"
 			label={ label }
 			placeholder={ placeholder }
-			help={ description }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
 			value={ toInputValue( value ) }
-			onChange={ onChangeControl }
+			onValueChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			disabled={ disabled }
 			step={ getStep( timeFormat, [ value ] ) }

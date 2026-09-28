@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import convertEditorSettings from '../convert-editor-settings';
 
 describe( 'convertEditorSettings', () => {

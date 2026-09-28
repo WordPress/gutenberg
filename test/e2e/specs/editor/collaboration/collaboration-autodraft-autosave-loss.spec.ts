@@ -15,7 +15,7 @@ function rawField( field: RestPost[ 'title' ] ): string {
 
 	return typeof field === 'string'
 		? field
-		: field.raw ?? field.rendered ?? '';
+		: ( field.raw ?? field.rendered ?? '' );
 }
 
 async function getCurrentPostId( page: Page ): Promise< number > {
@@ -78,7 +78,7 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( title );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( marker );
 

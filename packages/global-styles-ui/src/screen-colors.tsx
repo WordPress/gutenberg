@@ -16,6 +16,22 @@ const { useSettingsForBlockElement, ColorPanel: StylesColorPanel } = unlock(
 	blockEditorPrivateApis
 );
 
+const ADDITIONAL_ELEMENTS = [
+	{ name: 'cite', label: __( 'Citations' ) },
+	{ name: 'textInput', label: __( 'Inputs' ) },
+	{ name: 'select', label: __( 'Selects' ) },
+];
+
+const DEFAULT_CONTROLS = {
+	link: true,
+	heading: true,
+	button: true,
+	caption: true,
+	cite: true,
+	textInput: true,
+	select: true,
+};
+
 function ScreenColors() {
 	// Get user styles for editing
 	const [ style, setStyle ] = useStyle< GlobalStylesStyles >(
@@ -53,6 +69,8 @@ function ScreenColors() {
 				value={ style }
 				onChange={ setStyle }
 				settings={ settings }
+				additionalElements={ ADDITIONAL_ELEMENTS }
+				defaultControls={ DEFAULT_CONTROLS }
 				showInheritanceLabelIndicators={ false }
 			/>
 		</>

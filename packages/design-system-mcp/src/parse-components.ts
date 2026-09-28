@@ -3,7 +3,7 @@ import type {
 	ComponentDetail,
 	ComponentProp,
 	ManifestComponent,
-} from './types';
+} from './types.ts';
 
 /**
  * Mapping of canonical name to actual exported identifier, keyed by

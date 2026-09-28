@@ -321,7 +321,7 @@ test.describe( 'Router navigate', () => {
 		// Navigate to a page without clientNavigationDisabled.
 		await page.getByTestId( 'link 4' ).click();
 
-		// Check the page has updated and the navigation was successfull.
+		// Check the page has updated and the navigation was successful.
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
 		await expect( count ).toHaveText( '1' );

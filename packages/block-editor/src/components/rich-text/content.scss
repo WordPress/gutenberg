@@ -54,3 +54,9 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 .rich-text [contenteditable="false"]::selection {
 	background-color: transparent;
 }
+
+.is-selected .non-breaking-space {
+	outline: 1px solid currentColor;
+	outline-offset: -1px;
+	opacity: 0.8;
+}

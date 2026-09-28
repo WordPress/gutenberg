@@ -70,8 +70,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		background: none;
 		text-align: start;
 
-		svg,
-		path {
+		svg {
 			fill: currentColor;
 		}
 

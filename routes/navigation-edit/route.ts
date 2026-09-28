@@ -20,6 +20,13 @@ export const route = {
 			throw notFound();
 		}
 
+		// Only block themes render `wp_navigation` posts. Classic themes manage
+		// their menus through Appearance > Menus instead.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		if ( ! theme?.is_block_theme ) {
+			throw notFound();
+		}
+
 		try {
 			const navigation = await resolveSelect( coreStore ).getEntityRecord(
 				'postType',
@@ -42,14 +49,20 @@ export const route = {
 		};
 	} ) => {
 		const navigationId = parseInt( params.id );
-		const navigation = await resolveSelect( coreStore ).getEntityRecord(
+		const navigation = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			navigationId
-		);
+		) ) as { title?: { rendered?: string; raw?: string } } | undefined;
 
 		if ( navigation?.title?.rendered ) {
 			return decodeEntities( navigation.title.rendered );
+		}
+
+		// A record received from a save carries no rendered fields, only raw
+		// ones — that's what the cache holds for a menu created this session.
+		if ( navigation?.title?.raw ) {
+			return navigation.title.raw;
 		}
 
 		return __( 'Navigation' );
@@ -66,7 +79,6 @@ export const route = {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async ( {

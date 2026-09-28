@@ -8,7 +8,7 @@ test.describe( 'Spacer', () => {
 	test( 'can be created by typing "/spacer"', async ( { editor, page } ) => {
 		// Create a spacer with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/spacer' );
 		await expect(
@@ -25,7 +25,7 @@ test.describe( 'Spacer', () => {
 	} ) => {
 		// Create a spacer with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/spacer' );
 		await expect(

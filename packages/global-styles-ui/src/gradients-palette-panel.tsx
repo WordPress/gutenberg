@@ -2,17 +2,12 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
-	__experimentalSpacer as Spacer,
-	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { Gradient } from '@wordpress/global-styles-engine';
-import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
-
-const noop = () => {};
 
 interface GradientPalettePanelProps {
 	name?: string;
@@ -48,17 +43,6 @@ export default function GradientPalettePanel( {
 		'color.defaultGradients',
 		name
 	);
-
-	const [ customDuotone ] = useSetting( 'color.duotone.custom' ) || [];
-	const [ defaultDuotone ] = useSetting( 'color.duotone.default' ) || [];
-	const [ themeDuotone ] = useSetting( 'color.duotone.theme' ) || [];
-	const [ defaultDuotoneEnabled ] = useSetting( 'color.defaultDuotone' );
-
-	const duotonePalette = [
-		...( customDuotone || [] ),
-		...( themeDuotone || [] ),
-		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
-	];
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
@@ -100,20 +84,6 @@ export default function GradientPalettePanel( {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			{ !! duotonePalette && !! duotonePalette.length && (
-				<div>
-					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
-					<Spacer margin={ 3 } />
-					<DuotonePicker
-						duotonePalette={ duotonePalette }
-						disableCustomDuotone
-						disableCustomColors
-						clearable={ false }
-						onChange={ noop }
-						colorPalette={ [] }
-					/>
-				</div>
-			) }
 		</VStack>
 	);
 }

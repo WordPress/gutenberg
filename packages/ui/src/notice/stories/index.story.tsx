@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
-	title: 'Design System/Components/Notice',
+	title: 'Components/@wordpress-ui/Notice',
+	id: 'design-system-components-notice',
 	component: Notice.Root,
 	subcomponents: {
 		'Notice.Title': Notice.Title,
@@ -13,6 +15,12 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
+		docs: {
+			description: {
+				component:
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+			},
+		},
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -147,6 +155,21 @@ export const DescriptionOnly: Story = {
 				Just a description without title or actions.
 			</Notice.Description>,
 			<Notice.CloseIcon key="closeIcon" />,
+		],
+	},
+};
+
+/**
+ * Pass a custom icon via the `icon` prop to override the default intent icon.
+ */
+export const CustomIcon: Story = {
+	args: {
+		intent: 'info',
+		icon: unseen,
+		children: [
+			<Notice.Description key="description">
+				Parent block is hidden on Desktop
+			</Notice.Description>,
 		],
 	},
 };

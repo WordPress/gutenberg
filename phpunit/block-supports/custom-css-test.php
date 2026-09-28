@@ -29,8 +29,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $block_name Name for the test block.
 	 * @param array  $supports   Array defining block support configuration.
-	 *
-	 * @return WP_Block_Type The block type for the newly registered test block.
 	 */
 	private function register_custom_css_block_with_support( $block_name, $supports = array() ) {
 		$this->test_block_name = $block_name;

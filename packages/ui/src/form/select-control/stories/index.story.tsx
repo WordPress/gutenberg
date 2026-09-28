@@ -3,18 +3,30 @@ import { SelectControl } from '../';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Design System/Components/Form/SelectControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/SelectControl',
+	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
+		'SelectControl.ItemLabel': SelectControl.ItemLabel,
+		'SelectControl.ItemDescription': SelectControl.ItemDescription,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -174,7 +186,9 @@ export const Grouped: Story = {
 							value={ item }
 							label={ item.label }
 						>
-							{ item.label }
+							<SelectControl.ItemLabel>
+								{ item.label }
+							</SelectControl.ItemLabel>
 						</SelectControl.Item>
 					) ) }
 				</SelectControl.Group>
@@ -243,7 +257,9 @@ export const WithCustomTriggerAndItems: Story = {
 					value={ item }
 					label={ item.label }
 				>
-					<User user={ item } />
+					<SelectControl.ItemLabel>
+						<User user={ item } />
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
 		],
@@ -270,9 +286,50 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 					label={ item.label }
 					disabled={ item.disabled }
 				>
-					✨ { item.label }
+					<SelectControl.ItemLabel>
+						✨ { item.label }
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
 		],
+	},
+};
+
+/**
+ * Pass `description` on an `items` entry for supplementary text.
+ * It is announced as a description rather than part of the item name.
+ * Compose `SelectControl.Item` children when you need multiple
+ * descriptions or custom markup.
+ */
+export const WithItemDescription: Story = {
+	args: {
+		label: 'Fruit',
+		items: [
+			{
+				value: 'apple',
+				label: 'Apple',
+				description:
+					'99 in stock. Ships in two to three business days.',
+			},
+			{
+				value: 'banana',
+				label: 'Banana',
+				description: '12 in stock. Restock expected next week.',
+			},
+		],
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor. Defaults to `content` so static option lists can grow with their
+ * labels.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		label: 'Label',
+		items: longLabelPopupItems,
+		popupWidth: 'content',
 	},
 };

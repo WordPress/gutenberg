@@ -21,6 +21,7 @@ export default function CustomDuotoneBar( {
 	return (
 		<CustomGradientBar
 			disableInserter
+			disablePositioning
 			background={ background }
 			hasGradient={ hasGradient }
 			value={ controlPoints }

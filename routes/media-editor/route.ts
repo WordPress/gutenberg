@@ -56,11 +56,13 @@ export const route = {
 	},
 	title: async ( { params }: { params: { id: string } } ) => {
 		const attachmentId = getAttachmentId( params.id );
-		const attachment = await resolveSelect( coreStore ).getEntityRecord(
+		const attachment = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			'attachment',
 			attachmentId
-		);
+		) ) as
+			| { title?: string | { rendered?: string; raw?: string } }
+			| undefined;
 
 		return attachment
 			? getAttachmentTitle( attachment )

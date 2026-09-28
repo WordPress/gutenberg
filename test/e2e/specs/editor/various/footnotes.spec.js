@@ -25,7 +25,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be inserted', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -40,6 +40,11 @@ test.describe( 'Footnotes', () => {
 		const id1 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
+
+		// The ID is also the anchor target of the footnote link. A CSS
+		// identifier cannot start with a digit, so a letter prefix keeps
+		// `querySelector( '#' + id )` and `#id` style rules working.
+		expect( id1 ).toMatch( /^fn-[0-9a-f-]{36}$/ );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -189,7 +194,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be inserted in a list', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await editor.clickBlockToolbarButton( 'More' );
@@ -289,7 +294,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'works with revisions', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -394,7 +399,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be previewed when published', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a' );
 
@@ -519,7 +524,7 @@ test.describe( 'Footnotes meta written by something else', () => {
 
 		await admin.editPost( post.id );
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a paragraph' );
 

@@ -20,6 +20,7 @@ process.emitWarning(
 	'DeprecationWarning'
 );
 
+const esGlobals = require( 'globals' ).builtin;
 const plugin = require( '../' );
 
 /**
@@ -35,6 +36,7 @@ const PLUGIN_NAMESPACE_TO_ESLINTRC_NAME = {
 	jsdoc: 'jsdoc',
 	'jsx-a11y': 'jsx-a11y',
 	jest: 'jest',
+	vitest: '@vitest',
 	'jest-dom': 'jest-dom',
 	'testing-library': 'testing-library',
 	prettier: 'prettier',
@@ -48,7 +50,6 @@ const PLUGIN_NAMESPACE_TO_ESLINTRC_NAME = {
  * they are strings resolved via require().
  */
 const PARSER_NAME_TO_ESLINTRC = {
-	'@wordpress/babel-eslint-parser-compat': '@babel/eslint-parser',
 	'typescript-eslint/parser': '@typescript-eslint/parser',
 };
 
@@ -68,6 +69,20 @@ function flatToEslintrc( flatConfigs ) {
 	let parser;
 
 	for ( const config of flatConfigs ) {
+		// Use the same plugin namespaces for rule names and plugin registration.
+		const configRules = Object.fromEntries(
+			Object.entries( config.rules ?? {} ).map( ( [ name, value ] ) => [
+				name.replace(
+					/^(.+)\//,
+					( _, namespace ) =>
+						`${
+							PLUGIN_NAMESPACE_TO_ESLINTRC_NAME[ namespace ] ??
+							namespace
+						}/`
+				),
+				value,
+			] )
+		);
 		// Collect plugin names.
 		if ( config.plugins ) {
 			for ( const name of Object.keys( config.plugins ) ) {
@@ -86,7 +101,7 @@ function flatToEslintrc( flatConfigs ) {
 					: [ config.files ],
 			};
 			if ( config.rules ) {
-				override.rules = { ...config.rules };
+				override.rules = { ...configRules };
 			}
 			if ( config.settings ) {
 				override.settings = { ...config.settings };
@@ -108,7 +123,7 @@ function flatToEslintrc( flatConfigs ) {
 		} else {
 			// Global config: merge into base.
 			if ( config.rules ) {
-				Object.assign( rules, config.rules );
+				Object.assign( rules, configRules );
 			}
 			if ( config.settings ) {
 				Object.assign( settings, config.settings );
@@ -136,19 +151,24 @@ function flatToEslintrc( flatConfigs ) {
 	const result = {
 		plugins: [ ...pluginNames ],
 		rules,
+		/*
+		 * Flat config implies `ecmaVersion: 'latest'`, `sourceType: 'module'`
+		 * and the matching ES globals; eslintrc defaults to ES5 script with
+		 * none of them.
+		 */
+		globals: { ...esGlobals, ...globals },
+		parserOptions: {
+			ecmaVersion: 'latest',
+			sourceType: 'module',
+			...parserOptions,
+		},
 	};
 
-	if ( Object.keys( globals ).length > 0 ) {
-		result.globals = globals;
-	}
 	if ( Object.keys( settings ).length > 0 ) {
 		result.settings = settings;
 	}
 	if ( parser ) {
 		result.parser = parser;
-	}
-	if ( Object.keys( parserOptions ).length > 0 ) {
-		result.parserOptions = parserOptions;
 	}
 	if ( overrides.length > 0 ) {
 		result.overrides = overrides;

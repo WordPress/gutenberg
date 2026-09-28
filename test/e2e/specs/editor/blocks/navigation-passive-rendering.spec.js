@@ -121,5 +121,16 @@ test.describe( 'Navigation passive rendering', () => {
 		await expect
 			.poll( () => getDirtyEntityRecords( page ) )
 			.toEqual( [ { kind: 'postType', name: 'post', key: post.id } ] );
+
+		// Clear the preference in the page session too. The preference
+		// save is debounced and outlives the page, so it can land after
+		// the teardown's reset; this makes a late flush persist the
+		// cleared state instead of re-enabling Show template for every
+		// later post editor suite under a block theme.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core', 'renderingModes', undefined );
+		} );
 	} );
 } );

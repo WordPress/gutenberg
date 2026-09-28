@@ -11,7 +11,12 @@ import {
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isInSameBlock,
+} from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 
@@ -95,12 +100,24 @@ export function getClosestTabbable(
 		focusableNodes.reverse();
 	}
 
-	// Consider as candidates those focusables after the current target. It's
-	// assumed this can only be reached if the target is focusable (on its
-	// keydown event), so no need to verify it exists in the set.
-	focusableNodes = focusableNodes.slice(
-		focusableNodes.indexOf( target ) + 1
-	);
+	// Consider as candidates those focusables after the current target.
+	const targetIndex = focusableNodes.indexOf( target );
+
+	if ( targetIndex !== -1 ) {
+		focusableNodes = focusableNodes.slice( targetIndex + 1 );
+	} else {
+		// The target is not focusable (the selected block's editable under
+		// the editing host has no tabindex): take the focusables on the
+		// navigation side of it in document order, not its descendants.
+		focusableNodes = focusableNodes.filter( ( focusableNode ) => {
+			const position = target.compareDocumentPosition( focusableNode );
+			const mask = isReverse
+				? target.DOCUMENT_POSITION_PRECEDING
+				: target.DOCUMENT_POSITION_FOLLOWING;
+			// eslint-disable-next-line no-bitwise
+			return !! ( position & mask ) && ! target.contains( focusableNode );
+		} );
+	}
 
 	let targetRect;
 
@@ -109,17 +126,26 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		// If it's a block wrapper (not itself a contenteditable editing surface)
-		// and there are nested focusable nodes, skip because there are better
-		// candidates. We must not skip contenteditable nodes that happen to
-		// contain links or other focusable inline elements, since those are the
-		// correct navigation targets.
-		//
-		// See https://github.com/WordPress/gutenberg/pull/77474
-		// TODO: Consider fixing focus.tabbable
+		// Skip if there's only one child that is content editable (and thus a
+		// better candidate).
+		if (
+			node.children.length === 1 &&
+			isInSameBlock( node, node.firstElementChild ) &&
+			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+		) {
+			return;
+		}
+
+		// Wrappers that merge with the text flow dissolve into it: their
+		// content is the better candidate. Any other container is a
+		// boundary the caret stops on.
+		const blockType = getBlockType( node.getAttribute( 'data-type' ) );
 		if (
 			node.contentEditable !== 'true' &&
 			getBlockClientId( node ) &&
+			blockType &&
+			( blockType.merge ||
+				hasBlockSupport( blockType, '__experimentalOnMerge' ) ) &&
 			focus.focusable
 				.find( node )
 				// Exclude form elements for now because primary+a cannot be
@@ -313,9 +339,9 @@ export default function useArrowNav() {
 				return;
 			}
 
-			// When presing any key other than up or down, the initial vertical
+			// When pressing any key other than up or down, the initial vertical
 			// position must ALWAYS be reset. The vertical position is saved so
-			// it can be restored as well as possible on sebsequent vertical
+			// it can be restored as well as possible on subsequent vertical
 			// arrow key presses. It may not always be possible to restore the
 			// exact same position (such as at an empty line), so it wouldn't be
 			// good to compute the position right before any vertical arrow key

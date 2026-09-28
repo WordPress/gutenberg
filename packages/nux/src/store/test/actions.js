@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { triggerGuide, dismissTip, disableTips, enableTips } from '../actions';
 
 describe( 'actions', () => {

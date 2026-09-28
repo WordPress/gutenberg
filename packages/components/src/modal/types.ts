@@ -20,6 +20,8 @@ export type ModalProps = {
 	};
 	/**
 	 * Class name added to the body element when the modal is open.
+	 * If you use a custom class name, its styles must set `overflow: hidden`
+	 * to preserve the Modal's scroll lock.
 	 *
 	 * @default 'modal-open'
 	 */

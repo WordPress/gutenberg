@@ -22,7 +22,6 @@
 	}
 
 	.components-button {
-		border-radius: $grid-unit-05;
 
 		@media not (prefers-reduced-motion) {
 			transition: background-color 0.1s ease-out;
@@ -101,7 +100,7 @@
 	display: none;
 	pointer-events: none;
 	svg {
-		fill: $gray-600;
+		color: $gray-600;
 	}
 	@include break-small {
 		display: flex;

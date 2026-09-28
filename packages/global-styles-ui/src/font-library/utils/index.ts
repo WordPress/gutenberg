@@ -1,17 +1,15 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
+import { kebabCase } from '@wordpress/kebab-case';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Browser dependencies
  */
 const { File } = window;
-const { kebabCase } = unlock( componentsPrivateApis );
 
 export function setUIValuesNeeded(
 	font: FontFamily,

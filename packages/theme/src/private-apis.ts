@@ -1,7 +1,7 @@
 import deprecated from '@wordpress/deprecated';
-import { lock } from './lock-unlock';
-import { ThemeProvider } from './theme-provider';
-import { useThemeProviderStyles } from './use-theme-provider-styles';
+import { lock } from './lock-unlock.ts';
+import { ThemeProvider } from './theme-provider.tsx';
+import { useThemeProviderStyles } from './use-theme-provider-styles.ts';
 
 function warnPrivateApi(
 	apiName: string,

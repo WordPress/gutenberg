@@ -1,0 +1,401 @@
+import { describe, expect, it } from 'vitest';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+// Load the tokens that the production build also supplies as fallbacks.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../../../theme/prebuilt/css/design-tokens.css';
+import {
+	Card,
+	CardBody,
+	CardDivider,
+	CardFooter,
+	CardHeader,
+	CardMedia,
+} from '../';
+const spacingProperties = [
+	'paddingTop',
+	'paddingRight',
+	'paddingBottom',
+	'paddingLeft',
+] as const;
+
+function pickStyles(
+	element: Element,
+	properties: readonly ( keyof CSSStyleDeclaration )[]
+) {
+	const computed = getComputedStyle( element );
+	return Object.fromEntries(
+		properties.map( ( property ) => [ property, computed[ property ] ] )
+	);
+}
+
+function readElevationShadow( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'[aria-hidden="true"]'
+	);
+	return getComputedStyle( layers[ layers.length - 1 ] ).boxShadow;
+}
+
+function readElevationRadii( card: HTMLElement ) {
+	// The elevation layers are intentionally hidden presentation elements.
+	// eslint-disable-next-line testing-library/no-node-access
+	const layers = card.querySelectorAll< HTMLElement >(
+		'.components-elevation'
+	);
+	return Array.from(
+		layers,
+		( shadow ) => getComputedStyle( shadow ).borderRadius
+	);
+}
+
+describe( 'Card', () => {
+	it( 'renders its regions and media', async () => {
+		await render(
+			<Card data-testid="card">
+				<CardHeader>Card Header</CardHeader>
+				<CardBody data-testid="card-body">Card Body</CardBody>
+				<CardDivider />
+				<CardMedia>
+					<img alt="Card Media" src="about:blank" />
+				</CardMedia>
+				<CardFooter>Card Footer</CardFooter>
+			</Card>
+		);
+
+		expect( screen.getByTestId( 'card' ) ).toHaveClass( 'components-card' );
+		expect( screen.getByTestId( 'card-body' ) ).toHaveClass(
+			'components-card__body'
+		);
+		expect( screen.getByText( 'Card Header' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Card Body' ) ).toBeInTheDocument();
+		expect( screen.getByRole( 'separator' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'img', { name: 'Card Media' } )
+		).toBeInTheDocument();
+		expect( screen.getByText( 'Card Footer' ) ).toBeInTheDocument();
+	} );
+
+	it( 'removes the border when isBorderless is true', async () => {
+		const { rerender } = await render(
+			<Card data-testid="card-wrapper">Code is Poetry</Card>
+		);
+		const card = screen.getByTestId( 'card-wrapper' );
+		const borderedShadow = getComputedStyle( card ).boxShadow;
+
+		await rerender(
+			<Card data-testid="card-wrapper" isBorderless>
+				Code is Poetry
+			</Card>
+		);
+
+		expect( borderedShadow ).not.toBe( 'none' );
+		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
+	} );
+
+	it( 'adds a rounded border when isRounded is true', async () => {
+		await render(
+			<Card data-testid="card-rounded" isRounded>
+				Code is Poetry
+			</Card>
+		);
+		await render(
+			<Card data-testid="card-squared" isRounded={ false }>
+				Code is Poetry
+			</Card>
+		);
+
+		const roundedRadius = getComputedStyle(
+			screen.getByTestId( 'card-rounded' )
+		).borderTopLeftRadius;
+		const squaredRadius = getComputedStyle(
+			screen.getByTestId( 'card-squared' )
+		).borderTopLeftRadius;
+
+		expect( roundedRadius ).not.toBe( squaredRadius );
+		expect( squaredRadius ).toBe( '0px' );
+	} );
+
+	it( 'adds a box shadow when elevation is greater than zero', async () => {
+		await render(
+			<Card data-testid="elevated" elevation={ 2 }>
+				Code is Poetry
+			</Card>
+		);
+		await render( <Card data-testid="flat">Code is Poetry</Card> );
+
+		expect(
+			readElevationShadow( screen.getByTestId( 'elevated' ) )
+		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
+	} );
+
+	it( 'changes region spacing with the size prop', async () => {
+		await render(
+			<Card size="medium">
+				<CardHeader data-testid="medium-header">Header</CardHeader>
+				<CardBody data-testid="medium-body">Body</CardBody>
+			</Card>
+		);
+		await render(
+			<Card size="large">
+				<CardHeader data-testid="large-header">Header</CardHeader>
+				<CardBody data-testid="large-body">Body</CardBody>
+			</Card>
+		);
+
+		expect(
+			pickStyles(
+				screen.getByTestId( 'large-header' ),
+				spacingProperties
+			)
+		).not.toEqual(
+			pickStyles(
+				screen.getByTestId( 'medium-header' ),
+				spacingProperties
+			)
+		);
+		expect(
+			pickStyles( screen.getByTestId( 'large-body' ), spacingProperties )
+		).not.toEqual(
+			pickStyles( screen.getByTestId( 'medium-body' ), spacingProperties )
+		);
+	} );
+
+	it( 'supports the legacy isElevated prop with a warning', async () => {
+		await render(
+			<Card isElevated data-testid="legacy-elevated">
+				Code is Poetry
+			</Card>
+		);
+		await render(
+			<Card elevation={ 2 } data-testid="elevated">
+				Code is Poetry
+			</Card>
+		);
+		await render( <Card data-testid="flat">Code is Poetry</Card> );
+
+		expect( console ).toHaveWarned();
+		expect(
+			readElevationShadow( screen.getByTestId( 'legacy-elevated' ) )
+		).toBe( readElevationShadow( screen.getByTestId( 'elevated' ) ) );
+		expect(
+			readElevationShadow( screen.getByTestId( 'legacy-elevated' ) )
+		).not.toBe( readElevationShadow( screen.getByTestId( 'flat' ) ) );
+	} );
+
+	it( 'passes border and size styles from context to its regions', async () => {
+		await render(
+			<Card isBorderless size="large">
+				<CardHeader data-testid="borderless-large-header">
+					Header
+				</CardHeader>
+				<CardBody data-testid="borderless-large-body">Body</CardBody>
+			</Card>
+		);
+		await render(
+			<Card isBorderless={ false } size="small">
+				<CardHeader data-testid="bordered-small-header">
+					Header
+				</CardHeader>
+				<CardBody data-testid="bordered-small-body">Body</CardBody>
+			</Card>
+		);
+
+		expect(
+			getComputedStyle( screen.getByTestId( 'borderless-large-header' ) )
+				.borderBottomStyle
+		).toBe( 'none' );
+		expect(
+			getComputedStyle( screen.getByTestId( 'bordered-small-header' ) )
+				.borderBottomStyle
+		).not.toBe( 'none' );
+		expect(
+			pickStyles(
+				screen.getByTestId( 'borderless-large-body' ),
+				spacingProperties
+			)
+		).not.toEqual(
+			pickStyles(
+				screen.getByTestId( 'bordered-small-body' ),
+				spacingProperties
+			)
+		);
+	} );
+
+	it( 'lets region props override inherited Card styles', async () => {
+		await render(
+			<Card isBorderless size="large">
+				<CardHeader data-testid="inherited">Header</CardHeader>
+				<CardHeader
+					data-testid="overridden"
+					isBorderless={ false }
+					size="small"
+				>
+					Header
+				</CardHeader>
+				<CardBody>Body</CardBody>
+			</Card>
+		);
+
+		const inherited = screen.getByTestId( 'inherited' );
+		const overridden = screen.getByTestId( 'overridden' );
+
+		expect( getComputedStyle( inherited ).borderBottomStyle ).toBe(
+			'none'
+		);
+		expect( getComputedStyle( overridden ).borderBottomStyle ).not.toBe(
+			'none'
+		);
+		expect( pickStyles( inherited, spacingProperties ) ).not.toEqual(
+			pickStyles( overridden, spacingProperties )
+		);
+	} );
+
+	it( 'treats extraSmall as an alias for xSmall', async () => {
+		await render(
+			<Card size="xSmall">
+				<CardHeader data-testid="xsmall-header">Header</CardHeader>
+				<CardBody data-testid="xsmall-body">Body</CardBody>
+			</Card>
+		);
+		await render(
+			<Card size="extraSmall">
+				<CardHeader data-testid="extra-small-header">Header</CardHeader>
+				<CardBody data-testid="extra-small-body">Body</CardBody>
+			</Card>
+		);
+
+		expect(
+			pickStyles(
+				screen.getByTestId( 'xsmall-header' ),
+				spacingProperties
+			)
+		).toEqual(
+			pickStyles(
+				screen.getByTestId( 'extra-small-header' ),
+				spacingProperties
+			)
+		);
+		expect(
+			pickStyles( screen.getByTestId( 'xsmall-body' ), spacingProperties )
+		).toEqual(
+			pickStyles(
+				screen.getByTestId( 'extra-small-body' ),
+				spacingProperties
+			)
+		);
+	} );
+
+	it( 'applies the shady background to all Card regions', async () => {
+		await render(
+			<>
+				<CardHeader data-testid="header">Header</CardHeader>
+				<CardHeader data-testid="shady-header" isShady>
+					Header
+				</CardHeader>
+				<CardBody data-testid="body">Body</CardBody>
+				<CardBody data-testid="shady-body" isShady>
+					Body
+				</CardBody>
+				<CardFooter data-testid="footer">Footer</CardFooter>
+				<CardFooter data-testid="shady-footer" isShady>
+					Footer
+				</CardFooter>
+			</>
+		);
+
+		for ( const region of [ 'header', 'body', 'footer' ] ) {
+			expect(
+				getComputedStyle( screen.getByTestId( `shady-${ region }` ) )
+					.backgroundColor
+			).not.toBe(
+				getComputedStyle( screen.getByTestId( region ) ).backgroundColor
+			);
+		}
+	} );
+
+	it( 'applies CardFooter justification', async () => {
+		await render(
+			<CardFooter data-testid="footer" justify="flex-end">
+				Footer
+			</CardFooter>
+		);
+
+		expect(
+			getComputedStyle( screen.getByTestId( 'footer' ) ).justifyContent
+		).toBe( 'flex-end' );
+	} );
+
+	it( 'makes CardBody scrollable when requested', async () => {
+		await render(
+			<CardBody data-testid="scrollable" isScrollable>
+				Body
+			</CardBody>
+		);
+
+		expect(
+			getComputedStyle( screen.getByTestId( 'scrollable' ) ).overflowY
+		).toBe( 'auto' );
+	} );
+
+	it.each( [
+		{
+			order: 'rounded first',
+			rounded: [ true, false ],
+		},
+		{
+			order: 'square first',
+			rounded: [ false, true ],
+		},
+	] )(
+		'keeps both shadows aligned with the default Card radius with $order',
+		async ( { rounded } ) => {
+			await render(
+				<>
+					{ rounded.map( ( isRounded ) => (
+						<Card
+							key={ String( isRounded ) }
+							isRounded={ isRounded }
+							elevation={ 5 }
+							data-testid={
+								isRounded ? 'rounded-card' : 'square-card'
+							}
+						>
+							Card content
+						</Card>
+					) ) }
+				</>
+			);
+
+			for ( const isRounded of rounded ) {
+				const card = screen.getByTestId(
+					isRounded ? 'rounded-card' : 'square-card'
+				);
+				const radius = getComputedStyle( card ).borderRadius;
+				await expect
+					.poll( () => readElevationRadii( card ) )
+					.toEqual( [ radius, radius ] );
+			}
+		}
+	);
+
+	it( 'keeps both shadows aligned with a custom Card radius', async () => {
+		await render(
+			<Card
+				isRounded={ false }
+				elevation={ 5 }
+				style={ { borderRadius: 23 } }
+				data-testid="card"
+			>
+				Card content
+			</Card>
+		);
+
+		const card = screen.getByTestId( 'card' );
+		const radius = getComputedStyle( card ).borderRadius;
+		await expect
+			.poll( () => readElevationRadii( card ) )
+			.toEqual( [ radius, radius ] );
+	} );
+} );

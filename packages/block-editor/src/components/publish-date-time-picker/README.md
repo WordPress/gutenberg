@@ -59,3 +59,13 @@ Called when the user presses the close button.
 
 - Type: `Function`
 - Required: No
+
+### showPopoverHeader
+
+Whether to render the popover header, which holds the title, the close button
+and a "Reset" action. Set it to `false` when the picker is rendered inline,
+where the surrounding UI already provides a heading.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`

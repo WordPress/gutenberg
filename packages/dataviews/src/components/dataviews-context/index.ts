@@ -43,7 +43,7 @@ type DataViewsContextType< Item > = {
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	config: { perPageSizes: number[] };
+	config: { perPageSizes: number[]; mediaFitControl?: boolean };
 	empty?: ReactNode;
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;

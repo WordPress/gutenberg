@@ -1,5 +1,6 @@
 import { paramCase as kebabCase } from 'change-case';
 import { downloadZip } from 'client-zip';
+import removeAccents from 'remove-accents';
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { download } from '@wordpress/icons';
@@ -33,7 +34,9 @@ const exportPattern: Action< Pattern > = {
 		if ( items.length === 1 ) {
 			return downloadBlob(
 				`${ kebabCase(
-					getItemTitle( items[ 0 ] ) || items[ 0 ].slug
+					removeAccents(
+						getItemTitle( items[ 0 ] ) || items[ 0 ].slug
+					)
 				) }.json`,
 				getJsonFromItem( items[ 0 ] ),
 				'application/json'
@@ -41,7 +44,9 @@ const exportPattern: Action< Pattern > = {
 		}
 		const nameCount: Record< string, number > = {};
 		const filesToZip = items.map( ( item ) => {
-			const name = kebabCase( getItemTitle( item ) || item.slug );
+			const name = kebabCase(
+				removeAccents( getItemTitle( item ) || item.slug )
+			);
 			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
 			return {
 				name: `${

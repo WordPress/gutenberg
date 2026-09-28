@@ -5,13 +5,15 @@ import type { ProviderCreator } from '../types';
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns the defeault provider creators. HTTP polling is the current default
- * provider.
+ * Returns the default provider creators. HTTP polling is the default when
+ * real-time collaboration is enabled.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	return [ createHttpPollingProvider() ];
+	return window.__experimentalEnableRealTimeCollaboration
+		? [ createHttpPollingProvider() ]
+		: [];
 }
 
 /**
@@ -34,8 +36,8 @@ export function getProviderCreators(): ProviderCreator[] {
 		return providerCreators;
 	}
 
-	// Check if real-time collaboration is enabled via WordPress setting.
-	if ( ! window._wpCollaborationEnabled ) {
+	// Check if real-time collaboration is enabled.
+	if ( ! window.__experimentalEnableRealTimeCollaboration ) {
 		return [];
 	}
 

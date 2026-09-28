@@ -47,7 +47,7 @@ export default function MediaAttachedToEdit( {
 						),
 						value: data.post.toString(),
 					},
-			  ]
+				]
 			: [];
 	const [ options, setOptions ] =
 		useState< { label: string; value: string }[] >( defaultPost );
@@ -107,9 +107,7 @@ export default function MediaAttachedToEdit( {
 	 *
 	 * @param {Object} selectedPostId The selected post id.
 	 */
-	const handleSelectOption = (
-		selectedPostId: string | null | undefined
-	) => {
+	const handleSelectOption = ( selectedPostId: string | null ) => {
 		if ( ! selectedPostId ) {
 			handleDetach();
 			return;

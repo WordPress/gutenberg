@@ -54,7 +54,7 @@ function ModalContent< Item >( {
 			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+					[ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -168,6 +168,9 @@ function PanelModal< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+	const isDisabled =
+		fieldDefinition.readOnly === true ||
+		fieldDefinition.isDisabled( { item: data, field: fieldDefinition } );
 
 	const handleClose = () => {
 		setIsOpen( false );
@@ -183,7 +186,7 @@ function PanelModal< Item >( {
 				summaryFields={ summaryFields }
 				validity={ validity }
 				touched={ touched }
-				disabled={ fieldDefinition.readOnly === true }
+				disabled={ isDisabled }
 				onClick={ () => setIsOpen( true ) }
 				isOpen={ isOpen }
 			/>

@@ -4,7 +4,7 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
-import { parsedBlocksCache, getCacheKey } from '../parsed-blocks-cache';
+import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
 
 const EMPTY_ARRAY = [];
 
@@ -60,17 +60,15 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return EMPTY_ARRAY;
 		}
 
-		// Cache parsed blocks by entity identity. Store the content
-		// alongside the blocks so we can validate it hasn't changed.
-		const cacheKey = getCacheKey( kind, name, id );
-		const cached = parsedBlocksCache.get( cacheKey );
-		let _blocks;
+		// The cache validates the content and the registered block types, so
+		// an entry parsed from other content — or before the block types were
+		// registered, as happens when a record resolves while the editor's
+		// assets are still loading — is re-parsed instead of adopted.
+		let _blocks = getCachedBlocks( kind, name, id, content );
 
-		if ( cached && cached.content === content ) {
-			_blocks = cached.blocks;
-		} else {
+		if ( ! _blocks ) {
 			_blocks = parse( content );
-			parsedBlocksCache.set( cacheKey, { content, blocks: _blocks } );
+			setCachedBlocks( kind, name, id, content, _blocks );
 		}
 
 		return _blocks;

@@ -169,7 +169,7 @@ export default function MediaThumbnailView( {
 			if ( ! item.featured_media ) {
 				return;
 			}
-			return select( coreStore ).getEntityRecord< Attachment >(
+			return select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
 				item.featured_media

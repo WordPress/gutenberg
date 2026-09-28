@@ -5,14 +5,22 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalConfirmDialog as ConfirmDialog,
+	type IconType,
 } from '@wordpress/components';
 import {
 	DataViews,
 	filterSortAndPaginate,
+	type Field,
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useCallback,
+} from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -40,9 +48,11 @@ const initialView: View = {
 interface DataRow {
 	id: string;
 	label: string;
+	guidelines: string;
+	icon?: IconType;
 }
 
-const fields = [
+const fields: Field< DataRow >[] = [
 	{
 		id: 'icon',
 		label: __( 'Icon' ),
@@ -88,6 +98,9 @@ export default function BlockGuidelines( {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
+	const addButtonRef = useRef< HTMLButtonElement >( null );
+	const [ shouldFocusAddButton, setShouldFocusAddButton ] = useState( false );
+
 	const rows = useMemo(
 		() =>
 			contentBlocks
@@ -97,15 +110,20 @@ export default function BlockGuidelines( {
 					label: block.title,
 					guidelines:
 						bySlug[ blockSlug( block.name ) ]?.content ?? '',
-					icon: block.icon?.src,
+					/* Block registry icons are renderable by `Icon`, but the
+					   registry types do not model them. */
+					icon: block.icon?.src as IconType | undefined,
 				} ) ),
 		[ contentBlocks, bySlug ]
 	);
 
-	const handleRowClick = ( id: string ) => {
-		setSelectedItem( id );
-		setIsOpen( true );
-	};
+	const handleRowClick = useCallback(
+		( id: string ) => {
+			setSelectedItem( id );
+			setIsOpen( true );
+		},
+		[ setSelectedItem, setIsOpen ]
+	);
 
 	const actions = useMemo(
 		() => [
@@ -124,7 +142,7 @@ export default function BlockGuidelines( {
 				},
 			},
 		],
-		[ setItemToDelete ]
+		[ setItemToDelete, handleRowClick ]
 	);
 
 	const handleDelete = () => {
@@ -140,9 +158,10 @@ export default function BlockGuidelines( {
 		deleteGuidelineRow( row.id )
 			.then( () => {
 				setError( null );
-				createSuccessNotice( __( 'Guidelines removed.' ), {
+				createSuccessNotice( __( 'Guideline removed.' ), {
 					type: 'snackbar',
 				} );
+				setShouldFocusAddButton( true );
 			} )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => {
@@ -157,19 +176,11 @@ export default function BlockGuidelines( {
 	);
 
 	useEffect( () => {
-		const lastPage = Math.max( paginationInfo.totalPages, 1 );
-
-		if ( view.page && view.page > lastPage ) {
-			setView( ( currentView ) =>
-				currentView.page && currentView.page > lastPage
-					? {
-							...currentView,
-							page: lastPage,
-					  }
-					: currentView
-			);
+		if ( shouldFocusAddButton ) {
+			addButtonRef.current?.focus();
+			setShouldFocusAddButton( false );
 		}
-	}, [ paginationInfo.totalPages, view.page ] );
+	}, [ shouldFocusAddButton ] );
 
 	const closeModal = () => {
 		setIsOpen( false );
@@ -219,13 +230,14 @@ export default function BlockGuidelines( {
 					</VStack>
 				</DataViews>
 			) }
-			<HStack>
+			<HStack alignment="right">
 				<Button
+					ref={ addButtonRef }
 					variant="primary"
 					onClick={ openModal }
 					__next40pxDefaultSize
 				>
-					{ __( 'Add guidelines' ) }
+					{ __( 'Add' ) }
 				</Button>
 			</HStack>
 
@@ -236,11 +248,12 @@ export default function BlockGuidelines( {
 					contentBlocks={ contentBlocks }
 					bySlug={ bySlug }
 					query={ query }
+					onRemoved={ () => setShouldFocusAddButton( true ) }
 				/>
 			) }
 			<ConfirmDialog
 				isOpen={ !! itemToDelete }
-				title={ __( 'Remove block guidelines' ) }
+				title={ __( 'Remove block guideline' ) }
 				__experimentalHideHeader={ false }
 				onConfirm={ handleDelete }
 				onCancel={ () => setItemToDelete( null ) }
@@ -251,7 +264,7 @@ export default function BlockGuidelines( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block.'
+						'You are about to remove the block guideline for the %s block.'
 					),
 					itemToDelete?.label ?? ''
 				) }

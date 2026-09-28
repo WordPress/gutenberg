@@ -19,14 +19,24 @@ export { registerFieldType } from './field-types';
 export { registerIconResolver } from './icon-resolver';
 
 /**
+ * Host capabilities
+ */
+export { WidgetHostProvider, useWidgetHost, HostLink } from './widget-host';
+export type { WidgetHost, WidgetHostLinks } from './widget-host';
+
+/**
  * Types
  */
 export type {
 	WidgetName,
 	WidgetIcon,
+	WidgetIconReference,
+	WidgetRelevance,
 	WidgetType,
 	WidgetAction,
+	WidgetActionRecord,
 	WidgetAttributeField,
+	WidgetAttributeRecord,
 	WidgetRenderProps,
 	ResolveWidgetModule,
 	WidgetModuleRecord,

@@ -37,12 +37,7 @@ export default {
 			'line-height': [ 'px' ],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
-		'font-weight-notation': [
-			'numeric',
-			{
-				ignore: [ 'relative' ],
-			},
-		],
+		'font-weight-notation': 'numeric',
 		'function-name-case': [
 			'lower',
 			{
@@ -78,6 +73,16 @@ export default {
 		'selector-pseudo-element-colon-notation': 'double',
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
+		/*
+		 * Ban private prefixes (--_gcd-*, --_wp-*). The pattern is matched against the name without the leading `--`. Projects that already set custom-property-pattern will override this entirely and must merge `(?!_(?:gcd|wp)-)` into their own pattern if they want to keep the ban.
+		 */
+		'custom-property-pattern': [
+			'^(?!_(?:gcd|wp)-).+',
+			{
+				message: ( name ) =>
+					`Do not use "${ name }". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time.`,
+			},
+		],
 		'plugin-wpds/no-setting-wpds-custom-properties': true,
 		'plugin-wpds/no-token-fallback-values': true,
 		'plugin-wpds/no-unknown-ds-tokens': true,

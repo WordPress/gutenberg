@@ -20,6 +20,7 @@ const results = {
 	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
+	firstFocus: [],
 	selectAll: [],
 	listViewOpen: [],
 	inserterOpen: [],
@@ -292,10 +293,17 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Block: Paragraph/i,
 			} );
 
+			// The first click also mounts the block inspector, so it costs
+			// about twice a later one and gets its own metric.
 			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
+			const iterations = samples + 1;
 			for ( let i = 1; i <= iterations; i++ ) {
+				const paragraph = paragraphs.nth( i );
+
+				// Scroll first, so Playwright's auto-scroll on click stays
+				// out of the trace.
+				await paragraph.scrollIntoViewIfNeeded();
+
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -304,7 +312,7 @@ test.describe( 'Post Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Click the next paragraph.
-				await paragraphs.nth( i ).click();
+				await paragraph.click();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
@@ -313,14 +321,16 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Get the durations.
 				const allDurations = metrics.getSelectionEventDurations();
+				const duration = allDurations.reduce(
+					( acc, eventDurations ) => acc + sum( eventDurations ),
+					0
+				);
 
 				// Save the results.
-				if ( i > throwaway ) {
-					results.focus.push(
-						allDurations.reduce( ( acc, eventDurations ) => {
-							return acc + sum( eventDurations );
-						}, 0 )
-					);
+				if ( i === 1 ) {
+					results.firstFocus.push( duration );
+				} else {
+					results.focus.push( duration );
 				}
 			}
 		} );

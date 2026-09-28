@@ -6,6 +6,7 @@
 	> a,
 	> figure > a {
 		display: inline-block;
+		color: inherit;
 	}
 
 	img {
@@ -147,7 +148,7 @@
 		cursor: zoom-in;
 	}
 
-	img:hover + button {
+	&:has(img:hover) button {
 		opacity: 1;
 	}
 
@@ -336,6 +337,11 @@
 		}
 	}
 
+	.lightbox-thumbnail-container {
+		--wp--lightbox-image-width: var(--wp--lightbox-thumbnail-width);
+		--wp--lightbox-image-height: var(--wp--lightbox-thumbnail-height);
+	}
+
 	button {
 		border: none;
 		background: none;
@@ -450,9 +456,11 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
@@ -460,6 +468,7 @@
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
@@ -467,6 +476,7 @@
 	}
 	100% {
 		visibility: hidden;
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

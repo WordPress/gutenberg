@@ -107,6 +107,7 @@ export function RadioControl(
 							type="radio"
 							name={ id }
 							value={ option.value }
+							disabled={ option.disabled }
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={

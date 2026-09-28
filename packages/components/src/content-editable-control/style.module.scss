@@ -7,7 +7,6 @@
 	background: $components-color-background;
 	color: $components-color-foreground;
 	@include input-control;
-	border-color: $components-color-border;
 
 	// `::placeholder` only applies to native form fields, so draw the text
 	// from the `aria-placeholder` attribute while the element has no content.

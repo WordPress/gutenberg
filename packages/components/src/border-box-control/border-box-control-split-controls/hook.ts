@@ -1,8 +1,7 @@
-import { useMemo } from '@wordpress/element';
-import * as styles from '../styles';
+import clsx from 'clsx';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/';
 import type { SplitControlsProps } from '../types';
 
 export function useBorderBoxControlSplitControls(
@@ -17,28 +16,20 @@ export function useBorderBoxControlSplitControls(
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderBoxControlSplitControls, className );
-	}, [ cx, className ] );
-
-	const centeredClassName = useMemo( () => {
-		return cx( styles.centeredBorderControl, className );
-	}, [ cx, className ] );
-
-	const rightAlignedClassName = useMemo( () => {
-		return cx( styles.rightBorderControl(), className );
-	}, [ cx, className ] );
-
 	return {
 		...otherProps,
-		centeredClassName,
-		className: classes,
+		centeredClassName: clsx(
+			styles[ 'centered-border-control' ],
+			className
+		),
+		className: clsx( styles[ 'split-controls' ], className ),
 		colors,
 		enableAlpha,
 		enableStyle,
-		rightAlignedClassName,
+		rightAlignedClassName: clsx(
+			styles[ 'right-border-control' ],
+			className
+		),
 		__experimentalIsRenderedInSidebar,
 	};
 }

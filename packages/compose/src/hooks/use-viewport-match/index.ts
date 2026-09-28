@@ -76,9 +76,11 @@ const useViewportMatch = (
 		: undefined
 ): boolean => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
+	// Scoped to `screen` so printing, which matches against the page box,
+	// does not read as a narrower viewport.
 	const mediaQuery =
 		! simulatedWidth &&
-		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+		`screen and (${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
 	const mediaQueryResult = useMediaQuery( mediaQuery || undefined, view );
 
 	if ( simulatedWidth ) {
