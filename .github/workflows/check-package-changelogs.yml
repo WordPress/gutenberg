@@ -41,12 +41,17 @@ on:
             - 'packages/widget-dashboard/**'
             - 'packages/widget-primitives/**'
             - 'packages/wp-build/**'
+            - '!packages/*/**/*.md'
             - 'packages/*/CHANGELOG.md'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/**/stories/**'
             - '!packages/*/**/test/**'
             - '!packages/*/**/__tests__/**'
+            - '!packages/*/**/*.stories.*'
+            - '!packages/*/**/*.mdx'
+            - '!packages/*/**/tsconfig.stories.json'
+            - '!packages/*/**/storybook.d.ts'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -127,8 +132,10 @@ jobs:
                   # The workflow's `paths:` filter triggers on the union of all
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
+                  # Tests, Storybook files and Markdown files (docs, READMEs,
+                  # the CHANGELOG itself) don't warrant a CHANGELOG entry.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/((.+/)?(stories|test|__tests__)/|CHANGELOG\.md$)" || true)
+                      | grep -Ev "^${PACKAGE_PATH}/((.+/)?(stories|test|__tests__)/|.+\.(md|mdx)$|(.+/)?([^/]+\.stories\.[^/]+|tsconfig\.stories\.json|storybook\.d\.ts)$)" || true)
 
                   if [ -z "$relevant_changes" ]; then
                       echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
