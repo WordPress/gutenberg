@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
+-   `FontAppearanceControl`: Resolve a `@font-face` `font-style` range, such as the `oblique 0deg 10deg` a variable font with a `slnt` axis declares, to the slant nearest upright. The raw range was offered as an appearance value, which `font-style` discards, so selecting it left the text unchanged ([#83456](https://github.com/WordPress/gutenberg/pull/83456)).
 
 ## 18.0.0 (2026-09-23)
 
