@@ -176,17 +176,22 @@ assert.deepEqual(
 	),
 	[ 'vitest/valid-expect-in-promise' ]
 );
+const awaitedPromiseAllFixture =
+	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); await Promise.all( [ check ] ); } );";
 assert.deepEqual(
-	await lintTestRules(
-		nodeTest,
-		"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );"
-	),
+	await lintTestRules( nodeTest, awaitedPromiseAllFixture ),
+	[]
+);
+const returnedAwaitedPromiseAllFixture =
+	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );";
+assert.deepEqual(
+	await lintTestRules( nodeTest, returnedAwaitedPromiseAllFixture ),
 	[ 'vitest/valid-expect-in-promise' ]
 );
 assert.deepEqual(
 	await lintTestRules(
 		'packages/core-data/src/locks/test/engine.js',
-		"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );"
+		returnedAwaitedPromiseAllFixture
 	),
 	[]
 );

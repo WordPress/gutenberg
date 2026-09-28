@@ -652,8 +652,8 @@ export default dedupePlugins( [
 		],
 		rules: { 'vitest/valid-describe-callback': 'off' },
 	},
-	// Each assertion in the promise chain is awaited through Promise.all.
-	// The plugin does not trace the returned array elements back to the chains.
+	// These assertion chains are awaited through Promise.all. The plugin flags
+	// them because it does not recognize `return await Promise.all(...)`.
 	{
 		files: [ 'packages/core-data/src/locks/test/engine.js' ],
 		rules: { 'vitest/valid-expect-in-promise': 'off' },
