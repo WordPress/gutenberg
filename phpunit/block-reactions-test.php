@@ -46,6 +46,10 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 	}
 
 	public function test_reaction_block_meta_is_registered() {
+		// The test base unregisters every meta key after each test, so the
+		// `init` registration only survives for whichever test runs first.
+		gutenberg_register_reaction_block_meta();
+
 		$registered = get_registered_meta_keys( 'comment' );
 
 		$this->assertArrayHasKey( '_wp_reaction_block', $registered );
