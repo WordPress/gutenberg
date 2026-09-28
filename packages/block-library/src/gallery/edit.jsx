@@ -568,8 +568,8 @@ export default function GalleryEdit( props ) {
 		}
 	}
 
-	function setRandomOrder( nextRandomOrder ) {
-		setAttributes( { randomOrder: nextRandomOrder } );
+	function selectRandomOrder() {
+		setAttributes( { randomOrder: true } );
 	}
 
 	// Choosing any other order turns "Random" off. Called straight after the
@@ -602,7 +602,7 @@ export default function GalleryEdit( props ) {
 	// forgets any sort applied earlier, so the control reads "Custom" from
 	// here on rather than that sort.
 	function selectCustomOrder() {
-		setRandomOrder( false );
+		setAttributes( { randomOrder: false } );
 		setAppliedSort( null );
 	}
 
@@ -1031,7 +1031,7 @@ export default function GalleryEdit( props ) {
 									} }
 									isRandom={ !! randomOrder }
 									onChange={ changeSourceOrder }
-									onRandomChange={ setRandomOrder }
+									onSelectRandom={ selectRandomOrder }
 								/>
 							) : (
 								<SortImagesControl
@@ -1040,9 +1040,7 @@ export default function GalleryEdit( props ) {
 									canSort={ canSortImages }
 									onSort={ sortImages }
 									onSelectCustom={ selectCustomOrder }
-									onSelectRandom={ () =>
-										setRandomOrder( true )
-									}
+									onSelectRandom={ selectRandomOrder }
 								/>
 							) }
 						</ToolsPanelItem>

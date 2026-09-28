@@ -28,8 +28,8 @@ type SourceOrderControlProps = {
 	 * undo level.
 	 */
 	onChange: ( order: Order ) => void;
-	/** Called to set the `randomOrder` attribute. */
-	onRandomChange: ( isRandom: boolean ) => void;
+	/** Called when "Random" is chosen. */
+	onSelectRandom: () => void;
 };
 
 /**
@@ -43,7 +43,7 @@ export function SourceOrderControl( {
 	order,
 	isRandom,
 	onChange,
-	onRandomChange,
+	onSelectRandom,
 }: SourceOrderControlProps ) {
 	return (
 		<WCSelectControl
@@ -53,7 +53,7 @@ export function SourceOrderControl( {
 			help={ getOrderHelp( isRandom ) }
 			onChange={ ( value ) => {
 				if ( value === RANDOM_ORDER ) {
-					onRandomChange( true );
+					onSelectRandom();
 					return;
 				}
 				onChange( parseOrderValue( value ) );
