@@ -6,6 +6,11 @@
 
 -   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
 
+### Bug fix
+
+-   Point the apt sources of the buster-based WordPress images (PHP 7.2) at `archive.debian.org`, so building them no longer fails now that Debian 10 has reached end-of-life and left the regular mirrors.
+-   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
+
 ## 10.0.0 (2024-05-31)
 
 ### Breaking Changes
