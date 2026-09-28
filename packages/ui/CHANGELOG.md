@@ -15,7 +15,6 @@
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
 -   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
 -   `CollapsibleCard`: Only show the header's focus ring when its own trigger is keyboard-focused ([#81314](https://github.com/WordPress/gutenberg/pull/81314)).
--   `Notice`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
