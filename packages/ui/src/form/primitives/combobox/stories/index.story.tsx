@@ -36,6 +36,9 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
 	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',

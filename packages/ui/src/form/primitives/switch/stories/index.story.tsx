@@ -5,6 +5,9 @@ const meta: Meta< typeof Switch > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Switch',
 	id: 'design-system-components-form-primitives-switch',
 	component: Switch,
+	argTypes: {
+		onCheckedChange: { action: 'onCheckedChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',

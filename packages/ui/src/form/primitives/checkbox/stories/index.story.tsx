@@ -5,6 +5,9 @@ const meta: Meta< typeof Checkbox > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Checkbox',
 	id: 'design-system-components-form-primitives-checkbox',
 	component: Checkbox,
+	argTypes: {
+		onCheckedChange: { action: 'onCheckedChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',

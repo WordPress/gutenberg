@@ -42,6 +42,9 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Status': Autocomplete.Status,
 		'Autocomplete.Clear': Autocomplete.Clear,
 	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'recommended',

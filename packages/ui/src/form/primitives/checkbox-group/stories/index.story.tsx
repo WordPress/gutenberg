@@ -10,6 +10,9 @@ const meta: Meta< typeof CheckboxGroup > = {
 	subcomponents: {
 		'CheckboxGroup.NestedItems': CheckboxGroup.NestedItems,
 	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
