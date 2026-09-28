@@ -2,6 +2,9 @@ export const globalStylesDataKey = Symbol( 'globalStylesDataKey' );
 export const globalStylesLinksDataKey = Symbol( 'globalStylesLinks' );
 export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
+export const userPatternCategoriesSelectKey = Symbol(
+	'userPatternCategoriesSelect'
+);
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
 export const getMediaSelectKey = Symbol( 'getMediaSelect' );
@@ -12,4 +15,5 @@ export const isNavigationOverlayContextKey = Symbol(
 );
 export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
+export const mediaSideloadFromUrlKey = Symbol( 'mediaSideloadFromUrl' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );

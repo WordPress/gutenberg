@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useInsertionEffect, useCallback } from '@wordpress/element';
 
 /**

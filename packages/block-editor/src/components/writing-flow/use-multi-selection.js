@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 
 function selector( select ) {
 	const {
@@ -73,11 +67,9 @@ export default function useMultiSelection() {
 			// all content editable. We can't rely on using the store and
 			// React because re-rending happens too slowly. We need to be
 			// able to select across instances immediately.
-			node.contentEditable = true;
-
 			// For some browsers, like Safari, it is important that focus
 			// happens BEFORE selection removal.
-			node.focus();
+			setContentEditableWrapper( node, true );
 
 			defaultView.getSelection().removeAllRanges();
 		},

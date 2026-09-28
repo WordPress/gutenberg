@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Media } from '../media-editor-provider';
-import type { UseCropperStateReturn } from '../../image-editor';
+import type { MediaEditorController } from '../../state';
 import {
 	buildModifiers,
 	type Modifier,
@@ -37,10 +30,14 @@ export interface MediaEditorSaveResult {
 	id: number;
 	url?: string;
 	media: Media;
+	previous?: {
+		id: number;
+		url?: string;
+	};
 }
 
 interface UseSaveMediaEditorArgs {
-	cropper: UseCropperStateReturn;
+	cropper: MediaEditorController;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -52,8 +49,8 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( cropper: UseCropperStateReturn ): Modifier[] {
-	if ( ! cropper.isDirty || ! cropper.state.image ) {
+function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
+	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
 		return [];
 	}
 	return buildModifiers( cropper.state, {
@@ -104,6 +101,13 @@ export function useSaveMediaEditor( {
 		try {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( cropper );
+			const previous =
+				modifiers.length > 0 && media
+					? {
+							id,
+							url: media.source_url,
+						}
+					: undefined;
 
 			if ( modifiers.length > 0 ) {
 				const pendingEdits = registry
@@ -138,7 +142,8 @@ export function useSaveMediaEditor( {
 				saved = ( await saveEditedEntityRecord(
 					'postType',
 					'attachment',
-					id
+					id,
+					{ throwOnError: true }
 				) ) as Media | undefined;
 			}
 
@@ -156,26 +161,27 @@ export function useSaveMediaEditor( {
 					id: next.id,
 					url: next.source_url,
 					media: next,
+					previous,
 				} );
 			}
 		} catch ( error ) {
 			const message =
 				error instanceof Error
 					? error.message
-					: ( error as { message?: string } )?.message ??
-					  __( 'An unknown error occurred.' );
+					: ( ( error as { message?: string } )?.message ??
+						__( 'An unknown error occurred.' ) );
 			createErrorNotice(
 				isImage
 					? sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save image. %s' ),
 							message
-					  )
+						)
 					: sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save media. %s' ),
 							message
-					  ),
+						),
 				{
 					type: 'snackbar',
 					context: MEDIA_EDITOR_NOTICES_CONTEXT,

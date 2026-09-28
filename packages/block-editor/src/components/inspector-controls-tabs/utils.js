@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { cog, styles, listView, page } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 

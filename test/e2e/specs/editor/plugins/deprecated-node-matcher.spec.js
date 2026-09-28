@@ -1,9 +1,3 @@
-/**
- * WordPress dependencies
- */
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Deprecated Node Matcher', () => {

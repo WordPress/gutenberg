@@ -1,27 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.scss';
-
 import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
 type UseDraggingCallbackEvent =
-	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
-	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
-	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragStart' ] > >[ 0 ]
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragMove' ] > >[ 0 ]
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragEnd' ] > >[ 0 ];
 
 function AngleCircle( {
 	value,

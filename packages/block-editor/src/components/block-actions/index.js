@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	hasBlockSupport,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 
 export default function BlockActions( {
 	clientIds,
@@ -106,8 +96,7 @@ export default function BlockActions( {
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType(
+			const newBlocks = groupBlocks(
 				getBlocksByClientId( clientIds ),
 				groupingBlockName
 			);

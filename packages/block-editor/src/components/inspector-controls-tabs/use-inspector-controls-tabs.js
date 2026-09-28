@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
@@ -86,14 +79,7 @@ export default function useInspectorControlsTabs(
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
-	// When the block fields experiment is active, only rely on `hasContentFills`
-	// to determine whether the content tab to be shown. The tab purely uses slot
-	// fills in this situation.
-	const shouldShowBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
-	const hasContentTab =
-		hasContentFills ||
-		( ! shouldShowBlockFields && contentClientIds?.length );
+	const hasContentTab = hasContentFills || contentClientIds?.length;
 
 	if ( hasContentTab ) {
 		tabs.push( TAB_CONTENT );

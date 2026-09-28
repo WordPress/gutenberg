@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useEffect, useRef } from '@wordpress/element';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import usePostContentBlockTypes from './use-post-content-block-types';
@@ -52,22 +45,31 @@ export default function DisableNonPageContentBlocks() {
 	// Child blocks of templates and templateParts are also loaded separately,
 	// so these are kept in separate effects.
 	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
+		__unstableMarkNextChangeAsNotPersistent();
 		setBlockEditingMode( '', 'disabled' );
 
 		return () => {
+			__unstableMarkNextChangeAsNotPersistent();
 			unsetBlockEditingMode( '' );
 		};
 	}, [ registry ] );
 
 	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
 		registry.batch( () => {
 			for ( const clientId of templateParts ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 		} );
@@ -75,42 +77,74 @@ export default function DisableNonPageContentBlocks() {
 		return () => {
 			registry.batch( () => {
 				for ( const clientId of templateParts ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
 	}, [ templateParts, registry ] );
 
-	useEffect( () => {
-		const { setBlockEditingMode, unsetBlockEditingMode } =
-			registry.dispatch( blockEditorStore );
+	// The modes currently applied by this component, so that a change to the
+	// block tree only dispatches for the blocks that actually changed. The
+	// selectors return a new array whenever the tree changes, even when the
+	// client IDs are identical, and an unset/set cycle would briefly expose a
+	// `disabled` post content block. That flips `inert` on its wrapper, which
+	// blurs whatever is focused inside it.
+	const appliedModesRef = useRef( new Map() );
 
-		const contentOnlySet = new Set( contentOnlyIds );
+	useEffect( () => {
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
+
+		const nextModes = new Map();
+		for ( const clientId of contentOnlyIds ) {
+			nextModes.set( clientId, 'contentOnly' );
+		}
+		for ( const clientId of templatePartChildren ) {
+			if ( ! nextModes.has( clientId ) ) {
+				nextModes.set( clientId, 'disabled' );
+			}
+		}
+
+		const previousModes = appliedModesRef.current;
+		appliedModesRef.current = nextModes;
 
 		registry.batch( () => {
-			for ( const clientId of contentOnlyIds ) {
-				setBlockEditingMode( clientId, 'contentOnly' );
+			for ( const clientId of previousModes.keys() ) {
+				if ( ! nextModes.has( clientId ) ) {
+					__unstableMarkNextChangeAsNotPersistent();
+					unsetBlockEditingMode( clientId );
+				}
 			}
-			for ( const clientId of templatePartChildren ) {
-				if ( ! contentOnlySet.has( clientId ) ) {
-					setBlockEditingMode( clientId, 'disabled' );
+			for ( const [ clientId, mode ] of nextModes ) {
+				if ( previousModes.get( clientId ) !== mode ) {
+					__unstableMarkNextChangeAsNotPersistent();
+					setBlockEditingMode( clientId, mode );
 				}
 			}
 		} );
+	}, [ contentOnlyIds, templatePartChildren, registry ] );
 
+	// Unset on unmount only. Dependency changes are reconciled above.
+	useEffect( () => {
 		return () => {
+			const {
+				unsetBlockEditingMode,
+				__unstableMarkNextChangeAsNotPersistent,
+			} = registry.dispatch( blockEditorStore );
+
 			registry.batch( () => {
-				for ( const clientId of contentOnlyIds ) {
+				for ( const clientId of appliedModesRef.current.keys() ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					unsetBlockEditingMode( clientId );
 				}
-				for ( const clientId of templatePartChildren ) {
-					if ( ! contentOnlySet.has( clientId ) ) {
-						unsetBlockEditingMode( clientId );
-					}
-				}
 			} );
+			appliedModesRef.current = new Map();
 		};
-	}, [ contentOnlyIds, templatePartChildren, registry ] );
+	}, [ registry ] );
 
 	return null;
 }

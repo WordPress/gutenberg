@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { HStack } from '..';
 
@@ -42,7 +36,7 @@ const JUSTIFICATIONS = {
 
 const meta: Meta< typeof HStack > = {
 	component: HStack,
-	title: 'Components/Layout/HStack',
+	title: 'Components/@wordpress-components/Layout/HStack',
 	id: 'components-hstack',
 	argTypes: {
 		as: {
@@ -77,7 +71,7 @@ const meta: Meta< typeof HStack > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Stack` from `@wordpress/ui` instead.',
+			notes: 'Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

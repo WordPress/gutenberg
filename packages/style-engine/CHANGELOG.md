@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `background.backgroundClip` style rule that generates `background-clip`, along with the `-webkit-background-clip` and `-webkit-text-fill-color` declarations needed for the text clipping case ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+## 2.56.0 (2026-09-23)
+
+### New Features
+
+-   Add text shadow preset support ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 2.47.0 (2026-05-27)
+
 ## 2.46.0 (2026-05-14)
 
 ## 2.45.0 (2026-04-29)

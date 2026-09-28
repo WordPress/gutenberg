@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Global Styles - Button States', () => {
@@ -36,8 +33,11 @@ test.describe( 'Global Styles - Button States', () => {
 			.getByRole( 'button', { name: 'Blocks' } )
 			.click();
 
+		// The extensible site editor appends the "Has custom styles" badge to
+		// the item's accessible name, so match both shapes without matching
+		// the "Buttons" block.
 		await page
-			.getByRole( 'button', { name: 'Button', exact: true } )
+			.getByRole( 'button', { name: /^Button(Has custom styles)?$/ } )
 			.click();
 
 		const stateDropdown = page
@@ -52,7 +52,14 @@ test.describe( 'Global Styles - Button States', () => {
 			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
 			.click();
 
-		await page.getByRole( 'button', { name: 'Background' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
 
 		await page
 			.getByRole( 'option', { name: 'Luminous vivid orange' } )

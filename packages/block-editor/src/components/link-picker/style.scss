@@ -10,7 +10,6 @@
 	width: 100%;
 	height: auto;
 	padding: $grid-unit-15;
-	box-shadow: inset 0 0 0 1px $gray-600;
 	border-color: $gray-600;
 }
 
@@ -51,7 +50,7 @@
 
 .link-preview-button__title {
 	margin-top: $grid-unit-05;
-	font-weight: 500;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
 	display: block;
 }

@@ -14,7 +14,7 @@ import Button from '../../button';
 const meta: Meta< typeof Card > = {
 	component: Card,
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
-	title: 'Components/Containers/Card',
+	title: 'Components/@wordpress-components/Containers/Card',
 	id: 'components-card',
 	argTypes: {
 		as: {
@@ -32,7 +32,7 @@ const meta: Meta< typeof Card > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
+			notes: 'Use [`Card`](?path=/docs/design-system-components-card--docs) or [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

@@ -35,10 +35,15 @@
 			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
 			visibility: visible !important;
 			opacity: 1 !important;
-			min-width: 200px !important;
 			height: auto !important;
 			width: auto !important;
 			overflow: visible !important;
+		}
+
+		// Always-open submenus are laid out inline rather than as a flyout,
+		// so the flyout minimum width would only make them jump when selected.
+		&:not(.open-always) > .wp-block-navigation__submenu-container {
+			min-width: 200px !important;
 		}
 	}
 }
@@ -110,7 +115,7 @@
 .link-control-transform__subheading {
 	font-size: 11px;
 	text-transform: uppercase;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
 	margin-bottom: 1.5em;
 }

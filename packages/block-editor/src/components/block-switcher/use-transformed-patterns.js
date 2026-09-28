@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
 
 /**

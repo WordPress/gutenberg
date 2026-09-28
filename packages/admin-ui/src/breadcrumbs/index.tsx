@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Link as RouterLink } from '@wordpress/route';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { BreadcrumbsProps } from './types';
 import styles from './style.module.css';
 
@@ -51,7 +44,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	}
 
 	return (
-		<nav aria-label={ __( 'Breadcrumbs' ) }>
+		<nav aria-label={ _x( 'Breadcrumbs', 'area label' ) }>
 			<Stack
 				render={ <ul /> }
 				direction="row"

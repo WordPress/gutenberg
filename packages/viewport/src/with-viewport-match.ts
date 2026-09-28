@@ -1,21 +1,9 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createElement } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
-	pure,
 	useViewportMatch,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { ViewportQueries, BreakpointName, QueryOperator } from './types';
 
 /**
@@ -70,15 +58,13 @@ const withViewportMatch = ( queries: ViewportQueries ) => {
 		< T extends Record< string, unknown > >(
 			WrappedComponent: ComponentType< T >
 		) => {
-			const WrappedWithViewport = ( props: T ) => {
+			return function WithViewportMatch( props: T ) {
 				const queriesResult = useViewPortQueriesResult();
 				return createElement( WrappedComponent, {
 					...props,
 					...queriesResult,
 				} );
 			};
-
-			return pure( WrappedWithViewport );
 		},
 		'withViewportMatch'
 	);

@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	tags: [ 'manifest' ],
 	component: ProgressBar,
-	title: 'Components/Feedback/ProgressBar',
+	title: 'Components/@wordpress-components/Feedback/ProgressBar',
 	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },

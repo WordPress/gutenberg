@@ -2,5 +2,15 @@
 	"name": "core/hello-world",
 	"title": "Hello World",
 	"description": "A minimal example widget.",
-	"category": "demo"
+	"icon": "dashboard-widgets/wordpress",
+	"attributes": [
+		{
+			"id": "message",
+			"type": "text",
+			"label": "Message"
+		}
+	],
+	"category": "demo",
+	"presentation": "full-bleed",
+	"textdomain": "default"
 }

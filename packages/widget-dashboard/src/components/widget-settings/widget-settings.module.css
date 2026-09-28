@@ -1,0 +1,8 @@
+/*
+ * Clear the WP Admin admin bar. Its height varies (32/46px) and it is absent
+ * in some contexts (e.g. the site editor), so use the WP Admin token and
+ * default to 0.
+ */
+.popup {
+	margin-block-start: var(--wp-admin--admin-bar--height, 0);
+}

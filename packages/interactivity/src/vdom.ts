@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { h, type ComponentChild, type JSX } from 'preact';
-/**
- * Internal dependencies
- */
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
 
@@ -150,8 +144,8 @@ export function toVdom( root: Node ): ComponentChild {
 							typeof value === 'string'
 								? value
 								: typeof value?.namespace === 'string'
-								? value.namespace
-								: null;
+									? value.namespace
+									: null;
 						namespaces.push( islandNamespace );
 					} else {
 						directives.push( [ attributeName, namespace, value ] );

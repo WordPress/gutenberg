@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { useDraggable } from '@dnd-kit/core';
 
 // `useDraggable`'s `listeners` and `attributes` types are not exported
@@ -102,9 +99,16 @@ export interface GridOverlayRenderProps {
 	/**
 	 * Row height in pixels for surfaces with uniform rows. Omitted on
 	 * surfaces with content-driven heights (lanes) or when row height
-	 * is `'auto'`; in those cases the overlay paints columns only.
+	 * is `'auto'`; in those cases row markers are omitted.
 	 */
 	rowHeight?: number;
+
+	/**
+	 * Number of row tracks to mirror in each column. Derived from the
+	 * grid container height when `rowHeight` is numeric; omitted when
+	 * row height is unknown.
+	 */
+	rows?: number;
 
 	/**
 	 * Whether the overlay should be visible. Surfaces render the
@@ -155,3 +159,38 @@ export interface ResizeHandleProps {
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 }
+
+/**
+ * Per-item width limits, in pixels. Surfaces quantize each limit to
+ * whole tracks (minimums round up, maximums round down), bound rendered
+ * spans and resize gestures at the result, and never write it into the
+ * layout. A quantized minimum wins over a smaller quantized maximum.
+ */
+export type GridItemWidthLimits = {
+	/**
+	 * Minimum tile width in pixels.
+	 */
+	minWidth?: number;
+
+	/**
+	 * Maximum tile width in pixels.
+	 */
+	maxWidth?: number;
+};
+
+/**
+ * Per-item size limits on both axes, in pixels, for surfaces with row
+ * tracks. Height limits quantize against the row track when `rowHeight`
+ * is numeric and stay open otherwise.
+ */
+export type GridItemLimits = GridItemWidthLimits & {
+	/**
+	 * Minimum tile height in pixels.
+	 */
+	minHeight?: number;
+
+	/**
+	 * Maximum tile height in pixels.
+	 */
+	maxHeight?: number;
+};

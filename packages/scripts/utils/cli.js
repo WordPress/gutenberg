@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const minimist = require( 'minimist' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
 const { exit, getArgsFromCLI } = require( './process' );
 

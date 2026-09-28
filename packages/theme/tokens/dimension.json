@@ -45,19 +45,11 @@
 				}
 			}
 		},
-		"base": {
-			"$value": "{wpds-dimension.primitive.space.10}",
-			"$description": "Base dimension unit"
-		},
 		"padding": {
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Extra small padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.10}",
-						"comfortable": "{wpds-dimension.primitive.space.20}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -65,10 +57,6 @@
 				"$value": "{wpds-dimension.primitive.space.20}",
 				"$description": "Small padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.10}",
-						"comfortable": "{wpds-dimension.primitive.space.30}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -76,10 +64,6 @@
 				"$value": "{wpds-dimension.primitive.space.30}",
 				"$description": "Medium padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.20}",
-						"comfortable": "{wpds-dimension.primitive.space.40}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -87,10 +71,6 @@
 				"$value": "{wpds-dimension.primitive.space.40}",
 				"$description": "Large padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.30}",
-						"comfortable": "{wpds-dimension.primitive.space.50}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -98,10 +78,6 @@
 				"$value": "{wpds-dimension.primitive.space.50}",
 				"$description": "Extra large padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.40}",
-						"comfortable": "{wpds-dimension.primitive.space.60}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -109,10 +85,6 @@
 				"$value": "{wpds-dimension.primitive.space.60}",
 				"$description": "2x extra large padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.50}",
-						"comfortable": "{wpds-dimension.primitive.space.70}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -120,10 +92,6 @@
 				"$value": "{wpds-dimension.primitive.space.70}",
 				"$description": "3x extra large padding",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.60}",
-						"comfortable": "{wpds-dimension.primitive.space.80}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			}
@@ -133,10 +101,6 @@
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Extra small gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.10}",
-						"comfortable": "{wpds-dimension.primitive.space.20}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -144,10 +108,6 @@
 				"$value": "{wpds-dimension.primitive.space.20}",
 				"$description": "Small gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.10}",
-						"comfortable": "{wpds-dimension.primitive.space.30}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -155,10 +115,6 @@
 				"$value": "{wpds-dimension.primitive.space.30}",
 				"$description": "Medium gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.20}",
-						"comfortable": "{wpds-dimension.primitive.space.40}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -166,10 +122,6 @@
 				"$value": "{wpds-dimension.primitive.space.40}",
 				"$description": "Large gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.30}",
-						"comfortable": "{wpds-dimension.primitive.space.50}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -177,10 +129,6 @@
 				"$value": "{wpds-dimension.primitive.space.60}",
 				"$description": "Extra large gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.50}",
-						"comfortable": "{wpds-dimension.primitive.space.70}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -188,10 +136,6 @@
 				"$value": "{wpds-dimension.primitive.space.70}",
 				"$description": "2x extra large gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.60}",
-						"comfortable": "{wpds-dimension.primitive.space.80}"
-					},
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
@@ -199,11 +143,65 @@
 				"$value": "{wpds-dimension.primitive.space.80}",
 				"$description": "3x extra large gap",
 				"$extensions": {
-					"mode": {
-						"compact": "{wpds-dimension.primitive.space.70}",
-						"comfortable": "{wpds-dimension.primitive.space.90}"
-					},
 					"com.figma.scopes": [ "GAP" ]
+				}
+			}
+		},
+		"size": {
+			"5xs": {
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$description": "Notification indicators",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"4xs": {
+				"$value": "{wpds-dimension.primitive.space.20}",
+				"$description": "Visual size for small interactive elements like resize handles",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"3xs": {
+				"$value": "{wpds-dimension.primitive.space.30}",
+				"$description": "Small markers",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"2xs": {
+				"$value": "{wpds-dimension.primitive.space.40}",
+				"$description": "For small controls like checkboxes and radios, or small decorative icons",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.50}",
+				"$description": "For medium sized icons",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"sm": {
+				"$value": "{wpds-dimension.primitive.space.60}",
+				"$description": "For icons and small buttons",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"md": {
+				"$value": "{wpds-dimension.primitive.space.70}",
+				"$description": "For medium-sized buttons and inputs",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "Default size for buttons and inputs",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}
 			}
 		},

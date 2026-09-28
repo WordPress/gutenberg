@@ -1,18 +1,17 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-
 import * as DataViewsStories from './index.story';
 
 <Meta of={ DataViewsStories } name="Best practices" />
 
 # Data Views
 
-Data Views allow users to display and interact with information through different layouts such as table or grid. It includes features like search, filtering, sorting, pagination, and customization options to adjust column order, items per page, and hide columns, enhancing data exploration and flexibility. 
+Data Views allow users to display and interact with information through different layouts such as table or grid. It includes features like search, filtering, sorting, pagination, and customization options to adjust column order, items per page, and hide columns, enhancing data exploration and flexibility.
 
 A typical flow might be:
 
-- Use search and filters to narrow down a large collection.
-- Adjust the layout and visible fields to match the task (compare, skim, or visually scan).
-- Take inline actions on item metadata, or open an editing interface when more detail is needed.
+-   Use search and filters to narrow down a large collection.
+-   Adjust the layout and visible fields to match the task (compare, skim, or visually scan).
+-   Take inline actions on item metadata, or open an editing interface when more detail is needed.
 
 ## Choosing a layout
 
@@ -20,9 +19,9 @@ A typical flow might be:
 
 Use the **List** layout when:
 
-- **Content needs the most compact layout**, whether because it's used in a constrained context, or if paired with a preview surface.
-- Default information density allows for a reduced set of secondary metadata.
-- The view needs to work well in **narrow spaces**.
+-   **Content needs the most compact layout**, whether because it's used in a constrained context, or if paired with a preview surface.
+-   Default information density allows for a reduced set of secondary metadata.
+-   The view needs to work well in **narrow spaces**.
 
 List is a good fit for items like Pages that benefit from a live preview next to the list.
 
@@ -50,6 +49,5 @@ Table is ideal for dense, structured information where sorting and scanning down
 
 Data Views are designed for **browsing and managing collections**. In other situations, consider other components in the `@wordpress/dataviews` package:
 
-- **Use `DataForm`** when the primary workflow primarily relates to **creating or editing a single item** at a level that doesn't require a full editor.
-- **Use `DataViewsPicker`** when the goal is **selecting one or more items** and returning that selection to another part of the UI. This is a better fit for dialogs and sidebars where the outcome is a selection, not ongoing management of a collection, e.g. inserting from a media library.
-
+-   **Use `DataForm`** when the primary workflow primarily relates to **creating or editing a single item** at a level that doesn't require a full editor.
+-   **Use `DataViewsPicker`** when the goal is **selecting one or more items** and returning that selection to another part of the UI. This is a better fit for dialogs and sidebars where the outcome is a selection, not ongoing management of a collection, e.g. inserting from a media library.

@@ -13,6 +13,14 @@
 			"backgroundType": "image",
 			"isDark": false,
 			"tagName": "div",
+			"allowedVideoProviders": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			],
 			"layout": {
 				"type": "constrained"
 			}

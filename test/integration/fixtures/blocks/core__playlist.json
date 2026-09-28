@@ -1,0 +1,36 @@
+[
+	{
+		"name": "core/playlist",
+		"isValid": true,
+		"attributes": {
+			"type": "audio",
+			"order": "asc",
+			"showTracklist": true,
+			"showImages": true,
+			"showPlayButtonArtwork": false,
+			"showArtists": true,
+			"showNumbers": true,
+			"showTrackLength": true,
+			"waveformStyle": "bars",
+			"caption": "Sample playlist"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/playlist-track",
+				"isValid": true,
+				"attributes": {
+					"id": 123,
+					"src": "https://example.com/audio.mp3",
+					"type": "audio",
+					"album": "Example album",
+					"artist": "Example creator",
+					"image": "https://example.com/track-image.jpg",
+					"imageAlt": "Track image",
+					"length": "3:21",
+					"title": "Sample track"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

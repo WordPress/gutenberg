@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalText as WCText,
@@ -9,7 +6,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
-interface ActionProps {
+export interface ActionProps {
 	slug: 'import' | 'export' | 'revert';
 	title: string;
 	description: string;
@@ -62,6 +59,7 @@ export default function ActionItem( {
 				onClick={ onClick }
 				isBusy={ isBusy }
 				disabled={ disabled }
+				accessibleWhenDisabled
 			>
 				{ buttonLabel }
 			</Button>

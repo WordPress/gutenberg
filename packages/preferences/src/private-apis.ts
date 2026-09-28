@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import PreferenceBaseOption from './components/preference-base-option';
 import PreferenceToggleControl from './components/preference-toggle-control';
 import PreferencesModal from './components/preferences-modal';

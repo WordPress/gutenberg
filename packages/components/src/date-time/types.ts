@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { MinutesInput } from './time-picker/styles';
 
 export type TimePickerProps = {

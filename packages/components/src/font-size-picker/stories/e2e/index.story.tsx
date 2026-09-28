@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FontSizePicker from '../..';
 
 export default {
@@ -25,7 +14,6 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
-			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -36,7 +24,6 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 export const Default: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	fontSizes: [
 		{
 			name: 'Small',

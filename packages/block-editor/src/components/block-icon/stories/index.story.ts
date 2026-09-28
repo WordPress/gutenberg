@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { box, button, cog, paragraph } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../';
 
 const meta = {

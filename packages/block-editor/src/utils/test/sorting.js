@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { orderBy } from '../sorting';
 
 describe( 'orderBy', () => {
@@ -45,5 +43,20 @@ describe( 'orderBy', () => {
 		const input = [ a, b, c, d ];
 		const expected = [ a, b, d, c ];
 		expect( orderBy( input, 'x', 'desc' ) ).toEqual( expected );
+	} );
+
+	it( 'should maintain original order of equal items in large inputs', () => {
+		const input = Array.from( { length: 500 }, ( _, id ) => ( {
+			id,
+			x: id % 7 === 0 ? 1 : 0,
+		} ) );
+		const ones = input.filter( ( item ) => item.x === 1 );
+		const zeros = input.filter( ( item ) => item.x === 0 );
+
+		expect( orderBy( input, 'x' ) ).toEqual( [ ...zeros, ...ones ] );
+		expect( orderBy( input, 'x', 'desc' ) ).toEqual( [
+			...ones,
+			...zeros,
+		] );
 	} );
 } );

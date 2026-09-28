@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextDecorationControl from '../';
 
 const meta = {
-	title: 'BlockEditor/TextDecorationControl',
+	id: 'blockeditor-textdecorationcontrol',
+	title: 'Editor/Block Editor/TextDecorationControl',
 	component: TextDecorationControl,
 	parameters: {
 		docs: {

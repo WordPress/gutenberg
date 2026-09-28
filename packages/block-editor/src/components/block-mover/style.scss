@@ -96,17 +96,4 @@
 			animation-fill-mode: forwards;
 		}
 	}
-
-	// Don't show the focus inherited by the Button component.
-	&:focus,
-	&:focus:enabled,
-	// Override focus styles from the block toolbar
-	&:focus::before {
-		box-shadow: none;
-		outline: none;
-	}
-
-	&:focus-visible::before {
-		@include block-toolbar-button-style__focus();
-	}
 }

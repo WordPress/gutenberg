@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid values css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid values css > snapshot matches warnings 1`] = `
 [
   {
     "column": 16,
@@ -23,26 +23,35 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
   {
     "column": 15,
     "endColumn": 20,
-    "endLine": 12,
-    "line": 12,
+    "endLine": 13,
+    "line": 13,
     "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit "em" for property "line-height" (declaration-property-unit-allowed-list)",
+    "text": "Disallowed unit "em" for property "line-height" (declaration-property-unit-allowed-list)",
   },
   {
     "column": 15,
     "endColumn": 30,
-    "endLine": 10,
-    "line": 10,
+    "endLine": 11,
+    "line": 11,
     "rule": "font-family-name-quotes",
     "severity": "error",
     "text": "Expected quotes around "Times New Roman" (font-family-name-quotes)",
   },
   {
     "column": 15,
+    "endColumn": 21,
+    "endLine": 7,
+    "line": 7,
+    "rule": "font-weight-notation",
+    "severity": "error",
+    "text": "Expected numeric font-weight notation (font-weight-notation)",
+  },
+  {
+    "column": 15,
     "endColumn": 19,
-    "endLine": 11,
-    "line": 11,
+    "endLine": 12,
+    "line": 12,
     "rule": "font-weight-notation",
     "severity": "error",
     "text": "Expected "bold" to be "700" (font-weight-notation)",
@@ -54,7 +63,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 15,
@@ -63,7 +72,7 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 24,
@@ -72,16 +81,16 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
     "line": 6,
     "rule": "length-zero-no-unit",
     "severity": "error",
-    "text": "Unexpected unit (length-zero-no-unit)",
+    "text": "Disallowed unit (length-zero-no-unit)",
   },
   {
     "column": 1,
     "endColumn": 10,
-    "endLine": 15,
-    "line": 15,
+    "endLine": 16,
+    "line": 16,
     "rule": "no-duplicate-selectors",
     "severity": "error",
-    "text": "Unexpected duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)",
+    "text": "Duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)",
   },
 ]
 `;

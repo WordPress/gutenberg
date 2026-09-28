@@ -9,9 +9,9 @@ import {
 } from '@wordpress/block-editor';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import { parse } from '@wordpress/blocks';
+import contentCss from '@wordpress/block-editor/build-style/content.css?raw';
 import { pattern } from './pattern';
 import { editorStyles } from '../editor-styles';
-import contentCss from '../../../../packages/block-editor/build-style/content.css?raw';
 
 // Temporary hack to access private APIs before stabilizing zoom level.
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(

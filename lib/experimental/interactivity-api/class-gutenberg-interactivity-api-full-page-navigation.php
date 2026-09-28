@@ -2,7 +2,7 @@
 /**
  * Interactivity API: Experimental full-page client-side navigation.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage Interactivity API
  */
 

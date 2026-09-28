@@ -6,6 +6,7 @@
 	> a,
 	> figure > a {
 		display: inline-block;
+		color: inherit;
 	}
 
 	img {
@@ -117,7 +118,6 @@
 
 		// If a browser supports it, we will switch to using a circular SVG mask.
 		@supports (mask-image: none) or (-webkit-mask-image: none) {
-			/* stylelint-disable-next-line function-url-quotes -- We need quotes for the data URL to use the SVG inline. */
 			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
 			mask-mode: alpha;
 			mask-repeat: no-repeat;
@@ -148,7 +148,7 @@
 		cursor: zoom-in;
 	}
 
-	img:hover + button {
+	&:has(img:hover) button {
 		opacity: 1;
 	}
 
@@ -331,6 +331,11 @@
 		}
 	}
 
+	.lightbox-thumbnail-container {
+		--wp--lightbox-image-width: var(--wp--lightbox-thumbnail-width);
+		--wp--lightbox-image-height: var(--wp--lightbox-thumbnail-height);
+	}
+
 	button {
 		border: none;
 		background: none;
@@ -445,9 +450,11 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
@@ -455,6 +462,7 @@
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
@@ -462,6 +470,7 @@
 	}
 	100% {
 		visibility: hidden;
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

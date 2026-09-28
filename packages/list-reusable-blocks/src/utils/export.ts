@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
+import removeAccents from 'remove-accents';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { downloadBlob } from '@wordpress/blob';
 import type { Post, PostType } from './types';
 
@@ -43,7 +33,7 @@ async function exportReusableBlock( id: number ): Promise< void > {
 		2
 	);
 
-	const fileName = kebabCase( title ) + '.json';
+	const fileName = kebabCase( removeAccents( title ) ) + '.json';
 
 	downloadBlob( fileName, fileContent, 'application/json' );
 }

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { createSelector } from '../../create-selector';
 import { selectorArgsToStateKey } from './utils';
 import type { State, StateValue } from './reducer';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { linkAutocompleter, userAutocompleter } from '../components';
 
 function setDefaultCompleters( completers = [] ) {

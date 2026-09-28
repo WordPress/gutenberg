@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import {

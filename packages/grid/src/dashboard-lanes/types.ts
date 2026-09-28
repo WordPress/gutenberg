@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
 import type {
 	DragPreviewRenderProps,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -39,6 +37,22 @@ export type DashboardLanesLayoutItem = {
 	lane?: number;
 
 	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Display order. Lower values render first. When omitted, the
 	 * item falls back to its index in the `layout` array.
 	 */
@@ -46,13 +60,19 @@ export type DashboardLanesLayoutItem = {
 };
 
 /**
- * Props shared by fixed and responsive `DashboardLanes` variants.
+ * Props for `DashboardLanes`.
+ *
+ * `columns` and `minColumnWidth` compose as a layered model:
+ * - `columns` alone: fixed N lanes; tiles scale with the container.
+ * - `minColumnWidth` alone: lane count derives from container width,
+ *   floored by the per-tile minimum, down to 1.
+ * - Both together: `columns` caps the count, `minColumnWidth` enforces
+ *   a per-tile width floor that can reduce the count below the cap.
  */
-interface BaseDashboardLanesProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardLanesProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */
@@ -143,38 +163,33 @@ interface BaseDashboardLanesProps
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
 
 	/**
-	 * Override the default edit-mode overlay (diagonal stripes plus
-	 * dashed column track guides) with a custom component. Lanes are
-	 * content-driven vertically, so no `rowHeight` is supplied and the
-	 * default visual paints columns only.
+	 * Override the default edit-mode overlay (empty column tracks) with
+	 * a custom component. Lanes are content-driven vertically, so no
+	 * `rowHeight` or `rows` is supplied and the default visual paints
+	 * columns only.
 	 *
 	 * The overlay only renders when `editMode` is true. When omitted,
 	 * the package's default visual is used.
 	 */
 	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
-}
 
-interface FixedDashboardLanesProps extends BaseDashboardLanesProps {
 	/**
-	 * Total number of lanes in the surface.
-	 *
-	 * @default 6
+	 * Target lane count, used as a cap. Defaults to six when neither
+	 * `columns` nor `minColumnWidth` is set; with `minColumnWidth` set
+	 * it can resolve lower on narrow containers.
 	 */
-	columns: number;
+	columns?: number;
 
-	minColumnWidth?: never;
-}
-
-interface ResponsiveDashboardLanesProps extends BaseDashboardLanesProps {
 	/**
-	 * Minimum width in pixels per lane. Enables responsive mode: the
-	 * lane count is derived from container width, down to 1.
+	 * Per-tile minimum width in pixels. Enables responsive mode: the
+	 * lane count derives from container width, floored by this value,
+	 * down to 1.
 	 */
 	minColumnWidth?: number;
 
-	columns?: never;
+	/**
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
+	 */
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }
-
-export type DashboardLanesProps =
-	| FixedDashboardLanesProps
-	| ResponsiveDashboardLanesProps;

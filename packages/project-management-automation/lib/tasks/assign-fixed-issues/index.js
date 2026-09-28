@@ -1,10 +1,7 @@
-/**
- * Internal dependencies
- */
-const debug = require( '../../debug' );
+import debug from '../../debug.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
+/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-pull-request-opened']} WebhookPayloadPullRequest */
 
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
@@ -47,4 +44,4 @@ async function assignFixedIssues( payload, octokit ) {
 	}
 }
 
-module.exports = assignFixedIssues;
+export default assignFixedIssues;

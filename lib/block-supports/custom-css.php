@@ -8,6 +8,8 @@
 /**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
+ * @since 7.0.0
+ *
  * @param array $parsed_block The parsed block.
  * @return array The same parsed block with custom CSS class name added if appropriate.
  *
@@ -47,20 +49,30 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		? "$existing_class_name $class_name"
 		: $class_name;
 
-	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+	$parsed_block['attrs']['className'] = $updated_class_name;
 
 	// Process the custom CSS using the same method as global styles.
 	$selector      = '.' . $class_name;
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/*
-		 * Register and add inline style for block custom CSS.
-		 * The style depends on global-styles to ensure custom CSS loads after
-		 * and can override global styles.
+		/**
+		 * Reuse one handle so identical custom CSS is enqueued only once via
+		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
+		 * dependency so `global-styles` is guaranteed to print after it, preventing
+		 * block default styles from unintentionally overriding global styles.
 		 */
-		wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
-		wp_add_inline_style( 'wp-block-custom-css', $processed_css );
+		$handle = 'wp-block-custom-css';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
+		}
+		$after_styles = wp_styles()->get_data( $handle, 'after' );
+		if ( ! is_array( $after_styles ) ) {
+			$after_styles = array();
+		}
+		if ( ! in_array( $processed_css, $after_styles, true ) ) {
+			wp_add_inline_style( $handle, $processed_css );
+		}
 	}
 
 	return $parsed_block;
@@ -68,6 +80,8 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 /**
  * Enqueues the block custom CSS styles.
+ *
+ * @since 7.0.0
  */
 function gutenberg_enqueue_block_custom_css() {
 	wp_enqueue_style( 'wp-block-custom-css' );
@@ -79,9 +93,11 @@ function gutenberg_enqueue_block_custom_css() {
  * The class name is generated in {@see gutenberg_render_custom_css_support_styles()}
  * and stored in block attributes. This filter adds it to the actual markup.
  *
+ * @since 7.0.0
+ *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
- * @return string               Filtered block content.
+ * @return string Filtered block content.
  *
  * @phpstan-param array{
  *     attrs: array{
@@ -92,32 +108,31 @@ function gutenberg_enqueue_block_custom_css() {
  * } $block
  */
 function gutenberg_render_custom_css_class_name( $block_content, $block ) {
-	$class_name_attr = $block['attrs']['className'] ?? null;
-
-	if ( ! is_string( $class_name_attr ) || ! str_contains( $class_name_attr, 'wp-custom-css-' ) ) {
+	$class_name_attr   = $block['attrs']['className'] ?? null;
+	$class_name_prefix = 'wp-custom-css-';
+	if ( ! is_string( $class_name_attr ) || ! str_contains( $class_name_attr, $class_name_prefix ) ) {
 		return $block_content;
 	}
 
 	// Parse out the 'wp-custom-css-*' class name added by gutenberg_render_custom_css_support_styles().
-	$custom_class_name = null;
-	$token_delimiter   = " \t\f\r\n";
-	$class_token       = strtok( $class_name_attr, $token_delimiter );
+	$matched_class_name = null;
+	$token_delimiter    = " \t\f\r\n";
+	$class_token        = strtok( $class_name_attr, $token_delimiter );
 	while ( false !== $class_token ) {
-		if ( str_starts_with( $class_token, 'wp-custom-css-' ) ) {
-			$custom_class_name = $class_token;
+		if ( str_starts_with( $class_token, $class_name_prefix ) ) {
+			$matched_class_name = $class_token;
 			break;
 		}
 		$class_token = strtok( $token_delimiter );
 	}
-	if ( null === $custom_class_name ) {
+	if ( null === $matched_class_name ) {
 		return $block_content;
 	}
 
 	$tags = new WP_HTML_Tag_Processor( $block_content );
-
 	if ( $tags->next_tag() ) {
 		$tags->add_class( 'has-custom-css' );
-		$tags->add_class( $custom_class_name );
+		$tags->add_class( $matched_class_name );
 	}
 
 	return $tags->get_updated_html();
@@ -141,6 +156,8 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_custom_css', 1 );
 
 /**
  * Registers the style block attribute for block types that support it.
+ *
+ * @since 7.0.0
  *
  * @param WP_Block_Type $block_type Block Type.
  */
@@ -170,6 +187,8 @@ function gutenberg_register_custom_css_support( $block_type ) {
  * Uses WP_Block_Parser::next_token() to scan block tokens and surgically
  * replace only the attribute JSON that changed — no parse_blocks() +
  * serialize_blocks() round-trip needed.
+ *
+ * @since 7.0.0
  *
  * @param string $content Post content to filter, expected to be escaped with slashes.
  * @return string Filtered post content with block custom CSS removed.
@@ -251,6 +270,8 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 
 /**
  * Adds the filters to strip custom CSS from block content on save.
+ *
+ * @since 7.0.0
  * @access private
  */
 function gutenberg_custom_css_kses_init_filters() {
@@ -260,6 +281,8 @@ function gutenberg_custom_css_kses_init_filters() {
 
 /**
  * Removes the filters that strip custom CSS from block content on save.
+ *
+ * @since 7.0.0
  * @access private
  */
 function gutenberg_custom_css_remove_filters() {
@@ -269,6 +292,8 @@ function gutenberg_custom_css_remove_filters() {
 
 /**
  * Registers the custom CSS content filters if the user does not have the edit_css capability.
+ *
+ * @since 7.0.0
  * @access private
  */
 function gutenberg_custom_css_kses_init() {
@@ -284,6 +309,8 @@ function gutenberg_custom_css_kses_init() {
  * This filter is the last being executed on force_filtered_html_on_import.
  * If the input of the filter is true it means we are in an import situation and should
  * enable the custom CSS filters, independently of the user capabilities.
+ *
+ * @since 7.0.0
  * @access private
  *
  * @param mixed $arg Input argument of the filter.
