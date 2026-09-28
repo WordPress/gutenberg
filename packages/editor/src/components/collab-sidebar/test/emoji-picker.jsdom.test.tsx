@@ -3,7 +3,6 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { speak } from '@wordpress/a11y';
 import { dispatch } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -17,17 +16,6 @@ import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
 import type { EmojibaseEntry } from '../emojibase-data';
 
 globalThis.wpVitest.mockMatchMedia();
-
-vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => {
-	const original = await importOriginal();
-
-	return {
-		...original,
-		speak: vi.fn(),
-	} as unknown as typeof original;
-} );
-
-const mockSpeak = vi.mocked( speak );
 
 describe( 'resolveEmojibaseLocale', () => {
 	it( 'falls back to English for empty/invalid input', () => {
@@ -263,7 +251,6 @@ describe( 'EmojiPicker search announcements', () => {
 	const originalFetch = global.fetch;
 
 	beforeEach( () => {
-		mockSpeak.mockClear();
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
@@ -380,7 +367,7 @@ describe( 'EmojiPicker search announcements', () => {
 		expect( onSelect ).toHaveBeenCalledWith( '😁' );
 	} );
 
-	it( 'announces result counts and the empty state as the query settles', async () => {
+	it( 'reports result counts and the empty state through the Autocomplete status', async () => {
 		const user = userEvent.setup();
 		render( <EmojiPicker onSelect={ () => {} } /> );
 
@@ -392,26 +379,25 @@ describe( 'EmojiPicker search announcements', () => {
 		} );
 
 		await user.type( searchbox, 'face' );
-		// The announcement is debounced, so it fires once the typing
-		// settles rather than per keystroke.
-		await waitFor( () =>
-			expect( mockSpeak ).toHaveBeenCalledWith( '2 emojis found.' )
+		expect( await screen.findByText( '2 emojis found.' ) ).toHaveAttribute(
+			'data-visually-hidden'
 		);
 
 		await user.clear( searchbox );
 		await user.type( searchbox, 'grinning' );
-		await waitFor( () =>
-			expect( mockSpeak ).toHaveBeenCalledWith( '1 emoji found.' )
-		);
+		expect(
+			await screen.findByText( '1 emoji found.' )
+		).toBeInTheDocument();
 
 		await user.clear( searchbox );
 		await user.type( searchbox, 'zzz' );
-		await waitFor( () =>
-			expect( mockSpeak ).toHaveBeenCalledWith( 'No emoji found.' )
-		);
+		expect( await screen.findByText( 'No emoji found.' ) ).toBeVisible();
+		expect( screen.queryAllByRole( 'gridcell' ) ).toHaveLength( 0 );
+		// The grid stays mounted while empty, as the Autocomplete expects.
+		expect( screen.getByRole( 'grid', { name: 'Emoji' } ) ).toBeVisible();
 	} );
 
-	it( 'drops a queued count when the query is cleared', async () => {
+	it( 'clears the count when the query is cleared', async () => {
 		const user = userEvent.setup();
 		render( <EmojiPicker onSelect={ () => {} } /> );
 
@@ -424,10 +410,8 @@ describe( 'EmojiPicker search announcements', () => {
 		await user.type( searchbox, 'grinning' );
 		await user.clear( searchbox );
 
-		// Well past the 500ms debounce window: clearing restored the full
-		// grid, so the count queued for "grinning" no longer describes it.
-		await new Promise( ( resolve ) => setTimeout( resolve, 800 ) );
-		expect( mockSpeak ).not.toHaveBeenCalledWith( '1 emoji found.' );
+		// Clearing restores the full grid, so no count describes it.
+		expect( screen.queryByText( /found/ ) ).not.toBeInTheDocument();
 	} );
 } );
 

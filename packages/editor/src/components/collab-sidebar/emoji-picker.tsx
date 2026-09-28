@@ -1,11 +1,16 @@
+import type { ReactNode } from 'react';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Autocomplete, Icon, Input, InputLayout } from '@wordpress/ui';
+import {
+	Autocomplete,
+	Icon,
+	Input,
+	InputLayout,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { search } from '@wordpress/icons';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { speak } from '@wordpress/a11y';
-import { useDebounce } from '@wordpress/compose';
 import {
 	detectLocale,
 	getOverrideLabel,
@@ -23,6 +28,28 @@ import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 interface EmojiGroup {
 	key: number;
 	emojis: EmojibaseEntry[];
+}
+
+/**
+ * One grid cell, as handed to `Autocomplete.Root` through `items`.
+ */
+interface EmojiOption {
+	// Unique per section, since an emoji can appear in "Frequently used" too.
+	key: string;
+	// The emoji character, with the user's skin tone applied.
+	value: string;
+	label: string;
+	// Normalized hexcode of the base record, used for usage tracking.
+	hexKey: string;
+}
+
+/**
+ * A category section of the grid while browsing.
+ */
+interface EmojiOptionGroup {
+	key: string;
+	label: string;
+	items: EmojiOption[];
 }
 
 interface EmojiPickerProps {
@@ -118,11 +145,11 @@ export function groupEmojis( data: EmojibaseEntry[] ): EmojiGroup[] {
  * keeps a stable column count even as the visible list shrinks during
  * search.
  *
- * @param emojis Emoji records.
+ * @param emojis Emoji records or options.
  * @return Rows of up to `COLUMNS` emoji each.
  */
-export function chunkRows( emojis: EmojibaseEntry[] ): EmojibaseEntry[][] {
-	const rows: EmojibaseEntry[][] = [];
+export function chunkRows< T >( emojis: T[] ): T[][] {
+	const rows: T[][] = [];
 	for ( let i = 0; i < emojis.length; i += COLUMNS ) {
 		rows.push( emojis.slice( i, i + COLUMNS ) );
 	}
@@ -185,7 +212,6 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const [ locale ] = useState( detectLocale );
 	const { data, isLoading, error } = useEmojibaseData( baseUrl, locale );
 	const [ query, setQuery ] = useState( '' );
-	const viewportRef = useRef< HTMLDivElement >( null );
 	const searchRef = useRef< HTMLInputElement >( null );
 
 	const { frequentKeys, recordUse } = useFrequentEmojis();
@@ -207,64 +233,9 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		searchRef.current?.focus();
 	}, [] );
 
-	/**
-	 * Resolve an emoji's label, preferring the server-supplied override
-	 * over the Emojibase one.
-	 *
-	 * @param entry Emojibase emoji record.
-	 * @return The label to render and use as the accessible name.
-	 */
-	const labelFor = ( entry: EmojibaseEntry ): string =>
-		getOverrideLabel( labelOverrides, entry.hexcode ) || entry.label || '';
-
 	const groups = useMemo(
 		() => ( data ? groupEmojis( data ) : [] ),
 		[ data ]
-	);
-
-	const visibleGroups = useMemo( () => {
-		if ( ! groups.length ) {
-			return [];
-		}
-		if ( ! query.trim() ) {
-			return groups.map( ( g ) => ( {
-				...g,
-				rows: chunkRows( g.emojis ),
-			} ) );
-		}
-		return groups
-			.map( ( g ) => {
-				const filtered = searchEmojis(
-					g.emojis,
-					query,
-					labelOverrides
-				);
-				return {
-					...g,
-					emojis: filtered,
-					rows: chunkRows( filtered ),
-				};
-			} )
-			.filter( ( g ) => g.emojis.length > 0 );
-	}, [ groups, query, labelOverrides ] );
-
-	const matchCount = useMemo(
-		() => visibleGroups.reduce( ( n, g ) => n + g.emojis.length, 0 ),
-		[ visibleGroups ]
-	);
-
-	const isSearching = !! query.trim();
-
-	/*
-	 * One flat grid of results, as in the macOS picker: per-category
-	 * sections would scatter a few hits under mostly-empty headers.
-	 */
-	const searchRows = useMemo(
-		() =>
-			isSearching
-				? chunkRows( visibleGroups.flatMap( ( g ) => g.emojis ) )
-				: [],
-		[ isSearching, visibleGroups ]
 	);
 
 	// Resolves stored frequently-used hex keys back to full records.
@@ -278,30 +249,110 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		return map;
 	}, [ data ] );
 
-	// Hidden during search, where it would duplicate the category hits.
-	const frequentRows = useMemo( () => {
-		if ( query.trim() ) {
-			return [];
-		}
-		return chunkRows(
-			frequentKeys
-				.map( ( key ) => recordByHexKey.get( key ) )
-				.filter( ( entry ): entry is EmojibaseEntry =>
-					Boolean( entry )
-				)
-		);
-	}, [ frequentKeys, recordByHexKey, query ] );
+	const isSearching = !! query.trim();
 
 	/*
-	 * Announced via the `@wordpress/a11y` announcer, whose live regions
-	 * already exist: a live region mounted together with its content is
-	 * not reliably announced. Hence no live-region roles below either.
+	 * The items handed to `Autocomplete.Root`: category groups while
+	 * browsing, a flat list while searching. Filtering stays ours
+	 * (`filter={ null }`), since it matches label overrides and Emojibase
+	 * tags, so these are already the visible results.
 	 */
-	useEffect( () => {
-		if ( isLoading ) {
-			speak( __( 'Loading…' ) );
+	const items = useMemo( (): EmojiOptionGroup[] | EmojiOption[] => {
+		const toOption = (
+			entry: EmojibaseEntry,
+			prefix: string
+		): EmojiOption => {
+			/*
+			 * The variant is shown and selected; the base record still
+			 * drives search, usage, and the grid key.
+			 */
+			const display = applySkinTone( entry, skinTone );
+			return {
+				key: `${ prefix }-${ entry.hexcode }`,
+				value: display.emoji,
+				label:
+					getOverrideLabel( labelOverrides, display.hexcode ) ||
+					display.label ||
+					'',
+				hexKey: normalizeHexcode( entry.hexcode ),
+			};
+		};
+
+		if ( isSearching ) {
+			/*
+			 * One flat grid of results, as in the macOS picker:
+			 * per-category sections would scatter a few hits under
+			 * mostly-empty headers.
+			 */
+			return groups
+				.flatMap( ( group ) =>
+					searchEmojis( group.emojis, query, labelOverrides )
+				)
+				.map( ( entry ) => toOption( entry, 'search' ) );
 		}
-	}, [ isLoading ] );
+
+		// Hidden during search, where it would duplicate the category hits.
+		const frequent = frequentKeys
+			.map( ( key ) => recordByHexKey.get( key ) )
+			.filter( ( entry ): entry is EmojibaseEntry => Boolean( entry ) );
+
+		return [
+			{
+				key: 'frequent',
+				label: __( 'Frequently used' ),
+				items: frequent.map( ( entry ) =>
+					toOption( entry, 'frequent' )
+				),
+			},
+			...groups.map( ( group ) => ( {
+				key: String( group.key ),
+				label: getGroupLabel( group.key ),
+				items: group.emojis.map( ( entry ) =>
+					toOption( entry, String( group.key ) )
+				),
+			} ) ),
+		].filter( ( group ) => group.items.length > 0 );
+	}, [
+		groups,
+		isSearching,
+		query,
+		labelOverrides,
+		frequentKeys,
+		recordByHexKey,
+		skinTone,
+	] );
+
+	const matchCount = isSearching ? items.length : 0;
+
+	/**
+	 * Render grid rows of emoji cells, recording usage on selection.
+	 *
+	 * @param options Emoji options to lay out.
+	 * @return The rendered rows.
+	 */
+	const renderRows = ( options: EmojiOption[] ) =>
+		chunkRows( options ).map( ( row, rowIndex ) => (
+			<Autocomplete.Row
+				key={ rowIndex }
+				className="editor-collab-sidebar-panel__picker-row"
+			>
+				{ row.map( ( option ) => (
+					<Autocomplete.Item
+						key={ option.key }
+						value={ option }
+						className="editor-collab-sidebar-panel__picker-emoji"
+						aria-label={ option.label }
+						// Enter on the highlighted cell clicks it too.
+						onClick={ () => {
+							recordUse( option.hexKey );
+							onSelect( option.value );
+						} }
+					>
+						{ option.value }
+					</Autocomplete.Item>
+				) ) }
+			</Autocomplete.Row>
+		) );
 
 	// The parent swaps in the curated picker so reacting keeps working.
 	useEffect( () => {
@@ -310,78 +361,26 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		}
 	}, [ error, onError ] );
 
-	/*
-	 * Debounced, as in the block inserter, so fast typing announces the
-	 * settled result rather than every intermediate count.
-	 */
-	const debouncedSpeak = useDebounce( speak, 500 );
-	useEffect( () => {
-		if ( ! query.trim() || isLoading ) {
-			/*
-			 * Drop a count queued from the previous query: clearing the
-			 * field restores the full grid, so it no longer applies.
-			 */
-			debouncedSpeak.cancel();
-			return;
-		}
-		const message = matchCount
-			? sprintf(
-					/* translators: %d: number of emojis matching the search. */
-					_n( '%d emoji found.', '%d emojis found.', matchCount ),
-					matchCount
-				)
-			: __( 'No emoji found.' );
-		debouncedSpeak( message );
-	}, [ query, matchCount, isLoading, debouncedSpeak ] );
-
-	// Show the top match rather than a stale scroll offset.
-	useEffect( () => {
-		if ( viewportRef.current ) {
-			viewportRef.current.scrollTop = 0;
-		}
-	}, [ query ] );
-
 	if ( ! baseUrl ) {
 		return null;
 	}
 
-	/**
-	 * Render one grid row, applying the user's skin tone preference and
-	 * recording usage on selection.
-	 *
-	 * @param row    Emoji records for the row.
-	 * @param rowKey React key for the row.
-	 * @return The rendered row.
-	 */
-	const renderRow = ( row: EmojibaseEntry[], rowKey: string ) => (
-		<Autocomplete.Row
-			key={ rowKey }
-			className="editor-collab-sidebar-panel__picker-row"
-		>
-			{ row.map( ( emoji ) => {
-				/*
-				 * The variant is shown and selected; the base record
-				 * still drives search, usage, and the grid key.
-				 */
-				const display = applySkinTone( emoji, skinTone );
-				return (
-					<Autocomplete.Item
-						key={ emoji.hexcode }
-						value={ display.emoji }
-						className="editor-collab-sidebar-panel__picker-emoji"
-						aria-label={ labelFor( display ) }
-						// Enter on the highlighted cell clicks it too.
-						onClick={ () => {
-							recordUse( normalizeHexcode( emoji.hexcode ) );
-							onSelect( display.emoji );
-						} }
-					>
-						{ display.emoji }
-					</Autocomplete.Item>
-				);
-			} ) }
-		</Autocomplete.Row>
-	);
+	let status: ReactNode = null;
+	if ( isLoading ) {
+		status = __( 'Loading…' );
+	} else if ( error ) {
+		status = __( 'Couldn’t load emojis.' );
+	} else if ( isSearching && matchCount > 0 ) {
+		status = (
+			<VisuallyHidden>
+				{ sprintf(
+					/* translators: %d: number of emojis matching the search. */
+					_n( '%d emoji found.', '%d emojis found.', matchCount ),
+					matchCount
+				) }
+			</VisuallyHidden>
+		);
+	}
 
 	return (
 		<div className="editor-collab-sidebar-panel__picker">
@@ -389,23 +388,18 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 			 * An always-open inline autocomplete: focus stays in the search
 			 * field while the arrow keys move a highlight through the grid
 			 * (`aria-activedescendant`), and Enter picks the highlighted
-			 * emoji. Filtering stays ours (`mode="none"`), since it matches
-			 * label overrides and Emojibase tags.
+			 * emoji.
 			 */ }
 			<Autocomplete.Root
 				inline
 				open
 				grid
-				mode="none"
+				items={ items }
+				filter={ null }
 				// Enter picks the top hit once the user has typed.
 				autoHighlight
 				value={ query }
-				onValueChange={ ( value, { reason } ) => {
-					// Picking a cell would otherwise copy the emoji into the field.
-					if ( reason !== 'item-press' ) {
-						setQuery( value );
-					}
-				} }
+				onValueChange={ setQuery }
 			>
 				<div className="editor-collab-sidebar-panel__picker-search">
 					<Autocomplete.InputGroup className="editor-collab-sidebar-panel__picker-input">
@@ -446,69 +440,30 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 						}
 					/>
 				</div>
-				<div
-					ref={ viewportRef }
-					className="editor-collab-sidebar-panel__picker-viewport"
-				>
-					{ isLoading && (
-						<div className="editor-collab-sidebar-panel__picker-status">
-							{ __( 'Loading…' ) }
-						</div>
-					) }
-					{ error && ! isLoading && (
-						<div className="editor-collab-sidebar-panel__picker-status">
-							{ __( 'Couldn’t load emojis.' ) }
-						</div>
-					) }
-					{ ! isLoading && ! error && matchCount === 0 && (
-						<div className="editor-collab-sidebar-panel__picker-status">
-							{ __( 'No emoji found.' ) }
-						</div>
-					) }
-					{ ! isLoading && ! error && matchCount > 0 && (
-						<Autocomplete.List
-							aria-label={ _x(
-								'Emoji',
-								'emoji picker grid label'
-							) }
-							className="editor-collab-sidebar-panel__picker-list"
-						>
-							{ isSearching &&
-								searchRows.map( ( row, rowIndex ) =>
-									renderRow( row, `search-${ rowIndex }` )
-								) }
-							{ ! isSearching && frequentRows.length > 0 && (
-								<Autocomplete.Group className="editor-collab-sidebar-panel__picker-group">
-									<Autocomplete.GroupLabel className="editor-collab-sidebar-panel__picker-category">
-										{ __( 'Frequently used' ) }
-									</Autocomplete.GroupLabel>
-									{ frequentRows.map( ( row, rowIndex ) =>
-										renderRow(
-											row,
-											`frequent-${ rowIndex }`
-										)
-									) }
-								</Autocomplete.Group>
-							) }
-							{ ! isSearching &&
-								visibleGroups.map( ( group ) => (
+				<div className="editor-collab-sidebar-panel__picker-viewport">
+					<Autocomplete.Status>{ status }</Autocomplete.Status>
+					<Autocomplete.Empty>
+						{ isLoading || error ? null : __( 'No emoji found.' ) }
+					</Autocomplete.Empty>
+					<Autocomplete.List
+						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
+						className="editor-collab-sidebar-panel__picker-list"
+					>
+						{ isSearching
+							? renderRows( items as EmojiOption[] )
+							: ( group: EmojiOptionGroup ) => (
 									<Autocomplete.Group
 										key={ group.key }
+										items={ group.items }
 										className="editor-collab-sidebar-panel__picker-group"
 									>
 										<Autocomplete.GroupLabel className="editor-collab-sidebar-panel__picker-category">
-											{ getGroupLabel( group.key ) }
+											{ group.label }
 										</Autocomplete.GroupLabel>
-										{ group.rows.map( ( row, rowIndex ) =>
-											renderRow(
-												row,
-												`${ group.key }-${ rowIndex }`
-											)
-										) }
+										{ renderRows( group.items ) }
 									</Autocomplete.Group>
-								) ) }
-						</Autocomplete.List>
-					) }
+								) }
+					</Autocomplete.List>
 				</div>
 			</Autocomplete.Root>
 		</div>
