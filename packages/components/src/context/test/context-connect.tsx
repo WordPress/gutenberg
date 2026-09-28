@@ -4,6 +4,7 @@ import { contextConnect, contextConnectWithoutRef } from '../context-connect';
 import type { WordPressComponentProps } from '../wordpress-component';
 
 // Static TypeScript tests
+/* eslint-disable vitest/expect-expect -- TypeScript checks these cases during typecheck. */
 describe( 'ref forwarding', () => {
 	const ComponentWithRef = (
 		props: WordPressComponentProps< {}, 'div' >,
@@ -47,3 +48,4 @@ describe( 'ref forwarding', () => {
 		<NoRef foo={ null } />;
 	} );
 } );
+/* eslint-enable vitest/expect-expect */

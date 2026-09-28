@@ -3,7 +3,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Spinner,
@@ -275,7 +275,7 @@ export default function BreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
@@ -285,7 +285,7 @@ export default function BreadcrumbEdit( {
 						'If this Breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
 					) }
 				/>
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ __( 'Prefer taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>

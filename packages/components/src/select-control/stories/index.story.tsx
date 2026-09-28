@@ -5,7 +5,7 @@ import SelectControl from '../';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Components/Selection & Input/Common/SelectControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/SelectControl',
 	id: 'components-selectcontrol',
 	component: SelectControl,
 	argTypes: {

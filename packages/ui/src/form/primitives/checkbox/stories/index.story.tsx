@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox } from '../';
 
 const meta: Meta< typeof Checkbox > = {
-	title: 'Design System/Components/Form/Primitives/Checkbox',
+	title: 'Components/@wordpress-ui/Form/Primitives/Checkbox',
+	id: 'design-system-components-form-primitives-checkbox',
 	component: Checkbox,
 	parameters: {
 		componentStatus: {
