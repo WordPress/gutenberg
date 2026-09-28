@@ -108,7 +108,8 @@ function ParagraphBlock( {
 	isSelected: isSingleSelected,
 	name,
 } ) {
-	const { content, direction, dropCap, placeholder, style } = attributes;
+	const { allowedFormats, content, direction, dropCap, placeholder, style } =
+		attributes;
 	const textAlign = style?.typography?.textAlign;
 	useDeprecatedAlign( attributes.align, style, setAttributes );
 	const blockProps = useBlockProps( {
@@ -149,6 +150,7 @@ function ParagraphBlock( {
 				identifier="content"
 				tagName="p"
 				{ ...blockProps }
+				allowedFormats={ allowedFormats }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
