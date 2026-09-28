@@ -628,4 +628,40 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 		return $translation;
 	}
+
+	public function test_widget_type_presence_defaults_to_offer() {
+		$type = new WP_Widget_Type( 'core/test-widget' );
+		$this->assertSame( 'offer', $type->presence );
+	}
+
+	public function test_widget_type_accepts_auto_presence() {
+		$type = new WP_Widget_Type( 'core/test-widget', array( 'presence' => 'auto' ) );
+		$this->assertSame( 'auto', $type->presence );
+	}
+
+	public function test_widget_type_normalizes_invalid_presence() {
+		$type = new WP_Widget_Type( 'core/test-widget', array( 'presence' => 'invalid-value' ) );
+		$this->assertSame( 'offer', $type->presence );
+	}
+
+	public function test_registry_records_provenance_and_defaults() {
+		$registry = WP_Widget_Type_Registry::get_instance();
+
+		$core_type = $registry->register( 'core/my-widget' );
+		$this->assertSame( 'core', $core_type->provenance );
+		$this->assertSame( 'offer', $core_type->presence );
+
+		$custom_type = $registry->register(
+			'custom-plugin/my-widget',
+			array(
+				'provenance' => 'Custom Plugin Name',
+				'presence'   => 'auto',
+			)
+		);
+		$this->assertSame( 'Custom Plugin Name', $custom_type->provenance );
+		$this->assertSame( 'auto', $custom_type->presence );
+
+		$inferred_type = $registry->register( 'other-plugin/another-widget' );
+		$this->assertSame( 'other-plugin', $inferred_type->provenance );
+	}
 }

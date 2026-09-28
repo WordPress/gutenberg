@@ -195,6 +195,14 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['presentation'] = $widget_type->presentation;
 			}
 
+			if ( rest_is_field_included( 'presence', $fields ) ) {
+				$data['presence'] = $widget_type->presence;
+			}
+
+			if ( rest_is_field_included( 'provenance', $fields ) ) {
+				$data['provenance'] = $widget_type->provenance;
+			}
+
 			if ( rest_is_field_included( 'category', $fields ) ) {
 				$data['category'] = $widget_type->category;
 			}
@@ -274,6 +282,21 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'presence'      => array(
+						'description' => __( 'How the widget wants to appear when first discovered on a user dashboard.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'enum'        => array_merge( WP_Widget_Type::PRESENCE_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'provenance'    => array(
+						'description' => __( 'Identifier or name of the plugin or source that registered the widget type.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

@@ -195,6 +195,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 			$data['attributes']
 		);
 		$this->assertSame( array( 'alpha', 'first' ), $data['keywords'] );
+		$this->assertSame( 'offer', $data['presence'] );
+		$this->assertSame( 'test-plugin', $data['provenance'] );
 	}
 
 	public function test_get_item_returns_404_for_unknown_name() {
@@ -240,6 +242,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'render_module', $properties );
 		$this->assertArrayHasKey( 'widget_module', $properties );
+		$this->assertArrayHasKey( 'presence', $properties );
+		$this->assertArrayHasKey( 'provenance', $properties );
 		$this->assertArrayHasKey( 'category', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'description', $properties );

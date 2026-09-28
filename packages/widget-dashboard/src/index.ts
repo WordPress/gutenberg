@@ -14,3 +14,4 @@ export {
 	ROW_HEIGHT_PRESETS,
 	DEFAULT_ROW_HEIGHT,
 } from './utils/row-height-presets';
+export { createDashboardWidget } from './utils/create-dashboard-widget';

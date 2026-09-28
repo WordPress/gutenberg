@@ -242,6 +242,21 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
+	 * How the widget wants to appear when first discovered on a
+	 * user's dashboard.
+	 *
+	 * - `'offer'` (default when absent): offered via an announcement notice.
+	 * - `'auto'`: automatically inserted into the layout and announced.
+	 */
+	presence?: 'offer' | 'auto';
+
+	/**
+	 * Provenance of the widget type: name or identifier of the plugin or
+	 * source that registered it.
+	 */
+	provenance?: string;
+
+	/**
 	 * Alternative terms used to match the widget type when searching,
 	 * e.g. `calendar` for an events widget. Translatable.
 	 */
@@ -294,9 +309,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
  * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
  * resolves them into this camelCase shape.
  */
-export interface WidgetType<
-	Item = unknown,
-> extends WidgetTypeMetadata< Item > {
+export interface WidgetType< Item = unknown >
+	extends WidgetTypeMetadata< Item > {
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time, produced from the conventional `render.*` entry point.
@@ -345,17 +359,17 @@ export type ResolveWidgetModule = (
  * stands.
  */
 type WidgetModuleRecordOverrides = {
-	[
-		K in keyof Pick<
-			WidgetTypeMetadata,
-			| 'title'
-			| 'description'
-			| 'help'
-			| 'category'
-			| 'presentation'
-			| 'keywords'
-		>
-	]?: WidgetTypeMetadata[ K ] | null;
+	[ K in keyof Pick<
+		WidgetTypeMetadata,
+		| 'title'
+		| 'description'
+		| 'help'
+		| 'category'
+		| 'presentation'
+		| 'presence'
+		| 'provenance'
+		| 'keywords'
+	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
 /**
