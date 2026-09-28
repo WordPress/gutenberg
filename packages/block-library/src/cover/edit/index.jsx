@@ -23,6 +23,7 @@ import {
 	__experimentalUseGradient,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	useSettings,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -479,6 +480,7 @@ function CoverEdit( {
 	const hasNonContentControls = blockEditingMode === 'default';
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
+	const [ isMinHeightEnabled ] = useSettings( 'dimensions.minHeight' );
 	const minHeight = style?.dimensions?.minHeight;
 	const resizableBoxDimensions = useMemo( () => {
 		const [ quantity, unit ] = parseQuantityAndUnitFromRawValue(
@@ -750,7 +752,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ hasNonContentControls && isSelected && (
+				{ hasNonContentControls && isSelected && isMinHeightEnabled && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
@@ -901,7 +903,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ hasNonContentControls && isSelected && (
+			{ hasNonContentControls && isSelected && isMinHeightEnabled && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>

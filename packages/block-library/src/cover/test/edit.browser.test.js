@@ -168,7 +168,7 @@ describe( 'Cover block', () => {
 			);
 		} );
 
-		test( 'full height toggle is hidden when the theme opts out of minimum height', async () => {
+		test( 'full height toggle and resize handle are hidden when the theme opts out of minimum height', async () => {
 			const settings = {
 				...defaultSettings,
 				__experimentalFeatures: {
@@ -191,6 +191,12 @@ describe( 'Cover block', () => {
 
 			expect(
 				screen.queryByLabelText( 'Full height' )
+			).not.toBeInTheDocument();
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				document.querySelector(
+					'.block-library-cover__resize-container'
+				)
 			).not.toBeInTheDocument();
 		} );
 
