@@ -19,3 +19,7 @@ export { useEnableLinkStatusValidation } from './use-enable-link-status-validati
 export { useIsDraggingWithin } from './use-is-dragging-within';
 export { selectLabelText } from './select-label-text';
 export { useLinkPreview } from './use-link-preview';
+export {
+	BLOCK_SUGGESTION_TYPE,
+	useBlockSuggestions,
+} from './use-block-suggestions';

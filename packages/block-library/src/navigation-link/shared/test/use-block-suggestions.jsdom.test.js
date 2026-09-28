@@ -3,7 +3,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 import {
 	addBlockSuggestions,
 	BLOCK_SUGGESTION_TYPE,
-} from '../block-suggestions';
+} from '../use-block-suggestions';
 
 const homeLink = {
 	id: 'core/home-link',
