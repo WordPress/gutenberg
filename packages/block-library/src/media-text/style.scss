@@ -53,6 +53,8 @@
 	grid-row: 1;
 	/*rtl:end:ignore*/
 	padding: 0 8% 0 8%;
+	// Multicol has no effect on a grid container, so hand the wrapper's computed column-count down to the text column.
+	column-count: inherit;
 	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
