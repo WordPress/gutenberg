@@ -468,11 +468,15 @@ button.wp-block-navigation-item__content {
  * Justifications.
  */
 
-// When justified space-between, open submenus leftward for last menu item.
+// When using distributed justification, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
 .wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-space-around .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-around > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-space-evenly .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-evenly > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
 .wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
 	// First submenu.

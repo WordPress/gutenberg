@@ -1,8 +1,10 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .wp-block-navigation {
-	// space-between justification.
-	&.items-justified-space-between {
+	// Distributed justification.
+	&.items-justified-space-between,
+	&.items-justified-space-around,
+	&.items-justified-space-evenly {
 		.wp-block-page-list > div,
 		.wp-block-page-list {
 			display: contents;

@@ -39,23 +39,6 @@
 	}
 }
 
-.block-editor-hooks__flex-layout-justification-controls {
-	display: grid;
-	gap: $grid-unit-10;
-
-	.block-editor-hooks__flex-layout-justification-trigger {
-		width: 100%;
-	}
-
-	.block-editor-hooks__flex-layout-justification-label {
-		flex: 1;
-		min-width: 0;
-		overflow: hidden;
-		text-align: start;
-		text-overflow: ellipsis;
-	}
-}
-
 .block-editor-hooks__grid-layout-columns-and-rows-controls,
 .block-editor-hooks__grid-layout-minimum-width-control {
 	// Reset `fieldset` browser defaults.

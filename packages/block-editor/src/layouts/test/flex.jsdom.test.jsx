@@ -92,7 +92,7 @@ describe( 'FlexLayoutInspectorControls', () => {
 		renderInspectorControls();
 
 		await user.click(
-			await screen.findByRole( 'button', { name: 'Left' } )
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
 		);
 
 		for ( const description of [
@@ -107,9 +107,26 @@ describe( 'FlexLayoutInspectorControls', () => {
 		}
 	} );
 
+	it( 'should update the justification from the select control', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		renderInspectorControls( { onChange } );
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Space around' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			justifyContent: 'space-around',
+		} );
+	} );
+
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
-		await screen.findByRole( 'button', { name: 'Left' } );
+		await screen.findByRole( 'combobox', { name: 'Justification' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {

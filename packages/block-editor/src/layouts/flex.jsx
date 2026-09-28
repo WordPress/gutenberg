@@ -1,14 +1,6 @@
 import { __, _x } from '@wordpress/i18n';
 import {
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-	justifySpaceBetween,
-	justifySpaceAround,
-	justifySpaceEvenly,
-	justifyStretch,
 	justifyTop,
-	chevronDown,
 	justifyCenterVertical,
 	justifyBottom,
 	justifyStretchVertical,
@@ -17,15 +9,13 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	Button,
 	Flex,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Menu is being adopted early for the layout control design.
-import { Field, Menu } from '@wordpress/ui';
+import { SelectControl } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -522,19 +512,16 @@ function FlexLayoutJustifyContentControl( {
 	const justificationOptions = [
 		{
 			value: 'left',
-			icon: justifyLeft,
 			label: _x( 'Left', 'Flex layout justification option' ),
 			description: __( 'Space after the items.' ),
 		},
 		{
 			value: 'center',
-			icon: justifyCenter,
 			label: _x( 'Center', 'Flex layout justification option' ),
 			description: __( 'Space on both sides.' ),
 		},
 		{
 			value: 'right',
-			icon: justifyRight,
 			label: _x( 'Right', 'Flex layout justification option' ),
 			description: __( 'Space before the items.' ),
 		},
@@ -543,19 +530,16 @@ function FlexLayoutJustifyContentControl( {
 		justificationOptions.push(
 			{
 				value: 'space-between',
-				icon: justifySpaceBetween,
 				label: __( 'Space between' ),
 				description: __( 'No space at the edges.' ),
 			},
 			{
 				value: 'space-around',
-				icon: justifySpaceAround,
 				label: __( 'Space around' ),
 				description: __( 'Half space at the edges.' ),
 			},
 			{
 				value: 'space-evenly',
-				icon: justifySpaceEvenly,
 				label: __( 'Space evenly' ),
 				description: __( 'Equal space at the edges.' ),
 			}
@@ -563,7 +547,6 @@ function FlexLayoutJustifyContentControl( {
 	} else {
 		justificationOptions.push( {
 			value: 'stretch',
-			icon: justifyStretch,
 			label: __( 'Stretch items' ),
 			description: __( 'Fill the available space.' ),
 		} );
@@ -575,52 +558,15 @@ function FlexLayoutJustifyContentControl( {
 		) ?? justificationOptions[ 0 ];
 
 	return (
-		<div className="block-editor-hooks__flex-layout-justification-controls">
-			<Field.VisualLabel>{ __( 'Justification' ) }</Field.VisualLabel>
-			<Menu.Root>
-				<Menu.Trigger
-					render={
-						<Button
-							__next40pxDefaultSize
-							className="block-editor-hooks__flex-layout-justification-trigger"
-							icon={ chevronDown }
-							iconPosition="right"
-							variant="secondary"
-						/>
-					}
-				>
-					<span className="block-editor-hooks__flex-layout-justification-label">
-						{ selectedOption.label }
-					</span>
-				</Menu.Trigger>
-				<Menu.Popup
-					positioner={
-						<Menu.Positioner side="bottom" align="start" />
-					}
-				>
-					<Menu.RadioGroup
-						aria-label={ __( 'Justification' ) }
-						value={ justifyContent }
-						onValueChange={ onJustificationChange }
-					>
-						{ justificationOptions.map(
-							( { value, icon, label, description } ) => (
-								<Menu.RadioItem
-									key={ value }
-									value={ value }
-									prefix={ <Menu.PrefixIcon icon={ icon } /> }
-								>
-									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-									<Menu.ItemDescription>
-										{ description }
-									</Menu.ItemDescription>
-								</Menu.RadioItem>
-							)
-						) }
-					</Menu.RadioGroup>
-				</Menu.Popup>
-			</Menu.Root>
-		</div>
+		<SelectControl
+			className="block-editor-hooks__flex-layout-justification-controls"
+			label={ __( 'Justification' ) }
+			items={ justificationOptions }
+			value={ selectedOption }
+			onValueChange={ ( selectedItem ) =>
+				onJustificationChange( selectedItem.value )
+			}
+		/>
 	);
 }
 
