@@ -63,14 +63,14 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"@wordpress/theme": "file:../theme",
+		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
-		"@wordpress/theme": ">=0.8.0 <3.0.0"
+		"@wordpress/theme-build-tools": "^1.0.0-prerelease"
 	},
 	"peerDependenciesMeta": {
-		"@wordpress/theme": {
+		"@wordpress/theme-build-tools": {
 			"optional": true
 		}
 	},

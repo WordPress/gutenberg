@@ -58,16 +58,17 @@ import {
 function getEsbuildTarget() {
 	return browserslistToEsbuild( getBrowserslistQueries() );
 }
-// Optional dependency: @wordpress/theme provides a plugin that injects fallback
-// values for design system tokens in JavaScript. Fails gracefully when the
-// package is not installed (it is an optional peerDependency).
+// Optional dependency: @wordpress/theme-build-tools provides a plugin that
+// injects fallback values for design system tokens in JavaScript. Fails
+// gracefully when the package is not installed (it is an optional
+// peerDependency).
 let dsTokenFallbacksJs;
 try {
 	const { default: esbuildPlugin } =
-		await import( '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks' );
+		await import( '@wordpress/theme-build-tools/esbuild-plugins/esbuild-ds-token-fallbacks' );
 	dsTokenFallbacksJs = esbuildPlugin;
 } catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
+	// @wordpress/theme-build-tools is optional; skip token fallbacks if not available.
 }
 
 const ROOT_DIR = process.cwd();

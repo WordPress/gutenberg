@@ -4,6 +4,15 @@
 
 ### Breaking Changes
 
+-   Move the build plugins and Stylelint plugins to the new [`@wordpress/theme-build-tools`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme-build-tools/README.md) package. The `@wordpress/theme/*-plugins/*` exports are removed. Install `@wordpress/theme-build-tools` and replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in each import or Stylelint `plugins` entry; the paths after the package name are unchanged:
+    -   `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` → `@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks`
+    -   `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks` → `@wordpress/theme-build-tools/lightningcss-plugins/lightningcss-ds-token-fallbacks`
+    -   `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` → `@wordpress/theme-build-tools/esbuild-plugins/esbuild-ds-token-fallbacks`
+    -   `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` → `@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks`
+    -   `@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens` → `@wordpress/theme-build-tools/stylelint-plugins/no-unknown-ds-tokens`
+    -   `@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties` → `@wordpress/theme-build-tools/stylelint-plugins/no-setting-wpds-custom-properties`
+    -   `@wordpress/theme/stylelint-plugins/no-token-fallback-values` → `@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values`
+-   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies, which only the moved plugins used.
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features

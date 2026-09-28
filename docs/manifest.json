@@ -2808,6 +2808,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/theme-build-tools",
+		"slug": "packages-theme-build-tools",
+		"markdown_source": "../packages/theme-build-tools/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/theme",
 		"slug": "packages-theme",
 		"markdown_source": "../packages/theme/README.md",
