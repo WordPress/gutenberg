@@ -4,7 +4,7 @@ import { ESLint } from 'eslint';
 
 const rootDir = resolve( import.meta.dirname, '../..' );
 const eslint = new ESLint( { cwd: rootDir } );
-const nodeTest = 'packages/block-serialization-spec-parser/test/index.js';
+const nodeTest = 'packages/escape-html/src/test/index.ts';
 const jsdomTest =
 	'packages/components/src/form-token-field/test/index.jsdom.test.tsx';
 const browserTest =
@@ -29,6 +29,10 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 		'no-test-prefixes',
 		'expect-expect',
 		'no-conditional-expect',
+		'valid-describe-callback',
+		'valid-expect-in-promise',
+		'valid-title',
+		'require-awaited-expect-poll',
 	] ) {
 		assert.equal(
 			config.rules[ `vitest/${ rule }` ][ 0 ],
@@ -56,14 +60,33 @@ for ( const file of [ jsdomTest, browserTest ] ) {
 }
 
 const parserHelperConfig = await eslint.calculateConfigForFile( sharedHelper );
-for ( const rule of [
-	'no-conditional-expect',
-	'valid-describe-callback',
-	'valid-expect-in-promise',
-	'valid-title',
+assert.equal(
+	parserHelperConfig.rules[ 'vitest/no-conditional-expect' ][ 0 ],
+	2
+);
+
+for ( const file of [
+	'packages/block-serialization-default-parser/test/index.js',
+	'packages/block-serialization-spec-parser/test/index.js',
+	'test/unit/config/console.vitest.test.js',
+	'test/unit/config/console.vitest.jsdom.test.js',
+	'test/unit/config/console.vitest.browser.test.js',
 ] ) {
-	assert.equal( parserHelperConfig.rules[ `vitest/${ rule }` ][ 0 ], 2 );
+	const { rules } = await eslint.calculateConfigForFile( file );
+	assert.equal( rules[ 'vitest/valid-describe-callback' ][ 0 ], 0 );
 }
+const locksConfig = await eslint.calculateConfigForFile(
+	'packages/core-data/src/locks/test/engine.js'
+);
+assert.equal( locksConfig.rules[ 'vitest/valid-expect-in-promise' ][ 0 ], 0 );
+const generatedTitleConfig = await eslint.calculateConfigForFile(
+	'packages/rich-text/src/test/create.jsdom.test.js'
+);
+assert.equal( generatedTitleConfig.rules[ 'vitest/valid-title' ][ 0 ], 2 );
+assert.equal(
+	generatedTitleConfig.rules[ 'vitest/valid-title' ][ 1 ].allowArguments,
+	true
+);
 
 const legacyE2E = await eslint.calculateConfigForFile(
 	'packages/e2e-tests/plugins/media-upload-filter/index.js'
@@ -123,6 +146,77 @@ assert.deepEqual(
 		"import { test, expect } from 'vitest'; test( 'rejects conditional assertions', () => { if ( true ) { expect( true ).toBe( true ); } } );"
 	),
 	[ 'vitest/no-conditional-expect' ]
+);
+
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { describe, test, expect } from 'vitest'; describe( 'valid callback', () => { test( 'valid title', async () => { await Promise.resolve().then( () => expect( true ).toBe( true ) ); await expect.poll( () => true ).toBe( true ); } ); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { describe } from 'vitest'; describe( 'invalid callback', missingCallback );"
+	),
+	[ 'vitest/valid-describe-callback' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		'packages/block-serialization-default-parser/test/index.js',
+		"import { describe } from 'vitest'; describe( 'factory callback', makeTests() );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'floating assertion', () => { Promise.resolve().then( () => expect( true ).toBe( true ) ); } );"
+	),
+	[ 'vitest/valid-expect-in-promise' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );"
+	),
+	[ 'vitest/valid-expect-in-promise' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		'packages/core-data/src/locks/test/engine.js',
+		"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 42, () => { expect( true ).toBe( true ); } );"
+	),
+	[ 'vitest/valid-title' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		'packages/rich-text/src/test/create.jsdom.test.js',
+		"import { test, expect } from 'vitest'; test( description, () => { expect( true ).toBe( true ); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'unawaited poll', () => { expect.poll( () => true ).toBe( true ); } );"
+	),
+	[ 'vitest/require-awaited-expect-poll' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { expect } from 'vitest'; const waitFor = () => expect.element( locator ).toBeVisible();"
+	),
+	[ 'vitest/require-awaited-expect-poll' ]
 );
 
 assert.deepEqual(

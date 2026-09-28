@@ -603,11 +603,10 @@ export default dedupePlugins( [
 		],
 		rules: {
 			...config.rules,
-			// Callback factories, Promise.all/returned assertions and generated titles
-			// need compatibility checks in step 3 of the same issue.
-			'vitest/valid-describe-callback': 'off',
-			'vitest/valid-expect-in-promise': 'off',
-			'vitest/valid-title': 'off',
+			'vitest/valid-describe-callback': 'error',
+			'vitest/valid-expect-in-promise': 'error',
+			'vitest/valid-title': 'error',
+			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
 			'vitest/no-alias-methods': 'error',
@@ -641,21 +640,47 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
+	// These describe callbacks are supplied by shared test factories. The
+	// plugin only accepts an inline function as the second argument.
 	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
+		files: [
+			'packages/block-serialization-default-parser/test/index.js',
+			'packages/block-serialization-spec-parser/test/index.js',
+			'test/unit/config/console.vitest.test.js',
+			'test/unit/config/console.vitest.jsdom.test.js',
+			'test/unit/config/console.vitest.browser.test.js',
+		],
+		rules: { 'vitest/valid-describe-callback': 'off' },
+	},
+	// Each assertion in the promise chain is awaited through Promise.all.
+	// The plugin does not trace the returned array elements back to the chains.
+	{
+		files: [ 'packages/core-data/src/locks/test/engine.js' ],
+		rules: { 'vitest/valid-expect-in-promise': 'off' },
+	},
+	// Generated test names come from string-valued fixture data. Keep the
+	// rule's other checks active while allowing these identifier arguments.
+	{
+		files: [
+			'packages/editor/src/store/utils/test/notice-builder.js',
+			'packages/media-editor/src/components/media-editor-modal/test/build-modifiers.test.ts',
+			'packages/media-editor/src/image-editor/core/test/preview-export-parity.ts',
+			'packages/rich-text/src/test/is-format-equal.js',
+			'packages/rich-text/src/test/create.jsdom.test.js',
+			'packages/rich-text/src/test/to-dom.jsdom.test.js',
+			'packages/rich-text/src/test/to-html-string.jsdom.test.js',
+			'test/integration/blocks-raw-handling.jsdom.test.js',
+			'test/integration/full-content/full-content.jsdom.test.js',
+		],
 		rules: {
-			// The parser helper already passed these checks under its own Jest
-			// override. Keep that stricter baseline while suites await step 3.
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': 'error',
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 		},
 	},
 	{
 		files: [ 'test/unit/config/console.vitest.js' ],
 		rules: {
 			// aroundEach receives an awaited runTest callback. The deprecated rule
-			// mistakes it for a done callback; reassess in #83089 step 3.
+			// mistakes it for a done callback.
 			'vitest/no-done-callback': 'off',
 		},
 	},

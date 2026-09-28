@@ -6,13 +6,18 @@ import { useState } from '@wordpress/element';
 import { Menu } from '..';
 import Modal from '../../modal';
 
+// These helpers return assertion promises that their callers await.
+// The rule does not trace those returned promises.
 const waitForFocusedMenu = () =>
+	// eslint-disable-next-line vitest/require-awaited-expect-poll
 	expect.element( page.getByRole( 'menu' ) ).toHaveFocus();
 
 const waitForFocusedMenuItem = ( name: string ) =>
+	// eslint-disable-next-line vitest/require-awaited-expect-poll
 	expect.element( page.getByRole( 'menuitem', { name } ) ).toHaveFocus();
 
 const waitForClosedMenu = () =>
+	// eslint-disable-next-line vitest/require-awaited-expect-poll
 	expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
 
 const MenuWithModal = () => {
