@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
+
+## 1.23.0 (2026-09-23)
+
 ### Enhancements
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
@@ -10,6 +16,7 @@
 ### Bug Fixes
 
 -   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+-   Blocks screen: rank search results so a block whose title matches the search is listed before blocks that only match by keyword, category or description. ([#83435](https://github.com/WordPress/gutenberg/pull/83435))
 
 ### Internal
 

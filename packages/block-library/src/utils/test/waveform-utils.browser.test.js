@@ -757,24 +757,12 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'logPlayError', () => {
-		let consoleErrorSpy;
-
-		beforeEach( () => {
-			consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-		} );
-
-		afterEach( () => {
-			consoleErrorSpy.mockRestore();
-		} );
-
 		it( 'should not log AbortError', () => {
 			const abortError = new DOMException( 'Aborted', 'AbortError' );
 
 			logPlayError( abortError );
 
-			expect( consoleErrorSpy ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 		} );
 
 		it( 'should log other errors', () => {
@@ -782,7 +770,7 @@ describe( 'Waveform utilities', () => {
 
 			logPlayError( otherError );
 
-			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveErroredWith(
 				'Playlist play error:',
 				otherError
 			);
@@ -796,7 +784,7 @@ describe( 'Waveform utilities', () => {
 
 			logPlayError( notAllowedError );
 
-			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveErroredWith(
 				'Playlist play error:',
 				notAllowedError
 			);
