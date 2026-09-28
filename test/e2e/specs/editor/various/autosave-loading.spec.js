@@ -337,12 +337,14 @@ test.describe( 'Autosave loading', () => {
 			await gotoPostEditor( secondUserPage, post.id );
 			await waitForAutosaveResolution( secondUserPage, post.id );
 
-			// Unlike the administrator case above, this one is not served from
-			// the preload cache. For this user the kickoff's second phase lands
-			// after the cache is cleared, so none of the paths it carries are
-			// consumed — autosaves, the post author, the template lookup and
-			// global styles alike. That is pre-existing and not specific to
-			// autosaves; it reproduces on trunk with the other four.
+			// Served from the preload cache, as for the administrator. The
+			// author-scoped preload path only matches when it carries this
+			// user's id, so a stray network request here means it did not.
+			expect( requests ).toHaveLength( 0 );
+
+			// Ask again with the preload spent, to see the request itself.
+			await refetchAutosave( secondUserPage, post.id );
+
 			expect( requests ).toHaveLength( 1 );
 			expect( requests[ 0 ].searchParams.get( 'author' ) ).toBe(
 				String( secondUserId )
