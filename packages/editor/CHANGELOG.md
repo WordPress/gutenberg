@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+-   Post editor: Show the inline inserter in the gap between the post title and the first block ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
 ### Bug Fixes
 

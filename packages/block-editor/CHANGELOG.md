@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+-   In-between inserter: Opt-in `placeBeforeFirstBlock` places the before-first (title-gap) insertion popover above the first block so the "+" does not overlap it ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
 ### Bug Fixes
 

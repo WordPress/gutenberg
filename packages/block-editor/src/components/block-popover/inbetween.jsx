@@ -17,6 +17,10 @@ function BlockPopoverInbetween( {
 	__unstableContentRef,
 	operation = 'insert',
 	nearestSide = 'right',
+	// When true and there is no previous block, place the popover in the gap
+	// above the first block (title-gap inserter). Leave false for drag-and-drop
+	// and other index-0 indicators that expect a zero-height line.
+	placeBeforeFirstBlock = false,
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -113,6 +117,40 @@ function BlockPopoverInbetween( {
 						nextRect && previousRect
 							? ( previousRect.left + nextRect.left ) / 2
 							: ( previousRect || nextRect ).left;
+
+					// Title-gap inserter only: occupy the gap above the first
+					// block, never the block itself. A minimum height that
+					// overlaps the first block steals WebKit shift+click
+					// (e.g. nested multi-selection inside a Group).
+					if (
+						placeBeforeFirstBlock &&
+						! previousRect &&
+						nextRect &&
+						nextElement
+					) {
+						const layout = nextElement.parentElement;
+						const titleBottom =
+							layout?.previousElementSibling?.getBoundingClientRect()
+								.bottom;
+						if (
+							typeof titleBottom === 'number' &&
+							titleBottom < nextRect.top
+						) {
+							top = titleBottom;
+							height = nextRect.top - titleBottom;
+						} else {
+							const { defaultView } = nextElement.ownerDocument;
+							const marginTop = defaultView
+								? parseFloat(
+										defaultView.getComputedStyle(
+											nextElement
+										).marginTop
+									) || 0
+								: 0;
+							top = nextRect.top - marginTop;
+							height = marginTop;
+						}
+					}
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
 					height = previousRect
@@ -153,6 +191,7 @@ function BlockPopoverInbetween( {
 		isVisible,
 		operation,
 		nearestSide,
+		placeBeforeFirstBlock,
 	] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
