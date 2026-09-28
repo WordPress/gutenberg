@@ -25,6 +25,7 @@ import {
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from '../writing-flow/utils';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
@@ -330,6 +331,20 @@ function RichTextWrapper(
 		]
 	);
 
+	// Make the wrapper the editing host before the rich text hook applies the
+	// store selection in its own layout effect: the wrapper's effect runs
+	// only after this render, too late for a field that is inert by then.
+	useLayoutEffect( () => {
+		if ( ! isEditingHost || ! isSelected ) {
+			return;
+		}
+		const canvas =
+			anchorRef.current?.parentElement?.closest( '[contenteditable]' );
+		if ( canvas && canvas.contentEditable !== 'true' ) {
+			setContentEditableWrapper( canvas, true, { focus: false } );
+		}
+	}, [ isEditingHost, isSelected ] );
+
 	const {
 		value,
 		getValue,
@@ -385,11 +400,11 @@ function RichTextWrapper(
 
 		const { activeElement, body } = focusedDocument;
 		const canvas = element.parentElement?.closest( '[contenteditable]' );
-		// A field inside an editing host cannot hold focus.
-		const target = canvas?.isContentEditable ? canvas : element;
 
+		// Under an editing host, focus() on the field focuses the host and
+		// keeps the caret in the field (see focusUnderHostRef).
 		if ( activeElement === body || canvas?.contains( activeElement ) ) {
-			target.focus();
+			element.focus();
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
