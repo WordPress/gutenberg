@@ -24,6 +24,19 @@ export function getUndoManager( state: State ) {
 }
 
 /**
+ * Returns the open undo coalescing session, if any. It records the last
+ * undoable edit so that `editEntityRecord` can tell a continued run of edits
+ * from a new one.
+ *
+ * @param state State tree.
+ *
+ * @return The session, or `null` when no run is open.
+ */
+export function getUndoCoalesceSession( state: State ) {
+	return state.undoCoalesceSession;
+}
+
+/**
  * Retrieve the fallback Navigation.
  *
  * @param state Data state.

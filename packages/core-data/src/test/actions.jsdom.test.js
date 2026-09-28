@@ -71,6 +71,7 @@ describe( 'editEntityRecord', () => {
 				title: 'Original Title',
 				content: 'Original Content',
 			} ),
+			getUndoCoalesceSession: () => null,
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
 			} ),
@@ -87,6 +88,7 @@ describe( 'editEntityRecord', () => {
 			name: 'post',
 			recordId: 1,
 			edits: { title: 'New Title' },
+			coalesceSession: expect.any( Object ),
 		} );
 	} );
 
@@ -109,6 +111,7 @@ describe( 'editEntityRecord', () => {
 					editedKey: 'editedValue',
 				},
 			} ),
+			getUndoCoalesceSession: () => null,
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
 			} ),
@@ -133,6 +136,7 @@ describe( 'editEntityRecord', () => {
 					newKey: 'newValue',
 				},
 			},
+			coalesceSession: expect.any( Object ),
 		} );
 	} );
 
@@ -154,6 +158,7 @@ describe( 'editEntityRecord', () => {
 				title: 'Original Title',
 				meta: { existingKey: 'existingValue' },
 			} ),
+			getUndoCoalesceSession: () => null,
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
 			} ),
@@ -176,6 +181,7 @@ describe( 'editEntityRecord', () => {
 					newKey: 'newValue',
 				},
 			},
+			coalesceSession: expect.any( Object ),
 		} );
 	} );
 
@@ -195,6 +201,7 @@ describe( 'editEntityRecord', () => {
 				id: 1,
 				meta: { key1: 'value1' },
 			} ),
+			getUndoCoalesceSession: () => null,
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
 			} ),
@@ -214,6 +221,7 @@ describe( 'editEntityRecord', () => {
 				// meta should be undefined because merged value equals persisted record
 				meta: undefined,
 			},
+			coalesceSession: expect.any( Object ),
 		} );
 	} );
 
@@ -233,6 +241,7 @@ describe( 'editEntityRecord', () => {
 				id: 1,
 				title: 'Edited Title',
 			} ),
+			getUndoCoalesceSession: () => null,
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
 			} ),
@@ -251,6 +260,7 @@ describe( 'editEntityRecord', () => {
 			edits: {
 				title: undefined,
 			},
+			coalesceSession: expect.any( Object ),
 		} );
 	} );
 
@@ -289,6 +299,7 @@ describe( 'editEntityRecord', () => {
 						editedKey: 'editedValue',
 					},
 				} ),
+				getUndoCoalesceSession: () => null,
 				getUndoManager: () => ( {
 					addRecord: vi.fn(),
 				} ),
@@ -334,6 +345,7 @@ describe( 'editEntityRecord', () => {
 					id: 1,
 					meta: { key1: 'value1' },
 				} ),
+				getUndoCoalesceSession: () => null,
 				getUndoManager: () => ( {
 					addRecord: vi.fn(),
 				} ),
@@ -367,6 +379,7 @@ describe( 'editEntityRecord', () => {
 				edits: {
 					meta: undefined,
 				},
+				coalesceSession: expect.any( Object ),
 			} );
 		} );
 
@@ -389,6 +402,7 @@ describe( 'editEntityRecord', () => {
 					title: 'Original Title',
 					meta: { existingKey: 'existingValue' },
 				} ),
+				getUndoCoalesceSession: () => null,
 				getUndoManager: () => ( {
 					addRecord: vi.fn(),
 				} ),
@@ -432,6 +446,7 @@ describe( 'editEntityRecord', () => {
 					id: 1,
 					meta: { existingKey: 'existingValue' },
 				} ),
+				getUndoCoalesceSession: () => null,
 				getUndoManager: () => ( {
 					addRecord: vi.fn(),
 				} ),
@@ -524,6 +539,7 @@ describe( 'clearEntityRecordEdits', () => {
 				title: undefined,
 				content: undefined,
 			},
+			coalesceSession: null,
 		} );
 	} );
 } );
@@ -772,7 +788,10 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'END_UNDO_COALESCE_SESSION',
+		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -881,7 +900,10 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'END_UNDO_COALESCE_SESSION',
+		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -1677,7 +1699,10 @@ describe( 'saveEntityRecord', () => {
 			data: postType,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'END_UNDO_COALESCE_SESSION',
+		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'root',
