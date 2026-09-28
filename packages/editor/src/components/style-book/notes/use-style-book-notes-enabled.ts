@@ -61,8 +61,7 @@ export function useStyleBookNotesEnabled( {
 			 * does not describe that shape.
 			 */
 			const supports = postType?.supports as
-				| Record< string, Array< { notes?: boolean } > >
-				| undefined;
+				Record< string, Array< { notes?: boolean } > > | undefined;
 			return !! supports?.editor?.[ 0 ]?.notes;
 		},
 		[ enabled ]
@@ -80,7 +79,7 @@ export function useStyleBookNotesEnabled( {
 						kind: 'root',
 						name: 'globalStyles',
 						id: globalStylesId,
-				  } )
+					} )
 				: false,
 		[ globalStylesId ]
 	);

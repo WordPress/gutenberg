@@ -236,7 +236,7 @@ export function StyleBookNotesPanel( {
 									// translators: %s: Style Book example title, e.g. "Button".
 									__( 'New note on %s' ),
 									pendingLabel
-							  )
+								)
 							: __( 'New note' )
 					}
 				>
@@ -269,7 +269,7 @@ export function StyleBookNotesPanel( {
 											// translators: %s: Style Book example title, e.g. "Button".
 											__( 'New note on %s' ),
 											pendingLabel
-									  )
+										)
 									: __( 'New note' ),
 								placeholder: __( 'Add a note or @ mention' ),
 							} }

@@ -832,12 +832,12 @@ const ExampleNoteButton = ( {
 							),
 							count,
 							title
-					  )
+						)
 					: sprintf(
 							/* translators: %s: Title of an example, e.g. Heading. */
 							__( 'Add note on %s' ),
 							title
-					  )
+						)
 			}
 			onClick={ ( event ) => {
 				event.stopPropagation();
