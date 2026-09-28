@@ -1321,11 +1321,11 @@ describe( 'getAutosave', () => {
 		triggerFetch.mockImplementation( () => response );
 
 		return {
-			dispatch: Object.assign( jest.fn(), {
-				receiveAutosaves: jest.fn(),
+			dispatch: Object.assign( vi.fn(), {
+				receiveAutosaves: vi.fn(),
 			} ),
-			resolveSelect: Object.assign( jest.fn(), {
-				getPostType: jest.fn( () => ( {
+			resolveSelect: Object.assign( vi.fn(), {
+				getPostType: vi.fn( () => ( {
 					rest_base: restBase,
 					supports: { autosave: true },
 				} ) ),
@@ -1378,8 +1378,8 @@ describe( 'getAutosave', () => {
 
 	it( 'does not fetch when the post type does not support autosaves', async () => {
 		const { dispatch } = setUp( SUCCESSFUL_RESPONSE );
-		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => ( {
+		const resolveSelect = Object.assign( vi.fn(), {
+			getPostType: vi.fn( () => ( {
 				rest_base: restBase,
 				supports: { autosave: false },
 			} ) ),
