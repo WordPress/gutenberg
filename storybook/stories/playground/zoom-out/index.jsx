@@ -1,5 +1,4 @@
 import { useEffect, useState } from '@wordpress/element';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorProvider,
@@ -33,7 +32,6 @@ export default function EditorZoomOut( { zoomLevel } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
-		registerCoreBlocks();
 		updateBlocks( parse( pattern ) );
 	}, [] );
 
