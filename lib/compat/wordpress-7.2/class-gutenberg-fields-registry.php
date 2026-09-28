@@ -206,34 +206,35 @@ final class Gutenberg_Fields_Registry {
 	 * @param string        $name The entity name (e.g. `page`).
 	 * @param string[]|null $ids  The ids of the fields to unregister. Default
 	 *                            null, every field of the entity.
-	 * @return bool Whether the registry changed. False when called outside
-	 *              the `fields_api_init` action.
+	 * @return array[] The list of the definitions unregistered, in
+	 *                 registration order, as get_registered() returns them.
+	 *                 Empty when none of the fields is registered, or when
+	 *                 called outside the `fields_api_init` action.
 	 */
 	public function unregister( $kind, $name, $ids = null ) {
 		if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
-			return false;
+			return array();
 		}
 
 		$entity = $this->get_entity_key( $kind, $name );
 
 		if ( null === $ids ) {
-			if ( ! isset( $this->fields[ $entity ] ) ) {
-				return false;
-			}
+			$unregistered = array_values( $this->fields[ $entity ] ?? array() );
 			unset( $this->fields[ $entity ], $this->field_modules[ $entity ] );
-			return true;
+			return $unregistered;
 		}
 
-		$ids = array_intersect( (array) $ids, array_keys( $this->fields[ $entity ] ?? array() ) );
-		if ( empty( $ids ) ) {
-			return false;
+		$unregistered = array_intersect_key( $this->fields[ $entity ] ?? array(), array_flip( (array) $ids ) );
+		if ( empty( $unregistered ) ) {
+			return array();
 		}
 
 		// A script module only ever applies to registered fields: register()
 		// and update() add it for fields they store, and fields leave both
-		// lists together here. So the fields removed are all that tells
-		// whether the registry changed, and dropping them from the modules
-		// cannot change it on its own.
+		// lists together here. So the fields removed are all the registry
+		// loses, and the modules are not returned: the ones that applied to
+		// them are listed by get_registered_field_modules(), read beforehand.
+		$ids = array_keys( $unregistered );
 		foreach ( $ids as $id ) {
 			unset( $this->fields[ $entity ][ $id ] );
 		}
@@ -252,7 +253,7 @@ final class Gutenberg_Fields_Registry {
 			unset( $this->field_modules[ $entity ] );
 		}
 
-		return true;
+		return array_values( $unregistered );
 	}
 
 	/**

@@ -600,6 +600,46 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Unregistering returns the definitions it removes, in registration
+	 * order and with their origin, whatever the order of the ids asked for;
+	 * ids not registered are ignored, and nothing is returned when none is.
+	 */
+	public function test_unregistering_returns_the_unregistered_fields() {
+		$unregistered = array();
+		$this->on_fields_api_init(
+			function ( $registry ) use ( &$unregistered ) {
+				$registry->register( 'test-plugin', 'test', 'entity', array( $this->field( 'a' ), $this->field( 'b' ), $this->field( 'c' ) ), 'plugin/fields' );
+				$unregistered['by_id']   = $registry->unregister( 'test', 'entity', array( 'c', 'missing', 'a' ) );
+				$unregistered['missing'] = $registry->unregister( 'test', 'entity', array( 'a' ) );
+				$unregistered['every']   = $registry->unregister( 'test', 'entity' );
+				$unregistered['empty']   = $registry->unregister( 'test', 'entity' );
+			}
+		);
+
+		$origin = array(
+			'registeredBy' => 'test-plugin',
+			'updatedBy'    => array(),
+		);
+		$this->assertSame(
+			array(
+				array_merge( $this->field( 'a' ), array( 'origin' => $origin ) ),
+				array_merge( $this->field( 'c' ), array( 'origin' => $origin ) ),
+			),
+			$unregistered['by_id'],
+			'The fields unregistered by id are returned in registration order.'
+		);
+		$this->assertSame( array(), $unregistered['missing'], 'Nothing is returned when no field is registered.' );
+		$this->assertSame(
+			array( array_merge( $this->field( 'b' ), array( 'origin' => $origin ) ) ),
+			$unregistered['every'],
+			'Unregistering every field returns them all.'
+		);
+		$this->assertSame( array(), $unregistered['empty'], 'Nothing is returned for an entity without fields.' );
+		$this->assertSame( array(), gutenberg_get_registered_fields( 'test', 'entity' ), 'The entity has no fields left.' );
+		$this->assertArrayNotHasKey( 'test/entity', gutenberg_get_all_registered_field_modules(), 'The entity has no script module left.' );
+	}
+
+	/**
 	 * Updating merges each definition into the registered field, keeping
 	 * its position; the origin cannot be updated, and each origin that
 	 * updates the field is recorded once, in update order. The script module
@@ -770,8 +810,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$registry = Gutenberg_Fields_Registry::get_instance();
 		$fired    = did_action( 'fields_api_init' );
 
-		$this->assertFalse( $registry->unregister( 'postType', 'page', array( 'author' ) ), 'Unregistering fields by id is refused.' );
-		$this->assertFalse( $registry->unregister( 'postType', 'page' ), 'Unregistering every field is refused.' );
+		$this->assertSame( array(), $registry->unregister( 'postType', 'page', array( 'author' ) ), 'Unregistering fields by id is refused.' );
+		$this->assertSame( array(), $registry->unregister( 'postType', 'page' ), 'Unregistering every field is refused.' );
 		$this->assertSame( $fired, did_action( 'fields_api_init' ), 'Refusing does not fire the action.' );
 		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
 	}
