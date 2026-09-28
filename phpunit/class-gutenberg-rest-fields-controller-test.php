@@ -74,9 +74,22 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			remove_action( 'fields_api_init', $callback );
 		}
 		$this->callbacks = array();
-		Gutenberg_Fields_Registry::get_instance()->reset();
+		self::reset_registry();
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Resets the registry: drops the singleton instance, so the next
+	 * get_instance() creates an empty registry and its first read fires
+	 * `fields_api_init` again.
+	 */
+	private static function reset_registry() {
+		$instance = new ReflectionProperty( Gutenberg_Fields_Registry::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance->setAccessible( true );
+		}
+		$instance->setValue( null, null );
 	}
 
 	/**
@@ -102,8 +115,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		add_action( 'fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
+		self::reset_registry();
 		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->reset();
 		$registry->get_all_registered();
 
 		return $registered;
@@ -128,8 +141,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		add_action( 'fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
+		self::reset_registry();
 		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->reset();
 		$registry->get_all_registered();
 
 		return $updated;
