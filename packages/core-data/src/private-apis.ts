@@ -15,7 +15,6 @@ import {
 } from './components/entities-saved-states';
 import { useIsDirty as useEntitiesSavedStatesIsDirty } from './components/entities-saved-states/hooks/use-is-dirty';
 import { lock } from './lock-unlock';
-import { getEntitySyncManager, registerEntitySyncManager } from './entity-sync';
 import {
 	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	entityContainsSnapshot,
@@ -35,8 +34,6 @@ const lockedApis = {
 	useEntitiesSavedStatesIsDirty,
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
-	getEntitySyncManager,
-	registerEntitySyncManager,
 	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	entityContainsSnapshot,
 	getEntitySnapshot,

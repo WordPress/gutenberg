@@ -164,7 +164,7 @@ wp.data.select( 'core' ).getStatus( recordId );
 
 The store offers a private extension point for real-time collaboration with an entity sync manager. When one is registered, the store tells it when a record is loaded, edited, saved, and deleted, and lets it take over undo. The store itself knows nothing about how the syncing works.
 
-`registerEntitySyncManager( manager )` and `getEntitySyncManager()` are exposed through `privateApis`. Only one manager can be registered at a time. The `EntitySyncManager` type in `src/entity-sync.ts` documents the interface. Keep changes to that API deliberate, because code outside this repository can depend on it.
+The interface lives in `src/entity-sync.ts`. `registerEntitySyncManager( manager )` and `getEntitySyncManager()` are internal to the package for now and are not exposed. Only one manager can be registered at a time. The `EntitySyncManager` type documents the interface.
 
 ## Actions
 
