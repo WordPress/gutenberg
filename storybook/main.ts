@@ -131,6 +131,18 @@ const config: StorybookConfig = {
 	},
 	viteFinal: async ( viteConfig ) => {
 		return mergeConfig( viteConfig, {
+			resolve: {
+				alias: [
+					{
+						// Source stories and package imports must share one store.
+						find: /^@wordpress\/block-editor$/,
+						replacement: path.resolve(
+							import.meta.dirname,
+							'../packages/block-editor/src/index.js'
+						),
+					},
+				],
+			},
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,
