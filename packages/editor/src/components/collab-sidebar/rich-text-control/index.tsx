@@ -4,7 +4,6 @@ import {
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import type { __unstableUseAutocompleteProps } from '@wordpress/components';
 // @ts-expect-error No exported types
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
@@ -52,12 +51,13 @@ const {
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
 
-// The completer shape isn't exported from `@wordpress/components`, so derive
-// it from the autocomplete hook's parameter type. The deprecated export has
-// the same signature as the private hook and is only used here as a type.
-type Completer = Parameters<
-	typeof __unstableUseAutocompleteProps
->[ 0 ][ 'completers' ][ number ];
+// The completer shape is not exported as a type from `@wordpress/block-editor`,
+// so only the members this control relies on are typed.
+type Completer = {
+	name: string;
+	triggerPrefix: string;
+	[ key: string ]: unknown;
+};
 
 // Shared empty reference so the default `completers` value is stable across
 // renders and the autocomplete hook doesn't re-run for consumers that don't
@@ -149,7 +149,7 @@ export type RichTextControlProps = {
 	focusOnMount?: boolean;
 	/**
 	 * Autocompleters to wire to the field (e.g. an `@` mention completer).
-	 * Each is a `WPCompleter` object as consumed by `@wordpress/components`'
+	 * Each is a completer object as consumed by `@wordpress/block-editor`'
 	 * `Autocomplete`. Omit to disable autocomplete.
 	 */
 	completers?: Array< Completer >;

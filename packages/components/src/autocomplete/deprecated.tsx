@@ -1,14 +1,10 @@
 import deprecated from '@wordpress/deprecated';
-import type { AutocompleteProps, UseAutocompleteProps } from './types';
 
 /**
  * Returns no props. The hook is deprecated and kept only so that existing
  * calls keep rendering; autocompletion now lives in the block editor.
  */
-export function useDeprecatedAutocompleteProps(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	options: UseAutocompleteProps
-) {
+export function useDeprecatedAutocompleteProps() {
 	deprecated(
 		'`__unstableUseAutocompleteProps` from `@wordpress/components`',
 		{
@@ -18,6 +14,18 @@ export function useDeprecatedAutocompleteProps(
 	);
 	return {};
 }
+
+type AutocompleteProps = {
+	/**
+	 * A function that returns nodes to be rendered within the Autocomplete.
+	 */
+	children: ( props: {
+		listBoxId: string | undefined;
+		activeId: string | null;
+		onKeyDown: ( event: KeyboardEvent ) => void;
+	} ) => React.ReactNode;
+	[ key: string ]: unknown;
+};
 
 /**
  * Renders its children without autocompletion. The component is deprecated

@@ -26,7 +26,7 @@ export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
 	useDeprecatedAutocompleteProps as __unstableUseAutocompleteProps,
-} from './autocomplete';
+} from './autocomplete/deprecated';
 export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	/** @deprecated Import `BorderBoxControl` instead. */
