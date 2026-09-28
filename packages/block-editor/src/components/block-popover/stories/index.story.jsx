@@ -6,6 +6,7 @@ import {
 import { useMemo } from '@wordpress/element';
 import BlockPopover from '../';
 import BlockList from '../../block-list';
+import { useBlockProps } from '../../block-list/use-block-props';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 
 // A minimal block type, so that the story doesn't depend on the block library.
@@ -18,6 +19,10 @@ const clientIds = BLOCK_LABELS.map(
 	( label, index ) => `example-block-${ index + 1 }`
 );
 
+function ExampleEdit( { attributes } ) {
+	return <p { ...useBlockProps() }>{ attributes.content }</p>;
+}
+
 // Registered when the story renders rather than when this file loads, so that
 // the example block type doesn't leak into the registry shared with the other
 // stories.
@@ -25,12 +30,13 @@ function useExampleBlocks() {
 	return useMemo( () => {
 		if ( ! getBlockType( BLOCK_NAME ) ) {
 			registerBlockType( BLOCK_NAME, {
+				apiVersion: 3,
 				title: 'Example',
 				category: 'text',
 				attributes: {
 					content: { type: 'string' },
 				},
-				edit: ( { attributes } ) => attributes.content,
+				edit: ExampleEdit,
 				save: () => null,
 			} );
 		}
