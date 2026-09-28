@@ -202,6 +202,11 @@ test.describe( 'Font Library', () => {
 
 			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
 			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await expect(
+				page.getByText(
+					'Are you sure you want to delete "Exo 2" font and all its variants and assets?'
+				)
+			).toBeVisible();
 			await page.getByRole( 'button', { name: 'Delete' } ).click();
 			await expect(
 				page
