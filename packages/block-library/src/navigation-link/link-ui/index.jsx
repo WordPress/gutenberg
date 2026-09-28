@@ -202,6 +202,7 @@ function UnforwardedLinkUI( props, ref ) {
 			clientId,
 			isEnabled: canAddBlock && ! link?.url?.length,
 			onBlockInsert: props.onBlockInsert,
+			onClose: props.onClose,
 		} );
 
 	return (

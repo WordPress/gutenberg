@@ -94,13 +94,23 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
  * @param {Function=} options.onBlockInsert Called with the inserted block by a
  *                                          caller that tracks the new link,
  *                                          such as the list view.
+ * @param {Function=} options.onClose       Closes the link UI.
  * @return {{ transformSuggestions: Function|undefined, insertBlockFromSuggestion: Function }}
  * The `transformSuggestions` to give LinkControl, and the handler for a chosen
  * block suggestion.
  */
-export function useBlockSuggestions( { clientId, isEnabled, onBlockInsert } ) {
-	const { getBlockIndex, getBlockRootClientId, getInserterItems } =
-		useSelect( blockEditorStore );
+export function useBlockSuggestions( {
+	clientId,
+	isEnabled,
+	onBlockInsert,
+	onClose,
+} ) {
+	const {
+		getBlockIndex,
+		getBlockOrder,
+		getBlockRootClientId,
+		getInserterItems,
+	} = useSelect( blockEditorStore );
 	const { insertBlock, replaceBlock } = useDispatch( blockEditorStore );
 
 	const transformSuggestions = useCallback(
@@ -137,6 +147,14 @@ export function useBlockSuggestions( { clientId, isEnabled, onBlockInsert } ) {
 		if ( onBlockInsert ) {
 			insertBlock( block, index, rootClientId, false );
 			onBlockInsert( block );
+			return;
+		}
+
+		// A submenu keeps its items, so the block goes before it, where the
+		// "Add block" pane puts it. An empty link is replaced by the block.
+		if ( getBlockOrder( clientId ).length ) {
+			insertBlock( block, index, rootClientId );
+			onClose?.();
 			return;
 		}
 

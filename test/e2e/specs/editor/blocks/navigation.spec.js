@@ -1137,6 +1137,51 @@ test.describe( 'Navigation block', () => {
 				1
 			);
 		} );
+
+		// A submenu with no URL of its own still holds its items, so a block
+		// chosen from its search results goes beside it, as with "Add block",
+		// rather than replacing it.
+		test( 'keeps a submenu and its items when a block is chosen from its search results', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			requestUtils,
+			navigation,
+		} ) => {
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu( {
+				title: 'Block search in a submenu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"Parent"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.com"} /--><!-- /wp:navigation-submenu -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menuId },
+			} );
+
+			const submenu = navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Submenu' } );
+			await submenu.getByText( 'Parent' ).click();
+			await pageUtils.pressKeys( 'primary+k' );
+
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+			await page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } )
+				.click();
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toHaveCount( 1 );
+			await expect( submenu ).toHaveCount( 1 );
+			await expect( submenu.getByText( 'Child' ) ).toBeVisible();
+		} );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
