@@ -1,17 +1,23 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import create from '..';
 
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const mockedApiFetch = vi.mocked( apiFetch );
 
 describe( 'create', () => {
 	afterEach( () => {
-		apiFetch.mockReset();
+		mockedApiFetch.mockReset();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'set', () => {
 		it( 'stores backup restoration data in localStorage', () => {
-			apiFetch.mockResolvedValueOnce();
-			const spy = jest.spyOn( global.Storage.prototype, 'setItem' );
+			mockedApiFetch.mockResolvedValueOnce();
+			const spy = vi.spyOn( global.Storage.prototype, 'setItem' );
 
 			const localStorageRestoreKey = 'test';
 			const { set } = create( { localStorageRestoreKey } );
@@ -33,14 +39,14 @@ describe( 'create', () => {
 		} );
 
 		it( 'sends data to the `users/me` endpoint', () => {
-			apiFetch.mockResolvedValueOnce();
+			mockedApiFetch.mockResolvedValueOnce();
 
 			const { set } = create();
 
 			const data = { test: 1 };
 			set( data );
 
-			expect( apiFetch ).toHaveBeenCalledWith( {
+			expect( mockedApiFetch ).toHaveBeenCalledWith( {
 				path: '/wp/v2/users/me',
 				method: 'PUT',
 				keepalive: true,
@@ -55,38 +61,32 @@ describe( 'create', () => {
 
 	describe( 'get', () => {
 		it( 'avoids using the REST API or local storage when data is preloaded', async () => {
-			const getItemSpy = jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			);
+			const getItemSpy = vi.spyOn( global.Storage.prototype, 'getItem' );
 
 			const preloadedData = { preloaded: true };
 			const { get } = create( { preloadedData } );
 			expect( await get() ).toBe( preloadedData );
 			expect( getItemSpy ).not.toHaveBeenCalled();
-			expect( apiFetch ).not.toHaveBeenCalled();
+			expect( mockedApiFetch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'returns from a local cache once `set` has been called', async () => {
-			const getItemSpy = jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			);
-			apiFetch.mockResolvedValueOnce();
+			const getItemSpy = vi.spyOn( global.Storage.prototype, 'getItem' );
+			mockedApiFetch.mockResolvedValueOnce();
 
 			const data = { cached: true };
 			const { get, set } = create();
 
 			// apiFetch was called as a result of calling `set`.
 			set( data );
-			expect( apiFetch ).toHaveBeenCalled();
-			apiFetch.mockClear();
+			expect( mockedApiFetch ).toHaveBeenCalled();
+			mockedApiFetch.mockClear();
 
 			// Neither localStorage.getItem or apiFetch are called as a result
 			// of the call to `get`. A local cache is used.
 			expect( await get() ).toEqual( expect.objectContaining( data ) );
 			expect( getItemSpy ).not.toHaveBeenCalled();
-			expect( apiFetch ).not.toHaveBeenCalled();
+			expect( mockedApiFetch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'returns data from the users/me endpoint if there is no data in localStorage', async () => {
@@ -94,14 +94,13 @@ describe( 'create', () => {
 				__timestamp: 0,
 				test: 2,
 			};
-			apiFetch.mockResolvedValueOnce( {
+			mockedApiFetch.mockResolvedValueOnce( {
 				meta: { persisted_preferences: data },
 			} );
 
-			jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			).mockReturnValueOnce( 'null' );
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
+				'null'
+			);
 
 			const { get } = create();
 			expect( await get() ).toEqual( data );
@@ -112,14 +111,11 @@ describe( 'create', () => {
 				_modified: '2022-04-22T00:00:00.000Z',
 				test: 'api',
 			};
-			apiFetch.mockResolvedValueOnce( {
+			mockedApiFetch.mockResolvedValueOnce( {
 				meta: { persisted_preferences: data },
 			} );
 
-			jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			).mockReturnValueOnce(
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
 				JSON.stringify( {
 					_modified: '2022-04-21T00:00:00.000Z',
 					test: 'localStorage',
@@ -131,7 +127,7 @@ describe( 'create', () => {
 		} );
 
 		it( 'returns data from localStorage if it has a more recent modified date than data from the REST API', async () => {
-			apiFetch.mockResolvedValueOnce( {
+			mockedApiFetch.mockResolvedValueOnce( {
 				meta: {
 					persisted_preferences: {
 						_modified: '2022-04-21T00:00:00.000Z',
@@ -144,25 +140,23 @@ describe( 'create', () => {
 				_modified: '2022-04-22T00:00:00.000Z',
 				test: 'localStorage',
 			};
-			jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			).mockReturnValueOnce( JSON.stringify( data ) );
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
+				JSON.stringify( data )
+			);
 
 			const { get } = create();
 			expect( await get() ).toEqual( data );
 		} );
 
 		it( 'returns an empty object if neither local storage or the REST API return any data', async () => {
-			apiFetch.mockResolvedValueOnce( {
+			mockedApiFetch.mockResolvedValueOnce( {
 				meta: {
 					persisted_preferences: null,
 				},
 			} );
-			jest.spyOn(
-				global.Storage.prototype,
-				'getItem'
-			).mockReturnValueOnce( 'null' );
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
+				'null'
+			);
 
 			const { get } = create();
 			expect( await get() ).toEqual( {} );

@@ -1,6 +1,7 @@
 import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import { forwardRef } from '@wordpress/element';
 import type { AutocompleteRowProps } from './types';
+import { useAutocompleteGridContext } from './context';
 
 /**
  * Groups multiple `Autocomplete.Item` cells into a single row in a grid
@@ -9,6 +10,13 @@ import type { AutocompleteRowProps } from './types';
  */
 export const Row = forwardRef< HTMLDivElement, AutocompleteRowProps >(
 	function Row( { children, ...restProps }, ref ) {
+		const isGrid = useAutocompleteGridContext();
+		if ( process.env.NODE_ENV !== 'production' && ! isGrid ) {
+			throw new Error(
+				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
+			);
+		}
+
 		return (
 			<_Autocomplete.Row ref={ ref } { ...restProps }>
 				{ children }

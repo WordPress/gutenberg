@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	registerBlockType,
@@ -78,16 +87,16 @@ selectorNames.forEach( ( name ) => {
 			hasUndo() {
 				return Boolean(
 					state.editor &&
-						state.editor.past &&
-						state.editor.past.length
+					state.editor.past &&
+					state.editor.past.length
 				);
 			},
 
 			hasRedo() {
 				return Boolean(
 					state.editor &&
-						state.editor.future &&
-						state.editor.future.length
+					state.editor.future &&
+					state.editor.future.length
 				);
 			},
 
@@ -2692,7 +2701,45 @@ describe( 'selectors', () => {
 			expect( getEditedPostSlug( state ) ).toBe( 'edited-slug' );
 		} );
 
-		it( 'should return the cleaned title as slug if no saved or edited slug exists', () => {
+		it( 'should return the server-generated slug if no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+					generated_slug: 'server-generated-slug',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe(
+				'server-generated-slug'
+			);
+		} );
+
+		it( 'should prefer the server-generated slug over the cleaned title', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+					generated_slug: 'server-generated-slug',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe(
+				'server-generated-slug'
+			);
+		} );
+
+		it( 'should return the cleaned title as slug if no saved, edited, or generated slug exists', () => {
 			const state = {
 				currentPost: {
 					title: 'Sample Post',
@@ -2749,7 +2796,7 @@ describe( 'selectors', () => {
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
 		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
+		it( "should return false if the _links object doesn't contain the property wp:action-unfiltered-html", () => {
 			const state = {
 				currentPost: {
 					_links: {},

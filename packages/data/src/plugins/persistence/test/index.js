@@ -1,5 +1,5 @@
 import deepFreeze from 'deep-freeze';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
@@ -7,11 +7,8 @@ import { createRegistry } from '../../../';
 describe( 'persistence', () => {
 	let registry;
 
-	beforeAll( () => {
-		vi.spyOn( objectStorage, 'setItem' );
-	} );
-
 	beforeEach( () => {
+		vi.spyOn( objectStorage, 'setItem' );
 		objectStorage.clear();
 		objectStorage.setItem.mockClear();
 

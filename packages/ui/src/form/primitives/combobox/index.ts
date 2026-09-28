@@ -17,4 +17,5 @@ export { Popup } from './popup';
 export { Root } from './root';
 export { Status } from './status';
 export { Trigger } from './trigger';
+export { useFilteredItems } from './use-filtered-items';
 export { Value } from './value';

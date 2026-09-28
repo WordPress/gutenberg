@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).
+-   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+
+## 16.1.0 (2026-09-23)
+
+### New Features
+
+-   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 16.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).

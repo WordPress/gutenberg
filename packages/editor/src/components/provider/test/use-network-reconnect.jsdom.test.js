@@ -1,20 +1,21 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useRegistry } from '@wordpress/data';
 import useNetworkReconnect from '../use-network-reconnect';
 
-const mockPauseQueue = jest.fn();
-const mockResumeQueue = jest.fn();
+const mockPauseQueue = vi.fn();
+const mockResumeQueue = vi.fn();
 
-jest.mock( '@wordpress/data', () => ( {
-	useRegistry: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useRegistry: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/upload-media', () => ( {
+vi.mock( import( '@wordpress/upload-media' ), () => ( {
 	store: 'core/upload-media',
 } ) );
 
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
+vi.mock( import( '../../../lock-unlock' ), () => ( {
+	unlock: vi.fn( () => ( {
 		pauseQueue: mockPauseQueue,
 		resumeQueue: mockResumeQueue,
 	} ) ),
@@ -29,14 +30,14 @@ describe( 'useNetworkReconnect', () => {
 		mockPauseQueue.mockClear();
 		mockResumeQueue.mockClear();
 		listeners = {};
-		window.addEventListener = jest.fn( ( event, cb ) => {
+		window.addEventListener = vi.fn( ( event, cb ) => {
 			listeners[ event ] = cb;
 		} );
-		window.removeEventListener = jest.fn( ( event ) => {
+		window.removeEventListener = vi.fn( ( event ) => {
 			delete listeners[ event ];
 		} );
 		useRegistry.mockReturnValue( {
-			dispatch: jest.fn( () => ( {} ) ),
+			dispatch: vi.fn( () => ( {} ) ),
 		} );
 	} );
 

@@ -62,9 +62,8 @@ const { state } = store( 'directive-run', {
 			state.clickCount = state.clickCount + 1;
 		},
 		*navigate() {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			return actions.navigate( window.location, {
 				force: true,
 				html,

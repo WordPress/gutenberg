@@ -7,6 +7,6 @@ export default {
 	staticDirs: undefined,
 	stories: [
 		'../../../packages/components/src/**/stories/e2e/*.story.@(tsx|mdx)',
-		'../../../packages/ui/src/**/stories/e2e/*.story.@(ts|tsx|mdx)',
+		'../../../packages/ui/src/**/stories/e2e/*.story.@(ts|tsx|mts|cts|mdx)',
 	],
 } satisfies StorybookConfig;

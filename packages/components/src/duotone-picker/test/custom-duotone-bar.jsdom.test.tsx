@@ -1,12 +1,15 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CustomDuotoneBar from '../custom-duotone-bar';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const VALUE = [ '#000000', '#ffffff' ];
 
 describe( 'CustomDuotoneBar', () => {
 	it( 'does not offer to reposition control points, since a duotone has no positions to save', () => {
-		render( <CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } /> );
+		render( <CustomDuotoneBar value={ VALUE } onChange={ vi.fn() } /> );
 
 		const [ firstPoint ] = screen.getAllByRole( 'button', {
 			name: /Gradient control point/,
@@ -22,7 +25,7 @@ describe( 'CustomDuotoneBar', () => {
 
 	it( 'ignores arrow keys on a control point', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <CustomDuotoneBar value={ VALUE } onChange={ onChange } /> );
 
@@ -36,7 +39,7 @@ describe( 'CustomDuotoneBar', () => {
 	} );
 
 	it( 'ignores dragging a control point', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render( <CustomDuotoneBar value={ VALUE } onChange={ onChange } /> );
 
@@ -56,12 +59,12 @@ describe( 'CustomDuotoneBar', () => {
 	// gradient bar's own `stopPropagation` guards against.
 	it( 'does not let arrow keys bubble out of the control', async () => {
 		const user = userEvent.setup();
-		const onAncestorKeyDown = jest.fn();
+		const onAncestorKeyDown = vi.fn();
 
 		render(
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ onAncestorKeyDown }>
-				<CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } />
+				<CustomDuotoneBar value={ VALUE } onChange={ vi.fn() } />
 			</div>
 		);
 
@@ -79,7 +82,7 @@ describe( 'CustomDuotoneBar', () => {
 	it( 'still opens the color picker when a control point is clicked', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } /> );
+		render( <CustomDuotoneBar value={ VALUE } onChange={ vi.fn() } /> );
 
 		await user.click(
 			screen.getAllByRole( 'button', {
@@ -94,12 +97,12 @@ describe( 'CustomDuotoneBar', () => {
 
 	it( 'still lets other keys bubble', async () => {
 		const user = userEvent.setup();
-		const onAncestorKeyDown = jest.fn();
+		const onAncestorKeyDown = vi.fn();
 
 		render(
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ onAncestorKeyDown }>
-				<CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } />
+				<CustomDuotoneBar value={ VALUE } onChange={ vi.fn() } />
 			</div>
 		);
 

@@ -1,7 +1,8 @@
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB } from '@wordpress/keycodes';
+import { TAB, withIgnoreIMEEvents } from '@wordpress/keycodes';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
+import { useRefEffect, useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
@@ -17,12 +18,20 @@ const PREVENT_SCROLL_ON_FOCUS = {
 	position: 'absolute',
 	inset: 0,
 	pointerEvents: 'none',
+	outline: 'none',
 };
+
+// Keys that move focus from the canvas stop into the canvas.
+const ENTRY_KEYS = [ 'Enter', ' ', 'F2', 'Escape' ];
 
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
+	const hintId = useInstanceId(
+		useTabNav,
+		'block-editor-writing-flow__canvas-stop-hint'
+	);
 
 	const {
 		hasMultiSelection,
@@ -31,6 +40,7 @@ export default function useTabNav() {
 		getBlockOrder,
 		getLastFocus,
 		getSectionRootClientId,
+		getEditedContentOnlySection,
 		isZoomOut,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
@@ -39,16 +49,17 @@ export default function useTabNav() {
 	// capturing on the focus capture elements.
 	const noCaptureRef = useRef();
 
-	function onFocusCapture( event ) {
-		const canvasElement =
-			containerRef.current.ownerDocument === event.target.ownerDocument
-				? containerRef.current
-				: containerRef.current.ownerDocument.defaultView.frameElement;
+	// The canvas is a single stop in the page's tab order, and going in is
+	// an explicit action on it. Focus returns to the place it last left the
+	// canvas from.
+	function enterCanvas() {
+		// Focus the canvas window first. The stop is in the parent document,
+		// and when Firefox focuses an element in another document, it does
+		// not move window focus, so the caret would be restored but key
+		// presses would keep going to the parent page.
+		containerRef.current.ownerDocument.defaultView.focus();
 
-		// Do not capture incoming focus if set by us in WritingFlow.
-		if ( noCaptureRef.current ) {
-			noCaptureRef.current = null;
-		} else if ( hasMultiSelection() ) {
+		if ( hasMultiSelection() ) {
 			containerRef.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			if ( getLastFocus()?.current ) {
@@ -80,31 +91,100 @@ export default function useTabNav() {
 					.focus();
 			} else {
 				// If we don't have any section root, focus the canvas.
-				canvasElement.focus();
+				containerRef.current.focus();
 			}
 		} else {
-			const isBefore =
-				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( canvasElement ) &
-				event.target.DOCUMENT_POSITION_FOLLOWING;
 			const tabbables = focus.tabbable.find( containerRef.current );
 			if ( tabbables.length ) {
-				const next = isBefore
-					? tabbables[ 0 ]
-					: tabbables[ tabbables.length - 1 ];
-				next.focus();
+				tabbables[ 0 ].focus();
+			} else {
+				// Nothing in the canvas is tabbable. Entering still enters:
+				// keys go to the canvas, and a block can be selected with
+				// the arrow keys or a click.
+				containerRef.current.focus();
 			}
 		}
+	}
+
+	function onStopKeyDown( event ) {
+		if (
+			event.defaultPrevented ||
+			event.ctrlKey ||
+			event.metaKey ||
+			event.altKey
+		) {
+			return;
+		}
+
+		const { key } = event;
+
+		if ( ! event.shiftKey && ENTRY_KEYS.includes( key ) ) {
+			event.preventDefault();
+			enterCanvas();
+			return;
+		}
+
+		// Shift+Tab leaves the canvas on its own, because the stop is the
+		// first element before it. Plain Tab would move into the content,
+		// so move focus to the first tabbable element past the canvas.
+		if ( key === 'Tab' && ! event.shiftKey ) {
+			event.preventDefault();
+			focus.tabbable.findNext( focusCaptureAfterRef.current )?.focus();
+		}
+	}
+
+	// Focus arriving on the stop engages the canvas right away, like a
+	// text field that starts editing when focused. Only Escape parks
+	// focus on the stop, giving Tab traction again: from a parked stop,
+	// Tab moves to the interface around the canvas, not the content.
+	function onStopFocus() {
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
+			return;
+		}
+		enterCanvas();
 	}
 
 	const before = (
 		<div
 			ref={ focusCaptureBeforeRef }
 			tabIndex="0"
-			onFocus={ onFocusCapture }
+			role="button"
+			aria-label={ __( 'Editor canvas' ) }
+			aria-describedby={ hintId }
+			className="block-editor-writing-flow__canvas-stop"
 			style={ PREVENT_SCROLL_ON_FOCUS }
-		/>
+			onFocus={ onStopFocus }
+			onKeyDown={ onStopKeyDown }
+			// Assistive technology activates a button with a click event,
+			// not a key press. Pointer clicks pass through the element, so
+			// a click can only come from such an activation.
+			onClick={ enterCanvas }
+		>
+			{ /* The hint is also the button's description for assistive
+			     technology. Content hidden with `display: none` still
+			     works for `aria-describedby`. */ }
+			<div
+				className="block-editor-writing-flow__canvas-stop-hint"
+				id={ hintId }
+			>
+				{ __( 'Press Enter to edit the document' ) }
+			</div>
+		</div>
 	);
+
+	// Focus landing on the element after the canvas enters it, the same
+	// as focus landing on the stop before it.
+	function onFocusCapture() {
+		// Do not act on focus set by the tab handler below, which moves
+		// focus here so that the default behaviour (moving focus to the
+		// next tabbable element) continues from this element.
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
+			return;
+		}
+		enterCanvas();
+	}
 
 	const after = (
 		<div
@@ -121,12 +201,39 @@ export default function useTabNav() {
 				return;
 			}
 
+			// Escape steps out of the canvas onto its stop. Everything with
+			// a stronger claim on the key runs first: handlers deeper in
+			// the tree, capture handlers, and listeners registered earlier
+			// on this node, like the automatic change undo. If the key is
+			// still unclaimed here, nothing else wants it.
+			if (
+				event.key === 'Escape' &&
+				! event.shiftKey &&
+				! event.ctrlKey &&
+				! event.metaKey &&
+				! event.altKey
+			) {
+				// While a content-only section is being edited, Escape first
+				// stops editing it. That handler lives in the parent
+				// document and runs after this one, so leave the key to it.
+				if ( getEditedContentOnlySection() ) {
+					return;
+				}
+				if ( focusCaptureBeforeRef.current ) {
+					event.preventDefault();
+					// Park on the stop instead of engaging the canvas,
+					// which is what focus arriving on it normally does.
+					noCaptureRef.current = true;
+					focusCaptureBeforeRef.current.focus();
+				}
+				return;
+			}
+
 			// In Edit mode, Tab should focus the first tabbable element after
 			// the content, which is normally the sidebar (with block controls)
 			// and Shift+Tab should focus the first tabbable element before the
 			// content, which is normally the block toolbar.
-			// Arrow keys can be used, and Tab and arrow keys can be used in
-			// Navigation mode (press Esc), to navigate through blocks.
+			// Arrow keys can be used to navigate through blocks.
 			if ( event.keyCode !== TAB ) {
 				return;
 			}
@@ -169,11 +276,12 @@ export default function useTabNav() {
 			) {
 				return;
 			}
+
 			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
 
-			// Disable focus capturing on the focus capture element, so it
-			// doesn't refocus this block and so it allows default behaviour
-			// (moving focus to the next tabbable element).
+			// Disable the focus forwarding on the focus capture element, so
+			// it allows default behaviour (moving focus to the next tabbable
+			// element).
 			noCaptureRef.current = true;
 
 			next.current.focus();
@@ -202,10 +310,14 @@ export default function useTabNav() {
 			}
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
+		// During an IME composition, Escape and Tab control the input
+		// method, not the editor.
+		const onKeyDownOutsideIME = withIgnoreIMEEvents( onKeyDown );
+
+		node.addEventListener( 'keydown', onKeyDownOutsideIME );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener( 'keydown', onKeyDownOutsideIME );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};
 	}, [] );

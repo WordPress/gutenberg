@@ -56,12 +56,12 @@ export default function TemplatePartPlaceholder( {
 							// Translators: %s as template part area title ("Header", "Footer", etc.).
 							__( 'Choose an existing %s or create a new one.' ),
 							areaObject.label.toLowerCase()
-					  )
+						)
 					: sprintf(
 							// Translators: %s as template part area title ("Header", "Footer", etc.).
 							__( 'Choose an existing %s.' ),
 							areaObject.label.toLowerCase()
-					  )
+						)
 			}
 		>
 			{ isResolving && <Spinner /> }

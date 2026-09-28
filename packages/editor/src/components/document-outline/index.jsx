@@ -225,7 +225,7 @@ export default function DocumentOutline( {
 										create( {
 											html: item.attributes.content,
 										} )
-								  ) }
+									) }
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 &&
 								hasMultipleH1 &&

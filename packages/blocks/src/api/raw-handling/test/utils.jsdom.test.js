@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';

@@ -7,7 +7,8 @@
 
 			display: flex;
 			height: var(--wpds-dimension-size-lg);
-			background-color: var(--wpds-color-background-interactive-neutral-weak);
+			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 			border-width: var(--wpds-border-width-xs);
 			border-style: solid;
 			border-color: var(--wpds-color-stroke-interactive-neutral);
@@ -33,17 +34,25 @@
 
 			&.is-disabled,
 			&:has([data-can-disable-input-layout][data-disabled]) {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
-				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media (forced-colors: active) {
-					border-color: GrayText;
 					color: GrayText;
+				}
+
+				&:not(.is-borderless) {
+					/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+					background-color: var(--wpds-color-background-interactive-neutral-disabled, var(--wpds-color-background-surface-neutral-strong));
+					border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+					@media (forced-colors: active) {
+						border-color: GrayText;
+					}
 				}
 			}
 
 			&.is-borderless {
+				background-color: var(--wpds-color-background-interactive-neutral-weak);
 				border-color: transparent;
 			}
 
@@ -55,6 +64,8 @@
 			}
 
 			&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
+				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+				background-color: var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong));
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			}
 

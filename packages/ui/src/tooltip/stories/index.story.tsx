@@ -4,7 +4,8 @@ import { Icon } from '../../icon';
 import * as Tooltip from '../';
 
 const meta: Meta< typeof Tooltip.Root > = {
-	title: 'Design System/Components/Tooltip',
+	title: 'Components/@wordpress-ui/Tooltip',
+	id: 'design-system-components-tooltip',
 	component: Tooltip.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {

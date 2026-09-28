@@ -194,10 +194,7 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	anchorRef?:
-		| Element
-		| PopoverAnchorRefReference
-		| PopoverAnchorRefTopBottom
-		| Range;
+		Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range;
 	/**
 	 * A function returning the same value as the one expected by the `anchorRect`
 	 * prop, used to specify a dynamic popover position.

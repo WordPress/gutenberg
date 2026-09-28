@@ -1,6 +1,9 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedRadioControl } from '../radio-control';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ValidatedRadioControl', () => {
 	const options = [

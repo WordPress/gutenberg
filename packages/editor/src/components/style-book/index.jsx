@@ -217,7 +217,7 @@ function applyBlockVariationsToExamples( examples, variation ) {
 							style: undefined,
 							className: `is-style-${ variation }`,
 						},
-				  } ) )
+					} ) )
 				: {
 						...example.blocks,
 						attributes: {
@@ -225,7 +225,7 @@ function applyBlockVariationsToExamples( examples, variation ) {
 							style: undefined,
 							className: `is-style-${ variation }`,
 						},
-				  },
+					},
 		};
 	} );
 }
@@ -356,13 +356,13 @@ function StyleBook(
 						const categoryDefinition = tab.slug
 							? getTopLevelStyleBookCategories().find(
 									( _category ) => _category.slug === tab.slug
-							  )
+								)
 							: null;
 						const filteredExamples = categoryDefinition
 							? getExamplesByCategory(
 									categoryDefinition,
 									examples
-							  )
+								)
 							: { examples };
 						return (
 							<Tabs.Panel
@@ -680,7 +680,7 @@ export const StyleBookBody = ( {
 								// translators: %s: Category of blocks, e.g. Text.
 								__( 'Examples of blocks in the %s category' ),
 								title
-						  )
+							)
 						: __( 'Examples of blocks' )
 				}
 				isSelected={ isSelected }
@@ -885,7 +885,7 @@ const Example = ( {
 			? {
 					disabled: true,
 					accessibleWhenDisabled: !! onClick,
-			  }
+				}
 			: {};
 
 	return (
@@ -909,7 +909,7 @@ const Example = ( {
 									// translators: %s: Title of a block, e.g. Heading.
 									__( 'Open %s styles in Styles panel' ),
 									title
-							  )
+								)
 							: undefined
 					}
 					render={ <div /> }

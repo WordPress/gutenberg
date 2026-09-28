@@ -46,7 +46,7 @@ export function useViewConfig( {
 				fieldsKey
 					? {
 							fields: fieldsKey,
-					  }
+						}
 					: undefined
 			);
 		},

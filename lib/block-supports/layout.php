@@ -321,9 +321,9 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 /**
  * Returns child layout styles for a block affected by its parent's layout.
  *
- * @param string     $selector         CSS selector.
- * @param array      $child_layout     Child layout values.
- * @param array      $parent_layout    Parent layout values.
+ * @param string     $selector           CSS selector.
+ * @param array      $child_layout       Child layout values.
+ * @param array      $parent_layout      Parent layout values.
  * @param array|null $viewport_overrides Optional. Child viewport layout overrides to emit.
  * @return array Child layout style rules.
  */
@@ -790,6 +790,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		if ( 'horizontal' === $layout_orientation ) {
 			/*
+			 * `row` is the flex default, so the base layout never declares it. A viewport
+			 * override that switches a vertical base layout to horizontal has to declare
+			 * it explicitly, otherwise the base `flex-direction: column` keeps applying.
+			 */
+			if ( null !== $viewport_overrides && $has_viewport_property_override( 'orientation' ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'flex-direction' => 'row' ),
+				);
+			}
+			/*
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
@@ -974,8 +985,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * but it is unique across the life of the PHP process and it's stable per
  * prefix.
  *
- * @param  string $prefix Prefix for the returned ID.
- * @return string         Incremental ID per prefix.
+ * @param string $prefix Prefix for the returned ID.
+ * @return string Incremental ID per prefix.
  */
 function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 	static $id_counters = array();
@@ -1006,9 +1017,9 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 /**
  * Renders the layout config to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
@@ -1525,9 +1536,9 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * to restore the inner div for the group block
  * to avoid breaking styles relying on that div.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$tag_name_attr                    = $block['attrs']['tagName'] ?? null;
@@ -1599,7 +1610,7 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
- * @param  array  $block        Block object.
+ * @param array  $block         Block object.
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {

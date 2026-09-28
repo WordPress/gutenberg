@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import reducer, { getMergedItemIds, itemIsComplete } from '../reducer';
 import { removeItems } from '../actions';
@@ -83,7 +84,7 @@ describe( 'getMergedItemIds', () => {
 			perPage: 3,
 		} );
 
-		expect( result ).toEqual( [ 1, 2 ] );
+		expect( result ).toEqual( [ 1, 2, undefined ] );
 
 		original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
 		result = getMergedItemIds( original, [ 9 ], {

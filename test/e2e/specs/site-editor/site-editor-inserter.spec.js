@@ -10,9 +10,12 @@ test.describe( 'Site Editor Inserter', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//home',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

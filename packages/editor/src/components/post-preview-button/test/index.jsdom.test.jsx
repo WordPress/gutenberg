@@ -1,14 +1,36 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
-jest.useRealTimers();
+function renderMenu( children ) {
+	return render(
+		<Menu.Root>
+			<Menu.Trigger>View test menu</Menu.Trigger>
+			<Menu.Popup>{ children }</Menu.Popup>
+		</Menu.Root>
+	);
+}
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
-	jest.fn()
-);
+async function openMenu( user ) {
+	await user.click(
+		screen.getByRole( 'button', { name: 'View test menu' } )
+	);
+	await screen.findByRole( 'menu', { name: 'View test menu' } );
+}
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.useRealTimers();
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
+} ) );
 
 function mockUseSelect( overrides ) {
 	useSelect.mockImplementation( ( map ) =>
@@ -28,14 +50,14 @@ function mockUseSelect( overrides ) {
 }
 
 describe( 'PostPreviewButton', () => {
-	const documentWrite = jest.fn();
-	const documentTitle = jest.fn();
-	const documentClose = jest.fn();
-	const setLocation = jest.fn();
+	const documentWrite = vi.fn();
+	const documentTitle = vi.fn();
+	const documentClose = vi.fn();
+	const setLocation = vi.fn();
 
 	beforeEach( () => {
-		global.open = jest.fn( () => ( {
-			focus: jest.fn(),
+		global.open = vi.fn( () => ( {
+			focus: vi.fn(),
 			document: {
 				write: documentWrite,
 				close: documentClose,
@@ -128,17 +150,19 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should render the menu variant as a link with the shared menu item pattern.', () => {
+	it( 'should render the menu variant as a link with the shared menu item pattern.', async () => {
+		const user = userEvent.setup();
 		const url = 'https://wordpress.org';
 		mockUseSelect( {
 			getEditedPostPreviewLink: () => url,
 			isEditedPostSaveable: () => true,
 		} );
 
-		render( <PostPreviewMenuItem /> );
+		renderMenu( <PostPreviewMenuItem /> );
+		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview in new tab',
+			name: 'Preview (opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );

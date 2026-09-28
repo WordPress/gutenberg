@@ -965,7 +965,7 @@ function getBranchPath( node, useNode, parentNodes ) {
 	}
 
 	const branches = [];
-	for ( let child = node; parentNodes.has( child );  ) {
+	for ( let child = node; parentNodes.has( child ); ) {
 		const parent = parentNodes.get( child );
 		if ( useAncestors.has( parent ) ) {
 			break;
@@ -1107,7 +1107,7 @@ function getReachableWrites(
 							useNode,
 							identifierVariables,
 							parentNodes
-					  );
+						);
 			return executionNodes.map( ( executionNode ) => ( {
 				expression: reference.writeExpr,
 				node: executionNode,
@@ -1161,7 +1161,7 @@ function getReachableMemberWrites(
 						useNode,
 						identifierVariables,
 						parentNodes
-				  );
+					);
 		return executionNodes
 			.filter(
 				( executionNode ) => executionNode.range[ 0 ] < usePosition
@@ -1394,7 +1394,7 @@ function getReachableLocalFunctions( node, identifierVariables, parentNodes ) {
 						type: 'BoundFunction',
 						functionNode: value,
 						boundArgumentCount: 0,
-				  }
+					}
 				: [];
 		} )
 	);
@@ -1611,6 +1611,21 @@ export function validateVitestPolicy( {
 			}
 		}
 	};
+	const isTrackedDomValue = ( value ) =>
+		isBrowserGlobalExpression(
+			value,
+			unboundIdentifiers,
+			domVariables,
+			domCollectionVariables,
+			identifierVariables,
+			windowVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
+			testingLibraryNamespaceVariables
+		);
 
 	for ( const node of ast.body ) {
 		if ( node.type !== 'ImportDeclaration' ) {
@@ -1713,6 +1728,22 @@ export function validateVitestPolicy( {
 
 		if (
 			project === 'browser' &&
+			importSource === '@testing-library/react' &&
+			node.specifiers.some( ( specifier ) =>
+				[ 'render', 'renderHook' ].includes(
+					getImportedName( specifier )
+				)
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
+				node
+			);
+		}
+
+		if (
+			project === 'browser' &&
 			[ '@testing-library/dom', '@testing-library/react' ].includes(
 				importSource
 			) &&
@@ -1782,7 +1813,7 @@ export function validateVitestPolicy( {
 							node.arguments[ 0 ],
 							identifierVariables,
 							parentNodes
-					  )
+						)
 					: new Set();
 			if (
 				node.type === 'CallExpression' &&
@@ -1815,6 +1846,33 @@ export function validateVitestPolicy( {
 							elementParameterIndex + callback.boundArgumentCount
 						]
 					);
+				}
+			}
+
+			if ( node.type === 'CallExpression' ) {
+				let localFunctions;
+				for ( const [
+					argumentIndex,
+					argument,
+				] of node.arguments.entries() ) {
+					if (
+						argument.type !== 'SpreadElement' &&
+						isTrackedDomValue( argument )
+					) {
+						localFunctions ??= getReachableLocalFunctions(
+							node.callee,
+							identifierVariables,
+							parentNodes
+						);
+						for ( const localFunction of localFunctions ) {
+							trackDomValuePattern(
+								localFunction.functionNode.params[
+									argumentIndex +
+										localFunction.boundArgumentCount
+								]
+							);
+						}
+					}
 				}
 			}
 
@@ -2035,7 +2093,7 @@ export function validateVitestPolicy( {
 					? getObjectPatternPropertyIdentifiers(
 							target,
 							'getComputedStyle'
-					  )
+						)
 					: [] ),
 			];
 			for ( const identifier of computedStyleTargets ) {
@@ -2080,22 +2138,7 @@ export function validateVitestPolicy( {
 				}
 			}
 
-			if (
-				! isBrowserGlobalExpression(
-					value,
-					unboundIdentifiers,
-					domVariables,
-					domCollectionVariables,
-					identifierVariables,
-					windowVariables,
-					testingLibraryScreenVariables,
-					testingLibraryDomFunctionVariables,
-					testingLibraryAsyncDomFunctionVariables,
-					testingLibraryCollectionFunctionVariables,
-					testingLibraryAsyncCollectionFunctionVariables,
-					testingLibraryNamespaceVariables
-				)
-			) {
+			if ( ! isTrackedDomValue( value ) ) {
 				return;
 			}
 
@@ -2104,6 +2147,25 @@ export function validateVitestPolicy( {
 	}
 
 	traverseAst( ast, visitorKeys, ( node ) => {
+		if (
+			project === 'browser' &&
+			node.type === 'MemberExpression' &&
+			[ 'render', 'renderHook' ].includes(
+				getMemberPropertyName( node )
+			) &&
+			isVariableReference(
+				node.object,
+				testingLibraryNamespaceVariables,
+				identifierVariables
+			)
+		) {
+			report(
+				'browser-react-renderer',
+				"Browser tests must import React renderers from 'vitest-browser-react'",
+				node
+			);
+		}
+
 		if (
 			project === 'browser' &&
 			node.type === 'Identifier' &&
@@ -2186,6 +2248,23 @@ export function validateVitestPolicy( {
 			report( 'commonjs-import', 'CommonJS import', node );
 		}
 
+		// Preserve jest/no-export for suites. Vitest has no equivalent rule;
+		// shared helpers and setup modules must remain able to export.
+		if (
+			isVitestTest &&
+			[
+				'ExportNamedDeclaration',
+				'ExportDefaultDeclaration',
+				'ExportAllDeclaration',
+			].includes( node.type )
+		) {
+			report(
+				'test-export',
+				'Do not export from a test file. Move shared helpers to a separate module',
+				node
+			);
+		}
+
 		if (
 			node.type === 'TSExportAssignment' ||
 			( node.type === 'AssignmentExpression' &&
@@ -2202,7 +2281,7 @@ export function validateVitestPolicy( {
 		}
 
 		if (
-			/\.tsx?$/.test( file ) &&
+			/\.[cm]?tsx?$/.test( file ) &&
 			node.type === 'CallExpression' &&
 			node.callee?.type === 'MemberExpression' &&
 			isImportedApiReference(
@@ -2270,22 +2349,43 @@ export function validateVitestPolicy( {
 			);
 		}
 
-		if (
-			project === 'jsdom' &&
-			! typeOnlyNodes.has( node ) &&
-			( ( node.type === 'Identifier' &&
-				browserApiIdentifiers.has( node.name ) &&
-				unboundIdentifiers.has( node ) ) ||
-				( node.type === 'MemberExpression' &&
-					browserApiProperties.has( getMemberPropertyName( node ) ) &&
+		if ( project === 'jsdom' && ! typeOnlyNodes.has( node ) ) {
+			const isVitestMock =
+				node.type === 'CallExpression' &&
+				node.callee?.type === 'MemberExpression' &&
+				isImportedApiReference(
+					node.callee.object,
+					'vi',
+					vitestViVariables,
+					vitestNamespaceVariables,
+					identifierVariables
+				);
+			const mockMethod =
+				isVitestMock && getMemberPropertyName( node.callee );
+			const apiName =
+				mockMethod === 'spyOn'
+					? getStaticStringValue( node.arguments[ 1 ] )
+					: getMemberPropertyName( node );
+			const apiTarget =
+				mockMethod === 'spyOn' ? node.arguments[ 0 ] : node.object;
+
+			if (
+				( node.type === 'Identifier' &&
+					browserApiIdentifiers.has( node.name ) &&
+					unboundIdentifiers.has( node ) ) ||
+				( mockMethod === 'stubGlobal' &&
+					browserApiProperties.has(
+						getStaticStringValue( node.arguments[ 0 ] )
+					) ) ||
+				( browserApiProperties.has( apiName ) &&
 					( isWindowReference(
-						node.object,
+						apiTarget,
 						unboundIdentifiers,
 						windowVariables,
 						identifierVariables
 					) ||
 						isBrowserGlobalExpression(
-							node.object,
+							apiTarget,
 							unboundIdentifiers,
 							domVariables,
 							domCollectionVariables,
@@ -2297,9 +2397,10 @@ export function validateVitestPolicy( {
 							testingLibraryCollectionFunctionVariables,
 							testingLibraryAsyncCollectionFunctionVariables,
 							testingLibraryNamespaceVariables
-						) ) ) )
-		) {
-			reportJsdomBrowserApi( node );
+						) ) )
+			) {
+				reportJsdomBrowserApi( node );
+			}
 		}
 
 		if (

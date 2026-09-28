@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { forwardRef } from '@wordpress/element';
 import RovingTabIndex from '../roving-tab-index';
@@ -14,7 +15,9 @@ describe( 'RovingTabIndexItem', () => {
 	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
 		expect( () =>
 			render( <RovingTabIndexItem as={ TestButton } /> )
-		).toThrow();
+		).toThrow(
+			'TreeGridItem can only be rendered inside a TreeGrid component.'
+		);
 		expect( console ).toHaveErrored();
 	} );
 

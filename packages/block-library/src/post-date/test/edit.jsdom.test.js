@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { is12HourFormat } from '../edit';
 
 describe( 'is12HourFormat', () => {

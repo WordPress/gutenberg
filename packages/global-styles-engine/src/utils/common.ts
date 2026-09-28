@@ -101,6 +101,14 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
+		path: [ 'typography', 'textShadowPresets' ],
+		valueKey: 'textShadow',
+		cssVarInfix: 'text-shadow',
+		classes: [
+			{ classSuffix: 'text-shadow', propertyName: 'text-shadow' },
+		],
+	},
+	{
 		path: [ 'spacing', 'spacingSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'spacing',
@@ -167,6 +175,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
 	shadow: 'shadow',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
+	'typography.textShadow': 'text-shadow',
 };
 
 /**
@@ -500,7 +509,7 @@ function findInPresetsBy(
 					'blocks',
 					blockName,
 					...presetPath,
-			  ] )
+				] )
 			: undefined,
 		getValueFromObjectPath( settings, presetPath ),
 	].filter( Boolean );
@@ -587,7 +596,7 @@ function getValueFromCustomVariable(
 					blockName,
 					'custom',
 					...path,
-			  ] )
+				] )
 			: undefined ) ??
 		getValueFromObjectPath( features?.settings ?? {}, [
 			'custom',

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import specialCommentConverter from '../special-comment-converter';
 import { deepFilterHTML } from '../utils';
 

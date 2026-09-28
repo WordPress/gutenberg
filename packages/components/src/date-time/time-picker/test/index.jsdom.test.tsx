@@ -1,14 +1,28 @@
-import { render, screen } from '@testing-library/react';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import timezoneMock from 'timezone-mock';
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 import TimePicker from '..';
 
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
+
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -62,7 +76,7 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with an updated hour (12-hour clock)', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -84,7 +98,7 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with a bounded hour (12-hour clock) if the hour is out of bounds', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -106,7 +120,7 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -128,7 +142,7 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with a bounded minute if out of bounds', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -150,7 +164,7 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with a bounded day if out of bounds', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -173,7 +187,7 @@ describe( 'TimePicker', () => {
 	it( 'should clamp day when switching months', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -195,7 +209,7 @@ describe( 'TimePicker', () => {
 	it( 'should clamp day when switching year from leap to non-leap', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -219,7 +233,7 @@ describe( 'TimePicker', () => {
 	it( 'should switch to PM correctly', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -239,7 +253,7 @@ describe( 'TimePicker', () => {
 	it( 'should switch to AM correctly', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -259,7 +273,7 @@ describe( 'TimePicker', () => {
 	it( 'should allow to set the time correctly when the PM period is selected', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -292,7 +306,7 @@ describe( 'TimePicker', () => {
 	it( 'should truncate at the minutes on change', async () => {
 		const user = userEvent.setup();
 
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -311,8 +325,8 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:22:00' );
 	} );
 
-	it( 'should reset the date when currentTime changed', () => {
-		const onChangeSpy = jest.fn();
+	it( 'should reset the date when currentTime changed', async () => {
+		const onChangeSpy = vi.fn();
 
 		const { rerender } = render(
 			<TimePicker
@@ -328,6 +342,9 @@ describe( 'TimePicker', () => {
 				onChange={ onChangeSpy }
 				is12Hour
 			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked()
 		);
 
 		expect(
@@ -350,8 +367,8 @@ describe( 'TimePicker', () => {
 		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
 	} );
 
-	it( 'should have different layouts/orders for 12/24 hour formats', () => {
-		const onChangeSpy = jest.fn();
+	it( 'should have different layouts/orders for 12/24 hour formats', async () => {
+		const onChangeSpy = vi.fn();
 
 		const { rerender } = render(
 			<form aria-label="form">
@@ -383,6 +400,9 @@ describe( 'TimePicker', () => {
 				/>
 			</form>
 		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
+		);
 
 		monthInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Month' )
@@ -395,7 +415,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<form aria-label="form">
@@ -424,8 +444,8 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
-		const onChangeSpy = jest.fn();
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', async () => {
+		const onChangeSpy = vi.fn();
 
 		render(
 			<form aria-label="form">
@@ -437,6 +457,9 @@ describe( 'TimePicker', () => {
 				/>
 			</form>
 		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
+		);
 
 		const form = screen.getByRole( 'form' ) as HTMLFormElement;
 
@@ -455,8 +478,8 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should set a time when passed a null currentTime', () => {
-		const onChangeSpy = jest.fn();
+	it( 'Should set a time when passed a null currentTime', async () => {
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimePicker
@@ -464,6 +487,9 @@ describe( 'TimePicker', () => {
 				onChange={ onChangeSpy }
 				is12Hour
 			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
 		);
 
 		const monthInput = (
@@ -505,7 +531,7 @@ describe( 'TimePicker', () => {
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 			timezoneMock.unregister();
 		} );
 
@@ -576,19 +602,15 @@ describe( 'TimePicker', () => {
 					// For undefined, set fake system time to get a known current time
 					let user: ReturnType< typeof userEvent.setup >;
 					if ( initialTime === undefined ) {
-						jest.useFakeTimers();
+						vi.useFakeTimers( { toFake: [ 'Date' ] } );
 						// Set system time to 12:00 UTC
-						jest.setSystemTime(
-							Date.UTC( 2025, 11, 18, 12, 0, 0 )
-						);
-						user = userEvent.setup( {
-							advanceTimers: jest.advanceTimersByTime,
-						} );
+						vi.setSystemTime( Date.UTC( 2025, 11, 18, 12, 0, 0 ) );
+						user = userEvent.setup();
 					} else {
 						user = userEvent.setup();
 					}
 
-					const onChange = jest.fn();
+					const onChange = vi.fn();
 
 					const { rerender } = render(
 						<TimePicker
@@ -653,7 +675,7 @@ describe( 'TimePicker', () => {
 	describe( 'ISO 8601 compliance', () => {
 		it( 'should handle years below 1000 with zero-padded output', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<TimePicker

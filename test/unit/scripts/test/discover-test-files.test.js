@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-	findAddedLegacyJestTests,
 	getTestEnvironmentName,
 	getVitestTestsByProject,
 } from '../discover-test-files.mjs';
@@ -27,43 +26,16 @@ describe( 'getTestEnvironmentName', () => {
 describe( 'getVitestTestsByProject', () => {
 	it( 'routes every new test to Vitest without migration metadata', () => {
 		expect(
-			getVitestTestsByProject(
-				[
-					'example.test.ts',
-					'example.jsdom.test.tsx',
-					'example.browser.test.js',
-				],
-				{ jest: { files: [] } }
-			)
+			getVitestTestsByProject( [
+				'example.test.ts',
+				'example.jsdom.test.tsx',
+				'example.browser.test.js',
+			] )
 		).toEqual( {
 			browser: [ 'example.browser.test.js' ],
 			jsdom: [ 'example.jsdom.test.tsx' ],
 			node: [ 'example.test.ts' ],
 		} );
-	} );
-
-	it( 'keeps only exact allowlisted JSDOM tests in Jest', () => {
-		expect(
-			getVitestTestsByProject(
-				[ 'legacy.jsdom.test.tsx', 'new.jsdom.test.tsx' ],
-				{ jest: { files: [ 'legacy.jsdom.test.tsx' ] } }
-			)
-		).toEqual( {
-			browser: [],
-			jsdom: [ 'new.jsdom.test.tsx' ],
-			node: [],
-		} );
-	} );
-} );
-
-describe( 'findAddedLegacyJestTests', () => {
-	it( 'allows the legacy Jest list to shrink but reports additions', () => {
-		expect(
-			findAddedLegacyJestTests(
-				[ 'legacy-a.jsdom.test.js', 'new.jsdom.test.js' ],
-				[ 'legacy-a.jsdom.test.js', 'legacy-b.jsdom.test.js' ]
-			)
-		).toEqual( [ 'new.jsdom.test.js' ] );
 	} );
 } );
 

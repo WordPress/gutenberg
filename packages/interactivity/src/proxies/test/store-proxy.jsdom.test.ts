@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { proxifyStore, proxifyState } from '../';
 import { setScope, resetScope, getContext } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';
@@ -45,7 +46,11 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should wrap generators into async functions', async () => {
-				const asyncFunc = function* () {
+				const asyncFunc = function* (): Generator<
+					Promise< string >,
+					string,
+					string
+				> {
 					const data = yield Promise.resolve( 'data' );
 					const ctx = getContext< { value: string } >();
 					return `${ data } from ${ ctx.value }`;
@@ -73,7 +78,11 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should allow async functions to call functions from other stores', async () => {
-				const asyncFunc = function* () {
+				const asyncFunc = function* (): Generator<
+					Promise< string >,
+					string,
+					string
+				> {
 					const data = yield Promise.resolve( 'data' );
 					const ctx = getContext< { value: string } >();
 					return `${ data } from ${ ctx.value }`;
@@ -85,7 +94,7 @@ describe( 'Interactivity API', () => {
 
 				const storeTest2 = proxifyStore( 'test2', {
 					callbacks: {
-						*asyncFunc() {
+						*asyncFunc(): Generator< unknown, string, string > {
 							const result =
 								yield storeTest1.callbacks.asyncFunc();
 							return result;

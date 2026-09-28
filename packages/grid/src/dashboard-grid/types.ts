@@ -195,11 +195,10 @@ export type GridItemProps = {
  *   per-tile width floor that can reduce the count below the cap on
  *   narrow containers ("up to N columns, but never narrower than W px").
  */
-export interface DashboardGridProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardGridProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */

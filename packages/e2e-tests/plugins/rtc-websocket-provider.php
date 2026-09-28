@@ -40,7 +40,7 @@ function gutenberg_test_rtc_websocket_provider_enqueue() {
 	wp_enqueue_script(
 		'gutenberg-test-rtc-websocket-provider',
 		plugins_url( 'rtc-websocket-provider/build/index.js', __FILE__ ),
-		array( 'wp-hooks', 'wp-sync' ),
+		array( 'wp-hooks' ),
 		filemtime( $script_path ),
 		true
 	);

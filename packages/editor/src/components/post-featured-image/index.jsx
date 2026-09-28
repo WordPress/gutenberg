@@ -176,6 +176,11 @@ function PostFeaturedImage( {
 							DEFAULT_FEATURE_IMAGE_LABEL
 						}
 						onSelect={ onUpdateImage }
+						featuredImageFlow
+						// The deprecated name is passed too, because
+						// `editor.MediaUpload` callbacks read it to recognize
+						// the featured image. It will be removed in the near
+						// future, and passing both raises no warning.
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
@@ -205,7 +210,7 @@ function PostFeaturedImage( {
 												? null
 												: __(
 														'Edit or replace the featured image'
-												  )
+													)
 										}
 										aria-describedby={
 											! featuredImageId
@@ -303,7 +308,7 @@ const applyWithSelect = withSelect( ( select ) => {
 		media: featuredImageId
 			? getEntityRecord( 'postType', 'attachment', featuredImageId, {
 					context: 'view',
-			  } )
+				} )
 			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),

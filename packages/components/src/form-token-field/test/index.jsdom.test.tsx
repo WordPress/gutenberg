@@ -1,4 +1,4 @@
-/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	render,
 	screen,
@@ -11,6 +11,10 @@ import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
 import FormTokenField from '../';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockScrollIntoView();
 
 const FormTokenFieldWithState = ( {
 	onChange,
@@ -106,20 +110,23 @@ function unescapeAndFormatSpaces( str: string ) {
 	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
 
+const SHOW_HOW_TO_DEPRECATION =
+	'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.';
+
 describe( 'FormTokenField', () => {
+	beforeEach( () => {
+		delete logged[ SHOW_HOW_TO_DEPRECATION ];
+	} );
+
 	afterEach( () => {
-		// `@wordpress/deprecated` caches each warning message after the first
-		// log; reset it so multiple tests can assert the same deprecation.
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
+		delete logged[ SHOW_HOW_TO_DEPRECATION ];
 	} );
 
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
 
@@ -144,7 +151,7 @@ describe( 'FormTokenField', () => {
 		it( "should add a token with the input's value when pressing the comma key", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
 
@@ -160,7 +167,7 @@ describe( 'FormTokenField', () => {
 		it( 'should add a token with the input value when pressing the space key and the `tokenizeOnSpace` prop is `true`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
@@ -204,7 +211,7 @@ describe( 'FormTokenField', () => {
 		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
@@ -239,7 +246,7 @@ describe( 'FormTokenField', () => {
 		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
 
@@ -255,7 +262,7 @@ describe( 'FormTokenField', () => {
 		it( 'should remove the last token when pressing the backspace key', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -283,7 +290,7 @@ describe( 'FormTokenField', () => {
 		it( 'should remove a token when clicking the token\'s "remove" button', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -325,7 +332,7 @@ describe( 'FormTokenField', () => {
 		it( 'should remove a token when by focusing on the token\'s "remove" button and pressing space bar', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -360,7 +367,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not add a new token if a token with the same value already exists', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -387,7 +394,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not add a new token if the text input is blank', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -407,7 +414,7 @@ describe( 'FormTokenField', () => {
 		it( 'should allow moving the cursor through the tokens when pressing the arrow keys, and should remove the token in front of the cursor when pressing the delete key', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -534,7 +541,7 @@ describe( 'FormTokenField', () => {
 		it( 'should fire the `onFocus` callback when the input is focused', async () => {
 			const user = userEvent.setup();
 
-			const onFocusSpy = jest.fn();
+			const onFocusSpy = vi.fn();
 
 			render( <FormTokenFieldWithState onFocus={ onFocusSpy } /> );
 
@@ -556,7 +563,7 @@ describe( 'FormTokenField', () => {
 		it( "should fire the `onInputChange` callback when the input's value changes", async () => {
 			const user = userEvent.setup();
 
-			const onInputChangeSpy = jest.fn();
+			const onInputChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState onInputChange={ onInputChangeSpy } />
@@ -628,9 +635,7 @@ describe( 'FormTokenField', () => {
 				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
 			);
 
-			expect( console ).toHaveWarnedWith(
-				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
-			);
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 
 			expect(
 				screen.queryByText( 'Separate with commas or the Enter key.' )
@@ -648,7 +653,7 @@ describe( 'FormTokenField', () => {
 				/>
 			);
 
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( 'Help text' );
@@ -674,7 +679,7 @@ describe( 'FormTokenField', () => {
 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -703,7 +708,7 @@ describe( 'FormTokenField', () => {
 		it( 'should handle accents and special characters in tokens and input value', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -748,7 +753,7 @@ describe( 'FormTokenField', () => {
 		it( 'should render suggestions when receiving focus if the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
 			const user = userEvent.setup();
 
-			const onFocusSpy = jest.fn();
+			const onFocusSpy = vi.fn();
 
 			const suggestions = [ 'Cobalt', 'Blue', 'Octane' ];
 
@@ -791,7 +796,7 @@ describe( 'FormTokenField', () => {
 		it( 'should render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
 			const user = userEvent.setup();
 
-			const onFocusSpy = jest.fn();
+			const onFocusSpy = vi.fn();
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
@@ -823,7 +828,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `false` or not defined', async () => {
 			const user = userEvent.setup();
 
-			const onFocusSpy = jest.fn();
+			const onFocusSpy = vi.fn();
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
@@ -854,7 +859,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not render suggestions after the input is blurred', async () => {
 			const user = userEvent.setup();
 
-			const onFocusSpy = jest.fn();
+			const onFocusSpy = vi.fn();
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
@@ -951,7 +956,7 @@ describe( 'FormTokenField', () => {
 		it( 'should allow the user to use the keyboard to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const suggestions = [
 				'Pink',
@@ -1027,10 +1032,48 @@ describe( 'FormTokenField', () => {
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 
+		it( 'should select the last suggestion when pressing the up arrow with no suggestion selected', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'Pink', 'Salmon', 'Carnation', 'Neon' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "on" will show the "Salmon", "Carnation" and "Neon" suggestions
+			await user.type( input, 'on' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Salmon',
+				'Carnation',
+				'Neon',
+			] );
+
+			// Currently, none of the suggestions are selected
+			expect(
+				within( suggestionList ).queryByRole( 'option', {
+					selected: true,
+				} )
+			).not.toBeInTheDocument();
+
+			// Pressing the up arrow from an empty selection wraps to the end of
+			// the list and selects "Neon"
+			await user.keyboard( '[ArrowUp]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Neon' );
+		} );
+
 		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const suggestions = [ 'Tiger', 'Tangerine', 'Orange' ];
 
@@ -1100,7 +1143,7 @@ describe( 'FormTokenField', () => {
 		it( 'should hide the suggestion list when the Escape key is pressed', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const suggestions = [ 'Black', 'Ash', 'Onyx', 'Ebony' ];
 
@@ -1453,7 +1496,7 @@ describe( 'FormTokenField', () => {
 		it( 'should accept tokens in their object format', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState
@@ -1493,8 +1536,8 @@ describe( 'FormTokenField', () => {
 		it( 'should trigger mouse callbacks if the `onMouseEnter` and/or the `onMouseLeave` properties are set on a token data object', async () => {
 			const user = userEvent.setup();
 
-			const onMouseEnterSpy = jest.fn();
-			const onMouseLeaveSpy = jest.fn();
+			const onMouseEnterSpy = vi.fn();
+			const onMouseLeaveSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -1575,7 +1618,7 @@ describe( 'FormTokenField', () => {
 		it( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState
@@ -1639,7 +1682,7 @@ describe( 'FormTokenField', () => {
 		it( "should allow to modify the input's value when saving it as a token", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState
@@ -1702,7 +1745,7 @@ describe( 'FormTokenField', () => {
 		it( 'is applied to the search value when matching it against the list of suggestions', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const suggestions = [ 'Expensive food', 'Free food' ];
 
@@ -1740,7 +1783,7 @@ describe( 'FormTokenField', () => {
 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState
@@ -1796,7 +1839,7 @@ describe( 'FormTokenField', () => {
 		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const suggestions = [ 'Hot coffee', 'Hot tea' ];
 
@@ -1874,7 +1917,7 @@ describe( 'FormTokenField', () => {
 		it( 'should add a token only if it passes the validation set via `__experimentalValidateInput`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -1917,8 +1960,8 @@ describe( 'FormTokenField', () => {
 		it( 'should still preventDefault on Enter when validation rejects the value', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
-			const onSubmitSpy = jest.fn( ( e: React.FormEvent ) =>
+			const onChangeSpy = vi.fn();
+			const onSubmitSpy = vi.fn( ( e: React.FormEvent ) =>
 				e.preventDefault()
 			);
 			const startsWithCapitalLetter = ( tokenText: string ) =>
@@ -1946,7 +1989,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -1984,7 +2027,7 @@ describe( 'FormTokenField', () => {
 		it( 'should filter out invalid tokens when pasting with separators', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -2012,7 +2055,7 @@ describe( 'FormTokenField', () => {
 		it( 'should leave all segments in the input when none pass validation on paste', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -2035,7 +2078,7 @@ describe( 'FormTokenField', () => {
 		it( 'should commit a trailing valid segment and leave only failed segments in the input when pasting without a trailing separator', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -2059,7 +2102,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -2081,7 +2124,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values with `__experimentalValidateInput`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
@@ -2108,7 +2151,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not allow adding new tokens beyond the value defined by the `maxLength` prop', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState
@@ -2176,7 +2219,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not affect tokens that were added before the limit was imposed', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
@@ -2219,7 +2262,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not allow adding tokens when the `disabled` prop is `true`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const { rerender } = render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
@@ -2247,7 +2290,7 @@ describe( 'FormTokenField', () => {
 		it( 'should not allow removing tokens when the `disable` prop is `true`', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<FormTokenFieldWithState

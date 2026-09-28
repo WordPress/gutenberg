@@ -28,10 +28,10 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 ## The performance benchmark job
 
-A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `npm exec release-cli -- perf [branches]`, example:
+A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `npm exec --no release-cli -- perf [branches]`, example:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 On pull requests, the base branch column (for example `trunk`) is measured at the commit the pull request is based on, not at the current tip of the branch, so both columns match what the merge commit was built from.

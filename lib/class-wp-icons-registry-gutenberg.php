@@ -1,5 +1,96 @@
 <?php
 
+/**
+ * Returns the SVG elements and attributes allowed for registered icons.
+ *
+ * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
+ */
+function gutenberg_get_allowed_icon_svg_tags(): array {
+	$allow_attributes = static function ( string ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	};
+
+	$stroke_attributes = $allow_attributes(
+		'style',
+		'stroke',
+		'stroke-width',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'vector-effect',
+	);
+
+	return array(
+		'svg'     => array_merge(
+			$allow_attributes(
+				'class',
+				'xmlns',
+				'width',
+				'height',
+				'viewbox',
+				'aria-hidden',
+				'role',
+				'focusable',
+				'fill',
+				'fill-rule',
+				'clip-rule',
+			),
+			$stroke_attributes
+		),
+		'path'    => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'd',
+				'opacity',
+				'transform',
+			),
+			$stroke_attributes
+		),
+		'polygon' => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'points',
+				'transform',
+				'focusable',
+			),
+			$stroke_attributes
+		),
+		'rect'    => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'x',
+				'y',
+				'width',
+				'height',
+				'rx',
+				'ry',
+				'transform',
+			),
+			$stroke_attributes
+		),
+		'circle'  => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'cx',
+				'cy',
+				'r',
+				'transform',
+			),
+			$stroke_attributes
+		),
+	);
+}
+
+
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
@@ -188,8 +279,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Sanitizes the icon SVG content.
 	 *
-	 * Overrides the base class to allow stroke-related attributes and inline
-	 * styles required by stroke-based icons.
+	 * Overrides the base class to allow the `rect` and `circle` shapes, plus the
+	 * stroke-related attributes and inline styles required by stroke-based icons.
 	 *
 	 * The signature is intentionally left without type declarations to stay
 	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
@@ -273,7 +364,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * The base `$instance` slot is intentionally not redefined, so both
 	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
 	 * one instance. An existing base registry is upgraded, replaying any
-	 * non-`core/` icons so they are not lost.
+	 * non-`core/` and non-`core-admin/` icons so they are not lost.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -282,7 +373,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 			if ( null !== $original_registry ) {
 				foreach ( $original_registry->get_registered_icons() as $icon ) {
-					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) || str_starts_with( $icon['name'], 'core-admin/' ) ) {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );

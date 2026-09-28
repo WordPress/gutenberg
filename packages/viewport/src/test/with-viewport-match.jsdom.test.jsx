@@ -1,9 +1,14 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useViewportMatch } from '@wordpress/compose';
 import '../store';
 import withViewportMatch from '../with-viewport-match';
 
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match' );
+vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ), () => ( {
+	default: vi.fn(),
+} ) );
+
+const mockedUseViewportMatch = vi.mocked( useViewportMatch );
 
 const Component = ( { isWide, isSmall, isLarge, isLessThanSmall } ) => {
 	return (
@@ -18,7 +23,7 @@ const Component = ( { isWide, isSmall, isLarge, isLessThanSmall } ) => {
 
 describe( 'withViewportMatch()', () => {
 	afterEach( () => {
-		useViewportMatch.mockClear();
+		mockedUseViewportMatch.mockClear();
 	} );
 
 	it( 'should render with result of query as custom prop name', () => {
@@ -29,14 +34,14 @@ describe( 'withViewportMatch()', () => {
 			isLessThanSmall: '< small',
 		} )( Component );
 
-		useViewportMatch.mockReturnValueOnce( false );
-		useViewportMatch.mockReturnValueOnce( true );
-		useViewportMatch.mockReturnValueOnce( true );
-		useViewportMatch.mockReturnValueOnce( false );
+		mockedUseViewportMatch.mockReturnValueOnce( false );
+		mockedUseViewportMatch.mockReturnValueOnce( true );
+		mockedUseViewportMatch.mockReturnValueOnce( true );
+		mockedUseViewportMatch.mockReturnValueOnce( false );
 
 		render( <EnhancedComponent /> );
 
-		expect( useViewportMatch.mock.calls ).toEqual( [
+		expect( mockedUseViewportMatch.mock.calls ).toEqual( [
 			[ 'wide', '>=' ],
 			[ 'small', '>=' ],
 			[ 'large', '>=' ],

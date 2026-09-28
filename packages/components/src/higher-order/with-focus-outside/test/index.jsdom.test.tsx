@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Component } from '@wordpress/element';
@@ -39,7 +40,7 @@ describe( 'withFocusOutside', () => {
 		origHasFocus = document.hasFocus;
 		document.hasFocus = () => true;
 
-		onFocusOutside = jest.fn();
+		onFocusOutside = vi.fn();
 	} );
 
 	afterEach( () => {

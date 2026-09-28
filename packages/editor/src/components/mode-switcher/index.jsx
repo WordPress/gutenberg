@@ -4,7 +4,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
-import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
 
 /**
  * Set of available mode options.
@@ -23,12 +22,12 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const { keyCombination, isRichEditingEnabled, isCodeEditingEnabled, mode } =
+	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
 		useSelect(
 			( select ) => ( {
-				keyCombination: select(
-					keyboardShortcutsStore
-				).getShortcutKeyCombination( 'core/editor/toggle-mode' ),
+				shortcut: select( keyboardShortcutsStore ).getKeyboardShortcut(
+					'core/editor/toggle-mode'
+				),
 				isRichEditingEnabled:
 					select( editorStore ).getEditorSettings()
 						.richEditingEnabled,
@@ -49,7 +48,6 @@ function ModeSwitcher() {
 		selectedMode = 'visual';
 	}
 
-	const shortcut = getKeyboardShortcut( keyCombination );
 	const choices = MODES.map( ( choice ) => {
 		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
 			choice = {

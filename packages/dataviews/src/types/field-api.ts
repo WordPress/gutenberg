@@ -350,8 +350,10 @@ export type Field< Item > = {
 
 	/**
 	 * Callback used to sort the field.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * Validation config for the field.
@@ -432,11 +434,7 @@ export type Field< Item > = {
 	 * Display format configuration for fields.
 	 */
 	format?:
-		| FormatDatetime
-		| FormatDate
-		| FormatTime
-		| FormatNumber
-		| FormatInteger;
+		FormatDatetime | FormatDate | FormatTime | FormatNumber | FormatInteger;
 
 	/**
 	 * Callback used to format the value of the field for display.
@@ -575,8 +573,10 @@ export type NormalizedField< Item > = Omit<
 	/**
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * The validation rules of the field, normalized.

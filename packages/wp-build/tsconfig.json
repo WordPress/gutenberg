@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"module": "node16",
 		"moduleResolution": "node16",
@@ -17,7 +17,10 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
-	"references": [ { "path": "../style-runtime/tsconfig.build.json" } ],
+	"references": [
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../theme/tsconfig.plugins.json" }
+	],
 	"include": [ "." ],
 	"exclude": [
 		// Excluded to maintain consistency with bin/tsconfig.json

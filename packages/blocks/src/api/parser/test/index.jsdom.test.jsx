@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import '../../../store';
 import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,
@@ -34,11 +36,6 @@ describe( 'block parser', () => {
 		},
 		save: ( { attributes } ) => attributes.content || null,
 	};
-
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../../store' );
-	} );
 
 	afterEach( () => {
 		setFreeformContentHandlerName( undefined );
@@ -270,6 +267,10 @@ describe( 'block parser', () => {
 				expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 				expect( block.isValid ).toBe( true );
 				expect( console ).toHaveInformed();
+				expect( console ).toHaveLoggedWith(
+					'Updated Block: %s',
+					'core/test-block'
+				);
 			} );
 			it( 'handle deprecation but not log', () => {
 				const block = parseRawBlock(

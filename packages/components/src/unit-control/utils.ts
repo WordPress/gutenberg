@@ -371,7 +371,7 @@ export function filterUnitsWithSettings(
 	return Array.isArray( availableUnits )
 		? availableUnits.filter( ( unit ) =>
 				allowedUnitValues.includes( unit.value )
-		  )
+			)
 		: [];
 }
 

@@ -2,6 +2,9 @@ import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
+import type { IconProps } from '../icon/types';
+
+export type PrefixIconProps = IconProps;
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
@@ -9,21 +12,20 @@ export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
 // Keep the menu vertical, expose Escape bubbling only on SubmenuRoot, and omit
 // Base UI's detached-trigger handle and payload-rendering API.
-export interface RootProps
-	extends Pick<
-		_Menu.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'actionsRef'
-		| 'triggerId'
-		| 'defaultTriggerId'
-	> {
+export interface RootProps extends Pick<
+	_Menu.Root.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'modal'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'disabled'
+	| 'actionsRef'
+	| 'triggerId'
+	| 'defaultTriggerId'
+> {
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
@@ -44,19 +46,18 @@ export type TriggerProps = Omit<
 
 // Keep submenus vertical; horizontal orientation is not supported by the
 // styled Menu layout.
-export interface SubmenuRootProps
-	extends Pick<
-		_Menu.SubmenuRoot.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'closeParentOnEsc'
-		| 'actionsRef'
-	> {
+export interface SubmenuRootProps extends Pick<
+	_Menu.SubmenuRoot.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'disabled'
+	| 'closeParentOnEsc'
+	| 'actionsRef'
+> {
 	/**
 	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
 	 */
@@ -113,6 +114,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
+	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
 	 */
 	prefix?: ReactNode;
 
@@ -153,10 +155,7 @@ type MenuItemChildren =
 	| [
 			ReactElement< ItemLabelProps >,
 			...(
-				| ReactElement< ItemDescriptionProps >
-				| false
-				| null
-				| undefined
+				ReactElement< ItemDescriptionProps > | false | null | undefined
 			)[],
 	  ];
 
@@ -180,8 +179,17 @@ export type LinkItemProps = Omit<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * Whether to open the link in a new browser tab.
-		 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+		 * Where to open the linked document. `"_blank"` also adds the visual
+		 * indicator and accessible new-tab notice.
+		 *
+		 * When both `target` and `openInNewTab` are set, `target` determines the
+		 * browsing context.
+		 */
+		target?: ComponentProps< 'a' >[ 'target' ];
+
+		/**
+		 * Adds a visual indicator and accessible notice for opening in a new tab.
+		 * Defaults `target` to `"_blank"` when no explicit target is set.
 		 *
 		 * @default false
 		 */

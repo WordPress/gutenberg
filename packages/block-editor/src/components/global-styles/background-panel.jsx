@@ -14,7 +14,7 @@ import {
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const DEFAULT_CONTROLS = {
@@ -163,7 +163,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const {
 		colors,

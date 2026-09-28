@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
@@ -7,10 +8,11 @@ import { editMediaEntity, setCollaborationSupported } from '../private-actions';
 import { getSyncManager, hasSyncManager } from '../sync';
 import { unlock } from '../lock-unlock';
 
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
-	hasSyncManager: jest.fn(),
+vi.mock( '@wordpress/api-fetch' );
+vi.mock( '../sync', async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getSyncManager: vi.fn(),
+	hasSyncManager: vi.fn(),
 } ) );
 
 describe( 'editMediaEntity', () => {
@@ -19,13 +21,13 @@ describe( 'editMediaEntity', () => {
 
 	beforeEach( () => {
 		apiFetch.mockReset();
-		dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn( () => 'test-lock' ),
-			__unstableReleaseStoreLock: jest.fn(),
+		dispatch = Object.assign( vi.fn(), {
+			receiveEntityRecords: vi.fn(),
+			__unstableAcquireStoreLock: vi.fn( () => 'test-lock' ),
+			__unstableReleaseStoreLock: vi.fn(),
 		} );
 		resolveSelect = {
-			getEntitiesConfig: jest.fn( () => [
+			getEntitiesConfig: vi.fn( () => [
 				{
 					kind: 'postType',
 					name: 'attachment',
@@ -182,7 +184,7 @@ describe( 'editMediaEntity', () => {
 	it( 'should use custom fetch function when provided', async () => {
 		const recordId = 123;
 		const edits = { src: 'https://example.com/image.jpg' };
-		const customFetch = jest.fn().mockResolvedValue( { id: recordId } );
+		const customFetch = vi.fn().mockResolvedValue( { id: recordId } );
 
 		await editMediaEntity( recordId, edits, {
 			__unstableFetch: customFetch,
@@ -223,10 +225,10 @@ describe( 'setCollaborationSupported', () => {
 
 	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
 		const syncManager = {
-			unloadAll: jest.fn(),
+			unloadAll: vi.fn(),
 		};
-		const dispatch = Object.assign( jest.fn(), {
-			__unstableNotifySyncUndoManagerChange: jest.fn(),
+		const dispatch = Object.assign( vi.fn(), {
+			__unstableNotifySyncUndoManagerChange: vi.fn(),
 		} );
 		hasSyncManager.mockReturnValue( true );
 		getSyncManager.mockReturnValue( syncManager );

@@ -207,7 +207,6 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 * Input data needs to be sanitized.
 	 *
 	 * @param array $values The values being sanitized.
-	 *
 	 * @return array
 	 */
 	private static function sanitize( $values ) {

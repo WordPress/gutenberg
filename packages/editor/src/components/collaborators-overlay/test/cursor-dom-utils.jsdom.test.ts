@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	getCursorPosition,
 	getNearestVisibleBlockAncestor,
@@ -16,7 +17,7 @@ const OVERLAY_RECT = {
 } as DOMRect;
 
 function mockRect( element: HTMLElement, rect: Partial< DOMRect > ) {
-	element.getBoundingClientRect = jest.fn().mockReturnValue( {
+	vi.spyOn( element, 'getBoundingClientRect' ).mockReturnValue( {
 		left: 0,
 		top: 0,
 		right: 0,
@@ -26,23 +27,23 @@ function mockRect( element: HTMLElement, rect: Partial< DOMRect > ) {
 		x: 0,
 		y: 0,
 		...rect,
-	} );
+	} as DOMRect );
 }
 
-// jsdom performs no layout and doesn't implement Range.getBoundingClientRect
-// / getClientRects at all (not even as a zero-returning stub), so any test
-// that lets getOffsetPositionInBlock create and measure a real Range needs
-// this polyfilled.
-beforeAll( () => {
-	Range.prototype.getBoundingClientRect = jest.fn().mockReturnValue( {
-		left: 0,
-		top: 0,
-		width: 0,
-		height: 0,
-		x: 0,
-		y: 0,
-	} );
-	Range.prototype.getClientRects = jest.fn().mockReturnValue( [] );
+// Supplied rectangles exercise the fallback and ancestor-selection algorithms.
+// Keep native Range construction and DOM traversal, without measuring layout.
+beforeEach( () => {
+	const createRange = document.createRange.bind( document );
+	vi.spyOn( document, 'createRange' ).mockImplementation( () =>
+		Object.assign( createRange(), {
+			getBoundingClientRect: () => new DOMRect(),
+			getClientRects: () => [],
+		} )
+	);
+} );
+
+afterEach( () => {
+	vi.restoreAllMocks();
 } );
 
 describe( 'cursor-dom-utils', () => {
@@ -80,6 +81,7 @@ describe( 'cursor-dom-utils', () => {
 			);
 
 			expect( result ).toBeNull();
+			expect( document.createRange ).not.toHaveBeenCalled();
 		} );
 	} );
 

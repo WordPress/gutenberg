@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 8.9.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useFocusOutside`: Cancel the previous pending blur check so repeated blur events from portaled content do not report focus leaving after it returns ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+
+## 8.8.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `useResizeObserver`: Disconnect the observer when the hook unmounts so queued callbacks cannot run after teardown ([#82687](https://github.com/WordPress/gutenberg/pull/82687)).
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

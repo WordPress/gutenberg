@@ -3,13 +3,9 @@ import { Textarea } from '../index';
 
 const meta: Meta< typeof Textarea > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Textarea',
+	title: 'Components/@wordpress-ui/Form/Primitives/Textarea',
+	id: 'design-system-components-form-primitives-textarea',
 	component: Textarea,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <Textarea { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -24,6 +20,7 @@ type Story = StoryObj< typeof Textarea >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 

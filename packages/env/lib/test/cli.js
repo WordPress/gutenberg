@@ -23,7 +23,7 @@ const env = {
 	LifecycleScriptError: originalEnv.LifecycleScriptError,
 };
 require.cache[ envPath ].exports = env;
-const processExit = vi.spyOn( process, 'exit' ).mockImplementation( () => {} );
+let processExit = vi.spyOn( process, 'exit' ).mockImplementation( () => {} );
 const cli = require( '../cli' );
 afterAll( () => {
 	require.cache[ oraPath ].exports = originalOra;
@@ -33,7 +33,12 @@ afterAll( () => {
 } );
 
 describe( 'env cli', () => {
-	beforeEach( vi.clearAllMocks );
+	beforeEach( () => {
+		processExit = vi
+			.spyOn( process, 'exit' )
+			.mockImplementation( () => {} );
+		vi.clearAllMocks();
+	} );
 
 	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
@@ -157,18 +162,14 @@ describe( 'env cli', () => {
 		env.start.mockRejectedValueOnce( {
 			message: 'failure message',
 		} );
-		const consoleError = vi
-			.spyOn( console, 'error' )
-			.mockImplementation( () => {} );
 
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
-		expect( consoleError ).toHaveBeenCalled();
+		expect( console ).toHaveErroredWith( { message: 'failure message' } );
 		expect( processExit ).toHaveBeenCalledWith( 1 );
-		consoleError.mockRestore();
 	} );
 	it( 'handles failed docker commands with errors.', async () => {
 		env.start.mockRejectedValueOnce( {

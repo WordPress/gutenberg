@@ -2,7 +2,7 @@ import {
 	Flex,
 	FlexItem,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Spinner,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
@@ -131,7 +131,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					}
 					isShownByDefault
 				>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Taxonomy' ) }
 						options={ getTaxonomyOptions() }
 						value={ taxonomy }

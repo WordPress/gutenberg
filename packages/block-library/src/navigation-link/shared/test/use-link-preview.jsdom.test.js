@@ -1,34 +1,37 @@
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
-// Mock useRemoteUrlData from block-editor
-const mockUseRemoteUrlData = jest.fn();
-jest.mock( '@wordpress/block-editor', () => ( {
-	privateApis: {},
-	store: {},
-} ) );
-// Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
-		useRemoteUrlData: ( ...args ) => mockUseRemoteUrlData( ...args ),
-		isHashLink: ( url ) => url?.startsWith( '#' ),
-		isRelativePath: ( url ) =>
-			url?.startsWith( '/' ) && ! url?.startsWith( '//' ),
-	} ) ),
-} ) );
 import {
 	computeDisplayUrl,
 	computeBadges,
 	isHomepage,
 	useLinkPreview,
 } from '../use-link-preview';
+// Mock useRemoteUrlData from block-editor
+const mockUseRemoteUrlData = vi.fn();
+
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
+	privateApis: {},
+	store: {},
+} ) );
+
+// Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
+vi.mock( import( '../../../lock-unlock' ), () => ( {
+	unlock: vi.fn( () => ( {
+		useRemoteUrlData: ( ...args ) => mockUseRemoteUrlData( ...args ),
+		isHashLink: ( url ) => url?.startsWith( '#' ),
+		isRelativePath: ( url ) =>
+			url?.startsWith( '/' ) && ! url?.startsWith( '//' ),
+	} ) ),
+} ) );
 
 // Mock @wordpress/data
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
 } ) );
 
 // Mock @wordpress/core-data
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
@@ -205,7 +208,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'External link',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 
@@ -218,7 +221,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 
@@ -230,7 +233,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Internal link',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 
@@ -242,7 +245,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 
@@ -259,7 +262,7 @@ describe( 'computeBadges', () => {
 			} );
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 
@@ -273,7 +276,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).not.toContainEqual( {
 					label: 'Homepage',
-					intent: 'default',
+					intent: 'none',
 				} );
 			}
 		);
@@ -290,7 +293,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).toContainEqual( {
 					label: 'Homepage',
-					intent: 'default',
+					intent: 'none',
 				} );
 			}
 		);
@@ -303,7 +306,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'default',
+				intent: 'none',
 			} );
 		} );
 	} );
@@ -316,7 +319,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'No link selected',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -330,7 +333,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Missing page',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -343,7 +346,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Published',
-				intent: 'success',
+				intent: 'stable',
 			} );
 		} );
 
@@ -356,7 +359,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Draft',
-				intent: 'warning',
+				intent: 'low',
 			} );
 		} );
 	} );
@@ -372,12 +375,12 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 	// Should prioritize hash link detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Internal link',
-		intent: 'default',
+		intent: 'none',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'none',
 	} );
 } );
 
@@ -391,12 +394,12 @@ it( 'should show "Homepage" badge for root path even when type is present', () =
 	// Should prioritize homepage detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Homepage',
-		intent: 'default',
+		intent: 'none',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'none',
 	} );
 } );
 
@@ -417,12 +420,12 @@ test.each( [
 		// Should prioritize external link detection over type
 		expect( badges ).toContainEqual( {
 			label: 'External link',
-			intent: 'default',
+			intent: 'none',
 		} );
 		// Should NOT show Page badge
 		expect( badges ).not.toContainEqual( {
 			label: 'Page',
-			intent: 'default',
+			intent: 'none',
 		} );
 	}
 );
@@ -437,18 +440,18 @@ it( 'should show "Page" badge for internal custom links', () => {
 	// Should show Page badge for internal custom links
 	expect( badges ).toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'none',
 	} );
 	// Should NOT show Custom badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Custom',
-		intent: 'default',
+		intent: 'none',
 	} );
 } );
 
 describe( 'useLinkPreview', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockUseRemoteUrlData.mockReturnValue( { richData: null } );
 		useSelect.mockReturnValue( null );
 	} );
@@ -641,7 +644,7 @@ describe( 'useLinkPreview', () => {
 
 			expect( result.current.badges ).toContainEqual( {
 				label: 'No link selected',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -673,7 +676,7 @@ describe( 'useLinkPreview', () => {
 
 			expect( result.current.badges ).toContainEqual( {
 				label: 'Missing page',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 

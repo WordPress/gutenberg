@@ -40,6 +40,13 @@ function gutenberg_reregister_core_block_types() {
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
+/*
+ * Remove the WordPress core filter to avoid generating a second tabs ID for
+ * every tabs block: `wp_unique_prefixed_id()` advances a counter, so running
+ * both copies makes the numbering skip.
+ */
+remove_filter( 'render_block_context', 'block_core_tabs_provide_context', 10 );
+
 /**
  * Adds the defer loading strategy to all registered blocks.
  *

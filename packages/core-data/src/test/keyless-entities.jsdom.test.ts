@@ -6,6 +6,7 @@
  * signatures that make that callable, since they are otherwise only exercised
  * from untyped JavaScript.
  */
+import { describe, expect, it } from 'vitest';
 import { dispatch, select } from '@wordpress/data';
 import { store as coreStore } from '../index';
 

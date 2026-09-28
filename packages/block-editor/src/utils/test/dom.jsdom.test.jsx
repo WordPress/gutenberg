@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
 import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
@@ -9,7 +10,7 @@ import {
 } from '../dom';
 
 function mockVisibleBoundingClientRect( element ) {
-	element.getBoundingClientRect = jest.fn().mockReturnValue( {
+	element.getBoundingClientRect = vi.fn().mockReturnValue( {
 		left: 0,
 		top: 0,
 		right: 100,
@@ -84,7 +85,7 @@ describe( 'dom', () => {
 		} );
 		it( 'should clip left and right values when an element is larger than the viewport width', () => {
 			const element = window.document.createElement( 'div' );
-			element.getBoundingClientRect = jest.fn().mockReturnValue( {
+			element.getBoundingClientRect = vi.fn().mockReturnValue( {
 				left: -10,
 				top: 0,
 				right: window.innerWidth + 10,
@@ -105,7 +106,7 @@ describe( 'dom', () => {
 		} );
 		it( 'should return the parent DOMRectReadOnly object if the parent block type is not supported', () => {
 			const element = window.document.createElement( 'div' );
-			element.getBoundingClientRect = jest.fn().mockReturnValue( {
+			element.getBoundingClientRect = vi.fn().mockReturnValue( {
 				left: 0,
 				top: 0,
 				right: 100,
@@ -115,7 +116,7 @@ describe( 'dom', () => {
 			} );
 			element.setAttribute( 'data-type', 'test' );
 			const childElement = window.document.createElement( 'div' );
-			childElement.getBoundingClientRect = jest.fn().mockReturnValue( {
+			childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
 				left: 0,
 				top: 0,
 				right: 333,
@@ -141,7 +142,7 @@ describe( 'dom', () => {
 		describe( 'With known block type', () => {
 			it( 'should return the child DOMRectReadOnly object if it is visible and a known block type', () => {
 				const element = window.document.createElement( 'div' );
-				element.getBoundingClientRect = jest.fn().mockReturnValue( {
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
 					left: 0,
 					top: 0,
 					right: 100,
@@ -154,18 +155,16 @@ describe( 'dom', () => {
 					WITH_OVERFLOW_ELEMENT_BLOCKS[ 0 ]
 				);
 				const childElement = window.document.createElement( 'div' );
-				childElement.getBoundingClientRect = jest
-					.fn()
-					.mockReturnValue( {
-						left: 0,
-						top: 0,
-						right: 333,
-						bottom: 333,
-						width: 333,
-						height: 333,
-						x: 0,
-						y: 0,
-					} );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
 				element.appendChild( childElement );
 
 				expect( getElementBounds( element ).toJSON() ).toEqual( {
@@ -187,7 +186,7 @@ describe( 'dom', () => {
 				);
 				element.style.overflowX = 'auto';
 				element.style.overflowY = 'auto';
-				element.getBoundingClientRect = jest.fn().mockReturnValue( {
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
 					left: 0,
 					top: 0,
 					right: 100,
@@ -196,18 +195,16 @@ describe( 'dom', () => {
 					height: 100,
 				} );
 				const childElement = window.document.createElement( 'div' );
-				childElement.getBoundingClientRect = jest
-					.fn()
-					.mockReturnValue( {
-						left: 0,
-						top: 0,
-						right: 333,
-						bottom: 333,
-						width: 333,
-						height: 333,
-						x: 0,
-						y: 0,
-					} );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
 				element.appendChild( childElement );
 
 				expect( getElementBounds( element ).toJSON() ).toEqual( {
@@ -223,7 +220,7 @@ describe( 'dom', () => {
 			} );
 			it( 'should return the parent DOMRectReadOnly object if the child element is not visible', () => {
 				const element = window.document.createElement( 'div' );
-				element.getBoundingClientRect = jest.fn().mockReturnValue( {
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
 					left: 0,
 					top: 0,
 					right: 100,
@@ -236,18 +233,16 @@ describe( 'dom', () => {
 					WITH_OVERFLOW_ELEMENT_BLOCKS[ 0 ]
 				);
 				const childElement = window.document.createElement( 'div' );
-				childElement.getBoundingClientRect = jest
-					.fn()
-					.mockReturnValue( {
-						left: 0,
-						top: 0,
-						right: 333,
-						bottom: 333,
-						width: 333,
-						height: 333,
-						x: 0,
-						y: 0,
-					} );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
 				childElement.style.display = 'none';
 				element.appendChild( childElement );
 

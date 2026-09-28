@@ -1,18 +1,23 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import flex from '../flex';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
 
 const FlexLayoutInspectorControls = flex.inspectorControls;
 const PANEL_ID = 'test-panel';
 
 function renderInspectorControls( props = {} ) {
 	return render(
-		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+		<ToolsPanel label="Layout" resetAll={ vi.fn() } panelId={ PANEL_ID }>
 			<FlexLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ {} }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				{ ...props }
 			/>
 		</ToolsPanel>
@@ -34,11 +39,57 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+
+	it( 'should output flex-direction row when a viewport override switches a vertical layout to horizontal', () => {
+		const result = flex.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {
+				type: 'flex',
+				orientation: 'vertical',
+				flexWrap: 'nowrap',
+				justifyContent: 'center',
+			},
+			viewportOverrides: {
+				orientation: 'horizontal',
+				justifyContent: 'left',
+			},
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe(
+			'.my-container {\n\t\t\t\tflex-direction: row; justify-content: flex-start;\n\t\t\t}'
+		);
+	} );
+
+	it( 'should keep flex-direction implicit when a viewport override does not change a horizontal orientation', () => {
+		const result = flex.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {
+				type: 'flex',
+				orientation: 'horizontal',
+				justifyContent: 'left',
+			},
+			viewportOverrides: {
+				justifyContent: 'right',
+			},
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).not.toContain( 'flex-direction' );
+		expect( result ).toContain( 'justify-content: flex-end' );
+	} );
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
-	it( 'should not render the wrap toggle by default', () => {
+	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
+		await screen.findByRole( 'radio', { name: 'Justify items left' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {
@@ -47,13 +98,13 @@ describe( 'FlexLayoutInspectorControls', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the wrap toggle when it has a value', () => {
+	it( 'should render the wrap toggle when it has a value', async () => {
 		renderInspectorControls( {
 			layout: { flexWrap: 'nowrap' },
 		} );
 
 		expect(
-			screen.getByRole( 'checkbox', {
+			await screen.findByRole( 'checkbox', {
 				name: 'Allow to wrap to multiple lines',
 			} )
 		).toBeInTheDocument();

@@ -1,0 +1,57 @@
+# Pack the public test tooling and verify it in standalone consumer projects.
+# Keep registry installs and consumer browser downloads scoped to tooling changes.
+name: Vitest consumers
+
+on:
+    pull_request:
+        paths:
+            - 'packages/scripts/**'
+            - 'packages/eslint-plugin/**'
+            - 'tools/validation/test-vitest-consumers.mjs'
+            - 'tools/validation/fixtures/vitest-consumer/**'
+            - 'package-lock.json'
+            - '.github/workflows/vitest-consumers.yml'
+    workflow_dispatch:
+
+permissions: {}
+
+jobs:
+    consumer:
+        name: Node.js ${{ matrix.node }} / Vite ${{ matrix.vite }}
+        runs-on: ubuntu-24.04
+        timeout-minutes: 20
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                # Exact versions cover the supported Node and Vite lower bounds.
+                node: ['22.22.2', '24.15.0', '26.0.0']
+                vite: ['7.0.0', '8.0.0']
+                # Major ranges also catch new releases without manual pin updates.
+                include:
+                    - node: '22'
+                      vite: '^7'
+                    - node: '24'
+                      vite: '^8'
+                      browser: true
+                    - node: '26'
+                      vite: '^8'
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  package-manager-cache: false
+            - name: Test isolated public tooling
+              env:
+                  VITE_VERSION: ${{ matrix.vite }}
+                  TEST_BROWSER: ${{ matrix.browser || false }}
+              run: |
+                  args=(--vite="$VITE_VERSION")
+                  if [ "$TEST_BROWSER" = "true" ]; then
+                      args+=(--browser)
+                  fi
+                  node tools/validation/test-vitest-consumers.mjs "${args[@]}"

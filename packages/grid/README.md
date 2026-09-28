@@ -10,14 +10,14 @@ dashboard-style surfaces.
 This package exposes two components, each implementing a different
 layout model:
 
--   **`DashboardGrid`** is a 2D packed grid: tiles declare explicit
-    `(width, height)` spans in column/row units and can span multiple
-    columns and rows.
--   **`DashboardLanes`** is a masonry-style surface aligned with the
-    emerging WebKit spec [`display: grid-lanes`](https://webkit.org/blog/17660/introducing-css-grid-lanes/).
-    Tiles declare a column span only; heights are driven by content;
-    placement follows a source-ordered, shortest-lane skyline with a
-    `flow-tolerance` tiebreaker.
+- **`DashboardGrid`** is a 2D packed grid: tiles declare explicit
+  `(width, height)` spans in column/row units and can span multiple
+  columns and rows.
+- **`DashboardLanes`** is a masonry-style surface aligned with the
+  emerging WebKit spec [`display: grid-lanes`](https://webkit.org/blog/17660/introducing-css-grid-lanes/).
+  Tiles declare a column span only; heights are driven by content;
+  placement follows a source-ordered, shortest-lane skyline with a
+  `flow-tolerance` tiebreaker.
 
 ## Installation
 
@@ -136,9 +136,9 @@ interface DashboardGridLayoutItem {
 
 `width` is a discriminated value:
 
--   `number`: span that many columns (clamped to the grid's column count).
--   `'fill'`: fill the remaining columns in the current row.
--   `'full'`: span every column and force a row break; an `itemLimits` maximum caps the span.
+- `number`: span that many columns (clamped to the grid's column count).
+- `'fill'`: fill the remaining columns in the current row.
+- `'full'`: span every column and force a row break; an `itemLimits` maximum caps the span.
 
 `'fill'` is resolved per-row against the remaining free space.
 
@@ -208,20 +208,20 @@ display order independently of array position.
 
 When `editMode` is true:
 
--   Items become draggable (powered by `@dnd-kit`). The original tile
-    stays in place as a dashed placeholder while a clone follows the
-    cursor through `<DragOverlay>`.
--   A resize handle appears on the bottom-right of each item. A
-    solid outline previews the target size as the cursor moves.
--   While any tile is dragging or resizing, `actionableArea` content
-    on every tile is set `inert` so hovers on other tiles can't steal
-    the gesture.
--   `onChangeLayout` fires after drop or resize with the new layout.
--   `onPreviewLayout` fires continuously during the interaction for
-    live feedback; the committed layout is still emitted via
-    `onChangeLayout`.
--   Sibling tiles animate into their new positions when the layout
-    reflows.
+- Items become draggable (powered by `@dnd-kit`). The original tile
+  stays in place as a dashed placeholder while a clone follows the
+  cursor through `<DragOverlay>`.
+- A resize handle appears on the bottom-right of each item. A
+  solid outline previews the target size as the cursor moves.
+- While any tile is dragging or resizing, `actionableArea` content
+  on every tile is set `inert` so hovers on other tiles can't steal
+  the gesture.
+- `onChangeLayout` fires after drop or resize with the new layout.
+- `onPreviewLayout` fires continuously during the interaction for
+  live feedback; the committed layout is still emitted via
+  `onChangeLayout`.
+- Sibling tiles animate into their new positions when the layout
+  reflows.
 
 ---
 
@@ -330,15 +330,15 @@ items flow around them; out-of-range values (negative, or beyond
 `DashboardLanes` checks `CSS.supports( 'display', 'grid-lanes' )`
 once at mount.
 
--   When supported (Safari 26+, others as the spec ships), the
-    component emits `display: grid-lanes` and the spec's CSS, and lets
-    the engine handle layout. The placement layer mounts no per-tile
-    observers; the only `ResizeObserver` left is the container-width
-    one used for responsive mode and resize-step math.
--   When unsupported, an internal hook (`useLanePlacement`) measures
-    each tile's height with a `ResizeObserver`, runs the source-ordered
-    shortest-lane algorithm, and emits explicit `grid-column-start`
-    and `grid-row-start` / `grid-row-end: span N` values on each tile.
+- When supported (Safari 26+, others as the spec ships), the
+  component emits `display: grid-lanes` and the spec's CSS, and lets
+  the engine handle layout. The placement layer mounts no per-tile
+  observers; the only `ResizeObserver` left is the container-width
+  one used for responsive mode and resize-step math.
+- When unsupported, an internal hook (`useLanePlacement`) measures
+  each tile's height with a `ResizeObserver`, runs the source-ordered
+  shortest-lane algorithm, and emits explicit `grid-column-start`
+  and `grid-row-start` / `grid-row-end: span N` values on each tile.
 
 The same DOM contract is preserved in both paths; the visual is the
 same.
@@ -423,10 +423,10 @@ heights are content-driven.
 Drag-to-reorder is operable from the keyboard via `@dnd-kit`'s
 keyboard sensor:
 
--   `Tab` to focus a tile.
--   `Space` to pick it up.
--   Arrow keys to move it between positions.
--   `Space` to drop, or `Escape` to cancel.
+- `Tab` to focus a tile.
+- `Space` to pick it up.
+- Arrow keys to move it between positions.
+- `Space` to drop, or `Escape` to cancel.
 
 Resize handles are currently pointer-only.
 

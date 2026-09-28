@@ -69,7 +69,7 @@ This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
--   <https://lodash.com/docs/4#flow-right>
+- <https://lodash.com/docs/4#flow-right>
 
 ### createHigherOrderComponent
 
@@ -77,12 +77,12 @@ Given a function mapping a component to an enhanced component and modifier name,
 
 _Parameters_
 
--   _mapComponent_ `( Inner: TInner ) => TOuter`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
+- _mapComponent_ `( Inner: TInner ) => TOuter`: Function mapping component to enhanced component.
+- _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   Component class with generated display name assigned.
+- Component class with generated display name assigned.
 
 ### debounce
 
@@ -96,16 +96,16 @@ If `wait` is `0` and `leading` is `false`, `func` invocation is deferred until t
 
 _Parameters_
 
--   _func_ `Function`: The function to debounce.
--   _wait_ `number`: The number of milliseconds to delay.
--   _options_ `Partial< DebounceOptions >`: The options object.
--   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
--   _options.maxWait_ `number`: The maximum time `func` is allowed to be delayed before it's invoked.
--   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+- _func_ `Function`: The function to debounce.
+- _wait_ `number`: The number of milliseconds to delay.
+- _options_ `Partial< DebounceOptions >`: The options object.
+- _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+- _options.maxWait_ `number`: The maximum time `func` is allowed to be delayed before it's invoked.
+- _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
 
 _Returns_
 
--   Returns the new debounced function.
+- Returns the new debounced function.
 
 ### ifCondition
 
@@ -123,11 +123,11 @@ const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !
 
 _Parameters_
 
--   _predicate_ `( props: Props ) => boolean`: Function to test condition.
+- _predicate_ `( props: Props ) => boolean`: Function to test condition.
 
 _Returns_
 
--   Higher-order component.
+- Higher-order component.
 
 ### observableMap
 
@@ -135,7 +135,7 @@ A constructor (factory) for `ObservableMap`, a map-like key/value data structure
 
 _Returns_
 
--   `ObservableMap< K, V >`: A new instance of the `ObservableMap` type.
+- `ObservableMap< K, V >`: A new instance of the `ObservableMap` type.
 
 ### pipe
 
@@ -145,7 +145,7 @@ This is inspired by `lodash`'s `flow` function.
 
 _Related_
 
--   <https://lodash.com/docs/4#flow>
+- <https://lodash.com/docs/4#flow>
 
 ### privateApis
 
@@ -169,15 +169,15 @@ If `wait` is `0` and `leading` is `false`, `func` invocation is deferred until t
 
 _Parameters_
 
--   _func_ `Function`: The function to throttle.
--   _wait_ `number`: The number of milliseconds to throttle invocations to.
--   _options_ `Partial< ThrottleOptions >`: The options object.
--   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
--   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+- _func_ `Function`: The function to throttle.
+- _wait_ `number`: The number of milliseconds to throttle invocations to.
+- _options_ `Partial< ThrottleOptions >`: The options object.
+- _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+- _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
 
 _Returns_
 
--   Returns the new throttled function.
+- Returns the new throttled function.
 
 ### useAsyncList
 
@@ -185,12 +185,12 @@ React hook returns an array which items get asynchronously appended from a sourc
 
 _Parameters_
 
--   _list_ `T[]`: Source array.
--   _config_ `AsyncListConfig`: Configuration object.
+- _list_ `T[]`: Source array.
+- _config_ `AsyncListConfig`: Configuration object.
 
 _Returns_
 
--   `T[]`: Async array.
+- `T[]`: Async array.
 
 ### useConstrainedTabbing
 
@@ -214,7 +214,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `React.RefCallback< Element >`: Element Ref.
+- `React.RefCallback< Element >`: Element Ref.
 
 ### useCopyOnClick
 
@@ -224,13 +224,13 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
--   _text_ `string | ( () => string )`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+- _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
+- _text_ `string | ( () => string )`: The text to copy.
+- _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
--   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+- `boolean`: Whether or not the text has been copied. Resets after the timeout.
 
 ### useCopyToClipboard
 
@@ -238,12 +238,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
--   _onSuccess_ `() => void`: Called when to text is copied.
+- _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
+- _onSuccess_ `() => void`: Called when to text is copied.
 
 _Returns_
 
--   `RefCallback< T >`: A ref to assign to the target element.
+- `RefCallback< T >`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -251,17 +251,17 @@ Debounces a function similar to Lodash's `debounce`. A new debounced function wi
 
 _Related_
 
--   <https://lodash.com/docs/4#debounce>
+- <https://lodash.com/docs/4#debounce>
 
 _Parameters_
 
--   _fn_ `TFunc`: The function to debounce.
--   _wait_ `number`: The number of milliseconds to delay.
--   _options_ `DebounceOptions`: The options object.
+- _fn_ `TFunc`: The function to debounce.
+- _wait_ `number`: The number of milliseconds to delay.
+- _options_ `DebounceOptions`: The options object.
 
 _Returns_
 
--   `DebouncedFunc< TFunc >`: Debounced function.
+- `DebouncedFunc< TFunc >`: Debounced function.
 
 ### useDebouncedInput
 
@@ -269,11 +269,11 @@ Helper hook for input fields that need to debounce the value before using it.
 
 _Parameters_
 
--   _defaultValue_ The default value to use.
+- _defaultValue_ The default value to use.
 
 _Returns_
 
--   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
+- `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -302,12 +302,12 @@ const DisabledExample = () => {
 
 _Parameters_
 
--   _config_ `Object`: Configuration object.
--   _config.isDisabled_ `boolean=`: Whether the element should be disabled.
+- _config_ `Object`: Configuration object.
+- _config.isDisabled_ `boolean=`: Whether the element should be disabled.
 
 _Returns_
 
--   `React.RefCallback<HTMLElement>`: Element Ref.
+- `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useEvent
 
@@ -330,7 +330,7 @@ function Component( props ) {
 
 _Parameters_
 
--   _callback_ `T`: The callback function to wrap.
+- _callback_ `T`: The callback function to wrap.
 
 ### useFocusableIframe
 
@@ -338,7 +338,7 @@ Dispatches a bubbling focus event when the iframe receives focus. Use `onFocus` 
 
 _Returns_
 
--   `RefCallback< HTMLIFrameElement >`: Ref to pass to the iframe.
+- `RefCallback< HTMLIFrameElement >`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 
@@ -362,11 +362,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
+- _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
--   Ref callback.
+- Ref callback.
 
 ### useFocusReturn
 
@@ -390,11 +390,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `() => void`: Overrides the default return behavior.
+- _onFocusReturn_ `() => void`: Overrides the default return behavior.
 
 _Returns_
 
--   `React.RefCallback< HTMLElement >`: Element Ref.
+- `React.RefCallback< HTMLElement >`: Element Ref.
 
 ### useInstanceId
 
@@ -408,7 +408,7 @@ More accurately, useInstanceId distinguishes between three different signatures:
 
 _Parameters_
 
--   _object_ `object`: Object reference to create an id for.
+- _object_ `object`: Object reference to create an id for.
 
 ### useIsomorphicLayoutEffect
 
@@ -420,17 +420,17 @@ Attach a keyboard shortcut handler.
 
 _Related_
 
--   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+- <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
 
 _Parameters_
 
--   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
--   _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
--   _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
--   _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
--   _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
--   _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
--   _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
+- _shortcuts_ `string[] | string`: Keyboard Shortcuts.
+- _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
+- _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
+- _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
+- _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
+- _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
+- _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
 
 ### useMediaQuery
 
@@ -438,12 +438,12 @@ Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `[string]`: Media Query.
--   _view_ `[Window | undefined]`: Window instance, else default to global window
+- _query_ `[string]`: Media Query.
+- _view_ `[Window | undefined]`: Window instance, else default to global window
 
 _Returns_
 
--   `boolean`: return value of the media query.
+- `boolean`: return value of the media query.
 
 ### useMergeRefs
 
@@ -476,11 +476,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Ref< T >[]`: The refs to be merged.
+- _refs_ `Ref< T >[]`: The refs to be merged.
 
 _Returns_
 
--   `RefCallback< T >`: The merged ref callback.
+- `RefCallback< T >`: The merged ref callback.
 
 ### useObservableValue
 
@@ -488,12 +488,12 @@ React hook that lets you observe an entry in an `ObservableMap`. The hook return
 
 _Parameters_
 
--   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
--   _name_ `K`: The map key to observe.
+- _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+- _name_ `K`: The map key to observe.
 
 _Returns_
 
--   `V | undefined`: The value corresponding to the map key requested.
+- `V | undefined`: The value corresponding to the map key requested.
 
 ### usePrevious
 
@@ -501,11 +501,11 @@ Use something's value from the previous render. Based on <https://usehooks.com/u
 
 _Parameters_
 
--   _value_ `T`: The value to track.
+- _value_ `T`: The value to track.
 
 _Returns_
 
--   `T | undefined`: The value from the previous render.
+- `T | undefined`: The value from the previous render.
 
 ### useReducedMotion
 
@@ -513,7 +513,7 @@ Hook returning whether the user has a preference for reduced motion.
 
 _Returns_
 
--   `boolean`: Reduced motion preference value.
+- `boolean`: Reduced motion preference value.
 
 ### useRefEffect
 
@@ -523,12 +523,12 @@ It's worth noting that if the dependencies array is empty, there's not strictly 
 
 _Parameters_
 
--   _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
--   _dependencies_ `DependencyList`: Dependencies of the callback.
+- _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
+- _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `RefCallback< TElement | null >`: Ref callback.
+- `RefCallback< TElement | null >`: Ref callback.
 
 ### useResizeObserver
 
@@ -553,8 +553,8 @@ useLayoutEffect( () => {
 
 _Parameters_
 
--   _callback_ `ResizeObserverCallback`: The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
--   _options_ `ResizeObserverOptions`: Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
+- _callback_ `ResizeObserverCallback`: The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
+- _options_ `ResizeObserverOptions`: Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 
 ### useStateWithHistory
 
@@ -562,11 +562,11 @@ useState with undo/redo history.
 
 _Parameters_
 
--   _initialValue_ `T`: Initial value.
+- _initialValue_ `T`: Initial value.
 
 _Returns_
 
--   Value, setValue, hasUndo, hasRedo, undo, redo.
+- Value, setValue, hasUndo, hasRedo, undo, redo.
 
 ### useThrottle
 
@@ -574,17 +574,17 @@ Throttles a function similar to Lodash's `throttle`. A new throttled function wi
 
 _Related_
 
--   <https://lodash.com/docs/4#throttle>
+- <https://lodash.com/docs/4#throttle>
 
 _Parameters_
 
--   _fn_ `TFunc`: The function to throttle.
--   _wait_ `number`: The number of milliseconds to throttle invocations to.
--   _options_ `ThrottleOptions`: The options object.
+- _fn_ `TFunc`: The function to throttle.
+- _wait_ `number`: The number of milliseconds to throttle invocations to.
+- _options_ `ThrottleOptions`: The options object.
 
 _Returns_
 
--   `DebouncedFunc< TFunc >`: Throttled function.
+- `DebouncedFunc< TFunc >`: Throttled function.
 
 ### useViewportMatch
 
@@ -599,13 +599,13 @@ useViewportMatch( 'medium' );
 
 _Parameters_
 
--   _breakpoint_ `Breakpoint`: Breakpoint size name.
--   _operator_ `ViewportOperator`: Viewport operator.
--   _view_ `Window | undefined`: Window instance in which to perform viewport matching.
+- _breakpoint_ `Breakpoint`: Breakpoint size name.
+- _operator_ `ViewportOperator`: Viewport operator.
+- _view_ `Window | undefined`: Window instance in which to perform viewport matching.
 
 _Returns_
 
--   `boolean`: Whether viewport matches query.
+- `boolean`: Whether viewport matches query.
 
 ### useWarnOnChange
 
@@ -623,8 +623,8 @@ function MyComponent( props: Record< string, any > ) {
 
 _Parameters_
 
--   _object_ `Record< string, any > | any[]`: Object which changes to compare.
--   _prefix_ `string`: Just a prefix to show when console logging.
+- _object_ `Record< string, any > | any[]`: Object which changes to compare.
+- _prefix_ `string`: Just a prefix to show when console logging.
 
 ### withGlobalEvents
 
@@ -634,11 +634,11 @@ Higher-order component creator which, given an object of DOM event types and val
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+- _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `any`: Higher-order component.
+- `any`: Higher-order component.
 
 ### withInstanceId
 
@@ -656,11 +656,11 @@ A Higher Order Component used to provide and manage internal component state via
 
 _Parameters_
 
--   _initialState_ `any`: Optional initial state of the component.
+- _initialState_ `any`: Optional initial state of the component.
 
 _Returns_
 
--   `any`: A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
+- `any`: A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

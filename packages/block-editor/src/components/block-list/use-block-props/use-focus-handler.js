@@ -3,7 +3,7 @@ import {
 	useRefEffect,
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
-import { isInsideRootBlock } from '../../../utils/dom';
+import { isInsideRootBlock, getBlockClientId } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -74,6 +74,21 @@ export function useFocusHandler( clientId ) {
 				// builds the multi-selection from the anchor it recorded at
 				// mousedown, so this dispatch overwriting the store anchor
 				// is harmless.
+				// A click on the selected block's inert field can focus this
+				// wrapper instead (Firefox focuses the nearest focusable
+				// ancestor). Under an engaged editing host, a caret in the
+				// selected block within this one keeps that selection.
+				const { anchorNode } =
+					node.ownerDocument.defaultView.getSelection();
+				if (
+					anchorNode &&
+					node.contains( anchorNode ) &&
+					isBlockSelected( getBlockClientId( anchorNode ) ) &&
+					node.isContentEditable
+				) {
+					return;
+				}
+
 				if ( event.target.isContentEditable ) {
 					selectBlock( clientId, null );
 					return;

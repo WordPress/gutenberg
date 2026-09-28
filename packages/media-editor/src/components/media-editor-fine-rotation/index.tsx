@@ -7,6 +7,11 @@ import RotationRuler from '../rotation-ruler';
 export interface MediaEditorFineRotationProps {
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
+	/**
+	 * Disable the ruler. Set while the edit is saving; `RotationRuler`
+	 * cancels an in-flight drag when this flips.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -17,9 +22,11 @@ export interface MediaEditorFineRotationProps {
  *
  * @param props
  * @param props.onPlacementControlInteraction
+ * @param props.disabled
  */
 export default function MediaEditorFineRotation( {
 	onPlacementControlInteraction,
+	disabled = false,
 }: MediaEditorFineRotationProps ) {
 	const { state, setRotation } = useMediaEditor();
 	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
@@ -62,6 +69,7 @@ export default function MediaEditorFineRotation( {
 				max={ MAX_ROTATION_OFFSET }
 				value={ fineOffset }
 				onChange={ handleRotationSlider }
+				disabled={ disabled }
 			/>
 		</div>
 	);

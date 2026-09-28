@@ -1,16 +1,30 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { logged } from '@wordpress/deprecated';
 import { ValidatedInputControl } from '../components';
+
+globalThis.wpVitest.mockMatchMedia();
+
+const DEPRECATION_MESSAGE =
+	'wp.components.privateApis.ValidatedInputControl is deprecated since version 7.2. Please use ValidatedInputControl from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
 
 describe( 'Shows a deprecation warning', () => {
 	it( 'ValidatedInputControl', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		render(
 			<ValidatedInputControl label="URL" help="Enter a full URL." />
 		);
 
-		expect( console ).toHaveWarnedWith(
-			'wp.components.privateApis.ValidatedInputControl is deprecated since version 7.2. Please use ValidatedInputControl from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 

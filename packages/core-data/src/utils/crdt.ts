@@ -330,7 +330,7 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 				attributeKey: selectionStart.attributeKey,
 				clientId: selectionStart.clientId,
 				offset: asRichTextOffset( selectionStart.offset ),
-		  }
+			}
 		: null;
 }
 

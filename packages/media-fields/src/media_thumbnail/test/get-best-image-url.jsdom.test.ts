@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getBestImageUrl } from '../view';
 
 type Media = Parameters< typeof getBestImageUrl >[ 0 ];

@@ -109,6 +109,12 @@ export default function GlobalStylesSidebar() {
 	// Reset navigation when the sidebar opens, but only on a fresh entry into
 	// Styles - coming back from the notes sidebar is a return, not an opening,
 	// and resetting there would close the Style Book the notes are about.
+	// Also skip the reset when whatever opened it selected a path first —
+	// "Revisions" in the site editor sidebar sets /revisions and opens the
+	// sidebar together, and that path must survive. Only in the visual editor:
+	// the code editor has no styles canvas to show, and `shouldResetNavigation`
+	// clears the path there anyway.
+	const hasRequestedPath = stylesPath !== '/' && ! shouldResetNavigation;
 	useEffect( () => {
 		if ( isReturningFromNotesRef.current ) {
 			isReturningFromNotesRef.current = false;
@@ -116,11 +122,17 @@ export default function GlobalStylesSidebar() {
 		}
 		if (
 			activeComplementaryArea === GLOBAL_STYLES_SIDEBAR &&
-			! STYLES_COMPLEMENTARY_AREAS.includes( previousActiveArea )
+			! STYLES_COMPLEMENTARY_AREAS.includes( previousActiveArea ) &&
+			! hasRequestedPath
 		) {
 			resetStylesNavigation();
 		}
-	}, [ activeComplementaryArea, previousActiveArea, resetStylesNavigation ] );
+	}, [
+		activeComplementaryArea,
+		previousActiveArea,
+		hasRequestedPath,
+		resetStylesNavigation,
+	] );
 
 	useEffect( () => {
 		if ( ! shouldResetNavigation ) {
