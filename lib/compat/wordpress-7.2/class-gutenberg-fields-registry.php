@@ -9,9 +9,10 @@
  * Holds the fields registered for entities.
  *
  * The registry maps an entity, identified by its kind and name, to its
- * registered field definitions keyed by id, in registration order, and to
- * the script modules registered for it, each with the ids of the fields it
- * applies to. register() validates the definitions before storing them.
+ * registered field definitions keyed by id, in registration order, each
+ * with the origin that registered it, and to the script modules registered
+ * for it, each with the ids of the fields it applies to. register()
+ * validates the definitions before storing them.
  *
  * Fields are registered on the `fields_api_init` action, on the
  * registry its callbacks receive, and only there: register() and
@@ -80,9 +81,14 @@ final class Gutenberg_Fields_Registry {
 	 * Registers fields for an entity.
 	 *
 	 * A field with the id of an already registered field is merged into it,
-	 * property by property, keeping its position. The script module, if any,
-	 * applies to every field of the call.
+	 * property by property, keeping its position and its origin. The script
+	 * module, if any, applies to every field of the call.
 	 *
+	 * The origin is stored as the `origin` property of each new field,
+	 * replacing any `origin` the definition sets.
+	 *
+	 * @param string      $origin        Who registers the fields: `core`, or
+	 *                                   the slug of the plugin or theme.
 	 * @param string      $kind          The entity kind (e.g. `postType`).
 	 * @param string      $name          The entity name (e.g. `page`).
 	 * @param array[]     $fields        The list of field definitions, each with an `id`.
@@ -92,8 +98,17 @@ final class Gutenberg_Fields_Registry {
 	 *              outside the `fields_api_init` action or when an argument
 	 *              is invalid.
 	 */
-	public function register( $kind, $name, $fields, $script_module = null ) {
+	public function register( $origin, $kind, $name, $fields, $script_module = null ) {
 		if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $origin ) || '' === $origin ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'The origin must be a non-empty string.', 'gutenberg' ),
+				'7.2.0'
+			);
 			return false;
 		}
 
@@ -145,8 +160,8 @@ final class Gutenberg_Fields_Registry {
 		foreach ( $fields as $field ) {
 			$id                             = $field['id'];
 			$this->fields[ $entity ][ $id ] = isset( $this->fields[ $entity ][ $id ] )
-				? array_merge( $this->fields[ $entity ][ $id ], $field )
-				: $field;
+				? array_merge( $this->fields[ $entity ][ $id ], $field, array( 'origin' => $this->fields[ $entity ][ $id ]['origin'] ) )
+				: array_merge( $field, array( 'origin' => $origin ) );
 
 			if ( null !== $script_module ) {
 				$ids = $this->field_modules[ $entity ][ $script_module ] ?? array();

@@ -166,6 +166,7 @@ function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry
 			// `getElements`, `setValue`, and `isVisible` come from the script
 			// module.
 			$registry->register(
+				'core',
 				'postType',
 				$post_type,
 				array(
@@ -230,7 +231,7 @@ function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry
 			continue;
 		}
 
-		$registry->register( 'postType', $post_type, $fields );
+		$registry->register( 'core', 'postType', $post_type, $fields );
 	}
 }
 add_action( 'fields_api_init', '_gutenberg_register_posttype_supports_fields', 0 );
@@ -298,6 +299,7 @@ function _gutenberg_register_posttype_attachment_fields( Gutenberg_Fields_Regist
 	// Remove all default fields registered for postType attachment.
 	$registry->unregister( 'postType', 'attachment' );
 	$registry->register(
+		'core',
 		'postType',
 		'attachment',
 		array(

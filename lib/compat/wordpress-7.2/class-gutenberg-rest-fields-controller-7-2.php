@@ -333,6 +333,10 @@ class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
 					'description' => __( 'The unique identifier of the field.', 'gutenberg' ),
 					'type'        => 'string',
 				),
+				'origin'             => array(
+					'description' => __( 'Who registered the field: `core`, or the slug of the plugin or theme.', 'gutenberg' ),
+					'type'        => 'string',
+				),
 				'type'               => array(
 					'description' => __( 'The type of the field.', 'gutenberg' ),
 					'type'        => 'string',

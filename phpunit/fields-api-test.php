@@ -97,8 +97,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers fields on `fields_api_init` for the duration of the test:
-	 * the registry is reset on tear down.
+	 * Registers fields on `fields_api_init` for the duration of the test,
+	 * with the `test-plugin` origin: the registry is reset on tear down.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
@@ -110,7 +110,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$registered = false;
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
-				$registered = $registry->register( $kind, $name, $fields, $module );
+				$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
 			}
 		);
 		return $registered;
@@ -469,6 +469,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_a_callback_at_the_default_priority_alters_the_defaults() {
 		$callback = static function ( $registry ) {
 			$registry->register(
+				'test-plugin',
 				'postType',
 				'page',
 				array(
@@ -493,7 +494,37 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'comment_status', $fields, 'The default field is kept.' );
 		$this->assertTrue( $fields['comment_status']['enableSorting'], 'The property is patched.' );
 		$this->assertSame( 'text', $fields['comment_status']['type'], 'The rest of the default definition is kept.' );
+		$this->assertSame( 'core', $fields['comment_status']['origin'], 'Patching a field keeps its origin.' );
 		$this->assertArrayNotHasKey( 'author', $fields, 'The default field is removed.' );
+	}
+
+	/**
+	 * The origin a field is registered with is stored on its definition,
+	 * over any `origin` the definition sets; the default fields come from
+	 * `core`.
+	 */
+	public function test_fields_carry_the_origin_they_are_registered_with() {
+		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) + array( 'origin' => 'spoofed' ) ) );
+
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'origin', 'id' );
+		$this->assertSame( 'test-plugin', $fields['color'] );
+		$this->assertSame( 'core', $fields['author'] );
+	}
+
+	/**
+	 * An origin that is not a non-empty string is refused.
+	 */
+	public function test_registering_with_an_invalid_origin_is_refused() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$registered = true;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$registered ) {
+				$registered = $registry->register( '', 'postType', 'page', array( array( 'id' => 'color' ) ) );
+			}
+		);
+
+		$this->assertFalse( $registered );
+		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 	}
 
 	/**
@@ -508,7 +539,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$registry->reset();
 		$fired = did_action( 'fields_api_init' );
 
-		$this->assertFalse( $registry->register( 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
+		$this->assertFalse( $registry->register( 'test-plugin', 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
 		$this->assertSame( $fired, did_action( 'fields_api_init' ), 'Refusing does not fire the action.' );
 		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 		$this->assertArrayNotHasKey( 'plugin/color', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
