@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   `CheckboxControl`: Keep the default checkbox at 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 
 ### Bug Fixes
