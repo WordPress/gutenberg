@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Image: Stop a click on the enlarged image from closing the lightbox when the gallery navigation controls are present, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. A standalone image's lightbox still closes on click, and the Close button, Escape and the area around the image still close both ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
 -   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
