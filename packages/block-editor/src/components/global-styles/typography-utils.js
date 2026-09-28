@@ -1,4 +1,7 @@
-import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import {
+	getFontStyleValues,
+	getFontWeightValues,
+} from '../../utils/font-face-capabilities';
 
 /**
  * Returns an object of merged font families and the font faces from the selected font family
@@ -120,8 +123,20 @@ export function findNearestStyleAndWeight(
 	let nearestFontStyle = fontStyle;
 	let nearestFontWeight = fontWeight;
 
-	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
-		getFontStylesAndWeights( fontFamilyFaces );
+	const fontStyles = getFontStyleValues( fontFamilyFaces ).map(
+		( value ) => ( { value } )
+	);
+	const fontWeights = getFontWeightValues( fontFamilyFaces ).map(
+		( value ) => ( { value } )
+	);
+	const combinedStyleAndWeightOptions = fontStyles.flatMap( ( style ) =>
+		fontWeights.map( ( weight ) => ( {
+			style: {
+				fontStyle: style.value,
+				fontWeight: weight.value,
+			},
+		} ) )
+	);
 
 	// Check if the new font style and weight are available in the font family faces.
 	const hasFontStyle = fontStyles?.some(

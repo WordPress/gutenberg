@@ -41,6 +41,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
+	'fontVariationSettings',
 	'fontWeight',
 	'lineHeight',
 	'padding',

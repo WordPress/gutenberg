@@ -15,6 +15,16 @@ describe( 'generate', () => {
 		).toEqual( '' );
 	} );
 
+	it( 'should generate a width from a keyword or a percentage', () => {
+		// Both forms select a width the font provides, one face or one `wdth` coordinate.
+		expect(
+			compileCSS( { typography: { fontStretch: 'condensed' } } )
+		).toEqual( 'font-stretch: condensed;' );
+		expect( compileCSS( { typography: { fontStretch: '75%' } } ) ).toEqual(
+			'font-stretch: 75%;'
+		);
+	} );
+
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
 			compileCSS( {
@@ -92,6 +102,37 @@ describe( 'generate', () => {
 		).toEqual(
 			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-shadow: 1px 1px 2px red; text-transform: uppercase; }"
 		);
+	} );
+
+	it( 'should serialize font variation settings keyed by axis tag', () => {
+		expect(
+			compileCSS( {
+				typography: {
+					fontVariationSettings: {
+						GRAD: 50,
+						opsz: 24,
+						YOPQ: '24',
+						YTLC: false,
+						YTUC: [],
+						YTAS: Infinity,
+						wght: 700,
+						ital: 1,
+						'XT;A': 1,
+						XTRA: 'wide',
+					},
+				},
+			} )
+		).toEqual( 'font-variation-settings: "GRAD" 50, "opsz" 24;' );
+	} );
+
+	it( 'should skip font variation settings that only set registered axes', () => {
+		expect(
+			compileCSS( {
+				typography: {
+					fontVariationSettings: { wght: 700, wdth: 90 },
+				},
+			} )
+		).toEqual( '' );
 	} );
 
 	it( 'should parse preset values', () => {

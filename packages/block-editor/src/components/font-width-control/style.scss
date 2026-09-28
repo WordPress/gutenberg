@@ -1,0 +1,30 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-font-width-control__width {
+	position: relative;
+}
+
+// Sits at the end of the Width label row, as the toggle of the weight control
+// and of the font size picker do.
+.block-editor-font-width-control__width-toggle {
+	position: absolute;
+	top: -$grid-unit-05;
+	right: 0;
+}
+
+.block-editor-font-width-control__width-slider {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-editor-font-width-control__width-input {
+	flex: 0 0 35%;
+	min-width: 0;
+}
+
+.block-editor-font-width-control__notice {
+	margin: 0;
+	font-size: $helptext-font-size;
+	color: $gray-700;
+}

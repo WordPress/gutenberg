@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Typography: Let a font family's faces determine the Style, Weight and Width controls, and expose custom variation axes in a separate Font variations panel ([#83159](https://github.com/WordPress/gutenberg/pull/83159)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).

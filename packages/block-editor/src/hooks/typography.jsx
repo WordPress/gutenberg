@@ -35,16 +35,20 @@ const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 const TEXT_INDENT_SUPPORT_KEY = 'typography.textIndent';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
+const FONT_STRETCH_SUPPORT_KEY = 'typography.fontStretch';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+const FONT_VARIATION_SETTINGS_SUPPORT_KEY = 'typography.fontVariationSettings';
 const TEXT_SHADOW_SUPPORT_KEY = 'typography.textShadow';
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	FONT_STRETCH_SUPPORT_KEY,
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
+	FONT_VARIATION_SETTINGS_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
@@ -97,14 +101,28 @@ function styleToAttributes( style ) {
 	};
 }
 
-function attributesToStyle( attributes ) {
+/**
+ * Reads a block's typography attributes as one style object, resolving the two
+ * places a preset may be recorded: the attribute a picker sets, and the style
+ * a value written inline lands in.
+ *
+ * @param {Object} attributes The block's typography attributes.
+ * @return {Object} The style object.
+ */
+export function attributesToStyle( attributes ) {
 	return {
 		...attributes.style,
 		typography: {
 			...attributes.style?.typography,
+			/*
+			 * A family may be stored either way: as the attribute a preset
+			 * sets, or inline in the style. Reading only the attribute loses
+			 * the inline one, and everything that asks what font this block
+			 * is in then answers with the inherited one instead.
+			 */
 			fontFamily: attributes.fontFamily
 				? 'var:preset|font-family|' + attributes.fontFamily
-				: undefined,
+				: attributes.style?.typography?.fontFamily,
 			fontSize: attributes.fontSize
 				? 'var:preset|font-size|' + attributes.fontSize
 				: attributes.style?.typography?.fontSize,

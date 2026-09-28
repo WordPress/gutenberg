@@ -218,6 +218,85 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that font variation settings are serialized from an object.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_font_variation_settings() {
+		$this->test_block_name = 'test/font-variation-settings';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontVariationSettings' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array(
+			'style' => array(
+				'typography' => array(
+					'fontVariationSettings' => array(
+						'GRAD' => 50,
+						'wght' => 700,
+						'opsz' => 24,
+					),
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array( 'style' => 'font-variation-settings:"GRAD" 50, "opsz" 24;' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Tests skipping serialization of font variation settings.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_skip_serialization_for_font_variation_settings() {
+		$this->test_block_name = 'test/font-variation-settings-with-skipped-serialization';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontVariationSettings'           => true,
+						'__experimentalSkipSerialization' => array(
+							'fontVariationSettings',
+						),
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array( 'style' => array( 'typography' => array( 'fontVariationSettings' => array( 'GRAD' => 50 ) ) ) );
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array();
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
 	 * Tests legacy css var inline styles for font family.
 	 *
 	 * @covers ::wp_apply_typography_support
@@ -281,6 +360,87 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		$expected = array( 'class' => 'has-h-1-font-family' );
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Tests that a width is serialized when the block supports it, whether it
+	 * names a keyword or a percentage.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_font_stretch() {
+		$this->test_block_name = 'test/font-stretch';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontStretch' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+
+		$this->assertSame(
+			array( 'style' => 'font-stretch:condensed;' ),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => 'condensed' ) ) )
+			),
+			'A width named with a keyword should be serialized.'
+		);
+
+		$this->assertSame(
+			array( 'style' => 'font-stretch:75%;' ),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => '75%' ) ) )
+			),
+			'A width named as a percentage should be serialized.'
+		);
+	}
+
+	/**
+	 * Tests that a width is left alone when the block does not support it.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_skip_font_stretch_without_support() {
+		$this->test_block_name = 'test/font-stretch-without-support';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontSize' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+
+		$this->assertSame(
+			array(),
+			gutenberg_apply_typography_support(
+				$block_type,
+				array( 'style' => array( 'typography' => array( 'fontStretch' => 'condensed' ) ) )
+			)
+		);
 	}
 
 	/**

@@ -67,6 +67,7 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"__experimentalFontFamily": true,
+			"fontStretch": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
@@ -74,6 +75,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
 			"textShadow": true,
+			"fontVariationSettings": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

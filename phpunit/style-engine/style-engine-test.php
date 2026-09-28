@@ -210,6 +210,112 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_font_stretch_style'              => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontStretch' => 'condensed',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-stretch:condensed;',
+					'declarations' => array(
+						'font-stretch' => 'condensed',
+					),
+				),
+			),
+
+			'inline_valid_font_stretch_percentage_style'   => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontStretch' => '75%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-stretch:75%;',
+					'declarations' => array(
+						'font-stretch' => '75%',
+					),
+				),
+			),
+
+			'font_variation_settings_object'               => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontVariationSettings' => array(
+							'GRAD'  => 50,
+							'opsz'  => 24,
+							'YOPQ'  => '24',
+							'YTLC'  => false,
+							'YTUC'  => array(),
+							'wght'  => 700,
+							'ital'  => 1,
+							'XT;A'  => 1,
+							'XTRA'  => 'wide',
+							/*
+								* A tag begins with a letter, so none of these is one. PHP
+								* has already stored the first key as the integer 1234.
+								*/
+							'1234'  => 10,
+							'1ABC'  => 10,
+							' abc'  => 10,
+							'ab c'  => 10,
+							'abc'   => 10,
+							'abcde' => 10,
+							/*
+								* The registry pads a short tag with trailing spaces, but a
+								* declaration's whitespace runs are collapsed, so these could
+								* only be written as a different tag. See Trac #66199.
+								*/
+							'abc '  => 10,
+							'a   '  => 10,
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-variation-settings:"GRAD" 50, "opsz" 24;',
+					'declarations' => array(
+						'font-variation-settings' => '"GRAD" 50, "opsz" 24',
+					),
+				),
+			),
+
+			'font_variation_settings_axis_tag_syntax'      => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontVariationSettings' => array(
+							// A registered tag, a foundry-defined one, and
+							// digits after the first letter.
+							'opsz' => 24,
+							'GRAD' => 50,
+							'A123' => 10,
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'font-variation-settings:"opsz" 24, "GRAD" 50, "A123" 10;',
+					'declarations' => array(
+						'font-variation-settings' => '"opsz" 24, "GRAD" 50, "A123" 10',
+					),
+				),
+			),
+
+			'font_variation_settings_only_registered_axes' => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontVariationSettings' => array(
+							'wght' => 700,
+							'wdth' => 90,
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(

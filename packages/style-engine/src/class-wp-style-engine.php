@@ -280,7 +280,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				),
 			),
 			'typography' => array(
-				'fontSize'       => array(
+				'fontSize'              => array(
 					'property_keys' => array(
 						'default' => 'font-size',
 					),
@@ -292,7 +292,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-size' => 'font-size',
 					),
 				),
-				'fontFamily'     => array(
+				'fontFamily'            => array(
 					'property_keys' => array(
 						'default' => 'font-family',
 					),
@@ -304,43 +304,61 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-family' => 'font-family',
 					),
 				),
-				'fontStyle'      => array(
+				/*
+				 * `font-stretch` rather than its newer name `font-width`, which
+				 * browsers do not implement yet. CSS Fonts 4 keeps `font-stretch`
+				 * as the legacy alias.
+				 */
+				'fontStretch'           => array(
+					'property_keys' => array(
+						'default' => 'font-stretch',
+					),
+					'path'          => array( 'typography', 'fontStretch' ),
+				),
+				'fontStyle'             => array(
 					'property_keys' => array(
 						'default' => 'font-style',
 					),
 					'path'          => array( 'typography', 'fontStyle' ),
 				),
-				'fontWeight'     => array(
+				'fontWeight'            => array(
 					'property_keys' => array(
 						'default' => 'font-weight',
 					),
 					'path'          => array( 'typography', 'fontWeight' ),
 				),
-				'lineHeight'     => array(
+				'fontVariationSettings' => array(
+					'property_keys' => array(
+						'default' => 'font-variation-settings',
+					),
+					'path'          => array( 'typography', 'fontVariationSettings' ),
+					'value_func'    => array( self::class, 'get_font_variation_settings_css_declaration' ),
+				),
+				'lineHeight'            => array(
 					'property_keys' => array(
 						'default' => 'line-height',
 					),
 					'path'          => array( 'typography', 'lineHeight' ),
 				),
-				'textColumns'    => array(
+				'textColumns'           => array(
 					'property_keys' => array(
 						'default' => 'column-count',
 					),
 					'path'          => array( 'typography', 'textColumns' ),
 				),
-				'textDecoration' => array(
+				'textDecoration'        => array(
 					'property_keys' => array(
 						'default' => 'text-decoration',
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
 				),
-				'textIndent'     => array(
+				'textIndent'            => array(
 					'property_keys' => array(
 						'default' => 'text-indent',
 					),
 					'path'          => array( 'typography', 'textIndent' ),
 				),
-				'textShadow'     => array(
+				'textShadow'            => array(
 					'property_keys' => array(
 						'default' => 'text-shadow',
 					),
@@ -352,19 +370,19 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-text-shadow' => 'text-shadow',
 					),
 				),
-				'textTransform'  => array(
+				'textTransform'         => array(
 					'property_keys' => array(
 						'default' => 'text-transform',
 					),
 					'path'          => array( 'typography', 'textTransform' ),
 				),
-				'letterSpacing'  => array(
+				'letterSpacing'         => array(
 					'property_keys' => array(
 						'default' => 'letter-spacing',
 					),
 					'path'          => array( 'typography', 'letterSpacing' ),
 				),
-				'writingMode'    => array(
+				'writingMode'           => array(
 					'property_keys' => array(
 						'default' => 'writing-mode',
 					),
@@ -706,6 +724,90 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return $css_declarations;
+		}
+
+		/**
+		 * Serializes font variation settings, stored as an object keyed by axis tag.
+		 *
+		 * The tag must follow the OpenType axis tag syntax. The four axes that have a
+		 * CSS property of their own are refused: the property `font-variation-settings`
+		 * is applied after those properties, so a coordinate written here would take
+		 * the axis away from them, for example keeping a `<strong>` from rendering
+		 * bolder. `opsz` is allowed, because `font-optical-sizing` only switches the
+		 * browser's own tracking on or off and has no way to carry a chosen size. A
+		 * value is a number: a numeric string is not an axis coordinate.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param array $style_value      Axis values keyed by tag, e.g. `array( 'GRAD' => 50 )`.
+		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @return string[] An associative array of CSS definitions.
+		 */
+		protected static function get_font_variation_settings_css_declaration( $style_value, $style_definition ) {
+			if ( ! is_array( $style_value ) || empty( $style_definition['property_keys']['default'] ) ) {
+				return array();
+			}
+
+			$settings = array();
+			foreach ( $style_value as $tag => $value ) {
+				if ( ! static::is_font_variation_axis( $tag, $value ) ) {
+					continue;
+				}
+				$settings[] = sprintf( '"%s" %s', $tag, $value );
+			}
+
+			if ( empty( $settings ) ) {
+				return array();
+			}
+
+			return array( $style_definition['property_keys']['default'] => implode( ', ', $settings ) );
+		}
+
+		/**
+		 * Determines whether an axis tag and value may be written to `font-variation-settings`.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $tag   Axis tag, e.g. `GRAD`.
+		 * @param mixed $value Axis value.
+		 * @return bool Whether the pair may be written.
+		 */
+		protected static function is_font_variation_axis( $tag, $value ) {
+			$property_owned_axes = array( 'wght', 'wdth', 'slnt', 'ital' );
+
+			return static::is_font_variation_axis_tag( $tag )
+				&& ! in_array( $tag, $property_owned_axes, true )
+				&& ( is_int( $value ) || is_float( $value ) )
+				&& is_finite( $value );
+		}
+
+		/**
+		 * Determines whether a value is an OpenType design-variation axis tag.
+		 *
+		 * The OpenType Design-Variation Axis Tag Registry requires a tag to be four
+		 * bytes and to begin with a letter. That covers both the registered tags,
+		 * such as `opsz`, and the foundry-defined ones, which are further required to
+		 * use only uppercase letters and digits, such as `GRAD`.
+		 *
+		 * The registry also allows a tag of fewer than four letters or digits to be
+		 * padded with trailing spaces. Those are refused here, because a declaration
+		 * is filtered through `wp_strip_all_tags( $value, true )`, which collapses a
+		 * run of whitespace into one space: `"a   "` would reach CSS as `"a "`, which
+		 * is a different tag, and writing the wrong one is worse than writing none.
+		 * See Trac #66199.
+		 *
+		 * Because a tag cannot begin with a digit, one made only of digits is not a
+		 * tag at all, which is also why nothing is lost to PHP storing a decimal
+		 * string array key such as `'1000'` as the integer `1000`: the key was never
+		 * a tag this could accept.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $tag Value to check.
+		 * @return bool Whether the value is an axis tag.
+		 */
+		protected static function is_font_variation_axis_tag( $tag ) {
+			return is_string( $tag ) && 1 === preg_match( '/^[A-Za-z][A-Za-z0-9]{3}$/', $tag );
 		}
 
 		/**

@@ -771,6 +771,93 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	public function test_font_variation_settings_are_serialized_from_an_object() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'typography' => array(
+						'fontVariationSettings' => array( 'GRAD' => 20 ),
+					),
+					'blocks'     => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'fontVariationSettings' => array(
+									'GRAD' => 50,
+									'opsz' => 24,
+									'wght' => 700,
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
+		$this->assertStringContainsString( 'body{font-variation-settings: "GRAD" 20;}', $stylesheet );
+		$this->assertStringContainsString( ':root :where(p){font-variation-settings: "GRAD" 50, "opsz" 24;}', $stylesheet, '`wght` is left to font-weight.' );
+	}
+
+	public function test_font_variation_setting_axes_and_styles_survive_sanitization() {
+		$input = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'typography' => array(
+					'fontVariations' => true,
+					'fontFamilies'   => array(
+						array(
+							'name'       => 'Roboto Flex',
+							'slug'       => 'roboto-flex',
+							'fontFamily' => '"Roboto Flex", sans-serif',
+							'fontFace'   => array(
+								array(
+									'fontFamily' => 'Roboto Flex',
+									'fontWeight' => '100 1000',
+									'src'        => array( 'https://example.org/roboto-flex.woff2' ),
+									'axes'       => array(
+										array(
+											'tag'     => 'GRAD',
+											'min'     => -200,
+											'default' => 0,
+											'max'     => 150,
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'styles'   => array(
+				'typography' => array(
+					'fontVariationSettings' => array( 'GRAD' => 20 ),
+				),
+			),
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg( $input );
+		$settings   = $theme_json->get_settings();
+		$raw        = $theme_json->get_raw_data();
+
+		$this->assertSame( $input['settings']['typography']['fontVariations'], $settings['typography']['fontVariations'] );
+		$this->assertSame( $input['settings']['typography']['fontFamilies'][0]['fontFace'][0]['axes'], $settings['typography']['fontFamilies']['theme'][0]['fontFace'][0]['axes'] );
+		$this->assertSame( array( 'GRAD' => 20 ), $raw['styles']['typography']['fontVariationSettings'] );
+
+		$sanitized = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $input );
+		$this->assertSame( array( 'GRAD' => 20 ), $sanitized['styles']['typography']['fontVariationSettings'], 'Kept for users without unfiltered_html.' );
+
+		$input['styles']['typography']['fontVariationSettings'] = array(
+			'GRAD'        => 20,
+			'wght'        => 700,
+			'XTRA'        => '500; color: red',
+			'x}{color:re' => 1,
+		);
+		$sanitized = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $input );
+		$this->assertSame( array( 'GRAD' => 20 ), $sanitized['styles']['typography']['fontVariationSettings'], 'Registered axes, non-numeric values and invalid tags are dropped.' );
+	}
+
+
 	public function test_get_stylesheet_preset_classes_work_with_compounded_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

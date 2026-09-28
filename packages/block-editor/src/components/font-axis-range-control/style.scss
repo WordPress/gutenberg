@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// The slider takes the room; the field stays narrow beside it.
+.block-editor-font-axis-range-control__slider {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-editor-font-axis-range-control__number {
+	flex: 0 0 35%;
+	min-width: 0;
+}
+
+.block-editor-font-axis-range-control__notice {
+	margin: 0;
+	font-size: $helptext-font-size;
+	color: $gray-700;
+}

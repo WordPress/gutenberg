@@ -628,7 +628,7 @@ describe( 'typography utils', () => {
 				fontWeight: '400',
 				expected: {
 					nearestFontStyle: 'normal',
-					nearestFontWeight: '700',
+					nearestFontWeight: '400',
 				},
 			},
 		].forEach(
