@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the editor open with an error notice when saving attachment details fails ([#83560](https://github.com/WordPress/gutenberg/pull/83560)).
+
 ## 0.19.0 (2026-09-23)
 
 ### Bug Fixes
