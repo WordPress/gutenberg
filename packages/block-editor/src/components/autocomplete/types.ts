@@ -96,6 +96,55 @@ export type WPCompleter< TCompleterOption = any > = {
 
 type ContentRef = React.RefObject< HTMLElement | null >;
 
+export type AutocompleterUIProps = {
+	/**
+	 * The autocompleter configuration object.
+	 */
+	autocompleter: WPCompleter;
+	/**
+	 * The value to filter the options by.
+	 */
+	filterValue: string;
+	/**
+	 * An id unique to each instance of the component, used in the IDs of the
+	 * buttons generated for individual options.
+	 */
+	instanceId: number;
+	/**
+	 * The id of to be applied to the listbox of options.
+	 */
+	listBoxId: string | undefined;
+	/**
+	 * The class to apply to the wrapper element.
+	 */
+	className?: string;
+	/**
+	 * The index of the currently selected option.
+	 */
+	selectedIndex: number;
+	/**
+	 * A function to be called when the filterValue changes.
+	 */
+	onChangeOptions: ( items: Array< KeyedOption > ) => void;
+	/**
+	 * A function to be called when an option is selected.
+	 */
+	onSelect: ( option: KeyedOption ) => void;
+	/**
+	 * A function that defines the behavior of the completer when it is reset
+	 */
+	reset: ( event: Event ) => void;
+	/**
+	 * A ref containing the editable element that will serve as the anchor for
+	 * `Autocomplete`'s `Popover`.
+	 */
+	contentRef: ContentRef;
+};
+
+export type CancelablePromise< T = void > = Promise< T > & {
+	canceled?: boolean;
+};
+
 export type UseAutocompleteProps = {
 	/**
 	 * The rich text value object the autocompleter is being applied to.
@@ -125,18 +174,15 @@ export type UseAutocompleteProps = {
 	contentRef: ContentRef;
 };
 
-export type AutocompleteProps = UseAutocompleteProps & {
-	/**
-	 * A function that returns nodes to be rendered within the Autocomplete.
-	 */
-	children: ( props: {
-		listBoxId: string | undefined;
-		activeId: string | null;
-		onKeyDown: ( event: KeyboardEvent ) => void;
-	} ) => React.ReactNode;
-	/**
-	 * Whether or not the Autocomplete component is selected, and if its
-	 * `Popover` should be displayed.
-	 */
-	isSelected: boolean;
+export type AutocompleteState = {
+	selectedIndex: number;
+	filteredOptions: KeyedOption[];
+	filterValue: string;
+	autocompleter: WPCompleter | null;
 };
+
+export type AutocompleteAction =
+	| { type: 'RESET' }
+	| { type: 'SELECT'; index: number }
+	| { type: 'OPTIONS'; options: KeyedOption[] }
+	| { type: 'MATCH'; completer: WPCompleter; query: string };

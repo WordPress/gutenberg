@@ -1,13 +1,10 @@
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
-import { unlock } from '../../lock-unlock';
-
-const { useAutocompleteProps } = unlock( componentsPrivateApis );
+import { useAutocompleteProps } from './use-autocomplete';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid

@@ -42,6 +42,11 @@
 	// the future, this can be simplified to an `includes` of `src/**/*`.
 	"files": [
 		"src/lock-unlock.ts",
+		"src/components/autocomplete/autocompleter-ui.tsx",
+		"src/components/autocomplete/get-autocomplete-match.ts",
+		"src/components/autocomplete/get-default-use-items.tsx",
+		"src/components/autocomplete/types.ts",
+		"src/components/autocomplete/use-autocomplete.tsx",
 		"src/components/block-context/index.jsx",
 		"src/components/block-visibility/constants.ts",
 		"src/components/block-visibility/use-block-visibility.ts"

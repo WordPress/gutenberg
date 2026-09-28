@@ -16,7 +16,7 @@
 
 ### Deprecations
 
--   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. It returns no props; the hook moved to `@wordpress/block-editor` as a private API ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
 
 ### Bug Fixes
 

@@ -5,6 +5,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import type { __unstableUseAutocompleteProps } from '@wordpress/components';
+// @ts-expect-error No exported types
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
 	useRefEffect,
@@ -31,10 +33,10 @@ import FormatEdit from './format-edit';
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
 // required/validity treatment the other form controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
-const {
-	ValidatedContentEditableControl: RichTextControlShell,
-	useAutocompleteProps,
-} = unlock( componentsPrivateApis );
+const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
+	componentsPrivateApis
+);
+const { useAutocompleteProps } = unlock( blockEditorPrivateApis );
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
