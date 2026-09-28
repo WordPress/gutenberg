@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-tab-list__mover-button {
+	@include break-small() {
+		width: $button-size-small;
+		min-width: 0 !important;
+	}
+}

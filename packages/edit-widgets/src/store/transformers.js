@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, parse, serialize } from '@wordpress/blocks';
 import { addWidgetIdToBlock } from '@wordpress/widgets';
 
@@ -46,7 +43,7 @@ export function transformWidgetToBlock( widget ) {
  * Converts a block to a widget entity record.
  *
  * @param {Object}  block         The block.
- * @param {Object?} relatedWidget A related widget entity record from the API (optional).
+ * @param {?Object} relatedWidget A related widget entity record from the API (optional).
  * @return {Object} the widget object (converted from block).
  */
 export function transformBlockToWidget( block, relatedWidget = {} ) {

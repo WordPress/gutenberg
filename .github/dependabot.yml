@@ -4,23 +4,32 @@ version: 2
 updates:
     # Check for updates to GitHub Actions.
     - package-ecosystem: 'github-actions'
-      directory: '/'
+      directories:
+          - '.github/workflows'
+          - '.github/setup-*'
       schedule:
           interval: 'daily'
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 20
+      cooldown:
+          default-days: 7
       labels:
           - 'GitHub Actions'
           - '[Type] Build Tooling'
       groups:
           github-actions:
-              patterns:
-                  - '*'
-              exclude-patterns:
-                  - 'actions/setup-java'
-                  - 'gradle/*'
-                  - 'reactivecircus/*'
-          react-native:
-              patterns:
-                  - 'actions/setup-java'
-                  - 'gradle/*'
-                  - 'reactivecircus/*'
+              applies-to: version-updates
+              update-types:
+                  - minor
+                  - patch
+
+    # Manage npm security updates only.
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+      # disables noisy npm *version* updates across the monorepo;
+      # *security* updates ignore this limit and keep running.
+      open-pull-requests-limit: 0
+      labels:
+          - 'dependencies'
+          - '[Type] Build Tooling'

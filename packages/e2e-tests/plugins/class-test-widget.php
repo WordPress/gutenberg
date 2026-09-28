@@ -25,7 +25,7 @@ class Test_Widget extends WP_Widget {
 	/**
 	 * Outputs the content for the widget instance.
 	 *
-	 * @param array $args Display arguments including 'before_title', 'after_title',
+	 * @param array $args     Display arguments including 'before_title', 'after_title',
 	 *                        'before_widget', and 'after_widget'.
 	 * @param array $instance Settings for the current Block widget instance.
 	 */
@@ -48,7 +48,7 @@ class Test_Widget extends WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
-			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( isset( $instance['title'] ) ? $instance['title'] : '' ); ?>" />
+			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ?? '' ); ?>" />
 		</p>
 		<?php
 	}

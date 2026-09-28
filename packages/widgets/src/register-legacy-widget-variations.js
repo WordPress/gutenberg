@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { subscribe, select, dispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -24,10 +21,10 @@ export default function registerLegacyWidgetVariations( settings ) {
 						? {
 								idBase: widgetType.id,
 								instance: {},
-						  }
+							}
 						: {
 								id: widgetType.id,
-						  },
+							},
 				} ) )
 			);
 		}

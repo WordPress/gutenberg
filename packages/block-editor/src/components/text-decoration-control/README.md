@@ -28,7 +28,6 @@ Then, you can use the component in your block editor UI:
 ### `value`
 
 -   **Type:** `String`
--   **Default:** `none`
 -   **Options:** `none`, `underline`, `line-through`
 
 The current value of the Text Decoration setting. You may only choose from the `Options` listed above.

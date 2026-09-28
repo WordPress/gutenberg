@@ -27,16 +27,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/**
- * External dependencies
- */
-
+const { relative, sep } = require( 'path' );
+const { writeFileSync } = require( 'fs' );
 const deepmerge = require( 'deepmerge' );
 const { isPlainObject } = require( 'is-plain-object' );
 const { po } = require( 'gettext-parser' );
-const { relative, sep } = require( 'path' );
-const { writeFileSync } = require( 'fs' );
 
 /**
  * Default output headers if none specified in plugin options.
@@ -85,7 +80,7 @@ const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
 
 /**
  * Given an argument node (or recursed node), attempts to return a string
- * represenation of that node's value.
+ * representation of that node's value.
  *
  * @param {Object} node AST node.
  *
@@ -265,7 +260,7 @@ module.exports = () => {
 						);
 					}
 
-					// Attempt to exract nplurals from header.
+					// Attempt to extract nplurals from header.
 					const pluralsMatch = (
 						baseData.headers[ 'plural-forms' ] || ''
 					).match( /nplurals\s*=\s*(\d+);/ );

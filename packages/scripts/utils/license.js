@@ -1,8 +1,8 @@
-/**
- * External dependencies
- */
+const { existsSync, readFileSync, realpathSync } = require( 'node:fs' );
+const path = require( 'node:path' );
+const { createRequire, findPackageJSON } = require( 'node:module' );
+const { pathToFileURL } = require( 'node:url' );
 const chalk = require( 'chalk' );
-const { existsSync, readFileSync } = require( 'node:fs' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -71,6 +71,7 @@ const gpl2CompatibleLicenses = [
 	'ISC',
 	'LGPL-2.1',
 	'MIT',
+	'MIT-0',
 	'MIT/X11',
 	'MPL-2.0',
 	'ODC-By-1.0',
@@ -208,18 +209,20 @@ function detectTypeFromLicenseText( licenseText ) {
 const reportedPackages = new Set();
 
 /**
- * @param {string}   path
+ * @param {string}   depPath
  * @param {Licenses} licenses
  * @return {void}
  */
-function checkDepLicense( path, licenses ) {
-	if ( ! path ) {
+function checkDepLicense( depPath, licenses ) {
+	if ( ! depPath ) {
 		return;
 	}
 
-	const filename = path + '/package.json';
+	const filename = depPath + '/package.json';
 	if ( ! existsSync( filename ) ) {
-		process.stdout.write( `Unable to locate package.json in ${ path }.` );
+		process.stdout.write(
+			`Unable to locate package.json in ${ depPath }.`
+		);
 		process.exit( 1 );
 	}
 
@@ -267,7 +270,7 @@ function checkDepLicense( path, licenses ) {
 	 * or the type was invalid, try reading it from the files defined in
 	 * license files, instead.
 	 */
-	const detectedLicenseType = detectTypeFromLicenseFiles( path );
+	const detectedLicenseType = detectTypeFromLicenseFiles( depPath );
 	if ( ! licenseType && ! detectedLicenseType ) {
 		return;
 	}
@@ -309,7 +312,7 @@ function checkDepLicense( path, licenses ) {
  * @param {Object}  deps    The dependencies tree.
  * @param {Options} options
  */
-function checkDepsInTree( deps, options ) {
+function checkDeps( deps, options ) {
 	const licenses = getLicenses( options.gpl2 );
 
 	for ( const key in deps ) {
@@ -319,7 +322,11 @@ function checkDepsInTree( deps, options ) {
 			continue;
 		}
 
-		if ( Object.keys( dep ).length === 0 ) {
+		// Don't check for licenses if the package entry is invalid. This can
+		// happen if an incomplete package directory exists in node_modules.
+		// Historically this could happen due to buggy behavior of Windows
+		// environments in handling optional dependenciess
+		if ( ! dep.name || Object.keys( dep ).length === 0 ) {
 			continue;
 		}
 
@@ -341,25 +348,21 @@ function checkDepsInTree( deps, options ) {
 		} else {
 			checkDepLicense( dep.path, licenses );
 		}
-
-		if ( dep.hasOwnProperty( 'dependencies' ) ) {
-			checkDepsInTree( dep.dependencies, options );
-		}
 	}
 }
 
 /**
- * @param {string} path The path to the package.
+ * @param {string} depPath The path to the package.
  * @return {boolean} true if the package has a license, false if it
  */
-function detectTypeFromLicenseFiles( path ) {
+function detectTypeFromLicenseFiles( depPath ) {
 	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
 		// If another LICENSE file already had licenses in it, use those.
 		if ( detectedType ) {
 			return detectedType;
 		}
 
-		const licensePath = path + '/' + licenseFile;
+		const licensePath = depPath + '/' + licenseFile;
 
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
@@ -370,8 +373,149 @@ function detectTypeFromLicenseFiles( path ) {
 	}, false );
 }
 
+/**
+ * Resolve a package's path using Node's resolution algorithm.
+ * Works regardless of package manager (npm, pnpm, yarn, etc.).
+ *
+ * Uses `findPackageJSON` from node:module (Node.js 22.14.0+) when available,
+ * with a fallback for older versions.
+ *
+ * @param {string} packageName - Name of the package to resolve
+ * @param {string} fromDir     - Directory to resolve from
+ * @return {string|null} Path to the package directory, or null if not found
+ */
+function resolvePackagePath( packageName, fromDir ) {
+	// Use findPackageJSON when available (Node.js 22.14.0+)
+	if ( findPackageJSON ) {
+		try {
+			const parentURL = pathToFileURL(
+				path.join( fromDir, 'package.json' )
+			);
+			const pkgJsonPath = findPackageJSON( packageName, parentURL );
+			if ( pkgJsonPath ) {
+				// Use realpathSync to resolve symlinks. Without this, transitive dep resolution fails
+				// because Node resolves from the symlink path, not the real store path where sibling deps are located.
+				return realpathSync( path.dirname( pkgJsonPath ) );
+			}
+		} catch {
+			// Package not found
+		}
+		return null;
+	}
+
+	// Fallback for older Node.js versions
+	const localRequire = createRequire( path.join( fromDir, 'package.json' ) );
+	try {
+		const resolved = localRequire.resolve(
+			`${ packageName }/package.json`
+		);
+		return realpathSync( path.dirname( resolved ) );
+	} catch {
+		// Some packages use `exports` in package.json without exporting
+		// `./package.json`. In that case, resolving `pkg/package.json` fails
+		// but resolving the main entry still works. Walk up from the resolved
+		// main entry to find the nearest package.json.
+		try {
+			const mainResolved = localRequire.resolve( packageName );
+			let dir = path.dirname( mainResolved );
+			while ( dir !== path.parse( dir ).root ) {
+				if ( path.basename( dir ) === 'node_modules' ) {
+					break;
+				}
+				if ( existsSync( path.join( dir, 'package.json' ) ) ) {
+					return realpathSync( dir );
+				}
+				dir = path.dirname( dir );
+			}
+		} catch {
+			// Package not found
+		}
+		return null;
+	}
+}
+
+/**
+ * Read package.json from a directory.
+ *
+ * @param {string} dir - Directory containing package.json
+ * @return {Object|null} Parsed package.json or null if not found
+ */
+function readPackageJson( dir ) {
+	try {
+		return JSON.parse(
+			readFileSync( path.join( dir, 'package.json' ), 'utf8' )
+		);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Recursively collect production dependencies using Node's module resolution.
+ *
+ * @param {Object}   deps                 - Dependencies object from package.json
+ * @param {string}   fromDir              - Directory to resolve from
+ * @param {Object}   options
+ * @param {boolean}  options.gpl2         - Only allow GPL2 compatible licenses
+ * @param {Map}      options.depsMap      - Map to accumulate discovered dependencies
+ * @param {Set}      options.visited      - Set of already-visited paths (prevents cycles)
+ * @param {Function} [options.shouldSkip] - Optional callback; return true to skip a dep by name
+ */
+function collectDeps( deps, fromDir, options ) {
+	if ( ! deps ) {
+		return;
+	}
+
+	const { gpl2, depsMap, visited, shouldSkip } = options;
+	const licenses = getLicenses( gpl2 );
+
+	for ( const depName of Object.keys( deps ) ) {
+		if ( shouldSkip && shouldSkip( depName ) ) {
+			continue;
+		}
+
+		const depPath = resolvePackagePath( depName, fromDir );
+		if ( ! depPath ) {
+			continue;
+		}
+
+		// Avoid infinite loops
+		if ( visited.has( depPath ) ) {
+			continue;
+		}
+		visited.add( depPath );
+
+		const depPkgJson = readPackageJson( depPath );
+		if ( ! depPkgJson ) {
+			continue;
+		}
+
+		const key = `${ depName }@${ depPkgJson.version }`;
+		if ( ! depsMap.has( key ) ) {
+			const license = depPkgJson.license;
+
+			// Skip if license is in the allowed list
+			if ( ! license || ! licenses.includes( license ) ) {
+				depsMap.set( key, {
+					name: depName,
+					version: depPkgJson.version,
+					path: depPath,
+					license,
+				} );
+			}
+		}
+
+		// Recursively check this package's dependencies
+		collectDeps( depPkgJson.dependencies, depPath, options );
+	}
+}
+
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
-	checkDepsInTree,
+	checkDeps,
+	collectDeps,
+	getLicenses,
+	resolvePackagePath,
+	readPackageJson,
 };

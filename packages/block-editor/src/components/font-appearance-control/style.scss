@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .components-font-appearance-control {
 	[role="option"] {
 		color: $gray-900;

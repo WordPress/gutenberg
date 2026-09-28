@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { PanelRowProps } from './types';
 
 function UnforwardedPanelRow(
@@ -33,5 +22,6 @@ function UnforwardedPanelRow(
  * It is a flex container with a top margin for spacing.
  */
 export const PanelRow = forwardRef( UnforwardedPanelRow );
+PanelRow.displayName = 'PanelRow';
 
 export default PanelRow;

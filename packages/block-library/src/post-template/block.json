@@ -4,7 +4,7 @@
 	"name": "core/post-template",
 	"title": "Post Template",
 	"category": "theme",
-	"parent": [ "core/query" ],
+	"ancestor": [ "core/query" ],
 	"description": "Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.",
 	"textdomain": "default",
 	"usesContext": [
@@ -14,16 +14,29 @@
 		"templateSlug",
 		"previewPostType",
 		"enhancedPagination",
-		"postType"
+		"postType",
+		"postId"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
 		"layout": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
+			"heading": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
@@ -43,16 +56,27 @@
 			}
 		},
 		"spacing": {
+			"margin": true,
+			"padding": true,
 			"blockGap": {
 				"__experimentalDefault": "1.25em"
 			},
 			"__experimentalDefaultControls": {
-				"blockGap": true
+				"blockGap": true,
+				"padding": false,
+				"margin": false
 			}
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"shadow": true
 	},
 	"style": "wp-block-post-template",
 	"editorStyle": "wp-block-post-template-editor"

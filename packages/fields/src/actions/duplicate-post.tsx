@@ -1,44 +1,46 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
-import { titleField } from '../fields';
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
-const fields = [ titleField ];
-const formDuplicateAction = {
-	fields: [ 'title' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	modalHeader?: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+}
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
+	label: _x( 'Duplicate…', 'action label' ),
+	modalHeader: _x( 'Duplicate', 'action label' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],
 			title: sprintf(
-				/* translators: %s: Existing template title */
-				_x( '%s (Copy)', 'template' ),
+				/* translators: %s: Existing post title */
+				_x( '%s (Copy)', 'post' ),
 				getItemTitle( items[ 0 ] )
 			),
 		} );
@@ -55,7 +57,7 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
-			const newItemOject = {
+			const newItemObject = {
 				status: 'draft',
 				title: item.title,
 				slug: item.title || __( 'No title' ),
@@ -89,8 +91,8 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
-					newItemOject[ property ] = item[ property ];
+					// @ts-expect-error `property` is a dynamic string key on both objects.
+					newItemObject[ property ] = item[ property ];
 				}
 			} );
 			setIsCreatingPage( true );
@@ -98,15 +100,15 @@ const duplicatePost: Action< BasePost > = {
 				const newItem = await saveEntityRecord(
 					'postType',
 					item.type,
-					newItemOject,
+					newItemObject,
 					{ throwOnError: true }
 				);
 
 				createSuccessNotice(
 					sprintf(
-						// translators: %s: Title of the created post or template, e.g: "Hello world".
+						// translators: %s: Title of the created post, e.g: "Hello world".
 						__( '"%s" successfully created.' ),
-						decodeEntities( newItem.title?.rendered || item.title )
+						getItemTitle( newItem )
 					),
 					{
 						id: 'duplicate-post-action',
@@ -136,14 +138,14 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
-					<DataForm
-						data={ item }
-						fields={ fields }
-						form={ formDuplicateAction }
-						onChange={ ( changes ) =>
+					<WCInputControl
+						label={ __( 'Title' ) }
+						placeholder={ __( 'No title' ) }
+						value={ getItemTitle( item ) }
+						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								...changes,
+								title: value || __( 'No title' ),
 							} ) )
 						}
 					/>
@@ -171,4 +173,7 @@ const duplicatePost: Action< BasePost > = {
 	},
 };
 
+/**
+ * Duplicate action for BasePost.
+ */
 export default duplicatePost;

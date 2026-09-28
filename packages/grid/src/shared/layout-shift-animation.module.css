@@ -1,0 +1,16 @@
+/*
+ * Sibling tile reflow during drag/resize/remove in edit mode. Transition
+ * lives on tiles so the browser can interpolate `transform` reliably
+ * (inline `transition` + FLIP in the same frame is skipped).
+ */
+.layout-animating :global([data-wp-grid-item-key]) {
+	transition:
+		transform var(--wpds-motion-duration-md)
+		var(--wpds-motion-easing-balanced);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.layout-animating :global([data-wp-grid-item-key]) {
+		transition: none;
+	}
+}

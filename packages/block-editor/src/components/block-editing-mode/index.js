@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import {
 	useBlockEditContext,
@@ -50,8 +43,7 @@ import {
 export function useBlockEditingMode( mode ) {
 	const context = useBlockEditContext();
 	const { clientId = '' } = context;
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 	const globalBlockEditingMode = useSelect(
 		( select ) =>
 			// Avoid adding the subscription if not needed!
@@ -59,14 +51,23 @@ export function useBlockEditingMode( mode ) {
 		[ clientId ]
 	);
 	useEffect( () => {
-		if ( mode ) {
-			setBlockEditingMode( clientId, mode );
+		if ( ! mode ) {
+			return;
 		}
+
+		const {
+			setBlockEditingMode,
+			unsetBlockEditingMode,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
+
+		__unstableMarkNextChangeAsNotPersistent();
+		setBlockEditingMode( clientId, mode );
+
 		return () => {
-			if ( mode ) {
-				unsetBlockEditingMode( clientId );
-			}
+			__unstableMarkNextChangeAsNotPersistent();
+			unsetBlockEditingMode( clientId );
 		};
-	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
+	}, [ registry, clientId, mode ] );
 	return clientId ? context[ blockEditingModeKey ] : globalBlockEditingMode;
 }

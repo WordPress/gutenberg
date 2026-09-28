@@ -1,16 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
-import type { Action } from '@wordpress/dataviews';
+import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
-import type { PostType } from '../types';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import type { PostType } from '@wordpress/fields';
 import {
 	viewPost,
 	viewPostRevisions,
@@ -24,8 +15,69 @@ import {
 	renamePost,
 	resetPost,
 	deletePost,
+	duplicateTemplatePart,
+	excerptField,
+	featuredImageField,
+	dateField,
+	parentField,
+	passwordField,
+	commentStatusField,
+	pingStatusField,
+	discussionField,
+	slugField,
+	statusField,
+	authorField,
+	templateAuthorField,
+	templatePartAuthorField,
+	titleField,
+	templateField,
+	templateTitleField,
+	pageTitleField,
+	patternTitleField,
+	patternDescriptionField,
+	patternSyncStatusField,
+	notesField,
+	scheduledDateField,
+	lastEditedDateField,
+	formatField,
+	postContentInfoField,
+	stickyField,
+	descriptionField,
+	readOnlyDescriptionField,
+	postsPerPageField,
+	siteDiscussionField,
+	postsPageTitleField,
 } from '@wordpress/fields';
-import duplicateTemplatePart from '../actions/duplicate-template-part';
+import {
+	altTextField,
+	attachedToField,
+	authorField as mediaAuthorField,
+	captionField,
+	dateAddedField,
+	descriptionField as mediaDescriptionField,
+	filenameField,
+	filesizeField,
+	mediaDimensionsField,
+	mimeTypeField,
+} from '@wordpress/media-fields';
+import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
+import postPreviewField from '../fields/content-preview';
+import { unlock } from '../../lock-unlock';
+
+/**
+ * Check if a post type supports editor notes.
+ *
+ * @param supports The post type supports object.
+ * @return Whether editor notes are supported.
+ */
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
+	}
+	return false;
+}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -53,6 +105,32 @@ export function unregisterEntityAction(
 	};
 }
 
+export function registerEntityField< Item >(
+	kind: string,
+	name: string,
+	config: Field< Item >
+) {
+	return {
+		type: 'REGISTER_ENTITY_FIELD' as const,
+		kind,
+		name,
+		config,
+	};
+}
+
+export function unregisterEntityField(
+	kind: string,
+	name: string,
+	fieldId: string
+) {
+	return {
+		type: 'UNREGISTER_ENTITY_FIELD' as const,
+		kind,
+		name,
+		fieldId,
+	};
+}
+
 export function setIsReady( kind: string, name: string ) {
 	return {
 		type: 'SET_IS_READY' as const,
@@ -61,7 +139,32 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
-export const registerPostTypeActions =
+/*
+ * Media fields for the attachment post type.
+ *
+ * Field order follows a logical grouping:
+ * 1. Metadata fields in panels (date, author, file info)
+ * 2. Core editable fields (title, alt text, caption, description)
+ *
+ * Note: media_thumbnail is not included as it's shown in the canvas preview
+ */
+const ORDERED_MEDIA_FIELDS = [
+	// Metadata in panels (collapsed by default).
+	dateAddedField,
+	mediaAuthorField,
+	filenameField,
+	mimeTypeField,
+	filesizeField,
+	mediaDimensionsField,
+	attachedToField,
+	// Regular layout fields (always visible).
+	titleField,
+	altTextField,
+	captionField,
+	mediaDescriptionField,
+];
+
+export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
 		const isReady = unlock( registry.select( editorStore ) ).isEntityReady(
@@ -90,20 +193,29 @@ export const registerPostTypeActions =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
+		const { disablePostFormats } = registry
+			.select( editorStore )
+			.getEditorSettings();
+
+		let canDuplicate =
+			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
+				postTypeConfig.slug
+			) &&
+			canCreate &&
+			duplicatePost;
+
+		// @ts-expect-error `globalThis` has no index signature for this build-time global.
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication.
+			canDuplicate = undefined;
+		}
 
 		const actions = [
 			postTypeConfig.viewable ? viewPost : undefined,
-			!! postTypeConfig?.supports?.revisions
+			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
-			// @ts-ignore
-			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
-						postTypeConfig.slug
-				  ) &&
-				  canCreate &&
-				  duplicatePost
-				: undefined,
+			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&
 			currentTheme?.is_block_theme
@@ -113,7 +225,7 @@ export const registerPostTypeActions =
 				? duplicatePattern
 				: undefined,
 			postTypeConfig.supports?.title ? renamePost : undefined,
-			postTypeConfig?.supports?.[ 'page-attributes' ]
+			postTypeConfig.supports?.[ 'page-attributes' ]
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
@@ -122,20 +234,111 @@ export const registerPostTypeActions =
 			deletePost,
 			trashPost,
 			permanentlyDeletePost,
-		];
+		].filter( Boolean );
+
+		// Handle attachment post type separately with media-specific fields
+		let fields;
+
+		if ( postType === ATTACHMENT_POST_TYPE ) {
+			fields = ORDERED_MEDIA_FIELDS;
+		} else {
+			const postTypeSlug = postTypeConfig.slug;
+			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
+			const isPattern = postTypeSlug === 'wp_block';
+			// `post-thumbnails` is `true` or the list of post types the theme
+			// opted in.
+			const postThumbnails =
+				currentTheme?.theme_supports?.[ 'post-thumbnails' ];
+			const themeSupportsThumbnails = Array.isArray( postThumbnails )
+				? postThumbnails.includes( postTypeSlug )
+				: !! postThumbnails;
+
+			fields = [
+				postTypeConfig.supports?.thumbnail &&
+					themeSupportsThumbnails &&
+					featuredImageField,
+				! isDesignPostType &&
+					postTypeConfig.supports?.author &&
+					authorField,
+				postTypeSlug === 'wp_template' && templateAuthorField,
+				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
+				! isDesignPostType && statusField,
+				! isDesignPostType && dateField,
+				! isDesignPostType && scheduledDateField,
+				lastEditedDateField,
+				// There is no post type support flag for permalinks, and
+				// `viewable` alone is not the full condition (the type must
+				// also be public), so the field also checks each post.
+				! isDesignPostType && postTypeConfig.viewable && slugField,
+				! isDesignPostType &&
+					postTypeConfig.supports?.excerpt &&
+					excerptField,
+				isPattern &&
+					postTypeConfig.supports?.excerpt &&
+					patternDescriptionField,
+				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
+				postTypeConfig.supports?.comments && commentStatusField,
+				postTypeConfig.supports?.trackbacks && pingStatusField,
+				( postTypeConfig.supports?.comments ||
+					postTypeConfig.supports?.trackbacks ) &&
+					discussionField,
+				! isDesignPostType && templateField,
+				postTypeConfig.supports?.[ 'post-formats' ] &&
+					! disablePostFormats &&
+					formatField,
+				( ! isDesignPostType || isPattern ) &&
+					postTypeConfig.supports?.editor &&
+					postContentInfoField,
+				! isDesignPostType && passwordField,
+				postTypeSlug === 'post' && stickyField,
+				postTypeSlug === 'wp_template' && descriptionField,
+				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
+				// The `home`/`index` template summary exposes a few fields that
+				// target other entities (`root/site` and the posts page).
+				// `DataFormPostSummary` overrides them to read/write the right
+				// entity and to control their visibility.
+				postTypeSlug === 'wp_template' && postsPageTitleField,
+				postTypeSlug === 'wp_template' && postsPerPageField,
+				postTypeSlug === 'wp_template' && siteDiscussionField,
+				postTypeConfig.supports?.editor &&
+					postTypeConfig.viewable &&
+					postPreviewField,
+				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
+				isPattern && patternSyncStatusField,
+			].filter( Boolean );
+			if ( postTypeConfig.supports?.title ) {
+				let _titleField;
+				if ( postType === 'page' ) {
+					_titleField = pageTitleField;
+				} else if ( postType === 'wp_template' ) {
+					_titleField = templateTitleField;
+				} else if (
+					[ 'wp_block', 'wp_template_part' ].includes( postType )
+				) {
+					_titleField = patternTitleField;
+				} else {
+					_titleField = titleField;
+				}
+				fields.push( _titleField );
+			}
+		}
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
-				if ( ! action ) {
-					return;
-				}
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
 					'postType',
 					postType,
 					action
 				);
 			} );
+			fields.forEach( ( field ) => {
+				unlock( registry.dispatch( editorStore ) ).registerEntityField(
+					'postType',
+					postType,
+					field
+				);
+			} );
 		} );
 
-		doAction( 'core.registerPostTypeActions', postType );
+		doAction( 'core.registerPostTypeSchema', postType );
 	};

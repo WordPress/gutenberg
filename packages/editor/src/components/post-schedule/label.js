@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getSettings, getDate, dateI18n } from '@wordpress/date';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
@@ -15,7 +8,7 @@ import { store as editorStore } from '../../store';
  *
  * @param {Object} props Props.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostScheduleLabel( props ) {
 	return usePostScheduleLabel( props );

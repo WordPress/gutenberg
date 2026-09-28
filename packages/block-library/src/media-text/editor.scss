@@ -15,6 +15,7 @@
 	}
 }
 
+// stylelint-disable-next-line selector-class-pattern -- re-resizable library class name.
 .wp-block-media-text .__resizable_base__ {
 	grid-column: 1 / span 2;
 	grid-row: 2;

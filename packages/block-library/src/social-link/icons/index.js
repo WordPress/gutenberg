@@ -5,6 +5,7 @@ export * from './bluesky';
 export * from './chain';
 export * from './codepen';
 export * from './deviantart';
+export * from './discord';
 export * from './dribbble';
 export * from './dropbox';
 export * from './etsy';

@@ -1,29 +1,24 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
-	title: 'Components/Selection & Input/Common/SearchControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Selection & Input/Common/SearchControl',
 	id: 'components-searchcontrol',
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SearchControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -49,5 +44,4 @@ const Template: StoryFn< typeof SearchControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	help: 'Help text to explain the input.',
-	__nextHasNoMarginBottom: true,
 };

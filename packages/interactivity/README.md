@@ -6,7 +6,6 @@ The package `@wordpress/interactivity` contains the logic that enables the Inter
     Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API Reference docs in the Block Editor handbook</a> to learn more about the Interactivity API.
 </div>
 
-
 ## Installation
 
 Install the Interactivity API using the command:
@@ -20,7 +19,6 @@ This step is only required if you use the Interactivity API outside WordPress.
 Within WordPress, the package is already bundled in Core. To ensure it's loaded, add `@wordpress/interactivity` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
 
 Furthermore, this package assumes your code will run in an **ES2015+** environment. If you're using an environment with limited or no support for such language features and APIs, you should include the polyfill shipped in [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.
-
 
 ## License
 

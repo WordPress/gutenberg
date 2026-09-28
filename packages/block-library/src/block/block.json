@@ -26,6 +26,8 @@
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"customCSS": false,
+		"visibility": false
 	}
 }

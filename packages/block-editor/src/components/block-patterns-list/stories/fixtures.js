@@ -530,6 +530,7 @@ export default [
 													background: '#000000',
 												},
 											},
+											tagName: 'hr',
 										},
 										innerBlocks: [],
 										originalContent:

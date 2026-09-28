@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { ColorIndicatorProps } from './types';
 
@@ -43,5 +32,6 @@ function UnforwardedColorIndicator(
  * ```
  */
 export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
+ColorIndicator.displayName = 'ColorIndicator';
 
 export default ColorIndicator;

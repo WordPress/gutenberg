@@ -1,21 +1,7 @@
-/**
- * Internal dependencies
- */
 import type { Props as TextProps } from '../text/types';
 
 export type HeadingSize =
-	| 1
-	| 2
-	| 3
-	| 4
-	| 5
-	| 6
-	| '1'
-	| '2'
-	| '3'
-	| '4'
-	| '5'
-	| '6';
+	1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6';
 
 export type HeadingProps = Omit< TextProps, 'isBlock' | 'color' | 'weight' > & {
 	/**

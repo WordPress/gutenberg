@@ -1,12 +1,38 @@
+@use "@wordpress/base-styles/mixins";
+
 .components-external-link {
+	color: var(--wpds-color-foreground-interactive-brand);
 	text-decoration: none;
+
+	&:visited {
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	&:hover,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+
+	&:focus {
+		// Override style from wp-admin common.css.
+		box-shadow: none;
+		border-radius: 0;
+
+		&:not(:active) {
+			@include mixins.outset-ring__focus();
+		}
+	}
 }
 
 .components-external-link__contents {
 	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: from-font;
 }
 
 .components-external-link__icon {
-	margin-left: 0.5ch;
-	font-weight: 400;
+	line-height: 1;
+	display: inline-block;
+	margin-inline-start: var(--wpds-dimension-padding-xs);
+	font-weight: var(--wpds-typography-font-weight-default);
 }

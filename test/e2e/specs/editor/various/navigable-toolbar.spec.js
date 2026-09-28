@@ -1,17 +1,14 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-test.use( {
-	BlockToolbarUtils: async ( { editor, page, pageUtils }, use ) => {
-		await use( new BlockToolbarUtils( { editor, page, pageUtils } ) );
-	},
-} );
 
 test.describe( 'Block Toolbar', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so a mid-test failure doesn't leak
+		// the fixed-toolbar setting (or any other pref) to other tests.
+		await requestUtils.resetPreferences();
 	} );
 
 	test.describe( 'Contextual Toolbar', () => {
@@ -52,7 +49,6 @@ test.describe( 'Block Toolbar', () => {
 		} );
 
 		test( 'can navigate to the block toolbar and back to block using the keyboard', async ( {
-			BlockToolbarUtils,
 			editor,
 			page,
 			pageUtils,
@@ -60,34 +56,53 @@ test.describe( 'Block Toolbar', () => {
 			// Test navigating to block toolbar
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Paragraph' );
-			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Paragraph' );
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page.getByRole( 'button', { name: 'Paragraph', exact: true } )
+			).toBeFocused();
 			// // Navigate to Align Text
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await page.keyboard.press( 'ArrowRight' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 			// // Open the dropdown
 			await page.keyboard.press( 'Enter' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text left' );
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text left' } )
+			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Align text center'
-			);
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Align text center' } )
+			).toBeFocused();
 			await page.keyboard.press( 'Escape' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Align text' );
+			await expect(
+				page.getByRole( 'button', { name: 'Align text', exact: true } )
+			).toBeFocused();
 
 			// Navigate to the Bold item. Testing items via the fills within the block toolbar are especially important
 			await page.keyboard.press( 'ArrowRight' );
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
-			await BlockToolbarUtils.focusBlock();
-			await BlockToolbarUtils.expectLabelToHaveFocus(
-				'Block: Paragraph'
-			);
+			await pageUtils.pressKeys( 'Escape' );
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
-			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 
-			await BlockToolbarUtils.focusBlock();
+			await pageUtils.pressKeys( 'Escape' );
 
 			// Try selecting text and navigating to block toolbar
 			await pageUtils.pressKeys( 'Shift+ArrowLeft', {
@@ -101,8 +116,10 @@ test.describe( 'Block Toolbar', () => {
 			).toBe( 'raph' );
 
 			// Go back to the toolbar and apply a formatting option
-			await BlockToolbarUtils.focusBlockToolbar();
-			await BlockToolbarUtils.expectLabelToHaveFocus( 'Bold' );
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page.getByRole( 'button', { name: 'Bold', exact: true } )
+			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 			// Should focus the selected text again
 			expect(
@@ -110,6 +127,90 @@ test.describe( 'Block Toolbar', () => {
 					.locator( ':root' )
 					.evaluate( () => window.getSelection().toString() )
 			).toBe( 'raph' );
+		} );
+
+		// The image placeholder focuses its Upload button, so the block wrapper
+		// and the element that last had focus are two different elements.
+		test( 'returns focus to the element within the block that had it, not the block wrapper', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/image' } );
+			await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Upload' );
+
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page.getByRole( 'button', { name: 'Image', exact: true } )
+			).toBeFocused();
+
+			await pageUtils.pressKeys( 'Escape' );
+			await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Upload' );
+		} );
+
+		test( 'returns focus to the element within the block that had it when tabbing back into the canvas', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/image' } );
+			await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Upload' );
+
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page.getByRole( 'button', { name: 'Image', exact: true } )
+			).toBeFocused();
+
+			await pageUtils.pressKeys( 'Tab' );
+			await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Upload' );
+		} );
+
+		// Inserting from the global inserter leaves focus in the inserter, so the
+		// canvas has never been focused and there is no last focused element to
+		// return to. See https://github.com/WordPress/gutenberg/pull/61472.
+		test( 'returns focus to the block when the canvas has never been focused', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// The contextual toolbar is only rendered once the canvas has been
+			// interacted with, so use the fixed toolbar to reach it.
+			await editor.setIsFixedToolbar( true );
+
+			const inserterToggle = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Block Inserter' } );
+
+			await inserterToggle.click();
+			await page
+				.getByRole( 'region', { name: 'Block Library' } )
+				.getByRole( 'searchbox', { name: 'Search' } )
+				.fill( 'Separator' );
+			await page
+				.getByRole( 'listbox', { name: 'Blocks' } )
+				.getByRole( 'option', { name: 'Separator', exact: true } )
+				.click();
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Separator',
+				} )
+			).toBeVisible();
+
+			// Closing the inserter keeps focus on its toggle, so the canvas is
+			// still unfocused.
+			await inserterToggle.click();
+
+			await pageUtils.pressKeys( 'alt+F10' );
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block Tools' } )
+					.getByRole( 'button', { name: 'Separator', exact: true } )
+			).toBeFocused();
+
+			await pageUtils.pressKeys( 'Escape' );
+			await expect
+				.poll( editor.getFocusOwnerLabel )
+				.toBe( 'Block: Separator' );
 		} );
 	} );
 
@@ -124,7 +225,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 
@@ -132,49 +233,48 @@ test.describe( 'Block Toolbar', () => {
 	// overflow-x property set to allow the block toolbar to scroll.
 	test( 'Block toolbar will scroll to reveal hidden buttons with fixed toolbar', async ( {
 		editor,
-		BlockToolbarUtils,
 		page,
 		pageUtils,
 	} ) => {
-		/* eslint-disable playwright/expect-expect */
-		/* eslint-disable playwright/no-wait-for-timeout */
-		// Set the fixed toolbar
 		await editor.setIsFixedToolbar( true );
-		// Insert a block with a lot of tool buttons
+		// A block with more tools than fit in a narrow toolbar.
 		await editor.insertBlock( { name: 'core/buttons' } );
-		// Set the locators we'll need to check for visibility
-		const blockButton = page.getByRole( 'button', {
-			name: 'Button',
-			exact: true,
-		} );
 
 		const blockToolbar = page.getByRole( 'toolbar', {
 			name: 'Block tools',
 		} );
+		// The last tool in the toolbar, so it is the one the overflow hides.
+		const lastTool = blockToolbar.getByRole( 'button', {
+			name: 'Options',
+			exact: true,
+		} );
 
-		// Test: Top Toolbar can scroll to reveal hidden block tools.
-		await pageUtils.setBrowserViewport( { width: 960, height: 700 } );
+		// The top toolbar at a narrow viewport, then the toolbar fixed to the
+		// bottom of the screen.
+		for ( const width of [ 960, 400 ] ) {
+			await pageUtils.setBrowserViewport( { width, height: 700 } );
+			await expect( lastTool ).not.toBeInViewport();
 
-		// Test: Block toolbar can scroll on top toolbar mode
-		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
+			// The toolbar has to be scrolled by wheel rather than
+			// programmatically, which would scroll it even if it were not
+			// scrollable.
+			await blockToolbar.hover();
+			await page.mouse.wheel( 200, 0 );
+			await expect( lastTool ).toBeInViewport();
 
-		// Test: Fixed toolbar can scroll.
+			await page.mouse.wheel( -200, 0 );
+			await expect( lastTool ).not.toBeInViewport();
+		}
 
-		// Make the viewport very small to force the fixed to bottom toolbar overflow
-		await pageUtils.setBrowserViewport( { width: 400, height: 700 } );
-
-		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
-
-		// Test cleanup
+		// Preferences are saved on a debounce, so a fast test can outrun its own
+		// save and have it land after the reset in `afterEach`. Put the setting
+		// back instead of relying on that reset.
 		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
-		/* eslint-enable playwright/expect-expect */
-		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
 
 	test( 'Tab order of the block toolbar aligns with visual order', async ( {
 		editor,
-		BlockToolbarUtils,
 		page,
 		pageUtils,
 	} ) => {
@@ -192,10 +292,15 @@ test.describe( 'Block Toolbar', () => {
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		// check focus is on the block
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		await expect
+			.poll( editor.getFocusOwnerLabel )
+			.toBe( 'Block: Paragraph' );
 
 		// set the screen size to mobile
 		await pageUtils.setBrowserViewport( 'small' );
+		// The toolbar remounts when the viewport changes, so wait for it before
+		// tabbing. A key press that lands mid-remount moves focus elsewhere.
+		await expect( blockToolbarParagraphButton ).toBeVisible();
 
 		// TEST: Small screen toolbar without fixed toolbar setting should be the first tabstop before the editor
 		await pageUtils.pressKeys( 'shift+Tab' );
@@ -203,7 +308,9 @@ test.describe( 'Block Toolbar', () => {
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		// check focus is on the block
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		await expect
+			.poll( editor.getFocusOwnerLabel )
+			.toBe( 'Block: Paragraph' );
 		// TEST: Fixed toolbar should be within the header dom
 		// Changed to Fixed top toolbar setting and large viewport to test fixed toolbar
 		await pageUtils.setBrowserViewport( 'large' );
@@ -212,11 +319,13 @@ test.describe( 'Block Toolbar', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 
 		// Options button is the last one in the top toolbar, the first item outside of the editor canvas, so it should get focused.
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Options' );
+		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Options' );
 
 		await pageUtils.pressKeys( 'Tab' );
 		// check focus is on the block
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		await expect
+			.poll( editor.getFocusOwnerLabel )
+			.toBe( 'Block: Paragraph' );
 		// Move to block, alt + f10
 		await pageUtils.pressKeys( 'alt+F10' );
 		// check focus in block toolbar
@@ -224,7 +333,9 @@ test.describe( 'Block Toolbar', () => {
 		// escape back to block
 		await pageUtils.pressKeys( 'Escape' );
 		// check block focus
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		await expect
+			.poll( editor.getFocusOwnerLabel )
+			.toBe( 'Block: Paragraph' );
 
 		// TEST: Small screen toolbar with fixed toolbar setting should be the first tabstop before the editor. Even though the fixed toolbar setting is on, it should not render within the header since it's visually after it.
 		await pageUtils.setBrowserViewport( 'small' );
@@ -233,10 +344,10 @@ test.describe( 'Block Toolbar', () => {
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		// check focus is on the block
-		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		await expect
+			.poll( editor.getFocusOwnerLabel )
+			.toBe( 'Block: Paragraph' );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 
@@ -296,61 +407,3 @@ test.describe( 'Block Toolbar', () => {
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 	} );
 } );
-
-class BlockToolbarUtils {
-	constructor( { editor, page, pageUtils } ) {
-		this.editor = editor;
-		this.page = page;
-		this.pageUtils = pageUtils;
-	}
-
-	async focusBlockToolbar() {
-		await this.pageUtils.pressKeys( 'alt+F10' );
-	}
-
-	async focusBlock() {
-		await this.pageUtils.pressKeys( 'Escape' );
-	}
-
-	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
-	}
-
-	async testScrollable( scrollableElement, elementToTest ) {
-		// We can't use `not.toBeVisible()` here since Playwright's definition of visible or not visible is not the same
-		// as being human visible. It will pass if the element is off screen, but not human visible. Instead, we check the x
-		// position of the element. It should change as we scroll. But we also can't programmatically use scroll, as it will
-		// allow a scroll even if the element is not scrollable. So we use the mouse wheel event to scroll the element.
-		const initialBox = await elementToTest.boundingBox();
-
-		// Scroll the block toolbar to the right to reveal the hidden block tools
-		await scrollableElement.hover();
-		await this.page.mouse.wheel( 60, 0 );
-		// Wait for the scroll to complete. Playwright doesn't wait for the scroll from the mouse event to complete before returning.
-		await this.editor.page.waitForTimeout( 500 );
-
-		let currentBox = await elementToTest.boundingBox();
-
-		// The x position of the button should now be 60px lower.
-		expect( currentBox.x ).toEqual( initialBox.x - 60 );
-
-		// Scroll the block toolbar back to the left to hide the block tools again
-		await this.page.mouse.wheel( -60, 0 );
-		// Wait for the scroll to complete. Playwright doesn't wait for the scroll from the mouse event to complete before returning.
-		await this.editor.page.waitForTimeout( 500 );
-
-		currentBox = await elementToTest.boundingBox();
-
-		// The x positions should return to their initial values
-		expect( initialBox.x ).toEqual( currentBox.x );
-	}
-}

@@ -1,26 +1,15 @@
-/**
- * Internal dependencies
- */
 import type {
 	RenderedText,
 	Context,
 	ContextualField,
 	OmitNevers,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 export type NavMenuItemType =
-	| 'taxonomy'
-	| 'post_type'
-	| 'post_type_archive'
-	| 'custom';
+	'taxonomy' | 'post_type' | 'post_type_archive' | 'custom';
 export type NavMenuItemStatus =
-	| 'publish'
-	| 'future'
-	| 'draft'
-	| 'pending'
-	| 'private';
+	'publish' | 'future' | 'draft' | 'pending' | 'private';
 export type Target = '_blank' | '';
 
 declare module './base-entity-records' {
@@ -98,7 +87,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, string >,
+				Record< string, unknown >,
 				'view' | 'edit',
 				C
 			>;

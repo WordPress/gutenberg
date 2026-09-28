@@ -1,33 +1,27 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { BorderControl } from '..';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
-	title: 'Components/BorderControl',
+	id: 'components-bordercontrol',
+	title: 'Components/@wordpress-components/BorderControl',
 	component: BorderControl,
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		width: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -93,7 +87,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
-	__next40pxDefaultSize: true,
 	enableAlpha: true,
 	enableStyle: true,
 	shouldSanitizeBorder: true,

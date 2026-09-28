@@ -50,6 +50,7 @@
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"anchor": true,
+		"html": false,
 		"__experimentalExposeControlsToChildren": true,
 		"layout": {
 			"allowSwitching": false,
@@ -58,6 +59,9 @@
 			"default": {
 				"type": "flex"
 			}
+		},
+		"background": {
+			"gradient": true
 		},
 		"color": {
 			"enableContrastChecker": false,
@@ -93,7 +97,9 @@
 				"width": true,
 				"style": true
 			}
-		}
+		},
+		"contentRole": true,
+		"listView": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

@@ -65,10 +65,21 @@ Renders with a light gray background color.
 
 See the documentation for the `justify` prop for the [`Flex` component](/packages/components/src/flex/flex/README.md#justify)
 
-### `size`: `string`
+### `size`: `string | object`
 
-Determines the amount of padding within the component.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values:
+-   Single size token: `none`, `xSmall`, `small`, `medium`, `large`
+-   Object:
+
+    ```ts
+    {
+      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+    }
+    ```

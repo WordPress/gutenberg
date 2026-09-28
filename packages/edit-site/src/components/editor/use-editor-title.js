@@ -1,36 +1,48 @@
-/**
- * WordPress dependencies
- */
 import { _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import useTitle from '../routes/use-title';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 function useEditorTitle( postType, postId ) {
 	const { title, isLoaded } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const { __experimentalGetTemplateInfo: getTemplateInfo } =
-				select( editorStore );
+			const {
+				getEditedEntityRecord,
+				getCurrentTheme,
+				hasFinishedResolution,
+			} = select( coreStore );
+
+			if ( ! postId ) {
+				return { isLoaded: false };
+			}
+
 			const _record = getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			);
+
+			const { default_template_types: templateTypes = [] } =
+				getCurrentTheme() ?? {};
+
+			const templateInfo = getTemplateInfo( {
+				template: _record,
+				templateTypes,
+			} );
+
 			const _isLoaded = hasFinishedResolution( 'getEditedEntityRecord', [
 				'postType',
 				postType,
 				postId,
 			] );
-			const templateInfo = getTemplateInfo( _record );
 
 			return {
 				title: templateInfo.title,

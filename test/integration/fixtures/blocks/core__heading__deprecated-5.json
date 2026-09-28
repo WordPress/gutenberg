@@ -3,10 +3,14 @@
 		"name": "core/heading",
 		"isValid": true,
 		"attributes": {
-			"textAlign": "right",
 			"content": "Text",
 			"level": 2,
-			"textColor": "primary"
+			"textColor": "primary",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
 		},
 		"innerBlocks": []
 	}

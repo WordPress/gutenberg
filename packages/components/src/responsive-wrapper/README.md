@@ -1,5 +1,7 @@
 # ResponsiveWrapper
 
+<p class="callout callout-alert">This component is deprecated. Use the CSS <code>aspect-ratio</code> property instead.</p>
+
 A wrapper component that maintains its aspect ratio when resized.
 
 ## Usage

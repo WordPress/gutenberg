@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import {
 	Button,
@@ -15,20 +12,12 @@ import {
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
-
 import { unlock } from '../lock-unlock';
 import {
 	getItemTitle,
 	isTemplateRemovable,
 	isTemplate,
 	isTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
 } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
@@ -37,19 +26,16 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
 const renamePost: Action< PostWithPermissions > = {
 	id: 'rename-post',
-	label: __( 'Rename' ),
+	label: __( 'Rename…' ),
+	modalHeader: __( 'Rename' ),
+	modalFocusOnMount: 'firstContentElement',
 	isEligible( post ) {
 		if ( post.status === 'trash' ) {
 			return false;
 		}
+
 		// Templates, template parts and patterns have special checks for renaming.
-		if (
-			! [
-				TEMPLATE_POST_TYPE,
-				TEMPLATE_PART_POST_TYPE,
-				...Object.values( PATTERN_TYPES ),
-			].includes( post.type )
-		) {
+		if ( ! [ 'wp_template', 'wp_template_part' ].includes( post.type ) ) {
 			return post.permissions?.update;
 		}
 
@@ -64,7 +50,7 @@ const renamePost: Action< PostWithPermissions > = {
 
 		if ( isTemplatePart( post ) ) {
 			return (
-				post.source === TEMPLATE_ORIGINS.custom &&
+				post.source === 'custom' &&
 				! post?.has_theme_file &&
 				post.permissions?.update
 			);
@@ -74,7 +60,7 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
+		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -111,8 +97,6 @@ const renamePost: Action< PostWithPermissions > = {
 			<form onSubmit={ onRename }>
 				<VStack spacing="5">
 					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }
@@ -142,4 +126,7 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 };
 
+/**
+ * Rename action for PostWithPermissions.
+ */
 export default renamePost;

@@ -1,27 +1,15 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks';
-import BaseControl from '../../base-control';
+import BaseControl, { useBaseControlProps } from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
-import { VisualLabelWrapper } from './styles';
-import * as styles from './styles';
+import styles from './style.module.scss';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
-import { useMergeRefs } from '@wordpress/compose';
 import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
 
 function UnconnectedToggleGroupControl(
@@ -29,52 +17,53 @@ function UnconnectedToggleGroupControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
-		__next40pxDefaultSize = false,
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
 		isDeselectable = false,
+		disabled = false,
+		id,
 		label,
 		hideLabelFromVision = false,
 		help,
 		onChange,
-		size = 'default',
 		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 
-	const normalizedSize =
-		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+	const { baseControlProps, controlProps } = useBaseControlProps( {
+		id,
+		help,
+		label,
+		hideLabelFromVision,
+	} );
 
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
 	const selectedRect = useTrackElementOffsetRect(
-		value || value === 0 ? selectedElement : undefined
+		value !== null && value !== undefined ? selectedElement : undefined
 	);
 	useAnimatedOffsetRect( controlElement, selectedRect, {
 		prefix: 'selected',
 		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
-		roundRect: true,
+		roundRect: false,
 	} );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.toggleGroupControl( {
-					isBlock,
-					isDeselectable,
-					size: normalizedSize,
-				} ),
-				isBlock && styles.block,
-				className
-			),
-		[ className, cx, isBlock, isDeselectable, normalizedSize ]
+	const classes = clsx(
+		styles[ 'toggle-group-control' ],
+		{
+			[ styles[ 'is-block' ] ]: isBlock,
+			[ styles[ 'has-border' ] ]: isBlock && ! isDeselectable,
+			[ styles[ 'has-enclosing-borders' ] ]: ! isDeselectable,
+		},
+		className
 	);
 
 	const MainControl = isDeselectable
@@ -82,26 +71,20 @@ function UnconnectedToggleGroupControl(
 		: ToggleGroupControlAsRadioGroup;
 
 	return (
-		<BaseControl
-			help={ help }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="ToggleGroupControl"
-		>
-			{ ! hideLabelFromVision && (
-				<VisualLabelWrapper>
-					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
-				</VisualLabelWrapper>
-			) }
+		<BaseControl { ...baseControlProps }>
 			<MainControl
 				{ ...otherProps }
+				{ ...controlProps }
 				setSelectedElement={ setSelectedElement }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
+				// `label` is used for `aria-label` on the inner control.
+				// This is separate from the visual label rendered by `BaseControl`.
 				label={ label }
 				onChange={ onChange }
 				ref={ refs }
-				size={ normalizedSize }
 				value={ value }
+				disabled={ disabled }
 			>
 				{ children }
 			</MainControl>
@@ -116,7 +99,7 @@ function UnconnectedToggleGroupControl(
  *
  * This component is intended for selecting a single persistent value from a set of options,
  * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
- * use a `TabPanel` instead.
+ * use `Tabs` from `@wordpress/ui` instead.
  *
  * Only use this control when you know for sure the labels of items inside won't
  * wrap. For items with longer labels, you can consider a `SelectControl` or a
@@ -134,7 +117,6 @@ function UnconnectedToggleGroupControl(
  *       label="my label"
  *       value="vertical"
  *       isBlock
- *       __nextHasNoMarginBottom
  *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />

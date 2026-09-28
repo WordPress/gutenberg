@@ -1,50 +1,64 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import type { MenuItemProps } from './types';
+import type { ItemProps } from './types';
 import * as Styled from './styles';
-import { MenuContext } from './context';
-import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+import { Context } from './context';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
-export const MenuItem = forwardRef<
+export const Item = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuItemProps, 'div', false >
->( function MenuItem(
-	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
+	WordPressComponentProps< ItemProps, 'div', false >
+>( function Item(
+	{
+		prefix,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = true,
+		store,
+		...props
+	},
 	ref
 ) {
-	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
-	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
+	const computedStore = store ?? menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick(
+		computedStore,
+		hideOnClick
+	);
 
+	if ( ! menuContext?.store || ! computedStore ) {
+		throw new Error(
+			'Menu.Item can only be rendered inside a Menu component'
+		);
+	}
+
+	// In most cases, the menu store will be retrieved from context (ie. the store
+	// created by the top-level menu component). But in rare cases (ie.
+	// `Menu.SubmenuTriggerItem`), the context store wouldn't be correct. This is
+	// why the component accepts a `store` prop to override the context store.
 	return (
-		<Styled.MenuItem
+		<Styled.Item
 			ref={ ref }
 			{ ...props }
-			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
-			hideOnClick={ hideOnClick }
-			store={ menuContext?.store }
+			disabled={ disabled }
+			store={ computedStore }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<Styled.ItemContentWrapper>
+				<Styled.ItemChildrenWrapper>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</Styled.ItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuItem>
+			</Styled.ItemContentWrapper>
+		</Styled.Item>
 	);
 } );

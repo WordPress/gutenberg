@@ -1,22 +1,20 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
+	tags: [ 'manifest' ],
 	component: TextHighlight,
-	title: 'Components/Typography/TextHighlight',
+	title: 'Components/@wordpress-components/Typography/TextHighlight',
 	id: 'components-texthighlight',
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NavigableContainer from './container';
 import type { NavigableMenuProps } from './types';
 
@@ -96,5 +85,6 @@ export function UnforwardedNavigableMenu(
  *  ```
  */
 export const NavigableMenu = forwardRef( UnforwardedNavigableMenu );
+NavigableMenu.displayName = 'NavigableMenu';
 
 export default NavigableMenu;

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ColorPaletteProps } from '../color-palette/types';
 import type { PopoverProps } from '../popover/types';
 import type { ToggleGroupControlProps } from '../toggle-group-control/types';
@@ -92,7 +85,8 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * Size of the control.
 		 *
-		 * @default 'default'
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		size?: 'default' | '__unstable-large';
 		/**
@@ -113,13 +107,14 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * Start opting into the larger default height that will become the default size in a future version.
 		 *
-		 * @default false
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
 		 */
 		__next40pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &
-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+	Pick< BorderControlProps, 'enableStyle' > & {
 		/**
 		 * An object representing a border or `undefined`. This component will
 		 * extract the border color and style selections from this object to use as

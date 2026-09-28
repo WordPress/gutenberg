@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'iframed block editor settings styles', () => {
@@ -24,7 +21,7 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 
@@ -43,7 +40,7 @@ test.describe( 'iframed block editor settings styles', () => {
 				styles: [
 					...settings.styles,
 					{
-						css: 'p { border-width: 2px; }',
+						css: 'p { border-width: 3px; }',
 						__unstableType: 'plugin',
 					},
 				],
@@ -51,14 +48,14 @@ test.describe( 'iframed block editor settings styles', () => {
 		} );
 
 		// Expect a 2px border (added in JS).
-		await expect( defaultBlock ).toHaveCSS( 'border-width', '2px' );
+		await expect( defaultBlock ).toHaveCSS( 'border-width', '3px' );
 	} );
 
 	test( 'should load theme styles added through block editor settings', async ( {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 
@@ -68,22 +65,9 @@ test.describe( 'iframed block editor settings styles', () => {
 			window.wp.data
 				.dispatch( 'core/edit-post' )
 				.toggleFeature( 'themeStyles' );
-			const settings = window.wp.data
-				.select( 'core/editor' )
-				.getEditorSettings();
-			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				...settings,
-				styles: [
-					...settings.styles,
-					{
-						css: 'p { border-width: 2px; }',
-						__unstableType: 'theme',
-					},
-				],
-			} );
 		} );
 
-		// Expect a 1px border because theme styles are disabled.
+		// Expect a 1px border because theme styles are disabled. (only plugin styles applied)
 		await expect( defaultBlock ).toHaveCSS( 'border-width', '1px' );
 
 		await page.evaluate( () => {

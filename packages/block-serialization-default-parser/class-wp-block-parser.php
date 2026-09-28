@@ -36,7 +36,7 @@ class WP_Block_Parser {
 	 * List of parsed blocks
 	 *
 	 * @since 5.0.0
-	 * @var WP_Block_Parser_Block[]
+	 * @var array[]
 	 */
 	public $output;
 
@@ -45,6 +45,7 @@ class WP_Block_Parser {
 	 *
 	 * @since 5.0.0
 	 * @var WP_Block_Parser_Frame[]
+	 * @phpstan-var list<WP_Block_Parser_Frame>
 	 */
 	public $stack;
 
@@ -85,6 +86,7 @@ class WP_Block_Parser {
 	 *
 	 * @internal
 	 * @since 5.0.0
+	 *
 	 * @return bool
 	 */
 	public function proceed() {
@@ -231,6 +233,7 @@ class WP_Block_Parser {
 	 * @internal
 	 * @since 5.0.0
 	 * @since 4.6.1 fixed a bug in attribute parsing which caused catastrophic backtracking on invalid block comments
+	 *
 	 * @return array
 	 */
 	public function next_token() {
@@ -303,7 +306,7 @@ class WP_Block_Parser {
 	 * Returns a new block object for freeform HTML
 	 *
 	 * @internal
-	 * @since 3.9.0
+	 * @since 5.0.0
 	 *
 	 * @param string $inner_html HTML content of block.
 	 * @return WP_Block_Parser_Block freeform block object.
@@ -318,10 +321,11 @@ class WP_Block_Parser {
 	 *
 	 * @internal
 	 * @since 5.0.0
+	 *
 	 * @param null $length how many bytes of document text to output.
 	 */
 	public function add_freeform( $length = null ) {
-		$length = $length ? $length : strlen( $this->document ) - $this->offset;
+		$length = $length ?? strlen( $this->document ) - $this->offset;
 
 		if ( 0 === $length ) {
 			return;
@@ -336,6 +340,7 @@ class WP_Block_Parser {
 	 *
 	 * @internal
 	 * @since 5.0.0
+	 *
 	 * @param WP_Block_Parser_Block $block        The block to add to the output.
 	 * @param int                   $token_start  Byte offset into the document where the first token for the block starts.
 	 * @param int                   $token_length Byte length of entire block from start of opening token to end of closing token.
@@ -352,7 +357,7 @@ class WP_Block_Parser {
 		}
 
 		$parent->block->innerContent[] = null;
-		$parent->prev_offset           = $last_offset ? $last_offset : $token_start + $token_length;
+		$parent->prev_offset           = $last_offset ?? $token_start + $token_length;
 	}
 
 	/**
@@ -360,6 +365,7 @@ class WP_Block_Parser {
 	 *
 	 * @internal
 	 * @since 5.0.0
+	 *
 	 * @param int|null $end_offset byte offset into document for where we should stop sending text output as HTML.
 	 */
 	public function add_block_from_stack( $end_offset = null ) {

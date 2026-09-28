@@ -1,7 +1,7 @@
 # Editor Components
 
 This folder holds reusable editor components exported by the `editor` module.
-These components combined as children of the `EditorProvider` component can be use to build alternative Editor Layouts.
+These components, combined as children of the `EditorProvider` component, can be used to build alternative Editor Layouts.
 
 ## Which components should live in this folder?
 

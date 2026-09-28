@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const Benchmark = require( 'benchmark' );
-
-/**
- * Internal dependencies
- */
 const { __ } = require( '../' );
 
 const suite = new Benchmark.Suite();

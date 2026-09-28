@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .customize-widgets-welcome-guide {
 	&__image__wrapper {
 		background: #00a0d2;
@@ -12,7 +14,7 @@
 	// Extra specificity to override `.wrap h1` styles.
 	.wrap &__heading {
 		font-size: 18px;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	&__text {

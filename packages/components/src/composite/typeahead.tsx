@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
 import type { CompositeTypeaheadProps } from './types';
@@ -26,5 +15,7 @@ export const CompositeTypeahead = forwardRef<
 	// obfuscated to discourage its use outside of the component's internals.
 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
 
-	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
+	return (
+		<Ariakit.CompositeTypeahead store={ store } { ...props } ref={ ref } />
+	);
 } );

@@ -22,11 +22,15 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

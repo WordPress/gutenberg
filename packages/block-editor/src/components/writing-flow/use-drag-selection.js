@@ -1,27 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
-
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
-	// Firefox doesn't automatically move focus.
-	if ( value ) {
-		node.focus();
-	}
-}
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Sets a multi-selection based on the native selection across blocks.
@@ -30,10 +10,12 @@ export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
 	const {
+		getSettings,
 		isSelectionEnabled,
 		hasSelectedBlock,
 		isDraggingBlocks,
 		isMultiSelecting,
+		getSelectedBlockClientId,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -80,7 +62,17 @@ export default function useDragSelection() {
 				} );
 			}
 
+			let lastMouseDownTarget;
+
+			function onMouseDown( { target } ) {
+				lastMouseDownTarget = target;
+			}
+
 			function onMouseLeave( { buttons, target, relatedTarget } ) {
+				if ( ! target.contains( lastMouseDownTarget ) ) {
+					return;
+				}
+
 				// If we're moving into a child element, ignore. We're tracking
 				// the mouse leaving the element to a parent, no a child.
 				if ( target.contains( relatedTarget ) ) {
@@ -109,11 +101,15 @@ export default function useDragSelection() {
 					return;
 				}
 
-				// Check the attribute, not the contentEditable attribute. All
-				// child elements of the content editable wrapper are editable
-				// and return true for this property. We only want to start
-				// multi selecting when the mouse leaves the wrapper.
-				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
+				// Only start multi selecting when the mouse leaves a field:
+				// one editable on its own, or the selected block, editable
+				// through the editing host. In preview mode, allow drag
+				// selection from blocks since they are not contenteditable.
+				const isField =
+					target.contentEditable === 'true' ||
+					( target.isContentEditable &&
+						target.dataset.block === getSelectedBlockClientId() );
+				if ( ! isField && ! getSettings().isPreviewMode ) {
 					return;
 				}
 
@@ -141,6 +137,7 @@ export default function useDragSelection() {
 			}
 
 			node.addEventListener( 'mouseout', onMouseLeave );
+			node.addEventListener( 'mousedown', onMouseDown );
 
 			return () => {
 				node.removeEventListener( 'mouseout', onMouseLeave );

@@ -21,6 +21,7 @@ const MyBlockCard = () => (
 		icon={ paragraph }
 		title="Paragraph"
 		description="Start with the basic building block of all narrative."
+		name="Custom Block"
 	/>
 );
 ```
@@ -44,6 +45,12 @@ The title of the block.
 -   **Type:** `String`
 
 The description of the block.
+
+#### name
+
+-   **Type:** `String`
+
+The custom name of the block.
 
 ## Related components
 

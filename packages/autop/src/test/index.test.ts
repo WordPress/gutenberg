@@ -1,10 +1,34 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import { autop, removep } from '../';
 
 test( 'empty string', () => {
 	expect( autop( '' ) ).toBe( '' );
+} );
+
+// Regression test for https://github.com/WordPress/gutenberg/issues/9056.
+// Newlines inside <script>, <style>, <svg>, and <math> tags must not be
+// converted to <br /> tags.
+test( 'does not insert <br /> inside <script>, <style>, <svg>, or <math> tags', () => {
+	const script =
+		'Some text...\n' +
+		'<script type="text/javascript">\n' +
+		'alert(1);\n' +
+		'</script>';
+	expect( autop( script ) ).toBe(
+		'<p>Some text...<br />\n' +
+			'<script type="text/javascript">\n' +
+			'alert(1);\n' +
+			'</script></p>\n'
+	);
+
+	const style =
+		'Some text...\n' + '<style>\n' + '.foo { color: red; }\n' + '</style>';
+	expect( autop( style ) ).toBe(
+		'<p>Some text...</p>\n' +
+			'<style>\n' +
+			'.foo { color: red; }\n' +
+			'</style>\n'
+	);
 } );
 
 test( 'first post', () => {
@@ -83,6 +107,41 @@ done = 0;
 	expected =
 		'<p>Look at this code</p>\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n<p>Cool, huh?</p>';
 	expect( autop( str ).trim() ).toBe( expected );
+} );
+
+test( 'preserve bash ANSI-C quoting in pre elements', () => {
+	// Test case from issue #20512
+	const str = `Add the following to your <code>~/.bashrc</code> if you use bash or <code>~/.zshrc</code> if you use zsh:
+<pre><code># Set colors for less. Borrowed from https://wiki.archlinux.org/index.php/Color_output_in_console#less .
+export LESS_TERMCAP_mb=$'\\E[1;31m'     # begin bold
+export LESS_TERMCAP_md=$'\\E[1;36m'     # begin blink
+export LESS_TERMCAP_me=$'\\E[0m'        # reset bold/blink
+export LESS_TERMCAP_so=$'\\E[01;44;33m' # begin reverse video
+export LESS_TERMCAP_se=$'\\E[0m'        # reset reverse video
+export LESS_TERMCAP_us=$'\\E[1;32m'     # begin underline
+export LESS_TERMCAP_ue=$'\\E[0m'        # reset underline</code></pre>
+Now restart your shell and run <code>man less</code>—the manual is in colors! The difference is shown in the following two images`;
+
+	const result = autop( str );
+
+	// The pre/code content should be preserved exactly
+	expect( result ).toContain( "export LESS_TERMCAP_mb=$'\\E[1;31m'" );
+	expect( result ).toContain( "export LESS_TERMCAP_md=$'\\E[1;36m'" );
+	expect( result ).toContain( "export LESS_TERMCAP_me=$'\\E[0m'" );
+	expect( result ).toContain( '# begin bold' );
+	expect( result ).toContain( '# begin blink' );
+	expect( result ).toContain( '# reset bold/blink' );
+
+	// The text after the pre block should appear only once and in the right place
+	const manLessMatches = result.match( /man less/g ) || [];
+	expect( manLessMatches.length ).toBe( 1 );
+
+	// The text after </pre> should not be interleaved with the pre content
+	const preMatch = result.match( /<pre>[\s\S]*?<\/pre>/ );
+	expect( preMatch ).toBeTruthy();
+	const preContent = preMatch ? preMatch[ 0 ] : '';
+	// The "Now restart" text should NOT be inside the pre tag
+	expect( preContent ).not.toContain( 'Now restart your shell' );
 } );
 
 test( 'skip input elements', () => {

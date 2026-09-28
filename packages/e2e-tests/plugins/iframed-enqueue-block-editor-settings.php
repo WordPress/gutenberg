@@ -14,6 +14,11 @@ add_action(
 			'css'            => 'p { border: 1px solid red }',
 			'__unstableType' => 'plugin',
 		);
+		$settings['styles'][] = array(
+			'css'            => 'p { border-width: 2px; }',
+			'__unstableType' => 'theme',
+		);
+
 		return $settings;
 	}
 );

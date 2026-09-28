@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
- * WordPress dependencies
- */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { useRegistry } from '@wordpress/data';
+import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -23,7 +13,8 @@ import { store as blockEditorStore } from '../../store';
  * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
  * @param {string}  clientId                       The block client ID.
- * @param {Object}  template                       The template to match.
+ * @param {Object}  template                       A template to apply in place of the one
+ *                                                 declared in the block type settings.
  * @param {string}  templateLock                   The template lock state for the inner blocks. For
  *                                                 example, if the template lock is set to "all",
  *                                                 then the inner blocks will stay in sync with the
@@ -40,22 +31,44 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
+	if ( template !== undefined ) {
+		deprecated(
+			'The template prop of InnerBlocks and useInnerBlocksProps',
+			{
+				since: '7.2',
+				alternative: 'a `template` declared in the block type settings',
+			}
+		);
+	}
+	if ( templateInsertUpdatesSelection !== undefined ) {
+		deprecated(
+			'The templateInsertUpdatesSelection prop of InnerBlocks and useInnerBlocksProps',
+			{
+				since: '7.2',
+				alternative:
+					'`templateInsertUpdatesSelection` declared in the block type settings',
+			}
+		);
+	}
+
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
-
-	const {
-		getBlocks,
-		getSelectedBlocksInitialCaretPosition,
-		isBlockSelected,
-	} = useSelect( blockEditorStore );
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
 	const existingTemplateRef = useRef( null );
 
 	useLayoutEffect( () => {
 		let isCancelled = false;
+
+		const {
+			getBlockName,
+			getBlocks,
+			getSelectedBlocksInitialCaretPosition,
+			isBlockSelected,
+		} = registry.select( blockEditorStore );
+		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+			registry.dispatch( blockEditorStore );
 
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -66,36 +79,50 @@ export default function useInnerBlockTemplateSync(
 				return;
 			}
 
+			// A template declared in block type settings serves as the
+			// default when no `template` prop is passed, along with whether
+			// applying it moves the selection.
+			let resolvedTemplate = template;
+			let resolvedUpdatesSelection = templateInsertUpdatesSelection;
+			if ( template === undefined ) {
+				const blockType = getBlockType( getBlockName( clientId ) );
+				resolvedTemplate = blockType?.template;
+				resolvedUpdatesSelection =
+					blockType?.templateInsertUpdatesSelection;
+			}
+
+			const currentInnerBlocks = getBlocks( clientId );
+			const hasAppliedTemplate = fastDeepEqual(
+				resolvedTemplate,
+				existingTemplateRef.current
+			);
+
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
-			const currentInnerBlocks = getBlocks( clientId );
 			const shouldApplyTemplate =
 				currentInnerBlocks.length === 0 ||
 				templateLock === 'all' ||
 				templateLock === 'contentOnly';
 
-			const hasTemplateChanged = ! fastDeepEqual(
-				template,
-				existingTemplateRef.current
-			);
-
-			if ( ! shouldApplyTemplate || ! hasTemplateChanged ) {
+			if ( ! shouldApplyTemplate || hasAppliedTemplate ) {
 				return;
 			}
 
-			existingTemplateRef.current = template;
+			existingTemplateRef.current = resolvedTemplate;
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
-				template
+				resolvedTemplate
 			);
 
 			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
-				__unstableMarkNextChangeAsNotPersistent();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,
 					currentInnerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
+						resolvedUpdatesSelection &&
 						nextBlocks.length !== 0 &&
 						isBlockSelected( clientId ),
 					// This ensures the "initialPosition" doesn't change when applying the template
@@ -110,5 +137,11 @@ export default function useInnerBlockTemplateSync(
 		return () => {
 			isCancelled = true;
 		};
-	}, [ template, templateLock, clientId ] );
+	}, [
+		template,
+		templateLock,
+		clientId,
+		registry,
+		templateInsertUpdatesSelection,
+	] );
 }

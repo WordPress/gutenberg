@@ -14,10 +14,10 @@
 		}
 	}
 
-
-	animation: __wp-base-styles-fade-in $speed $easing $delay;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-in $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
 }
 
 @mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
@@ -30,19 +30,14 @@
 		}
 	}
 
-
-	animation: __wp-base-styles-fade-out $speed $easing $delay;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-out $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
 }
 
 // Deprecated
 @mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
 	@warn "The `edit-post__fade-in-animation` mixin is deprecated. Use `animation__fade-in` instead.";
 	@include animation__fade-in($speed, $delay);
-}
-
-@mixin editor-canvas-resize-animation($additional-transition-rules...) {
-	transition: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96), $additional-transition-rules;
-	@include reduce-motion("transition");
 }

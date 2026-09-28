@@ -2,7 +2,7 @@
 /**
  * Tests theme.json related public APIs.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Theme_Json_Test extends WP_UnitTestCase {

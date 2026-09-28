@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import warning from '@wordpress/warning';
 import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
 import type { CompositeItemProps } from './types';
@@ -25,24 +15,11 @@ export const CompositeItem = forwardRef<
 	// legacy compat layer. The `store` prop is documented, but its type is
 	// obfuscated to discourage its use outside of the component's internals.
 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
-
-	// If the active item is not connected, Composite may end up in a state
-	// where none of the items are tabbable. In this case, we force all items to
-	// be tabbable, so that as soon as an item received focus, it becomes active
-	// and Composite goes back to working as expected.
-	const tabbable = Ariakit.useStoreState( store, ( state ) => {
-		return (
-			state?.activeId !== null &&
-			! store?.item( state?.activeId )?.element?.isConnected
+	if ( ! store ) {
+		warning(
+			'Composite.Item: Missing composite state. Render inside Composite to enable composite keyboard behavior.'
 		);
-	} );
+	}
 
-	return (
-		<Ariakit.CompositeItem
-			store={ store }
-			tabbable={ tabbable }
-			{ ...props }
-			ref={ ref }
-		/>
-	);
+	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
 } );

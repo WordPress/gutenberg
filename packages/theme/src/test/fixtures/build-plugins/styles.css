@@ -1,0 +1,5 @@
+/* Token references in CSS comments are not transformed: var(--wpds-border-radius-sm). */
+.fixture {
+	color: var(--wpds-color-foreground-content-neutral);
+	content: "var(--wpds-border-radius-sm)";
+}

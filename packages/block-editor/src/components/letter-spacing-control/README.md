@@ -12,7 +12,7 @@ This component is used for blocks that display text, commonly inside a
 Renders a letter spacing control.
 
 ```jsx
-import { LetterSpacingControl } from '@wordpress/block-editor';
+import { __experimentalLetterSpacingControl as LetterSpacingControl } from '@wordpress/block-editor';
 
 const MyLetterSpacingControl = () => (
 	<LetterSpacingControl
@@ -44,13 +44,6 @@ A callback function invoked when the value is changed.
 -   **Default:** `undefined`
 
 Input width to pass through to inner UnitControl. Should be a valid CSS value.
-
-#### `__next40pxDefaultSize`
-
-- **Type:** `boolean`
-- **Default:** `false`
-
-Start opting into the larger default height that will become the default size in a future version.
 
 ## Related components
 

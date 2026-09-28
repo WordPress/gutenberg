@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NoticeListProps } from '../../notice/types';
 
 export type WithNoticeProps = {
@@ -31,5 +28,5 @@ export type WithNoticeProps = {
 		 */
 		removeAllNotices: () => void;
 	};
-	noticeUI: false | JSX.Element;
+	noticeUI: false | React.JSX.Element;
 };

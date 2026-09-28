@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { fetchDownloadableBlocks, receiveDownloadableBlocks } from './actions';
 
 export const getDownloadableBlocks =
@@ -35,5 +24,7 @@ export const getDownloadableBlocks =
 			);
 
 			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );
-		} catch {}
+		} catch {
+			dispatch( receiveDownloadableBlocks( [], filterValue ) );
+		}
 	};

@@ -1,0 +1,46 @@
+{
+	"$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
+	"name": "WordPress Design System",
+	"version": "2025.10",
+	"sets": {
+		"base": {
+			"sources": [
+				{ "$ref": "border.json" },
+				{ "$ref": "color.json" },
+				{ "$ref": "cursor.json" },
+				{ "$ref": "dimension.json" },
+				{ "$ref": "motion.json" },
+				{ "$ref": "typography.json" }
+			]
+		}
+	},
+	"modifiers": {
+		"corner-radius": {
+			"default": "subtle",
+			"contexts": {
+				"none": [ { "$ref": "modes/border.corner-radius-none.json" } ],
+				"subtle": [
+					{ "$ref": "modes/border.corner-radius-subtle.json" }
+				],
+				"moderate": [
+					{ "$ref": "modes/border.corner-radius-moderate.json" }
+				],
+				"pronounced": [
+					{ "$ref": "modes/border.corner-radius-pronounced.json" }
+				]
+			}
+		},
+		"pixel-density": {
+			"default": "standard",
+			"contexts": {
+				"standard": [],
+				"high-dpi": [ { "$ref": "modes/border.high-dpi.json" } ]
+			}
+		}
+	},
+	"resolutionOrder": [
+		{ "$ref": "#/sets/base" },
+		{ "$ref": "#/modifiers/corner-radius" },
+		{ "$ref": "#/modifiers/pixel-density" }
+	]
+}

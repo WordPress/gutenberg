@@ -1,12 +1,11 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getAllUnit,
 	getAllValue,
 	hasMixedValues,
 	hasDefinedValues,
 	mode,
+	getPresetValueFromControlValue,
 } from '../utils';
 
 const defaultUnitSelections = {
@@ -105,6 +104,96 @@ describe( 'getAllValue', () => {
 			expect( getAllValue( undefined ) ).toBe( undefined );
 		} );
 	} );
+
+	describe( 'when provided complex CSS values (clamp, min, max, calc)', () => {
+		it( 'should preserve clamp values when all corners have the same clamp value', () => {
+			const clampValue = 'clamp(1rem, 2vw, 3rem)';
+			const values = {
+				bottomLeft: clampValue,
+				bottomRight: clampValue,
+				topLeft: clampValue,
+				topRight: clampValue,
+			};
+			expect( getAllValue( values ) ).toBe( clampValue );
+		} );
+
+		it( 'should preserve min() values when all corners have the same min value', () => {
+			const minValue = 'min(10px, 5vw)';
+			const values = {
+				bottomLeft: minValue,
+				bottomRight: minValue,
+				topLeft: minValue,
+				topRight: minValue,
+			};
+			expect( getAllValue( values ) ).toBe( minValue );
+		} );
+
+		it( 'should preserve max() values when all corners have the same max value', () => {
+			const maxValue = 'max(20px, 10vw)';
+			const values = {
+				bottomLeft: maxValue,
+				bottomRight: maxValue,
+				topLeft: maxValue,
+				topRight: maxValue,
+			};
+			expect( getAllValue( values ) ).toBe( maxValue );
+		} );
+
+		it( 'should preserve calc() values when all corners have the same calc value', () => {
+			const calcValue = 'calc(100% - 20px)';
+			const values = {
+				bottomLeft: calcValue,
+				bottomRight: calcValue,
+				topLeft: calcValue,
+				topRight: calcValue,
+			};
+			expect( getAllValue( values ) ).toBe( calcValue );
+		} );
+
+		it( 'should return undefined when complex CSS values are mixed', () => {
+			const values = {
+				bottomLeft: 'clamp(1rem, 2vw, 3rem)',
+				bottomRight: 'clamp(1rem, 2vw, 3rem)',
+				topLeft: 'min(10px, 5vw)',
+				topRight: 'clamp(1rem, 2vw, 3rem)',
+			};
+			expect( getAllValue( values ) ).toBe( undefined );
+		} );
+
+		it( 'should return undefined when complex CSS values are mixed with simple values', () => {
+			const values = {
+				bottomLeft: 'clamp(1rem, 2vw, 3rem)',
+				bottomRight: 'clamp(1rem, 2vw, 3rem)',
+				topLeft: '2px',
+				topRight: 'clamp(1rem, 2vw, 3rem)',
+			};
+			expect( getAllValue( values ) ).toBe( undefined );
+		} );
+
+		it( 'should preserve string values that cannot be parsed at all (no numeric prefix)', () => {
+			// Values with no numeric prefix cannot be parsed, so they should be preserved
+			const unparseableValue = 'apples';
+			const values = {
+				bottomLeft: unparseableValue,
+				bottomRight: unparseableValue,
+				topLeft: unparseableValue,
+				topRight: unparseableValue,
+			};
+			expect( getAllValue( values ) ).toBe( unparseableValue );
+		} );
+
+		it( 'should parse numeric prefix from partially parseable values', () => {
+			// Values with numeric prefix get parsed, so "32apples" becomes "32"
+			const partiallyParseableValue = '32apples';
+			const values = {
+				bottomLeft: partiallyParseableValue,
+				bottomRight: partiallyParseableValue,
+				topLeft: partiallyParseableValue,
+				topRight: partiallyParseableValue,
+			};
+			expect( getAllValue( values ) ).toBe( '32' );
+		} );
+	} );
 } );
 
 describe( 'hasMixedValues', () => {
@@ -178,5 +267,34 @@ describe( 'mode', () => {
 	it( 'should return the most common real value', () => {
 		const values = [ undefined, 'a', undefined, undefined, undefined ];
 		expect( mode( values ) ).toBe( 'a' );
+	} );
+} );
+
+describe( 'getPresetValueFromControlValue', () => {
+	const presets = [
+		{ name: 'None', slug: '0', size: 0 },
+		{ name: 'Small', slug: 'sm', size: '4px' },
+		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
+	];
+
+	it( 'should return "0" if control value is 0 and not selectList', () => {
+		expect( getPresetValueFromControlValue( 0, 'slider', presets ) ).toBe(
+			'0'
+		);
+	} );
+
+	it( 'should return undefined if control value is 0 and controlType is selectList', () => {
+		expect(
+			getPresetValueFromControlValue( 0, 'selectList', presets )
+		).toBeUndefined();
+	} );
+
+	it( 'should return preset reference for other values', () => {
+		expect( getPresetValueFromControlValue( 1, 'slider', presets ) ).toBe(
+			'var:preset|border-radius|sm'
+		);
+		expect( getPresetValueFromControlValue( 2, 'slider', presets ) ).toBe(
+			'var:preset|border-radius|md'
+		);
 	} );
 } );

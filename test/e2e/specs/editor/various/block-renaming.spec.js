@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Renaming', () => {
@@ -126,8 +123,9 @@ test.describe( 'Block Renaming', () => {
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
 
-			// Check placeholder for input is the original block name.
+			// Check that input is empty and placeholder is the original block name.
 			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
+			await expect( nameInput ).toHaveValue( '' );
 
 			// It should be possible to submit empty.
 			await expect( saveButton ).toBeEnabled();
@@ -145,11 +143,6 @@ test.describe( 'Block Renaming', () => {
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
-					attributes: {
-						metadata: {
-							name: undefined,
-						},
-					},
 				},
 			] );
 		} );

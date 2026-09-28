@@ -1,25 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
-import {
-	header as headerIcon,
-	footer as footerIcon,
-	sidebar as sidebarIcon,
-	symbolFilled as symbolFilledIcon,
-} from '@wordpress/icons';
-
-function getTemplatePartIcon( iconName ) {
-	if ( 'header' === iconName ) {
-		return headerIcon;
-	} else if ( 'footer' === iconName ) {
-		return footerIcon;
-	} else if ( 'sidebar' === iconName ) {
-		return sidebarIcon;
-	}
-	return symbolFilledIcon;
-}
+import { getTemplatePartIcon } from './edit/utils/get-template-part-icon';
 
 export function enhanceTemplatePartVariations( settings, name ) {
 	if ( name !== 'core/template-part' ) {

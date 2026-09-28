@@ -1,9 +1,7 @@
 # ToolsPanel
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early
-implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early
+implementation subject to drastic and breaking changes.</p>
 <br />
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
@@ -51,14 +49,7 @@ both columns.
 ## Usage
 
 ```jsx
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
 import {
 	BoxControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -101,6 +92,7 @@ export function DimensionPanel() {
 				isShownByDefault
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Height' ) }
 					onChange={ setHeight }
 					value={ height }
@@ -113,6 +105,7 @@ export function DimensionPanel() {
 				isShownByDefault
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Width' ) }
 					onChange={ setWidth }
 					value={ width }

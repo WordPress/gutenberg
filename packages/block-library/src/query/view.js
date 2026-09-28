@@ -1,7 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -22,7 +24,7 @@ store(
 	'core/query',
 	{
 		actions: {
-			*navigate( event ) {
+			navigate: withSyncEvent( function* ( event ) {
 				const ctx = getContext();
 				const { ref } = getElement();
 				const queryRef = ref.closest(
@@ -32,9 +34,8 @@ store(
 				if ( isValidLink( ref ) && isValidEvent( event ) ) {
 					event.preventDefault();
 
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
+					const { actions } =
+						yield import( '@wordpress/interactivity-router' );
 					yield actions.navigate( ref.href );
 					ctx.url = ref.href;
 
@@ -42,13 +43,12 @@ store(
 					const firstAnchor = `.wp-block-post-template a[href]`;
 					queryRef.querySelector( firstAnchor )?.focus();
 				}
-			},
+			} ),
 			*prefetch() {
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
+					const { actions } =
+						yield import( '@wordpress/interactivity-router' );
 					yield actions.prefetch( ref.href );
 				}
 			},
@@ -58,9 +58,8 @@ store(
 				const { url } = getContext();
 				const { ref } = getElement();
 				if ( url && isValidLink( ref ) ) {
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
+					const { actions } =
+						yield import( '@wordpress/interactivity-router' );
 					yield actions.prefetch( ref.href );
 				}
 			},
