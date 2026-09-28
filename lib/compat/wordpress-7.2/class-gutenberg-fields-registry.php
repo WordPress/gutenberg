@@ -52,7 +52,7 @@ final class Gutenberg_Fields_Registry {
 
 	/**
 	 * Whether the `fields_api_init` action has fired since the registry
-	 * was created or last reset.
+	 * was created.
 	 *
 	 * @var bool
 	 */
@@ -304,18 +304,6 @@ final class Gutenberg_Fields_Registry {
 	public function get_all_registered_field_modules() {
 		$this->initialize();
 		return array_map( 'array_keys', $this->field_modules );
-	}
-
-	/**
-	 * Empties the registry, so the next read fires the `fields_api_init`
-	 * action again and registers the fields anew.
-	 *
-	 * Intended for tests.
-	 */
-	public function reset() {
-		$this->fields        = array();
-		$this->field_modules = array();
-		$this->initialized   = false;
 	}
 
 	/**
