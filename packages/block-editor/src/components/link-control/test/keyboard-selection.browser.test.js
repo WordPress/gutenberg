@@ -89,11 +89,13 @@ describe( 'LinkControl keyboard selection', () => {
 
 			if ( type === 'entity' ) {
 				await user.keyboard( '{ArrowDown}' );
+				// eslint-disable-next-line vitest/no-conditional-expect -- Only entity suggestions have a second option.
 				await expect
 					.element( selectedOption )
 					.toHaveTextContent( fauxEntitySuggestions[ 1 ].title );
 
 				await user.keyboard( '{ArrowUp}' );
+				// eslint-disable-next-line vitest/no-conditional-expect -- Only entity suggestions have a second option.
 				await expect
 					.element( selectedOption )
 					.toHaveTextContent( fauxEntitySuggestions[ 0 ].title );

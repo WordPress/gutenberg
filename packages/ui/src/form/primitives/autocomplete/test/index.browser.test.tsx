@@ -384,10 +384,12 @@ describe( 'Autocomplete', () => {
 				await user.hover( clearButton );
 
 				if ( disabled ) {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					expect(
 						screen.queryByText( 'Clear' )
 					).not.toBeInTheDocument();
 				} else {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					await expect
 						.element( screen.getByText( 'Clear' ) )
 						.toBeVisible();

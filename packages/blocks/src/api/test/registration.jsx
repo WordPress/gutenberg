@@ -872,6 +872,7 @@ describe( 'blocks', () => {
 						// Verify that for deprecations, the filter is called with a merge of pre-filter
 						// settings with deprecation keys omitted and the deprecation entry.
 						if ( i > 0 ) {
+							// eslint-disable-next-line vitest/no-conditional-expect -- The first call registers the current version; the next two register deprecations.
 							expect( settings ).toEqual( {
 								...omit(
 									{
@@ -914,6 +915,7 @@ describe( 'blocks', () => {
 					name,
 					blockSettingsWithDeprecations
 				);
+				expect( i ).toBe( 3 );
 
 				expect( block.attributes.id ).toEqual( { type: 'string' } );
 				block.deprecated.forEach( ( deprecation ) => {

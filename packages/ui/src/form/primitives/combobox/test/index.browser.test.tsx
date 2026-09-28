@@ -592,10 +592,12 @@ describe( 'Combobox', () => {
 				await user.hover( removeButton );
 
 				if ( disabled ) {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					expect(
 						screen.queryByText( 'Remove' )
 					).not.toBeInTheDocument();
 				} else {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					await expect
 						.element( screen.getByText( 'Remove' ) )
 						.toBeVisible();
@@ -615,10 +617,12 @@ describe( 'Combobox', () => {
 				await user.hover( clearButton );
 
 				if ( disabled ) {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					expect(
 						screen.queryByText( 'Clear' )
 					).not.toBeInTheDocument();
 				} else {
+					// eslint-disable-next-line vitest/no-conditional-expect -- Both fixed disabled states assert their tooltip behavior.
 					await expect
 						.element( screen.getByText( 'Clear' ) )
 						.toBeVisible();

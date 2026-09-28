@@ -18,7 +18,7 @@ describe( 'createRegistry', () => {
 		return unsubscribe;
 	}
 	function subscribeUntil( predicates ) {
-		predicates = Array.from( predicates );
+		predicates = Array.isArray( predicates ) ? predicates : [ predicates ];
 
 		return new Promise( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
@@ -363,7 +363,7 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getPage( 4, {} );
 		} );
 
-		it( 'should resolve action to dispatch', () => {
+		it( 'should resolve action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -387,10 +387,11 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should resolve promise action to dispatch', () => {
+		it( 'should resolve promise action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -414,10 +415,14 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
+		it( 'should not dispatch resolved promise action on subsequent selector calls', async () => {
+			const resolver = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' && state === 'NOTOK'
@@ -428,7 +433,7 @@ describe( 'createRegistry', () => {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
-					getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+					getValue: resolver,
 				},
 			} );
 
@@ -438,10 +443,12 @@ describe( 'createRegistry', () => {
 
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
+			await promise;
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+			expect( resolver ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( "should invalidate the resolver's resolution cache", async () => {
@@ -472,6 +479,7 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK.
 			vi.runAllTimers();
 			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 
 			// Invalidate the cache
 			registry.dispatch( 'demo' ).invalidate();
@@ -482,6 +490,7 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK.
 			vi.runAllTimers();
 			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'NOTOK' );
 		} );
 	} );
 
