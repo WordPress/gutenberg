@@ -16,7 +16,7 @@ Identifier of the complementary area. The string is saved on the store and allow
 
 -   Type: `String`
 -   Required: No
--   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `targe` of the sidebar passed as a property.
+-   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `target` of the sidebar passed as a property.
 
 ### target
 

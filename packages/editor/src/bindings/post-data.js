@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -35,23 +32,19 @@ const postDataFields = [
 export default {
 	name: 'core/post-data',
 	getValues( { select, context, bindings, clientId } ) {
-		const allowedFields = postDataFields.map(
-			( field ) => field.args.field
-		);
-
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
 		 */
 		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
 		let postId, postType;
 
 		if ( isNavigationBlock ) {
 			// Navigation blocks: read from block attributes
-			const blockAttributes = getBlockAttributes?.( clientId );
+			const blockAttributes = getBlockAttributes( clientId );
 			postId = blockAttributes?.id;
 			postType = blockAttributes?.type;
 		} else {
@@ -69,25 +62,30 @@ export default {
 
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
-			if ( ! allowedFields.includes( binding.args.field ) ) {
-				newValues[ attributeName ] = {};
-				continue;
-			}
+			const postDataField = postDataFields.find(
+				( field ) => field.args.field === binding.args.field
+			);
 
-			newValues[ attributeName ] =
-				entityDataValues?.[ binding.args.field ] ??
-				postDataFields.find(
-					( field ) => field.args.field === binding.args.field
-				).label;
+			if ( ! postDataField ) {
+				// If the field is unknown, return the field name.
+				newValues[ attributeName ] = binding.args.field;
+			} else if ( ! entityDataValues ) {
+				// If the entity data does not exist, return the field label.
+				newValues[ attributeName ] = postDataField.label;
+			} else {
+				// If the entity data exists, return the entity value.
+				newValues[ attributeName ] =
+					entityDataValues[ binding.args.field ];
+			}
 		}
 		return newValues;
 	},
 	setValues( { dispatch, context, bindings, clientId, select } ) {
 		const { getBlockName } = select( blockEditorStore );
 
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
+		// Navigation block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
@@ -108,9 +106,9 @@ export default {
 		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
-		const blockName = getBlockName?.( clientId );
+		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
+		// Navigation block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;
@@ -138,13 +136,13 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select } ) {
+	getFieldsList( { context, select } ) {
 		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
 		if ( selectedBlock?.name !== 'core/post-date' ) {
 			return [];
 		}
-		// Exit early for navigation blocks (read-only)
-		if ( NAVIGATION_BLOCK_TYPES.includes( selectedBlock?.name ) ) {
+
+		if ( ! context || ! context.postId || ! context.postType ) {
 			return [];
 		}
 

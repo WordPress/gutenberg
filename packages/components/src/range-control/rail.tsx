@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import RangeMark from './mark';
 import { MarksWrapper, Rail } from './styles/range-control-styles';
-
 import type { WordPressComponentProps } from '../context';
 import type {
 	MarksProps,

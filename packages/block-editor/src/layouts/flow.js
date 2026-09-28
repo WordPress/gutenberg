@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
@@ -14,6 +7,9 @@ import { LAYOUT_DEFINITIONS } from './definitions';
 export default {
 	name: 'default',
 	label: __( 'Flow' ),
+	hasInspectorControls() {
+		return false;
+	},
 	inspectorControls: function DefaultLayoutInspectorControls() {
 		return null;
 	},
@@ -27,7 +23,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const blockGapStyleValue = style?.spacing?.blockGap;
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.

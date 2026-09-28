@@ -1,0 +1,78 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`flags warnings when deprecated media queries are found > snapshot matches warnings 1`] = `
+[
+  {
+    "column": 8,
+    "endColumn": 13,
+    "endLine": 1,
+    "line": 1,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "aural" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 15,
+    "endLine": 8,
+    "line": 8,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "braille" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 16,
+    "endLine": 15,
+    "line": 15,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "embossed" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 16,
+    "endLine": 22,
+    "line": 22,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "handheld" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 18,
+    "endLine": 29,
+    "line": 29,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "projection" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 14,
+    "endLine": 36,
+    "line": 36,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "speech" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 11,
+    "endLine": 43,
+    "line": 43,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "tty" (media-type-no-deprecated)",
+  },
+  {
+    "column": 8,
+    "endColumn": 10,
+    "endLine": 50,
+    "line": 50,
+    "rule": "media-type-no-deprecated",
+    "severity": "error",
+    "text": "Deprecated media type "tv" (media-type-no-deprecated)",
+  },
+]
+`;

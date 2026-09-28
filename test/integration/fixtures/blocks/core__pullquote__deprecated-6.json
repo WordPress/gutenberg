@@ -1,0 +1,44 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Testing pullquote block...",
+			"citation": "...with a caption",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Testing pullquote block...",
+			"citation": "...with a caption",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Testing pullquote block...",
+			"citation": "...with a caption",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -30,17 +23,16 @@ export function useEditContentOnlySectionExit() {
 					return;
 				}
 
-				if ( ! event.defaultPrevented ) {
-					event.preventDefault();
+				// Check if the click is outside the edited block first.
+				const isClickOutside = ! event.target.closest(
+					`[data-block="${ editedContentOnlySection }"]`
+				);
 
-					// If the user clicks outside the edited block, stop editing.
-					if (
-						! event.target.closest(
-							`[data-block="${ editedContentOnlySection }"]`
-						)
-					) {
-						stopEditingContentOnlySection();
-					}
+				// Only prevent default and stop editing if clicking outside.
+				// This allows default behavior (e.g., file dialogs) to work when clicking inside.
+				if ( isClickOutside && ! event.defaultPrevented ) {
+					event.preventDefault();
+					stopEditingContentOnlySection();
 				}
 			}
 

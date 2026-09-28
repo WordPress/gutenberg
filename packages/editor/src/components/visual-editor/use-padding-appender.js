@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';

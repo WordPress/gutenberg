@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	ActionObject,
 	StoreState,
@@ -107,6 +104,4 @@ export async function setPersistenceLayer< D extends Object >(
 }
 
 export type AvailableActions =
-	| SetAction
-	| SetDefaultsAction
-	| SetPersistenceLayerAction< any >;
+	SetAction | SetDefaultsAction | SetPersistenceLayerAction< any >;

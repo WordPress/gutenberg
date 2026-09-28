@@ -1,9 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
-store(
+// Whether the hash has been handled for the current page load.
+// This is used to prevent the hash from being handled multiple times.
+let hashHandled = false;
+
+const { actions } = store(
 	'core/accordion',
 	{
 		state: {
@@ -13,6 +14,13 @@ store(
 					( item ) => item.id === id
 				);
 				return accordionItem ? accordionItem.isOpen : false;
+			},
+			get isHidden() {
+				const { id, accordionItems } = getContext();
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+				return accordionItem?.isOpen ? null : 'until-found';
 			},
 		},
 		actions: {
@@ -32,58 +40,82 @@ store(
 					accordionItem.isOpen = ! accordionItem.isOpen;
 				}
 			},
-			handleKeyDown: withSyncEvent( ( event ) => {
+			openPanelByHash: () => {
+				if ( hashHandled ) {
+					return;
+				}
+
+				const context = getContext();
+				const { id, accordionItems, autoclose } = context;
+				const targetElement = document.querySelector( ':target' );
+
+				if ( ! targetElement ) {
+					return;
+				}
+
+				const panelElement = window.document.querySelector(
+					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
+				);
+
 				if (
-					event.key !== 'ArrowUp' &&
-					event.key !== 'ArrowDown' &&
-					event.key !== 'Home' &&
-					event.key !== 'End'
+					! panelElement ||
+					! panelElement.contains( targetElement )
 				) {
 					return;
 				}
 
-				event.preventDefault();
+				hashHandled = true;
+
+				if ( autoclose ) {
+					accordionItems.forEach( ( item ) => {
+						item.isOpen = item.id === id;
+					} );
+				} else {
+					const targetItem = accordionItems.find(
+						( item ) => item.id === id
+					);
+
+					if ( targetItem ) {
+						targetItem.isOpen = true;
+					}
+				}
+
+				// Wait for the panel to be opened before scrolling to it.
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
+			},
+			handleBeforeMatch: () => {
 				const context = getContext();
-				const { id, accordionItems } = context;
-				const currentIndex = accordionItems.findIndex(
+				const { id, autoclose, accordionItems } = context;
+				const accordionItem = accordionItems.find(
 					( item ) => item.id === id
 				);
 
-				let nextIndex;
-
-				switch ( event.key ) {
-					case 'ArrowUp':
-						nextIndex = Math.max( 0, currentIndex - 1 );
-						break;
-					case 'ArrowDown':
-						nextIndex = Math.min(
-							currentIndex + 1,
-							accordionItems.length - 1
-						);
-						break;
-					case 'Home':
-						nextIndex = 0;
-						break;
-					case 'End':
-						nextIndex = accordionItems.length - 1;
-						break;
+				if ( accordionItem ) {
+					if ( autoclose ) {
+						accordionItems.forEach( ( item ) => {
+							item.isOpen = item.id === id;
+						} );
+					} else {
+						accordionItem.isOpen = true;
+					}
 				}
-
-				const nextId = accordionItems[ nextIndex ].id;
-				const nextButton = document.getElementById( nextId );
-				if ( nextButton ) {
-					nextButton.focus();
-				}
-			} ),
+			},
 		},
 		callbacks: {
 			initAccordionItems: () => {
 				const context = getContext();
-				const { id, openByDefault } = context;
-				context.accordionItems.push( {
+				const { id, openByDefault, accordionItems } = context;
+				accordionItems.push( {
 					id,
 					isOpen: openByDefault,
 				} );
+				actions.openPanelByHash();
+			},
+			hashChange: () => {
+				hashHandled = false;
+				actions.openPanelByHash();
 			},
 		},
 	},

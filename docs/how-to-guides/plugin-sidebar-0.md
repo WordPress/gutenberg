@@ -4,7 +4,7 @@
 
 How to add a sidebar to your plugin. A sidebar is the region to the far right of the editor. Your plugin can add an additional icon next to the InspectorControls (gear icon) that can be expanded.
 
-![Example sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-up-and-running.png)
+![Example sidebar](https://developer.wordpress.org/files/2026/06/sidebar-up-and-running.png)
 
 _Note: this tutorial covers a custom sidebar, if you are looking to add controls to the sidebar see the [Block Toolbar and Settings Sidebar](/docs/getting-started/fundamentals/block-in-the-editor.md)_
 
@@ -70,7 +70,7 @@ add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 
 After installing and activating this plugin, there is a new icon resembling a tack in the top-right of the editor. Upon clicking it, the plugin's sidebar will be opened:
 
-![Sidebar Up and Running](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-up-and-running.png)
+![Sidebar Up and Running](https://developer.wordpress.org/files/2026/06/sidebar-up-and-running.png)
 
 ### Step 2: Tweak the sidebar style and add controls
 
@@ -164,7 +164,7 @@ add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 
 Reload the editor and open the sidebar:
 
-![Sidebar with style and controls](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-style-and-controls.png)
+![Sidebar with style and controls](https://developer.wordpress.org/files/2026/06/sidebar-style-and-controls.png)
 
 This code doesn't let users store or retrieve data just yet, so the next steps will focus on how to connect it to the meta block field.
 
@@ -385,7 +385,7 @@ A complete example is available, download the [plugin-sidebar example](https://g
 
 If you have enabled Custom Fields in the 'Panels' page of the Editor 'Preferences' (via the three dots in top right), a field with the same name as the TextControl, in this case `sidebar_plugin_meta_block_field`, will also appear in the custom fields panel at the bottom of the editor window. These two fields have access to the same meta property.
 
-![Text Control and Custom Field](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-text-control-custom-field.png)
+![Text Control and Custom Field](https://developer.wordpress.org/files/2026/06/plugin-sidebar-text-control-custom-field.png)
 
 On saving the post the value in the TextControl will be saved first and the value in the custom field will be saved second, so that is the one that ends up persisting in the database. So if you change the value in the TextControl it is still the one in the custom field that ends up getting saved.
 

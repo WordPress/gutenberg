@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getServerState,
@@ -12,18 +9,16 @@ const { state } = store( 'test/get-server-state', {
 	actions: {
 		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( e.target.href );
 		} ),
 		attemptModification() {
-			try {
-				getServerState().prop = 'updated from client';
-				getContext().result = 'unexpectedly modified ❌';
-			} catch ( e ) {
-				getContext().result = 'not modified ✅';
-			}
+			getServerState().prop = 'updated from client';
+			getContext().result =
+				getServerState().prop === 'updated from client'
+					? 'unexpectedly modified ❌'
+					: 'not modified ✅';
 		},
 		updateNonChanging() {
 			state.nonChanging = 'modified from client';
@@ -39,6 +34,11 @@ const { state } = store( 'test/get-server-state', {
 			}
 			if ( nested.newProp ) {
 				state.nested.newProp = nested?.newProp;
+			}
+			if ( state.objCopiedFromServer ) {
+				state.objCopiedFromServer.prop = nested?.prop;
+			} else {
+				state.objCopiedFromServer = nested;
 			}
 		},
 		updateNonChanging() {

@@ -1,26 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { Navigator, useNavigator } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error: Not typed yet.
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import {
 	generateGlobalStyles,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type {
-	GlobalStylesConfig,
-	BlockType,
-} from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
@@ -31,6 +20,8 @@ import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
+import ScreenTextShadows from './screen-text-shadows';
+import ScreenTextShadowsEdit from './screen-text-shadows-edit';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
@@ -41,12 +32,18 @@ interface BlockStylesNavigationScreensProps {
 	parentMenu: string;
 	blockStyles: any[];
 	blockName: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function BlockStylesNavigationScreens( {
 	parentMenu,
 	blockStyles,
 	blockName,
+	selectedViewport,
+	showResponsiveStateControls,
+	showBlockStateControls,
 }: BlockStylesNavigationScreensProps ) {
 	return (
 		<>
@@ -55,7 +52,15 @@ function BlockStylesNavigationScreens( {
 					key={ index }
 					path={ parentMenu + '/variations/' + style.name }
 				>
-					<ScreenBlock name={ blockName } variation={ style.name } />
+					<ScreenBlock
+						name={ blockName }
+						variation={ style.name }
+						selectedViewport={ selectedViewport }
+						showResponsiveStateControls={
+							showResponsiveStateControls
+						}
+						showBlockStateControls={ showBlockStateControls }
+					/>
 				</Navigator.Screen>
 			) ) }
 		</>
@@ -65,6 +70,9 @@ function BlockStylesNavigationScreens( {
 interface ContextScreensProps {
 	name?: string;
 	parentMenu?: string;
+	selectedViewport?: string;
+	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 interface GlobalStylesNavigationScreenProps {
@@ -72,7 +80,13 @@ interface GlobalStylesNavigationScreenProps {
 	children: React.ReactNode;
 }
 
-function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
+function ContextScreens( {
+	name,
+	parentMenu = '',
+	selectedViewport,
+	showResponsiveStateControls,
+	showBlockStateControls,
+}: ContextScreensProps ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			if ( ! name ) {
@@ -84,22 +98,19 @@ function ContextScreens( { name, parentMenu = '' }: ContextScreensProps ) {
 		[ name ]
 	);
 
-	return (
-		<>
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/palette' }
-			>
-				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
+	if ( ! blockStyleVariations?.length ) {
+		return null;
+	}
 
-			{ !! blockStyleVariations?.length && (
-				<BlockStylesNavigationScreens
-					parentMenu={ parentMenu }
-					blockStyles={ blockStyleVariations }
-					blockName={ name || '' }
-				/>
-			) }
-		</>
+	return (
+		<BlockStylesNavigationScreens
+			parentMenu={ parentMenu }
+			blockStyles={ blockStyleVariations }
+			blockName={ name || '' }
+			selectedViewport={ selectedViewport }
+			showResponsiveStateControls={ showResponsiveStateControls }
+			showBlockStateControls={ showBlockStateControls }
+		/>
 	);
 }
 
@@ -120,6 +131,12 @@ interface GlobalStylesUIProps {
 	serverCSS?: { isGlobalStyles?: boolean }[];
 	/** Server settings for BlockEditorProvider (optional) */
 	serverSettings?: { __unstableResolvedAssets: Record< string, unknown > };
+	/** Selected viewport state (optional) */
+	selectedViewport?: string;
+	/** Whether to show responsive state controls (optional) */
+	showResponsiveStateControls?: boolean;
+	/** Whether to show block state controls (optional) */
+	showBlockStateControls?: boolean;
 }
 
 export function GlobalStylesUI( {
@@ -131,6 +148,9 @@ export function GlobalStylesUI( {
 	fontLibraryEnabled = false,
 	serverCSS,
 	serverSettings,
+	selectedViewport,
+	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
@@ -139,8 +159,13 @@ export function GlobalStylesUI( {
 		return mergeGlobalStyles( baseValue, value );
 	}, [ baseValue, value ] );
 
-	const [ globalStylesCSS, globalSettings ] =
-		generateGlobalStyles( mergedValue );
+	const [ globalStylesCSS, globalSettings ] = generateGlobalStyles(
+		mergedValue,
+		[],
+		{
+			styleOptions: { variationStyles: true },
+		}
+	);
 	const styles = useMemo(
 		() => [ ...( serverCSS ?? [] ), ...( globalStylesCSS ?? [] ) ],
 		[ serverCSS, globalStylesCSS ]
@@ -208,6 +233,12 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
 						<ScreenShadowsEdit />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows">
+						<ScreenTextShadows />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows/edit/:category/:slug">
+						<ScreenTextShadowsEdit />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
@@ -223,33 +254,55 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/cite">
+						<ScreenTypographyElement element="cite" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/textInput">
+						<ScreenTypographyElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/select">
+						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
-					{ blocks.map( ( block: BlockType ) => (
-						<GlobalStylesNavigationScreen
-							key={ 'menu-block-' + block.name }
-							path={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						>
-							<ScreenBlock name={ block.name } />
-						</GlobalStylesNavigationScreen>
-					) ) }
-
-					<ContextScreens />
-
-					{ blocks.map( ( block: BlockType ) => (
-						<ContextScreens
-							key={ 'screens-block-' + block.name }
-							name={ block.name }
-							parentMenu={
-								'/blocks/' + encodeURIComponent( block.name )
-							}
-						/>
+					{ blocks.map( ( block ) => (
+						<Fragment key={ block.name }>
+							<GlobalStylesNavigationScreen
+								path={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+							>
+								<ScreenBlock
+									name={ block.name }
+									selectedViewport={ selectedViewport }
+									showResponsiveStateControls={
+										showResponsiveStateControls
+									}
+									showBlockStateControls={
+										showBlockStateControls
+									}
+								/>
+							</GlobalStylesNavigationScreen>
+							<ContextScreens
+								name={ block.name }
+								parentMenu={
+									'/blocks/' +
+									encodeURIComponent( block.name )
+								}
+								selectedViewport={ selectedViewport }
+								showResponsiveStateControls={
+									showResponsiveStateControls
+								}
+								showBlockStateControls={
+									showBlockStateControls
+								}
+							/>
+						</Fragment>
 					) ) }
 				</Navigator>
 			</BlockEditorProvider>

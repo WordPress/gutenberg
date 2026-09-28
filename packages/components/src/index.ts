@@ -45,7 +45,6 @@ export {
 	/** @deprecated Import `BoxControl` instead. */
 	default as __experimentalBoxControl,
 	default as BoxControl,
-	applyValueToSides as __experimentalApplyValueToSides,
 } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
@@ -75,10 +74,9 @@ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
-export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
-export { Divider as __experimentalDivider } from './divider';
+export { default as __experimentalDivider } from './divider/deprecated';
 export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
@@ -86,7 +84,7 @@ export { default as Dropdown } from './dropdown';
 export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
-export { Elevation as __experimentalElevation } from './elevation';
+export { default as __experimentalElevation } from './elevation/deprecated';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
@@ -119,11 +117,6 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
-export { default as __experimentalNavigation } from './navigation';
-export { default as __experimentalNavigationBackButton } from './navigation/back-button';
-export { default as __experimentalNavigationGroup } from './navigation/group';
-export { default as __experimentalNavigationItem } from './navigation/item';
-export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	/** @deprecated Import `Navigator` instead. */
 	NavigatorProvider as __experimentalNavigatorProvider,
@@ -165,7 +158,7 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { Spacer as __experimentalSpacer } from './spacer';
-export { Scrollable as __experimentalScrollable } from './scrollable';
+export { default as __experimentalScrollable } from './scrollable/deprecated';
 export { default as Spinner } from './spinner';
 export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';
@@ -219,6 +212,12 @@ export {
 	useSlot as __experimentalUseSlot,
 	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
+export type {
+	SlotKey,
+	SlotComponentProps,
+	FillComponentProps,
+	DistributiveOmit,
+} from './slot-fill/types';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
 

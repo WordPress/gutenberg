@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import transformStyles from '../transform-styles';
 
 describe( 'transformStyles', () => {
@@ -8,7 +6,7 @@ describe( 'transformStyles', () => {
 		beforeEach( () => {
 			// Intentionally suppress the expected console errors and warnings to reduce
 			// noise in the test output.
-			jest.spyOn( console, 'warn' ).mockImplementation( jest.fn() );
+			vi.spyOn( console, 'warn' ).mockImplementation( vi.fn() );
 		} );
 
 		it( 'should not throw error in case of invalid css', () => {

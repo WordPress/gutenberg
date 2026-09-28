@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	getArgsFromCLI,
@@ -24,6 +17,7 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.md' ];
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
+	hasProjectFile( '.markdownlint.jsonc' ) ||
 	hasProjectFile( '.markdownlint.json' ) ||
 	hasProjectFile( '.markdownlint.yaml' ) ||
 	hasProjectFile( '.markdownlint.yml' ) ||

@@ -1,11 +1,15 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
 
 test.use( {
 	previewUtils: async ( { page }, use ) => {
 		await use( new PreviewUtils( { page } ) );
+	},
+	enableCollaboration: async ( { requestUtils }, use ) => {
+		await use( () => setCollaboration( requestUtils, true ) );
+		await setCollaboration( requestUtils, false );
 	},
 } );
 
@@ -62,7 +66,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
@@ -110,7 +114,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -132,7 +136,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -140,6 +144,58 @@ test.describe( 'Preview', () => {
 
 		// Title in preview should match updated input.
 		await expect( previewTitle ).toHaveText( 'aaaaabbbbb' );
+
+		await previewPage.close();
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/33758.
+	test( 'should not use stale autosave data after reverting title', async ( {
+		editor,
+		enableCollaboration,
+		page,
+		previewUtils,
+	} ) => {
+		await enableCollaboration();
+		await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'wp-sync' ) &&
+					response.status() === 200
+			),
+			page.reload(),
+		] );
+		const editorPage = page;
+
+		// Create and publish a post.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'original content' },
+		} );
+		await editor.publishPost();
+
+		// Close the panel.
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
+
+		// Change the title and preview to trigger an autosave.
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page 2' );
+		const previewPage = await editor.openPreviewPage( editorPage );
+		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
+		await expect( previewTitle ).toHaveText( 'Sample Page 2' );
+
+		// Return to editor, revert the title, and preview again.
+		await editorPage.bringToFront();
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.fill( 'Sample Page' );
+		await previewUtils.waitForPreviewNavigation( previewPage );
+
+		// Preview should show the reverted title, not the stale autosave.
+		await expect( previewTitle ).toHaveText( 'Sample Page' );
 
 		await previewPage.close();
 	} );
@@ -170,7 +226,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Change the title and preview again.
 		await editor.canvas
@@ -215,6 +271,16 @@ test.describe( 'Preview', () => {
 } );
 
 test.describe( 'Preview with Custom Fields enabled', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Preview opens frontend pages without the DIP header, creating an
+		// agent cluster mismatch that breaks popup reuse and cross-window
+		// communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
 	test.beforeEach( async ( { admin, previewUtils } ) => {
 		await admin.createNewPost();
 		await previewUtils.toggleCustomFieldsOption( true );
@@ -222,6 +288,12 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 	test.afterEach( async ( { previewUtils } ) => {
 		await previewUtils.toggleCustomFieldsOption( false );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	// Catch regressions of https://github.com/WordPress/gutenberg/issues/12617
@@ -245,7 +317,7 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage();
@@ -299,10 +371,12 @@ test.describe( 'Preview with private custom post type', () => {
 		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="View"i]' );
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 
 		await expect(
-			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
+			page.getByRole( 'menuitem', {
+				name: 'Preview (opens in a new tab)',
+			} )
 		).toBeHidden();
 	} );
 } );
@@ -321,22 +395,29 @@ class PreviewUtils {
 			await previewToggle.click();
 		}
 
-		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
+			.click();
+		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
 
 	async toggleCustomFieldsOption( shouldBeChecked ) {
 		// Open preferences dialog.
 
-		await this.page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-		);
-		await this.page.click( 'role=menuitem[name="Preferences"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preferences' } )
+			.click();
 
 		// Navigate to general section.
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'tab', { name: 'General' } )
+			.click();
 
 		// Find custom fields checkbox.
 		const customFieldsCheckbox = this.page.locator(
@@ -356,12 +437,14 @@ class PreviewUtils {
 
 		if ( isSaveVisible ) {
 			saveButton.click();
+			// eslint-disable-next-line playwright/no-wait-for-navigation
 			await this.page.waitForNavigation();
 			return;
 		}
 
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'button', { name: 'Close' } )
+			.click();
 	}
 }

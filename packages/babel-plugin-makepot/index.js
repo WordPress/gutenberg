@@ -27,16 +27,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/**
- * External dependencies
- */
-
+const { relative, sep } = require( 'path' );
+const { writeFileSync } = require( 'fs' );
 const deepmerge = require( 'deepmerge' );
 const { isPlainObject } = require( 'is-plain-object' );
 const { po } = require( 'gettext-parser' );
-const { relative, sep } = require( 'path' );
-const { writeFileSync } = require( 'fs' );
 
 /**
  * Default output headers if none specified in plugin options.

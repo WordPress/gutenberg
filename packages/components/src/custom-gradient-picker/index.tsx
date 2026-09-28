@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import { type LinearGradientNode } from 'gradient-parser';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useRef } from '@wordpress/element';
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
-import { Flex } from '../flex';
+import { Flex, FlexBlock } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
 import {
@@ -25,13 +15,10 @@ import {
 import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
-	HORIZONTAL_GRADIENT_ORIENTATION,
 	GRADIENT_OPTIONS,
+	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
-import {
-	AccessoryWrapper,
-	SelectWrapper,
-} from './styles/custom-gradient-picker-styles';
+import styles from './style.module.scss';
 import type {
 	CustomGradientPickerProps,
 	GradientAnglePickerProps,
@@ -70,14 +57,24 @@ const GradientTypePicker = ( {
 	onChange,
 }: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
+	const lastLinearOrientationAngle = useRef(
+		Number( HORIZONTAL_GRADIENT_ORIENTATION.value )
+	);
+
+	if ( type === 'linear-gradient' && gradientAST.orientation ) {
+		lastLinearOrientationAngle.current = Number(
+			gradientAST.orientation.value
+		);
+	}
 
 	const onSetLinearGradient = () => {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
-				orientation: gradientAST.orientation
-					? undefined
-					: HORIZONTAL_GRADIENT_ORIENTATION,
+				orientation: {
+					type: 'angular' as const,
+					value: `${ lastLinearOrientationAngle.current }`,
+				},
 				type: 'linear-gradient',
 			} satisfies LinearGradientNode )
 		);
@@ -104,13 +101,11 @@ const GradientTypePicker = ( {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
-			size="__unstable-large"
 			value={ hasGradient ? type : undefined }
 		/>
 	);
@@ -157,7 +152,7 @@ export function CustomGradientPicker( {
 			color: getStopCssColor( colorStop ),
 			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
 			// TypeScript doesn't know that `colorStop.length` is not undefined here.
-			// @ts-expect-error
+			// @ts-expect-error `colorStop.length` is possibly `undefined`.
 			position: parseInt( colorStop.length.value ),
 		};
 	} );
@@ -187,14 +182,14 @@ export function CustomGradientPicker( {
 				gap={ 3 }
 				className="components-custom-gradient-picker__ui-line"
 			>
-				<SelectWrapper>
+				<FlexBlock className={ styles[ 'control-wrapper' ] }>
 					<GradientTypePicker
 						gradientAST={ gradientAST }
 						hasGradient={ hasGradient }
 						onChange={ onChange }
 					/>
-				</SelectWrapper>
-				<AccessoryWrapper>
+				</FlexBlock>
+				<FlexBlock className={ styles[ 'control-wrapper' ] }>
 					{ gradientAST.type === 'linear-gradient' && (
 						<GradientAnglePicker
 							gradientAST={ gradientAST }
@@ -202,7 +197,7 @@ export function CustomGradientPicker( {
 							onChange={ onChange }
 						/>
 					) }
-				</AccessoryWrapper>
+				</FlexBlock>
 			</Flex>
 		</VStack>
 	);

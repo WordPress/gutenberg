@@ -1,4 +1,4 @@
-/**
- * Internal dependencies
- */
-export { Editor } from './component';
+export { Editor } from './components/editor';
+export { Preview } from './components/preview';
+export { useEditorAssets, loadEditorAssets } from './hooks/use-editor-assets';
+export { useEditorSettings } from './hooks/use-editor-settings';

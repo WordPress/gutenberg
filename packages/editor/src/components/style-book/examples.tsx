@@ -1,25 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
+import type { Block } from '@wordpress/blocks';
 import {
 	getBlockType,
 	getBlockTypes,
 	getBlockFromExample,
 	createBlock,
-	// @wordpress/blocks imports are not typed.
-	// @ts-expect-error
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import type {
-	BlockExample,
-	ColorOrigin,
-	MultiOriginPalettes,
-	BlockType,
-} from './types';
+import type { BlockExample, ColorOrigin, MultiOriginPalettes } from './types';
 import ColorExamples from './color-examples';
 import DuotoneExamples from './duotone-examples';
 import { STYLE_BOOK_COLOR_GROUPS } from './constants';
@@ -43,7 +30,7 @@ function getColorExamples( colors: MultiOriginPalettes ): BlockExample[] {
 		const paletteFiltered = Array.isArray( palette )
 			? palette.find(
 					( origin: ColorOrigin ) => origin.slug === group.origin
-			  )
+				)
 			: undefined;
 
 		if ( paletteFiltered?.[ group.type ] ) {
@@ -89,7 +76,7 @@ function getOverviewBlockExamples(
 	const themePalette = Array.isArray( colors?.colors )
 		? colors.colors.find(
 				( origin: ColorOrigin ) => origin.slug === 'theme'
-		  )
+			)
 		: undefined;
 
 	if ( themePalette ) {
@@ -111,7 +98,7 @@ function getOverviewBlockExamples(
 	}
 
 	// Get examples for typography blocks.
-	const typographyBlockExamples: BlockType[] = [];
+	const typographyBlockExamples: Block[] = [];
 
 	if ( getBlockType( 'core/heading' ) ) {
 		const headingBlock = createBlock( 'core/heading', {
@@ -127,7 +114,7 @@ function getOverviewBlockExamples(
 	if ( getBlockType( 'core/paragraph' ) ) {
 		const firstParagraphBlock = createBlock( 'core/paragraph', {
 			content: __(
-				`A paragraph in a website refers to a distinct block of text that is used to present and organize information. It is a fundamental unit of content in web design and is typically composed of a group of related sentences or thoughts focused on a particular topic or idea. Paragraphs play a crucial role in improving the readability and user experience of a website. They break down the text into smaller, manageable chunks, allowing readers to scan the content more easily.`
+				`A paragraph in a website refers to a distinct block of text that is used to present and organize information. It is a fundamental unit of content in web design, typically composed of related sentences focused on a single idea. Paragraphs play a crucial role in improving the readability and user experience of a website. They break down the text into smaller, manageable chunks, <a href="#">including styled links</a>, allowing readers to scan the content more easily.`
 			),
 		} );
 		const secondParagraphBlock = createBlock( 'core/paragraph', {
@@ -172,7 +159,7 @@ function getOverviewBlockExamples(
 		'core/image',
 		'core/separator',
 		'core/buttons',
-		'core/quote',
+		'core/pullquote',
 		'core/search',
 	];
 
@@ -212,7 +199,7 @@ function getOverviewBlockExamples(
  */
 export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 	const nonHeadingBlockExamples = getBlockTypes()
-		.filter( ( blockType: BlockType ) => {
+		.filter( ( blockType ) => {
 			const { name, example, supports } = blockType;
 			return (
 				name !== 'core/heading' &&
@@ -220,7 +207,7 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 				supports?.inserter !== false
 			);
 		} )
-		.map( ( blockType: BlockType ) => ( {
+		.map( ( blockType ) => ( {
 			name: blockType.name,
 			title: blockType.title,
 			category: blockType.category,
@@ -232,7 +219,7 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 			blocks: getBlockFromExample( blockType.name, {
 				...blockType.example,
 				attributes: {
-					...blockType.example.attributes,
+					...blockType.example?.attributes,
 					style: undefined,
 				},
 			} ),

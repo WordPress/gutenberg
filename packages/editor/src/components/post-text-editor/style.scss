@@ -10,7 +10,8 @@ textarea.editor-post-text-editor {
 	width: 100%;
 	box-shadow: none;
 	resize: none;
-	overflow: hidden;
+	field-sizing: content;
+	overflow: auto;
 	font-family: $editor-html-font;
 	line-height: 2.4;
 	min-height: 200px;
@@ -39,15 +40,7 @@ textarea.editor-post-text-editor {
 		position: relative;
 	}
 
-	&::-webkit-input-placeholder {
-		color: $dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: $dark-gray-placeholder;
 	}
 }

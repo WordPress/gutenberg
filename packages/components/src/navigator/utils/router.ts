@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { match } from 'path-to-regexp';
-
-/**
- * Internal dependencies
- */
 import type { Screen, MatchParams } from '../types';
 
 function matchPath( path: string, pattern: string ) {

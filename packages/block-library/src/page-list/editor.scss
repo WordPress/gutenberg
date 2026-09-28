@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/breakpoints" as *;
-@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .wp-block-navigation {
@@ -27,19 +25,6 @@
 // Make links unclickable in the editor.
 .wp-block-pages-list__item__link {
 	pointer-events: none;
-}
-
-// Modal that shows conversion option.
-.wp-block-page-list-modal {
-	@include break-small() {
-		max-width: $break-mobile;
-	}
-}
-
-.wp-block-page-list-modal-buttons {
-	display: flex;
-	justify-content: flex-end;
-	gap: $grid-unit-15;
 }
 
 // Simulate open on click behaviour in the editor by opening on focus instead.

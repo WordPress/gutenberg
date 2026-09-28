@@ -4,9 +4,9 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"openSubmenusOnClick": false,
 			"overlayMenu": "never",
 			"fontFamily": "cambria-georgia",
+			"submenuVisibility": "hover",
 			"layout": {
 				"type": "flex",
 				"orientation": "horizontal"

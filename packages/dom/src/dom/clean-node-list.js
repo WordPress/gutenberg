@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isEmpty from './is-empty';
 import remove from './remove';
 import unwrap from './unwrap';
@@ -13,7 +10,7 @@ const noop = () => {};
 /**
  * @typedef SchemaItem
  * @property {string[]}                            [attributes] Attributes.
- * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against.
+ * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against. Use '*' to keep all classes.
  * @property {'*' | { [tag: string]: SchemaItem }} [children]   Child schemas.
  * @property {string[]}                            [require]    Selectors to test required children against. Leave empty or undefined if there are no requirements.
  * @property {boolean}                             allowEmpty   Whether to allow nodes without children.
@@ -52,9 +49,18 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					} = schema[ tag ];
 
 					// If the node is empty and it's supposed to have children,
-					// remove the node.
+					// remove the node. For phrasing content nodes that contain
+					// only whitespace, unwrap instead to preserve the text.
+					// See https://github.com/WordPress/gutenberg/issues/50898
 					if ( children && ! allowEmpty && isEmpty( node ) ) {
-						remove( node );
+						if (
+							isPhrasingContent( node ) &&
+							node.hasChildNodes()
+						) {
+							unwrap( node );
+						} else {
+							remove( node );
+						}
 						return;
 					}
 

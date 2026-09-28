@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type gradientParser from 'gradient-parser';
 
 export type CustomGradientPickerProps = {
@@ -63,6 +60,14 @@ export type CustomGradientBarProps = {
 	onChange: ( newControlPoints: ControlPoint[] ) => void;
 	disableInserter?: boolean;
 	disableAlpha?: boolean;
+	/**
+	 * Whether control points are fixed in place. Set by consumers whose value
+	 * has no positions to store, such as a duotone, so the control does not
+	 * offer a move it cannot save.
+	 *
+	 * @default false
+	 */
+	disablePositioning?: boolean;
 	__experimentalIsRenderedInSidebar?: boolean;
 };
 
@@ -95,12 +100,14 @@ export type ControlPointButtonProps = {
 	isOpen: boolean;
 	position: ControlPoint[ 'position' ];
 	color: string;
+	disablePositioning?: boolean;
 };
 
 export type ControlPointsProps = {
 	disableRemove: boolean;
 	disableAlpha: boolean;
-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	disablePositioning?: boolean;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
 	onChange: ( controlPoints: ControlPoint[] ) => void;

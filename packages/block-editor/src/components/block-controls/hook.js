@@ -1,10 +1,3 @@
-/**
- * WordPress dependencies
- */
-
-/**
- * Internal dependencies
- */
 import groups from './groups';
 import {
 	useBlockEditContext,

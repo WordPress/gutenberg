@@ -1,0 +1,9 @@
+{
+	"$schema": "../../../../schemas/json/block.json",
+	"apiVersion": 3,
+	"name": "my-plugin/invalid-auto-register",
+	"title": "Invalid auto-registration",
+	"supports": {
+		"autoRegister": "yes"
+	}
+}

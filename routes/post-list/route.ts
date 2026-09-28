@@ -1,18 +1,31 @@
-/**
- * WordPress dependencies
- */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { notFound } from '@wordpress/route';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
  * Route configuration for post list.
  */
 export const route = {
+	beforeLoad: async ( { params }: { params: { type: string } } ) => {
+		try {
+			const postType = await resolveSelect( coreStore ).getPostType(
+				params.type
+			);
+
+			if ( ! postType ) {
+				throw notFound();
+			}
+		} catch {
+			throw notFound();
+		}
+	},
+	title: async ( { params }: { params: { type: string } } ) => {
+		const postType = await resolveSelect( coreStore ).getPostType(
+			params.type
+		);
+		return postType?.labels?.name || params.type;
+	},
 	async canvas( context: {
 		params: {
 			type: string;
@@ -39,9 +52,10 @@ export const route = {
 
 		// Check if postId is provided in query params
 		if ( search.postIds && search.postIds.length > 0 ) {
+			const postId = search.postIds[ 0 ].toString();
 			return {
 				postType: params.type,
-				postId: search.postIds[ 0 ].toString(),
+				postId,
 				isPreview: true,
 			};
 		}
@@ -56,9 +70,10 @@ export const route = {
 
 		// Return first post if available
 		if ( posts && posts.length > 0 ) {
+			const postId = ( posts[ 0 ] as any ).id.toString();
 			return {
 				postType: params.type,
-				postId: ( posts[ 0 ] as any ).id.toString(),
+				postId,
 				isPreview: true,
 			};
 		}

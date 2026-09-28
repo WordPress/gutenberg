@@ -22,7 +22,7 @@ Initializes the Command Palette.
 
 _Parameters_
 
--   _settings_ `Object`: Command palette settings.
+- _settings_ `Object`: Command palette settings.
 
 ### privateApis
 

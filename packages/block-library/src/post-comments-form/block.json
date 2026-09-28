@@ -6,15 +6,21 @@
 	"category": "theme",
 	"description": "Display a post's comments form.",
 	"textdomain": "default",
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
+			"button": true,
 			"gradients": true,
 			"heading": true,
 			"link": true,
@@ -30,6 +36,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
@@ -59,7 +66,11 @@
 	],
 	"example": {
 		"attributes": {
-			"textAlign": "center"
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
 		}
 	}
 }

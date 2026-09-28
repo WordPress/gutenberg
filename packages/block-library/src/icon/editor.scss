@@ -1,0 +1,78 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+.wp-block[data-align="center"] > .wp-block-icon {
+	display: flex;
+	justify-content: center;
+}
+
+.wp-block-icon__inserter-sidebar {
+	padding-bottom: $grid-unit-30;
+
+	@include break-medium() {
+		overflow-x: visible;
+		overflow-y: auto;
+		position: absolute;
+		top: $header-height + $grid-unit-10;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding-top: $grid-unit-30;
+		padding-inline: $grid-unit-30;
+	}
+}
+
+.wp-block-icon__inserter-panel {
+	@include break-medium() {
+		margin-inline-start: $sidebar-width;
+	}
+}
+
+.wp-block-icon__inserter-loading {
+	display: flex;
+	justify-content: center;
+	padding: $grid-unit-30;
+}
+
+.wp-block-icon__inserter-grid-icons-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.wp-block-icon__inserter-grid-no-results {
+	display: flex;
+	justify-content: center;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item {
+	display: flex;
+	flex-direction: column;
+	height: auto !important;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item-icon {
+	padding: $grid-unit-15;
+
+	// Fit any icon within 24x24. The viewBox preserves the aspect ratio, so
+	// non-square icons are scaled and centered without distortion.
+	svg {
+		display: block;
+		width: $icon-size;
+		height: $icon-size;
+	}
+}
+
+.wp-block-icon__inserter-grid-icons-list-item-title {
+	font-size: $font-size-small;
+	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
+	overflow-wrap: break-word;
+}
+
+.wp-block-icon__toolbar-content {
+	width: 250px;
+}
+
+.wp-block-icon__placeholder {
+	backdrop-filter: blur(100px);
+}

@@ -12,24 +12,38 @@
 	}
 }
 
+// The "Edit code" button in the inspector renders inside the tabs panel, so
+// it needs spacing on all sides, including against the tab list above it.
+.block-library-html__edit-code {
+	margin: $grid-unit-20;
+
+	.block-library-html__edit-code-button {
+		justify-content: center;
+	}
+}
+
 // Modal styles
 .block-library-html__modal {
-	// Make modal content scrollable
-	.components-modal__content {
-		display: flex;
-		flex-direction: column;
-		padding: 0;
-		min-height: 70vh;
+
+	// On medium and large screens, the modal component sets a max-height.
+	// We want the modal to be as tall as possible also when the content is short.
+	@include break-small() {
+		&:not(.is-full-screen) {
+			height: 9999rem;
+		}
 	}
 
 	.components-modal__children-container {
 		height: 100%;
-		padding: $grid-unit-20;
 	}
 }
 
 .block-library-html__modal-tabs {
-	height: 100%;
+	flex: 1;
+}
+
+.block-library-html__modal-content {
+	flex: 1;
 }
 
 .block-library-html__modal-tab {
@@ -73,10 +87,11 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: $grid-unit-60;
-}
+	min-height: 0;
+	overflow-y: auto;
+	flex: 1;
 
-.block-library-html__modal-actions {
-	margin-top: $grid-unit-20;
-	padding: 0 $grid-unit-40 $grid-unit-40;
+	iframe {
+		height: 100%;
+	}
 }

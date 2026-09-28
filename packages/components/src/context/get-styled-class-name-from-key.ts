@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
 import memoize from 'memize';
 

@@ -18,10 +18,10 @@
 .block-editor-block-allowed-blocks-modal__actions {
 	background-color: $white;
 	border-top: $border-width solid $gray-300;
-	bottom: -1 * $grid-unit-40;
+	bottom: -1 * $grid-unit-30;
 	left: 0;
-	margin: 0 (-1 * $grid-unit-40) (-1 * $grid-unit-40);
-	padding: $grid-unit-20 $grid-unit-40;
+	margin: 0 (-1 * $grid-unit-30) (-1 * $grid-unit-30);
+	padding: $grid-unit-20 $grid-unit-30;
 	position: sticky;
 	z-index: 1;
 }

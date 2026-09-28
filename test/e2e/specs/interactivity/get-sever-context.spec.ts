@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'getServerContext()', () => {
@@ -107,11 +104,13 @@ test.describe( 'getServerContext()', () => {
 	test( 'should update modified props on navigation', async ( { page } ) => {
 		const prop = page.getByTestId( 'prop' );
 		const nestedProp = page.getByTestId( 'nested.prop' );
+		const objCopiedFromServer = page.getByTestId( 'objCopiedFromServer' );
 		const inheritedProp = page.getByTestId( 'inherited.prop' );
 
 		await expect( page ).toHaveTitle( /main/ );
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( objCopiedFromServer ).toHaveText( 'child' );
 		await expect( inheritedProp ).toHaveText( 'parent' );
 
 		await page.getByTestId( 'modified' ).click();
@@ -119,6 +118,7 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toHaveText( 'childModified' );
 		await expect( nestedProp ).toHaveText( 'childModified' );
+		await expect( objCopiedFromServer ).toHaveText( 'childModified' );
 		await expect( inheritedProp ).toHaveText( 'parentModified' );
 
 		await page.goBack();
@@ -126,6 +126,7 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toHaveText( 'child' );
 		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( objCopiedFromServer ).toHaveText( 'child' );
 		await expect( inheritedProp ).toHaveText( 'parent' );
 	} );
 
@@ -254,5 +255,19 @@ test.describe( 'getServerContext()', () => {
 
 		await expect( prop ).toBeEmpty();
 		await expect( nestedProp ).toBeEmpty();
+	} );
+
+	test( 'should get server context using derived state getters', async ( {
+		page,
+	} ) => {
+		const serverProp = page.getByTestId( 'serverProp' );
+
+		await expect( page ).toHaveTitle( /main/ );
+		await expect( serverProp ).toHaveText( 'child' );
+
+		await page.getByTestId( 'modified' ).click();
+		await expect( page ).toHaveTitle( /modified/ );
+
+		await expect( serverProp ).toHaveText( 'childModified' );
 	} );
 } );

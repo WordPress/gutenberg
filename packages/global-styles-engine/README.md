@@ -101,7 +101,7 @@ The global styles object follows the theme.json schema:
     color: { text: '#000', background: '#fff' },
     typography: { fontSize: '16px' },
     elements: {
-      button: { color: { background: '#blue' } }
+      button: { color: { background: 'blue' } }
     },
     blocks: {
       'core/paragraph': { color: { text: '#333' } }
@@ -119,12 +119,12 @@ The global styles object follows the theme.json schema:
 
 ## Features
 
--   **Immutable Updates**: All setter functions return new objects
--   **Type Safety**: Full TypeScript support
--   **CSS Variable Resolution**: Automatic resolution of CSS custom properties
--   **Block-Specific Styles**: Support for block and element-specific styling
--   **Fallback Hierarchy**: Smart fallback from block → global → default settings
--   **Framework Agnostic**: No dependencies on React, WordPress, or other frameworks
+- **Immutable Updates**: All setter functions return new objects
+- **Type Safety**: Full TypeScript support
+- **CSS Variable Resolution**: Automatic resolution of CSS custom properties
+- **Block-Specific Styles**: Support for block and element-specific styling
+- **Fallback Hierarchy**: Smart fallback from block → global → default settings
+- **Framework Agnostic**: No dependencies on React, WordPress, or other frameworks
 
 ## Usage
 

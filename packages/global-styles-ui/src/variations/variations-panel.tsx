@@ -1,23 +1,9 @@
-/**
- * WordPress dependencies
- */
-// @ts-expect-error: Not typed yet.
+import type { BlockStyle } from '@wordpress/blocks';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { NavigationButtonAsItem } from '../navigation-button';
-import { useSetting } from '../hooks';
-
-interface BlockStyle {
-	name: string;
-	label: string;
-	source?: string;
-	isDefault?: boolean;
-}
+import { useStyle } from '../hooks';
 
 interface VariationsPanelProps {
 	name: string;
@@ -45,7 +31,7 @@ export function useBlockVariations( name: string ): BlockStyle[] {
 		},
 		[ name ]
 	);
-	const [ variations ] = useSetting( 'variations', name );
+	const [ variations ] = useStyle( 'variations', name );
 	const variationNames = Object.keys( variations ?? {} );
 
 	return getFilteredBlockStyles( blockStyles, variationNames );

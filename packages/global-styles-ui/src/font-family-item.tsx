@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
@@ -8,13 +5,9 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { FontLibraryContext } from './font-library-modal/context';
-import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-import type { FontFamily } from './font-library-modal/types';
+import type { FontFamily } from '@wordpress/core-data';
+import { FontLibraryContext } from './font-library/context';
+import { getFamilyPreviewStyle } from './font-library/utils/preview-styles';
 
 interface FontFamilyItemProps {
 	font: FontFamily;

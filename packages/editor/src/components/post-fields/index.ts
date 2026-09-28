@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { Field } from '@wordpress/dataviews';
 import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 

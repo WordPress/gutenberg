@@ -1,31 +1,25 @@
-/**
- * WordPress dependencies
- */
 import { backup } from '@wordpress/icons';
 import { dispatch, select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-// @ts-ignore
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
+import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import type { CoreDataError, Template, TemplatePart } from '../types';
 
-/**
- * Internal dependencies
- */
-import { getItemTitle } from './utils';
-import type { CoreDataError, TemplatePart } from '../types';
-
-const isTemplateRevertable = ( templateOrTemplatePart: TemplatePart ) => {
+const isTemplateRevertable = (
+	templateOrTemplatePart: Template | TemplatePart
+) => {
 	if ( ! templateOrTemplatePart ) {
 		return false;
 	}
@@ -46,7 +40,7 @@ const isTemplateRevertable = ( templateOrTemplatePart: TemplatePart ) => {
  *                                      reverting the template. Default true.
  */
 const revertTemplate = async (
-	template: TemplatePart,
+	template: TemplatePart | Template,
 	{ allowUndo = true } = {}
 ) => {
 	const noticeId = 'edit-site-template-reverted';
@@ -173,14 +167,15 @@ const revertTemplate = async (
 	}
 };
 
-const resetPostAction: Action< TemplatePart > = {
+const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
-	label: __( 'Reset' ),
+	label: __( 'Reset…' ),
 	isEligible: ( item ) => {
 		return (
-			item.type === 'wp_template_part' &&
+			isTemplateOrTemplatePart( item ) &&
 			item?.source === 'custom' &&
-			item?.has_theme_file
+			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
+				item?.has_theme_file )
 		);
 	},
 	icon: backup,
@@ -211,26 +206,38 @@ const resetPostAction: Action< TemplatePart > = {
 								/* translators: %d: The number of items. */
 								__( '%d items reset.' ),
 								items.length
-						  )
+							)
 						: sprintf(
 								/* translators: %s: The template/part's name. */
 								__( '"%s" reset.' ),
 								getItemTitle( items[ 0 ] )
-						  ),
+							),
 					{
 						type: 'snackbar',
 						id: 'revert-template-action',
 					}
 				);
 			} catch ( error ) {
-				const fallbackErrorMessage =
-					items.length === 1
-						? __(
-								'An error occurred while reverting the template part.'
-						  )
-						: __(
-								'An error occurred while reverting the template parts.'
-						  );
+				let fallbackErrorMessage;
+				if ( items[ 0 ].type === 'wp_template' ) {
+					fallbackErrorMessage =
+						items.length === 1
+							? __(
+									'An error occurred while reverting the template.'
+								)
+							: __(
+									'An error occurred while reverting the templates.'
+								);
+				} else {
+					fallbackErrorMessage =
+						items.length === 1
+							? __(
+									'An error occurred while reverting the template part.'
+								)
+							: __(
+									'An error occurred while reverting the template parts.'
+								);
+				}
 
 				const typedError = error as CoreDataError;
 				const errorMessage =
@@ -243,9 +250,9 @@ const resetPostAction: Action< TemplatePart > = {
 		};
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize

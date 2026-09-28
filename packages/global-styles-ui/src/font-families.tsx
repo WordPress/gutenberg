@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -11,18 +8,14 @@ import {
 } from '@wordpress/components';
 import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import FontLibraryProvider, {
 	FontLibraryContext,
-} from './font-library-modal/context';
-import FontLibraryModal from './font-library-modal';
+} from './font-library/context';
+import FontLibraryModal from './font-library/modal';
 import FontFamilyItem from './font-family-item';
-import { setUIValuesNeeded } from './font-library-modal/utils';
+import { setUIValuesNeeded } from './font-library/utils';
 
 /**
  * Maps the fonts with the source, if available.
@@ -65,7 +58,6 @@ function FontFamiliesInner() {
 					defaultTabId={ modalTabOpen }
 				/>
 			) }
-
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
@@ -90,11 +82,11 @@ function FontFamiliesInner() {
 				) }
 				{ ! hasFonts && (
 					<>
-						<Text as="p">
+						<WCText as="p">
 							{ hasInstalledFonts
 								? __( 'No fonts activated.' )
 								: __( 'No fonts installed.' ) }
-						</Text>
+						</WCText>
 						<Button
 							className="global-styles-ui-font-families__manage-fonts"
 							variant="secondary"

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isTextField from './is-text-field';
 import isHTMLInputElement from './is-html-input-element';
 
@@ -40,7 +37,7 @@ export default function inputFieldHasUncollapsedSelection( element ) {
 			// when not null, compare the two points
 			selectionStart !== selectionEnd
 		);
-	} catch ( error ) {
+	} catch {
 		// This is Safari's way of saying that the input type doesn't implement
 		// selection, so we default to true.
 		return true;

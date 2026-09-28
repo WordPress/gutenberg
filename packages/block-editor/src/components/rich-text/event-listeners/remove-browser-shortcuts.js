@@ -1,7 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { isKeyboardEvent } from '@wordpress/keycodes';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 /**
  * Hook to prevent default behaviors for key combinations otherwise handled
@@ -17,8 +18,5 @@ export default () => ( node ) => {
 			event.preventDefault();
 		}
 	}
-	node.addEventListener( 'keydown', onKeydown );
-	return () => {
-		node.removeEventListener( 'keydown', onKeydown );
-	};
+	return subscribeOwnedListener( node, 'keydown', onKeydown, true );
 };

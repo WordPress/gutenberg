@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ComponentType } from 'react';
 
 /**
@@ -10,7 +7,7 @@ import type { ReactNode, ComponentType } from 'react';
  * - SVG icons from @wordpress/icons
  * - Data URLs for images
  */
-export type IconType = string | JSX.Element | ReactNode;
+export type IconType = string | React.JSX.Element | ReactNode;
 
 export interface MenuItem {
 	id: string;
@@ -42,9 +39,134 @@ export interface RouteLoaderContext {
  * Canvas data returned by route's canvas function.
  */
 export interface CanvasData {
+	/**
+	 * Post type to render in the canvas.
+	 */
 	postType: string;
+
+	/**
+	 * Post ID to render in the canvas.
+	 */
 	postId: string;
+
+	/**
+	 * Indicates if the canvas is in preview mode.
+	 */
 	isPreview?: boolean;
+
+	/**
+	 * The rendering mode the canvas stays in, for routes that show the site
+	 * rather than one piece of content. Resolved from the post type and the
+	 * user's preference when omitted.
+	 */
+	renderingMode?: 'post-only' | 'template-locked';
+}
+
+/**
+ * The routes an entity of a given post type is edited and listed at.
+ *
+ * Registered by the application rather than known here, so the shell holds no
+ * knowledge of any particular page's URLs.
+ */
+export interface EntityLinks {
+	/**
+	 * Path the entities of this post type are listed at.
+	 */
+	list?: string;
+
+	/**
+	 * Path an entity of this post type is edited at. `{id}` is replaced with
+	 * the encoded entity ID.
+	 */
+	edit?: string;
+}
+
+/**
+ * Route lifecycle configuration exported from route_module.
+ * The module should export a named `route` object with these optional functions.
+ */
+export interface RouteConfig {
+	/**
+	 * Pre-navigation hook for authentication, validation, or redirects.
+	 * Called before the route is loaded.
+	 */
+	beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
+
+	/**
+	 * Data preloading function.
+	 * Called when the route is being loaded.
+	 */
+	loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
+
+	/**
+	 * Function that returns canvas data for rendering.
+	 * - Returns CanvasData to use default editor canvas
+	 * - Returns null to use custom canvas component from content_module
+	 * - Returns undefined to show no canvas
+	 */
+	canvas?: (
+		context: RouteLoaderContext
+	) => Promise< CanvasData | null | undefined >;
+
+	/**
+	 * Function that determines whether to show the inspector panel.
+	 * When not defined, defaults to true (always show inspector if component exists).
+	 * When it returns false, the inspector is hidden even if an inspector component is exported.
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   inspector: ({ search }) => {
+	 *     // Only show inspector when items are selected
+	 *     return search.selectedIds?.length > 0;
+	 *   },
+	 * };
+	 * ```
+	 */
+	inspector?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+
+	/**
+	 * Function that determines whether to show the stage.
+	 * When not defined, defaults to true (always show stage if component exists).
+	 * When it returns false, the stage is hidden even if a stage component is
+	 * exported, leaving the canvas to fill the surfaces area.
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   stage: async () => {
+	 *     // Only show the stage when there is something to edit
+	 *     const theme = await resolveSelect( coreStore ).getCurrentTheme();
+	 *     return !! theme?.is_block_theme;
+	 *   },
+	 * };
+	 * ```
+	 */
+	stage?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+
+	/**
+	 * Function that returns the document title for the route.
+	 * The returned title will be formatted as: "{title} ‹ {siteTitle} — WordPress"
+	 * and announced to screen readers for accessibility.
+	 *
+	 * @param context Route context with params and search
+	 * @return The document title string or a Promise resolving to a string
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   title: async ({ params }) => {
+	 *     const post = await resolveSelect(coreStore).getEntityRecord(
+	 *       'postType',
+	 *       params.type,
+	 *       params.id
+	 *     );
+	 *     return post?.title?.rendered || 'Edit Post';
+	 *   },
+	 * };
+	 * ```
+	 */
+	title?: ( context: RouteLoaderContext ) => string | Promise< string >;
 }
 
 /**
@@ -58,18 +180,19 @@ export interface Route {
 	path: string;
 
 	/**
-	 * Module path for lazy loading the route's surfaces (stage, inspector).
-	 * The module must export: RouteSurfaces (stage and/or inspector components)
+	 * Module path for lazy loading the route's surfaces.
+	 * The module can export:
+	 * - stage?: Main content component (ComponentType)
+	 * - inspector?: Sidebar component (ComponentType)
+	 * - canvas?: Custom canvas component (ComponentType)
 	 * This enables code splitting for better performance.
 	 */
 	content_module?: string;
 
 	/**
 	 * Module path for route lifecycle functions.
-	 * The module should export a named export `route` containing:
-	 * - beforeLoad?: Pre-navigation hook (authentication, validation, redirects)
-	 * - loader?: Data preloading function
-	 * - canvas?: Function that returns canvas data for rendering an editor
+	 * The module should export a named `route` object implementing RouteConfig.
+	 * @see RouteConfig for available lifecycle functions.
 	 */
 	route_module?: string;
 }
@@ -77,4 +200,6 @@ export interface Route {
 export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
+	dashboardLink?: string;
+	entityLinks: Record< string, EntityLinks >;
 }

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { getTemplatePartIcon } from './edit/utils/get-template-part-icon';
 
 export function enhanceTemplatePartVariations( settings, name ) {

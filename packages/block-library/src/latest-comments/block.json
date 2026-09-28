@@ -29,7 +29,17 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -44,6 +54,7 @@
 			"margin": true,
 			"padding": true
 		},
+		"shadow": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -61,6 +72,5 @@
 			"clientNavigation": true
 		}
 	},
-	"editorStyle": "wp-block-latest-comments-editor",
 	"style": "wp-block-latest-comments"
 }

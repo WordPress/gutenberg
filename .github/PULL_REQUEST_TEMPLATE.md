@@ -29,3 +29,9 @@ Closes <!-- #ISSUE-NUMBER or URL -->
 |Before|After|
 |-|-|
 |<!-- Before screenshot here -->|<!-- After screenshot here -->|
+
+## Use of AI Tools
+
+<!--
+You are free to use artificial intelligence (AI) tooling to contribute, but you must disclose what tooling you are using and to what extent a pull request has been authored by AI. It is your responsibility to review and take responsibility for what AI generates. See the WordPress AI Guidelines: <https://make.wordpress.org/ai/handbook/ai-guidelines/>.
+-->

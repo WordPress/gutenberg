@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-
+import { describe, expect, it } from 'vitest';
 import { add, subtract, clamp, ensureValidStep } from '../math';
 
 describe( 'add', () => {

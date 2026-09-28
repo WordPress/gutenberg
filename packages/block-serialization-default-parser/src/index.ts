@@ -22,10 +22,7 @@ type ParsedFrame = {
 };
 
 type TokenType =
-	| 'no-more-tokens'
-	| 'void-block'
-	| 'block-opener'
-	| 'block-closer';
+	'no-more-tokens' | 'void-block' | 'block-opener' | 'block-closer';
 
 type Token = [ TokenType, string, Attributes, number, number ];
 
@@ -366,7 +363,7 @@ function proceed(): boolean {
 function parseJSON( input: string ): Object | null {
 	try {
 		return JSON.parse( input );
-	} catch ( e ) {
+	} catch {
 		return null;
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 const PAGE_STATUS = [
@@ -71,11 +68,5 @@ export async function createPage(
 	payload: CreatePagePayload
 ) {
 	// https://developer.wordpress.org/rest-api/reference/pages/#create-a-page
-	const page = await this.rest< Page >( {
-		method: 'POST',
-		path: `/wp/v2/pages`,
-		data: { ...payload },
-	} );
-
-	return page;
+	return this.createRecord< Page >( 'pages', { ...payload } );
 }

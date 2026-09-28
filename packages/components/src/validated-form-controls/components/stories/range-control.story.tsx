@@ -1,21 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
-import type { StoryObj, Meta } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { StoryObj, Meta } from '@storybook/react-vite';
 import { formDecorator } from './story-utils';
 import { ValidatedRangeControl } from '../range-control';
 
 const meta: Meta< typeof ValidatedRangeControl > = {
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
+	title: 'Components/@wordpress-components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
 	id: 'components-validatedrangecontrol',
 	component: ValidatedRangeControl,
 	tags: [ 'status-private' ],
@@ -33,12 +22,6 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 			useState<
 				React.ComponentProps< typeof ValidatedRangeControl >[ 'value' ]
 			>();
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedRangeControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedRangeControl
@@ -48,17 +31,14 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v && v % 2 !== 0 ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Choose an even number.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value && value % 2 !== 0
+						? {
+								type: 'invalid',
+								message: 'Choose an even number.',
+							}
+						: undefined
+				}
 			/>
 		);
 	},

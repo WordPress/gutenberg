@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -94,12 +91,12 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 }
 
 export function useDefaultAvatar() {
-	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
+	const avatarURL = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
-	return defaultAvatarUrl;
+		return __experimentalDiscussionSettings?.avatarURL ?? '';
+	}, [] );
+	return avatarURL;
 }
 
 export function useToolsPanelDropdownMenuProps() {
@@ -111,6 +108,6 @@ export function useToolsPanelDropdownMenuProps() {
 					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 					offset: 259,
 				},
-		  }
+			}
 		: {};
 }
