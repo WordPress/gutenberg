@@ -77,9 +77,10 @@ export interface ButtonProps extends Omit<
 export interface ButtonIconProps extends IconProps {
 	/**
 	 * The icon to display, from the `@wordpress/icons` package.
-	 * Icons from version 15.0.0 or later inherit the button text color.
-	 * Custom SVGs can also be used; set fill or stroke to `currentColor`
-	 * wherever the icon should follow the button text color.
+	 *
+	 * When using `@wordpress/icons`, only version 15.0.0 or later is supported.
+	 * For custom SVGs, use `currentColor` for any fill or stroke that should
+	 * follow the button text color.
 	 */
 	icon: IconProps[ 'icon' ];
 }
