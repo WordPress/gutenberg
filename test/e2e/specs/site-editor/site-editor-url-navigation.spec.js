@@ -44,6 +44,8 @@ test.describe( 'Site editor url navigation', () => {
 				page.click( 'role=button[name="Templates"]' ),
 			] );
 			await page.click( 'role=button[name="Add New Template"i]' );
+			// Wait for network idle to avoid flaky tests.
+			await page.waitForLoadState( 'networkidle' );
 			await page
 				.getByRole( 'button', {
 					name: 'Single item: Post',
