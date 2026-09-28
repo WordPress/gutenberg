@@ -8,6 +8,11 @@ import { useCallback, useMemo } from '@wordpress/element';
 import type { ReactNode } from 'react';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	getMatchingFontFaces,
+	type FontAppearance,
+} from '../../utils/font-face-capabilities';
+import type { FontFamilyFace } from '../../utils/types';
 
 type FontVariationSettings = Record< string, number >;
 
@@ -34,15 +39,8 @@ type FontFamily = {
 	fontFace?: FontFace[];
 };
 
-type FontFace = {
-	fontStyle?: string;
-	fontWeight?: string | number;
+type FontFace = FontFamilyFace & {
 	axes?: FontFaceAxis[];
-};
-
-export type FontAppearance = {
-	fontStyle?: unknown;
-	fontWeight?: unknown;
 };
 
 type Settings = {
@@ -107,51 +105,6 @@ function getFontFamilySlug(
 }
 
 /**
- * Parses a font weight value into a number, `400` when it can't be read.
- *
- * @param value A font weight, e.g. `700`, `"700"` or `"bold"`.
- * @return The numeric weight.
- */
-function parseFontWeight( value: unknown ): number {
-	if ( value === 'bold' ) {
-		return 700;
-	}
-	const weight = parseFloat( String( value ) );
-	return Number.isFinite( weight ) ? weight : 400;
-}
-
-/**
- * Returns the faces the browser can use for a font style and weight: those
- * with the same style whose weight, or weight range, includes it. When none
- * match, the browser picks the nearest face, so all faces are returned.
- *
- * @param faces      The family's faces.
- * @param appearance The font style and weight in use.
- * @return The candidate faces.
- */
-function getCandidateFaces(
-	faces: FontFace[],
-	appearance: FontAppearance | undefined
-): FontFace[] {
-	const style =
-		typeof appearance?.fontStyle === 'string' && appearance.fontStyle
-			? appearance.fontStyle
-			: 'normal';
-	const weight = parseFontWeight( appearance?.fontWeight ?? 400 );
-	const matching = faces.filter( ( face ) => {
-		if ( ( face.fontStyle || 'normal' ) !== style ) {
-			return false;
-		}
-		const [ min, max = min ] = String( face.fontWeight ?? 400 )
-			.trim()
-			.split( /\s+/ )
-			.map( parseFontWeight );
-		return weight >= min && weight <= max;
-	} );
-	return matching.length ? matching : faces;
-}
-
-/**
  * Returns the axes a user can set for a font family: the ones the faces in use
  * declare, over the range all of them allow, once the theme has turned the panel
  * on with `settings.typography.fontVariations`.
@@ -164,7 +117,7 @@ function getCandidateFaces(
  *
  * @param settings        Block or Global Styles settings.
  * @param fontFamilyValue Font family from block attributes or Global Styles.
- * @param appearance      Font style and weight, which select the faces.
+ * @param appearance      Font width, style and weight, which select the faces.
  * @return The axes to show, in the order the faces declare them.
  */
 export function getFontVariationAxes(
@@ -187,7 +140,7 @@ export function getFontVariationAxes(
 	// An axis is offered only if every face that may render the text has it,
 	// and only within the range all of them support.
 	const family = fontFamilies.find( ( { slug: s } ) => s === slug );
-	const faces = getCandidateFaces( family?.fontFace ?? [], appearance );
+	const faces = getMatchingFontFaces( family?.fontFace ?? [], appearance );
 	const capabilities = new Map< string, FontFaceAxis >();
 	faces.forEach( ( face, index ) => {
 		const faceAxes = new Map(
@@ -326,13 +279,17 @@ export default function FontVariationsPanel( {
 		value?.typography?.fontStyle ?? inheritedValue?.typography?.fontStyle;
 	const fontWeight =
 		value?.typography?.fontWeight ?? inheritedValue?.typography?.fontWeight;
+	const fontStretch =
+		value?.typography?.fontStretch ??
+		inheritedValue?.typography?.fontStretch;
 	const axes = useMemo(
 		() =>
 			getFontVariationAxes( settings, fontFamily, {
 				fontStyle,
 				fontWeight,
+				fontStretch,
 			} ),
-		[ settings, fontFamily, fontStyle, fontWeight ]
+		[ settings, fontFamily, fontStyle, fontWeight, fontStretch ]
 	);
 
 	const resetAllFilter = useCallback(

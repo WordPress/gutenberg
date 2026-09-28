@@ -40,12 +40,32 @@ describe( 'the widths offered', () => {
 		expect( await openWidths() ).toEqual( [ 'Condensed', 'Normal' ] );
 	} );
 
+	it( 'keeps a static width beside a variable interval', async () => {
+		await renderControl( [
+			{ fontStretch: '50% 125%' },
+			{ fontStretch: '150%' },
+		] );
+		const widths = await openWidths();
+		expect( widths ).toContain( 'Expanded' );
+		expect( widths ).toContain( 'Extra Expanded' );
+	} );
+
 	it( 'offers no width to type for a static family', async () => {
 		// A static family has the widths its files have and nothing between
 		// them, so there is no value to reach with a slider.
 		await renderControl( [
 			{ fontStretch: 'normal' },
 			{ fontStretch: 'condensed' },
+		] );
+		expect(
+			screen.queryByRole( 'button', { name: /set custom width/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'does not offer one slider across disjoint variable intervals', async () => {
+		await renderControl( [
+			{ fontStretch: '50% 75%' },
+			{ fontStretch: '125% 150%' },
 		] );
 		expect(
 			screen.queryByRole( 'button', { name: /set custom width/i } )

@@ -361,7 +361,7 @@ Typography styles.
 | fontSize | Sets the `font-size` CSS property. | `string`, `{ ref }` |
 | fontStretch | Sets the `font-stretch` CSS property. | `string`, `{ ref }` |
 | fontStyle | Sets the `font-style` CSS property. | `string`, `{ ref }` |
-| fontVariationSettings | Sets the `font-variation-settings` CSS property from axis values keyed by OpenType tag, such as `{ "GRAD": 50 }`. `wght`, `wdth`, `slnt` and `ital` are ignored: they belong to `font-weight`, `font-stretch` and `font-style`. |  |
+| fontVariationSettings | Sets the `font-variation-settings` CSS property from axis values keyed by OpenType tag, such as `{ "GRAD": 50 }`. `wght`, `wdth`, `slnt` and `ital` are ignored: they belong to `font-weight`, `font-stretch` and `font-style`. | `object<string, number>` |
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
 | lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |

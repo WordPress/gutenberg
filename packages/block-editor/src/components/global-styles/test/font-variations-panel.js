@@ -169,7 +169,7 @@ describe( 'getFontVariationAxes with several faces', () => {
 		).toEqual( [ 'XTRA 323-500' ] );
 	} );
 
-	it( 'intersects the faces when none matches', () => {
+	it( 'uses the closest style when no face matches exactly', () => {
 		expect(
 			tags(
 				getFontVariationAxes( settings, 'Split', {
@@ -177,6 +177,74 @@ describe( 'getFontVariationAxes with several faces', () => {
 				} )
 			)
 		).toEqual( [ 'XTRA 323-500' ] );
+	} );
+
+	it( 'matches width before style and weight', () => {
+		const widths = {
+			typography: {
+				...settings.typography,
+				fontFamilies: {
+					theme: [
+						{
+							...family,
+							fontFace: [
+								{
+									fontStretch: 'normal',
+									axes: [
+										{ tag: 'GRAD', min: -50, max: 50 },
+									],
+								},
+								{
+									fontStretch: 'condensed',
+									axes: [ { tag: 'GRAD', min: 0, max: 150 } ],
+								},
+							],
+						},
+					],
+				},
+			},
+		};
+		expect(
+			tags(
+				getFontVariationAxes( widths, 'Split', {
+					fontStretch: 'condensed',
+				} )
+			)
+		).toEqual( [ 'GRAD 0-150' ] );
+	} );
+
+	it( 'matches an oblique angle inside the face descriptor range', () => {
+		const oblique = {
+			typography: {
+				...settings.typography,
+				fontFamilies: {
+					theme: [
+						{
+							...family,
+							fontFace: [
+								{
+									fontStyle: 'normal',
+									axes: [
+										{ tag: 'GRAD', min: -50, max: 50 },
+									],
+								},
+								{
+									fontStyle: 'oblique 0deg 10deg',
+									axes: [ { tag: 'GRAD', min: 0, max: 150 } ],
+								},
+							],
+						},
+					],
+				},
+			},
+		};
+		expect(
+			tags(
+				getFontVariationAxes( oblique, 'Split', {
+					fontStyle: 'oblique 6deg',
+				} )
+			)
+		).toEqual( [ 'GRAD 0-150' ] );
 	} );
 
 	it( 'matches weight ranges and single weights', () => {
@@ -216,6 +284,6 @@ describe( 'getFontVariationAxes with several faces', () => {
 			tags(
 				getFontVariationAxes( weights, 'Split', { fontWeight: '550' } )
 			)
-		).toEqual( [ 'GRAD 0-50' ] );
+		).toEqual( [ 'GRAD 0-150' ] );
 	} );
 } );

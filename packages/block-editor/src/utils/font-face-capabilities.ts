@@ -1,6 +1,11 @@
 import { parseFontStretchValue } from './parse-font-stretch';
 import { parseFontWeightValue } from './parse-font-weight';
-import { getFontSlantRange, type FontSlantRange } from './get-font-slant-range';
+import {
+	getFontSlantRange,
+	parseFontStyleDescriptor,
+	type FontSlantRange,
+	type FontStyleDescriptor,
+} from './get-font-slant-range';
 import type { FontFamilyFace } from './types';
 
 /**
@@ -32,6 +37,12 @@ export interface FontFaceCapabilities {
 	};
 }
 
+export interface FontAppearance {
+	fontStyle?: unknown;
+	fontWeight?: unknown;
+	fontStretch?: unknown;
+}
+
 const DEFAULT_FONT_WEIGHT_VALUES = [
 	'100',
 	'200',
@@ -46,6 +57,296 @@ const DEFAULT_FONT_WEIGHT_VALUES = [
 ];
 
 type Parser = ( value: string ) => number | undefined;
+
+function descriptorRange(
+	value: string | number | undefined,
+	fallback: string,
+	parse: Parser
+): FontAxisCoverage {
+	const parts = String( value ?? fallback )
+		.trim()
+		.split( /\s+/ );
+	const parsed = parts.map( parse );
+	if ( parts.length > 2 || parsed.some( ( end ) => end === undefined ) ) {
+		const defaultValue = parse( fallback ) ?? 0;
+		return { min: defaultValue, max: defaultValue };
+	}
+	const ends = parsed as number[];
+	const first = ends[ 0 ] ?? parse( fallback ) ?? 0;
+	const second = ends[ 1 ] ?? first;
+	return {
+		min: Math.min( first, second ),
+		max: Math.max( first, second ),
+	};
+}
+
+function contains( { min, max }: FontAxisCoverage, value: number ): boolean {
+	return value >= min && value <= max;
+}
+
+/**
+ * Whether any face can draw a value on an axis.
+ *
+ * @param coverage What the faces cover on an axis.
+ * @param value    The coordinate to test.
+ * @return Whether the coordinate is covered.
+ */
+export function isValueCovered(
+	coverage: FontAxisCoverage[],
+	value: number
+): boolean {
+	return coverage.some( ( range ) => contains( range, value ) );
+}
+
+function selectRangeValue(
+	ranges: FontAxisCoverage[],
+	desired: number,
+	preferLower: boolean
+): number {
+	const values = [
+		...new Set( ranges.flatMap( ( { min, max } ) => [ min, max ] ) ),
+	];
+	const lower = values
+		.filter( ( value ) => value < desired )
+		.sort( ( a, b ) => b - a );
+	const higher = values
+		.filter( ( value ) => value > desired )
+		.sort( ( a, b ) => a - b );
+	return (
+		preferLower ? [ ...lower, ...higher ] : [ ...higher, ...lower ]
+	)[ 0 ];
+}
+
+function selectByRange< T extends FontFamilyFace >(
+	faces: T[],
+	read: ( face: T ) => FontAxisCoverage,
+	desired: number,
+	preferLower: boolean
+): T[] {
+	const exact = faces.filter( ( face ) => contains( read( face ), desired ) );
+	if ( exact.length ) {
+		return exact;
+	}
+	const selected = selectRangeValue(
+		faces.map( read ),
+		desired,
+		preferLower
+	);
+	return faces.filter( ( face ) => contains( read( face ), selected ) );
+}
+
+function selectByWeight< T extends FontFamilyFace >(
+	faces: T[],
+	desired: number
+): T[] {
+	const read = ( face: T ) =>
+		descriptorRange( face.fontWeight, 'normal', parseFontWeightValue );
+	const exact = faces.filter( ( face ) => contains( read( face ), desired ) );
+	if ( exact.length ) {
+		return exact;
+	}
+	const values = [
+		...new Set(
+			faces.flatMap( ( face ) => Object.values( read( face ) ) )
+		),
+	];
+	const ascending = ( candidates: number[] ) =>
+		candidates.sort( ( a, b ) => a - b );
+	const descending = ( candidates: number[] ) =>
+		candidates.sort( ( a, b ) => b - a );
+	let ordered: number[];
+	if ( desired >= 400 && desired <= 500 ) {
+		ordered = [
+			...ascending(
+				values.filter( ( value ) => value >= desired && value <= 500 )
+			),
+			...descending( values.filter( ( value ) => value < desired ) ),
+			...ascending( values.filter( ( value ) => value > 500 ) ),
+		];
+	} else if ( desired < 400 ) {
+		ordered = [
+			...descending( values.filter( ( value ) => value < desired ) ),
+			...ascending( values.filter( ( value ) => value > desired ) ),
+		];
+	} else {
+		ordered = [
+			...ascending( values.filter( ( value ) => value > desired ) ),
+			...descending( values.filter( ( value ) => value < desired ) ),
+		];
+	}
+	return faces.filter( ( face ) => contains( read( face ), ordered[ 0 ] ) );
+}
+
+function prefersLowerOblique( angle: number ): boolean {
+	if ( angle >= 11 ) {
+		return false;
+	}
+	if ( angle >= 0 ) {
+		return true;
+	}
+	return angle <= -11;
+}
+
+function selectByStyle< T extends FontFamilyFace >(
+	faces: T[],
+	requested: FontStyleDescriptor
+): T[] {
+	const described = faces.map( ( face ) => ( {
+		face,
+		style: parseFontStyleDescriptor( face.fontStyle ),
+	} ) );
+	const sameKind = described.filter(
+		( { style } ) => style.kind === requested.kind
+	);
+	const oblique = sameKind as Array< {
+		face: T;
+		style: Extract< FontStyleDescriptor, { kind: 'oblique' } >;
+	} >;
+	const allOblique = described.filter(
+		(
+			item
+		): item is {
+			face: T;
+			style: Extract< FontStyleDescriptor, { kind: 'oblique' } >;
+		} => item.style.kind === 'oblique'
+	);
+	const selectOblique = (
+		candidates: typeof allOblique,
+		desired: number,
+		preferLower: boolean
+	) => {
+		const exact = candidates.filter( ( { style } ) =>
+			contains( style, desired )
+		);
+		if ( exact.length ) {
+			return exact.map( ( { face } ) => face );
+		}
+		const selected = selectRangeValue(
+			candidates.map( ( { style } ) => style ),
+			desired,
+			preferLower
+		);
+		return candidates
+			.filter( ( { style } ) => contains( style, selected ) )
+			.map( ( { face } ) => face );
+	};
+
+	if ( requested.kind === 'normal' ) {
+		if ( sameKind.length ) {
+			return sameKind.map( ( { face } ) => face );
+		}
+		const nonNegative = allOblique.filter(
+			( { style } ) => style.max >= 0
+		);
+		if ( nonNegative.length ) {
+			return selectOblique( nonNegative, 0, false );
+		}
+		const italic = described.filter(
+			( { style } ) => style.kind === 'italic'
+		);
+		if ( italic.length ) {
+			return italic.map( ( { face } ) => face );
+		}
+		if ( allOblique.length ) {
+			return selectOblique( allOblique, 0, true );
+		}
+		return faces.slice( 0, 1 );
+	}
+
+	if ( requested.kind === 'italic' ) {
+		if ( sameKind.length ) {
+			return sameKind.map( ( { face } ) => face );
+		}
+		const positive = allOblique.filter( ( { style } ) => style.max > 0 );
+		if ( positive.length ) {
+			return selectOblique( positive, 11, false );
+		}
+		const normal = described.filter(
+			( { style } ) => style.kind === 'normal'
+		);
+		if ( normal.length ) {
+			return normal.map( ( { face } ) => face );
+		}
+		if ( allOblique.length ) {
+			return selectOblique( allOblique, 0, true );
+		}
+		return faces.slice( 0, 1 );
+	}
+
+	const angle = requested.min;
+	const exact = oblique.filter( ( { style } ) => contains( style, angle ) );
+	if ( exact.length ) {
+		return exact.map( ( { face } ) => face );
+	}
+	const sameDirection = oblique.filter( ( { style } ) =>
+		angle >= 0 ? style.max >= 0 : style.min <= 0
+	);
+	if ( sameDirection.length ) {
+		return selectOblique(
+			sameDirection,
+			angle,
+			prefersLowerOblique( angle )
+		);
+	}
+	const fallbackKinds =
+		angle >= 0 ? [ 'italic', 'normal' ] : [ 'normal', 'italic' ];
+	for ( const kind of fallbackKinds ) {
+		const fallback = described.filter(
+			( { style } ) => style.kind === kind
+		);
+		if ( fallback.length ) {
+			return fallback.map( ( { face } ) => face );
+		}
+	}
+	return faces.slice( 0, 1 );
+}
+
+/**
+ * Selects the faces CSS may use for an appearance, in the same property order
+ * as the font matching algorithm: width, style, then weight.
+ *
+ * Several faces can remain when they have the same descriptors, for example
+ * where unicode ranges or sources split one appearance. Consumers may then
+ * intersect metadata that must be available whichever of those faces renders.
+ *
+ * @param faces      The family's faces.
+ * @param appearance The CSS appearance in use.
+ * @return The closest matching faces.
+ */
+export function getMatchingFontFaces< T extends FontFamilyFace >(
+	faces: T[],
+	appearance: FontAppearance = {}
+): T[] {
+	if ( ! faces.length ) {
+		return [];
+	}
+	const width =
+		typeof appearance.fontStretch === 'string'
+			? ( parseFontStretchValue( appearance.fontStretch ) ?? 100 )
+			: 100;
+	let matching = selectByRange(
+		faces,
+		( face ) =>
+			descriptorRange(
+				face.fontStretch,
+				'normal',
+				parseFontStretchValue
+			),
+		width,
+		width <= 100
+	);
+
+	matching = selectByStyle(
+		matching,
+		parseFontStyleDescriptor( appearance.fontStyle )
+	);
+
+	const weight =
+		parseFontWeightValue( String( appearance.fontWeight ?? 400 ) ) ?? 400;
+	matching = selectByWeight( matching, weight );
+
+	return matching;
+}
 
 function coverageOf(
 	fontFamilyFaces: FontFamilyFace[] | undefined,
@@ -132,24 +433,24 @@ export function isVariableCoverage( coverage: FontAxisCoverage[] ): boolean {
 }
 
 /**
- * The values the faces draw, for an axis none of them interpolates.
+ * The point values the faces draw beside any interpolating intervals.
  *
  * @param coverage What the faces cover on an axis.
- * @return The values, in order, or an empty list when a face interpolates.
+ * @return The static values, in order.
  */
 export function coveragePoints( coverage: FontAxisCoverage[] ): number[] {
-	return isVariableCoverage( coverage )
-		? []
-		: coverage.map( ( { min } ) => min );
+	return coverage
+		.filter( ( { min, max } ) => min === max )
+		.map( ( { min } ) => min );
 }
 
 /**
- * The range a control can move over, for an axis a face interpolates.
+ * The continuous range a control can move over, for an axis a face
+ * interpolates.
  *
- * Only the intervals are spanned. A family can have both, a variable face and
- * a static one beside it, and a point outside the intervals is a value one file
- * draws rather than a place the range reaches: spanning to it would offer
- * everything in between, which nothing draws.
+ * Only connected intervals are spanned. A family can have a variable face and
+ * a static one beside it, or separate variable intervals. Neither may make a
+ * control offer the gap between values that different files draw.
  *
  * @param coverage What the faces cover on an axis.
  * @return The range, or undefined when no face interpolates.
@@ -157,14 +458,20 @@ export function coveragePoints( coverage: FontAxisCoverage[] ): number[] {
 export function coverageRange(
 	coverage: FontAxisCoverage[]
 ): FontAxisCoverage | undefined {
-	const intervals = coverage.filter( ( { min, max } ) => min < max );
+	const intervals = coverage
+		.filter( ( { min, max } ) => min < max )
+		.sort( ( a, b ) => a.min - b.min );
 	if ( ! intervals.length ) {
 		return undefined;
 	}
-	return {
-		min: Math.min( ...intervals.map( ( { min } ) => min ) ),
-		max: Math.max( ...intervals.map( ( { max } ) => max ) ),
-	};
+	const range = { ...intervals[ 0 ] };
+	for ( const interval of intervals.slice( 1 ) ) {
+		if ( interval.min > range.max ) {
+			return undefined;
+		}
+		range.max = Math.max( range.max, interval.max );
+	}
+	return range;
 }
 
 /**

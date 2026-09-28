@@ -8,6 +8,11 @@ export interface FontSlantRange {
 	max: number;
 }
 
+export type FontStyleDescriptor =
+	| { kind: 'normal' }
+	| { kind: 'italic' }
+	| ( { kind: 'oblique' } & FontSlantRange );
+
 /**
  * The angle `font-style: oblique` means when it is written without one.
  *
@@ -17,6 +22,40 @@ export const DEFAULT_OBLIQUE_ANGLE = 14;
 
 const OBLIQUE_ANGLES =
 	/^oblique(?:\s+(-?\d*\.?\d+)deg)?(?:\s+(-?\d*\.?\d+)deg)?$/;
+
+/**
+ * Reads a `font-style` property or face descriptor, including an oblique
+ * angle range. An omitted or invalid descriptor has the CSS initial value,
+ * normal.
+ *
+ * @param value A font style or `@font-face` descriptor.
+ * @return The normalized style.
+ */
+export function parseFontStyleDescriptor(
+	value: unknown
+): FontStyleDescriptor {
+	if ( typeof value !== 'string' ) {
+		return { kind: 'normal' };
+	}
+	const normalized = value.trim().toLowerCase().replace( /\s+/g, ' ' );
+	if ( normalized === 'italic' ) {
+		return { kind: 'italic' };
+	}
+	const angles = normalized.match( OBLIQUE_ANGLES );
+	if ( ! angles ) {
+		return { kind: 'normal' };
+	}
+	const start =
+		angles[ 1 ] === undefined
+			? DEFAULT_OBLIQUE_ANGLE
+			: Number( angles[ 1 ] );
+	const end = angles[ 2 ] === undefined ? start : Number( angles[ 2 ] );
+	return {
+		kind: 'oblique',
+		min: Math.min( start, end ),
+		max: Math.max( start, end ),
+	};
+}
 
 /**
  * Returns the slant range a family's oblique faces declare.
@@ -39,25 +78,11 @@ export function getFontSlantRange(
 	let range: FontSlantRange | undefined;
 
 	fontFamilyFaces?.forEach( ( { fontStyle } ) => {
-		if ( 'string' !== typeof fontStyle ) {
+		const style = parseFontStyleDescriptor( fontStyle );
+		if ( style.kind !== 'oblique' ) {
 			return;
 		}
-		const angles = fontStyle
-			.trim()
-			.toLowerCase()
-			.replace( /\s+/g, ' ' )
-			.match( OBLIQUE_ANGLES );
-		if ( ! angles ) {
-			return;
-		}
-		// `oblique` alone is the one angle the property means by it.
-		const start =
-			angles[ 1 ] === undefined
-				? DEFAULT_OBLIQUE_ANGLE
-				: Number( angles[ 1 ] );
-		const end = angles[ 2 ] === undefined ? start : Number( angles[ 2 ] );
-		const min = Math.min( start, end );
-		const max = Math.max( start, end );
+		const { min, max } = style;
 		range = range
 			? {
 					min: Math.min( range.min, min ),

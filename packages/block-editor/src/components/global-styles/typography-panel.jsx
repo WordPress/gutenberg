@@ -39,6 +39,7 @@ import {
 	coverageRange,
 	getFontStyleValues,
 	getFontWeightValues,
+	isValueCovered,
 	resolveFontFaceCapabilities,
 } from '../../utils/font-face-capabilities';
 import {
@@ -409,16 +410,13 @@ export default function TypographyPanel( {
 		const hasFontStyle = fontStyles.includes( fontStyle );
 		// A variable font can draw any weight in its range, not only the
 		// hundreds listed as presets.
-		const newFontWeightRange = coverageRange(
-			resolveFontFaceCapabilities( newFontFamilyFaces ).weight
-		);
+		const newCapabilities =
+			resolveFontFaceCapabilities( newFontFamilyFaces );
 		const numericFontWeight = Number( fontWeight );
 		const hasFontWeight =
 			fontWeights.includes( fontWeight?.toString() ) ||
-			( !! newFontWeightRange &&
-				hasValue( fontWeight ) &&
-				numericFontWeight >= newFontWeightRange.min &&
-				numericFontWeight <= newFontWeightRange.max );
+			( hasValue( fontWeight ) &&
+				isValueCovered( newCapabilities.weight, numericFontWeight ) );
 
 		// Find the nearest available font style/weight if not available.
 		if ( ! hasFontStyle || ! hasFontWeight ) {
@@ -454,7 +452,6 @@ export default function TypographyPanel( {
 				};
 			}
 		}
-
 		onChange( updatedValue );
 	};
 	const hasFontFamily = () => hasValue( value?.typography?.fontFamily );

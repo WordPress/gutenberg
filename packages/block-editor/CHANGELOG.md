@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Typography: Variable fonts can use any weight within their declared range. Appearance separates the style selector from a weight picker, which offers both named presets and a direct numeric value ([#83141](https://github.com/WordPress/gutenberg/pull/83141)).
+-   Typography: Let a font family's faces determine the Style, Weight and Width controls, and expose custom variation axes in a separate Font variations panel ([#83159](https://github.com/WordPress/gutenberg/pull/83159)).
 
 ### Enhancements
 

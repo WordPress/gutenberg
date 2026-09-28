@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
 	coveragePoints,
 	coverageRange,
+	getMatchingFontFaces,
 	getFontStyleValues,
 	getFontWeightValues,
 	isVariableCoverage,
+	isValueCovered,
 	resolveFontFaceCapabilities,
 } from '../font-face-capabilities';
 
@@ -87,6 +89,74 @@ describe( 'control values', () => {
 		expect( getFontStyleValues() ).toEqual( [ 'normal', 'italic' ] );
 		expect( getFontWeightValues() ).toContain( '700' );
 	} );
+
+	it( 'keeps static weights beside a variable interval', () => {
+		expect(
+			getFontWeightValues( [
+				{ fontWeight: '300 800' },
+				{ fontWeight: '900' },
+			] )
+		).toEqual( [ '300', '400', '500', '600', '700', '800', '900' ] );
+	} );
+} );
+
+describe( 'getMatchingFontFaces', () => {
+	it( 'matches width before style and weight', () => {
+		const normal = {
+			id: 'normal',
+			fontStretch: 'normal',
+			fontStyle: 'normal',
+			fontWeight: '400',
+		};
+		const condensed = {
+			id: 'condensed',
+			fontStretch: 'condensed',
+			fontStyle: 'normal',
+			fontWeight: '400',
+		};
+		expect(
+			getMatchingFontFaces( [ normal, condensed ], {
+				fontStretch: 'condensed',
+			} )
+		).toEqual( [ condensed ] );
+	} );
+
+	it( 'matches a requested oblique angle inside a descriptor range', () => {
+		const upright = { id: 'upright', fontStyle: 'normal' };
+		const oblique = {
+			id: 'oblique',
+			fontStyle: 'oblique 0deg 10deg',
+		};
+		expect(
+			getMatchingFontFaces( [ upright, oblique ], {
+				fontStyle: 'oblique 6deg',
+			} )
+		).toEqual( [ oblique ] );
+	} );
+
+	it( 'uses the CSS style fallback order', () => {
+		const italic = { id: 'italic', fontStyle: 'italic' };
+		const negativeOblique = {
+			id: 'negative-oblique',
+			fontStyle: 'oblique -10deg -5deg',
+		};
+		expect(
+			getMatchingFontFaces( [ negativeOblique, italic ], {
+				fontStyle: 'normal',
+			} )
+		).toEqual( [ italic ] );
+	} );
+
+	it( 'uses the CSS weight search order when no range contains the value', () => {
+		const regular = { id: 'regular', fontWeight: '400' };
+		const bold = { id: 'bold', fontWeight: '700' };
+		expect(
+			getMatchingFontFaces( [ regular, bold ], { fontWeight: '450' } )
+		).toEqual( [ regular ] );
+		expect(
+			getMatchingFontFaces( [ regular, bold ], { fontWeight: '550' } )
+		).toEqual( [ bold ] );
+	} );
 } );
 
 describe( 'reading coverage', () => {
@@ -126,5 +196,17 @@ describe( 'reading coverage', () => {
 			min: 300,
 			max: 800,
 		} );
+		expect( coveragePoints( mixed.weight ) ).toEqual( [ 900 ] );
+	} );
+
+	it( 'does not bridge a gap between variable intervals', () => {
+		const split = resolveFontFaceCapabilities( [
+			{ fontWeight: '100 400' },
+			{ fontWeight: '700 900' },
+		] );
+		expect( coverageRange( split.weight ) ).toBeUndefined();
+		expect( isValueCovered( split.weight, 350 ) ).toBe( true );
+		expect( isValueCovered( split.weight, 550 ) ).toBe( false );
+		expect( isValueCovered( split.weight, 750 ) ).toBe( true );
 	} );
 } );

@@ -90,8 +90,21 @@ const serializePrimitiveTypes = createSerializer(
  * @type {SerializerFunction}
  */
 const serializeObjectTypes = createSerializer(
-	( schema ) => schema.properties,
-	( schema ) => `\`{ ${ Object.keys( schema.properties ).join( ', ' ) } }\``
+	( schema ) => schema.properties || schema.patternProperties,
+	( schema ) => {
+		if ( schema.properties ) {
+			return `\`{ ${ Object.keys( schema.properties ).join( ', ' ) } }\``;
+		}
+		const valueTypes = [
+			...new Set(
+				Object.values( schema.patternProperties ).map(
+					( valueSchema ) =>
+						generateTypes( valueSchema ).replaceAll( '`', '' )
+				)
+			),
+		].join( ' | ' );
+		return `\`object<string, ${ valueTypes }>\``;
+	}
 );
 
 /**

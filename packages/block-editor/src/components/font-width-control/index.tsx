@@ -7,6 +7,7 @@ import FontAxisRangeControl from '../font-axis-range-control';
 import {
 	coveragePoints,
 	coverageRange,
+	isValueCovered,
 	resolveFontFaceCapabilities,
 } from '../../utils/font-face-capabilities';
 import {
@@ -76,34 +77,37 @@ export default function FontWidthControl( {
 		value === undefined ? undefined : parseFontStretchValue( value );
 
 	/*
-	 * A variable face draws anything in its range, so the widths the property
-	 * names inside that range are offered as a quick way there. A static family
-	 * draws the widths its files have and nothing between them, so those are
-	 * what it offers: naming the rest would promise widths no file can draw.
+	 * A variable face draws anything in its interval, so the widths the property
+	 * names inside each interval are offered as a quick way there. Static points
+	 * stay beside them. A slider appears only when all variable intervals form
+	 * one continuous range.
 	 */
-	const presets: Option[] = range
-		? FONT_WIDTHS.filter(
-				( preset ) =>
-					FONT_STRETCH_KEYWORDS[ preset.value ] >= range.min &&
-					FONT_STRETCH_KEYWORDS[ preset.value ] <= range.max
-			).map( ( preset ) => ( {
+	const presetsByPoint = new Map< number, Option >(
+		FONT_WIDTHS.filter( ( preset ) => {
+			const point = FONT_STRETCH_KEYWORDS[ preset.value ];
+			return isValueCovered( coverage, point );
+		} ).map( ( preset ) => [
+			FONT_STRETCH_KEYWORDS[ preset.value ],
+			{
 				key: preset.value,
 				value: preset.value,
 				name: preset.name,
-			} ) )
-		: coveragePoints( coverage ).map( ( point ) => {
-				const named = FONT_WIDTHS.find(
-					( preset ) =>
-						FONT_STRETCH_KEYWORDS[ preset.value ] === point
-				);
-				return named
-					? { key: named.value, value: named.value, name: named.name }
-					: {
-							key: `${ point }%`,
-							value: `${ point }%`,
-							name: `${ point }%`,
-						};
-			} );
+			},
+		] )
+	);
+	coveragePoints( coverage ).forEach( ( point ) => {
+		if ( presetsByPoint.has( point ) ) {
+			return;
+		}
+		presetsByPoint.set( point, {
+			key: `${ point }%`,
+			value: `${ point }%`,
+			name: `${ point }%`,
+		} );
+	} );
+	const presets = [ ...presetsByPoint.entries() ]
+		.sort( ( [ a ], [ b ] ) => a - b )
+		.map( ( [ , preset ] ) => preset );
 
 	const isPresetWidth =
 		value === undefined ||
