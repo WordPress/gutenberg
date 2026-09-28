@@ -2,12 +2,12 @@
  * Admin typography, from WordPress Design System tokens.
  *
  * The scale is not the raw tokens. `@wordpress/ui`'s `Text` component defines
- * the roles, and its pairings are not index-aligned — `font-size-md` (13px)
+ * the roles, and its pairings are not index-aligned — `font-size-md` (14px)
  * pairs with `line-height-sm` (20px), not `line-height-md`. Reading the tokens
  * alone gives the wrong answer, so the roles below follow `Text`:
  *
- *     body-md      13 / 20     the default UI text
- *     body-lg      15 / 24     reading prose
+ *     body-md      14 / 20     the default UI text
+ *     body-lg      16 / 24     reading prose
  *     heading-xl   20 / 24     emphasis weight
  *
  * Line heights are expressed as a ratio derived from the two tokens, so they
@@ -30,17 +30,165 @@
 	/* -----------------------------------------------------------------------
 	   Base
 
-	   Both properties are inherited, so they set the floor without competing
-	   with anything WordPress sizes explicitly. WordPress's own body font-size is already
-	   13px, which is exactly `font-size-md`, so only the family and the rhythm
-	   actually change here.
+	   All three properties are inherited, so they set the floor without competing
+	   with anything WordPress sizes explicitly. WordPress's own body font-size is 13px;
+	   `font-size-md` is 14px, and taking the role here is what moves the admin's
+	   chrome onto the scale.
+
+	   The floor alone does not finish the job. WordPress declares 13px explicitly in
+	   53 more places, and an inherited value never reaches a declared one, so
+	   the Chrome section below restates those selectors. Together they are what
+	   "the admin is 14px" actually costs.
 	   ----------------------------------------------------------------------- */
 
 	body {
 		font-family: var(--wpds-typography-font-family-body);
-		/* body-md: 20 / 13. Fallback first for engines without length division. */
-		line-height: 1.538;
+		font-size: var(--wpds-typography-font-size-md);
+		/* body-md: 20 / 14. Fallback first for engines without length division. */
+		line-height: 1.42857;
 		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+	}
+
+	/* -----------------------------------------------------------------------
+	   Chrome — the admin's own 13px tier, taken to `md`
+
+	   These selectors are WordPress's, copied from the stylesheets that declare
+	   `font-size: 13px`, so the set restyled is exactly the set WordPress sizes and
+	   no wider. Only the stylesheets this experiment demotes are listed: a rule
+	   for `media.css`, `customize-controls.css`, `login.css`, `site-health.css`
+	   or `deprecated-media.css` would sit in a layer those sheets never join and
+	   would simply lose. Twelve declarations are out of reach for that reason,
+	   and they are why the admin is not uniformly 14px even with this file
+	   applied — visible as 13px text on the Media library and the Customizer.
+
+	   Nothing here changes a line-height, because none of these rules pairs its
+	   size with a hand-computed ratio. The admin bar does, and is handled
+	   separately below.
+	   ----------------------------------------------------------------------- */
+
+	/* common.css */
+	p,
+	.wp-die-message,
+	kbd,
+	code,
+	.subsubsub,
+	.widefat td,
+	.widefat td p,
+	.widefat td ol,
+	.widefat td ul,
+	.widefat td .notice ul li,
+	.widefat th .notice ul li,
+	.wrap .page-title-action,
+	.wrap .page-title-action:active,
+	.wp-filter,
+	.wp-filter .button.drawer-toggle,
+	.notice p,
+	.notice-title,
+	div.updated p,
+	div.error p,
+	.form-table td .notice p,
+	#screen-options-wrap legend,
+	#contextual-help-wrap h5,
+	.postbox .inside,
+	.stuffbox .inside,
+	#wpfooter p,
+	.plugin-version-author-uri,
+	#template textarea,
+	/* dashboard.css */
+	.welcome-panel .welcome-panel-close,
+	#latest-comments #the-comment-list .comment-item p.row-actions,
+	a.rsswidget,
+	.rss-widget span.rss-date,
+	/* list-tables.css */
+	#replyrow legend,
+	.tablenav-pages .current-page,
+	.row-actions,
+	.plugins .row-actions,
+	.row-actions span a,
+	.row-actions span .button-link,
+	/* edit.css */
+	#editable-post-name input,
+	.tagchecklist > li,
+	p.help,
+	p.description,
+	span.description,
+	.form-wrap p,
+	/* themes.css */
+	.theme-overlay .theme-version,
+	.theme-overlay .theme-tags,
+	.theme-overlay .current-label,
+	.theme-install-overlay .wp-full-overlay-header .button,
+	/* forms.css */
+	table.form-table td .updated,
+	table.form-table td .updated p,
+	/* nav-menus.css */
+	.bulk-select-button,
+	.menu-item-handle .item-title,
+	/* admin-menu.css */
+	#adminmenu .wp-submenu a,
+	/* widgets.css */
+	.widget-top,
+	/* wp-tooltip.css */
+	.wp-tooltip .wp-tooltip__bubble {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+
+	/*
+	 * Separated only because WordPress's ID uses an underscore, which the repo's
+	 * `selector-id-pattern` rule rejects. The markup is WordPress's, so the selector
+	 * cannot be renamed and the rule is disabled for this line alone.
+	 */
+	/* stylelint-disable-next-line selector-id-pattern -- WordPress's own markup; the ID cannot be renamed from here. */
+	#dashboard_primary .rss-widget {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Admin bar
+
+	   The one place in the chrome where the size is load-bearing. WordPress writes
+	   `#wpadminbar *` at 13px with `line-height: 2.46153846`, which is 32 divided
+	   by 13 — the bar's own fixed height expressed as a ratio. At 14px the same
+	   ratio computes to 34.46px and the text no longer fits the bar it was
+	   measured against. The submenu repeats the trick with `line-height: 2`
+	   against `height: 26px`.
+
+	   Both are restated as the heights they were always emulating, which is the
+	   change wordpress-develop needs anyway: a ratio derived from a font size is
+	   silently wrong the moment the size moves. 32px is `line-height-xl`; 26px
+	   is not on the scale and is written as itself, mirroring WordPress's own
+	   `height: 26px` rather than inventing a step.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * The icon carriers are excluded. WordPress sizes them with the `font`
+	 * SHORTHAND — `font: normal 20px/1 dashicons` — which carries a family, a
+	 * size and a line-height in one declaration. A `font-size` or `line-height`
+	 * from this layer replaces those two parts of it and leaves the family,
+	 * so the glyph rendered at 14px on a 32px line inside its own `padding: 4px 0`,
+	 * giving a 40px box in a 32px bar. That is the misalignment, and it is a
+	 * good illustration of why reaching into a stylesheet from a higher layer is
+	 * scaffolding: a shorthand cannot be partially overridden without knowing it
+	 * is a shorthand.
+	 *
+	 * Only `.ab-icon` and `.wp-admin-bar-arrow` need naming. The other dashicon
+	 * carriers are either pseudo-elements, which `*` never matches, or declared
+	 * `!important` — and importance reverses layer order, so WordPress's rule already
+	 * wins there.
+	 */
+	#wpadminbar,
+	#wpadminbar *:not(.ab-icon, .wp-admin-bar-arrow) {
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-xl);
+	}
+
+	#wpadminbar .quicklinks .menupop ul li a,
+	#wpadminbar .quicklinks .menupop ul li a strong,
+	#wpadminbar .quicklinks .menupop.hover ul li .ab-item,
+	#wpadminbar.nojs .quicklinks .menupop:hover ul li .ab-item,
+	#wpadminbar .shortlink-input {
+		/* Mirrors WordPress's own `height: 26px` on these selectors. */
+		line-height: 26px;
 	}
 
 	/* -----------------------------------------------------------------------
@@ -85,7 +233,7 @@
 
 	   h5 and h6 share `heading-sm`. The scale has five heading roles and HTML has
 	   six levels, so one pair must share until the design system grows a sixth
-	   step. Sharing at 11px is better than 8.7px, and inventing a step here would
+	   step. Sharing at 10px is better than 8.7px, and inventing a step here would
 	   be adding to the scale rather than adopting it.
 	   ----------------------------------------------------------------------- */
 
@@ -132,36 +280,51 @@
 
 	h3 {
 		font-size: var(--wpds-typography-font-size-lg);
-		line-height: 1.333;
+		line-height: 1.25;
 		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-lg));
 	}
 
 	h4 {
 		font-size: var(--wpds-typography-font-size-md);
-		line-height: 1.538;
+		line-height: 1.42857;
 		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
 	}
 
 	h5,
 	h6 {
 		font-size: var(--wpds-typography-font-size-xs);
-		line-height: 1.454;
+		line-height: 1.6;
 		line-height: calc(var(--wpds-typography-line-height-xs) / var(--wpds-typography-font-size-xs));
 	}
 
 	/* -----------------------------------------------------------------------
-	   Reading prose — the `body-lg` role
+	   Reading prose — the `body-md` role
 
-	   WordPress sets these at 14px, which has no place on the scale and is the most
-	   used size in wp-admin. It is doing a different job from the 13px used for
-	   chrome: labels, field descriptions and row titles are the longest
-	   continuous text in the admin, and a single pixel of difference reads as an
-	   accident rather than a distinction.
+	   These already are `md`. WordPress sets them at 14px, and 14px is now exactly
+	   `font-size-md`, so this block asserts no new value: it names the role the
+	   admin was already using, the way the heading block names a weight WordPress
+	   already had.
 
-	   Taking them up to 15px rather than down to 13px keeps that distinction and
-	   makes it deliberate. Settings screens are where this is most visible —
-	   85% of the text on Settings > General is in this set, and third-party
-	   settings pages built from `.form-table` inherit the same treatment.
+	   An earlier version of this file took them to `lg` instead. That was correct
+	   only while 14px had no token: the admin's two tiers were 13 for chrome and
+	   14 for reading, one pixel apart, which reads as an accident rather than a
+	   distinction, and `lg` made the distinction deliberate. With the chrome
+	   itself now on `md`, both tiers land on 14 and inventing a 16px tier would
+	   be adding a step WordPress never had, not adopting the scale.
+
+	   What that costs is worth saying plainly: WordPress did distinguish these two
+	   tiers, and after this change it does not. The distinction has not moved to
+	   a larger step, it has gone. Restoring it means taking the chrome down to
+	   `sm` rather than taking reading up to `lg` — a decision for the scale, not
+	   for this file.
+
+	   One override disappeared with this change. `list-tables.css` pins
+	   `.row-title` with `font-size: 14px !important` — the only `!important`
+	   font-size in that file — so 99-overrides.css carried a rule to cancel it
+	   and reach `lg`. Now that the role resolves to 14px, WordPress's own pin
+	   already lands on it and the cancellation is not needed. The declaration
+	   below is inert while that `!important` stands, and correct the moment it
+	   is removed.
 	   ----------------------------------------------------------------------- */
 
 	/*
@@ -186,7 +349,7 @@
 	 * rather than something to settle here.
 	 */
 	p.submit {
-		font-size: var(--wpds-typography-font-size-lg);
+		font-size: var(--wpds-typography-font-size-md);
 	}
 
 	.form-table input,
@@ -205,10 +368,10 @@
 	.form-table span.description,
 	.row-title,
 	.inline-edit-row p.howto {
-		font-size: var(--wpds-typography-font-size-lg);
-		/* body-lg: 24 / 15. */
-		line-height: 1.6;
-		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-lg));
+		font-size: var(--wpds-typography-font-size-md);
+		/* body-md: 20 / 14. */
+		line-height: 1.42857;
+		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
 	}
 
 	/* -----------------------------------------------------------------------

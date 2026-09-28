@@ -47,7 +47,7 @@
 		// Resolves Zooming on iOS devices
 		// https://github.com/WordPress/gutenberg/issues/27405
 		@include break-small() {
-			font-size: 13px;
+			font-size: $font-size-medium;
 		}
 
 		&:focus,

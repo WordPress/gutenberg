@@ -38,7 +38,7 @@
 		"font-size": {
 			"$type": "dimension",
 			"xs": {
-				"$value": { "value": 11, "unit": "px" },
+				"$value": { "value": 10, "unit": "px" },
 				"$description": "Extra small font size"
 			},
 			"sm": {
@@ -46,11 +46,11 @@
 				"$description": "Small font size"
 			},
 			"md": {
-				"$value": { "value": 13, "unit": "px" },
+				"$value": { "value": 14, "unit": "px" },
 				"$description": "Medium font size"
 			},
 			"lg": {
-				"$value": { "value": 15, "unit": "px" },
+				"$value": { "value": 16, "unit": "px" },
 				"$description": "Large font size"
 			},
 			"xl": {
