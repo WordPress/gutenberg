@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	getCurrentOrder,
-	hasSortableImages,
-	sortImageBlocks,
-} from '../order-images';
+import { hasSortableImages, sortImageBlocks } from '../order-images';
 
 const NEWEST_FIRST = { orderby: 'date', order: 'desc' };
 const OLDEST_FIRST = { orderby: 'date', order: 'asc' };
@@ -162,84 +158,5 @@ describe( 'hasSortableImages', () => {
 				ATTACHMENTS
 			)
 		).toBe( false );
-	} );
-} );
-
-describe( 'getCurrentOrder', () => {
-	it( 'detects newest to oldest', () => {
-		expect(
-			getCurrentOrder( createImageBlocks( 4, 1, 3, 2 ), ATTACHMENTS )
-		).toEqual( NEWEST_FIRST );
-	} );
-
-	it( 'detects oldest to newest', () => {
-		expect(
-			getCurrentOrder( createImageBlocks( 2, 3, 1, 4 ), ATTACHMENTS )
-		).toEqual( OLDEST_FIRST );
-	} );
-
-	it( 'detects title A to Z', () => {
-		expect(
-			getCurrentOrder( createImageBlocks( 2, 1, 4, 3 ), ATTACHMENTS )
-		).toEqual( TITLE_A_TO_Z );
-	} );
-
-	it( 'detects title Z to A', () => {
-		expect(
-			getCurrentOrder( createImageBlocks( 3, 4, 1, 2 ), ATTACHMENTS )
-		).toEqual( TITLE_Z_TO_A );
-	} );
-
-	it( 'returns null for a custom order', () => {
-		expect(
-			getCurrentOrder( createImageBlocks( 1, 2, 3, 4 ), ATTACHMENTS )
-		).toBeNull();
-	} );
-
-	it( 'returns null while the attachment records have not resolved', () => {
-		expect( getCurrentOrder( createImageBlocks( 1, 2 ), [] ) ).toBeNull();
-	} );
-
-	it( 'returns null when fewer than two images have an attachment record', () => {
-		expect(
-			getCurrentOrder(
-				createImageBlocks( 1, undefined, 99 ),
-				ATTACHMENTS
-			)
-		).toBeNull();
-	} );
-
-	it( 'ignores unplaceable images at the end when detecting the order', () => {
-		expect(
-			getCurrentOrder(
-				createImageBlocks( 4, 1, 3, 2, undefined ),
-				ATTACHMENTS
-			)
-		).toEqual( NEWEST_FIRST );
-	} );
-
-	describe( 'when a sequence satisfies several orders', () => {
-		// Oldest to newest and A → Z both match.
-		const media = [
-			createAttachment( 1, 'a', '2024-01-01T00:00:00' ),
-			createAttachment( 2, 'b', '2024-01-02T00:00:00' ),
-		];
-		const blocks = createImageBlocks( 1, 2 );
-
-		it( 'reports the first matching option by default', () => {
-			expect( getCurrentOrder( blocks, media ) ).toEqual( OLDEST_FIRST );
-		} );
-
-		it( 'reports the preferred order when it holds', () => {
-			expect( getCurrentOrder( blocks, media, TITLE_A_TO_Z ) ).toEqual(
-				TITLE_A_TO_Z
-			);
-		} );
-
-		it( 'ignores the preferred order when it no longer holds', () => {
-			expect( getCurrentOrder( blocks, media, TITLE_Z_TO_A ) ).toEqual(
-				OLDEST_FIRST
-			);
-		} );
 	} );
 } );

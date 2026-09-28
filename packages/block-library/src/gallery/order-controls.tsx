@@ -74,7 +74,7 @@ export function SourceOrderControl( {
 const CUSTOM_ORDER = 'custom';
 
 type SortImagesControlProps = {
-	/** The detected `{ orderby, order }`, or `null` for a custom order. */
+	/** The last sort applied, while it still holds, or `null` for a custom order. */
 	currentOrder: Order | null;
 	/** Whether the gallery's `randomOrder` attribute is set. */
 	isRandom: boolean;
@@ -85,8 +85,10 @@ type SortImagesControlProps = {
 	 * "Random" off; the handler owns that so both writes land in one undo level.
 	 */
 	onSort: ( order: Order ) => void;
-	/** Called to set or clear the `randomOrder` attribute. */
-	onRandomChange: ( isRandom: boolean ) => void;
+	/** Called when "Custom" is chosen, which turns "Random" off. */
+	onSelectCustom: () => void;
+	/** Called when "Random" is chosen. */
+	onSelectRandom: () => void;
 };
 
 /**
@@ -94,11 +96,11 @@ type SortImagesControlProps = {
  *
  * The date and title orders are one-off *actions*: choosing one reorders the
  * inner image blocks once, and the user can drag them into any other order
- * afterwards. Nothing is stored for them, so the displayed value is derived
- * from the order the images are currently in, or "Custom" when that matches
- * none of them. "Custom" means the order arranged in the editor, and is
- * choosable only while "Random" is on: picking it turns "Random" off without
- * reordering anything.
+ * afterwards. Nothing is stored for them, so the caller passes back the last
+ * sort it applied for as long as the images remain in that sequence, and
+ * `null` ("Custom") otherwise. "Custom" means the order arranged in the
+ * editor, and is choosable only while "Random" is on: picking it turns
+ * "Random" off without reordering anything.
  *
  * "Random" is the one stored value (the `randomOrder` attribute). It applies
  * on the front end only, leaving the editor order as it is, and choosing any
@@ -109,7 +111,8 @@ export function SortImagesControl( {
 	isRandom,
 	canSort,
 	onSort,
-	onRandomChange,
+	onSelectCustom,
+	onSelectRandom,
 }: SortImagesControlProps ) {
 	const options = [
 		// Choosing Custom only turns Random off, so it's only choosable while
@@ -138,13 +141,11 @@ export function SortImagesControl( {
 			help={ getOrderHelp( isRandom ) }
 			onChange={ ( nextValue ) => {
 				if ( nextValue === RANDOM_ORDER ) {
-					onRandomChange( true );
+					onSelectRandom();
 					return;
 				}
 				if ( nextValue === CUSTOM_ORDER ) {
-					// Custom means the editor order, so this only turns
-					// Random off (the option is disabled when it's off).
-					onRandomChange( false );
+					onSelectCustom();
 					return;
 				}
 				onSort( parseOrderValue( nextValue ) );

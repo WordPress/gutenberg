@@ -71,11 +71,7 @@ import {
 	DEFAULT_ORDERBY,
 	DEFAULT_ORDER,
 } from './dynamic-source';
-import {
-	getCurrentOrder,
-	hasSortableImages,
-	sortImageBlocks,
-} from './order-images';
+import { hasSortableImages, sortImageBlocks } from './order-images';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -324,15 +320,20 @@ export default function GalleryEdit( props ) {
 	const hasImages = !! images.length;
 	const isDynamic = !! attributes.dynamicContent;
 
-	// The order the static images are in, derived rather than stored so the
-	// "Order by" control reads honestly after images are dragged around. The
-	// last order applied from the control is only a tie-break for detection
-	// (see `getCurrentOrder`), so it's local state, rather than an attribute.
-	const [ lastAppliedOrder, setLastAppliedOrder ] = useState( null );
-	const currentOrder = useMemo(
-		() => getCurrentOrder( innerBlockImages, imageData, lastAppliedOrder ),
-		[ innerBlockImages, imageData, lastAppliedOrder ]
-	);
+	// The static "Order by" control shows the last sort applied from it, for as
+	// long as the images stay in the sequence that sort produced. Any other
+	// change to the images (a drag, an addition, a removal) drops it back to
+	// "Custom"; it never reports an order the user didn't choose. Nothing is
+	// stored, so this is local state rather than an attribute.
+	const [ appliedSort, setAppliedSort ] = useState( null );
+	const currentOrder =
+		appliedSort &&
+		appliedSort.clientIds.length === innerBlockImages.length &&
+		appliedSort.clientIds.every(
+			( id, index ) => innerBlockImages[ index ].clientId === id
+		)
+			? appliedSort.order
+			: null;
 	const canSortImages = hasSortableImages( innerBlockImages, imageData );
 
 	// Dynamic mode (resolving images from a source instead of inner blocks):
@@ -584,16 +585,25 @@ export default function GalleryEdit( props ) {
 	// Reorders the inner image blocks in place. Left persistent on purpose so
 	// the sort is a single undoable step.
 	function sortImages( order ) {
-		replaceInnerBlocks(
-			clientId,
-			sortImageBlocks(
-				getBlock( clientId ).innerBlocks,
-				imageData,
-				order
-			)
+		const sortedBlocks = sortImageBlocks(
+			getBlock( clientId ).innerBlocks,
+			imageData,
+			order
 		);
+		replaceInnerBlocks( clientId, sortedBlocks );
 		clearRandomOrderAfterEdit();
-		setLastAppliedOrder( order );
+		setAppliedSort( {
+			order,
+			clientIds: sortedBlocks.map( ( block ) => block.clientId ),
+		} );
+	}
+
+	// "Custom" is the order arranged in the editor: it turns Random off and
+	// forgets any sort applied earlier, so the control reads "Custom" from
+	// here on rather than that sort.
+	function selectCustomOrder() {
+		setRandomOrder( false );
+		setAppliedSort( null );
 	}
 
 	function changeSourceOrder( { orderby, order } ) {
@@ -1009,7 +1019,7 @@ export default function GalleryEdit( props ) {
 									);
 									clearRandomOrderAfterEdit();
 								} else {
-									setRandomOrder( false );
+									selectCustomOrder();
 								}
 							} }
 						>
@@ -1029,7 +1039,10 @@ export default function GalleryEdit( props ) {
 									isRandom={ !! randomOrder }
 									canSort={ canSortImages }
 									onSort={ sortImages }
-									onRandomChange={ setRandomOrder }
+									onSelectCustom={ selectCustomOrder }
+									onSelectRandom={ () =>
+										setRandomOrder( true )
+									}
 								/>
 							) }
 						</ToolsPanelItem>
