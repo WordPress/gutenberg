@@ -16,6 +16,8 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
+import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline';
+import mediaEditorRtl from '../package-styles/media-editor-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
@@ -102,8 +104,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^mediaeditor-/,
-		ltr: [ componentsLtr ],
-		rtl: [ componentsRtl ],
+		ltr: [ componentsLtr, mediaEditorLtr ],
+		rtl: [ componentsRtl, mediaEditorRtl ],
 	},
 	{
 		componentIdMatcher: /^design-system-/,

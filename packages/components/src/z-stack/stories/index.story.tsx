@@ -7,7 +7,7 @@ import { ZStack } from '..';
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
 	id: 'components-zstack',
-	title: 'Components/@wordpress-components/ZStack',
+	title: 'Components/@wordpress-components/Deprecated/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: { control: false },
@@ -21,7 +21,7 @@ const meta: Meta< typeof ZStack > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. Write your own CSS instead.',
+			notes: 'Deprecated. Write your own CSS instead.',
 		},
 	},
 };

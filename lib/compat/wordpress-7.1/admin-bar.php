@@ -71,7 +71,6 @@ function gutenberg_admin_bar_site_icon_styles(): void {
 		#wpadminbar #wp-admin-bar-site-name > .ab-item .site-icon {
 			width: 20px;
 			height: 20px;
-			background: #f0f0f1;
 			border-radius: 2px;
 		}
 		@media screen and (max-width: 782px) {

@@ -15,7 +15,6 @@ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
@@ -29,7 +28,7 @@ import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
-import { getAllowedFormats } from './utils';
+import { getAllowedFormats, isEmpty } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
@@ -82,13 +81,6 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	if ( onSplit ) {
-		deprecated( 'wp.blockEditor.RichText onSplit prop', {
-			since: '6.4',
-			alternative: 'block.json support key: "splitting"',
-		} );
-	}
-
 	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
@@ -262,7 +254,8 @@ function RichTextWrapper(
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
-	const { selectionChange } = useDispatch( blockEditorStore );
+	const { selectionChange, __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -453,7 +446,11 @@ function RichTextWrapper(
 		ariaActiveDescendant,
 	] );
 
-	useMarkPersistent( { html: adjustedValue, value } );
+	useMarkPersistent( {
+		html: adjustedValue,
+		value,
+		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
+	} );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
@@ -573,17 +570,8 @@ const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
 
 export { ForwardedRichTextWrapper as RichTextWrapper };
 
-// This is the private API for the RichText component.
-// It allows access to all props, not just the public ones.
-export const PrivateRichText = withDeprecations( ForwardedRichTextWrapper );
+const RichTextWithDeprecations = withDeprecations( ForwardedRichTextWrapper );
 
-PrivateRichText.Content = Content;
-PrivateRichText.isEmpty = ( value ) => {
-	return ! value || value.length === 0;
-};
-
-// This is the public API for the RichText component.
-// We wrap the PrivateRichText component to hide some props from the public API.
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
@@ -633,13 +621,14 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		);
 	}
 
-	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
+	// `readOnly` is internal-only.
+	return (
+		<RichTextWithDeprecations ref={ ref } { ...props } readOnly={ false } />
+	);
 } );
 
 PublicForwardedRichTextContainer.Content = Content;
-PublicForwardedRichTextContainer.isEmpty = ( value ) => {
-	return ! value || value.length === 0;
-};
+PublicForwardedRichTextContainer.isEmpty = isEmpty;
 
 export default PublicForwardedRichTextContainer;
 export { RichTextShortcut };
