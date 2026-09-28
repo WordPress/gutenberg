@@ -79,8 +79,10 @@ export function Note( {
 
 	const canResolve = note.parent === 0;
 	const metaStatus = note.meta?._wp_note_status;
-	const isResolvedNote = metaStatus === 'resolved';
-	const isResolutionNote = isResolvedNote || metaStatus === 'reopen';
+	const isResolutionNote =
+		metaStatus === 'resolved' || metaStatus === 'reopen';
+	const hasUserText =
+		typeof rawContent === 'string' && rawContent.trim() !== '';
 
 	const hasResolved = ( status ) =>
 		status === 'approved' || parentNote?.status === 'approved';
@@ -90,7 +92,8 @@ export function Note( {
 			id: 'edit',
 			title: __( 'Edit' ),
 			isEligible: ( { status } ) =>
-				! isResolvedNote && ! hasResolved( status ),
+				( ! isResolutionNote || hasUserText ) &&
+				! hasResolved( status ),
 			onClick: () => setActionState( 'edit' ),
 		},
 		{
