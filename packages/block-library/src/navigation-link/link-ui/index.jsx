@@ -5,8 +5,18 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
+	LinkControl,
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	useCallback,
 	useMemo,
 	useState,
 	useRef,
@@ -20,6 +30,10 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
+import {
+	addBlockSuggestions,
+	BLOCK_SUGGESTION_TYPE,
+} from './block-suggestions';
 import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
@@ -188,6 +202,70 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	// Blocks are offered where the "Add block" button is: on a new link, in a
+	// Navigation that can take them.
+	const canSearchBlocks =
+		!! clientId && blockEditingMode !== 'disabled' && ! link?.url?.length;
+
+	const { rootClientId, blockItems } = useSelect(
+		( select ) => {
+			if ( ! canSearchBlocks ) {
+				return {};
+			}
+
+			const { getBlockRootClientId, getInserterItems } =
+				select( blockEditorStore );
+			const _rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				rootClientId: _rootClientId,
+				blockItems: getInserterItems( _rootClientId ),
+			};
+		},
+		[ canSearchBlocks, clientId ]
+	);
+
+	const transformSuggestions = useCallback(
+		( suggestions, { isInitialSuggestions, searchTerm } ) =>
+			isInitialSuggestions
+				? suggestions
+				: addBlockSuggestions( suggestions, blockItems, searchTerm ),
+		[ blockItems ]
+	);
+
+	const { insertBlock, replaceBlock } = useDispatch( blockEditorStore );
+	const { getBlockIndex } = useSelect( blockEditorStore );
+
+	// Puts the block where the new link is.
+	const insertBlockFromSuggestion = ( itemId ) => {
+		const item = blockItems?.find( ( { id: _id } ) => _id === itemId );
+
+		if ( ! item ) {
+			return;
+		}
+
+		const block = createBlock(
+			item.name,
+			item.initialAttributes,
+			createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+		);
+
+		// A caller that tracks the new link, such as the list view, removes it
+		// itself once told about the block, as with the "Add block" pane.
+		if ( props.onBlockInsert ) {
+			insertBlock(
+				block,
+				getBlockIndex( clientId ),
+				rootClientId,
+				false
+			);
+			props.onBlockInsert( block );
+			return;
+		}
+
+		replaceBlock( clientId, block );
+	};
+
 	return (
 		<Popover
 			ref={ ref }
@@ -221,7 +299,19 @@ function UnforwardedLinkUI( props, ref ) {
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ props.onChange }
+						transformSuggestions={
+							canSearchBlocks ? transformSuggestions : undefined
+						}
+						onChange={ ( updatedValue ) => {
+							if (
+								updatedValue?.type === BLOCK_SUGGESTION_TYPE
+							) {
+								insertBlockFromSuggestion( updatedValue.id );
+								return;
+							}
+
+							props.onChange( updatedValue );
+						} }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click

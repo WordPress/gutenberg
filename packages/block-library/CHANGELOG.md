@@ -29,6 +29,7 @@
 ### Internal
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
+-   Navigation Link: List the blocks a Navigation allows in the link UI search results, so typing "Home" finds the Home Link block.
 
 ## 11.1.0 (2026-09-23)
 

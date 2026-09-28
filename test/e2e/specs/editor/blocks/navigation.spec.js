@@ -1009,6 +1009,131 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	// Blocks the Navigation allows are listed alongside the link results, so
+	// a Home Link can be found by typing "Home".
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test.describe( 'Block search results', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			// Each shares its first word with a block, so the block is listed
+			// in the same results as a page.
+			await requestUtils.createPage( {
+				title: 'Home Office',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Paragraph Guide',
+				status: 'publish',
+			} );
+		} );
+
+		test.beforeEach(
+			async ( { admin, editor, requestUtils, navigation } ) => {
+				await admin.createNewPost();
+
+				await requestUtils.createNavigationMenu( {
+					title: 'Block search',
+					content: '',
+				} );
+
+				await editor.insertBlock( { name: 'core/navigation' } );
+
+				await navigation.getNavBlockInserter().click();
+			}
+		);
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'can insert a block from the search results', async ( {
+			page,
+			navigation,
+		} ) => {
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			await test.step( 'List the block with the page results', async () => {
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+				await page.keyboard.type( 'Home' );
+
+				await expect(
+					searchResults.getByRole( 'option', { name: /Home Office/ } )
+				).toBeVisible();
+				await expect(
+					searchResults.getByRole( 'option' ).first()
+				).toHaveText( /Home Link.*Block/ );
+			} );
+
+			await test.step( 'Replace the new link with the block', async () => {
+				await searchResults
+					.getByRole( 'option', { name: /Home Link/ } )
+					.click();
+
+				await expect( navigation.getLinkPopover() ).toBeHidden();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Home Link' } )
+				).toBeVisible();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Page Link' } )
+				).toHaveCount( 0 );
+			} );
+		} );
+
+		test( 'can insert a block from the search results with the keyboard', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+
+			const blockResult = page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } );
+			await expect( blockResult ).toBeVisible();
+
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( blockResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await page.keyboard.press( 'Enter' );
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toBeVisible();
+		} );
+
+		test( 'does not list blocks the Navigation does not allow', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Paragraph' );
+
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			// Wait for the page result, so the results have arrived before
+			// counting them.
+			await expect(
+				searchResults.getByRole( 'option', { name: /Paragraph Guide/ } )
+			).toBeVisible();
+			await expect( searchResults.getByRole( 'option' ) ).toHaveCount(
+				1
+			);
+		} );
+	} );
+
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
 		admin,
 		page,
