@@ -394,9 +394,6 @@ describe( 'API functions', () => {
 		} );
 
 		it( 'should handle errors in client ability execution', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 			const executionError = new Error( 'Execution failed' );
 			const mockCallback = vi.fn().mockRejectedValue( executionError );
 
@@ -420,18 +417,13 @@ describe( 'API functions', () => {
 				executeAbility( 'test/client-ability', {} )
 			).rejects.toThrow( 'Execution failed' );
 
-			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveErroredWith(
 				'Error executing ability test/client-ability:',
 				executionError
 			);
-
-			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'should handle errors in server ability execution', async () => {
-			const consoleErrorSpy = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 			const serverError = new Error( 'Server execution failed' );
 			const mockServerCallback = vi.fn().mockRejectedValue( serverError );
 
@@ -455,12 +447,10 @@ describe( 'API functions', () => {
 				executeAbility( 'test/server-ability', {} )
 			).rejects.toThrow( 'Server execution failed' );
 
-			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveErroredWith(
 				'Error executing ability test/server-ability:',
 				serverError
 			);
-
-			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'should execute ability without callback as server ability', async () => {

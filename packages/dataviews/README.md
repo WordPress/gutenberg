@@ -1720,8 +1720,8 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
--   `a`: the first item to compare
--   `b`: the second item to compare
+-   `a`: the value of the field (as returned by `getValue`) for the first item to compare
+-   `b`: the value of the field (as returned by `getValue`) for the second item to compare
 -   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:

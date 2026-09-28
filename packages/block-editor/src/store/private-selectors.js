@@ -25,6 +25,7 @@ import {
 	getInsertBlockTypeDependants,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -963,31 +964,15 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 			canInsertBlockType( state, currentName, id )
 		);
 
-	// If we're trying to insert at the root level and it's not allowed
-	// Try the section root instead.
-	if ( ! clientId ) {
-		if ( areBlockNamesAllowedInClientId( clientId ) ) {
-			return clientId;
-		}
-
-		const sectionRootClientId = getSectionRootClientId( state );
-		if (
-			sectionRootClientId &&
-			areBlockNamesAllowedInClientId( sectionRootClientId )
-		) {
-			return sectionRootClientId;
-		}
-		return null;
+	if ( areBlockNamesAllowedInClientId( clientId ) ) {
+		return clientId;
 	}
 
-	// Traverse the block tree up until we find a place where we can insert.
-	let current = clientId;
-	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
-		const parentClientId = getBlockRootClientId( state, current );
-		current = parentClientId;
-	}
-
-	return current;
+	return (
+		getFallbackInsertionRoots( state, clientId ).find(
+			areBlockNamesAllowedInClientId
+		) ?? null
+	);
 }
 
 export function getClosestAllowedInsertionPointForPattern(

@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
+    -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
+    -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
+
+### Enhancements
+
+-   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
+
+### Bug Fixes
+
+-   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
+-   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
+-   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
+-   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
+
+### Internal
+
+-   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+
 ## 41.0.0 (2026-09-23)
 
 ### Breaking Changes
@@ -43,6 +65,7 @@
 
 ### Internal
 
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).
