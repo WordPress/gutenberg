@@ -235,14 +235,33 @@
 	   six levels, so one pair must share until the design system grows a sixth
 	   step. Sharing at 10px is better than 8.7px, and inventing a step here would
 	   be adding to the scale rather than adopting it.
+
+	   Meta boxes are excluded. wp-admin uses a heading as a structural handle —
+	   `<h2 class="hndle">` is the draggable header of every postbox, on the
+	   Dashboard and equally on the post, comment and link editing screens, since
+	   they share one template. A scale meant for document headings does not
+	   belong on a drag handle: applied there it took the handle from 14px to
+	   20px and, worse, gave it the 24px top margin of the rhythm below, which
+	   pushed the title down while the order and toggle controls stayed with the
+	   box. The headings inside a widget's body have the same problem in a
+	   smaller way, so the exclusion covers the whole subtree rather than the
+	   handle alone.
+
+	   The exclusion is written `:not(:where(...) *)` rather than `:not(:is(...) *)`
+	   because `:not()` takes the specificity of its argument. With `:is()` these
+	   selectors rose from (0,0,1) to (0,1,1), which tied `.wrap h1` above and won
+	   on source order, taking the page title from 20px to 32px. `:where()` is
+	   specificity-zero, so the exclusion changes what matches without changing
+	   what wins.
+
+	   This leaves meta box typography exactly as WordPress draws it. That is the
+	   conservative choice on purpose: the alternative is to invent values for a
+	   container the design system has no equivalent for, which is a design
+	   decision rather than token adoption. The finding to take upstream is that
+	   a drag handle should probably not be a heading at all.
 	   ----------------------------------------------------------------------- */
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
+	:is(h1, h2, h3, h4, h5, h6):not(:where(.postbox, .stuffbox) *) {
 		font-family: var(--wpds-typography-font-family-heading);
 		/* Already WordPress's value; expressed here as the token it always was. */
 		font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -266,32 +285,32 @@
 		margin-block: var(--wpds-dimension-gap-xl) var(--wpds-dimension-gap-sm);
 	}
 
-	h1 {
+	h1:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-2xl);
 		line-height: 1.25;
 		line-height: calc(var(--wpds-typography-line-height-2xl) / var(--wpds-typography-font-size-2xl));
 	}
 
-	h2 {
+	h2:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-xl);
 		line-height: 1.2;
 		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-xl));
 	}
 
-	h3 {
+	h3:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-lg);
 		line-height: 1.25;
 		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-lg));
 	}
 
-	h4 {
+	h4:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-md);
 		line-height: 1.42857;
 		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
 	}
 
-	h5,
-	h6 {
+	h5:not(:where(.postbox, .stuffbox) *),
+	h6:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-xs);
 		line-height: 1.6;
 		line-height: calc(var(--wpds-typography-line-height-xs) / var(--wpds-typography-font-size-xs));
