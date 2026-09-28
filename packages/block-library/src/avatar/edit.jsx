@@ -39,7 +39,9 @@ function useAvatarHelpText() {
 	);
 
 	if ( ! canManageSettings ) {
-		return __( 'Avatars use the Gravatar service.' );
+		return __(
+			'Avatars use the Gravatar service. Default avatar can be changed from Discussion settings.'
+		);
 	}
 
 	return createInterpolateElement(
