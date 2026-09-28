@@ -716,8 +716,15 @@ describe( 'keeping the end when truncating', () => {
 	/* Starting mid-line could split a fence opener and fence the rest. */
 	it( 'does not start the kept part inside a fence opener', () => {
 		const definition = getSection( 'props' )!;
-		const filler = 'x'.repeat( definition.budget - 2 );
-		const body = `${ filler }\n\`\`\`\nCo-authored-by: someone\n\`\`\``;
+		const trailer = '\nCo-authored-by: someone\n```';
+		// Sized so the cut lands between the opener's backticks.
+		const filler = 'x'.repeat( definition.budget - 2 - trailer.length );
+		const body = `pad\n\`\`\`${ filler }${ trailer }`;
+
+		// The setup only bites if the cut really does bisect the opener.
+		expect( body.slice( -definition.budget ).startsWith( '``' ) ).toBe(
+			true
+		);
 
 		const merged = bodyOf(
 			mergeSection( undefined, { id: 'props', body } )

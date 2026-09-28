@@ -224,32 +224,26 @@ function truncate(
 	 * committer copies. Reopen a fence the dropped part left open, or its
 	 * closing line would fence everything after it.
 	 */
-	if ( definition.keep === 'end' ) {
-		const cut = body.slice( -definition.budget );
+	/* Never mid-line: that could split a fence opener, fencing the rest. */
+	const cut = body.slice( -definition.budget );
+	const paragraph = cut.indexOf( '\n\n' );
+	const boundary = paragraph >= 0 ? paragraph + 2 : cut.indexOf( '\n' ) + 1;
 
-		/*
-		 * A paragraph break for preference, otherwise the first line break:
-		 * starting mid-line could split a fence opener, which leaves nothing
-		 * for `reopenBlocks` to find and its closer fencing the rest.
-		 */
-		const paragraph = cut.indexOf( '\n\n' );
-		const boundary =
-			paragraph >= 0 ? paragraph + 2 : cut.indexOf( '\n' ) + 1;
+	if ( definition.keep === 'end' && boundary > 0 ) {
 		const kept = cut.slice( boundary );
 		const dropped = body.slice( 0, body.length - kept.length );
 
 		return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
 	}
 
-	const cut = body.slice( 0, definition.budget );
-
 	/*
 	 * Cut at a paragraph break so the break falls between whole items rather
 	 * than mid-sentence, then close whatever the cut left open. A note
 	 * appended inside a fence renders as code, taking its link with it.
 	 */
-	const boundary = cut.lastIndexOf( '\n\n' );
-	const kept = boundary > 0 ? cut.slice( 0, boundary ) : cut;
+	const head = body.slice( 0, definition.budget );
+	const lastBreak = head.lastIndexOf( '\n\n' );
+	const kept = lastBreak > 0 ? head.slice( 0, lastBreak ) : head;
 
 	return `${ kept }${ closeOpenBlocks( kept ) }\n\n${ note }`;
 }

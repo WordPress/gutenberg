@@ -32,11 +32,10 @@ on:
 # Cancels all previous runs for a pull request that have not completed.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. Only runs that will write share that key. A run that does no
-    # props work, or that cannot write because a review event on a fork gets a
-    # read-only token, takes a group of its own: it would otherwise cancel a
-    # run that could have written.
-    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    # places. A run takes a group of its own when cancelling it would strand
+    # the label, when a fork's review token cannot write, or when it does no
+    # props work at all.
+    group: ${{ github.workflow }}-${{ github.event.action != 'labeled' && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -75,8 +74,7 @@ jobs:
     # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
         name: Generate a list of props
-        # Waits for the removal, which is otherwise still queued while this
-        # gathers, so a cancellation then leaves the label stuck on.
+        # Beside the removal, a cancellation could strand the label.
         needs: remove-label
         runs-on: 'ubuntu-24.04'
         permissions:
