@@ -4,7 +4,7 @@
 	border-color: $components-color-border;
 
 	&:not(.is-disabled, .is-borderless) {
-		:global(.components-input-control__container):hover & {
+		.container:hover & {
 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
 		}
 	}
