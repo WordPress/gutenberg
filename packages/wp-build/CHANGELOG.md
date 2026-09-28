@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Load the design token fallback plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. To keep injecting token fallbacks, install `@wordpress/theme-build-tools` alongside `@wordpress/build`; without it, the build skips token fallbacks ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Load design token fallback plugins from the optional `@wordpress/theme-build-tools` peer dependency instead of `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 
 ### Bug Fixes
 
