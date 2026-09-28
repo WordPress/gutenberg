@@ -817,7 +817,7 @@ test.describe( 'Pattern Overrides', () => {
 			.getByRole( 'textbox', { name: 'Button text' } );
 		// Focus the button, open the link popup.
 		await button.focus();
-		await pageUtils.pressKeys( 'Meta+k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
 		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
@@ -868,7 +868,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		// Reopen the link popup.
 		await button.focus();
-		await pageUtils.pressKeys( 'Meta+k' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
@@ -888,7 +888,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		// Reopen the link popup.
 		await button.focus();
-		await pageUtils.pressKeys( 'Meta+k' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		// Check only the "mark as nofollow" checkbox.
 		await editLinkButton.click();
