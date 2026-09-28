@@ -47,10 +47,40 @@ export default function BlockActions( {
 					);
 				} ),
 				canDuplicate: blocks.every( ( block ) => {
+					if ( ! block ) {
+						return false;
+					}
+
+					// Check if block supports uniqueWithin: 'parent'.
+					const isUniqueInParent = hasBlockSupport(
+						block.name,
+						'uniqueWithin'
+					);
+
+					if ( isUniqueInParent ) {
+						const currentRootClientId = getBlockRootClientId(
+							block.clientId
+						);
+						const siblingBlocks =
+							select( blockEditorStore ).getBlocks(
+								currentRootClientId
+							);
+						const sameTypeCount = siblingBlocks.filter(
+							( sibling ) => sibling.name === block.name
+						).length;
+
+						// Block already exists in parent, can't duplicate
+						if ( sameTypeCount >= 1 ) {
+							return false;
+						}
+					}
+
 					return (
-						!! block &&
 						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, rootClientId )
+						canInsertBlockType(
+							block.name,
+							getBlockRootClientId( block.clientId )
+						)
 					);
 				} ),
 			};
