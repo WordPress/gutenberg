@@ -14,9 +14,7 @@ process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
 	...baseConfig,
-	reporter: process.env.CI
-		? './config/performance-reporter.ts'
-		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
+	reporter: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
 	forbidOnly: !! process.env.CI,
 	fullyParallel: false,
 	retries: 0,
