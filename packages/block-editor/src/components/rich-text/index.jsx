@@ -11,7 +11,7 @@ import {
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId, useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
@@ -231,25 +231,33 @@ function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	// Whether the wrapper is the editing host, which depends on the selected
-	// block, not necessarily this one. Only the selected, default-mode block
-	// can be it, so others skip the subscription entirely.
+	// Whether the wrapper hosts editing for this block: the selected block
+	// can host it, and any block in a multi-selection is inside the host's
+	// range and must not be an editing area of its own there.
 	const isEditingHost = useSelect(
 		( select ) => {
-			if (
-				shouldDisableEditing ||
-				! hasDefaultEditingMode ||
-				! isBlockSelected
-			) {
+			if ( shouldDisableEditing || ! hasDefaultEditingMode ) {
 				return false;
 			}
 
-			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
-				select( blockEditorStore )
-			);
-			return canHostEditableRoot( getSelectedBlockClientId() );
+			const {
+				getSelectedBlockClientId,
+				canHostEditableRoot,
+				isBlockMultiSelected,
+			} = unlock( select( blockEditorStore ) );
+
+			if ( isBlockSelected ) {
+				return canHostEditableRoot( getSelectedBlockClientId() );
+			}
+
+			return isBlockMultiSelected( clientId );
 		},
-		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+		[
+			shouldDisableEditing,
+			hasDefaultEditingMode,
+			isBlockSelected,
+			clientId,
+		]
 	);
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
@@ -359,7 +367,7 @@ function RichTextWrapper(
 		// A pointer press outside the field makes it non editable until the
 		// release (see rich text's preventFocusCapture). Focusing it then
 		// makes the block focus handler drop the text selection.
-		if ( ! isSelected || element?.contentEditable !== 'true' ) {
+		if ( ! isSelected || element?.contentEditable === 'false' ) {
 			return;
 		}
 
@@ -459,6 +467,59 @@ function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	// Under the editing host the element is not a focus target (no tabindex
+	// and no contenteditable attribute, see below), so `focus()` on it would
+	// do nothing. Keep it working: place the caret in the element and focus
+	// the host instead.
+	const focusUnderHostRef = useRefEffect(
+		( element ) => {
+			if ( ! isEditingHost ) {
+				return;
+			}
+
+			const { ownerDocument } = element;
+			const { focus: nativeFocus } = element;
+
+			element.focus = ( options ) => {
+				const host = element.parentElement?.closest(
+					'[contenteditable="true"]'
+				);
+
+				// The host disengaged in this commit, ahead of this
+				// override's removal: the element is a focus target again.
+				if ( ! host ) {
+					nativeFocus.call( element, options );
+					return;
+				}
+
+				const selection = ownerDocument.defaultView.getSelection();
+
+				if ( ! element.contains( selection.anchorNode ) ) {
+					selection.collapse( element, 0 );
+				}
+
+				if (
+					ownerDocument.activeElement !== host ||
+					! ownerDocument.hasFocus()
+				) {
+					const range = selection.getRangeAt( 0 ).cloneRange();
+					host.focus( { preventScroll: true, ...options } );
+					// Gecko moves the selection when an editing host takes
+					// focus instead of adopting the one within it.
+					if ( ! element.contains( selection.anchorNode ) ) {
+						selection.removeAllRanges();
+						selection.addRange( range );
+					}
+				}
+			};
+
+			return () => {
+				delete element.focus;
+			};
+		},
+		[ isEditingHost ]
+	);
+
 	// Setting tabIndex to 0 is unnecessary, the element is already focusable
 	// because it's contentEditable. This also fixes a Safari bug where it's
 	// not possible to Shift+Click multi select blocks when Shift Clicking
@@ -470,7 +531,11 @@ function RichTextWrapper(
 	// focusability.
 	let tabIndex = props.tabIndex;
 	if ( isEditingHost ) {
-		tabIndex = props.tabIndex ?? 0;
+		// The field must not be a focus target under the host: iOS focuses a
+		// focusable child on tap, thrashing focus with the host and canceling
+		// native selection gestures (double tap to select a word). Block
+		// props pass tabIndex 0, so remove it explicitly.
+		tabIndex = null;
 	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
 		tabIndex = null;
 	}
@@ -551,8 +616,15 @@ function RichTextWrapper(
 					} ),
 					anchorRef,
 					setAnchorElement,
+					focusUnderHostRef,
 				] ) }
-				contentEditable={ ! shouldDisableEditing }
+				contentEditable={
+					// Under the editing host the field is editable through the
+					// host, not an editing host of its own. The attribute must
+					// be absent, not "inherit": Gecko treats the invalid value
+					// as non-editable.
+					isEditingHost ? undefined : ! shouldDisableEditing
+				}
 				suppressContentEditableWarning
 				className={ clsx(
 					'block-editor-rich-text__editable',

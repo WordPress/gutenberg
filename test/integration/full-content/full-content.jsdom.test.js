@@ -123,6 +123,7 @@ describe( 'full post content fixture', () => {
 
 			// Deprecated fixtures can report successful migrations. Other console
 			// messages, including validation errors, must still fail the test.
+			/* eslint-disable vitest/no-conditional-expect -- Notices vary by fixture; the required content assertions below always run. */
 			const isDeprecated = /__deprecated([-_]|$)/.test( basename );
 			// eslint-disable-next-line no-console
 			if ( isDeprecated && console.info.mock.calls.length > 0 ) {
@@ -148,6 +149,7 @@ describe( 'full post content fixture', () => {
 					'wp.blocks.children.matcher is deprecated since version 6.1 and will be removed in version 6.3. Please use html source instead. See: https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/'
 				);
 			}
+			/* eslint-enable vitest/no-conditional-expect */
 
 			const blocksActualNormalized =
 				normalizeParsedBlocks( blocksActual );
