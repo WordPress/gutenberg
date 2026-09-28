@@ -91,7 +91,7 @@ export const Default: Story = {
 };
 
 /**
- * Item descriptions appear below labels and contribute to each suggestion's accessible description.
+ * Item descriptions contribute to each suggestion's accessible description.
  */
 export const WithItemDescriptions: Story = {
 	args: {

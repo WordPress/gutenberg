@@ -70,7 +70,7 @@ export interface ComboboxItemLabelProps extends ComponentProps< 'span' > {
 
 export interface ComboboxItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content described by the combobox item.
+	 * Content that contributes to the combobox item's accessible description.
 	 */
 	children: ReactNode;
 }

@@ -5,9 +5,9 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { SelectItemDescriptionProps } from './types';
 
 /**
- * Supplementary text below a select item label. Use it as a
- * direct child after `Select.ItemLabel`. Content should be text or
- * non-interactive inline markup.
+ * Supplementary content for a select item. Its text contributes to the item's
+ * accessible description. Use it as a direct child after `Select.ItemLabel`.
+ * Content should be text or non-interactive inline markup.
  */
 export const ItemDescription = forwardRef<
 	HTMLSpanElement,

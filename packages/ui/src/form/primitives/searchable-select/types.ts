@@ -15,7 +15,7 @@ export type Item = {
 	value: string;
 	disabled?: boolean;
 	/**
-	 * Supplementary text shown below the item label in the popup.
+	 * Supplementary text for the item in the popup.
 	 */
 	description?: string;
 	/**

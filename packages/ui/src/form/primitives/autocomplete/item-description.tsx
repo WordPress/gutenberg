@@ -5,7 +5,8 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { AutocompleteItemDescriptionProps } from './types';
 
 /**
- * Supplementary text below an autocomplete item label.
+ * Supplementary content for an autocomplete item. Its text contributes to the
+ * item's accessible description.
  */
 export const ItemDescription = forwardRef<
 	HTMLSpanElement,

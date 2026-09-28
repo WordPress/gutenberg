@@ -53,7 +53,7 @@ export interface AutocompleteItemLabelProps extends ComponentProps< 'span' > {
 
 export interface AutocompleteItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content described by the autocomplete item.
+	 * Content that contributes to the autocomplete item's accessible description.
 	 */
 	children: ReactNode;
 }
