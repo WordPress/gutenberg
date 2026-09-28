@@ -1,4 +1,5 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
+const FIELD_SELECTOR = '[data-wp-block-attribute-key]';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
@@ -59,9 +60,9 @@ export function getSelectionEditableElement(
 
 	// While the root is the editing host, the selected block's field is
 	// editable through it and has no contenteditable attribute of its own:
-	// the block element is the editable element.
+	// find it by the block attribute it edits.
 	if ( editable === root ) {
-		editable = element?.closest( BLOCK_SELECTOR );
+		editable = element?.closest( FIELD_SELECTOR );
 	}
 
 	if (

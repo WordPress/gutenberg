@@ -15,7 +15,6 @@ export default function useDragSelection() {
 		hasSelectedBlock,
 		isDraggingBlocks,
 		isMultiSelecting,
-		getSelectedBlockClientId,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -102,13 +101,13 @@ export default function useDragSelection() {
 				}
 
 				// Only start multi selecting when the mouse leaves a field:
-				// one editable on its own, or the selected block, editable
+				// one editable on its own, or the selected block's, editable
 				// through the editing host. In preview mode, allow drag
 				// selection from blocks since they are not contenteditable.
 				const isField =
 					target.contentEditable === 'true' ||
 					( target.isContentEditable &&
-						target.dataset.block === getSelectedBlockClientId() );
+						target.hasAttribute( 'data-wp-block-attribute-key' ) );
 				if ( ! isField && ! getSettings().isPreviewMode ) {
 					return;
 				}

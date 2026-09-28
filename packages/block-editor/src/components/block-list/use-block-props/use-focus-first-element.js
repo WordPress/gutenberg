@@ -55,10 +55,22 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
+		// Find all tabbables within node. Under the editing host the
+		// selected block's fields are editable through the host and not
+		// tabbable: find them by the block attribute they edit.
+		let textInputs = focus.tabbable
 			.find( ref.current )
 			.filter( ( node ) => isTextField( node ) );
+		if ( ! textInputs.length ) {
+			textInputs = Array.from(
+				ref.current.querySelectorAll( '[data-wp-block-attribute-key]' )
+			).filter(
+				( node ) =>
+					node.isContentEditable &&
+					! node.hasAttribute( 'contenteditable' ) &&
+					isInsideRootBlock( ref.current, node )
+			);
+		}
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
