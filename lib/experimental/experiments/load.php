@@ -142,7 +142,6 @@ function gutenberg_initialize_experiments_settings() {
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'                 => 'object',
-					// Experiment properties must always be boolean.
 					'properties'           => $properties,
 					// Allow stale keys left behind by removed experiments without invalidating the entire option.
 					'additionalProperties' => array(
