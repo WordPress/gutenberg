@@ -176,6 +176,100 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	test.describe( 'Fronted fallback behavior', () => {
+		test( 'should render a Page List on the frontend when no menus exist', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect( page.locator( '.wp-block-page-list' ) ).toBeVisible();
+			await expect(
+				page.getByRole( 'link', { name: 'Cat', exact: true } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'link', { name: 'Dog', exact: true } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'link', { name: 'Walrus', exact: true } )
+			).toBeVisible();
+		} );
+
+		test( 'should render the first non-empty menu on the frontend', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			// The fallback should pick "Menu A" because it comes first alphabetically.
+			await requestUtils.createNavigationMenu( {
+				title: 'Menu B',
+				content:
+					'<!-- wp:navigation-link {"label":"Dog","url":"#dog"} /-->',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Menu A',
+				content:
+					'<!-- wp:navigation-link {"label":"Cat","url":"#cat"} /-->',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.getByRole( 'link', {
+					name: 'Cat',
+					exact: true,
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'link', {
+					name: 'Dog',
+					exact: true,
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'should skip empty menus and render the next available menu', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			// The fallback should skip empty 'Menu A' and render non-empty 'Menu B'.
+			await requestUtils.createNavigationMenu( {
+				title: 'Menu A',
+				content: '',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Menu B',
+				content:
+					'<!-- wp:navigation-link {"label":"Dog","url":"#dog"} /-->',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.getByRole( 'link', {
+					name: 'Dog',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+	} );
+
 	test.describe( 'As a user I want to create submenus using the navigation block', () => {
 		test( 'create a submenu', async ( {
 			admin,
