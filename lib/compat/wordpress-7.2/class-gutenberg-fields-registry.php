@@ -195,7 +195,7 @@ final class Gutenberg_Fields_Registry {
 	/**
 	 * Unregisters fields of an entity.
 	 *
-	 * Unregistering a field removes its registered definition, if any, and
+	 * Unregistering a field removes its registered definition and
 	 * drops it from the script modules that applied to it (a module left with
 	 * no field is forgotten). Unregistering every field forgets the entity:
 	 * its registered fields and script modules.
@@ -214,38 +214,35 @@ final class Gutenberg_Fields_Registry {
 			return false;
 		}
 
-		if ( null !== $ids ) {
-			$present = array_column( $this->get_registered( $kind, $name ), 'id' );
-			$ids     = array_values( array_intersect( (array) $ids, $present ) );
-			if ( empty( $ids ) ) {
-				return false;
-			}
-		}
-
 		$entity = $this->get_entity_key( $kind, $name );
 
 		if ( null === $ids ) {
-			$had_state = isset( $this->fields[ $entity ] ) || isset( $this->field_modules[ $entity ] );
+			if ( ! isset( $this->fields[ $entity ] ) ) {
+				return false;
+			}
 			unset( $this->fields[ $entity ], $this->field_modules[ $entity ] );
-			return $had_state;
+			return true;
 		}
 
-		$changed = false;
-		foreach ( (array) $ids as $id ) {
-			if ( isset( $this->fields[ $entity ][ $id ] ) ) {
-				unset( $this->fields[ $entity ][ $id ] );
-				$changed = true;
-			}
-			foreach ( $this->field_modules[ $entity ] ?? array() as $module => $module_ids ) {
-				$remaining = array_values( array_diff( $module_ids, array( $id ) ) );
-				if ( count( $remaining ) !== count( $module_ids ) ) {
-					$changed = true;
-				}
-				if ( empty( $remaining ) ) {
-					unset( $this->field_modules[ $entity ][ $module ] );
-				} else {
-					$this->field_modules[ $entity ][ $module ] = $remaining;
-				}
+		$ids = array_intersect( (array) $ids, array_keys( $this->fields[ $entity ] ?? array() ) );
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		// A script module only ever applies to registered fields: register()
+		// and update() add it for fields they store, and fields leave both
+		// lists together here. So the fields removed are all that tells
+		// whether the registry changed, and dropping them from the modules
+		// cannot change it on its own.
+		foreach ( $ids as $id ) {
+			unset( $this->fields[ $entity ][ $id ] );
+		}
+		foreach ( $this->field_modules[ $entity ] ?? array() as $module => $module_ids ) {
+			$remaining = array_values( array_diff( $module_ids, $ids ) );
+			if ( empty( $remaining ) ) {
+				unset( $this->field_modules[ $entity ][ $module ] );
+			} else {
+				$this->field_modules[ $entity ][ $module ] = $remaining;
 			}
 		}
 		if ( empty( $this->fields[ $entity ] ) ) {
@@ -255,7 +252,7 @@ final class Gutenberg_Fields_Registry {
 			unset( $this->field_modules[ $entity ] );
 		}
 
-		return $changed;
+		return true;
 	}
 
 	/**
@@ -363,9 +360,8 @@ final class Gutenberg_Fields_Registry {
 	 *
 	 * Outside the action a registration would either come before the
 	 * defaults, which could then not be registered, or after the fields have been read
-	 * and the import map of the editor script built from them; and
-	 * unregistering fields by id reads the registry, which would fire the
-	 * action early. Refusing keeps the registry immutable once read.
+	 * and the import map of the editor script built from them. Refusing
+	 * keeps the registry immutable once read.
 	 *
 	 * @param string $method The calling method, for the notice.
 	 * @return bool Whether the action is firing.
