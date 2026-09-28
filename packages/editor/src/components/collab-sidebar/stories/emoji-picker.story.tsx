@@ -31,6 +31,17 @@ const meta: Meta< typeof EmojiPicker > = {
 	argTypes: {
 		onSelect: { control: false },
 	},
+	parameters: {
+		// The search field keeps focus and arrow keys move through the grid,
+		// so the scrollable viewport is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 };
 export default meta;
 
