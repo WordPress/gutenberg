@@ -97,14 +97,28 @@ function styleToAttributes( style ) {
 	};
 }
 
-function attributesToStyle( attributes ) {
+/**
+ * Reads a block's typography attributes as one style object, resolving the two
+ * places a preset may be recorded: the attribute a picker sets, and the style
+ * a value written inline lands in.
+ *
+ * @param {Object} attributes The block's typography attributes.
+ * @return {Object} The style object.
+ */
+export function attributesToStyle( attributes ) {
 	return {
 		...attributes.style,
 		typography: {
 			...attributes.style?.typography,
+			/*
+			 * A family may be stored either way: as the attribute a preset
+			 * sets, or inline in the style. Reading only the attribute loses
+			 * the inline one, and everything that asks what font this block
+			 * is in then answers with the inherited one instead.
+			 */
 			fontFamily: attributes.fontFamily
 				? 'var:preset|font-family|' + attributes.fontFamily
-				: undefined,
+				: attributes.style?.typography?.fontFamily,
 			fontSize: attributes.fontSize
 				? 'var:preset|font-size|' + attributes.fontSize
 				: attributes.style?.typography?.fontSize,
