@@ -163,6 +163,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			array(
 				'playlistId'            => $playlist_id,
 				'currentId'             => $playlist_tracks[0],
+				'focusedId'             => $playlist_tracks[0],
 				'isPlaying'             => false,
 				'tracks'                => $playlist_tracks,
 				'waveformStyle'         => $waveform_style,
