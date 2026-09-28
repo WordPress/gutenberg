@@ -295,6 +295,11 @@ function UnforwardedColorPalette(
 							className="components-color-palette__custom-color-wrapper"
 							spacing={ 0 }
 						>
+							<span className="components-color-palette__custom-color-hint">
+								{ __(
+									'Preview of selected color - Click for custom color'
+								) }
+							</span>
 							<button
 								ref={ customColorPaletteCallbackRef }
 								className="components-color-palette__custom-color-button"
