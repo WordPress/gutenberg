@@ -9,15 +9,6 @@ import {
 } from './order-options';
 import type { Order } from './order-options';
 
-// Both controls below are a single "Order by" `SelectControl`, mirroring the
-// Query Loop block's `OrderControl`. They differ in what choosing an option
-// *means*, not in how they look.
-
-/**
- * Help text for the control while "Random" is selected. It's the one order the
- * editor can't show (the shuffle happens on the front end), so say so; the
- * other orders are self-evident from the canvas and get no help.
- */
 function getOrderHelp( isRandom: boolean ): string | undefined {
 	return isRandom
 		? __( 'Images are shown in a random order each time the page loads.' )
@@ -115,9 +106,6 @@ export function SortImagesControl( {
 	onSelectRandom,
 }: SortImagesControlProps ) {
 	const options = [
-		// Choosing Custom only turns Random off, so it's only choosable while
-		// Random is on; otherwise it's a read-only status for a hand-arranged
-		// order. It stays in the list either way so the options never shift.
 		{ label: __( 'Custom' ), value: CUSTOM_ORDER, disabled: ! isRandom },
 		...ORDER_OPTIONS.map( ( option ) => ( {
 			...option,
