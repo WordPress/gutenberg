@@ -73,14 +73,20 @@ test.describe( 'Style Book notes', () => {
 	 * Opens the site editor with the Style Book showing, on the Text tab where
 	 * the Headings example lives.
 	 *
+	 * Opens a template in edit mode directly, rather than clicking into the
+	 * canvas, so the same steps work in the extensible site editor.
+	 *
 	 * @param {Object} context
-	 * @param {Object} context.admin  Admin utils.
-	 * @param {Object} context.editor Editor utils.
-	 * @param {Object} context.page   Playwright page.
+	 * @param {Object} context.admin   Admin utils.
+	 * @param {Object} context.page    Playwright page.
+	 * @param {string} [context.theme] Active theme slug.
 	 */
-	async function openStyleBook( { admin, editor, page } ) {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	async function openStyleBook( { admin, page, theme = 'emptytheme' } ) {
+		await admin.visitSiteEditor( {
+			postId: `${ theme }//index`,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Styles' } )
@@ -97,10 +103,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'adds a note to an example and lists it under that example', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -137,10 +142,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'adds a second note to an example that already has one', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -184,10 +188,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'closing the notes sidebar leaves the Style Book standing', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -213,11 +216,10 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'stores the note on global styles with the example as its anchor', async ( {
 		admin,
-		editor,
 		page,
 		requestUtils,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -249,10 +251,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'persists notes across a reload and scrolls to the anchored example', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -266,7 +267,7 @@ test.describe( 'Style Book notes', () => {
 			sidebar.getByText( 'Still here after a reload.' )
 		).toBeVisible();
 
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: '1 note on Headings' } )
@@ -290,10 +291,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'replies to, resolves and reopens a note', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -336,13 +336,8 @@ test.describe( 'Style Book notes', () => {
 		await expect( sidebar.getByText( 'Reopening.' ) ).toBeVisible();
 	} );
 
-	test( 'keeps notes per theme', async ( {
-		admin,
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		await openStyleBook( { admin, editor, page } );
+	test( 'keeps notes per theme', async ( { admin, page, requestUtils } ) => {
+		await openStyleBook( { admin, page } );
 
 		await styleBookFrame( page )
 			.getByRole( 'button', { name: 'Add note on Headings' } )
@@ -359,7 +354,7 @@ test.describe( 'Style Book notes', () => {
 		// Notes live on the per-theme global styles record, so another theme
 		// starts clean.
 		await requestUtils.activateTheme( 'twentytwentyfour' );
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page, theme: 'twentytwentyfour' } );
 		await expect(
 			styleBookFrame( page ).getByRole( 'button', {
 				name: 'Add note on Headings',
@@ -367,7 +362,7 @@ test.describe( 'Style Book notes', () => {
 		).toBeVisible();
 
 		await requestUtils.activateTheme( 'emptytheme' );
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 		await expect(
 			styleBookFrame( page ).getByRole( 'button', {
 				name: '1 note on Headings',
@@ -377,10 +372,9 @@ test.describe( 'Style Book notes', () => {
 
 	test( 'leaves the example keyboard navigation alone', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
-		await openStyleBook( { admin, editor, page } );
+		await openStyleBook( { admin, page } );
 
 		// The notes button sits beside each example rather than inside it, so
 		// the examples remain the only members of the composite and arrow keys
