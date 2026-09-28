@@ -4,6 +4,9 @@ export type IconProps = React.ComponentProps< 'svg' > & {
 	 *
 	 * In most cases, you should use an icon from
 	 * [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
+	 * Icons from version 15.0.0 or later inherit CSS `color`. For a custom
+	 * SVG, use `currentColor` for any fill or stroke that should follow
+	 * the surrounding text color.
 	 */
 	icon: React.ReactElement< React.ComponentProps< 'svg' > >;
 	/**
