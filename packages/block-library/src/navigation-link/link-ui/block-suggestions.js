@@ -14,11 +14,6 @@ const { searchItems, normalizeString } = unlock( blockEditorPrivateApis );
 export const BLOCK_SUGGESTION_TYPE = 'block';
 
 /**
- * How many blocks to list at most, so they do not crowd out the links.
- */
-export const MAX_BLOCK_SUGGESTIONS = 3;
-
-/**
  * The link variations are left out: searching already finds the pages, posts
  * and terms they would link to.
  */
@@ -51,7 +46,7 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
 		fields: SEARCH_FIELDS,
 		filter: ( item ) =>
 			! item.isDisabled && ! EXCLUDED_BLOCK_NAMES.includes( item.name ),
-	} ).slice( 0, MAX_BLOCK_SUGGESTIONS );
+	} );
 
 	if ( ! matches.length ) {
 		return suggestions;

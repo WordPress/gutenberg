@@ -3,7 +3,6 @@ import { BlockIcon } from '@wordpress/block-editor';
 import {
 	addBlockSuggestions,
 	BLOCK_SUGGESTION_TYPE,
-	MAX_BLOCK_SUGGESTIONS,
 } from '../block-suggestions';
 
 const homeLink = {
@@ -109,16 +108,14 @@ describe( 'addBlockSuggestions', () => {
 		expect( suggestions ).toEqual( [] );
 	} );
 
-	it( `adds no more than ${ MAX_BLOCK_SUGGESTIONS } blocks`, () => {
+	it( 'adds every block that matches', () => {
 		const items = Array.from( { length: 5 }, ( _, index ) => ( {
 			id: `test/home-${ index }`,
 			name: `test/home-${ index }`,
 			title: `Home ${ index }`,
 		} ) );
 
-		expect( addBlockSuggestions( [], items, 'home' ) ).toHaveLength(
-			MAX_BLOCK_SUGGESTIONS
-		);
+		expect( addBlockSuggestions( [], items, 'home' ) ).toHaveLength( 5 );
 	} );
 
 	it( 'returns the links unchanged when no block matches', () => {
