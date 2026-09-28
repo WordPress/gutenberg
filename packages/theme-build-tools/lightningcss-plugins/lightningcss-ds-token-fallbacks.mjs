@@ -1,5 +1,5 @@
 import { transform } from 'lightningcss';
-import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
+import tokenFallbacks from '@wordpress/theme/design-token-fallbacks.js';
 import { getTokenFallback } from '../postcss-plugins/ds-token-fallbacks.mjs';
 
 /** @type {Map<string, import('lightningcss').TokenOrValue[]>} */

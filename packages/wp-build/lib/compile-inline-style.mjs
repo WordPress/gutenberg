@@ -7,10 +7,10 @@ import postcssModules from 'postcss-modules';
 let dsTokenFallbacks;
 try {
 	const { default: postcssPlugin } =
-		await import( '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks' );
+		await import( '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks' );
 	dsTokenFallbacks = postcssPlugin;
 } catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
+	// @wordpress/theme-build-tools is optional; skip token fallbacks if not available.
 }
 export { dsTokenFallbacks };
 
