@@ -34,13 +34,19 @@ function getSortKey( block, media, orderby ) {
  * @return {boolean} Whether the images can be sorted.
  */
 export function hasSortableImages( blocks, media ) {
-	return (
-		blocks.filter(
-			( block ) =>
-				block.attributes.id !== undefined &&
-				media.some( ( item ) => item.id === block.attributes.id )
-		).length > 1
-	);
+	// Runs on every render, so avoid scanning `media` once per block.
+	const mediaIds = new Set( media.map( ( item ) => item.id ) );
+	let sortableCount = 0;
+	for ( const block of blocks ) {
+		if ( ! mediaIds.has( block.attributes.id ) ) {
+			continue;
+		}
+		sortableCount++;
+		if ( sortableCount > 1 ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
