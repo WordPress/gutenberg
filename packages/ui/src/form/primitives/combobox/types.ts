@@ -61,19 +61,19 @@ export type ComboboxInputGroupProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export interface ComboboxItemLabelProps extends ComponentProps< 'span' > {
+export type ComboboxItemLabelProps = ComponentProps< 'span' > & {
 	/**
 	 * The primary label and accessible name of a combobox item.
 	 */
 	children: ReactNode;
-}
+};
 
-export interface ComboboxItemDescriptionProps extends ComponentProps< 'span' > {
+export type ComboboxItemDescriptionProps = ComponentProps< 'span' > & {
 	/**
 	 * Content that contributes to the combobox item's accessible description.
 	 */
 	children: ReactNode;
-}
+};
 
 type ComboboxItemChildren =
 	| ReactElement< ComboboxItemLabelProps >

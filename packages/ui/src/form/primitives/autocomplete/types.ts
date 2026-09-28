@@ -44,19 +44,19 @@ export type AutocompleteInputGroupProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export interface AutocompleteItemLabelProps extends ComponentProps< 'span' > {
+export type AutocompleteItemLabelProps = ComponentProps< 'span' > & {
 	/**
 	 * The primary label and accessible name of an autocomplete item.
 	 */
 	children: ReactNode;
-}
+};
 
-export interface AutocompleteItemDescriptionProps extends ComponentProps< 'span' > {
+export type AutocompleteItemDescriptionProps = ComponentProps< 'span' > & {
 	/**
 	 * Content that contributes to the autocomplete item's accessible description.
 	 */
 	children: ReactNode;
-}
+};
 
 type AutocompleteItemChildren =
 	| ReactElement< AutocompleteItemLabelProps >
