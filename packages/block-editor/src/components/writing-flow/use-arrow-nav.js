@@ -108,14 +108,19 @@ export function getClosestTabbable(
 	} else {
 		// The target is not focusable (the selected block's editable under
 		// the editing host has no tabindex): take the focusables on the
-		// navigation side of it in document order, not its descendants.
+		// navigation side of it in document order, not its descendants or
+		// its ancestors (the block wrapper around a nested field).
 		focusableNodes = focusableNodes.filter( ( focusableNode ) => {
 			const position = target.compareDocumentPosition( focusableNode );
 			const mask = isReverse
 				? target.DOCUMENT_POSITION_PRECEDING
 				: target.DOCUMENT_POSITION_FOLLOWING;
-			// eslint-disable-next-line no-bitwise
-			return !! ( position & mask ) && ! target.contains( focusableNode );
+			return (
+				// eslint-disable-next-line no-bitwise
+				!! ( position & mask ) &&
+				! target.contains( focusableNode ) &&
+				! focusableNode.contains( target )
+			);
 		} );
 	}
 
