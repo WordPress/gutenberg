@@ -8,12 +8,17 @@ import type {
 	PluginBuild,
 } from 'esbuild';
 import { build as esbuildBuild } from 'esbuild';
-import { transform as lightningcssTransform } from 'lightningcss';
+import {
+	composeVisitors,
+	transform as lightningcssTransform,
+} from 'lightningcss';
 import postcss from 'postcss';
+import tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
 import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
 import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
 import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
 import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
@@ -37,10 +42,7 @@ type EsbuildOnLoad = (
 	| null
 	| undefined;
 
-type ViteTransform = (
-	code: string,
-	id: string
-) => { code: string; map: null } | null;
+type ViteTransform = typeof transformDsTokenFallbacks;
 
 function getEsbuildHook(): {
 	options: OnLoadOptions;
@@ -141,6 +143,91 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( lightningcssResult ).toContain( expected );
 	} );
 
+	it.each( [
+		{
+			property: 'gap',
+			token: '--wpds-dimension-gap-sm',
+			fallback: '8px',
+		},
+		{
+			property: 'outline-width',
+			token: '--wpds-border-width-focus',
+			fallback: 'var(--wp-admin-border-width-focus, 2px)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong',
+			fallback: 'var(--wp-admin-theme-color, #3858e9)',
+		},
+		{
+			property: 'background-color',
+			token: '--wpds-color-background-interactive-brand-strong-active',
+			fallback:
+				'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 93.0%, black)',
+		},
+	] )(
+		'preserves global references in $token and its fallback with Lightning CSS',
+		( { property, token, fallback } ) => {
+			const result = lightningcssTransform( {
+				filename: 'styles.module.css',
+				code: Buffer.from(
+					`.fixture { ${ property }: var(${ token } from global); }`
+				),
+				cssModules: { dashedIdents: true },
+				visitor: lightningcssPlugin,
+			} );
+
+			expect( result.code.toString() ).toContain(
+				`${ property }: var(${ token }, ${ fallback })`
+			);
+			expect( result.references ).toEqual( {} );
+		}
+	);
+
+	it( 'isolates injected fallbacks from changes by composed Lightning CSS visitors', () => {
+		const source = '.fixture { gap: var(--wpds-dimension-gap-sm); }';
+		const result = lightningcssTransform( {
+			filename: 'styles.css',
+			code: Buffer.from( source ),
+			visitor: composeVisitors( [
+				lightningcssPlugin,
+				{
+					Variable( variable ) {
+						const fallback = variable.fallback?.[ 0 ];
+						if ( fallback?.type === 'length' ) {
+							fallback.value.value = 999;
+						}
+					},
+				},
+			] ),
+		} );
+
+		expect( result.code.toString() ).toContain( '999px' );
+		expect( transformWithLightningcss( source, 'styles.css' ) ).toContain(
+			'var(--wpds-dimension-gap-sm, 8px)'
+		);
+	} );
+
+	it( 'throws when a known token has no parsed fallback', () => {
+		const tokenName = '--wpds-test-missing-fallback';
+		// Simulate a generated token missing from the plugin's parsed cache.
+		Object.defineProperty( tokenFallbacks, tokenName, {
+			value: '1px',
+			configurable: true,
+		} );
+
+		try {
+			expect( () =>
+				transformWithLightningcss(
+					`a { gap: var(${ tokenName }); }`,
+					'styles.css'
+				)
+			).toThrow( `No parsed fallback for design token: ${ tokenName }.` );
+		} finally {
+			Reflect.deleteProperty( tokenFallbacks, tokenName );
+		}
+	} );
+
 	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {
 		const source = await readFile( emptyFallbackCssFixture, 'utf8' );
 		const result = await postcss( [ postcssPlugin ] ).process( source, {
@@ -175,9 +262,7 @@ describe( 'design token fallback build plugin parity', () => {
 		const source = await readFile( emptyFallbackJsFixture, 'utf8' );
 		const result = getViteTransform()( source, emptyFallbackJsFixture );
 
-		expect( result?.code ).toContain(
-			'gap: var(--wpds-dimension-gap-sm,);'
-		);
+		expect( result ).toBeNull();
 	} );
 
 	it( 'keeps esbuild and Vite source-text transforms aligned', async () => {
@@ -187,8 +272,10 @@ describe( 'design token fallback build plugin parity', () => {
 		} as OnLoadArgs );
 		const viteResult = getViteTransform()( source, validJsFixture );
 
-		expect( esbuildResult?.loader ).toBe( 'tsx' );
-		expect( esbuildResult?.contents ).toBe( viteResult?.code );
+		expect( esbuildResult?.loader ).toBe( 'ts' );
+		expect( esbuildResult?.contents ).toBe(
+			`${ viteResult?.code }\n//# sourceMappingURL=${ viteResult?.map.toUrl() }`
+		);
 		expect( viteResult?.code ).toMatchSnapshot();
 	} );
 

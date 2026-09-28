@@ -53,15 +53,16 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				{ ...itemAriaProps }
 				{ ...restProps }
 			>
-				<Icon
-					icon={ variant === 'creatable' ? plus : check }
-					className={ clsx(
-						itemPopupStyles[ 'item-icon' ],
-						variant !== 'creatable' &&
-							itemPopupStyles[ 'item-indicator-icon' ]
-					) }
-					size={ 24 }
-				/>
+				<span className={ itemPopupStyles[ 'item-icon' ] }>
+					<Icon
+						icon={ variant === 'creatable' ? plus : check }
+						className={ clsx(
+							variant !== 'creatable' &&
+								itemPopupStyles[ 'item-indicator-icon' ]
+						) }
+						size={ 24 }
+					/>
+				</span>
 				<div className={ itemPopupStyles[ 'item-text' ] }>
 					{ contentChildren }
 				</div>

@@ -149,10 +149,21 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		render( <App /> );
-		const label = await screen.findByLabelText( 'error' );
-		expect( label ).toHaveTextContent( 'resolution failed' );
-		expect( console ).toHaveErrored();
+		// React rethrows render errors as window `error` events in dev.
+		const onError = vi.fn( ( event ) => event.preventDefault() );
+		window.addEventListener( 'error', onError );
+
+		try {
+			render( <App /> );
+			const label = await screen.findByLabelText( 'error' );
+			expect( label ).toHaveTextContent( 'resolution failed' );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { error: 'resolution failed' } )
+			);
+			expect( console ).toHaveErrored();
+		} finally {
+			window.removeEventListener( 'error', onError );
+		}
 	} );
 
 	it( 'independent resolutions do not cause unrelated rerenders', async () => {
