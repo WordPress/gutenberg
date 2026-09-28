@@ -1,5 +1,14 @@
 import type { ReactElement } from 'react';
-import type { RichTextValue } from '@wordpress/rich-text';
+
+/**
+ * The subset of a rich text value the deprecated component accepted. Kept
+ * structural so that this package does not depend on `@wordpress/rich-text`.
+ */
+type RichTextValue = {
+	text: string;
+	start?: number;
+	end?: number;
+};
 
 // Insert the `value` into the text.
 export type InsertOption = {
