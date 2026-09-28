@@ -100,6 +100,9 @@ function register_block_core_footnotes_post_meta() {
 					'single'            => true,
 					'type'              => 'string',
 					'revisions_enabled' => true,
+					'auth_callback'     => function () {
+						return current_user_can( 'edit_posts' );
+					},
 				)
 			);
 		}
@@ -111,6 +114,26 @@ function register_block_core_footnotes_post_meta() {
  * order to catch them.
 */
 add_action( 'init', 'register_block_core_footnotes_post_meta', 20 );
+
+/**
+ * Marks the 'footnotes' meta key as protected.
+ *
+ * @since 6.9.0
+ *
+ * @param bool   $is_protected Whether the meta key is considered protected.
+ * @param string $meta_key     Meta key.
+ *
+ * @return bool Whether the meta key should be protected.
+ */
+function block_core_footnotes_is_meta_protected( $is_protected, $meta_key ) {
+	if ( 'footnotes' === $meta_key ) {
+		return true;
+	}
+	return $is_protected;
+}
+// Prevents the 'footnotes' meta field from appearing in the Custom Fields UI,
+// which can interfere with saving, see issue #54653.
+add_filter( 'is_protected_meta', 'block_core_footnotes_is_meta_protected', 10, 2 );
 
 /**
  * Adds the footnotes field to the revisions display.
