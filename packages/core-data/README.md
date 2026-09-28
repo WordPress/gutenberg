@@ -904,14 +904,14 @@ Without an author there is nothing to request, and the resolver returns early ra
 
 _Parameters_
 
--   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `EntityRecordKey`: The id of the parent post.
--   _authorId_ `EntityRecordKey`: The id of the author.
+- _state_ `State`: State tree.
+- _postType_ `string`: The type of the parent post.
+- _postId_ `EntityRecordKey`: The id of the parent post.
+- _authorId_ `EntityRecordKey`: The id of the author.
 
 _Returns_
 
--   `boolean`: True if the REST request was completed. False otherwise.
+- `boolean`: True if the REST request was completed. False otherwise.
 
 ### hasFetchedAutosaves
 
