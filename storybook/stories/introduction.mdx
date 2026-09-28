@@ -42,18 +42,17 @@ To view the source code for a component and its stories on GitHub, click the <In
 
 The sidebar lists everything on this site. Use the search box (⌘K / Ctrl+K) to find a component by name, or open the filter menu next to it to show only the entries with a given tag.
 
-Component names carry an icon with their status. The same statuses are available as tags in the filter, so you can, for example, show recommended components only.
+In the sidebar, component names carry an icon for every status other than recommended. Recommended has no sidebar icon. The component page still shows a checkmark for that status. The same statuses are available as tags in the filter, so you can, for example, show recommended components only.
 
 <Markdown>{ `
 | Icon | Tag                       | Meaning                                                                          |
 | ---- | ------------------------- | -------------------------------------------------------------------------------- |
-| ✅   | \`use-recommended\`         | Use this component for new UI.                                                   |
+| —    | \`use-recommended\`         | Use this component for new UI.                                                   |
 | ⚠️   | \`use-with-caution\`        | Use with care; check the notes on the component page.                            |
 | 🚫   | \`use-not-recommended\`     | Do not use for new UI. The component page points at the recommended alternative. |
 | ❓   | \`use-unaudited\`           | Not audited yet against the design system.                                       |
 | 🧪   | \`status-experimental\`     | Under active development, may change in future releases.                         |
 | 🔒   | \`status-private\`          | Locked as a private API, not for use outside Gutenberg.                          |
-| 🚧   | \`status-wip\`              | Work in progress, not ready for production.                                      |
 ` }</Markdown>
 
 Hover an icon in the sidebar for the same description. Each component page also shows its status at the top.

@@ -40,7 +40,7 @@ import {
 	getVisibleBounds,
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
-import './style.css';
+import styles from './style.module.css';
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
 
@@ -136,7 +136,7 @@ const DefaultComponent = () => {
 
 	return (
 		<div>
-			<div className="image-editor-story__container">
+			<div className={ styles.container }>
 				<Cropper
 					src={ SAMPLE_IMAGE }
 					controller={ controller }
@@ -321,9 +321,9 @@ const WithControlsComponent = () => {
 				type="file"
 				accept="image/*"
 				onChange={ handleFileChange }
-				className="image-editor-story__hidden-file"
+				className={ styles[ 'hidden-file' ] }
 			/>
-			<div className="image-editor-story__toolbar">
+			<div className={ styles.toolbar }>
 				<Flex align="center" gap={ 2 } wrap>
 					<FlexItem>
 						<Button
@@ -441,7 +441,7 @@ const WithControlsComponent = () => {
 						</Button>
 					</FlexItem>
 				</Flex>
-				<div className="image-editor-story__sliders">
+				<div className={ styles.sliders }>
 					<RangeControl
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
@@ -461,7 +461,7 @@ const WithControlsComponent = () => {
 				</div>
 			</div>
 
-			<div className="image-editor-story__resizable">
+			<div className={ styles.resizable }>
 				<Cropper
 					src={ src }
 					controller={ controller }
@@ -492,7 +492,7 @@ const WithControlsComponent = () => {
 
 			<div style={ { marginTop: 16 } }>
 				<strong>Current State:</strong>
-				<pre className="image-editor-story__state">
+				<pre className={ styles.state }>
 					{ JSON.stringify(
 						{
 							rotation: state.rotation,
@@ -738,9 +738,9 @@ const DebugComponent = () => {
 				type="file"
 				accept="image/*"
 				onChange={ handleFileChange }
-				className="image-editor-story__hidden-file"
+				className={ styles[ 'hidden-file' ] }
 			/>
-			<div className="image-editor-story__toolbar">
+			<div className={ styles.toolbar }>
 				<Flex align="center" gap={ 2 } wrap>
 					<FlexItem>
 						<Button
@@ -859,7 +859,7 @@ const DebugComponent = () => {
 						</Button>
 					</FlexItem>
 				</Flex>
-				<div className="image-editor-story__sliders">
+				<div className={ styles.sliders }>
 					<RangeControl
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
@@ -886,7 +886,7 @@ const DebugComponent = () => {
 					ref={ containerRef }
 					style={ { flex: '1 1 60%', minWidth: 0 } }
 				>
-					<div className="image-editor-story__container">
+					<div className={ styles.container }>
 						<Cropper
 							src={ src }
 							controller={ controller }
@@ -908,10 +908,10 @@ const DebugComponent = () => {
 						maxHeight: 500,
 					} }
 				>
-					<div className="image-editor-story__export-preview">
+					<div className={ styles[ 'export-preview' ] }>
 						{ previewSrc ? (
 							<img
-								className="image-editor-story__export-image"
+								className={ styles[ 'export-image' ] }
 								src={ previewSrc }
 								alt="Crop preview"
 							/>

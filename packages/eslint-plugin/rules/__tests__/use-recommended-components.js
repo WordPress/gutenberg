@@ -71,8 +71,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 			code: "import { __experimentalZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+					message: 'Write your own CSS instead.',
 				},
 			],
 		},
@@ -80,8 +79,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 			code: "import { __experimentalZStack as ZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+					message: 'Write your own CSS instead.',
 				},
 			],
 		},
