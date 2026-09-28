@@ -348,26 +348,29 @@ export function getMatchingFontFaces< T extends FontFamilyFace >(
 	return matching;
 }
 
+/**
+ * Gathers what a list of faces covers on one axis.
+ *
+ * Reading a descriptor belongs to `descriptorRange()`, so that the list a
+ * control offers and the face chosen to draw the text cannot disagree about
+ * what a face declares. This only collects those readings and drops duplicates.
+ *
+ * @param fontFamilyFaces The faces of the family.
+ * @param read            Takes the descriptor off a face.
+ * @param fallback        The descriptor's initial value, for a face without one.
+ * @param parse           Reads one end of the descriptor.
+ * @return What the faces cover, in ascending order.
+ */
 function coverageOf(
 	fontFamilyFaces: FontFamilyFace[] | undefined,
 	read: ( face: FontFamilyFace ) => string | number | undefined,
+	fallback: string,
 	parse: Parser
 ): FontAxisCoverage[] {
 	const coverage: FontAxisCoverage[] = [];
 
 	fontFamilyFaces?.forEach( ( face ) => {
-		const declared = read( face );
-		if ( declared === undefined ) {
-			return;
-		}
-		const parts = String( declared ).trim().split( /\s+/ );
-		const ends = parts.map( parse );
-		if ( ends.some( ( end ) => end === undefined ) ) {
-			return;
-		}
-		const values = ends as number[];
-		const min = Math.min( ...values );
-		const max = Math.max( ...values );
+		const { min, max } = descriptorRange( read( face ), fallback, parse );
 		if (
 			! coverage.some(
 				( existing ) => existing.min === min && existing.max === max
@@ -394,16 +397,17 @@ export function resolveFontFaceCapabilities(
 	fontFamilyFaces: FontFamilyFace[] | undefined
 ): FontFaceCapabilities {
 	return {
+		// `normal` is what an omitted descriptor means: 400, and 100%.
 		weight: coverageOf(
 			fontFamilyFaces,
-			// @font-face defaults an omitted descriptor to `normal` (400).
-			( face ) => face.fontWeight ?? 'normal',
+			( face ) => face.fontWeight,
+			'normal',
 			parseFontWeightValue
 		),
 		width: coverageOf(
 			fontFamilyFaces,
-			// @font-face defaults an omitted descriptor to `normal` (100%).
-			( face ) => face.fontStretch ?? 'normal',
+			( face ) => face.fontStretch,
+			'normal',
 			parseFontStretchValue
 		),
 		style: {

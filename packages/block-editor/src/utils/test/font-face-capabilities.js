@@ -76,6 +76,25 @@ describe( 'resolveFontFaceCapabilities', () => {
 		expect( capabilities.weight ).toEqual( [ { min: 400, max: 400 } ] );
 		expect( capabilities.width ).toEqual( [ { min: 100, max: 100 } ] );
 	} );
+
+	it( 'reads a descriptor with more ends than a range as the default', () => {
+		// A range has two ends. Reading this as 100 to 700 would offer weights
+		// the face selection then refuses to draw, which is the two readings
+		// this module exists to collapse into one.
+		const capabilities = resolveFontFaceCapabilities( [
+			{ fontWeight: '100 400 700', fontStretch: '50% 100% 150%' },
+		] );
+		expect( capabilities.weight ).toEqual( [ { min: 400, max: 400 } ] );
+		expect( capabilities.width ).toEqual( [ { min: 100, max: 100 } ] );
+	} );
+
+	it( 'reads a descriptor it cannot parse as the default', () => {
+		const capabilities = resolveFontFaceCapabilities( [
+			{ fontWeight: 'heavyish', fontStretch: 'widish' },
+		] );
+		expect( capabilities.weight ).toEqual( [ { min: 400, max: 400 } ] );
+		expect( capabilities.width ).toEqual( [ { min: 100, max: 100 } ] );
+	} );
 } );
 
 describe( 'control values', () => {
