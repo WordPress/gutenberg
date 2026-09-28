@@ -11,11 +11,54 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
+
+/**
+ * Returns the help text explaining where avatars come from. Users who can
+ * manage the site's settings also get a link to the Discussion settings, where
+ * the default avatar is chosen.
+ *
+ * @return {React.ReactNode} Help text.
+ */
+function useAvatarHelpText() {
+	const { canManageSettings, siteUrl } = useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+		return {
+			canManageSettings: canUser( 'update', {
+				kind: 'root',
+				name: 'site',
+			} ),
+			siteUrl: getEntityRecord( 'root', '__unstableBase' )?.url,
+		};
+	}, [] );
+
+	if ( ! canManageSettings || ! siteUrl ) {
+		return __( 'Avatars use the Gravatar service.' );
+	}
+
+	return createInterpolateElement(
+		__(
+			'Avatars use the Gravatar service. Go to <a>Discussion settings</a> to change the default avatar.'
+		),
+		{
+			a: (
+				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
+				<a
+					href={ siteUrl + '/wp-admin/options-discussion.php' }
+					target="_blank"
+					rel="noopener"
+				/>
+			),
+		}
+	);
+}
 
 /**
  * Renders the inspector controls for the `core/avatar` block.
@@ -35,6 +78,7 @@ const AvatarInspectorControls = ( {
 	selectUser,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const helpText = useAvatarHelpText();
 	return (
 		<InspectorControls>
 			<ToolsPanel
@@ -66,6 +110,7 @@ const AvatarInspectorControls = ( {
 						max={ avatar.maxSize }
 						initialPosition={ attributes?.size }
 						value={ attributes?.size }
+						help={ helpText }
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
