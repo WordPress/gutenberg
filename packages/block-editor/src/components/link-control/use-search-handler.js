@@ -33,9 +33,6 @@ const handleEntitySearch = async (
 
 	let results = await fetchSearchSuggestions( val, suggestionsQuery );
 
-	// Let the consumer filter and order the results. This runs before the
-	// front page is identified, so anything the consumer adds is labeled too,
-	// and before the "CREATE" option is added, which always stays last.
 	if ( transformSuggestions ) {
 		results = await transformSuggestions( results, {
 			isInitialSuggestions: !! isInitialSuggestions,
