@@ -713,6 +713,21 @@ describe( 'keeping the end when truncating', () => {
 		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
 	} );
 
+	/* Starting mid-line could split a fence opener and fence the rest. */
+	it( 'does not start the kept part inside a fence opener', () => {
+		const definition = getSection( 'props' )!;
+		const filler = 'x'.repeat( definition.budget - 2 );
+		const body = `${ filler }\n\`\`\`\nCo-authored-by: someone\n\`\`\``;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+		expect( section ).not.toMatch( /^``[^`]/m );
+	} );
+
 	/* Its closing line would otherwise fence everything after it. */
 	it( 'reopens a fence the dropped start left open', () => {
 		const body = `\`\`\`\n${ 'noise\n'.repeat( 20000 ) }done\n\`\`\``;

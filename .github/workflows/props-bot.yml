@@ -75,6 +75,9 @@ jobs:
     # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
         name: Generate a list of props
+        # Waits for the removal, which is otherwise still queued while this
+        # gathers, so a cancellation then leaves the label stuck on.
+        needs: remove-label
         runs-on: 'ubuntu-24.04'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
@@ -89,8 +92,10 @@ jobs:
         # - A review is created or commented on.
         # - The pull request is opened, synchronized, marked ready for review, or reopened.
         # - The `props-bot` label is added to the pull request.
+        # `!cancelled()` because the removal above is skipped on every event
+        # that did not add the label.
         if: |
-            (
+            ! cancelled() && (
               github.event_name == 'issue_comment' && github.event.issue.pull_request ||
               contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
               github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
@@ -148,8 +153,12 @@ jobs:
                   # Drop the intro: it is what the standalone props bot
                   # searches for, and it would find this comment. Its note
                   # about refreshing goes back in wording that will not match.
-                  printf '%s' "$BODY" | sed '1{/^The following accounts have interacted/d}' > pr-meta/body.md
-                  printf '\n_Updated as activity occurs. Add the `props-bot` label to refresh._\n' >> pr-meta/body.md
+                  printf '%s\n' "$BODY" | sed '1{/^The following accounts have interacted/d;}' > pr-meta/body.md
+
+                  cat >> pr-meta/body.md <<'EOF'
+
+                  _Updated as activity occurs. Add the `props-bot` label to refresh._
+                  EOF
 
             - uses: ./tools/pr-meta
               with:

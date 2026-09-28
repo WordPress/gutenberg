@@ -226,8 +226,16 @@ function truncate(
 	 */
 	if ( definition.keep === 'end' ) {
 		const cut = body.slice( -definition.budget );
-		const boundary = cut.indexOf( '\n\n' );
-		const kept = boundary >= 0 ? cut.slice( boundary + 2 ) : cut;
+
+		/*
+		 * A paragraph break for preference, otherwise the first line break:
+		 * starting mid-line could split a fence opener, which leaves nothing
+		 * for `reopenBlocks` to find and its closer fencing the rest.
+		 */
+		const paragraph = cut.indexOf( '\n\n' );
+		const boundary =
+			paragraph >= 0 ? paragraph + 2 : cut.indexOf( '\n' ) + 1;
+		const kept = cut.slice( boundary );
 		const dropped = body.slice( 0, body.length - kept.length );
 
 		return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
