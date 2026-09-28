@@ -15,7 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
-import { Text } from '@wordpress/ui';
+import { Link, Text } from '@wordpress/ui';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
@@ -29,18 +29,16 @@ import UserControl from './user-control';
  * @return {React.ReactNode} Help text.
  */
 function useAvatarHelpText() {
-	const { canManageSettings, siteUrl } = useSelect( ( select ) => {
-		const { canUser, getEntityRecord } = select( coreStore );
-		return {
-			canManageSettings: canUser( 'update', {
+	const canManageSettings = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'update', {
 				kind: 'root',
 				name: 'site',
 			} ),
-			siteUrl: getEntityRecord( 'root', '__unstableBase' )?.url,
-		};
-	}, [] );
+		[]
+	);
 
-	if ( ! canManageSettings || ! siteUrl ) {
+	if ( ! canManageSettings ) {
 		return __( 'Avatars use the Gravatar service.' );
 	}
 
@@ -49,14 +47,7 @@ function useAvatarHelpText() {
 			'Avatars use the Gravatar service. Go to <a>Discussion settings</a> to change the default avatar.'
 		),
 		{
-			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
-				<a
-					href={ siteUrl + '/wp-admin/options-discussion.php' }
-					target="_blank"
-					rel="noopener"
-				/>
-			),
+			a: <Link href="options-discussion.php" openInNewTab />,
 		}
 	);
 }
