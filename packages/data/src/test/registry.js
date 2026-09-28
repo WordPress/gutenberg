@@ -452,18 +452,19 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( "should invalidate the resolver's resolution cache", async () => {
+			const fulfill = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
-					return action.type === 'SET_OK' && state === 'NOTOK'
-						? 'OK'
-						: 'NOTOK';
+					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
 					getValue: {
-						fulfill: () => Promise.resolve( { type: 'SET_OK' } ),
+						fulfill,
 						shouldInvalidate: ( action ) =>
 							action.type === 'INVALIDATE',
 					},
@@ -473,24 +474,21 @@ describe( 'createRegistry', () => {
 				},
 			} );
 
-			let promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'OK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK.
+			const firstResolution = registry.resolveSelect( 'demo' ).getValue();
 			vi.runAllTimers();
-			await promise;
-			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+			await firstResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 1 );
 
 			// Invalidate the cache
 			registry.dispatch( 'demo' ).invalidate();
 
-			promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'NOTOK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK.
+			const secondResolution = registry
+				.resolveSelect( 'demo' )
+				.getValue();
 			vi.runAllTimers();
-			await promise;
-			expect( registry.select( 'demo' ).getValue() ).toBe( 'NOTOK' );
+			await secondResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 2 );
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 	} );
 
