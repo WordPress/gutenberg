@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
+
 ## 0.19.0 (2026-09-23)
 
 ### Bug Fixes
