@@ -16,6 +16,10 @@
 -   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
 -   `CollapsibleCard`: Only show the header's focus ring when its own trigger is keyboard-focused ([#81314](https://github.com/WordPress/gutenberg/pull/81314)).
 
+### Internal
+
+-   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes
