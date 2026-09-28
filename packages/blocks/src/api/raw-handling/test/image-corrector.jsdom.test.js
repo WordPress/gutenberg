@@ -32,8 +32,8 @@ describe( 'imageCorrector', () => {
 			.mocked( createBlobURL )
 			.mock.calls.map( ( [ file ] ) => file.name );
 		expect( names ).toHaveLength( 2 );
-		expect( names[ 0 ] ).toMatch( /^image-\d+\.png$/ );
-		expect( names[ 1 ] ).toMatch( /^image-\d+\.png$/ );
+		expect( names[ 0 ] ).toMatch( /^image-[0-9a-f]{8}\.png$/ );
+		expect( names[ 1 ] ).toMatch( /^image-[0-9a-f]{8}\.png$/ );
 		// Distinct names avoid the server-side wp_unique_filename() collision.
 		expect( names[ 0 ] ).not.toBe( names[ 1 ] );
 	} );

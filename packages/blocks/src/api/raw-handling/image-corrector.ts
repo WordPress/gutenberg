@@ -1,7 +1,5 @@
+import { v4 as uuid } from 'uuid';
 import { createBlobURL } from '@wordpress/blob';
-
-// Counter for generating unique filenames for pasted data-URI images.
-let uniqueImageId = 0;
 
 export default function imageCorrector( img: Node ): void {
 	if ( img.nodeName !== 'IMG' ) {
@@ -40,9 +38,11 @@ export default function imageCorrector( img: Node ): void {
 			uint8Array[ i ] = decoded.charCodeAt( i );
 		}
 
-		// Use a unique filename per image for pasted images.
+		// Each pasted image needs its own filename: images pasted together are
+		// uploaded concurrently, and identical names race in the server's
+		// unique filename check, so one upload can overwrite another.
 		const subtype = type.slice( type.indexOf( '/' ) + 1 );
-		const name = `image-${ ++uniqueImageId }.${ subtype }`;
+		const name = `image-${ uuid().slice( 0, 8 ) }.${ subtype }`;
 		const file = new window.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );
