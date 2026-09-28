@@ -15,6 +15,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
+import BlockIcon from '../block-icon';
 
 const TYPES = {
 	post: {
@@ -41,6 +42,17 @@ const TYPES = {
 
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
+
+	// A suggestion added by `transformSuggestions` can bring its own icon,
+	// in any shape a block icon takes.
+	if ( suggestion.icon ) {
+		return (
+			<BlockIcon
+				className="block-editor-link-control__search-item-icon"
+				icon={ suggestion.icon }
+			/>
+		);
+	}
 
 	if ( isURL ) {
 		icon = globe;
@@ -166,6 +178,11 @@ function getVisualTypeName( suggestion ) {
 
 	if ( suggestion.isBlogHome ) {
 		return __( 'Blog home' );
+	}
+
+	// A suggestion added by `transformSuggestions` can bring its own label.
+	if ( suggestion.typeLabel ) {
+		return suggestion.typeLabel;
 	}
 
 	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.
