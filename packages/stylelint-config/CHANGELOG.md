@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Load the design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. The rules are unchanged.
+-   Load the design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. The rules are unchanged ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 
 ## 26.1.0 (2026-10-07)
 

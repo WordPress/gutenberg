@@ -4,7 +4,6 @@
 
 ### Breaking Changes
 
--   Load the design token fallback plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. To keep injecting token fallbacks, install `@wordpress/theme-build-tools` alongside `@wordpress/build`; without it, the build skips token fallbacks.
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Bug Fixes
@@ -13,6 +12,7 @@
 
 ### Internal
 
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency; fallbacks are still applied when `@wordpress/theme` is installed ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 0.25.0 (2026-10-07)
