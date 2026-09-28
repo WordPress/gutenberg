@@ -5,11 +5,8 @@ import {
 	Notice,
 	PanelBody,
 	Placeholder,
-	SelectControl as WCSelectControl,
 	Spinner,
 	ToolbarButton,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
@@ -21,52 +18,7 @@ import {
 import { sharedIcon } from './shared-icon';
 import { isGalleryFlexLayout } from './shared';
 import { Caption } from '../utils/caption';
-import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
-
-/**
- * Ordering options for a dynamic gallery source. Each value is a composite
- * `"orderby/order"` string mapping to the matching `/wp/v2/media` collection
- * params. `menu_order` is deliberately omitted — it isn't a valid REST `orderby`
- * value, so the editor preview couldn't reproduce it (see `dynamic-source.js`).
- */
-const ORDER_OPTIONS = [
-	{ label: __( 'Newest to oldest' ), value: 'date/desc' },
-	{ label: __( 'Oldest to newest' ), value: 'date/asc' },
-	{
-		/* translators: Label for ordering images by title in ascending order. */
-		label: __( 'A → Z' ),
-		value: 'title/asc',
-	},
-	{
-		/* translators: Label for ordering images by title in descending order. */
-		label: __( 'Z → A' ),
-		value: 'title/desc',
-	},
-];
-
-/**
- * "Order by" control for a dynamic gallery, mirroring the Query Loop block's
- * `OrderControl`: a single `SelectControl` whose value composites `orderby` and
- * `order`, split apart again on change.
- *
- * @param {Object}   props
- * @param {string}   props.orderby  Current `orderby` value.
- * @param {string}   props.order    Current `order` value (`asc`/`desc`).
- * @param {Function} props.onChange Called with `{ orderby, order }` on change.
- */
-function OrderControl( { orderby, order, onChange } ) {
-	return (
-		<WCSelectControl
-			label={ __( 'Order by' ) }
-			value={ `${ orderby }/${ order }` }
-			options={ ORDER_OPTIONS }
-			onChange={ ( value ) => {
-				const [ newOrderby, newOrder ] = value.split( '/' );
-				onChange( { orderby: newOrderby, order: newOrder } );
-			} }
-		/>
-	);
-}
+import { MAX_IMAGES } from './dynamic-source';
 
 /**
  * Confirmation for leaving dynamic mode, shown from both the block toolbar and
@@ -101,32 +53,23 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
 /**
  * The Gallery block's "Source" inspector panel.
  *
- * In dynamic mode it shows the resolved source, a control to detach the gallery
- * from it, and the source ordering. In static mode it offers the entry point
- * into dynamic mode. Either direction is a one-way change, so both are behind a
- * confirmation dialog this panel owns. Rendered inside the block's
- * `InspectorControls`, alongside the Settings panel.
+ * In dynamic mode it shows the resolved source and a control to detach the
+ * gallery from it. In static mode it offers the entry point into dynamic mode.
+ * Either direction is a one-way change, so both are behind a confirmation
+ * dialog this panel owns. Rendered inside the block's `InspectorControls`,
+ * alongside the Settings panel, which owns the ordering for both modes.
  *
  * @param {Object}  props
- * @param {Object}  props.dynamic           The `useDynamicGallery` result.
- * @param {Object}  props.dropdownMenuProps Shared ToolsPanel dropdown menu props.
- * @param {boolean} props.hasImages         Whether the gallery has manually-added images.
+ * @param {Object}  props.dynamic   The `useDynamicGallery` result.
+ * @param {boolean} props.hasImages Whether the gallery has manually-added images.
  */
-export function GallerySourcePanel( {
-	dynamic,
-	dropdownMenuProps,
-	hasImages,
-} ) {
+export function GallerySourcePanel( { dynamic, hasImages } ) {
 	const {
 		dynamicContent,
 		canUseDynamicSource,
 		sourceDescriptor,
-		sourceOrderby,
-		sourceOrder,
-		setSourceOrder,
 		convertToStatic,
 		enableDynamicMode,
-		resetSource,
 		isResolvingDynamic,
 		hasMoreImagesThanCap,
 		dynamicMediaTotal,
@@ -149,11 +92,7 @@ export function GallerySourcePanel( {
 	if ( isDynamic ) {
 		return (
 			<>
-				<ToolsPanel
-					label={ __( 'Source' ) }
-					resetAll={ resetSource }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
+				<PanelBody title={ __( 'Source' ) }>
 					<div className="wp-block-gallery__source-settings">
 						<p className="wp-block-gallery__source-description">
 							{ sourceDescriptor?.description ??
@@ -188,26 +127,7 @@ export function GallerySourcePanel( {
 							) }
 						</Notice>
 					) }
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Order by' ) }
-						hasValue={ () =>
-							sourceOrderby !== DEFAULT_ORDERBY ||
-							sourceOrder !== DEFAULT_ORDER
-						}
-						onDeselect={ () =>
-							setSourceOrder( undefined, undefined )
-						}
-					>
-						<OrderControl
-							orderby={ sourceOrderby }
-							order={ sourceOrder }
-							onChange={ ( { orderby, order } ) =>
-								setSourceOrder( orderby, order )
-							}
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
+				</PanelBody>
 				{ isConfirmingDetach && (
 					<DetachGalleryDialog
 						onConfirm={ () => {

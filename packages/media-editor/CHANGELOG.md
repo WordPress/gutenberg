@@ -4,7 +4,12 @@
 
 ### Internal
 
--   Use `@wordpress/ui` Menu for the crop aspect ratio in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
+-   Show the selected crop aspect ratio in a menu in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
+
+### Bug Fixes
+
+-   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
+-   Keep the editor open with an error notice when saving attachment details fails ([#83560](https://github.com/WordPress/gutenberg/pull/83560)).
 
 ## 0.19.0 (2026-09-23)
 
