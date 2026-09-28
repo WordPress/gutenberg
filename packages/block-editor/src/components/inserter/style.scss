@@ -658,9 +658,6 @@ $block-inserter-tabs-height: 44px;
 	&:focus .block-editor-inserter__media-list__item-preview > * {
 		@include outset-ring__focus();
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
-		@media not ( prefers-reduced-motion ) {
-			transition: outline 0.1s linear;
-		}
 	}
 }
 
