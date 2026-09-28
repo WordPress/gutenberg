@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
--   Avatar: Explain in the block settings that avatars use the Gravatar service, and link to the Discussion settings where the default avatar is chosen ([#40281](https://github.com/WordPress/gutenberg/issues/40281)).
+-   Avatar: Explain in the block settings that avatars use the Gravatar service, and link to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
 
 ### Bug Fixes
 
