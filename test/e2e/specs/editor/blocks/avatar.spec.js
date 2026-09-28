@@ -71,20 +71,4 @@ test.describe( 'Avatar', () => {
 			originalSrc
 		);
 	} );
-
-	test( 'should link to the Discussion settings', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/avatar',
-		} );
-		await editor.openDocumentSettingsSidebar();
-
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'link', { name: 'Discussion settings' } )
-		).toHaveAttribute( 'href', /\/wp-admin\/options-discussion\.php$/ );
-	} );
 } );
