@@ -33,9 +33,19 @@
 	min-height: $grid-unit-30;
 }
 
-.block-editor-global-styles-state-control__badge-tooltip-trigger {
+.block-editor-global-styles-state-control__badge-infotip {
 	display: inline-flex;
-	max-width: 100%;
+	align-items: center;
+	padding: 0;
+	border: 0;
+	border-radius: var(--wpds-border-radius-sm);
+	background: none;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	cursor: var(--wpds-cursor-control);
+}
+
+.block-editor-global-styles-state-control__badge-infotip-popup {
+	max-width: 240px;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,

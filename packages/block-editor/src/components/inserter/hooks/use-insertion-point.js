@@ -174,7 +174,7 @@ function useInsertionPoint( {
 			}
 			const blockLength = Array.isArray( blocks ) ? blocks.length : 1;
 			const message = sprintf(
-				// translators: %d: the name of the block that has been added
+				// translators: %d: Number of blocks added.
 				_n( '%d block added.', '%d blocks added.', blockLength ),
 				blockLength
 			);
