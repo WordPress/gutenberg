@@ -172,7 +172,7 @@ jobs:
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
-                  cache: npm
+                  package-manager-cache: false
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
@@ -331,6 +331,7 @@ jobs:
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
+                  package-manager-cache: false
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
