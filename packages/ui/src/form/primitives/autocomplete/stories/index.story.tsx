@@ -625,6 +625,9 @@ const emojiPickerCellStyle: CSSProperties = {
 	aspectRatio: '1 / 1',
 	marginInline: 0,
 	padding: 'var(--wpds-dimension-padding-xs)',
+};
+
+const emojiPickerLabelStyle: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xl)',
 };
 
@@ -686,7 +689,11 @@ export const Grid: Story = {
 														emojiPickerCellStyle
 													}
 												>
-													<Autocomplete.ItemLabel>
+													<Autocomplete.ItemLabel
+														style={
+															emojiPickerLabelStyle
+														}
+													>
 														<span aria-hidden="true">
 															{ emoji.emoji }
 														</span>
