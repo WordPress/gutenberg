@@ -52,7 +52,7 @@ function {{PREFIX}}_override_script( $scripts, $handle, $src, $deps = array(), $
 function {{PREFIX}}_register_package_scripts( $scripts ) {
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
-	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
+	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
 
 	$scripts_dir  = __DIR__ . '/scripts';
 	$scripts_file = $scripts_dir . '/registry.php';

@@ -42,10 +42,10 @@ function {{PREFIX}}_override_style( $styles, $handle, $src, $deps = array(), $ve
 function {{PREFIX}}_register_package_styles( $styles ) {
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
-	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
+	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
 
 	$suffix = '.min';
-	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+	if ( SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
 		$suffix = '';
 	}
 

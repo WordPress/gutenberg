@@ -9,7 +9,6 @@
 ### Bug Fixes
 
 -   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
--   Registration templates: guard `SCRIPT_DEBUG` with `defined()` in the script and style templates, which otherwise emit a warning on PHP 8 when the constant is undefined ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
 ### Internal
 
