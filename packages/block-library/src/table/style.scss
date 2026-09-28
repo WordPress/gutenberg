@@ -33,11 +33,13 @@
 	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
+		border-color: inherit;
 
 		td,
 		th {
 			// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 			word-break: break-word;
+			border: 1px solid;
 		}
 	}
 
