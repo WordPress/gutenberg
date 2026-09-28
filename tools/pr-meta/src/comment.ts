@@ -216,6 +216,23 @@ function truncate(
 		return body;
 	}
 
+	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
+	const note = `<sub>Truncated.${ link }</sub>`;
+
+	/*
+	 * Some sections keep their ending instead, where props holds the trailer a
+	 * committer copies. Reopen a fence the dropped part left open, or its
+	 * closing line would fence everything after it.
+	 */
+	if ( definition.keep === 'end' ) {
+		const cut = body.slice( -definition.budget );
+		const boundary = cut.indexOf( '\n\n' );
+		const kept = boundary >= 0 ? cut.slice( boundary + 2 ) : cut;
+		const dropped = body.slice( 0, body.length - kept.length );
+
+		return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+	}
+
 	const cut = body.slice( 0, definition.budget );
 
 	/*
@@ -225,11 +242,23 @@ function truncate(
 	 */
 	const boundary = cut.lastIndexOf( '\n\n' );
 	const kept = boundary > 0 ? cut.slice( 0, boundary ) : cut;
-	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
 
-	return `${ kept }${ closeOpenBlocks(
-		kept
-	) }\n\n<sub>Truncated.${ link }</sub>`;
+	return `${ kept }${ closeOpenBlocks( kept ) }\n\n${ note }`;
+}
+
+/**
+ * Reopens the fence a dropped prefix left open.
+ *
+ * @param dropped The part of a body cut from its start.
+ * @return The opening markup the remainder needs, if any.
+ */
+function reopenBlocks( dropped: string ): string {
+	const fences = fenceTracker();
+	for ( const line of dropped.split( '\n' ) ) {
+		fences.track( line );
+	}
+
+	return fences.openMarker ? `\n\n${ fences.openMarker }` : '';
 }
 
 /**
@@ -424,9 +453,9 @@ export function mergeSection(
 		}
 	}
 
-	/* Blank lines only: trimming spaces would turn indented code into a fence. */
+	/* Leading spaces stay: trimming them would turn indented code into a fence. */
 	const body = demoteHeadings( sanitizeBody( update.body ) )
-		.replace( /^\n+/, '' )
+		.replace( /^[\r\n]+/, '' )
 		.replace( /\s+$/, '' );
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id

@@ -694,3 +694,34 @@ describe( 'demoteHeadings', () => {
 		);
 	} );
 } );
+
+describe( 'keeping the end when truncating', () => {
+	/* The trailer a committer copies is the last thing in a props body. */
+	it( 'keeps the trailer of an overlong props list', () => {
+		const definition = getSection( 'props' )!;
+		const body = `${ 'Contributor line.\n\n'.repeat(
+			2000
+		) }\`\`\`\nCo-authored-by: someone <someone@git.wordpress.org>\n\`\`\``;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section ).toContain( 'Co-authored-by: someone' );
+		expect( section.startsWith( '<sub>Truncated.' ) ).toBe( true );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
+	} );
+
+	/* Its closing line would otherwise fence everything after it. */
+	it( 'reopens a fence the dropped start left open', () => {
+		const body = `\`\`\`\n${ 'noise\n'.repeat( 20000 ) }done\n\`\`\``;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+	} );
+} );

@@ -44,18 +44,41 @@ concurrency:
 permissions: {}
 
 jobs:
-    # Compiles a list of props for a pull request.
+    # Removes the label that asked for a refresh.
     #
-    # Performs the following steps:
-    # - Collects a list of contributor props for the PR meta comment to post.
-    # - Removes the props-bot label, if necessary.
+    # Its own job, so it neither needs the gather's twenty minutes nor holds
+    # write access open for it, and so a cancellation mid-gather cannot leave
+    # the label behind with no way to ask again.
+    remove-label:
+        name: Remove the props-bot label
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: write
+        timeout-minutes: 5
+        if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
+
+        steps:
+            - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  ISSUE_NUMBER: ${{ github.event.number }}
+              with:
+                  retries: 2
+                  retry-exempt-status-codes: 418
+                  script: |
+                      github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: process.env.ISSUE_NUMBER,
+                        name: 'props-bot'
+                      });
+
+    # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
         name: Generate a list of props
         runs-on: 'ubuntu-24.04'
         permissions:
-            # Read to gather the contributors, write to remove the label below.
-            # The action itself posts nothing, see `post-comment`.
-            pull-requests: write
+            # Read is enough: the action posts nothing, see `post-comment`.
+            pull-requests: read
             contents: read
         timeout-minutes: 20
         outputs:
@@ -76,25 +99,6 @@ jobs:
             ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
-            # Before the gather, not after: a comment arriving meanwhile cancels
-            # this run, and a label left behind cannot be added again to ask for
-            # another refresh.
-            - name: Remove the props-bot label
-              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-              if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
-              env:
-                  ISSUE_NUMBER: ${{ github.event.number }}
-              with:
-                  retries: 2
-                  retry-exempt-status-codes: 418
-                  script: |
-                      github.rest.issues.removeLabel({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issue_number: process.env.ISSUE_NUMBER,
-                        name: 'props-bot'
-                      });
-
             - name: Gather a list of contributors
               id: props
               uses: WordPress/props-bot-action@trunk
@@ -142,8 +146,10 @@ jobs:
                   mkdir -p pr-meta
 
                   # Drop the intro: it is what the standalone props bot
-                  # searches for, and it would find this comment.
+                  # searches for, and it would find this comment. Its note
+                  # about refreshing goes back in wording that will not match.
                   printf '%s' "$BODY" | sed '1{/^The following accounts have interacted/d}' > pr-meta/body.md
+                  printf '\n_Updated as activity occurs. Add the `props-bot` label to refresh._\n' >> pr-meta/body.md
 
             - uses: ./tools/pr-meta
               with:

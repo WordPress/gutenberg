@@ -16,6 +16,8 @@ export type SectionDefinition = {
 	budget: number;
 	/** Label for a section long enough to collapse. Omitted leaves it open. */
 	summary?: string;
+	/** Which end truncation keeps. Defaults to the start. */
+	keep?: 'start' | 'end';
 };
 
 /*
@@ -34,8 +36,9 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'props',
 		heading: '🎉 Props',
 		scope: 'pr-state',
-		// Generous: truncation cuts the trailer a committer copies.
 		budget: 20000,
+		// The trailer a committer copies is the last thing in the body.
+		keep: 'end',
 	},
 	{
 		id: 'labels',
