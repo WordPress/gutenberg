@@ -43,7 +43,7 @@ const tabsConfig = await eslint.calculateConfigForFile(
 	'packages/ui/src/tabs/test/index.browser.test.tsx'
 );
 assert.equal( tabsConfig.rules[ 'vitest/expect-expect' ][ 0 ], 2 );
-assert.equal( tabsConfig.rules[ 'vitest/no-conditional-expect' ][ 0 ], 0 );
+assert.equal( tabsConfig.rules[ 'vitest/no-conditional-expect' ][ 0 ], 2 );
 
 for ( const file of [ jsdomTest, browserTest ] ) {
 	const { rules } = await eslint.calculateConfigForFile( file );

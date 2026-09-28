@@ -696,15 +696,6 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
-	{
-		files: [ 'packages/ui/src/tabs/test/index.browser.test.tsx' ],
-		rules: {
-			// These cases run both controlled and uncontrolled modes from a fixed
-			// table. Each mode has its own assertions; neither can skip them.
-			'vitest/no-conditional-expect': 'off',
-		},
-	},
-
 	// This compilation fixture is transformed as source, not run as a test.
 	{
 		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
