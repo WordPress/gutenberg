@@ -112,6 +112,7 @@ require __DIR__ . '/compat/wordpress-7.2/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
+require __DIR__ . '/experimental/block-editor-settings-mobile-allowed.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
