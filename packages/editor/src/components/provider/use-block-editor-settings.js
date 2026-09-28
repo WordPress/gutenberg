@@ -109,6 +109,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	showHiddenBlocksKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -148,6 +149,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
+		showHiddenBlocks,
 		isNavigationOverlayContext,
 		isRevisionsMode,
 		viewablePostTypeLabel,
@@ -226,6 +228,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
+				showHiddenBlocks: get( 'core', 'showHiddenBlocks' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
@@ -448,6 +451,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'template-locked' ||
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
+			[ showHiddenBlocksKey ]: showHiddenBlocks,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -484,6 +488,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		openMediaEditorModal,
 		deviceType,
+		showHiddenBlocks,
 		allImageSizes,
 		bigImageSizeThreshold,
 		imageStripMeta,
