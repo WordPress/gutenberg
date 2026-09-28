@@ -454,7 +454,7 @@ mark.wp-note {
 .editor-collab-sidebar-panel__picker-search {
 	display: flex;
 	align-items: center;
-	gap: var(--emoji-picker-gap);
+	gap: var(--wpds-dimension-gap-sm);
 	// The bottom padding keeps the scrolling grid, and the heading stuck
 	// to its top, clear of the input's focus ring.
 	padding: var(--emoji-picker-padding) var(--emoji-picker-padding) var(--wpds-dimension-padding-sm);
@@ -527,9 +527,6 @@ mark.wp-note {
 	// The list sits in the viewport, not a popup, so drop the popup
 	// list's grid slots and let it grow to its content.
 	display: block;
-	// Together with the search row's bottom padding, the first heading sits
-	// the full padding below the input.
-	padding-block: calc(var(--emoji-picker-padding) - var(--wpds-dimension-padding-sm)) var(--emoji-picker-padding);
 }
 
 .editor-collab-sidebar-panel__picker-group + .editor-collab-sidebar-panel__picker-group {
@@ -541,7 +538,6 @@ mark.wp-note {
 .editor-collab-sidebar-panel__picker-category {
 	position: sticky;
 	top: 0;
-	padding-inline: 0;
 	// `.components-popover` paints `$white`, not a token, and rows must
 	// scroll behind exactly that color. Move both together if it changes.
 	background-color: $white;
@@ -552,7 +548,6 @@ mark.wp-note {
 	display: grid;
 	grid-template-columns: repeat(6, var(--emoji-picker-cell-size));
 	gap: var(--emoji-picker-gap);
-	margin-block-end: var(--emoji-picker-gap);
 	// Skip offscreen rows so the ~330-row list mounts quickly; the
 	// intrinsic-size hint matches the real row height to keep scroll
 	// geometry accurate.
