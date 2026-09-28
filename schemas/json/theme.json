@@ -920,7 +920,7 @@
 														"properties": {
 															"tag": {
 																"type": "string",
-																"pattern": "^[A-Za-z0-9]{4}$"
+																"pattern": "^[A-Za-z][A-Za-z0-9]{3}$"
 															},
 															"name": {
 																"type": "string"
@@ -1944,7 +1944,7 @@
 							"description": "Sets the `font-variation-settings` CSS property from axis values keyed by OpenType tag, such as `{ \"GRAD\": 50 }`. `wght`, `wdth`, `slnt` and `ital` are ignored: they belong to `font-weight`, `font-stretch` and `font-style`.",
 							"type": "object",
 							"patternProperties": {
-								"^[A-Za-z0-9]{4}$": { "type": "number" }
+								"^[A-Za-z][A-Za-z0-9]{3}$": { "type": "number" }
 							},
 							"additionalProperties": false
 						},
