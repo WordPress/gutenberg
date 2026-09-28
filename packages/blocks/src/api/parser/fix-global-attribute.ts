@@ -25,6 +25,32 @@ export function getHTMLRootElement(
 }
 
 /**
+ * Whether any element in the markup carries the attribute with this value.
+ *
+ * @param innerHTML     Original block markup.
+ * @param attributeName Attribute to look for.
+ * @param value         Value the block attributes hold.
+ *
+ * @return Whether the markup still carries the value.
+ */
+function hasHTMLAttributeValue(
+	innerHTML: string,
+	attributeName: string | undefined,
+	value: unknown
+): boolean {
+	if ( ! attributeName || typeof value !== 'string' || ! value ) {
+		return false;
+	}
+
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = innerHTML;
+
+	return Array.from(
+		doc.body.querySelectorAll( `[${ attributeName }]` )
+	).some( ( element ) => element.getAttribute( attributeName ) === value );
+}
+
+/**
  * Given a parsed set of block attributes, if the block supports the specified attribute,
  * the attribute is synced with the block's markup: assigned when the markup carries it,
  * and removed when the markup does not.
@@ -57,7 +83,14 @@ export function fixGlobalAttribute(
 	);
 	if ( attributeValue ) {
 		modifiedBlockAttributes[ supportKey ] = attributeValue;
-	} else if ( innerHTML.trim() ) {
+	} else if (
+		innerHTML.trim() &&
+		! hasHTMLAttributeValue(
+			innerHTML,
+			attributeSchema.attribute,
+			modifiedBlockAttributes[ supportKey ]
+		)
+	) {
 		// The markup is the source of truth, so an attribute absent from it has
 		// been removed. A block that saves no markup has nothing to compare
 		// against and keeps whatever the delimiter holds.
