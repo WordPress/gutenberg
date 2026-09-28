@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -13,9 +10,48 @@ import {
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+
+/*
+ * The featured image field opens the WordPress media modal, which needs the
+ * media assets (`wp.media` and friends) that the editor canvas loads but this
+ * screen never does — without them, opening the field crashes the route.
+ * Wrap the field's edit component so the shared editor assets are loaded
+ * first.
+ *
+ * This is a stopgap owned by the route because the route is what knows the
+ * screen is asset-less. Ultimately a field should be able to declare this
+ * kind of asset dependency itself so every DataForm consumer gets it for
+ * free; once that exists, remove this wrapper.
+ */
+function withEditorAssets( FieldEdit: any ) {
+	return function EditWithEditorAssets( props: any ) {
+		const [ isReady, setIsReady ] = useState(
+			() => !! ( window as any ).wp?.media
+		);
+		useEffect( () => {
+			if ( ! isReady ) {
+				loadEditorAssets().then( () => setIsReady( true ) );
+			}
+		}, [ isReady ] );
+
+		// Render the field right away — only opening the modal needs the
+		// assets — and keep it inert until they have loaded.
+		return (
+			<div
+				aria-busy={ ! isReady || undefined }
+				style={ ! isReady ? { opacity: 0.6 } : undefined }
+				// @ts-expect-error inert not typed properly
+				inert={ ! isReady ? 'true' : undefined }
+			>
+				<FieldEdit { ...props } />
+			</div>
+		);
+	};
+}
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
@@ -23,12 +59,14 @@ interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
 	closeModal: () => void;
+	quickEditForm: Form | undefined;
 }
 
 export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	quickEditForm,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
@@ -94,64 +132,34 @@ export function QuickEditModal( {
 						readOnly: ! canSwitchTemplate,
 					};
 				}
+				if ( field.id === 'featured_media' && field.Edit ) {
+					return {
+						...field,
+						Edit: withEditorAssets( field.Edit ),
+					};
+				}
 
 				return field;
 			} ),
 		[ _fields, canSwitchTemplate ]
 	);
 
-	const form = useMemo( () => {
-		const allFields: Form[ 'fields' ] = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'status',
-				label: __( 'Status' ),
-				children: [
-					{
-						id: 'status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'scheduled_date',
-					'password',
-				],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				children: [
-					{
-						id: 'comment_status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'ping_status',
-				],
-			},
-			'template',
-		];
-
+	const form = useMemo( (): Form => {
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel' as const,
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
 		const currentData: Record< string, any > = {

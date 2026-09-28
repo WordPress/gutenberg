@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -13,13 +10,6 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { EmptyState, Link, Stack } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import styles from './style.module.css';
-
-// ─── Item type ────────────────────────────────────────────────────────────────
 
 type ActivityKind = 'post-future' | 'post-published' | 'comment';
 
@@ -37,8 +27,6 @@ type ActivityAttributes = {
 	// How many items of each activity type to fetch.
 	perPage?: number;
 };
-
-// ─── Date helpers ─────────────────────────────────────────────────────────────
 
 /**
  * Formats a `YYYY-MM-DD` string into a human-readable group label:
@@ -84,8 +72,6 @@ function htmlToPlainText( html: string ): string {
 	);
 	return ( body.textContent ?? '' ).trim();
 }
-
-// ─── Fields ───────────────────────────────────────────────────────────────────
 
 const FIELDS: Field< ActivityEvent >[] = [
 	{
@@ -138,8 +124,6 @@ const FIELDS: Field< ActivityEvent >[] = [
 	},
 ];
 
-// ─── Default view ─────────────────────────────────────────────────────────────
-
 // Default number of items fetched per activity type.
 const DEFAULT_PER_PAGE = 5;
 
@@ -169,13 +153,11 @@ const DEFAULT_VIEW: View = {
 	},
 };
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
-export default function Activity( {
-	attributes,
-}: {
+interface ActivityProps {
 	attributes?: ActivityAttributes;
-} ) {
+}
+
+export default function Activity( { attributes }: ActivityProps ) {
 	const perPage = Math.max( 1, attributes?.perPage ?? DEFAULT_PER_PAGE );
 
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
@@ -305,7 +287,7 @@ export default function Activity( {
 				direction="column"
 				align="center"
 				justify="center"
-				className={ styles.loading }
+				style={ { height: '100%' } }
 			>
 				<Spinner />
 			</Stack>
@@ -318,7 +300,7 @@ export default function Activity( {
 				direction="column"
 				align="center"
 				justify="center"
-				className={ styles.loading }
+				style={ { height: '100%' } }
 			>
 				<EmptyState.Root>
 					<EmptyState.Icon icon={ postList } />
@@ -336,33 +318,31 @@ export default function Activity( {
 	}
 
 	return (
-		<Stack direction="column" className={ styles.list }>
-			<DataViews
-				data={ shownData }
-				fields={ FIELDS }
-				view={ resolvedView }
-				onChangeView={ setView }
-				paginationInfo={ paginationInfo }
-				getItemId={ ( item ) => item.id }
-				search={ false }
-				isLoading={ false }
-				defaultLayouts={ {
-					activity: {
-						sort: {
-							field: 'datetime',
-							direction: 'desc',
-						},
+		<DataViews
+			data={ shownData }
+			fields={ FIELDS }
+			view={ resolvedView }
+			onChangeView={ setView }
+			paginationInfo={ paginationInfo }
+			getItemId={ ( item ) => item.id }
+			search={ false }
+			isLoading={ false }
+			defaultLayouts={ {
+				activity: {
+					sort: {
+						field: 'datetime',
+						direction: 'desc',
 					},
-				} }
-				renderItemLink={ ( { item, children, ...aProps } ) => (
-					<Link href={ item.link } { ...aProps }>
-						{ children }
-					</Link>
-				) }
-				isItemClickable={ ( item ) => !! item.link }
-			>
-				<DataViews.Layout />
-			</DataViews>
-		</Stack>
+				},
+			} }
+			renderItemLink={ ( { item, children, ...aProps } ) => (
+				<Link href={ item.link } { ...aProps }>
+					{ children }
+				</Link>
+			) }
+			isItemClickable={ ( item ) => !! item.link }
+		>
+			<DataViews.Layout />
+		</DataViews>
 	);
 }

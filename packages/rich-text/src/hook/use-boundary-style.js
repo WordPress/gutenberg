@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 
 /*
@@ -39,7 +32,10 @@ export function useBoundaryStyle( { record } ) {
 		const newColor = colord( computedStyle.color )
 			.alpha( 0.2 )
 			.toRgbString();
-		const selector = `.rich-text:focus ${ boundarySelector }`;
+		// Only while the editing host has focus, be it the element or the
+		// canvas root around it. Only the element with the selection renders
+		// a boundary.
+		const selector = `[contenteditable="true"]:focus ${ boundarySelector }`;
 		const rule = `background-color: ${ newColor }`;
 		const style = `${ selector } {${ rule }}`;
 		const globalStyleId = 'rich-text-boundary-style';

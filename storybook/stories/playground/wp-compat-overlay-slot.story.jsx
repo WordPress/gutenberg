@@ -1,13 +1,13 @@
-import { Modal, Popover, Button } from '@wordpress/components';
+import { Modal, Popover as WCPopover, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import {
 	Autocomplete,
 	Combobox,
+	Popover,
 	Select,
 	SelectControl,
 	Tooltip,
 } from '@wordpress/ui';
-
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [
@@ -27,10 +27,54 @@ const inputWrapperStyle = {
 		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
 };
 
-// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
-// `Combobox`, `SelectControl`, `Autocomplete`) inside a
+function UiPopoverFixture() {
+	return (
+		<div style={ { marginTop: '1rem' } }>
+			<Popover.Root>
+				<Popover.Trigger>Open `@wordpress/ui` Popover</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Title>Popover from `@wordpress/ui`</Popover.Title>
+					<p>
+						The popover and its nested autocomplete should appear
+						above the host overlay.
+					</p>
+					<Autocomplete.Root items={ autocompleteItems }>
+						<Autocomplete.Input
+							placeholder="Search nested items"
+							aria-label="Autocomplete inside @wordpress/ui Popover"
+						/>
+						<Autocomplete.Popup>
+							<Autocomplete.Empty>
+								No matching items.
+							</Autocomplete.Empty>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</Popover.Popup>
+			</Popover.Root>
+		</div>
+	);
+}
+
+// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Popover`,
+// `Select`, `Combobox`, `SelectControl`, `Autocomplete`) inside a
 // `@wordpress/components` Modal / Popover should sit above the
-// components-side overlay via the compat overlay slot.
+// components-side overlay via the compat overlay slot. The Popover fixture uses
+// controlled `@wordpress/ui` content; arbitrary legacy descendants remain out
+// of scope.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
@@ -69,6 +113,8 @@ export const InsideComponentsModal = {
 							</Tooltip.Root>
 						</Tooltip.Provider>
 
+						<UiPopoverFixture />
+
 						<div style={ { marginTop: '1rem' } }>
 							<Select.Root items={ selectItems }>
 								<Select.Trigger aria-label="Select primitive" />
@@ -78,7 +124,9 @@ export const InsideComponentsModal = {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.label }
+											<Select.ItemLabel>
+												{ item.label }
+											</Select.ItemLabel>
 										</Select.Item>
 									) ) }
 								</Select.Popup>
@@ -173,7 +221,7 @@ export const InsideComponentsPopover = {
 					Toggle `@wordpress/components` Popover
 				</Button>
 				{ isOpen && anchor && (
-					<Popover
+					<WCPopover
 						anchor={ anchor }
 						onClose={ () => setIsOpen( false ) }
 					>
@@ -192,6 +240,8 @@ export const InsideComponentsPopover = {
 								</Tooltip.Root>
 							</Tooltip.Provider>
 
+							<UiPopoverFixture />
+
 							<div style={ { marginTop: '1rem' } }>
 								<Select.Root items={ selectItems }>
 									<Select.Trigger aria-label="Select primitive" />
@@ -201,7 +251,9 @@ export const InsideComponentsPopover = {
 												key={ item.value }
 												value={ item }
 											>
-												{ item.label }
+												<Select.ItemLabel>
+													{ item.label }
+												</Select.ItemLabel>
 											</Select.Item>
 										) ) }
 									</Select.Popup>
@@ -274,7 +326,7 @@ export const InsideComponentsPopover = {
 								</Autocomplete.Root>
 							</div>
 						</div>
-					</Popover>
+					</WCPopover>
 				) }
 			</>
 		);

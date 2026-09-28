@@ -8,7 +8,7 @@ In the classic editor, notices hooked onto the `admin_notices` action can render
 
 In the classic editor, here's an example of the "Post draft updated" notice:
 
-![Post draft updated in the classic editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/notices/classic-editor-notice.png)
+![Post draft updated in the classic editor](https://developer.wordpress.org/files/2026/06/classic-editor-notice.png)
 
 Producing an equivalent "Post draft updated" notice would require code like this:
 
@@ -41,7 +41,7 @@ Importantly, the `admin_notices` hook allows a developer to render whatever HTML
 
 In the block editor, here's an example of the "Post published" notice:
 
-![Post published in the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/notices/block-editor-notice.png)
+![Post published in the block editor](https://developer.wordpress.org/files/2026/06/block-editor-notice.png)
 
 Producing an equivalent "Post published" notice would require code like this:
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { escapeHTML } from '@wordpress/escape-html';
 import { safeDecodeURI, getPath } from '@wordpress/url';
 

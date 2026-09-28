@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, useCallback, useId } from '@wordpress/element';
-import { Button, Field, InputControl, Select, Stack } from '@wordpress/ui';
+import { useState, useCallback } from '@wordpress/element';
+import { Button, InputControl, SelectControl, Stack } from '@wordpress/ui';
 
 const EASING_TOKENS = [
 	{
@@ -52,13 +52,14 @@ const DURATION_TOKENS = [
 ];
 
 const DURATION_OPTIONS = [
-	{ label: 'xs', value: 'var(--wpds-motion-duration-xs)' },
-	{ label: 'sm', value: 'var(--wpds-motion-duration-sm)' },
-	{ label: 'md', value: 'var(--wpds-motion-duration-md)' },
-	{ label: 'lg', value: 'var(--wpds-motion-duration-lg)' },
-	{ label: 'xl', value: 'var(--wpds-motion-duration-xl)' },
-	{ label: 'Custom', value: 'custom' },
+	...DURATION_TOKENS.map( ( token ) => ( {
+		label: token.name,
+		value: token.variable,
+	} ) ),
+	{ label: 'custom', value: 'custom' },
 ];
+
+const DEFAULT_DURATION_OPTION = DURATION_OPTIONS[ 4 ];
 
 const labelStyle = {
 	fontFamily: 'var(--wpds-typography-font-family-mono)',
@@ -138,11 +139,10 @@ function AnimationRow( {
 }
 
 function MotionDemo() {
-	const durationSelectId = useId();
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
 	const [ selectedDuration, setSelectedDuration ] = useState(
-		'var(--wpds-motion-duration-xl)'
+		DEFAULT_DURATION_OPTION.value
 	);
 	const [ customDuration, setCustomDuration ] = useState( '600' );
 
@@ -163,33 +163,24 @@ function MotionDemo() {
 			<Stack direction="column" gap="lg">
 				<h3>Easing curves</h3>
 				<Stack align="end" gap="md" wrap="wrap">
-					<Field.Root style={ { minWidth: '180px' } }>
-						<Field.Label htmlFor={ durationSelectId }>
-							Duration
-						</Field.Label>
-						<Select.Root
-							value={ selectedDuration }
-							onValueChange={ ( value ) => {
-								if ( typeof value !== 'string' ) {
+					<div style={ { minWidth: '180px' } }>
+						<SelectControl
+							label="Duration"
+							items={ DURATION_OPTIONS }
+							defaultValue={ DEFAULT_DURATION_OPTION }
+							triggerContent={ ( item ) => item.value }
+							onValueChange={ ( item ) => {
+								if (
+									! item ||
+									typeof item.value !== 'string'
+								) {
 									return;
 								}
-								setSelectedDuration( value );
+								setSelectedDuration( item.value );
 								setAnimKey( ( k ) => k + 1 );
 							} }
-						>
-							<Select.Trigger id={ durationSelectId } />
-							<Select.Popup>
-								{ DURATION_OPTIONS.map( ( opt ) => (
-									<Select.Item
-										key={ opt.value }
-										value={ opt.value }
-									>
-										{ opt.label }
-									</Select.Item>
-								) ) }
-							</Select.Popup>
-						</Select.Root>
-					</Field.Root>
+						/>
+					</div>
 					{ selectedDuration === 'custom' && (
 						<InputControl
 							label="Value (ms)"

@@ -141,6 +141,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
+			'version'         => Gutenberg_View_Config_Data::LATEST_VERSION,
 			'default_view'    => $this->cast_empty_objects( $config['default_view'], $schema['properties']['default_view'] ),
 			'default_layouts' => $this->cast_empty_objects( $config['default_layouts'], $schema['properties']['default_layouts'] ),
 			'view_list'       => $this->cast_empty_objects( $config['view_list'], $schema['properties']['view_list'] ),
@@ -248,6 +249,11 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 				'name'            => array(
 					'description' => __( 'Entity name.', 'gutenberg' ),
 					'type'        => 'string',
+					'readonly'    => true,
+				),
+				'version'         => array(
+					'description' => __( 'The schema version of the configuration.', 'gutenberg' ),
+					'type'        => 'integer',
 					'readonly'    => true,
 				),
 				'default_view'    => array(
@@ -368,13 +374,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	/**
 	 * Returns the schema properties shared by all view types (ViewBase), excluding 'type'.
 	 *
+	 * Note that `search` and `page` are not part of the schema: they are managed
+	 * via the URL, which is their only source of truth.
+	 *
 	 * @return array Schema properties for the base view configuration.
 	 */
 	protected function get_view_base_schema() {
 		return array(
-			'search'                => array(
-				'type' => 'string',
-			),
 			'filters'               => array(
 				'type'  => 'array',
 				'items' => array(
@@ -418,9 +424,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'enum' => array( 'asc', 'desc' ),
 					),
 				),
-			),
-			'page'                  => array(
-				'type' => 'integer',
 			),
 			'perPage'               => array(
 				'type' => 'integer',

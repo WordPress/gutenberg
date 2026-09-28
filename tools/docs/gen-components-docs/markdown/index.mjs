@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import json2md from 'json2md';
-
-/**
- * Internal dependencies
- */
 import { generateMarkdownPropsJson } from './props.mjs';
 
 /**
@@ -50,7 +43,7 @@ export function generateMarkdownDocs( {
 						headingLevel: 4,
 					} ),
 				] ),
-		  ]
+			]
 		: [];
 
 	return json2md(

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	packageNameFromPath,
 	parseProps,
@@ -263,7 +264,7 @@ describe( 'parseComponents', () => {
 			'badge-intent': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 			},
 		} );
 
@@ -286,7 +287,7 @@ describe( 'parseComponents', () => {
 			'badge-intent': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 			},
 		} );
 
@@ -439,7 +440,7 @@ describe( 'parseComponentDetail', () => {
 			},
 			'badge-intent': {
 				name: 'Badge',
-				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 				stories: [
 					{
 						name: 'High',
@@ -472,7 +473,7 @@ describe( 'parseComponentDetail', () => {
 			'badge-intent': {
 				name: 'Badge',
 				description: 'A badge component.',
-				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 			},
 		} );
 
@@ -489,7 +490,7 @@ describe( 'parseComponentDetail', () => {
 			},
 			'badge-intent': {
 				name: 'Badge',
-				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				path: '../packages/ui/src/badge/stories/usage-guidelines.story.tsx',
 				reactComponentMeta: {
 					props: {
 						intent: {

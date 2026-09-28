@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
+const { promisify } = require( 'util' );
 const { confirm } = require( '@inquirer/prompts' );
 const checkSync = require( 'check-node-version' );
 const tools = require( 'check-node-version/tools' );
-const { promisify } = require( 'util' );
-
-/**
- * Internal dependencies
- */
 const log = require( './log' );
 
 const check = promisify( checkSync );

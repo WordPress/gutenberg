@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import { Text } from '../text';
+import { CONFIG } from '../utils';
 import type { GroupLabelProps } from './types';
 import * as Styled from './styles';
 
@@ -33,7 +27,7 @@ export const GroupLabel = forwardRef<
 					upperCase
 					variant="muted"
 					size="11px"
-					weight={ 500 }
+					weight={ CONFIG.fontWeightEmphasis }
 					lineHeight="16px"
 				/>
 			}

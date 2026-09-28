@@ -41,7 +41,7 @@ When you are finished making changes, run the `npm run build` command. This opti
 
 ## View the block in action
 
-You can use any local WordPress development environment to test your new block, but the scaffolded plugin includes configuration for `wp-env`. You must have [Docker](https://www.docker.com/products/docker-desktop) already installed and running on your machine, but if you do, run the `npx wp-env start` command. 
+You can use any local WordPress development environment to test your new block, but the scaffolded plugin includes configuration for `wp-env`. You must have [Docker](https://www.docker.com/products/docker-desktop) already installed and running on your machine, but if you do, run the `npm run env start` command. 
 
 Once the script finishes running, you can access the local environment at: <code>http://localhost:8888</code>. Log into the WordPress dashboard using username `admin` and password `password`. The plugin will already be installed and activated. Open the Editor or Site Editor, and insert the Copyright Date Block as you would any other block.
 

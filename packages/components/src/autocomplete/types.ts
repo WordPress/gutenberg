@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { RichTextValue } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import type { useAutocomplete } from '.';
 
 // Insert the `value` into the text.

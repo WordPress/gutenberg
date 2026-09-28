@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { setImmutably } from '../utils/object';
 import type { GlobalStylesConfig } from '../types';
 import { normalizeStyleStateAliases } from '../style-state-back-compat';

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 
 /**

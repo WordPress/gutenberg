@@ -23,7 +23,13 @@
 		"./config": "./config.js"
 	},
 	"dependencies": {
-		"stylelint-plugin-logical-css": "^1.2.3"
+		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
+		"@wordpress/theme": "file:../../packages/theme",
+		"stylelint": "^17.14.1",
+		"stylelint-plugin-logical-css": "^2.1.0"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

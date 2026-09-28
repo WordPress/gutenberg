@@ -32,8 +32,21 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 		return $value;
 	}
 
-	$unwrapped_name = str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) );
-	return "var(--wp--$unwrapped_name)";
+	$parts = explode( '|', substr( $value, strlen( 'var:' ) ) );
+
+	/*
+	 * The slug is kebab-cased when the preset's custom property is generated,
+	 * so a reference has to be converted the same way or it points at a
+	 * property that does not exist (`--wp--preset--font-size--3xl` for a preset
+	 * generated as `--wp--preset--font-size--3-xl`). Mirrors
+	 * `WP_Theme_JSON_Gutenberg::convert_custom_properties()` and the JS style
+	 * engine's `getCSSValueFromRawStyle()`.
+	 */
+	if ( 3 === count( $parts ) ) {
+		$parts[2] = _wp_to_kebab_case( $parts[2] );
+	}
+
+	return 'var(--wp--' . implode( '--', $parts ) . ')';
 }
 
 /**
@@ -113,12 +126,13 @@ function gutenberg_get_state_declarations_with_background_resets( $declarations 
 
 	/*
 	 * When the state sets a solid background-color but no gradient of its own,
-	 * emit `background-image: unset !important` to clear any gradient (whether
-	 * stored as the `background` shorthand or as `background-image`) that was
-	 * applied to the default / normal state via an inline style attribute.
+	 * emit `background-image: unset` to clear any gradient (whether stored as
+	 * the `background` shorthand or as `background-image`) that was applied to
+	 * the default / normal state via an inline style attribute. The declaration
+	 * is marked important when the state rule is registered with the style engine.
 	 */
 	if ( $has_background_color && ! $has_background && ! $has_background_image ) {
-		$declarations['background-image'] = 'unset !important';
+		$declarations['background-image'] = 'unset';
 	}
 
 	return $declarations;
@@ -343,18 +357,24 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 
 	$style = gutenberg_get_state_style_with_fallback_dimension_styles( $style );
 
-	$compiled = gutenberg_style_engine_get_styles(
+	$compiled     = gutenberg_style_engine_get_styles(
 		gutenberg_normalize_state_style_for_css_output( $style )
 	);
+	$declarations = $compiled['declarations'] ?? array();
+	$text_align   = $style['typography']['textAlign'] ?? null;
+	// Base text alignment is class-based, so state styles need a declaration.
+	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
+		$declarations['text-align'] = $text_align;
+	}
 
-	if ( empty( $compiled['declarations'] ) ) {
+	if ( empty( $declarations ) ) {
 		return;
 	}
 
 	$css_rules[] = array(
 		'state'        => $state,
 		'selector'     => $selector,
-		'declarations' => $compiled['declarations'],
+		'declarations' => $declarations,
 	);
 	if ( ! empty( $rules_group ) ) {
 		$css_rules[ count( $css_rules ) - 1 ]['rules_group'] = $rules_group;
@@ -507,17 +527,29 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$block_name = $block['blockName'];
+
+	/*
+	 * Every CSS rule this function can produce is keyed off the block's `style`
+	 * attribute. Without it there is nothing to generate, so bail before doing
+	 * any of the lookups below — this runs for every block on every request.
+	 */
+	$raw_style = $block['attrs']['style'] ?? array();
+	if ( empty( $raw_style ) || ! is_array( $raw_style ) ) {
+		return $block_content;
+	}
+
+	// Keep the existing block registry lookup here.
+	$style = gutenberg_resolve_style_state_aliases( $raw_style, $block_name );
+
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
 		return $block_content;
 	}
 
-	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                   = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block_name
-	);
-	$css_rules               = array();
+	$supported_pseudo_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
+	$css_rules                = array();
+	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -533,7 +565,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 	}
 
-	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
 			continue;
 		}
@@ -645,26 +677,49 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 */
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
-		$declarations = $rule['declarations'];
-		foreach ( $declarations as $property => $value ) {
-			$declarations[ $property ] = is_string( $value ) && str_contains( $value, '!important' )
-				? $value
-				: $value . ' !important';
+		$declarations                 = $rule['declarations'];
+		$important_declaration_values = gutenberg_get_state_declarations_with_background_resets( $declarations );
+		$important_declarations       = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		foreach ( $important_declaration_values as $property => $value ) {
+			$important_declarations->add_declaration(
+				$property,
+				$value,
+				array(
+					'important' => true,
+				)
+			);
 		}
-		$declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
-		$declarations = gutenberg_get_state_declarations_with_background_resets( $declarations );
-		$style_rule   = array(
-			'selector'     => gutenberg_build_state_selector(
-				".$unique_class",
-				$rule['selector'],
-				$rule['state']
-			),
-			'declarations' => $declarations,
+		$selector             = gutenberg_build_state_selector(
+			".$unique_class",
+			$rule['selector'],
+			$rule['state']
+		);
+		$important_style_rule = array(
+			'selector'     => $selector,
+			'declarations' => $important_declarations,
 		);
 		if ( ! empty( $rule['rules_group'] ) ) {
-			$style_rule['rules_group'] = $rule['rules_group'];
+			$important_style_rule['rules_group'] = $rule['rules_group'];
 		}
-		$style_rules[] = $style_rule;
+		$style_rules[] = $important_style_rule;
+
+		$fallback_declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
+		foreach ( array_keys( $declarations ) as $property ) {
+			unset( $fallback_declarations[ $property ] );
+		}
+
+		if ( empty( $fallback_declarations ) ) {
+			continue;
+		}
+
+		$fallback_style_rule = array(
+			'selector'     => $selector,
+			'declarations' => $fallback_declarations,
+		);
+		if ( ! empty( $rule['rules_group'] ) ) {
+			$fallback_style_rule['rules_group'] = $rule['rules_group'];
+		}
+		$style_rules[] = $fallback_style_rule;
 	}
 
 	gutenberg_style_engine_get_stylesheet_from_css_rules(

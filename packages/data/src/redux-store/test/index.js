@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
@@ -13,7 +11,7 @@ describe( 'controls', () => {
 
 	describe( 'should call registry-aware controls', () => {
 		it( 'registers multiple selectors to the public API', () => {
-			const action1 = jest.fn( () => ( { type: 'NOTHING' } ) );
+			const action1 = vi.fn( () => ( { type: 'NOTHING' } ) );
 			const action2 = function* () {
 				yield { type: 'DISPATCH', store: 'store1', action: 'action1' };
 			};
@@ -82,7 +80,6 @@ describe( 'controls', () => {
 					.hasFinishedResolution( 'getItems' );
 				if ( isFinished ) {
 					const items = registry.select( 'store' ).getItems();
-					// eslint-disable-next-line jest/no-conditional-expect
 					expect( items ).toEqual( [ 1, 2, 3 ] );
 				}
 				resolve();
@@ -94,7 +91,7 @@ describe( 'controls', () => {
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
 		it( 'when custom store has resolvers defined', () => {
 			registry.registerStore( 'store', {
-				reducer: jest.fn(),
+				reducer: vi.fn(),
 				selectors: {
 					getItems: ( state ) => state,
 					getItem: ( state ) => state,
@@ -114,7 +111,7 @@ describe( 'controls', () => {
 		} );
 		it( 'when custom store does not have resolvers defined', () => {
 			registry.registerStore( 'store', {
-				reducer: jest.fn(),
+				reducer: vi.fn(),
 				selectors: {
 					getItems: ( state ) => state,
 				},
@@ -311,7 +308,7 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'handles isFulfilled with arguments correctly', async () => {
-		const fulfilledResolver = jest.fn();
+		const fulfilledResolver = vi.fn();
 		fulfilledResolver.isFulfilled = ( state, id ) => state.pages?.[ id ];
 
 		const resolvedState = {
@@ -348,7 +345,7 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'does not change Redux state when isFulfilled returns true', async () => {
-		const fulfill = jest.fn();
+		const fulfill = vi.fn();
 		const isFulfilled = () => true;
 
 		registry.registerStore( 'demo', {
@@ -361,7 +358,7 @@ describe( 'resolveSelect', () => {
 			},
 		} );
 
-		const listener = jest.fn();
+		const listener = vi.fn();
 		const unsubscribe = registry.subscribe( listener );
 
 		// Call the selector — isFulfilled is true, so no resolution should happen.
@@ -377,11 +374,11 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'calls resolver when isFulfilled returns false', async () => {
-		const fulfill = jest.fn().mockImplementation( () => ( {
+		const fulfill = vi.fn().mockImplementation( () => ( {
 			type: 'SET_DATA',
 			data: 'resolved data',
 		} ) );
-		const isFulfilled = jest.fn( ( state ) => state.hasData );
+		const isFulfilled = vi.fn( ( state ) => state.hasData );
 
 		registry.registerStore( 'demo', {
 			reducer: ( state = { hasData: false }, action ) => {
@@ -413,13 +410,13 @@ describe( 'resolveSelect', () => {
 } );
 
 describe( 'normalizing args', () => {
-	it( 'should call the __unstableNormalizeArgs method of the selector for both the selector and the resolver', async () => {
+	it( 'should call the normalizeArgs method of the selector for both the selector and the resolver', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		const normalizingFunction = jest.fn( ( ...args ) => args );
+		const normalizingFunction = vi.fn( ( ...args ) => args );
 
-		selector.__unstableNormalizeArgs = normalizingFunction;
+		selector.normalizeArgs = normalizingFunction;
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -441,11 +438,11 @@ describe( 'normalizing args', () => {
 		expect( normalizingFunction ).toHaveBeenCalledTimes( 3 );
 	} );
 
-	it( 'should not call the __unstableNormalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
+	it( 'should not call the normalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -457,17 +454,17 @@ describe( 'normalizing args', () => {
 			},
 		} );
 
-		// Called with no args so the __unstableNormalizeArgs method should not be called.
+		// Called with no args so the normalizeArgs method should not be called.
 		registry.select( 'store' ).getItems();
 
-		expect( selector.__unstableNormalizeArgs ).not.toHaveBeenCalled();
+		expect( selector.normalizeArgs ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call the __unstableNormalizeArgs method on the selectors without resolvers', async () => {
+	it( 'should call the normalizeArgs method on the selectors without resolvers', async () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -478,9 +475,158 @@ describe( 'normalizing args', () => {
 
 		registry.select( 'store' ).getItems( 'foo', 'bar' );
 
+		expect( selector.normalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
+		] );
+	} );
+
+	it( 'should call the legacy __unstableNormalizeArgs method', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = vi.fn( ( args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
+			},
+		} );
+
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
 		expect( selector.__unstableNormalizeArgs ).toHaveBeenCalledWith( [
 			'foo',
 			'bar',
 		] );
+	} );
+} );
+
+describe( 'resolution args', () => {
+	// A store whose selector takes an extra leading argument the resolver does
+	// not need, so calls differing only in it share one resolver run.
+	function registerStore( registry, { fulfill } ) {
+		registry.registerStore( 'store', {
+			reducer: ( state = {}, action ) =>
+				action.type === 'RECEIVE' ? action.items : state,
+			selectors: {
+				getItem: ( state, field, id ) => state[ id ]?.[ field ],
+			},
+			actions: {
+				receive: ( items ) => ( { type: 'RECEIVE', items } ),
+			},
+			resolvers: {
+				getItem: {
+					getResolutionArgs: ( field, id ) => [ id ],
+					fulfill,
+				},
+			},
+		} );
+	}
+
+	it( 'should run the resolver once for selector calls that share resolution args', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn(
+			( id ) =>
+				( { dispatch } ) =>
+					dispatch.receive( { [ id ]: { a: 1, b: 2 } } )
+		);
+		registerStore( registry, { fulfill } );
+
+		registry.select( 'store' ).getItem( 'a', 7 );
+		registry.select( 'store' ).getItem( 'b', 7 );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+		expect( fulfill ).toHaveBeenCalledWith( 7 );
+	} );
+
+	it( 'should run the resolver again for different resolution args', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn( () => () => {} );
+		registerStore( registry, { fulfill } );
+
+		registry.select( 'store' ).getItem( 'a', 7 );
+		registry.select( 'store' ).getItem( 'a', 8 );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should resolve each selector call with its own value', async () => {
+		const registry = createRegistry();
+		registerStore( registry, {
+			fulfill:
+				( id ) =>
+				( { dispatch } ) =>
+					dispatch.receive( { [ id ]: { a: 'A', b: 'B' } } ),
+		} );
+
+		const resolve = registry.resolveSelect( 'store' );
+		const [ a, b ] = await Promise.all( [
+			resolve.getItem( 'a', 7 ),
+			resolve.getItem( 'b', 7 ),
+		] );
+
+		expect( a ).toBe( 'A' );
+		expect( b ).toBe( 'B' );
+	} );
+
+	it( 'should share the resolution state across selector calls', async () => {
+		const registry = createRegistry();
+		registerStore( registry, { fulfill: () => () => {} } );
+
+		await registry.resolveSelect( 'store' ).getItem( 'a', 7 );
+
+		const { hasFinishedResolution } = registry.select( 'store' );
+		expect( hasFinishedResolution( 'getItem', [ 'a', 7 ] ) ).toBe( true );
+		expect( hasFinishedResolution( 'getItem', [ 'b', 7 ] ) ).toBe( true );
+		expect( hasFinishedResolution( 'getItem', [ 'a', 8 ] ) ).toBe( false );
+	} );
+
+	it( 'should suspend both selector calls on one resolution', async () => {
+		const registry = createRegistry();
+		const fulfill = vi.fn( () => () => {} );
+		registerStore( registry, { fulfill } );
+
+		const suspend = registry.suspendSelect( 'store' );
+		expect( () => suspend.getItem( 'a', 7 ) ).toThrow( Promise );
+		expect( () => suspend.getItem( 'b', 7 ) ).toThrow( Promise );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+		expect( suspend.getItem( 'a', 7 ) ).toBeUndefined();
+	} );
+
+	it( 'should apply getResolutionArgs after normalizeArgs', async () => {
+		const registry = createRegistry();
+		const selector = ( state, field, id ) => state[ id ]?.[ field ];
+		// Coerce the numeric id, then drop the field.
+		selector.normalizeArgs = ( [ field, id ] ) => [ field, Number( id ) ];
+		const fulfill = vi.fn( () => () => {} );
+
+		registry.registerStore( 'store', {
+			reducer: ( state = {} ) => state,
+			selectors: { getItem: selector },
+			resolvers: {
+				getItem: {
+					getResolutionArgs: ( field, id ) => [ id ],
+					fulfill,
+				},
+			},
+		} );
+
+		registry.select( 'store' ).getItem( 'a', '7' );
+
+		await new Promise( ( done ) => setTimeout( done, 0 ) );
+
+		expect( fulfill ).toHaveBeenCalledWith( 7 );
 	} );
 } );

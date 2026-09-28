@@ -2,7 +2,7 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ContentProps } from './types';
 
 /**
@@ -25,7 +25,7 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
 						styles.content,
 						state.open &&
 							state.transitionStatus === 'idle' &&
-							styles.overflowVisible,
+							styles[ 'overflow-visible' ],
 						className
 					)
 				}

@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine global functions that interact with the WP_Style_Engine class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 
@@ -608,6 +608,49 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			'inline_background_clip_border_box'            => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'border-box',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:border-box;-webkit-text-fill-color:currentColor;',
+					'declarations' => array(
+						'background-clip'         => 'border-box',
+						'-webkit-text-fill-color' => 'currentColor',
+					),
+				),
+			),
+
+			'inline_background_clip_text_with_vendor_prefixes' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
+				),
+			),
+
+			'inline_background_clip_invalid_value'         => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'invalid-value',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
+			),
 		);
 	}
 
@@ -818,6 +861,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( ".wp-duotone-ffffff-000000-1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet with important declarations.
+	 *
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_with_important_declarations() {
+		$declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			array(
+				'important' => true,
+			)
+		);
+		$css_rules = array(
+			array(
+				'selector'     => '.responsive-state',
+				'declarations' => $declarations,
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( '.responsive-state{background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;}', $compiled_stylesheet );
 	}
 
 	/**

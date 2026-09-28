@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MutableRefObject, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { NoticeProps, NoticeAction } from '../notice/types';
 
 type SnackbarOnlyProps = {

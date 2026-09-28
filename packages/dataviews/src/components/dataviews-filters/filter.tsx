@@ -1,26 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Dropdown,
 	FlexItem,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -102,7 +91,7 @@ function OperatorSelector( {
 					{ filter.name }
 				</FlexItem>
 
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-filters__summary-operators-filter-select"
 					label={ __( 'Conditions' ) }
 					value={ value }
@@ -145,7 +134,7 @@ function OperatorSelector( {
 											return _filter;
 										}
 									),
-							  ]
+								]
 							: [
 									...( view.filters ?? [] ),
 									{
@@ -153,7 +142,7 @@ function OperatorSelector( {
 										operator: newOperator,
 										value: undefined,
 									},
-							  ];
+								];
 						onChangeView( {
 							...view,
 							page: 1,
@@ -212,22 +201,28 @@ export default function Filter( {
 		} );
 	} else if ( Array.isArray( filterInView?.value ) ) {
 		// or, filterInView.value can also be array
-		// for the between operator, as in [ 1, 2 ]
-		const label = filterInView.value.map( ( v ) => {
-			const formattedValue = field?.getValueFormatted( {
-				item: { [ field.id ]: v },
-				field,
+		// for the between operator, as in [ 1, 2 ]. A range with an unfilled
+		// bound does not filter, so the chip renders as if no value were set.
+		const isComplete = ! filterInView.value.some(
+			( v ) => v === undefined || v === null || v === ''
+		);
+		if ( isComplete ) {
+			const label = filterInView.value.map( ( v ) => {
+				const formattedValue = field?.getValueFormatted( {
+					item: { [ field.id ]: v },
+					field,
+				} );
+				return formattedValue || String( v );
 			} );
-			return formattedValue || String( v );
-		} );
 
-		activeElements = [
-			{
-				value: filterInView.value,
-				// @ts-ignore
-				label,
-			},
-		];
+			activeElements = [
+				{
+					value: filterInView.value,
+					// @ts-expect-error `label` is a `string[]` here, but the element type expects a `string`.
+					label,
+				},
+			];
+		}
 	} else if ( typeof filterInView?.value === 'object' ) {
 		// or, it can also be object for the inThePast/over operators,
 		// as in { value: '1', units: 'days' }
@@ -241,7 +236,7 @@ export default function Filter( {
 				? field.getValueFormatted( {
 						item: { [ field.id ]: filterInView.value },
 						field,
-				  } )
+					} )
 				: String( filterInView.value );
 
 		activeElements = [

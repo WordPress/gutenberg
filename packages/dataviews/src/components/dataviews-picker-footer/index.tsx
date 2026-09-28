@@ -1,15 +1,13 @@
-/**
- * WordPress dependencies
- */
-import { Button, CheckboxControl } from '@wordpress/components';
+import type { ReactNode } from 'react';
+import clsx from 'clsx';
+import {
+	Button,
+	CheckboxControl as WCCheckboxControl,
+} from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
@@ -49,7 +47,7 @@ function BulkSelectionCheckbox< Item >( {
 
 	if ( disableSelectAll ) {
 		return (
-			<CheckboxControl
+			<WCCheckboxControl
 				className="dataviews-view-table-selection-checkbox"
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
@@ -62,7 +60,7 @@ function BulkSelectionCheckbox< Item >( {
 	}
 
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
@@ -116,8 +114,15 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, callback } = action;
+				const { id, label, icon, isPrimary, isEligible, callback } =
+					action;
 
+				// `items` holds the current page's selection only, so an
+				// action without `isEligible` stays enabled for a selection
+				// made on other pages.
+				const eligibleItems = isEligible
+					? items.filter( ( item ) => isEligible( item ) )
+					: items;
 				const _label =
 					typeof label === 'string' ? label : label( items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
@@ -128,11 +133,15 @@ function ActionButtons< Item >( {
 						key={ id }
 						accessibleWhenDisabled
 						icon={ icon }
-						disabled={ isInProgress || ! selection?.length }
+						disabled={
+							isInProgress ||
+							! selection?.length ||
+							( !! isEligible && ! eligibleItems.length )
+						}
 						isBusy={ isInProgress }
 						onClick={ async () => {
 							setActionInProgress( id );
-							await callback( items, {
+							await callback( eligibleItems, {
 								registry,
 							} );
 							setActionInProgress( null );
@@ -203,7 +212,7 @@ function PickerBulkSelectionInfo() {
 	);
 }
 
-function PickerActions() {
+export function PickerActions( { className }: { className?: string } ) {
 	const {
 		data,
 		selection,
@@ -222,7 +231,9 @@ function PickerActions() {
 	}
 
 	return (
-		<div className="dataviews-picker-footer__actions">
+		<div
+			className={ clsx( 'dataviews-picker-footer__actions', className ) }
+		>
 			<ActionButtons
 				actions={ actions }
 				items={ selectedItems }
@@ -234,9 +245,13 @@ function PickerActions() {
 
 // The bulk-selection info and action buttons without pagination — the picker
 // counterpart to `DataViews.BulkActionToolbar`, for free composition.
-export function DataViewsPickerBulkActionToolbar() {
+export function DataViewsPickerBulkActionToolbar( {
+	className,
+}: {
+	className?: string;
+} ) {
 	return (
-		<Stack direction="row" gap="md" align="center">
+		<Stack direction="row" gap="md" align="center" className={ className }>
 			<PickerBulkSelectionInfo />
 			<PickerActions />
 		</Stack>
@@ -244,8 +259,15 @@ export function DataViewsPickerBulkActionToolbar() {
 }
 
 // The full picker footer: bulk-selection info, pagination, and actions — the
-// picker counterpart to `DataViews.Footer`.
-export function DataViewsPickerFooter() {
+// picker counterpart to `DataViews.Footer`. Given children, it renders those
+// in their place instead.
+export function DataViewsPickerFooter( {
+	children,
+	className,
+}: {
+	children?: ReactNode;
+	className?: string;
+} ) {
 	const {
 		actions = EMPTY_ARRAY,
 		paginationInfo,
@@ -257,7 +279,12 @@ export function DataViewsPickerFooter() {
 		!! paginationInfo.totalItems &&
 		paginationInfo.totalPages > 1;
 
-	if ( ! actions.length && ! hasPagination ) {
+	// Without actions and without pagination every default part renders
+	// nothing, leaving the row's border and padding around an empty line. The
+	// check belongs to those parts alone: children are the consumer's, and
+	// what they need is not something this can work out.
+	const rendersDefaultContents = children === undefined || children === null;
+	if ( rendersDefaultContents && ! actions.length && ! hasPagination ) {
 		return null;
 	}
 
@@ -266,12 +293,16 @@ export function DataViewsPickerFooter() {
 			direction="row"
 			justify="space-between"
 			align="center"
-			className="dataviews-footer"
+			className={ clsx( 'dataviews-footer', className ) }
 			gap="sm"
 		>
-			<PickerBulkSelectionInfo />
-			<DataViewsPagination />
-			<PickerActions />
+			{ children ?? (
+				<>
+					<PickerBulkSelectionInfo />
+					<DataViewsPagination />
+					<PickerActions />
+				</>
+			) }
 		</Stack>
 	);
 }

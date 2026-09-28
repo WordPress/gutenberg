@@ -78,6 +78,21 @@ For example, to change the `indentation` to four spaces and turn off the `number
 }
 ```
 
+### `custom-property-pattern`
+
+The preset disallows `--_gcd-*` and `--_wp-*` custom properties. These are private and will break at any time.
+
+Stylelint does not merge `custom-property-pattern` values. If your project already sets this rule, the preset ban is replaced — include `(?!_(?:gcd|wp)-)` in your pattern if you want to keep it, for example:
+
+```json
+{
+	"extends": "@wordpress/stylelint-config",
+	"rules": {
+		"custom-property-pattern": "^(?!_(?:gcd|wp)-)my-prefix-.+"
+	}
+}
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import useRefEffect from '../use-ref-effect';
 import useEvent from '../use-event';
 import type { UseDropZoneProps } from './types';

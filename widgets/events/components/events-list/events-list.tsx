@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { dateI18n, format } from '@wordpress/date';
 import {
@@ -11,10 +8,6 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { calendar, people, wordpress } from '@wordpress/icons';
 import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './events-list.module.css';
 
 export interface WPEvent {
@@ -204,7 +197,7 @@ function toEventListItem( event: WPEvent ): EventListItem {
 function EventIcon( { item }: { item: EventListItem } ) {
 	return (
 		<Stack
-			className={ styles.eventIcon }
+			className={ styles[ 'event-icon' ] }
 			direction="column"
 			align="center"
 			justify="center"
@@ -216,7 +209,11 @@ function EventIcon( { item }: { item: EventListItem } ) {
 
 function EventTitle( { item }: { item: EventListItem } ) {
 	return (
-		<Link href={ item.url } openInNewTab className={ styles.titleLink }>
+		<Link
+			href={ item.url }
+			openInNewTab
+			className={ styles[ 'title-link' ] }
+		>
 			{ item.title }
 		</Link>
 	);
@@ -285,7 +282,11 @@ export function EventsList( {
 	};
 
 	const empty = showEmptyState ? (
-		<Stack align="center" justify="center" className={ styles.emptyState }>
+		<Stack
+			align="center"
+			justify="center"
+			className={ styles[ 'empty-state' ] }
+		>
 			<EmptyState.Root>
 				<EmptyState.Icon icon={ calendar } />
 				<EmptyState.Title>{ emptyTitle() }</EmptyState.Title>
@@ -303,7 +304,7 @@ export function EventsList( {
 
 	return (
 		<Stack className={ styles.root } direction="column">
-			<Stack className={ styles.listArea } direction="column">
+			<Stack className={ styles[ 'list-area' ] } direction="column">
 				<DataViews
 					data={ items }
 					fields={ fields }
@@ -322,7 +323,7 @@ export function EventsList( {
 				</DataViews>
 			</Stack>
 			{ events.length > 0 && events.length <= 2 && (
-				<Text variant="body-sm" className={ styles.eventNone }>
+				<Text variant="body-sm" className={ styles[ 'event-none' ] }>
 					{ createInterpolateElement(
 						__(
 							'Want more events? <a>Help organize the next one!</a>'

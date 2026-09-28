@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**

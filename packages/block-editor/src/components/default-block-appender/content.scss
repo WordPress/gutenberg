@@ -111,12 +111,15 @@
 		display: none;
 	}
 
-	// These could be avoided by employing a :not(:only-child) on the parent,
+	// These could be avoided by employing a :not(:first-child) on the parent,
 	// but this should be more performant.
 	// @todo These styles can almost certainly be refactored away we refactor
 	// the markup and classes of the component itself. The rules provide some
-	// baseline styles for when the block is the only one inside.
-	&:only-child {
+	// baseline styles for when the container has no blocks. The appender
+	// always renders after the blocks, so being the first child means the
+	// container is empty; non-block siblings may follow, like the citation
+	// in the quote block.
+	&:first-child {
 		position: relative;
 		right: auto;
 		align-self: center;

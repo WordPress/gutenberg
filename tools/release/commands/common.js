@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const semver = require( 'semver' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { readJSONFile } = require( '../lib/utils' );
 
 /**

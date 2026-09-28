@@ -4,7 +4,6 @@ import TreeSelect from '../tree-select';
 import type { CategorySelectProps } from './types';
 
 export default function CategorySelect( {
-	__next40pxDefaultSize,
 	label,
 	noOptionLabel,
 	categoriesList,
@@ -30,7 +29,6 @@ export default function CategorySelect( {
 					: undefined
 			}
 			{ ...props }
-			__next40pxDefaultSize={ __next40pxDefaultSize }
 		/>
 	);
 }

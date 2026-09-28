@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-
+import { describe, expect, it } from 'vitest';
 import { isCollapsed } from '../is-collapsed';
 
 describe( 'isCollapsed', () => {

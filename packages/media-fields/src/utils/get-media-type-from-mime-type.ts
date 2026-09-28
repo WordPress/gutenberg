@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { audio, video, image, file } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { MediaType } from '../types';
 
 /**

@@ -32,6 +32,51 @@ export function isInsideRootBlock( blockElement: Element, element: Element ) {
 }
 
 /**
+ * Returns the editable element containing the selection, if the selection is
+ * fully contained within one. The root element (an editable wrapper) does not
+ * count as a containing editable element.
+ *
+ * @param selection The selection.
+ * @param root      The editable wrapper element.
+ *
+ * @return The editable element containing the selection.
+ */
+export function getSelectionEditableElement(
+	selection: Selection,
+	root: Element
+) {
+	const { anchorNode, focusNode } = selection;
+
+	if ( ! anchorNode || ! focusNode ) {
+		return;
+	}
+
+	const element =
+		anchorNode.nodeType === anchorNode.ELEMENT_NODE
+			? ( anchorNode as Element )
+			: anchorNode.parentElement;
+	let editable = element?.closest( '[contenteditable="true"]' );
+
+	// While the root is the editing host, the selected block's field is
+	// editable through it and has no contenteditable attribute of its own:
+	// the block element is the editable element.
+	if ( editable === root ) {
+		editable = element?.closest( BLOCK_SELECTOR );
+	}
+
+	if (
+		! editable ||
+		editable === root ||
+		! ( editable as HTMLElement ).isContentEditable ||
+		! editable.contains( focusNode )
+	) {
+		return;
+	}
+
+	return editable;
+}
+
+/**
  * Finds the block client ID given any DOM node inside the block.
  *
  * @param node DOM node.

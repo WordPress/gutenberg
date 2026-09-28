@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	type AccumulateSubSizeAction,
 	type AddAction,
@@ -43,6 +40,7 @@ const DEFAULT_STATE: State = {
 		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
+	failureCount: 0,
 };
 
 type Action =
@@ -87,28 +85,26 @@ function reducer(
 		case Type.PauseItem:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									status: ItemStatus.Paused,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								status: ItemStatus.Paused,
+							}
+						: item
 				),
 			};
 
 		case Type.ResumeItem:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									status: ItemStatus.Processing,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								status: ItemStatus.Processing,
+							}
+						: item
 				),
 			};
 
@@ -118,52 +114,73 @@ function reducer(
 				queue: [ ...state.queue, action.item ],
 			};
 
-		case Type.Cancel:
+		case Type.Cancel: {
+			/*
+			 * Only top-level items count as failures. A sub-size that fails on
+			 * its own does not stop the attachment from being uploaded, and a
+			 * sub-size failure bad enough to sink the whole attachment cancels
+			 * the parent too - which is the cancellation counted here.
+			 */
+			const cancelled = state.queue.find(
+				( item ) => item.id === action.id
+			);
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									error: action.error,
-							  }
-							: item
+				failureCount:
+					cancelled && ! cancelled.parentId
+						? state.failureCount + 1
+						: state.failureCount,
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								error: action.error,
+							}
+						: item
 				),
 			};
+		}
 
 		case Type.RetryItem:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									status: ItemStatus.Processing,
-									error: undefined,
-									retryCount: ( item.retryCount ?? 0 ) + 1,
-									abortController: new AbortController(),
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								status: ItemStatus.Processing,
+								error: undefined,
+								retryCount: ( item.retryCount ?? 0 ) + 1,
+								abortController: new AbortController(),
+								/*
+								 * The failed operation is still recorded on
+								 * the item: nothing finishes it when it
+								 * fails, and while the item waits out the
+								 * backoff that is what keeps it out of the
+								 * concurrency pools. Clear it now that the
+								 * item is about to run again, so processItem
+								 * does not mistake it for an operation still
+								 * in flight and skip the retry.
+								 */
+								currentOperation: undefined,
+							}
+						: item
 				),
 			};
 
 		case Type.ScheduleRetry:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									status: ItemStatus.PendingRetry,
-									error: action.error,
-									retryCount: action.retryCount,
-									nextRetryTimestamp:
-										action.nextRetryTimestamp,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								status: ItemStatus.PendingRetry,
+								error: action.error,
+								retryCount: action.retryCount,
+								nextRetryTimestamp: action.nextRetryTimestamp,
+							}
+						: item
 				),
 			};
 
@@ -176,14 +193,13 @@ function reducer(
 		case Type.OperationStart: {
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									currentOperation: action.operation,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								currentOperation: action.operation,
+							}
+						: item
 				),
 			};
 		}
@@ -224,7 +240,7 @@ function reducer(
 							? {
 									...item.attachment,
 									...action.item.attachment,
-							  }
+								}
 							: undefined;
 
 					return {
@@ -265,31 +281,29 @@ function reducer(
 		case Type.UpdateProgress:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									progress: action.progress,
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								progress: action.progress,
+							}
+						: item
 				),
 			};
 
 		case Type.AccumulateSubSize:
 			return {
 				...state,
-				queue: state.queue.map(
-					( item ): QueueItem =>
-						item.id === action.id
-							? {
-									...item,
-									subSizes: [
-										...( item.subSizes || [] ),
-										action.subSize,
-									],
-							  }
-							: item
+				queue: state.queue.map( ( item ): QueueItem =>
+					item.id === action.id
+						? {
+								...item,
+								subSizes: [
+									...( item.subSizes || [] ),
+									action.subSize,
+								],
+							}
+						: item
 				),
 			};
 

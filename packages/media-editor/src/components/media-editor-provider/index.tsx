@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
 import type { Field } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';

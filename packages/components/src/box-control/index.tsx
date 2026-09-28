@@ -1,23 +1,14 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { BaseControl } from '../base-control';
 import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
+import Button from '../button';
 import { Grid } from '../grid';
-import {
-	InputWrapper,
-	ResetButton,
-	LinkedButtonWrapper,
-} from './styles/box-control-styles';
+import { HStack } from '../h-stack';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
@@ -27,6 +18,7 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
+import styles from './style.module.scss';
 
 const defaultInputProps = {
 	min: 0,
@@ -157,17 +149,17 @@ function BoxControl( {
 				{ label }
 			</BaseControl.VisualLabel>
 			{ isLinked && (
-				<InputWrapper>
+				<HStack className={ styles[ 'input-wrapper' ] }>
 					<BoxInputControl side="all" { ...inputControlProps } />
-				</InputWrapper>
+				</HStack>
 			) }
 			{ ! hasOneSide && (
-				<LinkedButtonWrapper>
+				<div className={ styles[ 'linked-button-wrapper' ] }>
 					<LinkedButton
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
-				</LinkedButtonWrapper>
+				</div>
 			) }
 
 			{ ! isLinked &&
@@ -189,15 +181,19 @@ function BoxControl( {
 					/>
 				) ) }
 			{ allowReset && (
-				<ResetButton
-					className="component-box-control__reset-button"
+				<Button
+					className={ clsx(
+						styles[ 'reset-button' ],
+						'component-box-control__reset-button'
+					) }
 					variant="secondary"
 					size="small"
 					onClick={ handleOnReset }
 					disabled={ ! isDirty }
+					accessibleWhenDisabled
 				>
 					{ __( 'Reset' ) }
-				</ResetButton>
+				</Button>
 			) }
 		</Grid>
 	);

@@ -150,24 +150,10 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	// Run through the actions that are typically taken on the_content.
-	$content                       = shortcode_unautop( $content );
-	$content                       = do_shortcode( $content );
-	$seen_ids[ $template_part_id ] = true;
-	$content                       = do_blocks( $content );
-	unset( $seen_ids[ $template_part_id ] );
-	$content = wptexturize( $content );
-	$content = convert_smilies( $content );
-	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
+	$content = _wp_apply_block_content_filters( $content, "template_part_{$area}", $seen_ids, $template_part_id );
 
-	/**
-	 * Handle embeds for block template parts.
-	 *
-	 * @global WP_Embed $wp_embed WordPress Embed object.
-	 */
-	global $wp_embed;
-	$content = $wp_embed->autoembed( $content );
-
-	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
+	$tag_name = $attributes['tagName'] ?? null;
+	if ( empty( $tag_name ) || ! is_string( $tag_name ) || tag_escape( $tag_name ) !== $tag_name ) {
 		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];

@@ -253,7 +253,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 		);
 
 		gutenberg_render_elements_support_styles( $block );
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertMatchesRegularExpression(
 			$expected_styles,
@@ -324,6 +324,21 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 				'elements_styles' => array(
 					'button' => array( 'color' => $color_styles ),
 				),
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-element-button, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-block-button__link' . $color_css_rules . '$/',
+			),
+			'button hover styles are skipped without a hover selector' => array(
+				'color_settings'  => array( 'button' => true ),
+				'elements_styles' => array(
+					'button' => array(
+						'color'  => $color_styles,
+						':hover' => array( 'color' => $color_styles ),
+					),
+				),
+				/*
+				 * Only the base button rule should be emitted. The button element
+				 * type has no `hover_selector`, so the `:hover` object must be
+				 * ignored rather than triggering an undefined array key warning.
+				 */
 				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-element-button, .wp-elements-(?:[a-f0-9]{32}|[0-9]+) .wp-block-button__link' . $color_css_rules . '$/',
 			),
 			'link element styles are applied'            => array(

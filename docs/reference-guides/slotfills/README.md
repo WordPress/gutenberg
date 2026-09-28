@@ -38,9 +38,6 @@ With the exception of [MainDashboardButton](/docs/reference-guides/slotfills/mai
 A fill can be restricted to the Post Editor by checking to see if the current post type object property `viewable` is set to `true`. Any post type not set to `viewable`, does not have an associated edit post screen and is a good indicator that the user is not in the Post Editor. The example below will render its content on the edit post screen for any registered post type.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -87,9 +84,6 @@ registerPlugin( 'example-post-edit-only', {
 The following example expands on the example above by creating an allow list of post types where the fill should be rendered. In this case, the fill is only rendered when editing pages.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -149,9 +143,6 @@ registerPlugin( 'example-restrict-post-types', {
 To restrict fills to the Site Editor, the reverse logic is true. If the post type object's `viewable` property is set to `true`, then the fill should not be rendered. The example below will render its content on any Site Editor screen.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -200,9 +191,6 @@ registerPlugin( 'example-site-editor', {
 This example builds on the example above by providing an allow list to control which screens a fill can be rendered within the Site Editor.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -266,15 +254,11 @@ registerPlugin( 'example-site-editor-only', {
 
 SlotFills are created using `createSlotFill`. This creates two components, `Slot` and `Fill` which are then used to create a new component that is exported on the `wp.plugins` global.
 
-**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-post-status-info/index.js#L55))
+**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-post-status-info/index.jsx#L55))
 
 ```js
 /**
  * Defines as extensibility slot for the Summary panel.
- */
-
-/**
- * WordPress dependencies
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
@@ -296,7 +280,7 @@ This new Slot is then exposed in the editor. The example below is from core and 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
 Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed in the end of the component.
 
-See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/sidebar/post-summary.js#L39).
+See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/sidebar/post-summary.jsx#L39).
 
 ```js
 export default function PostSummary( { onActionPerformed } ) {

@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getErrorMessage } from '../error-messages';
 import { ErrorCode } from '../upload-error';
 

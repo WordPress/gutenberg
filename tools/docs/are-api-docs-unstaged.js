@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 const { extname, join, resolve } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const execSync = require( 'child_process' ).execSync;

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { deepFilterHTML } from './utils';
 import msListIgnore from './ms-list-ignore';
 

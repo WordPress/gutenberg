@@ -18,6 +18,7 @@
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/notices": "file:../../packages/notices"
+		"@wordpress/notices": "file:../../packages/notices",
+		"@wordpress/ui": "file:../../packages/ui"
 	}
 }

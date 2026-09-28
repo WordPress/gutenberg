@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { mat2d, vec2 } from 'gl-matrix';
-
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedRect, Size } from './types';
 import { ABSOLUTE_MIN_ZOOM, MAX_ZOOM, MIN_ZOOM } from './constants';
 import { degreesToRadians } from './math/rotation';

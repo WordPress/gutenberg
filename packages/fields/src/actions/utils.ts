@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { Post, TemplatePart, Template } from '../types';
 
 export function isTemplate( post: Post ): post is Template {

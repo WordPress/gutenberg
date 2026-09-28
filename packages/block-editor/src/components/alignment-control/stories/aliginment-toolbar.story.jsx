@@ -1,18 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { AlignmentToolbar } from '..';
 
 /**
  * The `AlignmentToolbar` component renders a dropdown menu that displays alignment options for the selected block in `Toolbar`.
  */
 const meta = {
-	title: 'BlockEditor/AlignmentToolbar',
+	id: 'blockeditor-alignmenttoolbar',
+	title: 'Editor/Block Editor/AlignmentToolbar',
 	component: AlignmentToolbar,
 	argTypes: {
 		value: {

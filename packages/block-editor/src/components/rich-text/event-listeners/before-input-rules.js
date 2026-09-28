@@ -1,17 +1,13 @@
-/**
- * WordPress dependencies
- */
-import { insert, isCollapsed } from '@wordpress/rich-text';
+import {
+	insert,
+	isCollapsed,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { applyFilters } from '@wordpress/hooks';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 /**
  * When typing over a selection, the selection will we wrapped by a matching
@@ -84,10 +80,10 @@ export default ( props ) => ( element ) => {
 		// call few lines above has fully updated the data store state and rerendered
 		// all affected components.
 		window.queueMicrotask( () => {
-			event.target.dispatchEvent( newEvent );
+			element.dispatchEvent( newEvent );
 		} );
 		event.preventDefault();
 	}
 
-	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
+	return subscribeOwnedListener( element, 'beforeinput', onInput, true );
 };

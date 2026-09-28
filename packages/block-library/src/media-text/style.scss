@@ -53,6 +53,7 @@
 	grid-row: 1;
 	/*rtl:end:ignore*/
 	padding: 0 8% 0 8%;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 
@@ -102,7 +103,7 @@
 	padding: 0;
 	margin: -1px;
 	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
 	border: 0;
 }
 

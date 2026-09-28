@@ -15,11 +15,11 @@ export default {
 		'background-interactive-neutral-weak-disabled',
 	],
 	'primary-bgFill1': [ 'background-interactive-brand-strong' ],
+	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-fgFill': [
 		'foreground-interactive-brand-strong',
 		'foreground-interactive-brand-strong-active',
 	],
-	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
 	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
 	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
@@ -52,11 +52,11 @@ export default {
 	'warning-stroke3': [ 'stroke-surface-warning-strong' ],
 	'warning-stroke1': [ 'stroke-surface-warning' ],
 	'error-bgFill1': [ 'background-interactive-error-strong' ],
+	'error-bgFill2': [ 'background-interactive-error-strong-active' ],
 	'error-fgFill': [
 		'foreground-interactive-error-strong',
 		'foreground-interactive-error-strong-active',
 	],
-	'error-bgFill2': [ 'background-interactive-error-strong-active' ],
 	'error-surface2': [
 		'background-interactive-error-active',
 		'background-surface-error-weak',
@@ -87,11 +87,17 @@ export default {
 		'background-interactive-neutral-strong-disabled',
 	],
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
-	'bg-surface3': [ 'background-surface-neutral-strong' ],
+	'bg-surface3': [
+		'background-interactive-neutral',
+		'background-interactive-neutral-active',
+		'background-interactive-neutral-disabled',
+		'background-surface-neutral-strong',
+	],
 	'bg-fgSurface4': [
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
 		'foreground-interactive-neutral-active',
+		'foreground-interactive-neutral-weak-active',
 	],
 	'bg-fgSurface3': [
 		'foreground-content-neutral-weak',
@@ -117,7 +123,8 @@ export default {
 		'stroke-interactive-neutral-strong',
 	],
 	'bg-stroke2': [
-		'background-thumb-neutral-disabled',
+		'background-thumb-brand-disabled',
+		'background-thumb-neutral-weak-disabled',
 		'background-track-neutral',
 		'stroke-interactive-brand-disabled',
 		'stroke-interactive-error-disabled',

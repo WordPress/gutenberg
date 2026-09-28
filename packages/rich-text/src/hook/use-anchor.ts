@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import type { WPFormat } from '../register-format-type';
+import { ownsSelection } from '../owns-selection';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -228,7 +222,7 @@ export function useAnchor( {
 		const { ownerDocument } = editableContentElement;
 
 		if (
-			editableContentElement === ownerDocument.activeElement ||
+			ownsSelection( editableContentElement ) ||
 			// When a link is created, we need to attach the popover to the newly created anchor.
 			( ! wasActive && isActive ) ||
 			// Sometimes we're _removing_ an active anchor, such as the inline color popover.

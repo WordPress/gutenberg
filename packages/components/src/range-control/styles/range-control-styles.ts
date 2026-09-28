@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import NumberControl from '../../number-control';
 import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
-
 import type {
 	RangeMarkProps,
 	RailProps,
@@ -18,7 +10,6 @@ import type {
 	TooltipProps,
 	TrackProps,
 	WrapperProps,
-	RangeControlProps,
 } from '../types';
 
 const rangeHeightValue = 30;
@@ -27,13 +18,7 @@ const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
-const deprecatedHeight = ( {
-	__next40pxDefaultSize,
-}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
-	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
-
-type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
-export const Root = styled.div< RootProps >`
+export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
 	display: flex;
@@ -43,8 +28,6 @@ export const Root = styled.div< RootProps >`
 	touch-action: none;
 	width: 100%;
 	min-height: 40px;
-	/* TODO: remove after removing the __next40pxDefaultSize prop */
-	${ deprecatedHeight };
 `;
 
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
@@ -79,9 +62,11 @@ export const AfterIconWrapper = styled.span`
 
 const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.ui.backgroundDisabled
-			: railColor || COLORS.theme.gray[ 300 ] };
+		background: ${
+			disabled
+				? COLORS.ui.backgroundDisabled
+				: railColor || COLORS.theme.gray[ 300 ]
+		};
 
 		@media ( forced-colors: active ) {
 			background: GrayText;
@@ -105,9 +90,9 @@ export const Rail = styled.span`
 
 const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.theme.gray[ 400 ]
-			: trackColor || 'currentColor' };
+		background: ${
+			disabled ? COLORS.theme.gray[ 400 ] : trackColor || 'currentColor'
+		};
 
 		@media ( forced-colors: active ) {
 			background: ${ disabled ? 'GrayText' : 'CanvasText' };
@@ -177,9 +162,9 @@ export const MarkLabel = styled.span`
 
 const thumbColor = ( { disabled }: ThumbProps ) => {
 	return css`
-		background: ${ disabled
-			? COLORS.theme.gray[ 400 ]
-			: COLORS.theme.accent };
+		background: ${
+			disabled ? COLORS.theme.gray[ 400 ] : COLORS.theme.accent
+		};
 
 		@media ( forced-colors: active ) {
 			background: ${ disabled ? 'GrayText' : 'CanvasText' };
@@ -234,7 +219,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 						background: GrayText;
 					}
 				}
-		  `
+			`
 		: '';
 };
 

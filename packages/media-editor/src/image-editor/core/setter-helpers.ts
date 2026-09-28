@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, CropperAction } from './types';
 import { MAX_ZOOM } from './constants';
 import { getMinZoom, restrictPanZoom } from './containment';
@@ -48,7 +45,7 @@ export function buildFocalPointZoomAction(
 		? {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
-		  }
+			}
 		: { width: 1, height: 1 };
 	const { pan: clampedPan }: { pan: NormalizedPoint } = restrictPanZoom(
 		{

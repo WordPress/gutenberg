@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Relocated color controls with block style states', () => {
@@ -19,13 +16,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 			name: 'Editor settings',
 		} );
 
-		// Switch the block's editing context to the Mobile viewport state.
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+		await page.keyboard.press( 'Escape' );
 
 		// Text color now lives in the Typography panel.
 		await settings
@@ -78,12 +74,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 		} );
 
 		// Switch the block's editing context to the Mobile viewport state.
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+		await page.keyboard.press( 'Escape' );
 
 		const elementsPanel = settings
 			.locator( '.components-tools-panel' )
@@ -146,12 +142,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 			name: 'Editor settings',
 		} );
 
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+		await page.keyboard.press( 'Escape' );
 
 		// Reset all of the Background panel while the Mobile state is selected.
 		await settings

@@ -23,8 +23,7 @@
 	margin: 0;
 	background: $components-color-background;
 	color: $components-color-foreground;
-	@include input-control( $components-color-accent );
-	border-color: $components-color-border;
+	@include input-control;
 
 	// Subtract 1px to account for the border, which isn't included on the element
 	// on newer components like InputControl, SelectControl, etc.
@@ -34,6 +33,23 @@
 
 	&::placeholder {
 		color: $components-color-dark-gray-placeholder;
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		// Override the disabled background from WP forms.css.
+		background: var(--wpds-color-background-interactive-neutral-disabled);
+
+		@media ( forced-colors: active ) {
+			border-color: GrayText;
+			color: GrayText;
+		}
+
+		&::placeholder {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
 	}
 }
 

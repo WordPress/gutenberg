@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -18,10 +15,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { safeDecodeURI } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY: any[] = [];
@@ -86,7 +79,7 @@ function SuggestionListItem( {
 			<WCText
 				size="body"
 				lineHeight={ 1.53846153846 } // 20px
-				weight={ 500 }
+				weight="var(--wpds-typography-font-weight-emphasis)"
 				className={ `${ baseCssClass }__title` }
 			>
 				<TextHighlight
@@ -274,7 +267,7 @@ function AddCustomTemplateModalContent( {
 						>
 							<WCText
 								as="span"
-								weight={ 500 }
+								weight="var(--wpds-typography-font-weight-emphasis)"
 								lineHeight={ 1.53846153846 } // 20px
 							>
 								{ entityForSuggestions.labels.all_items }
@@ -298,7 +291,7 @@ function AddCustomTemplateModalContent( {
 						>
 							<WCText
 								as="span"
-								weight={ 500 }
+								weight="var(--wpds-typography-font-weight-emphasis)"
 								lineHeight={ 1.53846153846 } // 20px
 							>
 								{ entityForSuggestions.labels.singular_name }

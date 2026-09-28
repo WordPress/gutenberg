@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	initialImportMap,
 	importPreloadedModule,
@@ -69,9 +66,9 @@ export const preloadScriptModules = ( doc: Document ) => {
 };
 
 /**
- * Imports modules respresented by the passed `ScriptModuleLoad` instances.
+ * Imports modules represented by the passed `ScriptModuleLoad` instances.
  *
- * @param modules Array of `MoudleLoad` instances.
+ * @param modules Array of `ModuleLoad` instances.
  * @return Promise that resolves once all modules are imported.
  */
 export const importScriptModules = ( modules: ScriptModuleLoad[] ) =>

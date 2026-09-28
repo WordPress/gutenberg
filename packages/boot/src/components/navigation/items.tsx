@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { isValidElement } from '@wordpress/element';
 import { Dashicon, Icon as WCIcon } from '@wordpress/components';
 import { SVG } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import type { IconType } from '../../store/types';
 
 /**

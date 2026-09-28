@@ -18,8 +18,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"files": [
 		"src",
@@ -34,7 +33,8 @@
 	"dependencies": {
 		"@wordpress/boot": "file:../boot",
 		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
 		"access": "public"

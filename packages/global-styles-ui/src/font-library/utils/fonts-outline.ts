@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { FontFace, FontFamily } from '@wordpress/core-data';
 
 export function getFontsOutline(

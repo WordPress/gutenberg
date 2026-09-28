@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { useMemoOne } from 'use-memo-one';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { debounce } from '../../utils/debounce';
 import type { DebounceOptions, DebouncedFunc } from '../../utils/debounce';
 

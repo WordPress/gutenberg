@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Icon } from '@wordpress/icons';
 
 interface IconWithCurrentColorProps {

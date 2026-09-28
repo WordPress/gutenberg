@@ -62,7 +62,7 @@ function render_block_core_button( $attributes, $content ) {
 
 	$width = $attributes['style']['dimensions']['width'] ?? null;
 
-	if ( $width ) {
+	if ( is_string( $width ) && '' !== $width ) {
 		// Resolve preset references to their actual values.
 		$resolved_width = $width;
 		$is_preset      = str_starts_with( $width, 'var:preset|dimension|' );

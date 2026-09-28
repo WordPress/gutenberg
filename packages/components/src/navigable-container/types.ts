@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 
 type BaseProps = {

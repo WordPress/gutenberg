@@ -1,11 +1,13 @@
-/**
- * External dependencies
- */
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +15,6 @@ import {
 	privateApis,
 } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
@@ -43,6 +41,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
+	styleStateViewport,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -50,18 +49,38 @@ import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
-jest.mock( '@wordpress/data/src/select', () => {
-	const actualSelect = jest.requireActual( '@wordpress/data/src/select' );
+const { mockIsContentBlock } = vi.hoisted( () => ( {
+	mockIsContentBlock: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actualData = await importOriginal();
 
 	return {
-		select: jest.fn( ( ...args ) => actualSelect.select( ...args ) ),
+		...actualData,
+		select: vi.fn( ( ...args ) => actualData.select( ...args ) ),
 	};
 } );
 
-jest.mock( '@wordpress/blocks/src/api/utils', () => {
+vi.mock( import( '../../lock-unlock' ), async ( importOriginal ) => {
+	const actualLockUnlock = await importOriginal();
+
 	return {
-		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
-		isContentBlock: jest.fn(),
+		...actualLockUnlock,
+		unlock: ( value ) => {
+			const unlocked = actualLockUnlock.unlock( value );
+			if (
+				unlocked &&
+				typeof unlocked === 'object' &&
+				'isContentBlock' in unlocked
+			) {
+				return {
+					...unlocked,
+					isContentBlock: mockIsContentBlock,
+				};
+			}
+			return unlocked;
+		},
 	};
 } );
 
@@ -834,7 +853,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'ribs',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -880,7 +899,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -888,7 +907,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 1 );
 			expect( state.byClientId.get( 'wings' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
@@ -903,7 +922,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -955,7 +974,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -974,7 +993,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -1037,7 +1056,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'chicken',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -1048,7 +1067,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
@@ -1072,7 +1091,7 @@ describe( 'state', () => {
 			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -1098,7 +1117,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 		} );
 
@@ -1603,7 +1622,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'persimmon',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -3455,10 +3474,6 @@ describe( 'state', () => {
 
 	describe( 'settings', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
-			const consoleWarn = jest
-				.spyOn( global.console, 'warn' )
-				.mockImplementation();
-
 			const settingsObject = settings( undefined, {
 				type: 'UPDATE_SETTINGS',
 				reset: true,
@@ -3467,11 +3482,9 @@ describe( 'state', () => {
 			expect( settingsObject.__unstableIsPreviewMode ).toBeDefined();
 			expect( settingsObject.isPreviewMode ).toBeDefined();
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
 			);
-
-			consoleWarn.mockRestore();
 		} );
 	} );
 
@@ -4241,7 +4254,7 @@ describe( 'state', () => {
 
 		describe( 'edit mode', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -4295,7 +4308,7 @@ describe( 'state', () => {
 
 		describe( 'synced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the pattern is inserted with no inner blocks.
 				// - next the pattern is marked as a controlled block.
@@ -4860,7 +4873,7 @@ describe( 'state', () => {
 
 		describe( 'contentOnly template locking', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5118,7 +5131,7 @@ describe( 'state', () => {
 		describe( 'zoom out mode', () => {
 			let initialState;
 
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5309,7 +5322,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5471,7 +5484,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5579,7 +5592,7 @@ describe( 'state', () => {
 
 		describe( 'isIsolatedEditor setting', () => {
 			let stateWithUnsyncedPatternAndTemplatePart;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Set up a state with both an unsynced pattern and a template part.
 				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
 					[
@@ -5749,7 +5762,7 @@ describe( 'state', () => {
 
 		describe( 'template parts', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the template part is inserted with no inner blocks.
 				// - next the template part is marked as a controlled block.
@@ -5863,7 +5876,7 @@ describe( 'state', () => {
 
 		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5948,7 +5961,6 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -5994,7 +6006,6 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':focus',
 				},
 			} );
@@ -6103,6 +6114,36 @@ describe( 'state', () => {
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes within the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				start: { clientId: 'client-1' },
+				end: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes across multiple blocks', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'client-1' },
+					end: { clientId: 'client-2' },
 				}
 			);
 
@@ -6272,6 +6313,35 @@ describe( 'state', () => {
 				showStateOnCanvas: false,
 				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
+		} );
+	} );
+
+	describe( 'styleStateViewport', () => {
+		it( 'defaults to "default"', () => {
+			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+		} );
+
+		it( 'stores the selected viewport', () => {
+			expect(
+				styleStateViewport( 'default', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+					viewport: '@tablet',
+				} )
+			).toBe( '@tablet' );
+		} );
+
+		it( 'falls back to "default" when no viewport is provided', () => {
+			expect(
+				styleStateViewport( '@tablet', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+				} )
+			).toBe( 'default' );
+		} );
+
+		it( 'ignores unrelated actions', () => {
+			expect(
+				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+			).toBe( '@mobile' );
 		} );
 	} );
 

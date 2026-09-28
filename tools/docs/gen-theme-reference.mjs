@@ -3,13 +3,9 @@
  * Reads from  : schemas/json/theme.json
  * Publishes to: docs/reference-guides/theme-json-reference/theme-json-living.md
  */
-
-/**
- * External dependencies
- */
 import fs from 'node:fs/promises';
-import $RefParser from '@apidevtools/json-schema-ref-parser';
 import { fileURLToPath } from 'node:url';
+import $RefParser from '@apidevtools/json-schema-ref-parser';
 
 /**
  * @typedef {import('@apidevtools/json-schema-ref-parser').JSONSchema} JSONSchema

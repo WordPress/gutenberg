@@ -11,7 +11,7 @@
  *
  * @since 6.0.0
  *
- * @param  array $context home link block context.
+ * @param array $context home link block context.
  * @return array Colors CSS classes and inline styles.
  */
 function block_core_home_link_build_css_colors( $context ) {
@@ -64,7 +64,7 @@ function block_core_home_link_build_css_colors( $context ) {
  *
  * @since 6.0.0
  *
- * @param  array $context    Home link block context.
+ * @param array $context Home link block context.
  * @return string The li wrapper attributes.
  */
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
@@ -73,7 +73,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
 		$colors['css_classes']
 	);
 
-	$style_attribute = ( $colors['inline_styles'] );
+	$style_attribute = $colors['inline_styles'];
 	$classes[]       = 'wp-block-navigation-item';
 
 	if ( is_front_page() ) {

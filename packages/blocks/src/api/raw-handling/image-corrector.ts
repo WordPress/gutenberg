@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlobURL } from '@wordpress/blob';
 
 // Counter for generating unique filenames for pasted data-URI images.

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useReducedMotion } from '@wordpress/compose';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { CONFIG } from '../utils';
 
 /**
@@ -50,8 +43,7 @@ export function useModalExitAnimation() {
 				}
 
 				let handleAnimationEnd:
-					| undefined
-					| ( ( e: AnimationEvent ) => void );
+					undefined | ( ( e: AnimationEvent ) => void );
 
 				const startAnimation = () =>
 					new Promise< void >( ( animationResolve ) => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {

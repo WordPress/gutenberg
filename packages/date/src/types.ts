@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { LocaleSpecification as MomentLocaleSpecification } from 'moment';
 
 export type MeridiemConfig = {
