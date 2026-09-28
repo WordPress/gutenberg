@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BlockIcon } from '@wordpress/block-editor';
 import {
 	addBlockSuggestions,
 	BLOCK_SUGGESTION_TYPE,
@@ -47,9 +48,18 @@ describe( 'addBlockSuggestions', () => {
 			id: 'core/home-link',
 			type: BLOCK_SUGGESTION_TYPE,
 			title: 'Home Link',
-			icon: homeLink.icon,
+			icon: expect.anything(),
 			typeLabel: 'Block',
 		} );
+	} );
+
+	// LinkControl renders an icon it is given as is, so the block's icon
+	// object is turned into an element here, where blocks are known about.
+	it( 'renders the block icon the way the inserter does', () => {
+		const [ suggestion ] = addBlockSuggestions( [], [ homeLink ], 'Home' );
+
+		expect( suggestion.icon.type ).toBe( BlockIcon );
+		expect( suggestion.icon.props.icon ).toBe( homeLink.icon );
 	} );
 
 	it( 'puts a block whose title starts with the search before the links', () => {

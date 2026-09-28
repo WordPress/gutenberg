@@ -1,5 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { createElement } from '@wordpress/element';
+import {
+	BlockIcon,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 
 const { searchItems, normalizeString } = unlock( blockEditorPrivateApis );
@@ -62,7 +66,7 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
 			id: item.id,
 			type: BLOCK_SUGGESTION_TYPE,
 			title: item.title,
-			icon: item.icon,
+			icon: createElement( BlockIcon, { icon: item.icon } ),
 			typeLabel: __( 'Block' ),
 		};
 

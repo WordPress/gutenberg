@@ -15,7 +15,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-import BlockIcon from '../block-icon';
 
 const TYPES = {
 	post: {
@@ -43,18 +42,10 @@ const TYPES = {
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
 
-	// A suggestion added by `transformSuggestions` can bring its own icon,
-	// in any shape a block icon takes.
+	// A suggestion added by `transformSuggestions` can bring its own icon.
 	if ( suggestion.icon ) {
-		return (
-			<BlockIcon
-				className="block-editor-link-control__search-item-icon"
-				icon={ suggestion.icon }
-			/>
-		);
-	}
-
-	if ( isURL ) {
+		icon = suggestion.icon;
+	} else if ( isURL ) {
 		icon = globe;
 	} else if ( suggestion.type in TYPES ) {
 		icon = TYPES[ suggestion.type ].icon;

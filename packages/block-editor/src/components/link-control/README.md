@@ -186,7 +186,7 @@ It is called with the suggestions and an object with two properties:
 
 Return the suggestions to show, or a Promise that resolves to them. It is not called when the user types a URL.
 
-A suggestion you add can set `icon` and `typeLabel` to control how it is shown. Selecting any suggestion calls `onChange` with it, so a suggestion that is not a link can be recognized there by its `type`.
+A suggestion you add can set `typeLabel`, the label shown beside it, and `icon`, an icon element such as one from `@wordpress/icons`. Selecting any suggestion calls `onChange` with it, so a suggestion that is not a link can be recognized there by its `type`.
 
 ```jsx
 <LinkControl

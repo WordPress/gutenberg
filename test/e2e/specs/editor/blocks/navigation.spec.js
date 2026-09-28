@@ -1061,9 +1061,14 @@ test.describe( 'Navigation block', () => {
 				await expect(
 					searchResults.getByRole( 'option', { name: /Home Office/ } )
 				).toBeVisible();
+				const blockResult = searchResults.getByRole( 'option' ).first();
+				await expect( blockResult ).toHaveText( /Home Link.*Block/ );
+				// The block's own icon, as the inserter shows it.
 				await expect(
-					searchResults.getByRole( 'option' ).first()
-				).toHaveText( /Home Link.*Block/ );
+					blockResult.locator(
+						'.block-editor-link-control__search-item-icon svg'
+					)
+				).toBeVisible();
 			} );
 
 			await test.step( 'Replace the new link with the block', async () => {
