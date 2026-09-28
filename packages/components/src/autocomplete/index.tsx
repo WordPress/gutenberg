@@ -448,20 +448,18 @@ export function useDeprecatedAutocompleteProps(
 	return useAutocompleteProps( options );
 }
 
-export default function Autocomplete( {
-	children,
-	isSelected,
-	...options
-}: AutocompleteProps ) {
+/**
+ * Renders its children without autocompletion. The component is deprecated
+ * and kept only so that existing calls keep rendering.
+ */
+export default function Autocomplete( { children }: AutocompleteProps ) {
 	deprecated( 'wp.components.Autocomplete', {
 		since: '7.2',
-		hint: 'The block editor’s RichText component accepts completers through its autocompleters prop.',
+		hint: 'The component no longer provides autocompletion. The block editor’s RichText component accepts completers through its autocompleters prop.',
 	} );
-	const { popover, ...props } = useAutocomplete( options );
-	return (
-		<>
-			{ children( props ) }
-			{ isSelected && popover }
-		</>
-	);
+	return children( {
+		listBoxId: undefined,
+		activeId: null,
+		onKeyDown: () => {},
+	} );
 }

@@ -1,8 +1,5 @@
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import {
-	Autocomplete as WCAutocomplete,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
@@ -59,19 +56,21 @@ export function useBlockEditorAutocompleteProps( props ) {
 }
 
 /**
- * Wrap the default Autocomplete component with one that supports a filter hook
- * for customizing its list of autocompleters.
+ * Renders its children without autocompletion. The component is deprecated
+ * and kept only so that existing calls keep rendering.
  *
  * @type {React.FC}
  */
-function BlockEditorAutocomplete( props ) {
+function BlockEditorAutocomplete( { children } ) {
 	deprecated( 'wp.blockEditor.Autocomplete', {
 		since: '7.2',
-		hint: 'The RichText component accepts completers through its autocompleters prop.',
+		hint: 'The component no longer provides autocompletion. The RichText component accepts completers through its autocompleters prop.',
 	} );
-	return (
-		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
-	);
+	return children( {
+		listBoxId: undefined,
+		activeId: null,
+		onKeyDown: () => {},
+	} );
 }
 
 /**

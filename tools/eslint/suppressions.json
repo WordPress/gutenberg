@@ -132,11 +132,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/autocomplete/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/background-image-control/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3

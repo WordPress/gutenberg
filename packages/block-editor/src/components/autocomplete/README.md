@@ -1,6 +1,6 @@
 # Autocomplete
 
-<p class="callout callout-alert">This component is deprecated. Pass completers to the `RichText` component through its `autocompleters` prop.</p>
+<p class="callout callout-alert">This component is deprecated and no longer provides autocompletion: it renders its children as they are. Pass completers to the `RichText` component through its `autocompleters` prop.</p>
 
 This is an Autocomplete component for use in block UI. It is based on `Autocomplete` from `@wordpress/components` and takes the same props. In addition, it passes its autocompleters through a `editor.Autocomplete.completers` filter to give developers an opportunity to override or extend them.
 
