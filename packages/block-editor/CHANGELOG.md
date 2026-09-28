@@ -2,13 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Autocomplete`: the component no longer provides autocompletion and only renders its children. Pass completers to `RichText` through its `autocompleters` prop ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
-
-### Deprecations
-
--   `Autocomplete`: deprecate the component. Pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
 
 ### Bug Fixes
 

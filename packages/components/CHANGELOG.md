@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Autocomplete`: the component no longer provides autocompletion and only renders its children. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
@@ -15,8 +16,7 @@
 
 ### Deprecations
 
--   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
--   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
 
 ### Bug Fixes
 
