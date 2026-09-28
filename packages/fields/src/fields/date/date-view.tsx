@@ -78,7 +78,7 @@ const DateView = ( { item }: { item: BasePost } ) => {
 		);
 	}
 
-	// Unknow status.
+	// Unknown status.
 	return <time>{ getFormattedDate( item.date ?? null ) }</time>;
 };
 

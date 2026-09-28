@@ -180,8 +180,33 @@ describe( 'SearchableChipSelect', () => {
 			expect.anything()
 		);
 		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove' } ) )
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
 			.toBeVisible();
+	} );
+
+	it( 'keeps the search input focused after selecting the first item', async () => {
+		const user = userEvent;
+
+		await render(
+			<SearchableChipSelect
+				aria-label="Fruit"
+				items={ ITEMS.slice( 0, 3 ) }
+			/>
+		);
+
+		const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await user.click( input );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Apple' } )
+		);
+
+		await expect
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
+			.toBeVisible();
+		expect( screen.getByRole( 'combobox', { name: 'Fruit' } ) ).toBe(
+			input
+		);
+		await expect.element( input ).toHaveFocus();
 	} );
 
 	it( 'announces statusContent in a status live region', async () => {

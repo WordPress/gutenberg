@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 6.56.0 (2026-09-23)
+
 ### Enhancements
 
 -   Add `@wordpress/global-styles-engine` and `@wordpress/global-styles-ui` as bundled packages, so consumer builds bundle them instead of externalizing them to the nonexistent `wp-global-styles-engine` and `wp-global-styles-ui` scripts ([#82589](https://github.com/WordPress/gutenberg/pull/82589)).
+-   Pretty-print generated asset files with line breaks and indentation ([#79650](https://github.com/WordPress/gutenberg/pull/79650)).
 
 ## 6.55.0 (2026-09-10)
 

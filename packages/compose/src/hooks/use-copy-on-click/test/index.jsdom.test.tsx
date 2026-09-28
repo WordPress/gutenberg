@@ -111,6 +111,7 @@ describe( 'useCopyOnClick', () => {
 	} );
 
 	it( 'should not update hasCopied after unmount', async () => {
+		const user = userEvent.setup();
 		const renderSpy = vi.fn();
 
 		const SpyComponent = ( { text }: { text: string } ) => {
@@ -132,7 +133,6 @@ describe( 'useCopyOnClick', () => {
 			delayedPromise as Promise< void >
 		);
 
-		const user = userEvent.setup();
 		const { unmount } = render( <SpyComponent text="test" /> );
 
 		expect( renderSpy ).toHaveBeenLastCalledWith( false );
