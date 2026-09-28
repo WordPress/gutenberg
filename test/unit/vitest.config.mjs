@@ -244,6 +244,8 @@ export default defineConfig( {
 						),
 						isolationSetupFile,
 					],
+					// Revisit the interceptor warning once this fix ships:
+					// https://github.com/vitest-dev/vitest/pull/11377
 					browser: {
 						enabled: true,
 						headless: true,
