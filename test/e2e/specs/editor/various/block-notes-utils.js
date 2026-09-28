@@ -135,17 +135,57 @@ class BlockNoteUtils {
 		await this.#page
 			.getByRole( 'button', { name: 'Add reaction' } )
 			.click();
+		await this.waitForFullPicker();
 
-		// Wait for the emoji picker popover to appear.
-		const emojiPicker = this.#page.locator(
-			'.editor-collab-sidebar-panel__emoji-picker'
-		);
-		await expect( emojiPicker ).toBeVisible();
-
-		// Click the specific emoji within the picker.
-		await emojiPicker
-			.getByRole( 'button', { name: new RegExp( emoji, 'i' ) } )
+		// Curated and filter-provided reactions carry exact label
+		// overrides (e.g. "Heart") and are seeded into the "Frequently
+		// used" section, so an exact-name gridcell lookup finds them
+		// without matching Emojibase labels that merely contain the name
+		// (e.g. "smiling face with hearts").
+		await this.#page
+			.getByRole( 'gridcell', { name: emoji, exact: true } )
+			.first()
 			.click();
+	}
+
+	/**
+	 * Wait for the full emoji picker to finish loading its Emojibase
+	 * data and render at least one emoji button. The grid / gridcell
+	 * roles are stable across className changes.
+	 */
+	async waitForFullPicker() {
+		await expect(
+			this.#page.getByPlaceholder( 'Search emoji' )
+		).toBeVisible();
+		await expect(
+			this.#page.getByRole( 'grid' ).getByRole( 'gridcell' ).first()
+		).toBeVisible();
+	}
+
+	/**
+	 * Open the emoji picker, search by name, and click the first
+	 * matching emoji.
+	 *
+	 * @param {string} search Search term (matched against Emojibase
+	 *                        labels, e.g. "red heart" or "thumbs up").
+	 */
+	async pickFullPickerEmojiBySearch( search ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
+		await this.waitForFullPicker();
+
+		await this.#page.getByPlaceholder( 'Search emoji' ).fill( search );
+
+		// Wait for the search to actually filter. Each gridcell exposes
+		// the emoji label as its accessible name, so once the first cell
+		// carries a name matching `search` we know the grid has finished
+		// re-laying-out.
+		const match = this.#page
+			.getByRole( 'gridcell', { name: new RegExp( search, 'i' ) } )
+			.first();
+		await expect( match ).toBeVisible();
+		await match.click();
 	}
 }
 

@@ -122,6 +122,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
+		"storybook": "^10.5.3",
 		"vitest": "^5.0.0",
 		"vitest-browser-react": "^2.3.0"
 	},

@@ -11,10 +11,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay, {
-	AddReactionButton,
-	getReactedSlugs,
-} from './reaction-display';
+import ReactionDisplay, { getReactedSlugs } from './reaction-display';
+import { AddReactionButton } from './add-reaction-picker';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
