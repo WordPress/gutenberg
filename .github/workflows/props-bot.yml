@@ -32,10 +32,11 @@ on:
 # Cancels all previous runs for a pull request that have not completed.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. A run that will do no props work takes a group of its own: a
-    # group replaces its pending run whatever `cancel-in-progress` says, so
-    # sharing one would drop a props update that is only waiting its turn.
-    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    # places. Only runs that will write share that key. A run that does no
+    # props work, or that cannot write because a review event on a fork gets a
+    # read-only token, takes a group of its own: it would otherwise cancel a
+    # run that could have written.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -75,14 +76,9 @@ jobs:
             ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
-            - name: Gather a list of contributors
-              id: props
-              uses: WordPress/props-bot-action@trunk
-              with:
-                  # The PR meta comment carries the list, so the action renders
-                  # it to an output and posts nothing itself.
-                  post-comment: false
-
+            # Before the gather, not after: a comment arriving meanwhile cancels
+            # this run, and a label left behind cannot be added again to ask for
+            # another refresh.
             - name: Remove the props-bot label
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
               if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
@@ -98,6 +94,14 @@ jobs:
                         issue_number: process.env.ISSUE_NUMBER,
                         name: 'props-bot'
                       });
+
+            - name: Gather a list of contributors
+              id: props
+              uses: WordPress/props-bot-action@trunk
+              with:
+                  # The PR meta comment carries the list, so the action renders
+                  # it to an output and posts nothing itself.
+                  post-comment: false
 
     pr-meta:
         name: Update PR meta comment
