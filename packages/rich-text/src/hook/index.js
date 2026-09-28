@@ -25,7 +25,9 @@ function hasFocus( element ) {
 	return (
 		activeElement === element ||
 		( activeElement?.contentEditable === 'true' &&
-			activeElement.contains( element ) )
+			activeElement.contains( element ) &&
+			// The body is the active element whenever nothing has focus.
+			activeElement.matches( ':focus' ) )
 	);
 }
 
@@ -55,7 +57,8 @@ function getFocusedHost( element ) {
  * @param {Object}      record      The record.
  */
 function applyThroughHost( host, applyRecord, record ) {
-	if ( host.ownerDocument.activeElement !== host ) {
+	// The body is the active element whenever nothing has focus.
+	if ( ! host.matches( ':focus' ) ) {
 		host.focus( { preventScroll: true } );
 	}
 	applyRecord( record );
