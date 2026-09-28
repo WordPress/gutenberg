@@ -6,6 +6,7 @@ import emotion from '@rolldown/plugin-emotion';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+import { createPostcssBrowserPlugin } from './postcss-browser-plugin.mjs';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -142,6 +143,15 @@ const config: StorybookConfig = {
 						),
 					},
 				],
+			},
+			optimizeDeps: {
+				rolldownOptions: {
+					plugins: [
+						createPostcssBrowserPlugin(
+							path.resolve( import.meta.dirname, '..' )
+						),
+					],
+				},
 			},
 			plugins: [
 				dsTokenFallbacksJs(),
