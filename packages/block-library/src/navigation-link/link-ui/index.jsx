@@ -201,11 +201,12 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const canAddBlock = blockEditingMode !== 'disabled';
 
-	// Blocks are offered where the "Add block" button is: on a new link, in a
-	// Navigation that can take them.
-	const canSearchBlocks =
-		!! clientId && blockEditingMode !== 'disabled' && ! link?.url?.length;
+	// Blocks are listed in the search results only when the "Add block"
+	// button would be shown: the link has no URL yet and the block is not
+	// locked.
+	const canSearchBlocks = !! clientId && canAddBlock && ! link?.url?.length;
 
 	const { rootClientId, blockItems } = useSelect(
 		( select ) => {
@@ -343,9 +344,7 @@ function UnforwardedLinkUI( props, ref ) {
 										permissions?.canCreate &&
 										type === 'page'
 									}
-									canAddBlock={
-										blockEditingMode !== 'disabled'
-									}
+									canAddBlock={ canAddBlock }
 								/>
 							);
 						} }
