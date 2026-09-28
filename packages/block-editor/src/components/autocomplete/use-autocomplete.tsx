@@ -314,8 +314,7 @@ export function useAutocomplete( {
 	return {
 		listBoxId,
 		activeId,
-		onKeyDown: ( event: KeyboardEvent ) =>
-			withIgnoreIMEEvents( handleKeyDown )( event ),
+		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
 				key={ autocompleter.name + autocompleter.triggerPrefix }

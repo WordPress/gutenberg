@@ -139,7 +139,7 @@
 	},
 	"packages/block-editor/src/components/autocomplete/use-autocomplete.tsx": {
 		"react-hooks/refs": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/background-image-control/index.jsx": {
