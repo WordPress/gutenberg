@@ -59,12 +59,29 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 		 *
 		 * @param {Object} node Node to test.
 		 *
-		 * @return {boolean} Whether declarator is emempt from consideration.
+		 * @return {boolean} Whether declarator is exempt from consideration.
 		 */
 		function isExemptObjectDestructureDeclarator( node ) {
 			return (
 				node.id.type === 'ObjectPattern' &&
 				node.id.properties.length > 1
+			);
+		}
+
+		/**
+		 * Checks if a return statement is inside a control flow block like try-catch-finally or if.
+		 *
+		 * @param {ESTreeNode} node The return statement node.
+		 *
+		 * @return {boolean} Whether the return is inside a control flow block.
+		 */
+		function isUsedInControlFlow( node ) {
+			return (
+				node.parent &&
+				node.parent.type === 'BlockStatement' &&
+				( node.parent.finally ||
+					node.parent.catcher ||
+					node.parent.ifStatement )
 			);
 		}
 
@@ -140,6 +157,13 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 						( identifier ) =>
 							identifier.range[ 1 ] < node.range[ 1 ]
 					);
+
+					// Exclude variables used in control flow structures like try-catch-finally
+					const isUsedInControlFlowBlock =
+						isUsedInControlFlow( node );
+					if ( isUsedInControlFlowBlock ) {
+						continue;
+					}
 
 					if ( isUsedBeforeReturn ) {
 						continue;
