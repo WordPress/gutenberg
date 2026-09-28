@@ -271,7 +271,7 @@
 
 ### Breaking Changes
 
--   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` now define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+-   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` 15.0.0 or later define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Custom SVGs need to use `currentColor` for any fill or stroke that should follow the surrounding CSS `color`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
 
 ### Enhancements
 
