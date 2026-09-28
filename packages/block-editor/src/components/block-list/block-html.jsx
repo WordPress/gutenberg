@@ -33,6 +33,12 @@ function BlockHTML( { clientId } ) {
 	);
 
 	const onChange = () => {
+		// Blur fires whether or not anything was typed, so an untouched visit
+		// would otherwise rewrite the block and mark the post dirty.
+		if ( html === blockContent ) {
+			return;
+		}
+
 		const blockType = getBlockType( block.name );
 
 		if ( ! blockType ) {
