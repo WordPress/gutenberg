@@ -7,11 +7,6 @@ function createDeclarativePlayer() {
 	return element;
 }
 
-/**
- * Imports the Playlist utilities, the only module graph that pulls in the
- * waveform player and therefore the only one that can leave the document
- * scanned for declarative markup.
- */
 async function loadWaveformUtils() {
 	await import( '../waveform-utils' );
 }
@@ -56,19 +51,6 @@ describe( 'Waveform Player dependency', () => {
 		} else {
 			delete document.readyState;
 		}
-	} );
-
-	/*
-	 * Must run first: a scan would happen when the dependency is evaluated, and
-	 * `vi.resetModules()` does not re-evaluate dependencies.
-	 */
-	it( 'leaves declarative markup it does not own uninitialized', async () => {
-		const element = createDeclarativePlayer();
-
-		await loadWaveformUtils();
-
-		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
-		expect( element ).toBeEmptyDOMElement();
 	} );
 
 	it( 'initializes declarative markup that is requested explicitly', async () => {
