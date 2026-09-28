@@ -1833,18 +1833,27 @@ test.describe( 'Block Notes', () => {
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
+			const popover = page.locator(
+				'.editor-collab-sidebar-panel__picker-popover'
+			);
+			const { width: openWidth } = await popover.boundingBox();
+
 			// A query no Emojibase label/tag matches.
 			await page
 				.getByPlaceholder( 'Search emoji' )
 				.fill( 'zzzzzznoresults' );
 
-			// The grid is replaced by an empty-state status message.
+			await expect( page.getByText( 'No emoji found.' ) ).toBeVisible();
 			await expect(
-				page.locator( '.editor-collab-sidebar-panel__picker-status' )
-			).toContainText( 'No emoji found.' );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__picker-emoji' )
+				page.getByRole( 'grid' ).getByRole( 'gridcell' )
 			).toHaveCount( 0 );
+
+			// The popover keeps its width rather than collapsing around
+			// the empty grid.
+			const { width: emptyWidth } = await popover.boundingBox();
+			expect( Math.abs( emptyWidth - openWidth ) ).toBeLessThanOrEqual(
+				1
+			);
 		} );
 
 		test( 'full picker shows a Frequently used section that learns from picks', async ( {

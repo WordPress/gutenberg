@@ -438,6 +438,7 @@ mark.wp-note {
 	--emoji-picker-cell-size: var(--wpds-dimension-size-lg);
 	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
 	--emoji-picker-padding: var(--wpds-dimension-padding-lg);
+	--emoji-picker-grid-width: calc(var(--emoji-picker-cell-size) * 6 + var(--emoji-picker-gap) * 5);
 
 	display: flex;
 	flex-direction: column;
@@ -516,6 +517,7 @@ mark.wp-note {
 	scroll-padding-block: var(--wpds-dimension-size-md) 0;
 }
 
+// Loading state shown while the lazy picker chunk downloads.
 .editor-collab-sidebar-panel__picker-status {
 	display: grid;
 	place-items: center;
@@ -523,10 +525,11 @@ mark.wp-note {
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.editor-collab-sidebar-panel__picker-list {
-	// The list sits in the viewport, not a popup, so drop the popup
-	// list's grid slots and let it grow to its content.
-	display: block;
+// Hold the grid's width even while it is empty (loading, or no search
+// results) so the popover doesn't resize and reposition.
+.editor-collab-sidebar-panel__picker-list,
+.editor-collab-sidebar-panel__picker-status {
+	min-inline-size: var(--emoji-picker-grid-width);
 }
 
 .editor-collab-sidebar-panel__picker-group + .editor-collab-sidebar-panel__picker-group {

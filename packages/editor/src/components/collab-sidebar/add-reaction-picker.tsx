@@ -76,8 +76,11 @@ function PickerLoading() {
 	}, [] );
 	return (
 		<div className="editor-collab-sidebar-panel__picker">
-			<div className="editor-collab-sidebar-panel__picker-status">
-				{ __( 'Loading…' ) }
+			{ /* The viewport reserves the same scrollbar gutter as the grid. */ }
+			<div className="editor-collab-sidebar-panel__picker-viewport">
+				<div className="editor-collab-sidebar-panel__picker-status">
+					{ __( 'Loading…' ) }
+				</div>
 			</div>
 		</div>
 	);
