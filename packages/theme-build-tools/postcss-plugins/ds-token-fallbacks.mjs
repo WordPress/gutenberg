@@ -1,4 +1,4 @@
-import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
+import tokenFallbacks from '@wordpress/theme/design-token-fallbacks.js';
 import {
 	addFallbackToVar as _addFallbackToVar,
 	getTokenFallback as _getTokenFallback,

@@ -1,5 +1,5 @@
 import stylelint from 'stylelint';
-import tokenList from '../prebuilt/js/design-tokens.mjs';
+import tokenList from '@wordpress/theme/design-tokens.js';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 

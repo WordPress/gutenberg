@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Load the design token fallback plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. To keep injecting token fallbacks, install `@wordpress/theme-build-tools` alongside `@wordpress/build`; without it, the build skips token fallbacks.
+
 ### Bug Fixes
 
 -   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

@@ -7,14 +7,6 @@
 		"rootDir": ".",
 		"types": [ "node" ]
 	},
-	"include": [
-		"esbuild-plugins/*.mjs",
-		"js-plugins/*.mjs",
-		"lightningcss-plugins/*.mjs",
-		"postcss-plugins/*.mjs",
-		"prebuilt/js/*.mjs",
-		"stylelint-plugins/*.mjs",
-		"vite-plugins/*.mjs"
-	],
+	"include": [ "prebuilt/js/*.mjs" ],
 	"exclude": []
 }

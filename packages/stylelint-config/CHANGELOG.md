@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Load the design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`, which no longer ships them. The rules are unchanged.
+
 ## 26.0.0 (2026-09-23)
 
 ### Breaking Changes

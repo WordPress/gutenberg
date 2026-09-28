@@ -61,6 +61,7 @@
 		"@wordpress/private-apis": "file:../packages/private-apis",
 		"@wordpress/route": "file:../packages/route",
 		"@wordpress/theme": "file:../packages/theme",
+		"@wordpress/theme-build-tools": "file:../packages/theme-build-tools",
 		"@wordpress/ui": "file:../packages/ui",
 		"clsx": "^2.1.1",
 		"eslint": "^10.0.0",

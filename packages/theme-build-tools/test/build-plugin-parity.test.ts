@@ -13,12 +13,12 @@ import {
 	transform as lightningcssTransform,
 } from 'lightningcss';
 import postcss from 'postcss';
-import tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
-import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
-import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
-import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
-import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
-import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
+import tokenFallbacks from '@wordpress/theme/design-token-fallbacks.js';
+import esbuildPlugin from '../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
+import lightningcssPlugin from '../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
+import postcssPlugin from '../postcss-plugins/postcss-ds-token-fallbacks.mjs';
+import vitePlugin from '../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
