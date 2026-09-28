@@ -80,8 +80,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Registers fields on `fields_api_init` for the duration of the test:
-	 * the registry is reset on tear down.
+	 * Registers fields on `fields_api_init` for the duration of the test,
+	 * with the `test-plugin` origin: the registry is reset on tear down.
 	 *
 	 * Registering only runs on the action, so the registration is hooked to
 	 * it, as a plugin does, and the action fired anew: the registry is reset
@@ -97,7 +97,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	private function register_fields( $kind, $name, $fields, $module = null ) {
 		$registered = false;
 		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
-			$registered = $registry->register( $kind, $name, $fields, $module );
+			$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
 		};
 		add_action( 'fields_api_init', $callback );
 		$this->callbacks[] = $callback;
@@ -405,8 +405,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
 
 		$fields = array_column( $data['fields'], null, 'id' );
-		$this->assertSame( $color, $fields['color'] );
-		$this->assertSame( $size, $fields['size'] );
+		$this->assertSame( $color + array( 'origin' => 'test-plugin' ), $fields['color'] );
+		$this->assertSame( $size + array( 'origin' => 'test-plugin' ), $fields['size'] );
 
 		$this->assertSame(
 			array(
@@ -504,7 +504,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$field = $schema['properties']['fields']['items'];
 		$this->assertSame( 'object', $field['type'] );
 		$this->assertTrue( $field['additionalProperties'], 'A plugin can register properties of its own.' );
-		foreach ( array( 'id', 'type', 'label', 'Edit', 'isValid', 'elements', 'filterBy', 'readOnly', 'format' ) as $property ) {
+		foreach ( array( 'id', 'origin', 'type', 'label', 'Edit', 'isValid', 'elements', 'filterBy', 'readOnly', 'format' ) as $property ) {
 			$this->assertArrayHasKey( $property, $field['properties'], "The `$property` field property should be described." );
 		}
 

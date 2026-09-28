@@ -38,6 +38,7 @@
  */
 function gutenberg_test_fields_api_add_field_declarative( $registry ) {
 	$registry->register(
+		'gutenberg-test-fields-api',
 		'postType',
 		'page',
 		array(
@@ -102,6 +103,7 @@ add_action( 'init', 'gutenberg_test_fields_api_register_reading_time_assets' );
 
 function gutenberg_test_fields_api_add_field_with_script_module( $registry ) {
 	$registry->register(
+		'gutenberg-test-fields-api',
 		'postType',
 		'page',
 		array(
@@ -156,6 +158,7 @@ add_action( 'init', 'gutenberg_test_fields_api_register_comment_status_assets' )
 
 function gutenberg_test_fields_api_update_field( $registry ) {
 	$registry->register(
+		'gutenberg-test-fields-api',
 		'postType',
 		'page',
 		array(
@@ -179,6 +182,7 @@ add_action( 'fields_api_init', 'gutenberg_test_fields_api_update_field' );
 function gutenberg_test_fields_api_replace_field( $registry ) {
 	$registry->unregister( 'postType', 'page', array( 'author' ) );
 	$registry->register(
+		'gutenberg-test-fields-api',
 		'postType',
 		'page',
 		array(
@@ -213,6 +217,7 @@ add_action( 'fields_api_init', 'gutenberg_test_fields_api_replace_field' );
  */
 function gutenberg_test_fields_api_add_field_with_data( $registry ) {
 	$registry->register(
+		'gutenberg-test-fields-api',
 		'postType',
 		'page',
 		array(
