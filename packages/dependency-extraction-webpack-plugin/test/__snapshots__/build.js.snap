@@ -1,7 +1,23 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`combine-assets\` > should produce expected output > Asset file 'assets.php' should match snapshot 1`] = `
-"<?php return array('fileA.mjs' => array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '270cb9e2d17f391e9270', 'type' => 'module'), 'fileB.mjs' => array('dependencies' => array('@wordpress/token-list'), 'version' => '4cf36c37afb98cbb1f86', 'type' => 'module'));
+"<?php return array(
+	'fileA.mjs' => array(
+		'dependencies' => array(
+			'@wordpress/blob',
+			'lodash'
+		),
+		'version' => '270cb9e2d17f391e9270',
+		'type' => 'module'
+	),
+	'fileB.mjs' => array(
+		'dependencies' => array(
+			'@wordpress/token-list'
+		),
+		'version' => '4cf36c37afb98cbb1f86',
+		'type' => 'module'
+	)
+);
 "
 `;
 
@@ -26,7 +42,13 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`combine-assets\` 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dependency-graph\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => '3432e19e5eaf6d6f4b77', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/interactivity'
+	),
+	'version' => '3432e19e5eaf6d6f4b77',
+	'type' => 'module'
+);
 "
 `;
 
@@ -41,7 +63,16 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dependency
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dynamic-dependency-graph\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => 'da8027509a599765e92e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		array(
+			'id' => '@wordpress/interactivity',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => 'da8027509a599765e92e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -56,7 +87,16 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dynamic-de
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-external-deps\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '65d060225529cfdd95f5', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		array(
+			'id' => '@wordpress/interactivity',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '65d060225529cfdd95f5',
+	'type' => 'module'
+);
 "
 `;
 
@@ -71,7 +111,16 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-external-d
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`dynamic-import\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => '7d8b118ac6242e7f308e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		array(
+			'id' => '@wordpress/blob',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '7d8b118ac6242e7f308e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -95,7 +144,14 @@ Module not found: Error: Attempted to use WordPress script in a module: @wordpre
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`function-output-filename\` > should produce expected output > Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'b68363f122fe0a26183e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => 'b68363f122fe0a26183e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -115,7 +171,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`function-output-f
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`has-extension-suffix\` > should produce expected output > Asset file 'index.min.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'fd4b8dcc8741c1523219', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => 'fd4b8dcc8741c1523219',
+	'type' => 'module'
+);
 "
 `;
 
@@ -135,7 +198,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`has-extension-suf
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`module-renames\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('renamed--@my/module', 'renamed--other-module'), 'version' => '79d3c39076be7f6df4ea', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'renamed--@my/module',
+		'renamed--other-module'
+	),
+	'version' => '79d3c39076be7f6df4ea',
+	'type' => 'module'
+);
 "
 `;
 
@@ -155,7 +225,16 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`module-renames\` 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`nested-dynamic-import\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '67bfe5b9e28926bb7d9f', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		array(
+			'id' => '@wordpress/interactivity',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '67bfe5b9e28926bb7d9f',
+	'type' => 'module'
+);
 "
 `;
 
@@ -170,21 +249,40 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`nested-dynamic-im
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`no-default\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'ef50aa650dbfb7d400af', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => 'ef50aa650dbfb7d400af',
+	'type' => 'module'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`no-default\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`no-deps\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '47abc9f11d44c8d2ea89', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => '47abc9f11d44c8d2ea89',
+	'type' => 'module'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`no-deps\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-function-output-filename\` > should produce expected output > Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'b68363f122fe0a26183e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => 'b68363f122fe0a26183e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -204,7 +302,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-function-o
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-output-filename\` > should produce expected output > Asset file 'main-foo.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'b68363f122fe0a26183e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => 'b68363f122fe0a26183e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -223,7 +328,15 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-output-fil
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-json\` > should produce expected output > Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash"],"version":"11156aba3b369605e939","type":"module"}"`;
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-json\` > should produce expected output > Asset file 'main.asset.json' should match snapshot 1`] = `
+"{
+	"dependencies": [
+		"lodash"
+	],
+	"version": "11156aba3b369605e939",
+	"type": "module"
+}"
+`;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-json\` > should produce expected output > External modules should match snapshot 1`] = `
 [
@@ -236,7 +349,16 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-jso
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`overrides\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', '@wordpress/url', 'rxjs', 'rxjs/operators'), 'version' => 'af74b6f7d8a3f114b5b3', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'@wordpress/url',
+		'rxjs',
+		'rxjs/operators'
+	),
+	'version' => 'af74b6f7d8a3f114b5b3',
+	'type' => 'module'
+);
 "
 `;
 
@@ -266,31 +388,65 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`overrides\` > sho
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`polyfill-magic-comment\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-polyfill'), 'version' => 'ce3c6b76208e3e42fe21', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'wp-polyfill'
+	),
+	'version' => 'ce3c6b76208e3e42fe21',
+	'type' => 'module'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`polyfill-magic-comment\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`polyfill-magic-comment-minified\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '31d6cfe0d16ae931b73c', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'wp-polyfill'
+	),
+	'version' => '31d6cfe0d16ae931b73c',
+	'type' => 'module'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`polyfill-magic-comment-minified\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '5822b2168d9a9ad0ab52', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob'
+	),
+	'version' => '5822b2168d9a9ad0ab52',
+	'type' => 'module',
+	'handle' => 'runtime-chunk-single-modules-a'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '95c637f4ad0885697262', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-b');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => '95c637f4ad0885697262',
+	'type' => 'module',
+	'handle' => 'runtime-chunk-single-modules-b'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '9c63db42c1fe56ddaf1e', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-runtime');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => '9c63db42c1fe56ddaf1e',
+	'type' => 'module',
+	'handle' => 'runtime-chunk-single-modules-runtime'
+);
 "
 `;
 
@@ -310,7 +466,13 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-cache-group\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '8d9f598be79e102d0648', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob'
+	),
+	'version' => '8d9f598be79e102d0648',
+	'type' => 'module'
+);
 "
 `;
 
@@ -325,7 +487,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-cache-group
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-imports\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '825b69f70b86760c73a3', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => '825b69f70b86760c73a3',
+	'type' => 'module'
+);
 "
 `;
 
@@ -345,7 +514,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-imports\` >
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'b68363f122fe0a26183e', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => 'b68363f122fe0a26183e',
+	'type' => 'module'
+);
 "
 `;
 
@@ -365,7 +541,17 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress\` > sho
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-interactivity\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '995805497b878a0197d9', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		array(
+			'id' => '@wordpress/interactivity',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '995805497b878a0197d9',
+	'type' => 'module'
+);
 "
 `;
 
@@ -385,7 +571,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-interac
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '9dcb7bb56f3fd06c5087', 'type' => 'module');
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/blob',
+		'lodash'
+	),
+	'version' => '9dcb7bb56f3fd06c5087',
+	'type' => 'module'
+);
 "
 `;
 
@@ -405,7 +598,21 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`combine-assets\` > should produce expected output > Asset file 'assets.php' should match snapshot 1`] = `
-"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => '09504998b440d7f5861d'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => 'dc31de0b2bd54808365a'));
+"<?php return array(
+	'fileA.js' => array(
+		'dependencies' => array(
+			'lodash',
+			'wp-blob'
+		),
+		'version' => '09504998b440d7f5861d'
+	),
+	'fileB.js' => array(
+		'dependencies' => array(
+			'wp-token-list'
+		),
+		'version' => 'dc31de0b2bd54808365a'
+	)
+);
 "
 `;
 
@@ -436,7 +643,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`combine-assets\` 
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-dependency-graph\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '2f1a57170044bbe4b31e');
+"<?php return array(
+	'dependencies' => array(
+		'wp-interactivity'
+	),
+	'version' => '2f1a57170044bbe4b31e'
+);
 "
 `;
 
@@ -454,7 +666,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-dependency
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-dynamic-dependency-graph\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => 'ca11d0bf855ab592ac36');
+"<?php return array(
+	'dependencies' => array(
+		'wp-interactivity'
+	),
+	'version' => 'ca11d0bf855ab592ac36'
+);
 "
 `;
 
@@ -472,7 +689,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-dynamic-de
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-external-deps\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '34137dbaccc3b6e9106e');
+"<?php return array(
+	'dependencies' => array(
+		'wp-interactivity'
+	),
+	'version' => '34137dbaccc3b6e9106e'
+);
 "
 `;
 
@@ -490,7 +712,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`cyclic-external-d
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`dynamic-import\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'b5b0369ff43e45de9a31');
+"<?php return array(
+	'dependencies' => array(
+		'wp-blob'
+	),
+	'version' => 'b5b0369ff43e45de9a31'
+);
 "
 `;
 
@@ -514,7 +741,13 @@ Module not found: Error: Ensure error in script build.
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`function-output-filename\` > should produce expected output > Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e47c17efde0e9efa1d41');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => 'e47c17efde0e9efa1d41'
+);
 "
 `;
 
@@ -537,7 +770,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`function-output-f
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`has-extension-suffix\` > should produce expected output > Asset file 'index.min.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'd4f650de95657219702b');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => 'd4f650de95657219702b'
+);
 "
 `;
 
@@ -560,7 +799,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`has-extension-suf
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`module-renames\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('renamed--@my/module', 'renamed--other-module'), 'version' => '556545d20d0075ed699f');
+"<?php return array(
+	'dependencies' => array(
+		'renamed--@my/module',
+		'renamed--other-module'
+	),
+	'version' => '556545d20d0075ed699f'
+);
 "
 `;
 
@@ -586,7 +831,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`module-renames\` 
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`nested-dynamic-import\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '08ac1b57d8e3301bd45e');
+"<?php return array(
+	'dependencies' => array(
+		'wp-interactivity'
+	),
+	'version' => '08ac1b57d8e3301bd45e'
+);
 "
 `;
 
@@ -604,21 +854,37 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`nested-dynamic-im
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`no-default\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '93d83bee525cbfa3ca27');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => '93d83bee525cbfa3ca27'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`no-default\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`no-deps\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'b922a4320dd8b7a352f4');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => 'b922a4320dd8b7a352f4'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`no-deps\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`option-function-output-filename\` > should produce expected output > Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e47c17efde0e9efa1d41');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => 'e47c17efde0e9efa1d41'
+);
 "
 `;
 
@@ -641,7 +907,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`option-function-o
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`option-output-filename\` > should produce expected output > Asset file 'main-foo.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e47c17efde0e9efa1d41');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => 'e47c17efde0e9efa1d41'
+);
 "
 `;
 
@@ -663,7 +935,14 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`option-output-fil
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`output-format-json\` > should produce expected output > Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash"],"version":"1eb19273417cb6fc62c1"}"`;
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`output-format-json\` > should produce expected output > Asset file 'main.asset.json' should match snapshot 1`] = `
+"{
+	"dependencies": [
+		"lodash"
+	],
+	"version": "1eb19273417cb6fc62c1"
+}"
+`;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`output-format-json\` > should produce expected output > External modules should match snapshot 1`] = `
 [
@@ -676,7 +955,14 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`output-format-jso
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`overrides\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '96b889b779d0e972229e');
+"<?php return array(
+	'dependencies' => array(
+		'wp-blob',
+		'wp-script-handle-for-rxjs',
+		'wp-url'
+	),
+	'version' => '96b889b779d0e972229e'
+);
 "
 `;
 
@@ -715,31 +1001,60 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`overrides\` > sho
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`polyfill-magic-comment\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '48f720dd907eea75c1fd');
+"<?php return array(
+	'dependencies' => array(
+		'wp-polyfill'
+	),
+	'version' => '48f720dd907eea75c1fd'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`polyfill-magic-comment\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`polyfill-magic-comment-minified\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '31d6cfe0d16ae931b73c');
+"<?php return array(
+	'dependencies' => array(
+		'wp-polyfill'
+	),
+	'version' => '31d6cfe0d16ae931b73c'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`polyfill-magic-comment-minified\` > should produce expected output > External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => '10219f2e878437d6563a', 'handle' => 'runtime-chunk-single-scripts-a');
+"<?php return array(
+	'dependencies' => array(
+		'wp-blob'
+	),
+	'version' => '10219f2e878437d6563a',
+	'handle' => 'runtime-chunk-single-scripts-a'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '47dc3725258841aebdf0', 'handle' => 'runtime-chunk-single-scripts-b');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => '47dc3725258841aebdf0',
+	'handle' => 'runtime-chunk-single-scripts-b'
+);
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`runtime-chunk-single\` > should produce expected output > Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '75a75bd03c2bec2dbf4f', 'handle' => 'runtime-chunk-single-scripts-runtime');
+"<?php return array(
+	'dependencies' => array(
+		
+	),
+	'version' => '75a75bd03c2bec2dbf4f',
+	'handle' => 'runtime-chunk-single-scripts-runtime'
+);
 "
 `;
 
@@ -762,7 +1077,12 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`runtime-chunk-sin
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`style-cache-group\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => '497ef38d9beef8e874bb');
+"<?php return array(
+	'dependencies' => array(
+		'wp-blob'
+	),
+	'version' => '497ef38d9beef8e874bb'
+);
 "
 `;
 
@@ -780,7 +1100,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`style-cache-group
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`style-imports\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '01aed64eaec11c2d6896');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => '01aed64eaec11c2d6896'
+);
 "
 `;
 
@@ -803,7 +1129,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`style-imports\` >
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e47c17efde0e9efa1d41');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => 'e47c17efde0e9efa1d41'
+);
 "
 `;
 
@@ -826,7 +1158,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress\` > sho
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-interactivity\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => '234896667c155befffe2');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-interactivity'
+	),
+	'version' => '234896667c155befffe2'
+);
 "
 `;
 
@@ -849,7 +1187,13 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-interac
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-require\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '21cb4044c3c0bc8f09f8');
+"<?php return array(
+	'dependencies' => array(
+		'lodash',
+		'wp-blob'
+	),
+	'version' => '21cb4044c3c0bc8f09f8'
+);
 "
 `;
 

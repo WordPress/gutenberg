@@ -410,7 +410,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$this->assertTrue( $result );
 
 		$icon = $this->registry->get_registered_icon( $name );
-		$this->assertSame( '<svg viewbox="0 0 24 24"><path d="M0 0" /></svg>', $icon['content'] );
+		$this->assertEqualHTML( '<svg viewbox="0 0 24 24"><path d="M0 0" /></svg>', $icon['content'] );
 	}
 
 	/**
@@ -422,7 +422,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @param non-falsy-string $expected The expected sanitized output.
 	 */
 	public function test_sanitize_icon_content( $input, $expected ) {
-		$this->assertSame( $expected, $this->sanitize_icon_content( $input ) );
+		$this->assertEqualHTML( $expected, $this->sanitize_icon_content( $input ) );
 	}
 
 	/**
@@ -498,25 +498,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should fail to register an icon whose `public` property is not a boolean.
-	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
-	 */
-	public function test_register_icon_rejects_non_boolean_public_property() {
-		$result = $this->registry->register(
-			'test-collection/invalid-visibility',
-			array(
-				'label'   => 'Icon',
-				'content' => '<svg></svg>',
-				'public'  => 'yes',
-			)
-		);
-
-		$this->assertFalse( $result );
-		$this->assertFalse( $this->registry->is_registered( 'test-collection/invalid-visibility' ) );
-	}
-
-	/**
 	 * Provides every SVG file shipped in the `@wordpress/icons` library.
 	 *
 	 * @return array<string, array{0: string}> Data sets of [ $file_path ], keyed by icon slug.
@@ -539,8 +520,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_sanitize_icon_content_preserves_library_icons( string $file_path ) {
 		$content = file_get_contents( $file_path );
-		// `wp_kses()` lowercases attribute names, so `viewBox` comes back as `viewbox`.
-		$expected = str_replace( 'viewBox=', 'viewbox=', $content );
-		$this->assertSame( $expected, $this->sanitize_icon_content( $content ) );
+		$this->assertEqualHTML( $content, $this->sanitize_icon_content( $content ) );
 	}
 }

@@ -51,14 +51,15 @@ function writeJson( path, contents ) {
  * Creates a repository root holding a build solution, a root solution and the
  * given packages.
  *
- * @param {Object} repo          Repository description.
- * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies, devDependencies }`.
- * @param {Object} [repo.routes] Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
- * @param {Array}  repo.build    References of the build solution.
- * @param {Array}  repo.root     References of the root solution.
+ * @param {Object} repo           Repository description.
+ * @param {Object} repo.packages  Package name to `{ tsconfigs, dependencies, devDependencies }`.
+ * @param {Object} [repo.routes]  Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
+ * @param {Object} [repo.widgets] Widget name to the same shape as a route.
+ * @param {Array}  repo.build     References of the build solution.
+ * @param {Array}  repo.root      References of the root solution.
  * @return {string} Path of the created repository root.
  */
-function createRepo( { packages, routes, build, root } ) {
+function createRepo( { packages, routes, widgets, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
@@ -70,13 +71,23 @@ function createRepo( { packages, routes, build, root } ) {
 	} );
 
 	for ( const [
+		entryType,
 		name,
 		{ tsconfigs, dependencies, devDependencies, manifest = true, files },
-	] of Object.entries( routes ?? {} ) ) {
-		const routeDir = join( repoRoot, 'routes', name );
-		mkdirSync( routeDir, { recursive: true } );
+	] of [
+		...Object.entries( routes ?? {} ).map( ( entry ) => [
+			'routes',
+			...entry,
+		] ),
+		...Object.entries( widgets ?? {} ).map( ( entry ) => [
+			'widgets',
+			...entry,
+		] ),
+	] ) {
+		const entryDir = join( repoRoot, entryType, name );
+		mkdirSync( entryDir, { recursive: true } );
 		if ( manifest ) {
-			writeJson( join( routeDir, 'package.json' ), {
+			writeJson( join( entryDir, 'package.json' ), {
 				name: `@wordpress/route-${ name }`,
 				version: '1.0.0',
 				...( dependencies && { dependencies } ),
@@ -84,15 +95,15 @@ function createRepo( { packages, routes, build, root } ) {
 			} );
 		}
 		for ( const [ fileName, references ] of Object.entries( tsconfigs ) ) {
-			writeJson( join( routeDir, fileName ), {
+			writeJson( join( entryDir, fileName ), {
 				references: references.map( ( path ) => ( { path } ) ),
 			} );
 		}
 		for ( const file of files ?? [] ) {
-			mkdirSync( join( routeDir, dirname( file ) ), {
+			mkdirSync( join( entryDir, dirname( file ) ), {
 				recursive: true,
 			} );
-			writeFileSync( join( routeDir, file ), 'export {};\n' );
+			writeFileSync( join( entryDir, file ), 'export {};\n' );
 		}
 	}
 
@@ -861,6 +872,110 @@ test( 'passes when a route test project covers the test files', () => {
 	);
 	expect( stderr ).toBe( '' );
 	expect( status ).toBe( 0 );
+} );
+
+test( 'passes when a widget is registered and references its dependencies', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a widget is missing from the root solution', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "widgets/news" in tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget does not reference a dependency', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: { 'tsconfig.json': [] },
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "../../packages/blob/tsconfig.build.json" in widgets/news/tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget has TypeScript files but no tsconfig', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			widgets: { news: { tsconfigs: {}, files: [ 'render.tsx' ] } },
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing tsconfig.json for the TypeScript files of widgets/news'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget references a package that is not a dependency', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Reference to "packages/blob" in widgets/news/tsconfig.json without a dependency on "@wordpress/blob".'
+	);
+	expect( status ).toBe( 1 );
 } );
 
 test( 'fails when a package references a package that is not a dependency', () => {

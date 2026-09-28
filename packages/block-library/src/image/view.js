@@ -30,6 +30,14 @@ const touchStartEvent = {
 	startTime: 0,
 };
 
+/**
+ * Elements made inert while the lightbox is open, so only those are restored
+ * when it closes.
+ *
+ * @type {Element[]}
+ */
+let inertElements = [];
+
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
@@ -690,16 +698,28 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			setInertElements() {
-				// Makes all children of the document inert exempt .wp-lightbox-overlay.
-				document
-					.querySelectorAll( 'body > :not(.wp-lightbox-overlay)' )
-					.forEach( ( el ) => {
-						if ( state.overlayEnabled ) {
-							el.setAttribute( 'inert', '' );
-						} else {
-							el.removeAttribute( 'inert' );
+				if ( ! state.overlayEnabled ) {
+					inertElements.forEach( ( el ) =>
+						el.removeAttribute( 'inert' )
+					);
+					inertElements = [];
+					return;
+				}
+				// Inerts the overlay's siblings at each level, not its ancestors.
+				const { ref } = getElement();
+				let node = ref;
+				while ( node && node !== document.body && node.parentElement ) {
+					for ( const sibling of node.parentElement.children ) {
+						if (
+							sibling !== node &&
+							! sibling.hasAttribute( 'inert' )
+						) {
+							sibling.setAttribute( 'inert', '' );
+							inertElements.push( sibling );
 						}
-					} );
+					}
+					node = node.parentElement;
+				}
 			},
 			initTriggerButton() {
 				const { imageId } = getContext();
