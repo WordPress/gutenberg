@@ -51,18 +51,10 @@ const {
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
 
-// The completer shape is not exported as a type from `@wordpress/block-editor`,
-// so only the members this control relies on are typed.
-type Completer = {
-	name: string;
-	triggerPrefix: string;
-	[ key: string ]: unknown;
-};
-
 // Shared empty reference so the default `completers` value is stable across
 // renders and the autocomplete hook doesn't re-run for consumers that don't
 // opt into it.
-const EMPTY_COMPLETERS: Array< Completer > = [];
+const EMPTY_COMPLETERS: Array< unknown > = [];
 
 export type RichTextControlProps = {
 	/**
@@ -152,7 +144,7 @@ export type RichTextControlProps = {
 	 * Each is a completer object as consumed by `@wordpress/block-editor`'
 	 * `Autocomplete`. Omit to disable autocomplete.
 	 */
-	completers?: Array< Completer >;
+	completers?: Array< unknown >;
 };
 
 /**
