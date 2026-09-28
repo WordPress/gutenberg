@@ -117,7 +117,9 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			const { activeElement } = ownerDocument;
 			const isHosted =
 				activeElement?.isContentEditable &&
-				activeElement.contains( target );
+				activeElement.contains( target ) &&
+				// The body is the active element whenever nothing has focus.
+				activeElement.matches( ':focus' );
 			if ( ! isHosted ) {
 				target.focus();
 			}

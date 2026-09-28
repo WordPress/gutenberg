@@ -12,9 +12,10 @@ import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 
 /**
- * Whether a selection may be set into the element: it (or an editing host
- * around it) has focus. Otherwise the focus handler sets the selection once
- * focus arrives.
+ * Whether the element holds focus, directly or through an editing host that
+ * contains it. Anything focused within the host counts: applying a selection
+ * inside the element then moves focus to the host. The body is the active
+ * element whenever nothing has focus, hence the `:focus` check.
  *
  * @param {HTMLElement} element The editable element.
  *
@@ -22,46 +23,15 @@ import { useFormatTypes } from './use-format-types';
  */
 function hasFocus( element ) {
 	const { activeElement } = element.ownerDocument;
-	return (
-		activeElement === element ||
-		( activeElement?.contentEditable === 'true' &&
-			activeElement.contains( element ) &&
-			// The body is the active element whenever nothing has focus.
-			activeElement.matches( ':focus' ) )
-	);
-}
-
-/**
- * Returns the editing host containing the element when focus is within that
- * host. The host holds focus for the fields inside it, but while it takes
- * over from another element in the same commit, focus is still on that
- * element.
- *
- * @param {HTMLElement} element The rich text element.
- * @return {HTMLElement|null} The editing host holding focus, if any.
- */
-function getFocusedHost( element ) {
-	const { activeElement } = element.ownerDocument;
-	const host = element.parentElement?.closest( '[contenteditable="true"]' );
-	return host && host.contains( activeElement ) ? host : null;
-}
-
-/**
- * Applies the record's selection through the editing host: focus moves to
- * the host first, so that applying the selection does not bounce focus back
- * to the element that held it (e.g. another block's wrapper), whose focus
- * handler would change the block selection.
- *
- * @param {HTMLElement} host        The editing host.
- * @param {Function}    applyRecord Applies the record.
- * @param {Object}      record      The record.
- */
-function applyThroughHost( host, applyRecord, record ) {
-	// The body is the active element whenever nothing has focus.
-	if ( ! host.matches( ':focus' ) ) {
-		host.focus( { preventScroll: true } );
+	if ( activeElement === element ) {
+		return true;
 	}
-	applyRecord( record );
+	const host = element.parentElement?.closest( '[contenteditable="true"]' );
+	return (
+		!! host &&
+		host.contains( activeElement ) &&
+		activeElement.matches( ':focus' )
+	);
 }
 
 function useRichTextBase( {
@@ -214,16 +184,9 @@ function useRichTextBase( {
 		}
 
 		setRecordFromProps();
-		const { anchorNode } =
-			ref.current.ownerDocument.defaultView.getSelection();
-		const host = getFocusedHost( ref.current );
-		if ( hasFocus( ref.current ) ) {
-			applyRecord( recordRef.current );
-		} else if ( host && ref.current.contains( anchorNode ) ) {
-			applyThroughHost( host, applyRecord, recordRef.current );
-		} else {
-			applyRecord( recordRef.current, { domOnly: true } );
-		}
+		applyRecord( recordRef.current, {
+			domOnly: ! hasFocus( ref.current ),
+		} );
 		forceRender();
 	}, [ value ] );
 
@@ -233,20 +196,11 @@ function useRichTextBase( {
 		sentSelectionRef.current = [];
 
 		if (
-			! isSelected ||
-			( selectionStart === sentStart && selectionEnd === sentEnd )
+			isSelected &&
+			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
+			hasFocus( ref.current )
 		) {
-			return;
-		}
-
-		if ( hasFocus( ref.current ) ) {
 			applyRecord( recordRef.current );
-			return;
-		}
-
-		const host = getFocusedHost( ref.current );
-		if ( host ) {
-			applyThroughHost( host, applyRecord, recordRef.current );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 

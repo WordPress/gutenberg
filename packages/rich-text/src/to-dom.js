@@ -318,8 +318,12 @@ export function applySelection( { startPath, endPath }, current ) {
 
 	// This function is not intended to cause a shift in focus. Since the above
 	// selection manipulations may shift focus, ensure that focus is restored to
-	// its previous state.
-	if ( activeElement !== ownerDocument.activeElement ) {
+	// its previous state, unless focus moved to an editing host containing the
+	// element, which is where focus belongs for a selection inside it.
+	if (
+		activeElement !== ownerDocument.activeElement &&
+		! ownerDocument.activeElement?.contains( current )
+	) {
 		// The `instanceof` checks protect against edge cases where the focused
 		// element is not of the interface HTMLElement (does not have a `focus`
 		// or `blur` property).

@@ -331,19 +331,48 @@ function RichTextWrapper(
 		]
 	);
 
-	// Make the wrapper the editing host before the rich text hook applies the
-	// store selection in its own layout effect: the wrapper's effect runs
-	// only after this render, too late for a field that is inert by then.
+	// Under an editing host the field is not a focus target: the host holds
+	// focus for it. Engage the host and let it take focus before the rich
+	// text hook applies the store selection in its own layout effect, which
+	// only applies while focus is inside a focused host. The host may still
+	// be engaged for a field that no longer hosts, until the wrapper's effect
+	// disengages it after this render; a nested editable cannot take focus
+	// under it, so the host takes focus then too.
 	useLayoutEffect( () => {
-		if ( ! isEditingHost || ! isSelected ) {
+		const element = anchorRef.current;
+		if ( ! isSelected || ! element ) {
 			return;
 		}
-		const canvas =
-			anchorRef.current?.parentElement?.closest( '[contenteditable]' );
-		if ( canvas && canvas.contentEditable !== 'true' ) {
-			setContentEditableWrapper( canvas, true, { focus: false } );
+		let host = element.parentElement?.closest( '[contenteditable="true"]' );
+		if ( ! host && isEditingHost ) {
+			const canvas =
+				element.parentElement?.closest( '[contenteditable]' );
+			if (
+				canvas &&
+				setContentEditableWrapper( canvas, true, { focus: false } )
+			) {
+				host = canvas;
+			}
 		}
-	}, [ isEditingHost, isSelected ] );
+		if ( ! host || host.matches( ':focus' ) ) {
+			return;
+		}
+		// Focus follows the selection while focus is inside the host or was
+		// lost to the body, also the body of the parent document (a removed
+		// toolbar button), which leaves the frame document without focus.
+		const { ownerDocument } = element;
+		const focusedDocument = [
+			ownerDocument,
+			ownerDocument.defaultView.frameElement?.ownerDocument,
+		].find( ( doc ) => doc?.hasFocus() );
+		if ( ! focusedDocument ) {
+			return;
+		}
+		const { activeElement, body } = focusedDocument;
+		if ( activeElement === body || host.contains( activeElement ) ) {
+			host.focus( { preventScroll: true } );
+		}
+	}, [ isEditingHost, isSelected, selectionStart, selectionEnd ] );
 
 	const {
 		value,
