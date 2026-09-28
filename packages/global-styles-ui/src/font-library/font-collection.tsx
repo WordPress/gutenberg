@@ -290,7 +290,6 @@ function FontCollection( { slug }: { slug: string } ) {
 													size="small"
 													icon={ moreVertical }
 													label={ __( 'Actions' ) }
-													showTooltip
 												/>
 											}
 										/>
