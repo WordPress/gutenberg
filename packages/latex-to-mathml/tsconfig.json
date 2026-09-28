@@ -1,8 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
+		"types": [ "gutenberg-env" ]
 	},
-	"references": [ { "path": "./tsconfig.build.json" } ]
+	"references": [],
+	"exclude": [ "src/loader.ts" ]
 }
