@@ -25,9 +25,14 @@ async function openTaxonomyPanel( page, name ) {
 	} );
 }
 
-// Selected tags are rendered as chips, each with a remove button.
+// Selected tags are chips. The remove button is named Remove and described by
+// the tag.
 function getTagChip( page, name ) {
-	return page.getByRole( 'button', { name: `Remove ${ name }` } );
+	return page.getByRole( 'button', {
+		name: 'Remove',
+		description: name,
+		exact: true,
+	} );
 }
 
 async function createTag( page, name ) {
