@@ -110,6 +110,32 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Updates registered fields on `fields_api_init` for the duration of the
+	 * test, with the `test-plugin` origin, the way register_fields() registers
+	 * them.
+	 *
+	 * @param string      $kind   The entity kind.
+	 * @param string      $name   The entity name.
+	 * @param array[]     $fields The partial field definitions.
+	 * @param string|null $module The script module id, if any.
+	 * @return bool Whether the fields were updated.
+	 */
+	private function update_fields( $kind, $name, $fields, $module = null ) {
+		$updated  = false;
+		$callback = static function ( $registry ) use ( &$updated, $kind, $name, $fields, $module ) {
+			$updated = $registry->update( 'test-plugin', $kind, $name, $fields, $module );
+		};
+		add_action( 'fields_api_init', $callback );
+		$this->callbacks[] = $callback;
+
+		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry->reset();
+		$registry->get_all_registered();
+
+		return $updated;
+	}
+
+	/**
 	 * Dispatches a request to the fields route.
 	 *
 	 * @param string|null $kind Entity kind.
@@ -399,14 +425,30 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			'label' => 'Size',
 		);
 		$this->register_fields( 'customKind', 'customName', array( $color, $size ), 'plugin/appearance' );
-		$this->register_fields( 'customKind', 'customName', array( $size ), 'plugin/sizes' );
+		$this->update_fields( 'customKind', 'customName', array( array( 'id' => 'size' ) ), 'plugin/sizes' );
 
 		wp_set_current_user( self::$editor_id );
 		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
 
 		$fields = array_column( $data['fields'], null, 'id' );
-		$this->assertSame( $color + array( 'origin' => 'test-plugin' ), $fields['color'] );
-		$this->assertSame( $size + array( 'origin' => 'test-plugin' ), $fields['size'] );
+		$this->assertSame(
+			$color + array(
+				'origin' => array(
+					'registeredBy' => 'test-plugin',
+					'updatedBy'    => array(),
+				),
+			),
+			$fields['color']
+		);
+		$this->assertSame(
+			$size + array(
+				'origin' => array(
+					'registeredBy' => 'test-plugin',
+					'updatedBy'    => array( 'test-plugin' ),
+				),
+			),
+			$fields['size']
+		);
 
 		$this->assertSame(
 			array(

@@ -9,7 +9,7 @@
  * `fields_api_init`, the action the registry fires the first time its
  * fields are read, after `init`, once the default fields are registered. The
  * callbacks register on the registry they receive: there is no function
- * wrapping its `register()` and `unregister()` methods.
+ * wrapping its `register()`, `update()`, and `unregister()` methods.
  *
  * 1. `add_field_declarative`: a declarative field (`menu_order`), plain data,
  *    no JavaScript.
@@ -19,7 +19,7 @@
  *    `word_count` field no registration names: the module augments the fields
  *    it was registered with, so the entry is ignored and the field is not
  *    registered.
- * 3. `update_field`: a patch of a default field (`comment_status`), which
+ * 3. `update_field`: an update of a default field (`comment_status`), which
  *    becomes sortable and hideable, and gets a render from
  *    `fields-api/comment-status.js`, keeping the rest of its definition.
  * 4. `replace_field`: a substitute for a default field (`author`),
@@ -122,15 +122,14 @@ function gutenberg_test_fields_api_add_field_with_script_module( $registry ) {
 add_action( 'fields_api_init', 'gutenberg_test_fields_api_add_field_with_script_module' );
 
 /**
- * Case 3: a patch of a default field (`comment_status`). Only the properties
+ * Case 3: an update of a default field (`comment_status`). Only the properties
  * given change, and the module applies to the field on top of the modules it
  * has. Hideable, so the field can be shown from the view options.
  *
- * A registration with the id of an existing field patches it, so the patch
- * must come after the default fields, registered on `fields_api_init`
- * at priority 0: the default priority does. A patch registered before would
- * be patched by the default definition in turn. The assets go on `init`,
- * split from the field as in case 2.
+ * Only a registered field can be updated, so the update must come after the
+ * default fields, registered on `fields_api_init` at priority 0: the
+ * default priority does. An update before would be refused. The assets go
+ * on `init`, split from the field as in case 2.
  */
 function gutenberg_test_fields_api_register_comment_status_assets() {
 	wp_register_script_module(
@@ -157,7 +156,7 @@ function gutenberg_test_fields_api_register_comment_status_assets() {
 add_action( 'init', 'gutenberg_test_fields_api_register_comment_status_assets' );
 
 function gutenberg_test_fields_api_update_field( $registry ) {
-	$registry->register(
+	$registry->update(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',

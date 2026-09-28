@@ -13,9 +13,9 @@
  * the fields it was registered with, see gutenberg_get_registered_field_modules().
  *
  * Fields are registered on the `fields_api_init` action, and only there, on
- * the registry its callbacks receive, see Gutenberg_Fields_Registry::register()
- * and Gutenberg_Fields_Registry::unregister(). The functions below read the
- * registry.
+ * the registry its callbacks receive, see Gutenberg_Fields_Registry::register(),
+ * Gutenberg_Fields_Registry::update(), and Gutenberg_Fields_Registry::unregister().
+ * The functions below read the registry.
  *
  * @package gutenberg
  */

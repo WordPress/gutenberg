@@ -334,8 +334,21 @@ class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
 					'type'        => 'string',
 				),
 				'origin'             => array(
-					'description' => __( 'Who registered the field: `core`, or the slug of the plugin or theme.', 'gutenberg' ),
-					'type'        => 'string',
+					'description' => __( 'Who registered and updated the field: `core`, or the slug of a plugin or theme.', 'gutenberg' ),
+					'type'        => 'object',
+					'properties'  => array(
+						'registeredBy' => array(
+							'description' => __( 'Who registered the field.', 'gutenberg' ),
+							'type'        => 'string',
+						),
+						'updatedBy'    => array(
+							'description' => __( 'Who updated the field, in update order.', 'gutenberg' ),
+							'type'        => 'array',
+							'items'       => array(
+								'type' => 'string',
+							),
+						),
+					),
 				),
 				'type'               => array(
 					'description' => __( 'The type of the field.', 'gutenberg' ),

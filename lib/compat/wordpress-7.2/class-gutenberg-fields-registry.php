@@ -10,13 +10,14 @@
  *
  * The registry maps an entity, identified by its kind and name, to its
  * registered field definitions keyed by id, in registration order, each
- * with the origin that registered it, and to the script modules registered
- * for it, each with the ids of the fields it applies to. register()
- * validates the definitions before storing them.
+ * with the origins that registered and updated it, and to the script modules
+ * registered for it, each with the ids of the fields it applies to.
+ * register() adds fields, update() changes registered ones, and both
+ * validate the definitions before storing them.
  *
  * Fields are registered on the `fields_api_init` action, on the
- * registry its callbacks receive, and only there: register() and
- * unregister() refuse to run while the action is not firing.
+ * registry its callbacks receive, and only there: register(), update(),
+ * and unregister() refuse to run while the action is not firing.
  *
  * The registry is filled lazily: the first time its fields are read, it
  * fires the `fields_api_init` action, on which the default fields of every
@@ -80,12 +81,14 @@ final class Gutenberg_Fields_Registry {
 	/**
 	 * Registers fields for an entity.
 	 *
-	 * A field with the id of an already registered field is merged into it,
-	 * property by property, keeping its position and its origin. The script
-	 * module, if any, applies to every field of the call.
+	 * The fields must be new: registering a field with the id of a registered
+	 * field, or the same id twice, is refused and registers none of the
+	 * fields of the call. To change a registered field, see update(); to
+	 * replace it, unregister it first. The script module, if any, applies to
+	 * every field of the call.
 	 *
-	 * The origin is stored as the `origin` property of each new field,
-	 * replacing any `origin` the definition sets.
+	 * The origin is stored as the `origin` property of each field, as
+	 * `registeredBy`, replacing any `origin` the definition sets.
 	 *
 	 * @param string      $origin        Who registers the fields: `core`, or
 	 *                                   the slug of the plugin or theme.
@@ -95,82 +98,96 @@ final class Gutenberg_Fields_Registry {
 	 * @param string|null $script_module The id of the script module providing
 	 *                                   the JavaScript parts of the fields, if any.
 	 * @return bool Whether the fields were registered. False when called
-	 *              outside the `fields_api_init` action or when an argument
-	 *              is invalid.
+	 *              outside the `fields_api_init` action, when an argument
+	 *              is invalid, or when a field is already registered.
 	 */
 	public function register( $origin, $kind, $name, $fields, $script_module = null ) {
-		if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
+		if ( ! $this->validate_arguments( __METHOD__, $origin, $kind, $name, $fields, $script_module ) ) {
 			return false;
-		}
-
-		if ( ! is_string( $origin ) || '' === $origin ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'The origin must be a non-empty string.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return false;
-		}
-
-		foreach ( array( $kind, $name ) as $argument ) {
-			if ( ! is_string( $argument ) || '' === $argument ) {
-				_doing_it_wrong(
-					__METHOD__,
-					__( 'The entity kind and the entity name must be non-empty strings.', 'gutenberg' ),
-					'7.2.0'
-				);
-				return false;
-			}
-		}
-
-		if ( null !== $script_module && ( ! is_string( $script_module ) || '' === $script_module ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'The script module must be the id of a script module.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return false;
-		}
-
-		if ( ! is_array( $fields ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'The fields must be a list of field definitions.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return false;
-		}
-
-		foreach ( $fields as $field ) {
-			if ( ! is_array( $field ) || empty( $field['id'] ) || ! is_string( $field['id'] ) ) {
-				_doing_it_wrong(
-					__METHOD__,
-					__( 'Every field definition must be an array with a non-empty string `id`.', 'gutenberg' ),
-					'7.2.0'
-				);
-				return false;
-			}
 		}
 
 		$entity = $this->get_entity_key( $kind, $name );
 
-		if ( ! isset( $this->fields[ $entity ] ) ) {
-			$this->fields[ $entity ] = array();
+		$ids = array_column( $fields, 'id' );
+		if ( count( array_unique( $ids ) ) !== count( $ids ) || array_intersect_key( array_flip( $ids ), $this->fields[ $entity ] ?? array() ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'A field can only be registered once. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
 		}
-		foreach ( $fields as $field ) {
-			$id                             = $field['id'];
-			$this->fields[ $entity ][ $id ] = isset( $this->fields[ $entity ][ $id ] )
-				? array_merge( $this->fields[ $entity ][ $id ], $field, array( 'origin' => $this->fields[ $entity ][ $id ]['origin'] ) )
-				: array_merge( $field, array( 'origin' => $origin ) );
 
-			if ( null !== $script_module ) {
-				$ids = $this->field_modules[ $entity ][ $script_module ] ?? array();
-				if ( ! in_array( $id, $ids, true ) ) {
-					$ids[] = $id;
-				}
-				$this->field_modules[ $entity ][ $script_module ] = $ids;
-			}
+		foreach ( $fields as $field ) {
+			$this->fields[ $entity ][ $field['id'] ] = array_merge(
+				$field,
+				array(
+					'origin' => array(
+						'registeredBy' => $origin,
+						'updatedBy'    => array(),
+					),
+				)
+			);
 		}
+		$this->add_field_module( $entity, $ids, $script_module );
+
+		return true;
+	}
+
+	/**
+	 * Updates registered fields of an entity.
+	 *
+	 * Each definition is merged into the registered field with its id,
+	 * property by property; the field keeps its position. The fields must be
+	 * registered: updating a field that is not is refused and updates none
+	 * of the fields of the call. The script module, if any, applies to every
+	 * field of the call, on top of the modules the fields have.
+	 *
+	 * The origin is appended to the `updatedBy` list of the `origin` property
+	 * of each field, once; the rest of the `origin` property cannot be
+	 * updated, and any `origin` the definition sets is ignored.
+	 *
+	 * Like register(), it only runs on the `fields_api_init` action.
+	 *
+	 * @param string      $origin        Who updates the fields: `core`, or
+	 *                                   the slug of the plugin or theme.
+	 * @param string      $kind          The entity kind (e.g. `postType`).
+	 * @param string      $name          The entity name (e.g. `page`).
+	 * @param array[]     $fields        The list of partial field definitions,
+	 *                                   each with the `id` of a registered field.
+	 * @param string|null $script_module The id of the script module providing
+	 *                                   the JavaScript parts of the fields, if any.
+	 * @return bool Whether the fields were updated. False when called outside
+	 *              the `fields_api_init` action, when an argument is invalid,
+	 *              or when a field is not registered.
+	 */
+	public function update( $origin, $kind, $name, $fields, $script_module = null ) {
+		if ( ! $this->validate_arguments( __METHOD__, $origin, $kind, $name, $fields, $script_module ) ) {
+			return false;
+		}
+
+		$entity = $this->get_entity_key( $kind, $name );
+
+		$ids = array_column( $fields, 'id' );
+		if ( array_diff_key( array_flip( $ids ), $this->fields[ $entity ] ?? array() ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Only registered fields can be updated. Use register() to add a field.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		foreach ( $fields as $field ) {
+			$registered   = $this->fields[ $entity ][ $field['id'] ];
+			$field_origin = $registered['origin'];
+			if ( ! in_array( $origin, $field_origin['updatedBy'], true ) ) {
+				$field_origin['updatedBy'][] = $origin;
+			}
+
+			$this->fields[ $entity ][ $field['id'] ] = array_merge( $registered, $field, array( 'origin' => $field_origin ) );
+		}
+		$this->add_field_module( $entity, $ids, $script_module );
 
 		return true;
 	}
@@ -331,7 +348,7 @@ final class Gutenberg_Fields_Registry {
 		}
 
 		// Set before firing, so a callback reading the registry to inspect
-		// the fields it patches does not fire the action again.
+		// the fields it updates does not fire the action again.
 		$this->initialized = true;
 
 		/**
@@ -353,11 +370,11 @@ final class Gutenberg_Fields_Registry {
 	}
 
 	/**
-	 * Checks that the `fields_api_init` action is firing, as register() and
-	 * unregister() require.
+	 * Checks that the `fields_api_init` action is firing, as register(),
+	 * update(), and unregister() require.
 	 *
 	 * Outside the action a registration would either come before the
-	 * defaults, which then merge over it, or after the fields have been read
+	 * defaults, which could then not be registered, or after the fields have been read
 	 * and the import map of the editor script built from them; and
 	 * unregistering fields by id reads the registry, which would fire the
 	 * action early. Refusing keeps the registry immutable once read.
@@ -372,10 +389,101 @@ final class Gutenberg_Fields_Registry {
 
 		_doing_it_wrong(
 			$method,
-			__( 'Fields can only be registered and unregistered on the `fields_api_init` action, on the registry it passes.', 'gutenberg' ),
+			__( 'Fields can only be registered, updated, and unregistered on the `fields_api_init` action, on the registry it passes.', 'gutenberg' ),
 			'7.2.0'
 		);
 		return false;
+	}
+
+	/**
+	 * Validates the arguments of register() and update().
+	 *
+	 * @param string $method        The calling method, for the notice.
+	 * @param mixed  $origin        The origin.
+	 * @param mixed  $kind          The entity kind.
+	 * @param mixed  $name          The entity name.
+	 * @param mixed  $fields        The field definitions.
+	 * @param mixed  $script_module The script module id, if any.
+	 * @return bool Whether the call may proceed: the `fields_api_init` action
+	 *              is firing and the arguments are valid.
+	 */
+	private function validate_arguments( $method, $origin, $kind, $name, $fields, $script_module ) {
+		if ( ! $this->doing_fields_api_init( $method ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $origin ) || '' === $origin ) {
+			_doing_it_wrong(
+				$method,
+				__( 'The origin must be a non-empty string.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		foreach ( array( $kind, $name ) as $argument ) {
+			if ( ! is_string( $argument ) || '' === $argument ) {
+				_doing_it_wrong(
+					$method,
+					__( 'The entity kind and the entity name must be non-empty strings.', 'gutenberg' ),
+					'7.2.0'
+				);
+				return false;
+			}
+		}
+
+		if ( null !== $script_module && ( ! is_string( $script_module ) || '' === $script_module ) ) {
+			_doing_it_wrong(
+				$method,
+				__( 'The script module must be the id of a script module.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		if ( ! is_array( $fields ) ) {
+			_doing_it_wrong(
+				$method,
+				__( 'The fields must be a list of field definitions.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		foreach ( $fields as $field ) {
+			if ( ! is_array( $field ) || empty( $field['id'] ) || ! is_string( $field['id'] ) ) {
+				_doing_it_wrong(
+					$method,
+					__( 'Every field definition must be an array with a non-empty string `id`.', 'gutenberg' ),
+					'7.2.0'
+				);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Applies a script module to fields of an entity, after the fields it
+	 * already applies to.
+	 *
+	 * @param string      $entity        The entity key.
+	 * @param string[]    $ids           The ids of the fields.
+	 * @param string|null $script_module The id of the script module, if any.
+	 */
+	private function add_field_module( $entity, $ids, $script_module ) {
+		if ( null === $script_module ) {
+			return;
+		}
+
+		$module_ids = $this->field_modules[ $entity ][ $script_module ] ?? array();
+		foreach ( $ids as $id ) {
+			if ( ! in_array( $id, $module_ids, true ) ) {
+				$module_ids[] = $id;
+			}
+		}
+		$this->field_modules[ $entity ][ $script_module ] = $module_ids;
 	}
 
 	/**
