@@ -58,7 +58,7 @@ export const Default: Story = {
 		items: ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -92,7 +92,7 @@ export const Compact: Story = {
 				aria-label="Fruit"
 				key="trigger"
 			/>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -208,7 +208,7 @@ export const Creatable: Story = {
 				}
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -301,7 +301,7 @@ export const AsyncItems: Story = {
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -374,7 +374,7 @@ export const WithCustomTriggerAndItem: Story = {
 					</span>
 				) }
 			</Combobox.Trigger>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -422,7 +422,7 @@ export const Grouped: Story = {
 		items: GROUPED_ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -480,6 +480,7 @@ export const WithCustomZIndex: Story = {
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
+				aria-label="Fruit"
 				positioner={
 					<Combobox.Positioner
 						style={ {
