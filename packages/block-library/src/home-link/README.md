@@ -38,6 +38,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `margin`: `true`
+  - `padding`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
