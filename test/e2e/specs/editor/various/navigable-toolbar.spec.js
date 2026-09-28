@@ -14,6 +14,12 @@ test.describe( 'Block Toolbar', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so a mid-test failure doesn't leak
+		// the fixed-toolbar setting (or any other pref) to other tests.
+		await requestUtils.resetPreferences();
+	} );
+
 	test.describe( 'Contextual Toolbar', () => {
 		test( 'should not scroll page', async ( { page, pageUtils } ) => {
 			while (
@@ -165,8 +171,6 @@ test.describe( 'Block Toolbar', () => {
 
 		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 		/* eslint-enable playwright/expect-expect */
 		/* eslint-enable playwright/no-wait-for-timeout */
@@ -235,8 +239,6 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is on the block
 		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 
