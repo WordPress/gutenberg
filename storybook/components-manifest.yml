@@ -92,6 +92,18 @@
             - render
             - style
             - value
+      - name: Autocomplete.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.List
         props:
             - children
@@ -1163,6 +1175,18 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelect.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1255,6 +1279,18 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: SearchableSelectControl
   props:
       - actionsRef
@@ -1338,6 +1374,18 @@
             - style
             - value
             - variant
+      - name: SearchableSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: SearchControl
   props:
       - __next40pxDefaultSize
