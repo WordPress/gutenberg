@@ -42,6 +42,7 @@ describe( 'BlockReactionsRow', () => {
 
 	beforeAll( () => {
 		registerBlockType( 'core/paragraph', {
+			apiVersion: 3,
 			title: 'Paragraph',
 			category: 'text',
 			attributes: { metadata: { type: 'object' } },
