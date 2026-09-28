@@ -22,7 +22,12 @@ export async function activateTheme( slug ) {
 		return;
 	}
 
-	await page.click( `div[data-slug="${ slug }"] .button.activate` );
-	await page.waitForSelector( `div[data-slug="${ slug }"].active` );
+	await Promise.all( [
+		page.click( `div[data-slug="${ slug }"] .button.activate` ),
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+	] );
+	await page.waitForSelector( `div[data-slug="${ slug }"].active`, {
+		timeout: 45000,
+	} );
 	await switchUserToTest();
 }
