@@ -37,7 +37,7 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 			options: [ true, false, 'horizontal', 'vertical' ],
 		},
 	},
-	play: () => {
+	play: ( { id } ) => {
 		expect(
 			logged[
 				'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
@@ -48,11 +48,18 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 				'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.'
 			]
 		).toBe( true );
-		expect(
-			logged[
-				'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
-			]
-		).toBe( true );
+		if (
+			id ===
+				'components-composite-unstable--two-dimensions-with-state-prop' ||
+			id ===
+				'components-composite-unstable--two-dimensions-with-spread-props'
+		) {
+			expect(
+				logged[
+					'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
+				]
+			).toBe( true );
+		}
 		expect(
 			logged[
 				'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.'
