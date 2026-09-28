@@ -21,10 +21,9 @@ export function ownsSelection( element ) {
 	// update. Since each editable element checks this on every keystroke, that
 	// forced update would scale with the number of blocks in the post. The
 	// focused editing host sets the attribute explicitly, so the attribute is
-	// equivalent for it. The element itself may be editable by inheritance
-	// (`contenteditable="inherit"` under the editing host, so it is not a
-	// focusable editing area of its own); since the focused editing host must
-	// contain it, the inherited state counts as editable too.
+	// equivalent for it. The element itself may have no attribute and be
+	// editable through the host (the property reads "inherit" then); since
+	// the focused editing host must contain it, that counts as editable too.
 	if (
 		! activeElement ||
 		activeElement.contentEditable !== 'true' ||

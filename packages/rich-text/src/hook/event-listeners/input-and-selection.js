@@ -104,11 +104,12 @@ export default ( props ) => ( element ) => {
 
 		// Check if the implementor disabled editing. `contentEditable` does
 		// disable input, but not text selection, so we must ignore selection
-		// changes. The element may be editable by inheritance from the editing
-		// host (`contenteditable="inherit"`), which counts as editable. This
-		// must stay a comparison against the known editable values: JSDOM does
-		// not implement the `contentEditable` getter (it returns undefined),
-		// and this handler must not run in that environment.
+		// changes. The property reads "inherit" when the element has no
+		// attribute and is editable through the editing host, which counts as
+		// editable. This must stay a comparison against the known editable
+		// values: JSDOM does not implement the `contentEditable` getter (it
+		// returns undefined), and this handler must not run in that
+		// environment.
 		const { contentEditable } = element;
 		if ( contentEditable !== 'true' && contentEditable !== 'inherit' ) {
 			return;
