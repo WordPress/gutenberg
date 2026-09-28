@@ -2,10 +2,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type InlineConfig, type PluginOption, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import emotion from '@rolldown/plugin-emotion';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
-import babel from './vite-babel-plugin.js';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -132,22 +132,7 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,
-				// @rolldown/plugin-babel requires Node 22, but Gutenberg still
-				// supports Node 20. Keep the same call shape so this fallback can
-				// be replaced with the package after the Node upgrade.
-				await babel( {
-					generatorOpts: {
-						decoratorsBeforeExport: true,
-						importAttributesKeyword: 'with',
-					},
-					overrides: [
-						{
-							test: /x(?:$|\?)/,
-							retainLines: NODE_ENV !== 'production',
-						},
-					],
-					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
-				} ),
+				emotion( { sourceMap: true } ),
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
 				{
 					name: 'stub-vips',
