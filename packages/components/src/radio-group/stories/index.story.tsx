@@ -1,5 +1,6 @@
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import { RadioGroup } from '..';
 import { Radio } from '../radio';
@@ -26,6 +27,13 @@ const meta: Meta< typeof RadioGroup > = {
 					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
 			},
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalRadioGroup is deprecated since version 6.8. Please use wp.components.RadioControl or wp.components.__experimentalToggleGroupControl instead.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

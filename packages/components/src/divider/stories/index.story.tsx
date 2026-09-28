@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Text } from '../../text';
 import Divider from '../deprecated';
@@ -35,6 +37,13 @@ const meta: Meta< typeof Divider > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Prefer a `Separator` subcomponent such as [`Menu.Separator`](?path=/docs/design-system-components-menu--docs) when the surrounding component provides one. Otherwise write your own CSS, preferably using the [`design tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalDivider is deprecated since version 7.2 and will be removed in version 7.4.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import ButtonGroup from '..';
 import Button from '../../button';
 
@@ -18,6 +20,13 @@ const meta: Meta< typeof ButtonGroup > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.ButtonGroup is deprecated since version 6.8. Please use wp.components.__experimentalToggleGroupControl instead.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

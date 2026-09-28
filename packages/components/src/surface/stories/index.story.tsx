@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Surface } from '..';
 import { Text } from '../../text';
@@ -21,6 +23,13 @@ const meta: Meta< typeof Surface > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Write your own CSS instead, preferably using the [`design tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalSurface is deprecated since version 7.2 and will be removed in version 7.4.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

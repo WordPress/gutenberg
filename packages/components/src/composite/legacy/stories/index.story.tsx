@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
 	Composite,
@@ -34,6 +36,28 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 			control: 'select',
 			options: [ true, false, 'horizontal', 'vertical' ],
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
+			]
+		).toBe( true );
+		expect(
+			logged[
+				'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.'
+			]
+		).toBe( true );
+		expect(
+			logged[
+				'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
+			]
+		).toBe( true );
+		expect(
+			logged[
+				'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

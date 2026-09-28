@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useRef } from '@wordpress/element';
 import { View } from '../../view';
@@ -26,6 +28,13 @@ const meta: Meta< typeof Scrollable > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Write your own CSS instead.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalScrollable is deprecated since version 7.2 and will be removed in version 7.4.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

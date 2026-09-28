@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Elevation } from '../../elevation';
@@ -23,6 +25,13 @@ const meta: Meta< typeof ZStack > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Write your own CSS instead.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalZStack is deprecated since version 7.2 and will be removed in version 7.4. Please use your own CSS instead.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

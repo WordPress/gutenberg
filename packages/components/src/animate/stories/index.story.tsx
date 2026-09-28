@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Animate } from '..';
 import Notice from '../../notice';
@@ -14,6 +16,13 @@ const meta: Meta< typeof Animate > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Write your own CSS animations instead, preferably using the [`motion tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.Animate is deprecated since version 7.2 and will be removed in version 7.4.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

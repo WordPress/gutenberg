@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import Elevation from '../deprecated';
 
@@ -20,6 +22,13 @@ const meta: Meta< typeof Elevation > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Use [`elevation tokens`](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.__experimentalElevation is deprecated since version 7.2 and will be removed in version 7.4.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;

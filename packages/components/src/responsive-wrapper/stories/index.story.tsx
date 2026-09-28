@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+import { logged } from '@wordpress/deprecated';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import ResponsiveWrapper from '..';
 
@@ -16,6 +18,13 @@ const meta: Meta< typeof ResponsiveWrapper > = {
 			whereUsed: 'global',
 			notes: 'Deprecated. Use the CSS `aspect-ratio` property instead.',
 		},
+	},
+	play: () => {
+		expect(
+			logged[
+				'wp.components.ResponsiveWrapper is deprecated since version 7.2 and will be removed in version 7.4. Please use the CSS aspect-ratio property instead.'
+			]
+		).toBe( true );
 	},
 };
 export default meta;
