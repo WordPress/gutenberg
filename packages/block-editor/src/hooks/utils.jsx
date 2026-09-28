@@ -228,6 +228,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -299,6 +300,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'background.backgroundImage',
 		'background.backgroundSize',
 		'background.gradient',
+		'background.backgroundClip',
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
@@ -374,6 +376,7 @@ export function useBlockSettings( name, parentLayout ) {
 				backgroundImage,
 				backgroundSize,
 				gradient,
+				backgroundClip,
 			},
 			color: {
 				palette: {
@@ -472,6 +475,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,

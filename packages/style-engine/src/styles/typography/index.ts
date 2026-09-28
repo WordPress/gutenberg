@@ -59,11 +59,26 @@ const fontStretch = {
 const REGISTERED_AXES_WITH_PROPERTIES = [ 'wght', 'wdth', 'slnt', 'ital' ];
 
 /**
+ * Whether a key is an OpenType design-variation axis tag.
+ *
+ * The registry requires four bytes beginning with a letter, which covers the
+ * registered tags such as `opsz` and the foundry-defined ones such as `GRAD`.
+ * It also allows a shorter tag padded with trailing spaces; those are refused,
+ * as they are in the PHP style engine, because a declaration's whitespace runs
+ * are collapsed before it reaches CSS and the tag written would not be the one
+ * asked for.
+ *
+ * @param tag The key to check.
+ * @return Whether it is an axis tag.
+ */
+const isFontVariationAxisTag = ( tag: string ) =>
+	/^[A-Za-z][A-Za-z0-9]{3}$/.test( tag );
+
+/**
  * Serializes font variation settings stored as an object keyed by axis tag.
- * Only four-character letter-or-digit tags with finite number values are kept,
- * matching the PHP style engine, and
- * the axes above are skipped; `opsz` stays, as `font-optical-sizing` only
- * switches it on or off.
+ * Only axis tags with finite number values are kept, matching the PHP style
+ * engine, and the axes above are skipped; `opsz` stays, as
+ * `font-optical-sizing` only switches it on or off.
  *
  * @param value Axis values keyed by tag, e.g. `{ GRAD: 50 }`.
  * @return The CSS value, or undefined when no axis is left.
@@ -77,7 +92,7 @@ export function serializeFontVariationSettings(
 	const settings = Object.entries( value as Record< string, unknown > )
 		.filter(
 			( [ tag, axisValue ] ) =>
-				/^[A-Za-z0-9]{4}$/.test( tag ) &&
+				isFontVariationAxisTag( tag ) &&
 				! REGISTERED_AXES_WITH_PROPERTIES.includes( tag ) &&
 				typeof axisValue === 'number' &&
 				Number.isFinite( axisValue )

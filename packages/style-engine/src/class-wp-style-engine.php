@@ -85,6 +85,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-background' => true,
 					),
 				),
+				'backgroundClip'       => array(
+					'value_func' => array( self::class, 'get_background_clip_css_declarations' ),
+					'path'       => array( 'background', 'backgroundClip' ),
+				),
 			),
 			'color'      => array(
 				'text'       => array(
@@ -725,13 +729,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Serializes font variation settings, stored as an object keyed by axis tag.
 		 *
-		 * `wght`, `wdth`, `slnt` and `ital` are skipped: they have high-level
-		 * properties (`font-weight`, `font-stretch`, `font-style`), and setting them
-		 * here would override those, for example keeping a `<strong>` from getting
-		 * bolder. `opsz` is kept, since `font-optical-sizing` only switches it on or
-		 * off. Tags must be four letters or digits, which covers registered and
-		 * custom OpenType axis tags and keeps quotes out of the output, and values must
-		 * be numbers.
+		 * The tag must follow the OpenType axis tag syntax. The four axes that have a
+		 * CSS property of their own are refused: the property `font-variation-settings`
+		 * is applied after those properties, so a coordinate written here would take
+		 * the axis away from them, for example keeping a `<strong>` from rendering
+		 * bolder. `opsz` is allowed, because `font-optical-sizing` only switches the
+		 * browser's own tracking on or off and has no way to carry a chosen size. A
+		 * value is a number: a numeric string is not an axis coordinate.
 		 *
 		 * @since 7.2.0
 		 *
@@ -744,15 +748,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				return array();
 			}
 
-			$registered_axes = array( 'wght', 'wdth', 'slnt', 'ital' );
-			$settings        = array();
+			$settings = array();
 			foreach ( $style_value as $tag => $value ) {
-				$tag = (string) $tag;
-				if ( ! preg_match( '/^[A-Za-z0-9]{4}$/', $tag ) || in_array( $tag, $registered_axes, true ) ) {
-					continue;
-				}
-				// Numbers only, as in the JS style engine: a numeric string is not an axis value.
-				if ( ! ( is_int( $value ) || is_float( $value ) ) || ! is_finite( $value ) ) {
+				if ( ! static::is_font_variation_axis( $tag, $value ) ) {
 					continue;
 				}
 				$settings[] = sprintf( '"%s" %s', $tag, $value );
@@ -763,6 +761,97 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return array( $style_definition['property_keys']['default'] => implode( ', ', $settings ) );
+		}
+
+		/**
+		 * Determines whether an axis tag and value may be written to `font-variation-settings`.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $tag   Axis tag, e.g. `GRAD`.
+		 * @param mixed $value Axis value.
+		 * @return bool Whether the pair may be written.
+		 */
+		protected static function is_font_variation_axis( $tag, $value ) {
+			$property_owned_axes = array( 'wght', 'wdth', 'slnt', 'ital' );
+
+			return static::is_font_variation_axis_tag( $tag )
+				&& ! in_array( $tag, $property_owned_axes, true )
+				&& ( is_int( $value ) || is_float( $value ) )
+				&& is_finite( $value );
+		}
+
+		/**
+		 * Determines whether a value is an OpenType design-variation axis tag.
+		 *
+		 * The OpenType Design-Variation Axis Tag Registry requires a tag to be four
+		 * bytes and to begin with a letter. That covers both the registered tags,
+		 * such as `opsz`, and the foundry-defined ones, which are further required to
+		 * use only uppercase letters and digits, such as `GRAD`.
+		 *
+		 * The registry also allows a tag of fewer than four letters or digits to be
+		 * padded with trailing spaces. Those are refused here, because a declaration
+		 * is filtered through `wp_strip_all_tags( $value, true )`, which collapses a
+		 * run of whitespace into one space: `"a   "` would reach CSS as `"a "`, which
+		 * is a different tag, and writing the wrong one is worse than writing none.
+		 * See Trac #66199.
+		 *
+		 * Because a tag cannot begin with a digit, one made only of digits is not a
+		 * tag at all, which is also why nothing is lost to PHP storing a decimal
+		 * string array key such as `'1000'` as the integer `1000`: the key was never
+		 * a tag this could accept.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param mixed $tag Value to check.
+		 * @return bool Whether the value is an axis tag.
+		 */
+		protected static function is_font_variation_axis_tag( $tag ) {
+			return is_string( $tag ) && 1 === preg_match( '/^[A-Za-z][A-Za-z0-9]{3}$/', $tag );
+		}
+
+		/**
+		 * Style value parser that returns CSS declarations for background-clip.
+		 *
+		 * When the value is 'text', this also outputs the necessary vendor-prefixed
+		 * properties to clip the background to the text.
+		 *
+		 * @param string $style_value      A single raw style value from $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 *
+		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 */
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
+		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
+			if ( empty( $style_value ) || ! is_string( $style_value ) ) {
+				return array();
+			}
+
+			$valid_values = array( 'border-box', 'padding-box', 'content-box', 'text' );
+			if ( ! in_array( $style_value, $valid_values, true ) ) {
+				return array();
+			}
+
+			$css_declarations = array(
+				'background-clip' => $style_value,
+			);
+
+			if ( 'text' === $style_value ) {
+				$css_declarations['-webkit-background-clip'] = 'text';
+				$css_declarations['-webkit-text-fill-color'] = 'transparent';
+			} else {
+				/*
+				 * Only the fill colour is restored. `-webkit-background-clip`
+				 * is an alias of `background-clip` in Chromium, so resetting it
+				 * here would discard the value set above. The fill colour is
+				 * inherited, so it needs its initial value rather than `unset`,
+				 * which would take a transparent fill from an ancestor clipping
+				 * to text.
+				 */
+				$css_declarations['-webkit-text-fill-color'] = 'currentColor';
+			}
+
+			return $css_declarations;
 		}
 
 		/**
