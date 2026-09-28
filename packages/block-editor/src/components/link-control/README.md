@@ -177,9 +177,16 @@ Controls the query parameters used to search for suggestions. For example, to li
 -   Type: `Function`
 -   Required: No
 
-Filters and orders the fetched suggestions before they are shown. Called with the suggestions and an object containing `isInitialSuggestions` and `searchTerm`, and returns the suggestions to display or a Promise that resolves to them. It is not called when the input is a URL, and the option to create a page is added after it runs, so it always comes last.
+Changes the search suggestions before they are shown. It can filter them, reorder them, or add new ones.
 
-A suggestion the transform adds can set `icon`, in any shape a block icon takes, and `typeLabel`, the label shown beside it in place of its type. Selecting any suggestion calls `onChange` with it, so a suggestion that is not a link can be recognized there by its `type`.
+It is called with the suggestions and an object with two properties:
+
+-   `searchTerm`: what the user typed.
+-   `isInitialSuggestions`: `true` for the suggestions shown before anything is typed.
+
+Return the suggestions to show, or a Promise that resolves to them. It is not called when the user types a URL.
+
+A suggestion you add can set `icon` and `typeLabel` to control how it is shown. Selecting any suggestion calls `onChange` with it, so a suggestion that is not a link can be recognized there by its `type`.
 
 ```jsx
 <LinkControl
