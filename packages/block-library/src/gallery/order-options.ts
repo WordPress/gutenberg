@@ -33,12 +33,21 @@ export function parseOrderValue( value: string ): Order {
 
 /**
  * Ordering options offered for gallery images. Each value is a composite
- * `"orderby/order"` string. For a dynamic source these map to the matching
- * `/wp/v2/media` collection params; for a static gallery the same orders are
- * applied client-side to the inner image blocks (see `order-images.js`), so the
- * two modes offer an identical list. `menu_order` is deliberately omitted — it
- * isn't a valid REST `orderby` value, so the editor preview couldn't reproduce
- * it (see `dynamic-source.js`).
+ * `orderby/order` string. The two modes share values and labels but differ
+ * in their comparison logic:
+ *
+ * - A dynamic gallery passes `orderby/order` to the REST API in the editor (the
+ *   `/wp/v2/media` collection params; see `dynamic-source.js`) and to a
+ *   `WP_Query` on the front end (see `index.php`). Either way the database
+ *   orders by post date or post title.
+ * - A static gallery orders its inner image blocks client-side from the same
+ *   attachment fields (see `order-images.js`). Dates compare the same way.
+ *   Titles use a natural, case-insensitive compare, so `IMG_2` sorts before
+ *   `IMG_10` where the database would put it after. The two title orders can
+ *   therefore differ for numbered titles.
+ *
+ * `menu_order` is deliberately omitted — it isn't a valid REST `orderby`
+ * value, so the editor preview couldn't reproduce it (see `dynamic-source.js`).
  */
 export const ORDER_OPTIONS = [
 	{ label: __( 'Newest to oldest' ), value: 'date/desc' },
