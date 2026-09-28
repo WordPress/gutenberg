@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).
+-   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+
 ## 16.1.0 (2026-09-23)
 
 ### New Features
