@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect } from '@wordpress/element';
 import { Cropper } from '../../image-editor';
@@ -15,8 +16,8 @@ import '../../image-editor/style.scss';
 // magnifies the image past one screen pixel per source pixel.
 const IMAGE = {
 	src: 'large.png',
-	naturalWidth: 1000,
-	naturalHeight: 1000,
+	naturalWidth: 999,
+	naturalHeight: 999,
 };
 
 function CropperWithHistory( {
@@ -50,24 +51,18 @@ describe( 'useMediaEditorState with a Cropper', () => {
 			name: 'Resize from bottom-right corner',
 		} );
 
-		// Drag the corner in by an odd pixel count so the crop edges fall
-		// between source pixels, then release so the crop settles.
-		const { left, top } = handle.getBoundingClientRect();
-		fireEvent.pointerDown( handle, {
-			button: 0,
-			clientX: left,
-			clientY: top,
-			pointerId: 1,
-		} );
-		fireEvent.pointerMove( handle, {
-			clientX: left - 297,
-			clientY: top - 297,
-			pointerId: 1,
-		} );
-		await waitFor( () =>
-			expect( controller.state.cropRect.width ).toBeLessThan( 0.5 )
+		// Shrink the crop to 30% in steps of 10% of a 999px image, so its
+		// edges fall between source pixels, then wait for it to settle.
+		handle.focus();
+		await userEvent.keyboard(
+			'{Shift>}' +
+				'{ArrowLeft}'.repeat( 7 ) +
+				'{ArrowUp}'.repeat( 7 ) +
+				'{/Shift}'
 		);
-		fireEvent.pointerUp( handle, { pointerId: 1 } );
+		await waitFor( () =>
+			expect( controller.state.zoom ).toBeGreaterThan( 1 )
+		);
 
 		act( () =>
 			controller.setFlip( { horizontal: true, vertical: false } )
