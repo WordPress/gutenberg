@@ -65,7 +65,8 @@ jobs:
 
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: 'ubuntu-24.04'
+        # Playwright 1.32.0 doesn't support Ubuntu 24.04.
+        runs-on: 'ubuntu-22.04'
         timeout-minutes: 60
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
