@@ -120,7 +120,8 @@ export const Button = Object.assign( _Button, {
 
 ```ts
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Components/Button',
+	title: 'Components/@wordpress-ui/Button',
+	id: 'design-system-components-button',
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,

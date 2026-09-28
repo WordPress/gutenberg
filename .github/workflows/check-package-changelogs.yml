@@ -7,14 +7,33 @@ on:
             - trunk
         paths:
             - 'packages/admin-ui/**'
+            - 'packages/babel-plugin-import-jsx-pragma/**'
+            - 'packages/babel-plugin-makepot/**'
+            - 'packages/babel-preset-default/**'
+            - 'packages/browserslist-config/**'
             - 'packages/components/**'
+            - 'packages/create-block/**'
+            - 'packages/create-block-interactive-template/**'
+            - 'packages/create-block-tutorial-template/**'
             - 'packages/dataviews/**'
+            - 'packages/dependency-extraction-webpack-plugin/**'
+            - 'packages/docgen/**'
+            - 'packages/e2e-test-utils-playwright/**'
+            - 'packages/env/**'
+            - 'packages/eslint-plugin/**'
             - 'packages/fields/**'
             - 'packages/grid/**'
             - 'packages/icons/**'
             - 'packages/interface/**'
+            - 'packages/npm-package-json-lint-config/**'
+            - 'packages/postcss-plugins-preset/**'
+            - 'packages/postcss-themes/**'
+            - 'packages/prettier-config/**'
             - 'packages/private-apis/**'
+            - 'packages/readable-js-assets-webpack-plugin/**'
+            - 'packages/scripts/**'
             - 'packages/style-runtime/**'
+            - 'packages/stylelint-config/**'
             - 'packages/theme/**'
             - 'packages/ui/**'
             - 'packages/undo-manager/**'
@@ -25,8 +44,9 @@ on:
             - 'packages/*/CHANGELOG.md'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
-            - '!packages/*/src/**/stories/**'
-            - '!packages/*/src/**/test/**'
+            - '!packages/*/**/stories/**'
+            - '!packages/*/**/test/**'
+            - '!packages/*/**/__tests__/**'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -63,6 +83,26 @@ jobs:
                     - widget-dashboard
                     - widget-primitives
                     - wp-build
+                    # Tooling and config packages published to npm
+                    - babel-plugin-import-jsx-pragma
+                    - babel-plugin-makepot
+                    - babel-preset-default
+                    - browserslist-config
+                    - create-block
+                    - create-block-interactive-template
+                    - create-block-tutorial-template
+                    - dependency-extraction-webpack-plugin
+                    - docgen
+                    - e2e-test-utils-playwright
+                    - env
+                    - eslint-plugin
+                    - npm-package-json-lint-config
+                    - postcss-plugins-preset
+                    - postcss-themes
+                    - prettier-config
+                    - readable-js-assets-webpack-plugin
+                    - scripts
+                    - stylelint-config
         steps:
             - name: 'Get PR commit count'
               env:
@@ -88,7 +128,7 @@ jobs:
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
+                      | grep -Ev "^${PACKAGE_PATH}/((.+/)?(stories|test|__tests__)/|CHANGELOG\.md$)" || true)
 
                   if [ -z "$relevant_changes" ]; then
                       echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."

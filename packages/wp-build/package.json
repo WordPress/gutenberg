@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"type": "module",
 	"module": "./lib/build.mjs",
@@ -60,21 +59,9 @@
 		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
-		"@wordpress/boot": ">=0.3.0 <1.0.0",
-		"@wordpress/private-apis": "^1.0.0",
-		"@wordpress/route": ">=0.2.0 <1.0.0",
 		"@wordpress/theme": ">=0.8.0 <3.0.0"
 	},
 	"peerDependenciesMeta": {
-		"@wordpress/boot": {
-			"optional": true
-		},
-		"@wordpress/private-apis": {
-			"optional": true
-		},
-		"@wordpress/route": {
-			"optional": true
-		},
 		"@wordpress/theme": {
 			"optional": true
 		}

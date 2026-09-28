@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { sanitizeBlockAttributes } from '@wordpress/blocks';
+import { parseErrorMessage } from './errors';
 
 export function rendererPath(
 	block: string,
@@ -178,12 +179,11 @@ export function useServerSideRender(
 								return;
 							}
 
+							// eslint-disable-next-line no-console
+							console.warn( error );
 							setResponse( {
 								status: 'error',
-								error:
-									error instanceof Error
-										? error.message
-										: String( error ),
+								error: parseErrorMessage( error ),
 							} );
 						} )
 						.finally( () => {
