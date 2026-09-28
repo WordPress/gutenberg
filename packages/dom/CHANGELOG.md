@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.56.0 (2026-09-23)
+
 ### Bug Fixes
 
 -   `getRectangleFromRange`: Measure a collapsed range on an element at the text position next to it instead of inserting a temporary text node under the caret ([#82977](https://github.com/WordPress/gutenberg/pull/82977)).

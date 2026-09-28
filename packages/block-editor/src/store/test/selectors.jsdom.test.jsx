@@ -4658,64 +4658,67 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getActiveBlockIdByBlockName', () => {
-		const state = {
-			selection: {
-				selectionStart: {
-					clientId: 'client-id-04',
+		let state;
+		beforeEach( () => {
+			state = {
+				selection: {
+					selectionStart: {
+						clientId: 'client-id-04',
+					},
+					selectionEnd: {
+						clientId: 'client-id-04',
+					},
 				},
-				selectionEnd: {
-					clientId: 'client-id-04',
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							'client-id-01': '',
+							'client-id-02': 'client-id-01',
+							'client-id-03': 'client-id-02',
+							'client-id-04': 'client-id-03',
+							'client-id-05': 'client-id-03',
+						} )
+					),
+					byClientId: new Map(
+						Object.entries( {
+							'client-id-01': {
+								clientId: 'client-id-01',
+								name: 'core/columns',
+							},
+							'client-id-02': {
+								clientId: 'client-id-02',
+								name: 'core/navigation',
+							},
+							'client-id-03': {
+								clientId: 'client-id-03',
+								name: 'core/navigation-link',
+							},
+							'client-id-04': {
+								clientId: 'client-id-04',
+								name: 'core/navigation-link',
+							},
+							'client-id-05': {
+								clientId: 'client-id-05',
+								name: 'core/navigation-link',
+							},
+						} )
+					),
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+						'client-id-05': {},
+					},
+					order: new Map(
+						Object.entries( {
+							'client-id-03': [ 'client-id-04', 'client-id-05' ],
+						} )
+					),
+					controlledInnerBlocks: new Set(),
 				},
-			},
-			blocks: {
-				parents: new Map(
-					Object.entries( {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-03',
-					} )
-				),
-				byClientId: new Map(
-					Object.entries( {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/columns',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/navigation',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation-link',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
-					} )
-				),
-				cache: {
-					'client-id-01': {},
-					'client-id-02': {},
-					'client-id-03': {},
-					'client-id-04': {},
-					'client-id-05': {},
-				},
-				order: new Map(
-					Object.entries( {
-						'client-id-03': [ 'client-id-04', 'client-id-05' ],
-					} )
-				),
-				controlledInnerBlocks: new Set(),
-			},
-		};
+			};
+		} );
 		it( 'Should return first active matching block (including self) when single block selected', () => {
 			expect(
 				getActiveBlockIdByBlockNames( state, [
@@ -5314,6 +5317,17 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 } );
 
 describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5339,12 +5353,19 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
+	beforeEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+	} );
+
 	afterEach( () => {
-		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5367,7 +5388,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5395,7 +5416,7 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 

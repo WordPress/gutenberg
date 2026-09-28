@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.41.0 (2026-09-23)
+
 ### New Features
 
 -   Add the `isHeicFile` export, which recognizes a HEIC/HEIF image from its file header rather than from the MIME type the browser infers from the file name ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).

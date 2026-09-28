@@ -4,6 +4,12 @@
 
 ### New Features
 
+-   Accept `background.backgroundClip` as a valid theme.json setting ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+## 1.23.0 (2026-09-23)
+
+### New Features
+
 -   Add text shadow settings and presets ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
 ### Bug Fixes
