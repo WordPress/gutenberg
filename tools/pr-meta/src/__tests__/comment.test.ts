@@ -713,26 +713,24 @@ describe( 'keeping the end when truncating', () => {
 		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
 	} );
 
-	/* Starting mid-line could split a fence opener and fence the rest. */
+	/* With no line break to cut at, the end cannot be kept safely. */
 	it( 'does not start the kept part inside a fence opener', () => {
 		const definition = getSection( 'props' )!;
-		const trailer = '\nCo-authored-by: someone\n```';
-		// Sized so the cut lands between the opener's backticks.
-		const filler = 'x'.repeat( definition.budget - 2 - trailer.length );
-		const body = `pad\n\`\`\`${ filler }${ trailer }`;
+		// No newline in the last budget characters, and the cut bisects the opener.
+		const body = `pad\n\`\`\`${ 'x'.repeat( definition.budget - 2 ) }`;
 
-		// The setup only bites if the cut really does bisect the opener.
 		expect( body.slice( -definition.budget ).startsWith( '``' ) ).toBe(
 			true
 		);
+		expect( body.slice( -definition.budget ) ).not.toContain( '\n' );
 
 		const merged = bodyOf(
 			mergeSection( undefined, { id: 'props', body } )
 		);
 		const section = parseSections( merged )[ 0 ].body;
 
-		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
 		expect( section ).not.toMatch( /^``[^`]/m );
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
 	} );
 
 	/* Its closing line would otherwise fence everything after it. */
