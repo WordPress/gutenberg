@@ -1,7 +1,5 @@
-@use "../utils/theme-variables" as *;
-
 .border {
-	border-color: $components-color-border;
+	border-color: var(--wpds-color-stroke-interactive-neutral);
 
 	&:not(.is-disabled, .is-borderless) {
 		.container:hover & {
