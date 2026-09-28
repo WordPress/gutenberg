@@ -125,12 +125,9 @@
 	gap: $grid-unit-15;
 }
 
-// The Source controls are a plain (non-ToolsPanelItem) child of the Source
-// ToolsPanel, so they span both grid columns. The description sits above the
-// button so the button is the last element, keeping the same vertical rhythm to
-// the next control (control -> grid row-gap -> next label) as the other rows.
+// The Source panel's controls: a description above a full-width action button,
+// stacked inside a PanelBody.
 .wp-block-gallery__source-settings {
-	grid-column: 1 / -1;
 	display: flex;
 	flex-direction: column;
 	gap: $grid-unit-10;
@@ -150,9 +147,8 @@
 	}
 }
 
-// The "showing the first N" notice is a plain (non-ToolsPanelItem) child of the
-// Source ToolsPanel, so span both grid columns rather than defaulting to one.
+// The "showing the first N" notice follows the Source controls in the same
+// PanelBody, which adds no spacing of its own between children.
 .wp-block-gallery__source-notice {
-	grid-column: 1 / -1;
-	margin: 0;
+	margin: $grid-unit-20 0 0;
 }
