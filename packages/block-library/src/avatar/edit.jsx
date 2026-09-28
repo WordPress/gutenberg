@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
+import { Text } from '@wordpress/ui';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
@@ -93,6 +94,7 @@ const AvatarInspectorControls = ( {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
+				<Text className="wp-block-avatar__help-text">{ helpText }</Text>
 				<ToolsPanelItem
 					label={ __( 'Image size' ) }
 					isShownByDefault
@@ -110,7 +112,6 @@ const AvatarInspectorControls = ( {
 						max={ avatar.maxSize }
 						initialPosition={ attributes?.size }
 						value={ attributes?.size }
-						help={ helpText }
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
