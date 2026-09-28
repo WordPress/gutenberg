@@ -6,7 +6,8 @@ import {
 import WidthHeightTool from '../width-height-tool';
 
 export default {
-	title: 'BlockEditor/DimensionsTool/WidthHeightTool',
+	id: 'blockeditor-dimensionstool-widthheighttool',
+	title: 'Editor/Block Editor/DimensionsTool/WidthHeightTool',
 	component: WidthHeightTool,
 	tags: [ 'status-private' ],
 	argTypes: {

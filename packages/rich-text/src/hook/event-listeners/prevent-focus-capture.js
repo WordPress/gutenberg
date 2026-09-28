@@ -31,6 +31,12 @@ export function preventFocusCapture() {
 			if ( ! event.target.closest( '[data-block]' ) ) {
 				return;
 			}
+			// Only an editing host of its own can capture focus. Under the
+			// block editor's editing host the element has no contenteditable
+			// attribute and is not a focus target.
+			if ( element.getAttribute( 'contenteditable' ) !== 'true' ) {
+				return;
+			}
 			value = element.getAttribute( 'contenteditable' );
 			defaultView.getSelection().removeAllRanges();
 			element.setAttribute( 'contenteditable', 'false' );

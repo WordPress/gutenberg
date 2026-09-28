@@ -13,6 +13,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -64,6 +65,10 @@ function VideoEdit( {
 	// swap. A non-`auto` ratio governs the box height throughout the load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const videoStyle = {
+		...( aspectRatio && { aspectRatio } ),
+		...getShadowClassesAndStyles( attributes ).style,
+	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
@@ -255,7 +260,11 @@ function VideoEdit( {
 					playsInline={ playsInline }
 					width={ width }
 					height={ height }
-					style={ aspectRatio ? { aspectRatio } : undefined }
+					style={
+						Object.keys( videoStyle ).length
+							? videoStyle
+							: undefined
+					}
 				>
 					<Tracks tracks={ tracks } />
 				</video>

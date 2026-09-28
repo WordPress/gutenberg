@@ -4,7 +4,8 @@ import { Stack } from '../../stack';
 
 const meta: Meta< typeof Text > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Text',
+	title: 'Components/@wordpress-ui/Text',
+	id: 'design-system-components-text',
 	component: Text,
 	parameters: {
 		componentStatus: {

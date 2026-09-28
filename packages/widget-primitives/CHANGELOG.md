@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Keep Vite from analyzing host-provided widget metadata URLs in `useWidgetTypes`. ([#83602](https://github.com/WordPress/gutenberg/pull/83602))
+
+## 0.8.0 (2026-09-23)
+
 ### New Features
 
 -   `HostLink`: an anchor that mounts the host router's link for a target

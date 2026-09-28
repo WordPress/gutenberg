@@ -978,7 +978,7 @@ _Returns_
 
 ### PostAuthor
 
-Renders the component for selecting the post author.
+Renders the control for selecting the post author.
 
 _Returns_
 
