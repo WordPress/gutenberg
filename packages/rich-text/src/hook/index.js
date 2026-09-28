@@ -29,6 +29,38 @@ function hasFocus( element ) {
 	);
 }
 
+/**
+ * Returns the editing host containing the element when focus is within that
+ * host. The host holds focus for the fields inside it, but while it takes
+ * over from another element in the same commit, focus is still on that
+ * element.
+ *
+ * @param {HTMLElement} element The rich text element.
+ * @return {HTMLElement|null} The editing host holding focus, if any.
+ */
+function getFocusedHost( element ) {
+	const { activeElement } = element.ownerDocument;
+	const host = element.parentElement?.closest( '[contenteditable="true"]' );
+	return host && host.contains( activeElement ) ? host : null;
+}
+
+/**
+ * Applies the record's selection through the editing host: focus moves to
+ * the host first, so that applying the selection does not bounce focus back
+ * to the element that held it (e.g. another block's wrapper), whose focus
+ * handler would change the block selection.
+ *
+ * @param {HTMLElement} host        The editing host.
+ * @param {Function}    applyRecord Applies the record.
+ * @param {Object}      record      The record.
+ */
+function applyThroughHost( host, applyRecord, record ) {
+	if ( host.ownerDocument.activeElement !== host ) {
+		host.focus( { preventScroll: true } );
+	}
+	applyRecord( record );
+}
+
 function useRichTextBase( {
 	value = '',
 	selectionStart,
@@ -179,9 +211,16 @@ function useRichTextBase( {
 		}
 
 		setRecordFromProps();
-		applyRecord( recordRef.current, {
-			domOnly: ! hasFocus( ref.current ),
-		} );
+		const { anchorNode } =
+			ref.current.ownerDocument.defaultView.getSelection();
+		const host = getFocusedHost( ref.current );
+		if ( hasFocus( ref.current ) ) {
+			applyRecord( recordRef.current );
+		} else if ( host && ref.current.contains( anchorNode ) ) {
+			applyThroughHost( host, applyRecord, recordRef.current );
+		} else {
+			applyRecord( recordRef.current, { domOnly: true } );
+		}
 		forceRender();
 	}, [ value ] );
 
@@ -191,11 +230,20 @@ function useRichTextBase( {
 		sentSelectionRef.current = [];
 
 		if (
-			isSelected &&
-			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
-			hasFocus( ref.current )
+			! isSelected ||
+			( selectionStart === sentStart && selectionEnd === sentEnd )
 		) {
+			return;
+		}
+
+		if ( hasFocus( ref.current ) ) {
 			applyRecord( recordRef.current );
+			return;
+		}
+
+		const host = getFocusedHost( ref.current );
+		if ( host ) {
+			applyThroughHost( host, applyRecord, recordRef.current );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
