@@ -64,6 +64,15 @@ describe( 'Fix global attribute', () => {
 		expect( attributes ).not.toHaveProperty( 'anchor' );
 	} );
 
+	it( 'should keep the attribute when the markup carries it on a nested element', () => {
+		const attributes = fixAnchor(
+			{ anchor: 'foo' },
+			'<div><p id="foo">x</p></div>'
+		);
+
+		expect( attributes.anchor ).toBe( 'foo' );
+	} );
+
 	it( 'should keep the attribute when there is no markup to compare against', () => {
 		const attributes = fixAnchor( { anchor: 'foo' }, '' );
 
