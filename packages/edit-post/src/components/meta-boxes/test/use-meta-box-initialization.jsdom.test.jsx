@@ -107,7 +107,10 @@ describe( 'useMetaBoxInitialization', () => {
 		renderHook( registry );
 
 		expect( initializeMetaBoxes ).toHaveBeenCalled();
-		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
+		expect( setCollaborationSupported ).toHaveBeenCalledWith( false, [
+			'My Meta Box',
+			'Another',
+		] );
 	} );
 
 	it( 'does not disable collaboration when all metaboxes are rtcCompatible', () => {
@@ -148,7 +151,44 @@ describe( 'useMetaBoxInitialization', () => {
 
 		renderHook( registry );
 
-		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
+		expect( setCollaborationSupported ).toHaveBeenCalledWith( false, [
+			'Incompatible',
+		] );
+	} );
+
+	it( 'names the plugin that registered an incompatible metabox', () => {
+		const mockStores = createMockStores( {
+			metaBoxes: [
+				{
+					id: 'slim-seo-metabox',
+					title: 'SEO',
+					plugin: 'Slim SEO',
+				},
+			],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( setCollaborationSupported ).toHaveBeenCalledWith( false, [
+			'Slim SEO',
+		] );
+	} );
+
+	it( 'names a plugin once when it registers several incompatible metaboxes', () => {
+		const mockStores = createMockStores( {
+			metaBoxes: [
+				{ id: 'slim-seo-main', title: 'SEO', plugin: 'Slim SEO' },
+				{ id: 'slim-seo-social', title: 'Social', plugin: 'Slim SEO' },
+			],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( setCollaborationSupported ).toHaveBeenCalledWith( false, [
+			'Slim SEO',
+		] );
 	} );
 
 	it( 'does not disable collaboration when the only metabox is rtcCompatible', () => {

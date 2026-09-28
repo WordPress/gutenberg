@@ -52,6 +52,7 @@ export interface State {
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
+	collaborationIncompatiblePlugins: string[];
 	viewConfigs: Record< string, Record< string, any > >;
 }
 
