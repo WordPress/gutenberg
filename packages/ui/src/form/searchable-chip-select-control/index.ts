@@ -8,10 +8,6 @@ import { ChipWithRemove } from '../primitives/combobox/chip-with-remove';
 import { Collection } from '../primitives/combobox/collection';
 import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
 
-Item.displayName = 'SearchableChipSelectControl.Item';
-ItemLabel.displayName = 'SearchableChipSelectControl.ItemLabel';
-ItemDescription.displayName = 'SearchableChipSelectControl.ItemDescription';
-
 /**
  * A complete searchable multi-select field with chips, integrated label,
  * and description.

@@ -7,10 +7,6 @@ import { ItemLabel } from '../primitives/combobox/item-label';
 import { Collection } from '../primitives/combobox/collection';
 import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
 
-Item.displayName = 'SearchableSelectControl.Item';
-ItemLabel.displayName = 'SearchableSelectControl.ItemLabel';
-ItemDescription.displayName = 'SearchableSelectControl.ItemDescription';
-
 /**
  * A complete searchable select field with integrated label and description.
  */
