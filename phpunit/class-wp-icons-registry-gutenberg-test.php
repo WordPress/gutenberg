@@ -542,7 +542,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should register an icon that provides, optional args like a valid `keywords` array.
+	 * Should register an icon that provides optional args like a valid `keywords` array.
 	 */
 	public function test_register_icon_with_optional_args() {
 		$name = 'test-collection/with-keywords';
