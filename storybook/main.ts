@@ -88,6 +88,8 @@ const config: StorybookConfig = {
 	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
+		// Revisit the animation docgen warning after the parser fix ships:
+		// https://github.com/styleguidist/react-docgen-typescript/issues/529
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
@@ -239,6 +241,9 @@ const config: StorybookConfig = {
 							// string before it prepends it to the current stylesheet. Parsing
 							// that string discards the declarations' source metadata, which
 							// makes Vite warn even when no asset resolution is needed.
+							// Remove this fallback once the upstream fix is released and
+							// composed CSS with relative assets still resolves correctly:
+							// https://github.com/madyankin/postcss-modules/pull/173
 							postcssPlugin:
 								'supply-composed-css-module-source-fallback',
 							OnceExit( root ) {
