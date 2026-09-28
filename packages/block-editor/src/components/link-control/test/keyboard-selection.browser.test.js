@@ -30,7 +30,16 @@ beforeEach( () => {
 
 describe( 'LinkControl keyboard selection', () => {
 	it.each( [
-		[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ],
+		[
+			'entity',
+			'hello world',
+			fauxEntitySuggestions[ 0 ],
+			[
+				[ '{ArrowDown}', fauxEntitySuggestions[ 0 ].title ],
+				[ '{ArrowDown}', fauxEntitySuggestions[ 1 ].title ],
+				[ '{ArrowUp}', fauxEntitySuggestions[ 0 ].title ],
+			],
+		],
 		[
 			'url',
 			'https://www.wordpress.org',
@@ -38,10 +47,11 @@ describe( 'LinkControl keyboard selection', () => {
 				title: 'https://www.wordpress.org',
 				url: 'https://www.wordpress.org',
 			},
+			[ [ '{ArrowDown}', 'https://www.wordpress.org' ] ],
 		],
 	] )(
 		'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard',
-		async ( type, searchTerm, selectedLink ) => {
+		async ( type, searchTerm, selectedLink, selectionSteps ) => {
 			const user = userEvent.setup();
 			function LinkControlConsumer() {
 				const [ link, setLink ] = useState();
@@ -78,27 +88,11 @@ describe( 'LinkControl keyboard selection', () => {
 				selected: true,
 			} );
 
-			await user.keyboard( '{ArrowDown}' );
-			await expect
-				.element( selectedOption )
-				.toHaveTextContent(
-					type === 'entity'
-						? fauxEntitySuggestions[ 0 ].title
-						: searchTerm
-				);
-
-			if ( type === 'entity' ) {
-				await user.keyboard( '{ArrowDown}' );
-				// eslint-disable-next-line vitest/no-conditional-expect -- Only entity suggestions have a second option.
+			for ( const [ key, expectedTitle ] of selectionSteps ) {
+				await user.keyboard( key );
 				await expect
 					.element( selectedOption )
-					.toHaveTextContent( fauxEntitySuggestions[ 1 ].title );
-
-				await user.keyboard( '{ArrowUp}' );
-				// eslint-disable-next-line vitest/no-conditional-expect -- Only entity suggestions have a second option.
-				await expect
-					.element( selectedOption )
-					.toHaveTextContent( fauxEntitySuggestions[ 0 ].title );
+					.toHaveTextContent( expectedTitle );
 			}
 
 			await user.keyboard( '{Enter}' );

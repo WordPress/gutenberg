@@ -864,40 +864,12 @@ describe( 'blocks', () => {
 					],
 				};
 
-				let i = 0;
+				const filteredSettings = [];
 				addFilter(
 					'blocks.registerBlockType',
 					'core/blocks/without-title',
 					( settings ) => {
-						// Verify that for deprecations, the filter is called with a merge of pre-filter
-						// settings with deprecation keys omitted and the deprecation entry.
-						if ( i > 0 ) {
-							// eslint-disable-next-line vitest/no-conditional-expect -- The first call registers the current version; the next two register deprecations.
-							expect( settings ).toEqual( {
-								...omit(
-									{
-										name,
-										icon: BLOCK_ICON_DEFAULT,
-										attributes: {},
-										providesContext: {},
-										usesContext: [],
-										keywords: [],
-										selectors: {},
-										supports: {},
-										styles: [],
-										variations: [],
-										blockHooks: {},
-										save: () => null,
-										...blockSettingsWithDeprecations,
-									},
-									DEPRECATED_ENTRY_KEYS
-								),
-								...blockSettingsWithDeprecations.deprecated[
-									i - 1
-								],
-							} );
-						}
-						i++;
+						filteredSettings.push( settings );
 
 						return {
 							...settings,
@@ -915,7 +887,34 @@ describe( 'blocks', () => {
 					name,
 					blockSettingsWithDeprecations
 				);
-				expect( i ).toBe( 3 );
+				expect( filteredSettings ).toHaveLength( 3 );
+				// Deprecation settings merge the pre-filter settings, without
+				// deprecation keys, with each deprecation entry.
+				blockSettingsWithDeprecations.deprecated.forEach(
+					( deprecation, index ) => {
+						expect( filteredSettings[ index + 1 ] ).toEqual( {
+							...omit(
+								{
+									name,
+									icon: BLOCK_ICON_DEFAULT,
+									attributes: {},
+									providesContext: {},
+									usesContext: [],
+									keywords: [],
+									selectors: {},
+									supports: {},
+									styles: [],
+									variations: [],
+									blockHooks: {},
+									save: () => null,
+									...blockSettingsWithDeprecations,
+								},
+								DEPRECATED_ENTRY_KEYS
+							),
+							...deprecation,
+						} );
+					}
+				);
 
 				expect( block.attributes.id ).toEqual( { type: 'string' } );
 				block.deprecated.forEach( ( deprecation ) => {
