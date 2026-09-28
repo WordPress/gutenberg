@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import '../../store';
 import { createBlock } from '../factory';
 import {
 	getBlockTypes,
@@ -12,11 +14,6 @@ import {
 const noop = () => {};
 
 describe( 'templates', () => {
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );

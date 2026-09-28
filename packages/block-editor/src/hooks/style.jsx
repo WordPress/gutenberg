@@ -36,6 +36,7 @@ import {
 	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
+	usePrivateStyleOverride,
 	useBlockSettings,
 } from './utils';
 import {
@@ -72,6 +73,34 @@ const hasStyleSupport = ( nameOrType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**
+ * Converts a CSS property name into the key a React style object expects.
+ *
+ * Vendor-prefixed properties are camelCased without their leading dash, so
+ * `-webkit-background-clip` becomes `WebkitBackgroundClip`.
+ *
+ * @param {string} key CSS property name.
+ *
+ * @return {string} React style object key.
+ */
+function getReactStyleKey( key ) {
+	// Custom properties start with two dashes. React writes them verbatim.
+	if ( ! key.startsWith( '-' ) || key.startsWith( '--' ) ) {
+		return key;
+	}
+
+	const camelCased = key
+		.slice( 1 )
+		.replace( /-([a-z])/g, ( _, character ) => character.toUpperCase() );
+
+	// `-ms-` is the one prefix React keeps lowercase, e.g. `msFlexAlign`.
+	return key.startsWith( '-ms-' )
+		? camelCased
+		: camelCased.replace( /^[a-z]/, ( character ) =>
+				character.toUpperCase()
+			);
+}
+
+/**
  * Returns the inline styles to add depending on the style object
  *
  * @param {Object} styles Styles configuration.
@@ -83,7 +112,7 @@ export function getInlineStyles( styles = {} ) {
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	getCSSRules( styles ).forEach( ( rule ) => {
-		output[ rule.key ] = rule.value;
+		output[ getReactStyleKey( rule.key ) ] = rule.value;
 	} );
 
 	return output;
@@ -993,7 +1022,7 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { clientId, name, style } ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
 		'wp-elements'
@@ -1037,7 +1066,7 @@ function useBlockProps( { name, style } ) {
 		viewportSettings,
 	] );
 
-	useStyleOverride( { css: styles } );
+	usePrivateStyleOverride( { css: styles, clientId } );
 
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },

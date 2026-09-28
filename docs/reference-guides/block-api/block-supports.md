@@ -401,7 +401,7 @@ supports: {
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filterduotone).
+This property has been replaced by [`filter.duotone`](#filter-duotone).
 
 ### color.gradients
 
@@ -1042,7 +1042,7 @@ When the block declares support for `shadow`, the attributes definition is exten
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#spacing-control).
 
 ```js
 supports: {
@@ -1093,6 +1093,7 @@ supports: {
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
     -   `textAlign`: type `boolean` or `array`, default value `false`
+    -   `textShadow`: type `boolean`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -1224,6 +1225,50 @@ attributes: {
         default: {
             typography: {
                 textAlign: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.textShadow
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for text-shadow.
+        textShadow: true,
+    },
+}
+```
+
+When the block declares support for `textShadow`, the attributes definition is extended to include two new attributes: `textShadow` and `style`:
+
+-   `textShadow`: an attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default preset text shadow by specifying its own `textShadow` attribute with a default. For example:
+
+```js
+attributes: {
+    textShadow: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+-   `style`: an attribute of `object` type with no default assigned. It stores the custom value set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textShadow: 'value'
             }
         }
     }

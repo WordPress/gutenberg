@@ -14,8 +14,10 @@ async function loadDefaultCategoryViaPublishPanel( page: Page ) {
 			if ( ! core ) {
 				return false;
 			}
-			const defaultCategoryId = core.getEntityRecord( 'root', 'site' )
-				?.default_category;
+			const defaultCategoryId = core.getEntityRecord(
+				'root',
+				'site'
+			)?.default_category;
 
 			return (
 				!! defaultCategoryId &&

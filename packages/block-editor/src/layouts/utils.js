@@ -87,3 +87,22 @@ export function getAlignmentsInfo( layout ) {
 	}
 	return alignmentInfo;
 }
+
+/**
+ * Resolves the legacy layout shape to a typed one.
+ *
+ * Before layout types existed, a constrained layout was expressed as
+ * `inherit: true` or as bare `contentSize` / `wideSize` values with no `type`.
+ * Markup saved that way, such as a theme template's Post Content block, is
+ * still around, and consumers that read `type` alone would resolve it to the
+ * flow layout.
+ *
+ * @param {Object} layout The layout object.
+ * @return {Object} The layout, with `type: 'constrained'` set when it was
+ *                  expressed in the legacy form; otherwise the same object.
+ */
+export function normalizeLegacyLayout( layout ) {
+	return layout?.inherit || layout?.contentSize || layout?.wideSize
+		? { ...layout, type: 'constrained' }
+		: layout;
+}

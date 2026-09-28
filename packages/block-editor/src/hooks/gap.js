@@ -1,4 +1,5 @@
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { normalizeLegacyLayout } from '../layouts/utils';
 
 /**
  * Returns whether the current layout can use separate row and column gaps.
@@ -8,10 +9,7 @@ import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/util
  * @return {boolean} Whether axial block gap controls should be available.
  */
 export function isAxialBlockGapAllowed( layout, defaultLayout ) {
-	const usedLayout =
-		layout?.inherit || layout?.contentSize || layout?.wideSize
-			? { ...layout, type: 'constrained' }
-			: layout || defaultLayout || {};
+	const usedLayout = normalizeLegacyLayout( layout ) || defaultLayout || {};
 
 	return [ 'flex', 'grid' ].includes( usedLayout?.type );
 }

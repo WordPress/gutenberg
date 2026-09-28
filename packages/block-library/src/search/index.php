@@ -360,7 +360,7 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
  *
  * @since 5.8.0
  *
- * @param  array $attributes The block attributes.
+ * @param array $attributes The block attributes.
  *
  * @return array Style HTML attribute.
  */

@@ -222,11 +222,10 @@ export default class CollaborationUtils {
 	}
 
 	async getCurrentPostRoomName( page: Page ): Promise< string > {
-		const postId = await page.evaluate(
-			() =>
-				( window as any ).wp?.data
-					?.select( 'core/editor' )
-					?.getCurrentPostId?.()
+		const postId = await page.evaluate( () =>
+			( window as any ).wp?.data
+				?.select( 'core/editor' )
+				?.getCurrentPostId?.()
 		);
 
 		if ( ! postId ) {

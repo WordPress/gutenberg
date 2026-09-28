@@ -33,6 +33,7 @@ function ListViewBlockSelectButton(
 		onDragEnd,
 		draggable,
 		isExpanded,
+		isSelected,
 		ariaDescribedBy,
 		visibilityLabel,
 		isDisabled = false,
@@ -129,7 +130,11 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
-			<BlockIcon icon={ icon } showColors context="list-view" />
+			<BlockIcon
+				icon={ icon }
+				showColors={ ! isSelected }
+				context="list-view"
+			/>
 			<Stack
 				align="center"
 				className="block-editor-list-view-block-select-button__label-wrapper"

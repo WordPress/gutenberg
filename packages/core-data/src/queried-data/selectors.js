@@ -39,7 +39,9 @@ function getQueriedItemsUncached( state, query, options = {} ) {
 	}
 
 	const isPaginated = supportsPagination && perPage !== -1;
-	const startOffset = isPaginated ? queryOffset ?? ( page - 1 ) * perPage : 0;
+	const startOffset = isPaginated
+		? ( queryOffset ?? ( page - 1 ) * perPage )
+		: 0;
 	const endOffset = isPaginated
 		? Math.min( startOffset + perPage, itemIds.length )
 		: itemIds.length;

@@ -1,5 +1,6 @@
-const getJSDocFromToken = require( '../lib/get-jsdoc-from-token' );
-const engine = require( '../lib/engine' );
+import { describe, expect, it } from 'vitest';
+import getJSDocFromToken from '../lib/get-jsdoc-from-token';
+import engine from '../lib/engine';
 
 /**
  * Generate the AST necessary to assert inferred types.

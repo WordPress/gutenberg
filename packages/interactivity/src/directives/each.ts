@@ -52,7 +52,7 @@ const evaluateItemKey = (
 	};
 
 	// If passed, evaluate `eachKey` entry with the simulated scope. Return
-	// `item` otherwhise.
+	// `item` otherwise.
 	return eachKey ? getEvaluate( { scope } )( eachKey ) : item;
 };
 

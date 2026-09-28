@@ -5,9 +5,11 @@ import {
 	useInnerBlocksProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
+import { isGalleryFlexLayout } from './shared';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	const { caption, columns, imageCrop, dynamicContent } = attributes;
+	const { caption, columns, imageCrop, dynamicContent, layout } = attributes;
+	const isFlexLayout = isGalleryFlexLayout( layout );
 
 	const captionElement = ! RichText.isEmpty( caption ) && (
 		<RichText.Content
@@ -30,9 +32,9 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	}
 
 	const className = clsx( 'has-nested-images', {
-		[ `columns-${ columns }` ]: columns !== undefined,
-		[ `columns-default` ]: columns === undefined,
-		'is-cropped': imageCrop,
+		[ `columns-${ columns }` ]: isFlexLayout && columns !== undefined,
+		[ `columns-default` ]: isFlexLayout && columns === undefined,
+		'is-cropped': isFlexLayout && imageCrop,
 	} );
 	const blockProps = useBlockProps.save( { className } );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );

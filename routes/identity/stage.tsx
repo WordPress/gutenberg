@@ -2,11 +2,13 @@ import { Page } from '@wordpress/admin-ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { DataForm, type Field, type Form } from '@wordpress/dataviews';
+import { DataForm, type Field } from '@wordpress/dataviews';
+import { useViewConfig } from '@wordpress/views';
 import { MediaEdit } from '@wordpress/fields';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import styles from './style.module.scss';
 
 type SiteSettings = {
 	title?: string;
@@ -97,13 +99,12 @@ const fields: Field< SiteSettings >[] = [
 	},
 ];
 
-const form: Form = {
-	layout: {
-		type: 'regular',
-		labelPosition: 'top',
-	},
-	fields: [ 'title', 'description', 'site_logo', 'site_icon' ],
-};
+/**
+ * The stage only renders a form, so it requests the `form` of the entity view
+ * configuration alone. Must match the fields the route loader requests so both
+ * resolve under the same cache key.
+ */
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 function Identity() {
 	const data = useSelect(
@@ -117,24 +118,33 @@ function Identity() {
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { form } = useViewConfig( {
+		kind: 'root',
+		name: 'site',
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 
 	const onChange = ( edits: Record< string, any > ) => {
 		// The site entity is a singleton and has no record key.
 		editEntityRecord( 'root', 'site', undefined, edits );
 	};
 
+	if ( ! form ) {
+		// The route loader resolves the form configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
 	return (
-		<Page
-			title={ _x( 'Identity', 'site identity' ) }
-			headingLevel={ 2 }
-			hasPadding
-		>
-			<DataForm
-				data={ data }
-				fields={ fields }
-				form={ form }
-				onChange={ onChange }
-			/>
+		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>
+			<div className={ styles.form }>
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ onChange }
+				/>
+			</div>
 		</Page>
 	);
 }

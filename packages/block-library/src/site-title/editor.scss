@@ -2,3 +2,8 @@
 	padding: 1em 0;
 	border: 1px dashed;
 }
+
+// Overrides the inline `white-space: pre-wrap` rich text sets on the editable.
+.wp-block-site-title.has-fit-text > * {
+	white-space: inherit !important;
+}

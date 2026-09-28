@@ -7,7 +7,6 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 /*
- * Same failure hint as the build, so a red CI run points at the fix.
  * `--pretty` keeps related info (e.g. the tsconfig behind a bad `types`
  * entry) that tsc drops when stdout is not a TTY, as in CI.
  */
@@ -21,8 +20,13 @@ const result = spawn.sync(
 );
 
 if ( result.status !== 0 ) {
+	/*
+	 * Same failure hint as the build, so a red CI run points at the fix.
+	 * Only `--verbose` names the project behind a file-less diagnostic.
+	 */
 	console.error(
-		'\n❌ Type check failed. Try cleaning up first: `npm run clean:package-types`'
+		'\n❌ Type check failed. Try cleaning up first: `npm run clean:package-types`' +
+			'\n   Run `npm run typecheck -- --verbose` to see which project an error without a file came from.'
 	);
 }
 process.exit( result.status ?? 1 );

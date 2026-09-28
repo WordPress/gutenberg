@@ -1,4 +1,4 @@
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { usePublicTaxonomies } from '../../utils';
 
 export default function TaxonomyControl( { value, onChange, ...props } ) {
@@ -9,7 +9,7 @@ export default function TaxonomyControl( { value, onChange, ...props } ) {
 	} ) );
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			options={ taxonomyOptions }
 			value={ value }
 			onChange={ onChange }

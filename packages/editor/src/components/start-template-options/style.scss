@@ -3,6 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 $actions-height: 92px;
+$pattern-min-width: 220px;
 
 .editor-start-template-options__modal {
 	.editor-start-template-options__modal__actions {
@@ -35,11 +36,7 @@ $actions-height: 92px;
 	column-gap: $grid-unit-30;
 
 	@include break-medium() {
-		column-count: 3;
-	}
-
-	@include break-wide() {
-		column-count: 4;
+		columns: 4 $pattern-min-width;
 	}
 
 	.block-editor-block-patterns-list__list-item {

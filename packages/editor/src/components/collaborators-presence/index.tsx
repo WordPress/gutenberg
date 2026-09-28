@@ -76,7 +76,7 @@ export function CollaboratorsPresence( {
 		<>
 			<div className="editor-collaborators-presence">
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					className="editor-collaborators-presence__button"
 					onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
 					isPressed={ isPopoverVisible }

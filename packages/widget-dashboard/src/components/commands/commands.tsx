@@ -25,6 +25,7 @@ export function Commands() {
 		useDashboardInternalContext();
 
 	const canCustomize = canPerform( { operation: 'customize' } );
+	const canReset = canPerform( { operation: 'reset' } );
 	const canInsertAny = useMemo(
 		() =>
 			widgetTypes.some( ( widgetType ) =>
@@ -101,7 +102,7 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'reset' ), __( 'default' ) ],
-				disabled: ! onLayoutReset,
+				disabled: ! onLayoutReset || ! canReset,
 				callback: resetToDefault,
 			},
 		],
@@ -109,6 +110,7 @@ export function Commands() {
 			onEditChange,
 			editMode,
 			canCustomize,
+			canReset,
 			canInsertAny,
 			customize,
 			addWidgets,

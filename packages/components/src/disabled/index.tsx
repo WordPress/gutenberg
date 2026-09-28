@@ -59,14 +59,14 @@ function Disabled( {
 			<div
 				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ isDisabled ? 'true' : undefined }
+				// Only the disabled styling is conditional. The consumer's own
+				// className has to stick around so the wrapper stays targetable
+				// whether or not it is currently disabled.
 				className={
-					isDisabled
-						? clsx(
-								styles.disabled,
-								className,
-								'components-disabled'
-						  )
-						: undefined
+					clsx(
+						className,
+						isDisabled && [ styles.disabled, 'components-disabled' ]
+					) || undefined
 				}
 				{ ...props }
 			>

@@ -1,15 +1,12 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	Notice,
 	PanelBody,
 	Placeholder,
-	SelectControl,
 	Spinner,
 	ToolbarButton,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
@@ -19,53 +16,9 @@ import {
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { sharedIcon } from './shared-icon';
+import { isGalleryFlexLayout } from './shared';
 import { Caption } from '../utils/caption';
-import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
-
-/**
- * Ordering options for a dynamic gallery source. Each value is a composite
- * `"orderby/order"` string mapping to the matching `/wp/v2/media` collection
- * params. `menu_order` is deliberately omitted — it isn't a valid REST `orderby`
- * value, so the editor preview couldn't reproduce it (see `dynamic-source.js`).
- */
-const ORDER_OPTIONS = [
-	{ label: __( 'Newest to oldest' ), value: 'date/desc' },
-	{ label: __( 'Oldest to newest' ), value: 'date/asc' },
-	{
-		/* translators: Label for ordering images by title in ascending order. */
-		label: __( 'A → Z' ),
-		value: 'title/asc',
-	},
-	{
-		/* translators: Label for ordering images by title in descending order. */
-		label: __( 'Z → A' ),
-		value: 'title/desc',
-	},
-];
-
-/**
- * "Order by" control for a dynamic gallery, mirroring the Query Loop block's
- * `OrderControl`: a single `SelectControl` whose value composites `orderby` and
- * `order`, split apart again on change.
- *
- * @param {Object}   props
- * @param {string}   props.orderby  Current `orderby` value.
- * @param {string}   props.order    Current `order` value (`asc`/`desc`).
- * @param {Function} props.onChange Called with `{ orderby, order }` on change.
- */
-function OrderControl( { orderby, order, onChange } ) {
-	return (
-		<SelectControl
-			label={ __( 'Order by' ) }
-			value={ `${ orderby }/${ order }` }
-			options={ ORDER_OPTIONS }
-			onChange={ ( value ) => {
-				const [ newOrderby, newOrder ] = value.split( '/' );
-				onChange( { orderby: newOrderby, order: newOrder } );
-			} }
-		/>
-	);
-}
+import { MAX_IMAGES } from './dynamic-source';
 
 /**
  * Confirmation for leaving dynamic mode, shown from both the block toolbar and
@@ -100,32 +53,23 @@ function DetachGalleryDialog( { onConfirm, onCancel } ) {
 /**
  * The Gallery block's "Source" inspector panel.
  *
- * In dynamic mode it shows the resolved source, a control to detach the gallery
- * from it, and the source ordering. In static mode it offers the entry point
- * into dynamic mode. Either direction is a one-way change, so both are behind a
- * confirmation dialog this panel owns. Rendered inside the block's
- * `InspectorControls`, alongside the Settings panel.
+ * In dynamic mode it shows the resolved source and a control to detach the
+ * gallery from it. In static mode it offers the entry point into dynamic mode.
+ * Either direction is a one-way change, so both are behind a confirmation
+ * dialog this panel owns. Rendered inside the block's `InspectorControls`,
+ * alongside the Settings panel, which owns the ordering for both modes.
  *
  * @param {Object}  props
- * @param {Object}  props.dynamic           The `useDynamicGallery` result.
- * @param {Object}  props.dropdownMenuProps Shared ToolsPanel dropdown menu props.
- * @param {boolean} props.hasImages         Whether the gallery has manually-added images.
+ * @param {Object}  props.dynamic   The `useDynamicGallery` result.
+ * @param {boolean} props.hasImages Whether the gallery has manually-added images.
  */
-export function GallerySourcePanel( {
-	dynamic,
-	dropdownMenuProps,
-	hasImages,
-} ) {
+export function GallerySourcePanel( { dynamic, hasImages } ) {
 	const {
 		dynamicContent,
 		canUseDynamicSource,
 		sourceDescriptor,
-		sourceOrderby,
-		sourceOrder,
-		setSourceOrder,
 		convertToStatic,
 		enableDynamicMode,
-		resetSource,
 		isResolvingDynamic,
 		hasMoreImagesThanCap,
 		dynamicMediaTotal,
@@ -148,11 +92,7 @@ export function GallerySourcePanel( {
 	if ( isDynamic ) {
 		return (
 			<>
-				<ToolsPanel
-					label={ __( 'Source' ) }
-					resetAll={ resetSource }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
+				<PanelBody title={ __( 'Source' ) }>
 					<div className="wp-block-gallery__source-settings">
 						<p className="wp-block-gallery__source-description">
 							{ sourceDescriptor?.description ??
@@ -187,26 +127,7 @@ export function GallerySourcePanel( {
 							) }
 						</Notice>
 					) }
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Order by' ) }
-						hasValue={ () =>
-							sourceOrderby !== DEFAULT_ORDERBY ||
-							sourceOrder !== DEFAULT_ORDER
-						}
-						onDeselect={ () =>
-							setSourceOrder( undefined, undefined )
-						}
-					>
-						<OrderControl
-							orderby={ sourceOrderby }
-							order={ sourceOrder }
-							onChange={ ( { orderby, order } ) =>
-								setSourceOrder( orderby, order )
-							}
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
+				</PanelBody>
 				{ isConfirmingDetach && (
 					<DetachGalleryDialog
 						onConfirm={ () => {
@@ -237,14 +158,17 @@ export function GallerySourcePanel( {
 					 * its confirm dialog below) is temporary. Once more sources
 					 * exist it becomes a "Choose source" select whose options read
 					 * from each source descriptor's `title`, with help text
-					 * carrying the per-source explanation this string does today.
+					 * carrying the per-source explanation these strings do today.
 					 */ }
+					<p className="wp-block-gallery__source-description">
+						{ __( 'Images added to the gallery.' ) }
+					</p>
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ requestEnableDynamicMode }
 					>
-						{ __( 'Use images attached to the post' ) }
+						{ __( 'Use attached images' ) }
 					</Button>
 				</div>
 			</PanelBody>
@@ -282,12 +206,21 @@ export function GallerySourcePanel( {
  * stays editable. This relies on the gallery's image styles using descendant
  * (not direct-child) selectors, which the box-less wrapper leaves intact.
  *
+ * The gallery's layout is passed through so the previewed images see the same
+ * parent layout that real inner blocks would (`useBlockPreview` provides it to
+ * their layout context). Without it they resolve to the default flow layout and
+ * behave as if they weren't in a gallery — most visibly, an image inside a
+ * cropped gallery would keep its baseline `height: auto` and defeat the
+ * gallery's cropping CSS.
+ *
  * @param {Object}   props
  * @param {Object[]} props.imageBlocks Non-persisted `core/image` blocks to preview.
+ * @param {Object}   props.layout      The gallery's layout, for the preview's layout context.
  */
-function GalleryImagesPreview( { imageBlocks } ) {
+function GalleryImagesPreview( { imageBlocks, layout } ) {
 	const { children, ref, className } = useBlockPreview( {
 		blocks: imageBlocks,
+		layout,
 	} );
 	return (
 		<div
@@ -353,6 +286,19 @@ export function GalleryDynamicView( {
 
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
+	// The layout the previewed images sit in. Normalized the same way the
+	// gallery's own classes are (`isGalleryFlexLayout`), so a layout that the
+	// wrapper treats as flex — including a missing or typeless one — is reported
+	// as flex to the images rather than resolving to the default flow layout.
+	// Memoized because it becomes the preview's layout context value.
+	const previewLayout = useMemo(
+		() =>
+			isGalleryFlexLayout( attributes.layout )
+				? { ...attributes.layout, type: 'flex' }
+				: attributes.layout,
+		[ attributes.layout ]
+	);
+
 	// Empty-state copy for the preview. Framed as forward-looking ("… will appear
 	// here") rather than as an error, since the same empty result covers both a
 	// post with no matching images and a template with no post in context yet —
@@ -360,8 +306,8 @@ export function GalleryDynamicView( {
 	// source wording comes from the source descriptor.
 	const emptyInstructions = isResolvingDynamic
 		? __( 'Loading images…' )
-		: sourceDescriptor?.emptyMessage ??
-		  __( 'Dynamic images will appear here.' );
+		: ( sourceDescriptor?.emptyMessage ??
+			__( 'Dynamic images will appear here.' ) );
 
 	return (
 		<>
@@ -396,6 +342,7 @@ export function GalleryDynamicView( {
 					<BlockContextProvider value={ galleryContext }>
 						<GalleryImagesPreview
 							imageBlocks={ dynamicImageBlocks }
+							layout={ previewLayout }
 						/>
 					</BlockContextProvider>
 				) : (

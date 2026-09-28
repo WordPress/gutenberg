@@ -20,6 +20,8 @@ Read the cross-package guide and the package-specific source guidance that
 matches the change:
 
 - [`docs/contributors/design/design-system-packages.md`](../../../docs/contributors/design/design-system-packages.md)
+- [`storybook/stories/design-system/contributing.md`](../../../storybook/stories/design-system/contributing.md)
+  for when to report instead of fix, and what a report contains
 - [`packages/components/CONTRIBUTING.md`](../../../packages/components/CONTRIBUTING.md)
 - [`packages/ui/CONTRIBUTING.md`](../../../packages/ui/CONTRIBUTING.md)
 - [`packages/theme/README.md`](../../../packages/theme/README.md)
@@ -40,6 +42,8 @@ Follow current package precedents only where they apply. Do not add optional
 stories, public documentation, release notes, or compatibility machinery for
 an unchanged public capability. Still follow the repository's required package
 changelog policy for production code changes.
+
+If a published package can run with a dependency supplied separately by WordPress, apply the [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md) skill before implementation.
 
 ## Finish
 

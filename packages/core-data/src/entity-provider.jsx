@@ -12,7 +12,9 @@ import { EntityContext } from './entity-context';
  * @param {number} [props.revisionId] Optional revision ID. When set,
  *                                    `useEntityProp` reads from the
  *                                    revision record instead of the
- *                                    current entity.
+ *                                    current entity. Applies only to this
+ *                                    entity, not to others rendered within
+ *                                    it.
  * @param {*}      props.children     The children to wrap.
  *
  * @return {Object} The provided children, wrapped with
@@ -35,7 +37,16 @@ export default function EntityProvider( {
 					[ name ]: id,
 				},
 			} ),
-			...( revisionId !== undefined && { revisionId } ),
+			...( revisionId !== undefined &&
+				kind && {
+					revision: {
+						...parent?.revision,
+						[ kind ]: {
+							...parent?.revision?.[ kind ],
+							[ name ]: revisionId,
+						},
+					},
+				} ),
 		} ),
 		[ parent, kind, name, id, revisionId ]
 	);

@@ -25,7 +25,7 @@
   <rect x="100" y="176" width="208" height="64" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
   <text x="110" y="194" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#b07020" opacity="0.7">action</text>
   <text x="110" y="212" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">href: 'admin.php?page=analytics</text>
-  <text x="110" y="226" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">&amp;p=/reports'</text>
+  <text x="110" y="226" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">&amp;p=%2Fsales%3Fby%3Dday'</text>
   <text x="104" y="262" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">declares where, as a portable URL</text>
 
   <!-- Declaration flow -->
@@ -36,7 +36,7 @@
   <text x="356" y="180" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">useWidgetHost()</text>
   <text x="356" y="198" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">links.match( href )</text>
   <line x1="352" y1="210" x2="544" y2="210" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="356" y="230" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" font-weight="700" fill="#1d6b5a">&lt;Link path='/reports' /&gt;</text>
+  <text x="356" y="230" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" font-weight="700" fill="#1d6b5a">&lt;Link path='/sales?by=day' /&gt;</text>
   <text x="356" y="248" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" fill="#94a3b8">a real anchor · navigates client-side</text>
 
   <!-- Capability flow -->
@@ -45,7 +45,7 @@
   <!-- The links capability -->
   <rect x="600" y="140" width="212" height="110" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.4"/>
   <text x="616" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">links</text>
-  <text x="616" y="186" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">match( href ): '/reports' | null</text>
+  <text x="616" y="186" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">match( href ): string | null</text>
   <text x="616" y="204" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">Link: the router's primitive</text>
   <text x="616" y="232" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">only the application knows</text>
   <text x="706" y="268" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#64748b">provided through WidgetHostProvider</text>

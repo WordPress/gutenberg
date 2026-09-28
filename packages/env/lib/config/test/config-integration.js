@@ -1,41 +1,90 @@
-'use strict';
-const { readFile } = require( 'fs' ).promises;
-const { existsSync } = require( 'fs' );
-const loadConfig = require( '../load-config' );
-const detectDirectoryType = require( '../detect-directory-type' );
-const md5 = require( '../../md5' );
-
-jest.mock( 'fs', () => ( {
-	promises: {
-		readFile: jest.fn(),
-		stat: jest.fn().mockResolvedValue( true ),
-		mkdir: jest.fn(),
-		writeFile: jest.fn(),
+import { createRequire } from 'node:module';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const readFile = vi.fn();
+const stat = vi.fn();
+const mkdir = vi.fn();
+const writeFile = vi.fn();
+const existsSync = vi.fn();
+const resolveDns = vi.fn();
+const gotPath = require.resolve( 'got' );
+const originalGot = require( gotPath );
+const got = vi.fn( ( url ) => ( {
+	json: () => {
+		if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
+			return Promise.resolve( {
+				'1.0': 'insecure',
+				'99.1.1': 'outdated',
+				'100.0.0': 'latest',
+				'100.0.1': 'fancy',
+			} );
+		}
 	},
-	existsSync: jest.fn().mockReturnValue( false ),
 } ) );
-
-// This mocks a small response with a format matching the stable-check API.
-// It makes getLatestWordPressVersion resolve to "100.0.0".
-jest.mock( 'got', () =>
-	jest.fn( ( url ) => ( {
-		json: () => {
-			if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
-				return Promise.resolve( {
-					'1.0': 'insecure',
-					'99.1.1': 'outdated',
-					'100.0.0': 'latest',
-					'100.0.1': 'fancy',
-				} );
-			}
-		},
-	} ) )
+const detectDirectoryTypePath = require.resolve( '../detect-directory-type' );
+const originalDetectDirectoryType = require( detectDirectoryTypePath );
+const detectDirectoryType = vi.fn();
+const loadConfigPath = require.resolve( '../load-config' );
+const parseConfigPath = require.resolve( '../parse-config' );
+const wordpressPath = require.resolve( '../../wordpress' );
+const cachePath = require.resolve( '../../cache' );
+const getCacheDirectoryPath = require.resolve( '../get-cache-directory' );
+const readRawConfigFilePath = require.resolve( '../read-raw-config-file' );
+const mockedModulePaths = [
+	'fs',
+	'dns',
+	loadConfigPath,
+	parseConfigPath,
+	wordpressPath,
+	cachePath,
+	getCacheDirectoryPath,
+	readRawConfigFilePath,
+];
+const originalModules = new Map(
+	mockedModulePaths.map( ( modulePath ) => [
+		modulePath,
+		require.cache[ modulePath ],
+	] )
 );
-
-jest.mock( '../detect-directory-type', () => jest.fn() );
+for ( const modulePath of mockedModulePaths ) {
+	delete require.cache[ modulePath ];
+}
+let loadConfig;
+try {
+	require.cache.fs = {
+		exports: {
+			promises: { readFile, stat, mkdir, writeFile },
+			existsSync,
+		},
+	};
+	require.cache.dns = {
+		exports: { promises: { resolve: resolveDns } },
+	};
+	require.cache[ gotPath ].exports = got;
+	require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
+	loadConfig = require( loadConfigPath );
+} finally {
+	for ( const [ modulePath, originalModule ] of originalModules ) {
+		if ( originalModule ) {
+			require.cache[ modulePath ] = originalModule;
+		} else {
+			delete require.cache[ modulePath ];
+		}
+	}
+	require.cache[ gotPath ].exports = originalGot;
+	require.cache[ detectDirectoryTypePath ].exports =
+		originalDetectDirectoryType;
+}
+const md5 = require( '../../md5' );
 
 describe( 'Config Integration', () => {
 	beforeEach( () => {
+		readFile.mockReset().mockRejectedValue( { code: 'ENOENT' } );
+		stat.mockReset().mockResolvedValue( true );
+		mkdir.mockReset().mockResolvedValue();
+		writeFile.mockReset().mockResolvedValue();
+		existsSync.mockReset().mockReturnValue( false );
+		resolveDns.mockReset().mockResolvedValue( [ '198.143.164.252' ] );
 		process.env.WP_ENV_HOME = '/cache';
 		detectDirectoryType.mockResolvedValue( null );
 	} );

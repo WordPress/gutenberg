@@ -282,12 +282,14 @@ test.describe( 'Tabs', () => {
 	// TODO: Extend this with the remaining front-end interactions
 	// (e.g. switching tabs by click and by keyboard on the published post).
 	test.describe( 'Frontend functionality', () => {
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
 		test( 'keeps the content of inactive panels available to find-in-page', async ( {
-			admin,
 			editor,
 			page,
 		} ) => {
-			await admin.createNewPost();
 			await editor.insertBlock( {
 				name: 'core/tabs',
 				innerBlocks: [
@@ -356,6 +358,100 @@ test.describe( 'Tabs', () => {
 			await expect(
 				page.getByRole( 'tab', { name: 'Tab 2' } )
 			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		const tabsWithAnchoredTarget = {
+			name: 'core/tabs',
+			innerBlocks: [
+				{ name: 'core/tab-list' },
+				{
+					name: 'core/tab-panels',
+					innerBlocks: [
+						{
+							name: 'core/tab-panel',
+							attributes: { label: 'Tab 1' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'Panel 1' },
+								},
+							],
+						},
+						{
+							name: 'core/tab-panel',
+							attributes: { label: 'Tab 2' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										anchor: 'target',
+										content: 'Panel 2',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+
+		test( 'activates the tab whose panel contains the URL hash target', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '1000px' },
+			} );
+			await editor.insertBlock( tabsWithAnchoredTarget );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }#target` );
+
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( page.locator( '#target' ) ).toBeInViewport();
+		} );
+
+		test( 'activates the tab when a link to a target inside a panel is clicked', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="#target">Go to the second tab</a>',
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '1000px' },
+			} );
+			await editor.insertBlock( tabsWithAnchoredTarget );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const target = page.locator( '#target' );
+			await expect( target ).toBeHidden();
+
+			await page
+				.getByRole( 'link', { name: 'Go to the second tab' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( target ).toBeInViewport();
 		} );
 	} );
 } );

@@ -70,7 +70,7 @@
 
 			&[data-orientation="horizontal"] {
 				z-index: 1;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
 				left: 0;
 				bottom: 0;
 				height: var(--wpds-border-width-focus);
@@ -84,7 +84,7 @@
 				z-index: 0;
 				border-radius: var(--wpds-border-radius-sm);
 				top: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
 				left: 50%;
 				width: 100%;
 				height: var(--active-tab-height);

@@ -67,7 +67,7 @@ function useApplyBlockShortcut() {
 			const variation = variationName
 				? getBlockVariations( targetBlockName )?.find(
 						( { name } ) => name === variationName
-				  )
+					)
 				: undefined;
 
 			// The block is already of the target type, so there is nothing to
@@ -111,7 +111,7 @@ function useApplyBlockShortcut() {
 										...newBlock.attributes,
 										...variation.attributes,
 									},
-							  }
+								}
 							: newBlock
 					);
 				}

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings with invalid properties css snapshot matches warnings 1`] = `
+exports[`flags warnings with invalid properties css > snapshot matches warnings 1`] = `
 [
   {
     "column": 13,
@@ -45,7 +45,7 @@ exports[`flags warnings with invalid properties css snapshot matches warnings 1`
     "line": 5,
     "rule": "declaration-block-no-shorthand-property-overrides",
     "severity": "error",
-    "text": "Unexpected shorthand "margin" after "margin-left" (declaration-block-no-shorthand-property-overrides)",
+    "text": "Overridden property "margin-left" by shorthand "margin" (declaration-block-no-shorthand-property-overrides)",
   },
   {
     "column": 2,
@@ -54,7 +54,7 @@ exports[`flags warnings with invalid properties css snapshot matches warnings 1`
     "line": 6,
     "rule": "property-no-unknown",
     "severity": "error",
-    "text": "Unexpected unknown property "argin" (property-no-unknown)",
+    "text": "Unknown property "argin" (property-no-unknown)",
   },
   {
     "column": 11,

@@ -7,22 +7,24 @@ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const InserterDraggableBlocks = ( {
+export default function InserterDraggableBlocks( {
 	isEnabled,
 	blocks,
 	icon,
 	children,
 	pattern,
-} ) => {
+} ) {
 	const blockName = blocks.length === 1 ? blocks[ 0 ].name : undefined;
+	const isPattern = !! pattern;
+	// Fallback for callers that pass no icon (the media tab).
 	const blockTypeIcon = useSelect(
 		( select ) => {
-			return (
-				blockName &&
-				select( blocksStore ).getBlockType( blockName )?.icon
-			);
+			if ( icon || isPattern || ! blockName ) {
+				return;
+			}
+			return select( blocksStore ).getBlockType( blockName )?.icon;
 		},
-		[ blockName ]
+		[ icon, isPattern, blockName ]
 	);
 
 	const { startDragging, stopDragging } = unlock(
@@ -62,7 +64,7 @@ const InserterDraggableBlocks = ( {
 						/*
 						 * This will fill in the dataTransfer.types array so that
 						 * the drop zone can check if the draggable is eligible.
-						 * Unfortuantely, on drag start, we don't have access to the
+						 * Unfortunately, on drag start, we don't have access to the
 						 * actual data, only the data keys/types.
 						 */
 						event.dataTransfer.items.add( '', type );
@@ -76,8 +78,8 @@ const InserterDraggableBlocks = ( {
 			__experimentalDragComponent={
 				<BlockDraggableChip
 					count={ blocks.length }
-					icon={ icon || ( ! pattern && blockTypeIcon ) }
-					isPattern={ !! pattern }
+					icon={ icon || blockTypeIcon }
+					isPattern={ isPattern }
 				/>
 			}
 		>
@@ -90,6 +92,4 @@ const InserterDraggableBlocks = ( {
 			} }
 		</Draggable>
 	);
-};
-
-export default InserterDraggableBlocks;
+}

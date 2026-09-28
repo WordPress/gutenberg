@@ -14,7 +14,7 @@ const BLOCK_CORE_TABLE_OF_CONTENTS_DEFAULT_HEADING_LEVEL = 2;
  * Adds an aria-label to the table of contents block content.
  *
  * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param string $content    Content of the block being rendered.
  *
  * @return string The content of the block being rendered.
  */
@@ -364,8 +364,8 @@ function block_core_table_of_contents_build_list_items( $nested_headings, $list_
  * Renders the table of contents block from current post headings.
  *
  * @param array         $attributes Attributes of the block being rendered.
- * @param string        $content Content of the block being rendered.
- * @param WP_Block|null $block Block instance.
+ * @param string        $content    Content of the block being rendered.
+ * @param WP_Block|null $block      Block instance.
  *
  * @return string The content of the block being rendered.
  */

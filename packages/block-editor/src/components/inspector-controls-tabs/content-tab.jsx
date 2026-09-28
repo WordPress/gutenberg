@@ -11,21 +11,14 @@ const ContentTab = ( {
 		return null;
 	}
 
-	const shouldShowBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
-
 	return (
-		<>
-			{ ! shouldShowBlockFields && (
-				<PanelBody title={ __( 'Content' ) }>
-					<BlockQuickNavigation
-						clientIds={ contentClientIds }
-						onSwitchToListView={ onSwitchToListView }
-						hasListViewTab={ hasListViewTab }
-					/>
-				</PanelBody>
-			) }
-		</>
+		<PanelBody title={ __( 'Content' ) }>
+			<BlockQuickNavigation
+				clientIds={ contentClientIds }
+				onSwitchToListView={ onSwitchToListView }
+				hasListViewTab={ hasListViewTab }
+			/>
+		</PanelBody>
 	);
 };
 

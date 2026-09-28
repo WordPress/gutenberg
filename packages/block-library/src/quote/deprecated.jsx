@@ -20,9 +20,9 @@ export const migrateToQuoteV2 = ( attributes ) => {
 							source: 'html',
 						},
 					},
-			  } ).map( ( { content } ) =>
+				} ).map( ( { content } ) =>
 					createBlock( 'core/paragraph', { content } )
-			  )
+				)
 			: createBlock( 'core/paragraph' ),
 	];
 };

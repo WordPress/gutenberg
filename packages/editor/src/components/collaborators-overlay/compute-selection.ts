@@ -286,7 +286,7 @@ function computeMultiBlockOverlayRects(
 					selectionRects: [
 						blockBoundingRect( docFirstEl, overlayRect ),
 					],
-			  }
+				}
 			: {};
 	}
 
@@ -308,7 +308,7 @@ function computeMultiBlockOverlayRects(
 						MAX,
 						editorDocument,
 						overlayRect
-				  )
+					)
 				: null;
 			rects.push(
 				...( textRects ?? [
@@ -339,7 +339,7 @@ function computeMultiBlockOverlayRects(
 						lastOffset,
 						editorDocument,
 						overlayRect
-				  )
+					)
 				: null;
 			rects.push(
 				...( textRects ?? [

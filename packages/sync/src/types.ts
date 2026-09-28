@@ -96,6 +96,15 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * The Yjs module used by the editor. Providers must use this instance
+	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
+	 * on the same document cause silent data corruption:
+	 *
+	 * https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (

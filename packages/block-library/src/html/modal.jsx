@@ -148,7 +148,6 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 										placeholder={ __( 'Write HTML…' ) }
 										aria-label={ __( 'HTML' ) }
 										className="block-library-html__modal-editor"
-										async
 									/>
 								</Tabs.TabPanel>
 								{ canUserUseUnfilteredHTML && (
@@ -163,7 +162,6 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 											placeholder={ __( 'Write CSS…' ) }
 											aria-label={ __( 'CSS' ) }
 											className="block-library-html__modal-editor"
-											async
 										/>
 									</Tabs.TabPanel>
 								) }
@@ -181,7 +179,6 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 											) }
 											aria-label={ __( 'JavaScript' ) }
 											className="block-library-html__modal-editor"
-											async
 										/>
 									</Tabs.TabPanel>
 								) }

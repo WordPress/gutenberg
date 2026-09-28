@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import withWeakMapCache from '../with-weak-map-cache';
 
 describe( 'withWeakMapCache', () => {
@@ -11,7 +12,7 @@ describe( 'withWeakMapCache', () => {
 	it( 'caches by weak reference', () => {
 		const a = {};
 		const b = {};
-		const fn = jest.fn().mockReturnValue( 'Called' );
+		const fn = vi.fn().mockReturnValue( 'Called' );
 		const cachedFn = withWeakMapCache( fn );
 
 		cachedFn( a );

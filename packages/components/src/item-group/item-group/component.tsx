@@ -23,6 +23,7 @@ function UnconnectedItemGroup(
 	const size = sizeProp || contextSize;
 
 	const contextValue = {
+		isList: otherProps.role === 'list' || otherProps.role === 'directory',
 		spacedAround,
 		size,
 	};

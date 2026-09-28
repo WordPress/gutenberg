@@ -20,6 +20,7 @@ interface RenderModalProps< Item > {
 interface Action< Item > {
 	id: string;
 	label: string;
+	modalHeader?: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
 	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
@@ -129,7 +130,8 @@ function ReorderModal( {
 
 const reorderPage: Action< BasePost > = {
 	id: 'order-pages',
-	label: __( 'Order' ),
+	label: __( 'Order…' ),
+	modalHeader: __( 'Order' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},

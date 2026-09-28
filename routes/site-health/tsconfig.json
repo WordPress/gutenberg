@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"rootDir": ".",
@@ -16,6 +16,7 @@
 		{ "path": "../../packages/dom" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

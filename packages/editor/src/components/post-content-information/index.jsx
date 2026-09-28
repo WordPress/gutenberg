@@ -66,7 +66,7 @@ export function PostContentInformationUI( { postContent } ) {
 					/* translators: %s: the number of minutes to read the post. */
 					_n( '%s minute', '%s minutes', readingTime ),
 					readingTime.toLocaleString()
-			  );
+				);
 	return (
 		<div className="editor-post-content-information">
 			<WCText>

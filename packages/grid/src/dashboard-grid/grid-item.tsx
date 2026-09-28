@@ -41,6 +41,8 @@ export function GridItem( {
 	resizeSnapPreview = null,
 	minResizeWidthPx,
 	minResizeHeightPx,
+	maxResizeWidthPx,
+	maxResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -79,7 +81,7 @@ export function GridItem( {
 				: Math.min(
 						typeof item.width === 'number' ? item.width : 1,
 						maxColumns
-				  )
+					)
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
@@ -104,10 +106,18 @@ export function GridItem( {
 			height: verticalResizable ? delta.height : 0,
 		};
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-				height: verticalResizable ? minResizeHeightPx : undefined,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{
+					width: minResizeWidthPx,
+					height: verticalResizable ? minResizeHeightPx : undefined,
+				},
+				{
+					width: maxResizeWidthPx,
+					height: verticalResizable ? maxResizeHeightPx : undefined,
+				}
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( item.key, clamped );
@@ -126,7 +136,7 @@ export function GridItem( {
 					height: verticalResizable
 						? initialContentSize.height + resizeDelta.height
 						: undefined,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (

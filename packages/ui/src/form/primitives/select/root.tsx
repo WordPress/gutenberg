@@ -5,6 +5,8 @@ import { DirectionProvider } from '../../../utils/direction-provider';
 /**
  * A component that lets users choose one option from a list.
  *
+ * Prefer `SelectControl` when using with a standard label and description.
+ *
  * When using object values, pass an `items` array so `Select.Trigger` can
  * auto-resolve the selected item's label. By default, items should use a
  * `{ value, label }` shape, or provide `itemToStringLabel` for a custom shape.

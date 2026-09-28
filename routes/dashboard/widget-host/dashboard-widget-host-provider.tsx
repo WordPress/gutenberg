@@ -6,6 +6,27 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { matchDashboardHref } from './match-dashboard-href';
 
 /*
+ * `match` hands the route back with its query attached; the router takes
+ * the query as search params.
+ */
+function toRouteTarget( path: string ): {
+	to: string;
+	search?: Record< string, string >;
+} {
+	const queryStart = path.indexOf( '?' );
+	if ( queryStart === -1 ) {
+		return { to: path };
+	}
+
+	return {
+		to: path.slice( 0, queryStart ),
+		search: Object.fromEntries(
+			new URLSearchParams( path.slice( queryStart + 1 ) )
+		),
+	};
+}
+
+/*
  * Consumers mount this through render-prop composition, where the ref
  * carries the anchor to menu items and tooltip triggers; `forwardRef`
  * keeps that path unbroken.
@@ -14,7 +35,7 @@ const DashboardRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
 >( function DashboardRouteLink( { path, ...props }, ref ) {
-	return <Link ref={ ref } to={ path } { ...props } />;
+	return <Link ref={ ref } { ...toRouteTarget( path ) } { ...props } />;
 } );
 
 type DashboardWidgetHostProviderProps = {

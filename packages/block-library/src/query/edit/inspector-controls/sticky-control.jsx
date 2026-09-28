@@ -1,4 +1,4 @@
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const stickyOptions = [
@@ -10,7 +10,7 @@ const stickyOptions = [
 
 export default function StickyControl( { value, onChange } ) {
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Sticky posts' ) }
 			options={ stickyOptions }
 			value={ value }

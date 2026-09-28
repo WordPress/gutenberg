@@ -8,7 +8,7 @@ export const identityRoute = {
 	areas: {
 		sidebar: <SidebarNavigationScreenIdentity />,
 		content: <SidebarIdentity />,
-		preview: <Editor />,
+		preview: <Editor renderingMode="template-locked" />,
 		mobileContent: <SidebarIdentity />,
 	},
 	widths: {

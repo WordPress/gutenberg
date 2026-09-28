@@ -14,6 +14,6 @@ export function getWidgetSettingsTitle( widgetType?: WidgetType ): string {
 				/* translators: %s: Widget title. */
 				__( '%s settings' ),
 				widgetType.title
-		  )
+			)
 		: __( 'Widget settings' );
 }

@@ -23,7 +23,7 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 					...( themeColors || [] ),
 					...( defaultColors || [] ),
 					...( customColors || [] ),
-			  ]
+				]
 			: [ ...( themeColors || [] ), ...( customColors || [] ) ];
 
 		const { colors = _colors, disableCustomColors = ! enableCustomColors } =

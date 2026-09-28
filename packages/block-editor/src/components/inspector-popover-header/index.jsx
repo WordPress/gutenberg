@@ -1,13 +1,12 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	Button,
-	__experimentalText as WCText,
 } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { Text } from '@wordpress/ui';
 
 export default function InspectorPopoverHeader( {
 	title,
@@ -18,13 +17,13 @@ export default function InspectorPopoverHeader( {
 	return (
 		<VStack className="block-editor-inspector-popover-header" spacing={ 4 }>
 			<HStack alignment="center">
-				<Heading
+				<Text
+					variant="heading-md"
+					render={ <h2 /> }
 					className="block-editor-inspector-popover-header__heading"
-					level={ 2 }
-					size={ 13 }
 				>
 					{ title }
-				</Heading>
+				</Text>
 				<Spacer />
 				{ actions.map( ( { label, icon, onClick } ) => (
 					<Button
@@ -49,7 +48,7 @@ export default function InspectorPopoverHeader( {
 					/>
 				) }
 			</HStack>
-			{ help && <WCText>{ help }</WCText> }
+			{ help && <Text>{ help }</Text> }
 		</VStack>
 	);
 }

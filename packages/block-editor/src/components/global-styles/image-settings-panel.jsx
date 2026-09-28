@@ -8,7 +8,7 @@ import { useToolsPanelDropdownMenuProps } from './utils';
 
 export function useHasImageSettingsPanel( name, value, inheritedValue ) {
 	// Note: If lightbox `value` exists, that means it was
-	// defined via the the Global Styles UI and will NOT
+	// defined via the Global Styles UI and will NOT
 	// be a boolean value or contain the `allowEditing` property,
 	// so we should show the settings panel in those cases.
 	return (

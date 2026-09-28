@@ -3,6 +3,7 @@ import { ChipWithRemove } from '../combobox/chip-with-remove';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
 import { Collection } from '../combobox/collection';
+import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableChipSelect as _SearchableChipSelect } from './searchable-chip-select';
 
 Item.displayName = 'SearchableChipSelect.Item';
@@ -12,7 +13,7 @@ GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
 
 /**
  * A low-level primitive for a searchable multi-selection field with chips, with
- * support for a footer item to create new items.
+ * support for a creatable footer action.
  *
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
@@ -22,4 +23,5 @@ export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	Group,
 	GroupLabel,
 	Collection,
+	useFilteredItems,
 } );

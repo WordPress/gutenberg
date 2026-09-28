@@ -100,7 +100,7 @@ export function CollaboratorsList( {
 													collaboratorState
 														.collaboratorInfo.id ??
 														collaboratorState.clientId
-											  )
+												)
 									}
 									dimmed={ ! collaboratorState.isConnected }
 								/>

@@ -59,6 +59,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'gradient' ],
 		useEngine: true,
 	},
+	backgroundClip: {
+		value: [ 'background', 'backgroundClip' ],
+		support: [ 'background', 'backgroundClip' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
@@ -274,6 +279,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	textIndent: {
 		value: [ 'typography', 'textIndent' ],
 		support: [ 'typography', 'textIndent' ],
+		useEngine: true,
+	},
+	textShadow: {
+		value: [ 'typography', 'textShadow' ],
+		support: [ 'typography', 'textShadow' ],
 		useEngine: true,
 	},
 	writingMode: {

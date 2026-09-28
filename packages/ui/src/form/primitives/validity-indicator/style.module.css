@@ -5,13 +5,10 @@
 		.indicator {
 			--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
 			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
-			--_gcd-p-margin: var(--wpds-dimension-gap-sm) 0 0;
 
 			display: flex;
 			align-items: flex-start;
 			gap: var(--wpds-dimension-gap-xs);
-			margin-block: var(--wpds-dimension-gap-sm) 0;
-			margin-inline: 0;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-sm);
 

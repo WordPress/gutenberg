@@ -60,7 +60,7 @@ const MaybeTagsPanel = () => {
 						'taxonomy',
 						'post_tag',
 						{ per_page: 1 }
-				  )?.length
+					)?.length
 				: false;
 
 			return {

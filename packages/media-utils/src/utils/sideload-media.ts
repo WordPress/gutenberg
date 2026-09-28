@@ -1,4 +1,3 @@
-import { __, sprintf } from '@wordpress/i18n';
 import type {
 	OnErrorHandler,
 	CreateSideloadFile,
@@ -7,6 +6,7 @@ import type {
 } from './types';
 import { sideloadToServer } from './sideload-to-server';
 import { UploadError } from './upload-error';
+import { getUploadErrorMessage } from './get-upload-error-message';
 
 const noop = () => {};
 
@@ -58,20 +58,10 @@ export async function sideloadMedia( {
 		);
 		onSuccess?.( subSizeData );
 	} catch ( error ) {
-		let message;
-		if ( error instanceof Error ) {
-			message = error.message;
-		} else {
-			message = sprintf(
-				// translators: %s: file name
-				__( 'Error while sideloading file %s to the server.' ),
-				file.name
-			);
-		}
 		onError(
 			new UploadError( {
 				code: 'GENERAL',
-				message,
+				message: getUploadErrorMessage( error, file.name ),
 				file,
 				cause: error instanceof Error ? error : undefined,
 			} )

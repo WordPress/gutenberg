@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import isLatexMathMode from '../latex-to-math';
 
 describe( 'isLatexMathMode', () => {

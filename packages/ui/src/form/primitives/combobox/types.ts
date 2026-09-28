@@ -22,6 +22,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	prefix?: React.ReactNode;
 	/**
 	 * Accessible label for the remove button.
+	 * Keep this to the action (for example `Remove`). The chip label describes
+	 * the button.
 	 *
 	 * @default __( 'Remove' )
 	 */
@@ -112,6 +114,10 @@ export type ComboboxRootProps<
 	Value,
 	Multiple extends boolean | undefined = false,
 > = _Combobox.Root.Props< Value, Multiple >;
+
+export type ComboboxStatusProps = ComponentProps< typeof _Combobox.Status > & {
+	children?: React.ReactNode;
+};
 
 export type ComboboxTriggerProps = ComponentProps<
 	typeof _Combobox.Trigger

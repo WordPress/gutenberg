@@ -4,12 +4,7 @@ import itemPopupStyles from './item-popup.module.css';
  * Preset width constraints for item popups.
  */
 export type ItemPopupWidth =
-	| 'anchor'
-	| 'content'
-	| 'sm'
-	| 'md'
-	| 'lg'
-	| 'available';
+	'anchor' | 'content' | 'sm' | 'md' | 'lg' | 'available';
 
 export type ItemPopupWidthProps = {
 	/**
@@ -27,13 +22,13 @@ export type ItemPopupWidthProps = {
 	 *
 	 * @default 'anchor'
 	 */
-	popupWidth?: ItemPopupWidth;
+	width?: ItemPopupWidth;
 };
 
 export function getItemPopupWidthClassName(
-	popupWidth: ItemPopupWidth | undefined = 'anchor'
+	width: ItemPopupWidth | undefined = 'anchor'
 ): string | false {
-	switch ( popupWidth ) {
+	switch ( width ) {
 		case 'available':
 			return itemPopupStyles[ 'is-width-available' ];
 		case 'content':

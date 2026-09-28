@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import DateFormatPicker from '../';
 
 export default {
-	title: 'BlockEditor/DateFormatPicker',
+	id: 'blockeditor-dateformatpicker',
+	title: 'Editor/Block Editor/DateFormatPicker',
 	component: DateFormatPicker,
 	parameters: {
 		docs: {

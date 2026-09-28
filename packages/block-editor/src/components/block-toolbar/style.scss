@@ -295,7 +295,7 @@
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-gap: $grid-unit-15;
+		gap: $grid-unit-15;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
 		}

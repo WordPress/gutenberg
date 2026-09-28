@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { buildBgRamp, type RampResult } from '../color-ramps';
 import {
 	collectThemeProviderColorWarnings,

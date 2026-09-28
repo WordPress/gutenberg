@@ -1159,11 +1159,9 @@ test.describe( 'Links', () => {
 			await optionsButton.click();
 
 			await expect( linkPopover ).toBeHidden();
-			// Expect focus on Top toolbar button within dropdown
+			// Expect focus to have moved into the dropdown
 			await expect(
-				page.getByRole( 'menuitemcheckbox', {
-					name: 'Top toolbar Access all block and document tools in a single place',
-				} )
+				page.getByRole( 'menu', { name: 'Options' } )
 			).toBeFocused();
 			// Press Escape
 			await pageUtils.pressKeys( 'Escape' );
