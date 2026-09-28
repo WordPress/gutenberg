@@ -9,14 +9,14 @@
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
 
-### Deprecations
-
--   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
-
 ### Enhancements
 
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Darken the field border on hover to the active stroke color used by `@wordpress/ui`. Disabled and borderless fields keep their resting border ([#83306](https://github.com/WordPress/gutenberg/pull/83306)).
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
+
+### Deprecations
+
+-   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
 ### Bug Fixes
 
