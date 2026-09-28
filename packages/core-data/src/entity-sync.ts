@@ -226,21 +226,23 @@ export interface EntitySyncManager {
 let registeredManager: EntitySyncManager | undefined;
 
 /**
- * Registers the entity sync manager. Only one can be active: registering
- * a second one replaces the first. Callers that want to cooperate should
- * check `getEntitySyncManager()` first and back off when one exists.
+ * Registers the entity sync manager. Only one can be active. The first
+ * registration wins: a later call with a different manager is ignored and
+ * warns in development. To swap managers, unregister the current one first.
  *
  * @param manager The manager to register.
- * @return A function that unregisters this manager (a no-op if another
- *         manager has replaced it since).
+ * @return A function that unregisters this manager. When the registration
+ *         was ignored because another manager is active, it does nothing.
  */
 export function registerEntitySyncManager(
 	manager: EntitySyncManager
 ): () => void {
 	if ( registeredManager && registeredManager !== manager ) {
 		warning(
-			'registerEntitySyncManager: an entity sync manager was already registered and has been replaced.'
+			'registerEntitySyncManager: an entity sync manager is already registered. The new manager was ignored.'
 		);
+
+		return () => {};
 	}
 
 	registeredManager = manager;

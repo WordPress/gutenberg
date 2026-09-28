@@ -68,19 +68,30 @@ describe( 'registerEntitySyncManager', () => {
 		expect( getEntitySyncManager() ).toBeUndefined();
 	} );
 
-	it( 'replaces an earlier manager with a warning', () => {
+	it( 'keeps the earlier manager and warns when a second one registers', () => {
+		const first = createFakeManager();
+		const second = createFakeManager();
+		unregister = registerEntitySyncManager( first );
+		const unregisterSecond = registerEntitySyncManager( second );
+
+		expect( warning ).toHaveBeenCalledTimes( 1 );
+		expect( getEntitySyncManager() ).toBe( first );
+
+		// The ignored registration's unregister function does nothing.
+		unregisterSecond();
+
+		expect( getEntitySyncManager() ).toBe( first );
+	} );
+
+	it( 'accepts a new manager after the earlier one unregisters', () => {
 		const first = createFakeManager();
 		const second = createFakeManager();
 		const unregisterFirst = registerEntitySyncManager( first );
+
+		unregisterFirst();
 		unregister = registerEntitySyncManager( second );
 
-		expect( warning ).toHaveBeenCalledTimes( 1 );
-		expect( getEntitySyncManager() ).toBe( second );
-
-		// The first manager's unregister function only clears its own
-		// registration, which is gone already.
-		unregisterFirst();
-
+		expect( warning ).not.toHaveBeenCalled();
 		expect( getEntitySyncManager() ).toBe( second );
 	} );
 
