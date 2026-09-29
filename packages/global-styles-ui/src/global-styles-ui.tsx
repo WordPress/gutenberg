@@ -248,48 +248,8 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/link">
+					<GlobalStylesNavigationScreen path="/blocks/elements/:element">
 						<ScreenElement
-							element="link"
-							showStateControls={ showBlockStateControls }
-						/>
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/caption">
-						<ScreenElement element="caption" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/cite">
-						<ScreenElement element="cite" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/heading">
-						<ScreenElement element="heading" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h1">
-						<ScreenElement element="h1" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h2">
-						<ScreenElement element="h2" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h3">
-						<ScreenElement element="h3" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h4">
-						<ScreenElement element="h4" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h5">
-						<ScreenElement element="h5" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/h6">
-						<ScreenElement element="h6" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/textInput">
-						<ScreenElement element="textInput" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/select">
-						<ScreenElement element="select" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/blocks/elements/button">
-						<ScreenElement
-							element="button"
 							showStateControls={ showBlockStateControls }
 						/>
 					</GlobalStylesNavigationScreen>
