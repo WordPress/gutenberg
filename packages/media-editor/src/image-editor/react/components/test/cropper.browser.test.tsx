@@ -1345,7 +1345,7 @@ describe( 'Cropper', () => {
 		);
 
 		await screen.findByTestId( 'cropper-image' );
-		expect( controller.setCropRect ).not.toHaveBeenCalled();
+		expect( controller.adjustCropRectForViewport ).not.toHaveBeenCalled();
 
 		controller.state = { ...controller.state, zoom: 3 };
 		await rerender(
@@ -1357,9 +1357,12 @@ describe( 'Cropper', () => {
 		);
 
 		await waitFor( () =>
-			expect( controller.setCropRect ).toHaveBeenCalledTimes( 1 )
+			expect(
+				controller.adjustCropRectForViewport
+			).toHaveBeenCalledTimes( 1 )
 		);
-		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
+		const rect = ( controller.adjustCropRectForViewport as Mock ).mock
+			.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
 			{ ...controller.state, cropRect: rect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
@@ -1412,7 +1415,7 @@ describe( 'Cropper', () => {
 			/>
 		);
 
-		expect( controller.setCropRect ).not.toHaveBeenCalled();
+		expect( controller.adjustCropRectForViewport ).not.toHaveBeenCalled();
 	} );
 
 	function imageRendering(): string {
