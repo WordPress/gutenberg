@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Darken the field border on hover to the active stroke color used by `@wordpress/ui`. Disabled and borderless fields keep their resting border ([#83306](https://github.com/WordPress/gutenberg/pull/83306)).
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 
