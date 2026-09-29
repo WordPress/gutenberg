@@ -119,8 +119,12 @@ export default function useEditableRoot() {
 					! isZoomOut() && canHostEditableRoot( clientId );
 
 				if ( ! enabled ) {
+					// The selection observer may have disabled the wrapper
+					// already; the field it hosted is released regardless.
 					if ( node.contentEditable === 'true' ) {
 						disengage();
+					} else {
+						releaseField();
 					}
 					return;
 				}
@@ -174,6 +178,8 @@ export default function useEditableRoot() {
 				unsubscribe();
 				if ( node.contentEditable === 'true' ) {
 					disengage();
+				} else {
+					releaseField();
 				}
 			};
 		},
