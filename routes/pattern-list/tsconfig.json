@@ -18,6 +18,7 @@
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
 		{ "path": "../../packages/editor/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
+		{ "path": "../../packages/entity-fields/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
