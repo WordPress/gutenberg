@@ -23,6 +23,7 @@ const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
 	phpVersion: null,
+	mariadbVersion: null,
 	coreSource: {
 		type: 'git',
 		url: 'https://github.com/WordPress/WordPress.git',
@@ -76,6 +77,7 @@ describe( 'parseConfig', () => {
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
 		delete process.env.WP_ENV_PHP_VERSION;
+		delete process.env.WP_ENV_MARIADB_VERSION;
 		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
@@ -388,6 +390,108 @@ describe( 'parseConfig', () => {
 				)
 			);
 		}
+	} );
+
+	it( 'should parse mariadbVersion at the root and per environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					mariadbVersion: '10.11',
+					env: {
+						tests: {
+							mariadbVersion: 'latest',
+						},
+					},
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBe( '10.11' );
+		expect( parsed.env.tests.mariadbVersion ).toBe( 'latest' );
+	} );
+
+	it( 'should accept a null mariadbVersion', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return { mariadbVersion: null };
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBeNull();
+	} );
+
+	it( 'should throw for an invalid mariadbVersion', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return { env: { tests: { mariadbVersion: 'LTS' } } };
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				'Invalid /test/gutenberg/.wp-env.json: "tests.mariadbVersion" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+			)
+		);
+	} );
+
+	it( 'should override mariadbVersion in every environment with WP_ENV_MARIADB_VERSION', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					mariadbVersion: '10.11',
+					env: { tests: { mariadbVersion: 'latest' } },
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+		process.env.WP_ENV_MARIADB_VERSION = '10.3';
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBe( '10.3' );
+		expect( parsed.env.development.mariadbVersion ).toBe( '10.3' );
+		expect( parsed.env.tests.mariadbVersion ).toBe( '10.3' );
+	} );
+
+	it( 'should throw for an invalid WP_ENV_MARIADB_VERSION', async () => {
+		process.env.WP_ENV_MARIADB_VERSION = 'LTS';
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				'Invalid environment variable: "WP_ENV_MARIADB_VERSION" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+			)
+		);
 	} );
 } );
 /* eslint-enable jest/no-conditional-expect */
