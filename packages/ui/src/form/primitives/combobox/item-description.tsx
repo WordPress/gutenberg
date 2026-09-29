@@ -18,7 +18,7 @@ type InternalItemDescriptionProps = ComboboxItemDescriptionProps & {
 const ItemDescription = forwardRef<
 	HTMLSpanElement,
 	ComboboxItemDescriptionProps
->( function ItemDescription( props, ref ) {
+>( function ItemDescriptionComponent( props, ref ) {
 	const { className, validationToken, ...restProps } =
 		props as InternalItemDescriptionProps;
 	if (
@@ -42,5 +42,7 @@ const ItemDescription = forwardRef<
 		/>
 	);
 } );
+
+ItemDescription.displayName = 'ItemDescription';
 
 export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };

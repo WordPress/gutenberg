@@ -10,7 +10,7 @@ import type { ComboboxItemLabelProps } from './types';
  * still uses the item's `label` or the content of `Combobox.Value`.
  */
 export const ItemLabel = forwardRef< HTMLSpanElement, ComboboxItemLabelProps >(
-	function ItemLabel( { className, ...restProps }, ref ) {
+	function ItemLabelComponent( { className, ...restProps }, ref ) {
 		return (
 			<Text
 				ref={ ref }
@@ -21,3 +21,5 @@ export const ItemLabel = forwardRef< HTMLSpanElement, ComboboxItemLabelProps >(
 		);
 	}
 );
+
+ItemLabel.displayName = 'ItemLabel';
