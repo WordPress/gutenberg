@@ -198,16 +198,6 @@ export default function useSelectionObserver() {
 							activeElement.contains( selection.anchorNode )
 						) {
 							node.focus();
-						} else if (
-							// A click on the inert field leaves the default
-							// target (iframe body or page body) active but
-							// unfocused: take focus for the host.
-							( activeElement === node ||
-								activeElement === ownerDocument.body ) &&
-							ownerDocument.hasFocus() &&
-							! activeElement.matches( ':focus' )
-						) {
-							node.focus( { preventScroll: true } );
 						}
 
 						return;
