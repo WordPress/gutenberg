@@ -97,6 +97,7 @@
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.5.3",
 		"@storybook/react-vite": "^10.5.3",
+		"@terrazzo/cli": "^2.7.1",
 		"@terrazzo/parser": "^2.7.1",
 		"@terrazzo/plugin-css": "^2.7.1",
 		"@terrazzo/token-tools": "^2.7.1",
