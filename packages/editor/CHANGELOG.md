@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, are deprecated. Register and unregister fields in PHP on the `fields_api_init` action instead, with a script module for their JavaScript parts.
+
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).

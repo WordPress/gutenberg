@@ -1560,6 +1560,8 @@ _Parameters_
 
 ### registerEntityField
 
+> **Deprecated** since Gutenberg 24.2. Register the field in PHP on the `fields_api_init` action instead, with a script module for its JavaScript parts.
+
 Registers a new DataViews field.
 
 This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
@@ -1666,6 +1668,8 @@ _Parameters_
 - _actionId_ `string`: Action ID.
 
 ### unregisterEntityField
+
+> **Deprecated** since Gutenberg 24.2. Unregister the field in PHP on the `fields_api_init` action instead.
 
 Unregisters a DataViews field.
 

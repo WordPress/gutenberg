@@ -1,4 +1,5 @@
 import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
 
@@ -54,11 +55,20 @@ export function unregisterEntityAction( kind, name, actionId ) {
  * This is an experimental API and is subject to change.
  * it's only available in the Gutenberg plugin for now.
  *
+ * @deprecated since Gutenberg 24.2. Register the field in PHP on the
+ *             `fields_api_init` action instead, with a script module for its
+ *             JavaScript parts.
+ *
  * @param {string} kind   Entity kind.
  * @param {string} name   Entity name.
  * @param {Field}  config Field configuration.
  */
 export function registerEntityField( kind, name, config ) {
+	deprecated( 'wp.editor.registerEntityField', {
+		since: '24.2',
+		plugin: 'Gutenberg',
+		alternative: 'the `fields_api_init` PHP action',
+	} );
 	const { registerEntityField: _registerEntityField } = unlock(
 		dispatch( editorStore )
 	);
@@ -74,11 +84,19 @@ export function registerEntityField( kind, name, config ) {
  * This is an experimental API and is subject to change.
  * it's only available in the Gutenberg plugin for now.
  *
+ * @deprecated since Gutenberg 24.2. Unregister the field in PHP on the
+ *             `fields_api_init` action instead.
+ *
  * @param {string} kind    Entity kind.
  * @param {string} name    Entity name.
  * @param {string} fieldId Field ID.
  */
 export function unregisterEntityField( kind, name, fieldId ) {
+	deprecated( 'wp.editor.unregisterEntityField', {
+		since: '24.2',
+		plugin: 'Gutenberg',
+		alternative: 'the `fields_api_init` PHP action',
+	} );
 	const { unregisterEntityField: _unregisterEntityField } = unlock(
 		dispatch( editorStore )
 	);
