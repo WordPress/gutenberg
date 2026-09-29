@@ -17,6 +17,9 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.ItemLabel': Select.ItemLabel,
 		'Select.ItemDescription': Select.ItemDescription,
 	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
