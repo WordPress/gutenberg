@@ -1,481 +1,239 @@
-import { describe, expect, it, vi } from 'vitest';
-import {
-	default as fetchLinkSuggestions,
-	sortResults,
-	tokenize,
-} from '../__experimental-fetch-link-suggestions';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
+import { getQueryArgs } from '@wordpress/url';
+import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
 
 vi.mock( '@wordpress/api-fetch', () => ( {
-	default: vi.fn( ( { path } ) => {
-		switch ( path ) {
-			case '/wp/v2/search?search=&per_page=20&type=post':
-			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 37,
-						title: 'Contact Page',
-						url: 'http://wordpress.local/contact-page/',
-						type: 'post',
-						subtype: 'page',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=20&type=term':
-			case '/wp/v2/search?search=cat&per_page=20&type=term&subtype=category':
-				return Promise.resolve( [
-					{
-						id: 9,
-						title: 'Cats',
-						url: 'http://wordpress.local/category/cats/',
-						type: 'category',
-					},
-					{
-						id: 1,
-						title: 'Uncategorized',
-						url: 'http://wordpress.local/category/uncategorized/',
-						type: 'category',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=20&type=post-format':
-				return Promise.resolve( [
-					{
-						id: 'gallery',
-						title: 'Gallery',
-						url: 'http://wordpress.local/type/gallery/',
-						type: 'post-format',
-						kind: 'taxonomy',
-					},
-					{
-						id: 'quote',
-						title: 'Quote',
-						url: 'http://wordpress.local/type/quote/',
-						type: 'post-format',
-						kind: 'taxonomy',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 11,
-						title: 'Limit Case',
-						url: 'http://wordpress.local/limit-case/',
-						type: 'post',
-						subtype: 'page',
-					},
-				] );
-			case '/wp/v2/search?search=&page=11&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 22,
-						title: 'Page Case',
-						url: 'http://wordpress.local/page-case/',
-						type: 'post',
-						subtype: 'page',
-					},
-				] );
-			case '/wp/v2/media?search=&per_page=20':
-				return Promise.resolve( [
-					{
-						id: 54,
-						title: {
-							rendered: 'Some Test Media Title',
-						},
-						type: 'attachment',
-						source_url:
-							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					},
-				] );
-			default:
-				return Promise.resolve( [
-					{
-						id: -1,
-						title: 'missing case or failed',
-						url: path,
-						type: 'missing case or failed',
-					},
-				] );
-		}
-	} ),
+	default: vi.fn(),
 } ) );
 
+const ENDPOINT = '/wp-block-editor/v1/link-suggestions';
+
+/**
+ * The query arguments of the one request made.
+ */
+function getRequestedArgs() {
+	const { path } = apiFetch.mock.calls[ 0 ][ 0 ];
+	expect( path.split( '?' )[ 0 ] ).toBe( ENDPOINT );
+	return getQueryArgs( path );
+}
+
 describe( 'fetchLinkSuggestions', () => {
-	it( 'filters suggestions by post-type', () => {
-		return fetchLinkSuggestions( 'Contact', {
+	beforeEach( () => {
+		apiFetch.mockReset();
+		apiFetch.mockResolvedValue( [] );
+	} );
+
+	it( 'requests one page of suggestions from the link suggestions endpoint', async () => {
+		await fetchLinkSuggestions( 'coffee' );
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: `${ ENDPOINT }?search=coffee&per_page=20`,
+		} );
+	} );
+
+	it( 'passes on the type, subtype, page and number per page asked for', async () => {
+		await fetchLinkSuggestions( 'Contact', {
 			type: 'post',
 			subtype: 'page',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 37,
-					title: 'Contact Page',
-					type: 'page',
-					url: 'http://wordpress.local/contact-page/',
-					kind: 'post-type',
-				},
-			] )
-		);
-	} );
-	it( 'filters suggestions by term', () => {
-		return fetchLinkSuggestions( 'cat', {
-			type: 'term',
-			subtype: 'category',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 9,
-					title: 'Cats',
-					url: 'http://wordpress.local/category/cats/',
-					type: 'category',
-					kind: 'taxonomy',
-				},
-				{
-					id: 1,
-					title: 'Uncategorized',
-					url: 'http://wordpress.local/category/uncategorized/',
-					type: 'category',
-					kind: 'taxonomy',
-				},
-			] )
-		);
-	} );
-	it( 'filters suggestions by post-format', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'post-format',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 'gallery',
-					title: 'Gallery',
-					url: 'http://wordpress.local/type/gallery/',
-					type: 'post-format',
-					kind: 'taxonomy',
-				},
-				{
-					id: 'quote',
-					title: 'Quote',
-					url: 'http://wordpress.local/type/quote/',
-					type: 'post-format',
-					kind: 'taxonomy',
-				},
-			] )
-		);
-	} );
-	it( 'filters does not return post-format suggestions when formats are not supported', () => {
-		return fetchLinkSuggestions(
-			'',
-			{
-				type: 'post-format',
-			},
-			{ disablePostFormats: true }
-		).then( ( suggestions ) => expect( suggestions ).toEqual( [] ) );
-	} );
-
-	it( 'filters suggestions by attachment', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'attachment',
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 54,
-					title: 'Some Test Media Title',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					type: 'attachment',
-					kind: 'media',
-				},
-			] )
-		);
-	} );
-
-	it( 'returns suggestions from post, term, post-format and media', () => {
-		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 37,
-					title: 'Contact Page',
-					url: 'http://wordpress.local/contact-page/',
-					type: 'page',
-					kind: 'post-type',
-				},
-				{
-					id: 9,
-					title: 'Cats',
-					url: 'http://wordpress.local/category/cats/',
-					type: 'category',
-					kind: 'taxonomy',
-				},
-				{
-					id: 1,
-					title: 'Uncategorized',
-					url: 'http://wordpress.local/category/uncategorized/',
-					type: 'category',
-					kind: 'taxonomy',
-				},
-				{
-					id: 'gallery',
-					title: 'Gallery',
-					url: 'http://wordpress.local/type/gallery/',
-					type: 'post-format',
-					kind: 'taxonomy',
-				},
-				{
-					id: 'quote',
-					title: 'Quote',
-					url: 'http://wordpress.local/type/quote/',
-					type: 'post-format',
-					kind: 'taxonomy',
-				},
-				{
-					id: 54,
-					title: 'Some Test Media Title',
-					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					type: 'attachment',
-					kind: 'media',
-				},
-			] )
-		);
-	} );
-	describe( 'Initial search suggestions', () => {
-		it( 'initial search suggestions limits results', () => {
-			return fetchLinkSuggestions( '', {
-				type: 'post',
-				subtype: 'page',
-				isInitialSuggestions: true,
-			} ).then( ( suggestions ) =>
-				expect( suggestions ).toEqual( [
-					{
-						id: 11,
-						title: 'Limit Case',
-						url: 'http://wordpress.local/limit-case/',
-						type: 'page',
-						kind: 'post-type',
-					},
-				] )
-			);
+			page: 2,
+			perPage: 5,
 		} );
 
-		it( 'should allow custom search options for initial suggestions', () => {
-			return fetchLinkSuggestions( '', {
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: `${ ENDPOINT }?search=Contact&page=2&per_page=5&type=post&subtype=page`,
+		} );
+	} );
+
+	it( 'leaves out post formats when they are disabled', async () => {
+		await fetchLinkSuggestions(
+			'gallery',
+			{ typeExclude: [ 'attachment' ] },
+			{ disablePostFormats: true }
+		);
+
+		expect( getRequestedArgs() ).toEqual( {
+			search: 'gallery',
+			per_page: '20',
+			type_exclude: [ 'attachment', 'post-format' ],
+		} );
+	} );
+
+	it( 'passes the types and subtypes asked for', async () => {
+		await fetchLinkSuggestions( 'chai', {
+			type: [ 'post', 'term' ],
+			subtype: [ 'page', 'category' ],
+		} );
+
+		expect( getRequestedArgs() ).toEqual( {
+			search: 'chai',
+			per_page: '20',
+			type: [ 'post', 'term' ],
+			subtype: [ 'page', 'category' ],
+		} );
+	} );
+
+	it( 'passes the types and subtypes to leave out', async () => {
+		await fetchLinkSuggestions( 'chai', {
+			typeExclude: [ 'attachment' ],
+			subtypeExclude: [ 'post_tag' ],
+		} );
+
+		expect( getRequestedArgs() ).toEqual( {
+			search: 'chai',
+			per_page: '20',
+			type_exclude: [ 'attachment' ],
+			subtype_exclude: [ 'post_tag' ],
+		} );
+	} );
+
+	it( 'passes the preferred types in the order given', async () => {
+		await fetchLinkSuggestions( 'chai', {
+			preferTypes: [
+				{ type: 'term', subtype: 'category' },
+				'attachment',
+			],
+		} );
+
+		expect( getRequestedArgs() ).toEqual( {
+			search: 'chai',
+			per_page: '20',
+			prefer_types: [
+				{ type: 'term', subtype: 'category' },
+				'attachment',
+			],
+		} );
+	} );
+
+	it( 'keeps the order the endpoint ranked the suggestions in, as links of each kind', async () => {
+		apiFetch.mockResolvedValue( [
+			{
+				id: 2,
+				title: 'Notes On Coffee',
+				url: 'http://wordpress.local/notes-on-coffee/',
+				type: 'post',
+				subtype: 'page',
+			},
+			{
+				id: 9,
+				title: 'Coffee',
+				url: 'http://wordpress.local/category/coffee/',
 				type: 'term',
 				subtype: 'category',
-				page: 11,
+			},
+			{
+				id: 'gallery',
+				title: 'Gallery',
+				url: 'http://wordpress.local/type/gallery/',
+				type: 'post-format',
+				subtype: 'post-format',
+			},
+			{
+				id: 54,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/wp-content/uploads/coffee.jpg',
+				type: 'attachment',
+				subtype: 'attachment',
+			},
+		] );
+
+		expect( await fetchLinkSuggestions( 'coffee' ) ).toEqual( [
+			{
+				id: 2,
+				title: 'Notes On Coffee',
+				url: 'http://wordpress.local/notes-on-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 9,
+				title: 'Coffee',
+				url: 'http://wordpress.local/category/coffee/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 'gallery',
+				title: 'Gallery',
+				url: 'http://wordpress.local/type/gallery/',
+				type: 'post-format',
+				kind: 'taxonomy',
+			},
+			{
+				id: 54,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/wp-content/uploads/coffee.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+		] );
+	} );
+
+	it( 'names untitled suggestions', async () => {
+		apiFetch.mockResolvedValue( [
+			{
+				id: 2,
+				title: '',
+				url: 'http://wordpress.local/2/',
+				type: 'post',
+				subtype: 'page',
+			},
+		] );
+
+		expect(
+			( await fetchLinkSuggestions( '' ) ).map( ( { title } ) => title )
+		).toEqual( [ '(no title)' ] );
+	} );
+
+	it( 'returns no suggestions when the request fails', async () => {
+		apiFetch.mockRejectedValue( {
+			code: 'rest_forbidden',
+			message: 'Sorry, you are not allowed to search for links.',
+		} );
+
+		expect( await fetchLinkSuggestions( 'coffee' ) ).toEqual( [] );
+	} );
+
+	describe( 'Initial search suggestions', () => {
+		it( 'asks for three suggestions by default', async () => {
+			await fetchLinkSuggestions( '', { isInitialSuggestions: true } );
+
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: `${ ENDPOINT }?search=&per_page=3`,
+			} );
+		} );
+
+		it( 'uses the options given for initial suggestions over the search options', async () => {
+			await fetchLinkSuggestions( '', {
 				isInitialSuggestions: true,
+				type: 'term',
+				perPage: 10,
 				initialSuggestionsSearchOptions: {
 					type: 'post',
 					subtype: 'page',
-					perPage: 20,
-					page: 11,
+					perPage: 5,
 				},
-			} ).then( ( suggestions ) =>
-				expect( suggestions ).toEqual( [
-					{
-						id: 22,
-						title: 'Page Case',
-						url: 'http://wordpress.local/page-case/',
-						type: 'page',
-						kind: 'post-type',
-					},
-				] )
-			);
+			} );
+
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: `${ ENDPOINT }?search=&per_page=5&type=post&subtype=page`,
+			} );
 		} );
 
-		it( 'should default any missing initial search options to those from the main search options', () => {
-			return fetchLinkSuggestions( '', {
+		it( 'falls back to the search options for any initial suggestion option not given', async () => {
+			await fetchLinkSuggestions( '', {
+				isInitialSuggestions: true,
 				type: 'post',
 				subtype: 'page',
-				page: 11,
-				perPage: 20,
-				isInitialSuggestions: true,
 				initialSuggestionsSearchOptions: {
-					// intentionally missing.
-					// expected to default to those from the main search options.
+					perPage: 5,
 				},
-			} ).then( ( suggestions ) =>
-				expect( suggestions ).toEqual( [
-					{
-						id: 22,
-						title: 'Page Case',
-						url: 'http://wordpress.local/page-case/',
-						type: 'page',
-						kind: 'post-type',
-					},
-				] )
-			);
+			} );
+
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: `${ ENDPOINT }?search=&per_page=5&type=post&subtype=page`,
+			} );
 		} );
-	} );
-	it( 'allows searching from a page', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'post',
-			subtype: 'page',
-			page: 11,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 22,
-					title: 'Page Case',
-					url: 'http://wordpress.local/page-case/',
-					type: 'page',
-					kind: 'post-type',
-				},
-			] )
-		);
-	} );
-} );
-
-describe( 'sortResults', () => {
-	it( 'returns empty array for empty results', () => {
-		expect( sortResults( [], '' ) ).toEqual( [] );
-	} );
-
-	it( 'orders results', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'How to get from Stockholm to Helsinki by boat',
-				url: 'http://wordpress.local/stockholm-helsinki-boat/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'A day trip from Stockholm to Swedish countryside towns',
-				url: 'http://wordpress.local/day-trip-stockholm/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 3,
-				title: 'The art of packing lightly: How to travel with just a cabin bag',
-				url: 'http://wordpress.local/packing-lightly/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 4,
-				title: 'Tips for travel with a young baby',
-				url: 'http://wordpress.local/young-baby-tips/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 5,
-				title: '', // Test that empty titles don't cause an error.
-				url: 'http://wordpress.local/420/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 6,
-				title: 'City Guides',
-				url: 'http://wordpress.local/city-guides/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-			{
-				id: 7,
-				title: 'Travel Tips',
-				url: 'http://wordpress.local/travel-tips/',
-				type: 'category',
-				kind: 'taxonomy',
-			},
-		];
-		const order = sortResults( results, 'travel tips' ).map(
-			( result ) => result.id
-		);
-		expect( order ).toEqual( [
-			7, // exact match
-			4, // contains: travel, tips
-			3, // contains: travel
-			// same order as input:
-			1,
-			2,
-			5,
-			6,
-		] );
-	} );
-
-	it( 'scores results that share an id separately', () => {
-		// Posts, terms and media are separate tables, so ids repeat across
-		// them. On a fresh site the post "Hello world!" and the category
-		// "Uncategorized" are both id 1.
-		const results = [
-			{
-				id: 1,
-				title: 'Hello world!',
-				type: 'post',
-				kind: 'post-type',
-				url: 'http://wordpress.local/hello-world/',
-			},
-			{
-				id: 1,
-				title: 'Contact',
-				type: 'category',
-				kind: 'taxonomy',
-				url: 'http://wordpress.local/category/contact/',
-			},
-			{
-				id: 2,
-				title: 'Contact us today',
-				type: 'page',
-				kind: 'post-type',
-				url: 'http://wordpress.local/contact-us-today/',
-			},
-		];
-
-		expect(
-			sortResults( results, 'contact' ).map( ( { title } ) => title )
-		).toEqual( [ 'Contact', 'Contact us today', 'Hello world!' ] );
-	} );
-
-	it( 'orders results to prefer direct matches over sub matches', () => {
-		const results = [
-			{
-				id: 1,
-				title: 'News',
-				url: 'http://wordpress.local/news/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 2,
-				title: 'Newspaper',
-				url: 'http://wordpress.local/newspaper/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 3,
-				title: 'News Flash News',
-				url: 'http://wordpress.local/news-flash-news/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 4,
-				title: 'News',
-				url: 'http://wordpress.local/news-2/',
-				type: 'page',
-				kind: 'post-type',
-			},
-		];
-		const order = sortResults( results, 'News' ).map(
-			( result ) => result.id
-		);
-		expect( order ).toEqual( [ 1, 4, 3, 2 ] );
-	} );
-} );
-
-describe( 'tokenize', () => {
-	it( 'returns empty array for empty string', () => {
-		expect( tokenize( '' ) ).toEqual( [] );
-	} );
-
-	it( 'tokenizes a string', () => {
-		expect( tokenize( 'Hello, world!' ) ).toEqual( [ 'hello', 'world' ] );
-	} );
-
-	it( 'tokenizes non latin languages', () => {
-		expect( tokenize( 'こんにちは、世界！' ) ).toEqual( [
-			'こんにちは',
-			'世界',
-		] );
 	} );
 } );

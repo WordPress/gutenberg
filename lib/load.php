@@ -48,6 +48,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-link-suggestions-controller.php';
 
 
 	// WordPress 7.1 compat.
