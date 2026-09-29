@@ -18,6 +18,8 @@ const meta: Meta< typeof SearchableSelect > = {
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Separator': SearchableSelect.Separator,
 		'SearchableSelect.Item': SearchableSelect.Item,
+		'SearchableSelect.ItemLabel': SearchableSelect.ItemLabel,
+		'SearchableSelect.ItemDescription': SearchableSelect.ItemDescription,
 		'SearchableSelect.Collection': SearchableSelect.Collection,
 	},
 	argTypes: {
@@ -40,6 +42,19 @@ export const Default: Story = {
 	args: {
 		'aria-label': 'Fruit',
 		items: ITEMS,
+	},
+};
+
+/**
+ * Item descriptions supplement each popup item and are not copied to the trigger.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		...Default.args,
+		items: [
+			{ value: 'apple', label: 'Apple', description: 'A crisp fruit.' },
+			{ value: 'banana', label: 'Banana', description: 'A soft fruit.' },
+		],
 	},
 };
 
@@ -92,7 +107,9 @@ export const WithCustomTriggerAndItems: Story = {
 			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
-				😋 { item.label }
+				<SearchableSelect.ItemLabel>
+					😋 { item.label }
+				</SearchableSelect.ItemLabel>
 			</SearchableSelect.Item>
 		),
 	},
@@ -133,7 +150,9 @@ export const Grouped: Story = {
 								key={ item.value }
 								value={ item }
 							>
-								{ item.label }
+								<SearchableSelect.ItemLabel>
+									{ item.label }
+								</SearchableSelect.ItemLabel>
 							</SearchableSelect.Item>
 						) }
 					</SearchableSelect.Collection>

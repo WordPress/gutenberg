@@ -92,6 +92,18 @@
             - render
             - style
             - value
+      - name: Autocomplete.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.List
         props:
             - children
@@ -143,6 +155,12 @@
         props:
             - children
             - className
+            - render
+            - style
+      - name: Autocomplete.Separator
+        props:
+            - className
+            - orientation
             - render
             - style
       - name: Autocomplete.Status
@@ -1164,6 +1182,24 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelect.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.Separator
+        props:
+            - className
+            - orientation
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1256,6 +1292,24 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.Separator
+        props:
+            - className
+            - orientation
+            - render
+            - style
 - name: SearchableSelectControl
   props:
       - actionsRef
@@ -1339,6 +1393,24 @@
             - style
             - value
             - variant
+      - name: SearchableSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Separator
+        props:
+            - className
+            - orientation
+            - render
+            - style
 - name: SearchControl
   props:
       - __next40pxDefaultSize
@@ -1449,6 +1521,12 @@
             - sideOffset
             - sticky
             - style
+      - name: Select.Separator
+        props:
+            - className
+            - orientation
+            - render
+            - style
       - name: Select.Trigger
         props:
             - children
@@ -1528,6 +1606,12 @@
         props:
             - children
             - className
+            - render
+            - style
+      - name: SelectControl.Separator
+        props:
+            - className
+            - orientation
             - render
             - style
 - name: Shortcut

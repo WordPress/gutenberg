@@ -29,6 +29,8 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Group': Combobox.Group,
 		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
+		'Combobox.ItemLabel': Combobox.ItemLabel,
+		'Combobox.ItemDescription': Combobox.ItemDescription,
 		'Combobox.Separator': Combobox.Separator,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
@@ -75,7 +77,9 @@ export const Default: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -117,7 +121,9 @@ export const WithSeparator: Story = {
 													key={ item.value }
 													value={ item }
 												>
-													{ item.label }
+													<Combobox.ItemLabel>
+														{ item.label }
+													</Combobox.ItemLabel>
 												</Combobox.Item>
 											) }
 										</Combobox.Collection>
@@ -155,7 +161,9 @@ export const Compact: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -212,7 +220,9 @@ export const DetachedInline: Story = {
 					<Combobox.Collection>
 						{ ( item: FixtureItem ) => (
 							<Combobox.Item key={ item.value } value={ item }>
-								{ item.label }
+								<Combobox.ItemLabel>
+									{ item.label }
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						) }
 					</Combobox.Collection>
@@ -275,7 +285,9 @@ export const Creatable: Story = {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.label }
+											<Combobox.ItemLabel>
+												{ item.label }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									)
 								}
@@ -287,7 +299,9 @@ export const Creatable: Story = {
 								value={ creatableItem }
 								key={ creatableItem.value }
 							>
-								{ creatableItem.label }
+								<Combobox.ItemLabel>
+									{ creatableItem.label }
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						</Combobox.ListFooter>
 					</Combobox.List>
@@ -380,7 +394,9 @@ export const AsyncItems: Story = {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -395,6 +411,7 @@ export const AsyncItems: Story = {
 /**
  * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
  * while `Combobox.Item` can take arbitrary content as children.
+ * Wrap that content in `Combobox.ItemLabel`, followed by optional `Combobox.ItemDescription` components.
  *
  * In this example, some extra information is added to each list item as an ARIA description.
  */
@@ -436,24 +453,13 @@ export const WithCustomTriggerAndItem: Story = {
 								<Combobox.Item
 									key={ item.value }
 									value={ item }
-									aria-describedby={ `description-${ item.value }` }
 								>
-									<div
-										style={ {
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-											flexGrow: 1,
-										} }
-									>
-										<span>{ item.label }</span>
-										<span
-											id={ `description-${ item.value }` }
-											aria-hidden="true"
-										>
-											99 in stock
-										</span>
-									</div>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+									<Combobox.ItemDescription>
+										99 in stock
+									</Combobox.ItemDescription>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -495,7 +501,9 @@ export const Grouped: Story = {
 												key={ item.value }
 												value={ item }
 											>
-												{ item.label }
+												<Combobox.ItemLabel>
+													{ item.label }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -552,7 +560,9 @@ export const WithCustomZIndex: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>

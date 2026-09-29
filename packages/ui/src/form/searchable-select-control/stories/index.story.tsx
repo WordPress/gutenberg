@@ -30,6 +30,9 @@ const meta: Meta< typeof SearchableSelectControl > = {
 			SearchableSelectControl.GroupLabel,
 		'SearchableSelectControl.Separator': SearchableSelectControl.Separator,
 		'SearchableSelectControl.Item': SearchableSelectControl.Item,
+		'SearchableSelectControl.ItemLabel': SearchableSelectControl.ItemLabel,
+		'SearchableSelectControl.ItemDescription':
+			SearchableSelectControl.ItemDescription,
 		'SearchableSelectControl.Collection':
 			SearchableSelectControl.Collection,
 	},
@@ -57,6 +60,14 @@ export const Default: Story = {
 		...SearchableSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const WithItemDescriptions: Story = {
+	...SearchableSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
 	},
 };
 
@@ -334,7 +345,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableSelectControl.ItemLabel>
 								</SearchableSelectControl.Item>
 							) }
 						</SearchableSelectControl.Collection>
