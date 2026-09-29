@@ -50,6 +50,11 @@
 		"@playwright/test": ">=1",
 		"@types/node": ">=20"
 	},
+	"peerDependenciesMeta": {
+		"@types/node": {
+			"optional": true
+		}
+	},
 	"publishConfig": {
 		"access": "public"
 	},

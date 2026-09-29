@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config`.
+
 ## 36.0.0 (2026-09-23)
 
 ### Breaking Changes

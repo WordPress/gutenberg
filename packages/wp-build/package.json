@@ -34,6 +34,7 @@
 		"wp-build": "./lib/build.mjs"
 	},
 	"dependencies": {
+		"@babel/core": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
