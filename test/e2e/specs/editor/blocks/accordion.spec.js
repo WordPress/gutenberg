@@ -235,4 +235,96 @@ test.describe( 'Accordion', () => {
 		await expect( accordionPanel ).toBeVisible();
 		await expect( targetParagraph ).toBeInViewport();
 	} );
+
+	test( 'should persist the accordion heading level on items inserted before another item', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			attributes: { headingLevel: 2 },
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: { title: 'Item 1', level: 2 },
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'First panel' },
+								},
+							],
+						},
+					],
+				},
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: { title: 'Item 2', level: 2 },
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'Second panel' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Accordion Item' } )
+			.first()
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Add before' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/accordion',
+				attributes: { headingLevel: 2 },
+				innerBlocks: [
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { level: 2 },
+							},
+							{ name: 'core/accordion-panel' },
+						],
+					},
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { title: 'Item 1', level: 2 },
+							},
+							{ name: 'core/accordion-panel' },
+						],
+					},
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { title: 'Item 2', level: 2 },
+							},
+							{ name: 'core/accordion-panel' },
+						],
+					},
+				],
+			},
+		] );
+	} );
 } );

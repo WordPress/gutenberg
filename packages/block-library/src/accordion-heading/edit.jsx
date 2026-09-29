@@ -12,7 +12,7 @@ import {
 import { useDispatch } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes, context } ) {
-	const { title } = attributes;
+	const { title, level } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
@@ -34,6 +34,19 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	}, [
 		iconPosition,
 		showIcon,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	// Persist the parent accordion heading level so save markup matches the editor.
+	useEffect( () => {
+		if ( headingLevel !== undefined && headingLevel !== level ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { level: headingLevel } );
+		}
+	}, [
+		headingLevel,
+		level,
 		setAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
