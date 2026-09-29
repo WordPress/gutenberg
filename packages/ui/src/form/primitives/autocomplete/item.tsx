@@ -21,7 +21,7 @@ const ITEM_CONTENT_COMPONENTS = {
 };
 
 export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
-	function Item(
+	function UnforwardedItem(
 		{
 			className,
 			children,
@@ -41,7 +41,6 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 				'aria-labelledby': ariaLabelledBy,
 			}
 		);
-
 		return (
 			<_Autocomplete.Item
 				className={ clsx(

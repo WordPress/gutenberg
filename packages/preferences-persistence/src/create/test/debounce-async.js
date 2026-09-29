@@ -112,8 +112,7 @@ describe( 'debounceAsync', () => {
 		await expect( debounced() ).rejects.toBe( expectedError );
 
 		// Test chained .catch().
-		await debounced().catch( ( error ) => {
-			expect( error ).toBe( expectedError );
-		} );
+		const caughtError = await debounced().catch( ( error ) => error );
+		expect( caughtError ).toBe( expectedError );
 	} );
 } );

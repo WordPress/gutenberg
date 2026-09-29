@@ -18,7 +18,7 @@ type InternalItemDescriptionProps = SelectItemDescriptionProps & {
 const ItemDescription = forwardRef<
 	HTMLSpanElement,
 	SelectItemDescriptionProps
->( function ItemDescription( props, ref ) {
+>( function UnforwardedItemDescription( props, ref ) {
 	const { className, validationToken, ...restProps } =
 		props as InternalItemDescriptionProps;
 	if (

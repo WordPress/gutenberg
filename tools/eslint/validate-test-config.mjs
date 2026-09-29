@@ -27,6 +27,8 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 		'no-alias-methods',
 		'no-done-callback',
 		'no-test-prefixes',
+		'expect-expect',
+		'no-conditional-expect',
 	] ) {
 		assert.equal(
 			config.rules[ `vitest/${ rule }` ][ 0 ],
@@ -34,9 +36,14 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 			`${ file }: ${ rule }`
 		);
 	}
-	assert.equal( config.rules[ 'vitest/expect-expect' ][ 0 ], 1 );
 	assert.equal( config.languageOptions.globals.jest, undefined );
 }
+
+const tabsConfig = await eslint.calculateConfigForFile(
+	'packages/ui/src/tabs/test/index.browser.test.tsx'
+);
+assert.equal( tabsConfig.rules[ 'vitest/expect-expect' ][ 0 ], 2 );
+assert.equal( tabsConfig.rules[ 'vitest/no-conditional-expect' ][ 0 ], 2 );
 
 for ( const file of [ jsdomTest, browserTest ] ) {
 	const { rules } = await eslint.calculateConfigForFile( file );
@@ -99,16 +106,23 @@ assert.deepEqual(
 assert.deepEqual(
 	await lintTestRules(
 		nodeTest,
-		"import { test } from 'vitest'; test( 'example', () => {} );"
+		"import { test } from 'vitest'; test( 'rejects tests without assertions', () => {} );"
 	),
 	[ 'vitest/expect-expect' ]
 );
 assert.deepEqual(
 	await lintTestRules(
 		nodeTest,
-		"import { test, expect } from 'vitest'; test( 'example', () => { expect( true ).toBe( true ); } );"
+		"import { test, expect } from 'vitest'; test( 'accepts unconditional assertions', () => { expect( true ).toBe( true ); } );"
 	),
 	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'rejects conditional assertions', () => { if ( true ) { expect( true ).toBe( true ); } } );"
+	),
+	[ 'vitest/no-conditional-expect' ]
 );
 
 assert.deepEqual(

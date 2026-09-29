@@ -23,7 +23,7 @@ const ITEM_CONTENT_COMPONENTS = {
 };
 
 export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
-	function Item(
+	function UnforwardedItem(
 		{
 			className,
 			children,
