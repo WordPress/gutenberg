@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Autocomplete`: the component no longer provides autocompletion and only renders its children. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
@@ -20,6 +21,10 @@
 
 -   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
+### Deprecations
+
+-   `__unstableUseAutocompleteProps`: deprecate the export. It returns no props; the hook moved to `@wordpress/block-editor` as a private API ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
+
 ### Bug Fixes
 
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
@@ -31,6 +36,7 @@
 
 ### Internal
 
+-   Drop the `@wordpress/rich-text` dependency ([#83732](https://github.com/WordPress/gutenberg/pull/83732)).
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
 
 ## 41.0.0 (2026-09-23)

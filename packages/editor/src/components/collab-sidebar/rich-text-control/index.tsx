@@ -3,8 +3,9 @@ import type { ReactNode } from 'react';
 import {
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
-	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
+// @ts-expect-error No exported types
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
 	useRefEffect,
@@ -34,6 +35,7 @@ import FormatEdit from './format-edit';
 const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
+const { useAutocompleteProps } = unlock( blockEditorPrivateApis );
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
@@ -49,16 +51,10 @@ const {
 	inputEventsListener,
 } = unlock( richTextPrivateApis );
 
-// The completer shape isn't exported from `@wordpress/components`, so derive
-// it from the autocomplete hook's own parameter type.
-type Completer = Parameters<
-	typeof useAutocompleteProps
->[ 0 ][ 'completers' ][ number ];
-
 // Shared empty reference so the default `completers` value is stable across
 // renders and the autocomplete hook doesn't re-run for consumers that don't
 // opt into it.
-const EMPTY_COMPLETERS: Array< Completer > = [];
+const EMPTY_COMPLETERS: Array< unknown > = [];
 
 export type RichTextControlProps = {
 	/**
@@ -145,10 +141,10 @@ export type RichTextControlProps = {
 	focusOnMount?: boolean;
 	/**
 	 * Autocompleters to wire to the field (e.g. an `@` mention completer).
-	 * Each is a `WPCompleter` object as consumed by `@wordpress/components`'
+	 * Each is a completer object as consumed by `@wordpress/block-editor`'
 	 * `Autocomplete`. Omit to disable autocomplete.
 	 */
-	completers?: Array< Completer >;
+	completers?: Array< unknown >;
 };
 
 /**

@@ -13,6 +13,7 @@ import {
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { useAutocompleteProps } from './components/autocomplete/use-autocomplete';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import { isDefaultBlockStyleState } from './hooks/block-style-state';
@@ -86,6 +87,7 @@ const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
  */
 export const privateApis = {};
 lock( privateApis, {
+	useAutocompleteProps,
 	...globalStyles,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,

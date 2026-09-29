@@ -25,8 +25,8 @@ export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
-	useAutocompleteProps as __unstableUseAutocompleteProps,
-} from './autocomplete';
+	useDeprecatedAutocompleteProps as __unstableUseAutocompleteProps,
+} from './autocomplete/deprecated';
 export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	/** @deprecated Import `BorderBoxControl` instead. */

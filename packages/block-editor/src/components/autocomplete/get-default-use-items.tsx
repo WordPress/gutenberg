@@ -1,7 +1,7 @@
 import removeAccents from 'remove-accents';
 import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
-import { escapeRegExp } from '../utils/strings';
+import { escapeRegExp } from '../../utils/strings';
 import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
 
 function filterOptions(

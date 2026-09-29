@@ -20,7 +20,6 @@ import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import type {
 	AutocompleteAction,
-	AutocompleteProps,
 	AutocompleteState,
 	InsertOption,
 	KeyedOption,
@@ -28,8 +27,8 @@ import type {
 	ReplaceOption,
 	UseAutocompleteProps,
 } from './types';
-import getNodeText from '../utils/get-node-text';
-import { unlock } from '../lock-unlock';
+import getNodeText from '../../utils/get-node-text';
+import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
@@ -433,18 +432,4 @@ export function useAutocompleteProps(
 		'aria-owns': listBoxId,
 		'aria-activedescendant': activeId ?? undefined,
 	};
-}
-
-export default function Autocomplete( {
-	children,
-	isSelected,
-	...options
-}: AutocompleteProps ) {
-	const { popover, ...props } = useAutocomplete( options );
-	return (
-		<>
-			{ children( props ) }
-			{ isSelected && popover }
-		</>
-	);
 }

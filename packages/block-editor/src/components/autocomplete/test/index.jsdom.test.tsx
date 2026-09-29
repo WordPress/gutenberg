@@ -3,7 +3,7 @@ import { render, screen, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRef } from '@wordpress/element';
 import { AutocompleterUI } from '../autocompleter-ui';
-import { useLastDifferentValue } from '..';
+import { useLastDifferentValue } from '../use-autocomplete';
 
 type FruitOption = { visual: string; name: string; id: number };
 

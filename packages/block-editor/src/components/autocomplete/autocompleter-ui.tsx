@@ -10,10 +10,9 @@ import { useAnchor } from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { Button, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import getDefaultUseItems from './get-default-use-items';
-import Button from '../button';
-import Popover from '../popover';
-import { VisuallyHidden } from '../visually-hidden';
 import type { AutocompleterUIProps, KeyedOption } from './types';
 
 type ListBoxProps = {

@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { useAutocomplete } from '.';
 
 // Insert the `value` into the text.
 export type InsertOption = {
@@ -187,17 +186,3 @@ export type AutocompleteAction =
 	| { type: 'SELECT'; index: number }
 	| { type: 'OPTIONS'; options: KeyedOption[] }
 	| { type: 'MATCH'; completer: WPCompleter; query: string };
-
-export type AutocompleteProps = UseAutocompleteProps & {
-	/**
-	 * A function that returns nodes to be rendered within the Autocomplete.
-	 */
-	children: (
-		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
-	) => React.ReactNode;
-	/**
-	 * Whether or not the Autocomplete component is selected, and if its
-	 * `Popover` should be displayed.
-	 */
-	isSelected: boolean;
-};
