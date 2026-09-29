@@ -287,8 +287,9 @@ add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fi
  * and comment status fields like any other post type. Yet the media editor
  * shows its own set of fields, declared client-side in
  * packages/media-fields/src, none of which is a default one. The default
- * fields are dropped and the media fields ported to the server so far are
- * registered instead.
+ * fields, the ones registered by `core`, are dropped and the media fields
+ * ported to the server so far are registered instead. Fields registered by
+ * plugins in between are kept.
  *
  * It runs right after the default fields are registered, on
  * `fields_api_init` at priority 9, so a plugin hooking the action at
@@ -302,8 +303,15 @@ function _gutenberg_register_posttype_attachment_fields( Gutenberg_Fields_Regist
 		return;
 	}
 
-	// Remove all default fields registered for postType attachment.
-	$registry->unregister( 'postType', 'attachment' );
+	// Drop the fields registered by core only: any other field a plugin registered
+	// for attachments at an earlier priority stay.
+	$defaults = array();
+	foreach ( $registry->get_registered( 'postType', 'attachment' ) as $field ) {
+		if ( 'core' === $field['origin']['registeredBy'] ) {
+			$defaults[] = $field['id'];
+		}
+	}
+	$registry->unregister( 'postType', 'attachment', $defaults );
 	$registry->register(
 		'core',
 		'postType',

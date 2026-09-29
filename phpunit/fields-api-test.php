@@ -479,6 +479,36 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Replacing the defaults of attachments only drops the fields `core`
+	 * registered: a plugin registering attachment fields between the
+	 * defaults and the adjustment keeps them.
+	 */
+	public function test_attachments_keep_the_fields_plugins_register_before_the_media_fields() {
+		$this->on_fields_api_init(
+			static function ( $registry ) {
+				$registry->register(
+					'my-plugin',
+					'postType',
+					'attachment',
+					array(
+						array(
+							'id'    => 'credit',
+							'type'  => 'text',
+							'label' => 'Credit',
+						),
+					)
+				);
+			},
+			5
+		);
+
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertContains( 'credit', $ids, 'The plugin field is kept.' );
+		$this->assertNotContains( 'author', $ids, 'The default author field is dropped.' );
+		$this->assertContains( 'date', $ids, 'The media fields are registered.' );
+	}
+
+	/**
 	 * Reading the registry fires `fields_api_init` once, whichever
 	 * getter is read first and however many times it is read.
 	 */
