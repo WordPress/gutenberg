@@ -10,3 +10,5 @@ export const NOTES_PANEL_WIDTH = 280;
 // the floating panel hides and the "All notes" sidebar remains the surface.
 // Twice the panel width keeps at least an equal share for the content.
 export const MIN_CANVAS_WIDTH_FOR_FLOATING_NOTES = NOTES_PANEL_WIDTH * 2;
+
+export const NOTE_FORMAT_NAME = 'core/note';

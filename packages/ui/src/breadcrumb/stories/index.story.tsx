@@ -141,7 +141,7 @@ export const LongLabelsAndRtl: Story = {
 };
 
 const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
-	function RouterLink( { children, ...props }, ref ) {
+	function UnforwardedRouterLink( { children, ...props }, ref ) {
 		return (
 			<a { ...props } ref={ ref } data-router-link>
 				{ children }

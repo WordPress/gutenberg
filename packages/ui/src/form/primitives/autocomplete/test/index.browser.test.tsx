@@ -30,6 +30,34 @@ function renderDisabledAutocompleteWithClear( disabled: boolean ) {
 }
 
 describe( 'Autocomplete', () => {
+	it( 'keeps the item description out of the input after selection', async () => {
+		await render(
+			<Autocomplete.Root items={ [ 'Apple' ] }>
+				<Autocomplete.Input aria-label="Fruit" />
+				<Autocomplete.Popup>
+					<Autocomplete.List>
+						<Autocomplete.Item value="Apple">
+							<Autocomplete.ItemLabel>
+								Apple
+							</Autocomplete.ItemLabel>
+							<Autocomplete.ItemDescription>
+								Fresh fruit.
+							</Autocomplete.ItemDescription>
+						</Autocomplete.Item>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await userEvent.type( input, 'App' );
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		expect( input ).toHaveValue( 'Apple' );
+	} );
+
 	it( 'forwards ref', async () => {
 		const user = userEvent;
 		const inputGroupRef = createRef< HTMLDivElement >();
@@ -67,7 +95,9 @@ describe( 'Autocomplete', () => {
 										}
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -122,7 +152,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -161,7 +193,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -205,7 +239,9 @@ describe( 'Autocomplete', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Autocomplete.ItemLabel>
+												{ item.value }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>
@@ -262,7 +298,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -300,7 +338,9 @@ describe( 'Autocomplete', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Autocomplete.ItemLabel>
+												{ item.value }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>
@@ -347,7 +387,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -372,28 +414,23 @@ describe( 'Autocomplete', () => {
 	/* eslint-enable testing-library/no-node-access */
 
 	describe( 'when disabled', () => {
-		it.each( [ true, false ] )(
-			'shows the clear tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledAutocompleteWithClear( disabled );
+		it( 'does not show the clear tooltip when disabled', async () => {
+			await renderDisabledAutocompleteWithClear( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
 
-				const clearButton = screen.getByLabelText( 'Clear', {
-					selector: 'button',
-				} );
-				await user.hover( clearButton );
+			expect( screen.queryByText( 'Clear' ) ).not.toBeInTheDocument();
+		} );
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Clear' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Clear' ) )
-						.toBeVisible();
-				}
-			}
-		);
+		it( 'shows the clear tooltip when enabled', async () => {
+			await renderDisabledAutocompleteWithClear( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
+
+			await expect.element( screen.getByText( 'Clear' ) ).toBeVisible();
+		} );
 	} );
 
 	describe( 'grouped items', () => {
@@ -448,7 +485,9 @@ describe( 'Autocomplete', () => {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Autocomplete.ItemLabel>
+															{ item.value }
+														</Autocomplete.ItemLabel>
 													</Autocomplete.Item>
 												) }
 											</Autocomplete.Collection>
