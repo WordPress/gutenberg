@@ -348,7 +348,9 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 							onSelect( option.value );
 						} }
 					>
-						{ option.value }
+						<Autocomplete.ItemLabel className="editor-collab-sidebar-panel__picker-emoji-label">
+							<span aria-hidden="true">{ option.value }</span>
+						</Autocomplete.ItemLabel>
 					</Autocomplete.Item>
 				) ) }
 			</Autocomplete.Row>
