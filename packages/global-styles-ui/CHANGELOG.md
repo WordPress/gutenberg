@@ -7,6 +7,7 @@
 -   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Show the selected state, such as hover, in the link and button element previews. The button sample is now a link, like a Button block on the site, so the link-only states apply to it too ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal
