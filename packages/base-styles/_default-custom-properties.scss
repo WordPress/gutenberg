@@ -12,5 +12,5 @@
 	// but is maintained for backwards compatibility.
 	--wp-bound-block-color: var(--wp-block-synced-color);
 	--wp-editor-canvas-background: #{colors.$gray-300};
-	@include mixins.admin-scheme(#007cba);
+	@include mixins.admin-scheme(#3858e9);
 }

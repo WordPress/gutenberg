@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Default `--wp-admin-theme-color` to `#3858e9`, the WordPress 7.0 default admin color scheme, instead of the legacy `#007cba`. To keep the old color, include `admin-scheme(#007cba)` on `:root` in your own stylesheet.
+
 ## 13.2.0 (2026-09-23)
 
 ### Enhancements

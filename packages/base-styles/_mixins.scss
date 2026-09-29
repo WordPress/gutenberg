@@ -461,7 +461,7 @@
 @mixin link-reset {
 	&:focus {
 		color: var(--wp-admin-theme-color--rgb);
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
 		border-radius: variables.$radius-small;
 	}
 }
