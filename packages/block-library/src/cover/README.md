@@ -160,6 +160,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+  - `interactive`: `true`
 - [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
   - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
