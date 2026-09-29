@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Stack } from '../../stack';
 import { Spinner } from '../index';
 
 const meta: Meta< typeof Spinner > = {
@@ -31,16 +32,26 @@ export const CustomSize: Story = {
 };
 
 export const CustomColor: Story = {
-	args: { color: 'rebeccapurple' },
+	args: {
+		color: '#d92d20',
+		style: {
+			width: 'var(--wpds-dimension-size-lg)',
+			height: 'var(--wpds-dimension-size-lg)',
+		},
+	},
 };
 
 export const CurrentColor: Story = {
 	args: { color: 'currentColor' },
 	render: ( args ) => (
-		<div
-			style={ { color: 'var(--wpds-color-foreground-content-neutral)' } }
+		<Stack
+			direction="row"
+			gap="sm"
+			align="center"
+			style={ { color: '#7f32c9' } }
 		>
 			<Spinner { ...args } />
-		</div>
+			<span>Loading…</span>
+		</Stack>
 	),
 };
