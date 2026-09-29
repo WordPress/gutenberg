@@ -830,6 +830,19 @@ _Returns_
 
 - `0|-1|null`: Initial position.
 
+### getSelectedBlockStyleState
+
+Returns the selected style state for a block's style controls.
+
+_Parameters_
+
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block client ID.
+
+_Returns_
+
+- `Object`: The selected block style state.
+
 ### getSelectionEnd
 
 Returns the current selection end block client ID, attribute key and text offset.
@@ -947,6 +960,19 @@ _Parameters_
 _Returns_
 
 - `boolean`: Whether a single block is selected.
+
+### hasSelectedBlockStyleState
+
+Returns whether a non-default style state is selected for a block.
+
+_Parameters_
+
+- _state_ `Object`: Global application state.
+- _clientId_ `string`: The block client ID.
+
+_Returns_
+
+- `boolean`: Whether a non-default block style state is selected.
 
 ### hasSelectedInnerBlock
 

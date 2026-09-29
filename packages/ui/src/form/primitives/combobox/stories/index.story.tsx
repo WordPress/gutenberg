@@ -12,7 +12,8 @@ import {
 } from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
-	title: 'Design System/Components/Form/Primitives/Combobox',
+	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
+	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
 		'Combobox.Trigger': Combobox.Trigger,
@@ -28,12 +29,17 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Group': Combobox.Group,
 		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
+		'Combobox.ItemLabel': Combobox.ItemLabel,
+		'Combobox.ItemDescription': Combobox.ItemDescription,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
 		'Combobox.Empty': Combobox.Empty,
 		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
+	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
 	},
 	parameters: {
 		componentStatus: {
@@ -57,7 +63,7 @@ export const Default: Story = {
 		items: ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -70,7 +76,9 @@ export const Default: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -91,7 +99,7 @@ export const Compact: Story = {
 				aria-label="Fruit"
 				key="trigger"
 			/>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -104,7 +112,9 @@ export const Compact: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -161,7 +171,9 @@ export const DetachedInline: Story = {
 					<Combobox.Collection>
 						{ ( item: FixtureItem ) => (
 							<Combobox.Item key={ item.value } value={ item }>
-								{ item.label }
+								<Combobox.ItemLabel>
+									{ item.label }
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						) }
 					</Combobox.Collection>
@@ -207,7 +219,7 @@ export const Creatable: Story = {
 				}
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -224,7 +236,9 @@ export const Creatable: Story = {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.label }
+											<Combobox.ItemLabel>
+												{ item.label }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									)
 								}
@@ -236,7 +250,9 @@ export const Creatable: Story = {
 								value={ creatableItem }
 								key={ creatableItem.value }
 							>
-								{ creatableItem.label }
+								<Combobox.ItemLabel>
+									{ creatableItem.label }
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						</Combobox.ListFooter>
 					</Combobox.List>
@@ -278,10 +294,11 @@ export const AsyncItems: Story = {
 				items={ items }
 				value={ value }
 				open={ open }
-				onValueChange={ ( newValue ) => {
+				onValueChange={ ( newValue, ...changeArgs ) => {
 					setValue(
 						( newValue ?? undefined ) as FixtureItem | undefined
 					);
+					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
 					setOpen( nextOpen );
@@ -300,7 +317,7 @@ export const AsyncItems: Story = {
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -328,7 +345,9 @@ export const AsyncItems: Story = {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -343,6 +362,7 @@ export const AsyncItems: Story = {
 /**
  * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
  * while `Combobox.Item` can take arbitrary content as children.
+ * Wrap that content in `Combobox.ItemLabel`, followed by optional `Combobox.ItemDescription` components.
  *
  * In this example, some extra information is added to each list item as an ARIA description.
  */
@@ -373,7 +393,7 @@ export const WithCustomTriggerAndItem: Story = {
 					</span>
 				) }
 			</Combobox.Trigger>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -384,24 +404,13 @@ export const WithCustomTriggerAndItem: Story = {
 								<Combobox.Item
 									key={ item.value }
 									value={ item }
-									aria-describedby={ `description-${ item.value }` }
 								>
-									<div
-										style={ {
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-											flexGrow: 1,
-										} }
-									>
-										<span>{ item.label }</span>
-										<span
-											id={ `description-${ item.value }` }
-											aria-hidden="true"
-										>
-											99 in stock
-										</span>
-									</div>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+									<Combobox.ItemDescription>
+										99 in stock
+									</Combobox.ItemDescription>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -421,7 +430,7 @@ export const Grouped: Story = {
 		items: GROUPED_ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -443,7 +452,9 @@ export const Grouped: Story = {
 												key={ item.value }
 												value={ item }
 											>
-												{ item.label }
+												<Combobox.ItemLabel>
+													{ item.label }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -479,6 +490,7 @@ export const WithCustomZIndex: Story = {
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
+				aria-label="Fruit"
 				positioner={
 					<Combobox.Positioner
 						style={ {
@@ -499,7 +511,9 @@ export const WithCustomZIndex: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>

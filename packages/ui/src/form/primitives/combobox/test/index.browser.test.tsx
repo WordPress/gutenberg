@@ -48,7 +48,9 @@ function renderDisabledMultiSelect( disabled: boolean ) {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -115,7 +117,9 @@ describe( 'Combobox', () => {
 										}
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -169,7 +173,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -189,35 +195,43 @@ describe( 'Combobox', () => {
 		);
 	} );
 
-	it( 'uses a custom accessible label for chip remove buttons', async () => {
+	it( 'uses a custom tooltip label for chip remove buttons', async () => {
+		const user = userEvent;
+
 		await render(
-			<Combobox.Root< Item, true >
-				items={ ITEMS }
-				multiple
-				defaultValue={ [ ITEMS[ 0 ] ] }
-			>
-				<Combobox.Chips>
-					<Combobox.Value>
-						{ ( value: Item[] ) => (
-							<>
-								{ value.map( ( item ) => (
-									<Combobox.ChipWithRemove
-										key={ item.id }
-										removeLabel={ `Remove ${ item.value }` }
-									>
-										{ item.value }
-									</Combobox.ChipWithRemove>
-								) ) }
-							</>
-						) }
-					</Combobox.Value>
-				</Combobox.Chips>
-			</Combobox.Root>
+			<Tooltip.Provider delay={ 0 }>
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+											removeLabel="Delete"
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			</Tooltip.Provider>
 		);
 
-		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove Item 1' } ) )
-			.toBeVisible();
+		await user.hover(
+			screen.getByLabelText( 'Delete', {
+				selector: 'button',
+			} )
+		);
+
+		await expect.element( screen.getByText( 'Delete' ) ).toBeVisible();
 	} );
 
 	it( 'allows selecting items when Empty is rendered after List', async () => {
@@ -241,7 +255,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -290,7 +306,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -329,7 +347,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -389,7 +409,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -427,7 +449,9 @@ describe( 'Combobox', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Combobox.ItemLabel>
+												{ item.value }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									) }
 								</Combobox.Collection>
@@ -472,7 +496,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -549,7 +575,9 @@ describe( 'Combobox', () => {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Combobox.ItemLabel>
+															{ item.value }
+														</Combobox.ItemLabel>
 													</Combobox.Item>
 												) }
 											</Combobox.Collection>
@@ -572,50 +600,40 @@ describe( 'Combobox', () => {
 	} );
 
 	describe( 'when disabled', () => {
-		it.each( [ true, false ] )(
-			'shows the chip remove tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledMultiSelect( disabled );
+		it( 'does not show the chip remove tooltip when disabled', async () => {
+			await renderDisabledMultiSelect( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Remove', { selector: 'button' } )
+			);
 
-				const removeButton = screen.getByLabelText( 'Remove', {
-					selector: 'button',
-				} );
-				await user.hover( removeButton );
+			expect( screen.queryByText( 'Remove' ) ).not.toBeInTheDocument();
+		} );
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Remove' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Remove' ) )
-						.toBeVisible();
-				}
-			}
-		);
+		it( 'shows the chip remove tooltip when enabled', async () => {
+			await renderDisabledMultiSelect( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Remove', { selector: 'button' } )
+			);
 
-		it.each( [ true, false ] )(
-			'shows the clear tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledMultiSelect( disabled );
+			await expect.element( screen.getByText( 'Remove' ) ).toBeVisible();
+		} );
 
-				const clearButton = screen.getByLabelText( 'Clear', {
-					selector: 'button',
-				} );
-				await user.hover( clearButton );
+		it( 'does not show the clear tooltip when disabled', async () => {
+			await renderDisabledMultiSelect( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Clear' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Clear' ) )
-						.toBeVisible();
-				}
-			}
-		);
+			expect( screen.queryByText( 'Clear' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'shows the clear tooltip when enabled', async () => {
+			await renderDisabledMultiSelect( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
+
+			await expect.element( screen.getByText( 'Clear' ) ).toBeVisible();
+		} );
 	} );
 } );

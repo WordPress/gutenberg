@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import ColorPalette from '..';
 
 const EXAMPLE_COLORS = [
@@ -15,6 +16,17 @@ const DUPLICATE_COLOR_PALETTE = [
 	{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
 ];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
+
+const DEPRECATION_MESSAGE =
+	'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
 
 const ControlledColorPalette = ( {
 	onChange,
@@ -64,6 +76,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		await render(
 			<ColorPalette
 				aria-label="Colors"
@@ -79,9 +92,7 @@ describe( 'ColorPalette', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'red' } )
 		).not.toHaveAttribute( 'aria-pressed' );
-		expect( console ).toHaveWarnedWith(
-			'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( 'should preserve asButtons as a toggle-button alias', async () => {

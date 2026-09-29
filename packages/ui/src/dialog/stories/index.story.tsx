@@ -6,7 +6,8 @@ import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
-	title: 'Design System/Components/Dialog',
+	title: 'Components/@wordpress-ui/Dialog',
+	id: 'design-system-components-dialog',
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,

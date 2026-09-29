@@ -875,6 +875,49 @@ test.describe( 'Image', () => {
 		await expect( uriInput ).toBeFocused();
 		await expect( uriInput ).toBeEmpty();
 	} );
+
+	test( 'should give the image its context menu while selected @webkit @firefox', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/1024x768_e2e_test_image.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: media.id, url: media.source_url },
+		} );
+
+		// The inserted block is selected, so its resize box is rendered over
+		// the image once the image has its size.
+		const image = editor.canvas.locator( '.wp-block-image img' );
+		await expect(
+			editor.canvas.locator( '.components-resizable-box__handle-bottom' )
+		).toBeVisible();
+
+		// The browser offers the image menu (copy image, open in new tab)
+		// when the image is the target of the right click.
+		const target = image.evaluate(
+			( element ) =>
+				new Promise( ( resolve ) => {
+					element.ownerDocument.addEventListener(
+						'contextmenu',
+						( event ) => {
+							event.preventDefault();
+							resolve( event.target === element );
+						},
+						{ once: true }
+					);
+				} )
+		);
+		// At the image's position, so the click goes to whatever is on top.
+		const box = await image.boundingBox();
+		await page.mouse.click( box.x + box.width / 2, box.y + box.height / 2, {
+			button: 'right',
+		} );
+		expect( await target ).toBe( true );
+	} );
 } );
 
 test.describe( 'Image - lightbox', () => {
@@ -995,6 +1038,62 @@ test.describe( 'Image - lightbox', () => {
 					.getPropertyValue( 'margin' );
 			} );
 			expect( margin ).toBe( '0px' );
+		} );
+
+		test.describe( 'Overlay not a direct child of body', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test( 'should make only the rest of the page inert and restore it on close', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				const wrapper = page.locator( '#site-wrap' );
+				const pageContent = page.locator(
+					'#site-wrap > :has(.wp-lightbox-container)'
+				);
+				const overlay = page.locator(
+					'#site-wrap > .wp-lightbox-overlay'
+				);
+				await expect( overlay ).toBeAttached();
+
+				// A direct child of <body> the theme made inert must stay inert
+				// after closing.
+				await page.evaluate( () => {
+					const themeInert = document.createElement( 'div' );
+					themeInert.id = 'theme-inert';
+					themeInert.inert = true;
+					document.body.prepend( themeInert );
+				} );
+
+				await page.locator( '.wp-lightbox-container img' ).click();
+				await expect( overlay ).toHaveClass( /active/ );
+				await expect( wrapper ).not.toHaveAttribute( 'inert' );
+				await expect( pageContent ).toHaveAttribute( 'inert' );
+
+				await overlay.getByRole( 'button', { name: 'Close' } ).click();
+				await expect( overlay ).not.toHaveClass( /active/ );
+				await expect( pageContent ).not.toHaveAttribute( 'inert' );
+				await expect( page.locator( '#theme-inert' ) ).toHaveAttribute(
+					'inert'
+				);
+			} );
 		} );
 	} );
 } );
