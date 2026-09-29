@@ -8,6 +8,10 @@
 
 -   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
 
+### Internal
+
+-   Replace the `cmdk` dependency with the `Autocomplete` primitive from `@wordpress/ui` to resolve accessibility issues ([#83263](https://github.com/WordPress/gutenberg/pull/83263)).
+
 ## 1.55.0 (2026-09-10)
 
 ### Internal
