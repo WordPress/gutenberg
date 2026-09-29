@@ -45,7 +45,7 @@ function getInputSelectionHint( selectedCount: number ): string | undefined {
 export const SearchableChipSelect = forwardRef<
 	HTMLInputElement,
 	SearchableChipSelectProps
->( function SearchableChipSelect(
+>( function UnforwardedSearchableChipSelect(
 	{
 		children,
 		disabled,

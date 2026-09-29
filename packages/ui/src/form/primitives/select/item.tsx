@@ -19,7 +19,7 @@ const ITEM_CONTENT_COMPONENTS = {
 };
 
 export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
-	function Item(
+	function UnforwardedItem(
 		{
 			className,
 			value,
