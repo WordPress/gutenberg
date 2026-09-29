@@ -50,10 +50,12 @@ function gutenberg_get_registered_field_modules( $kind, $name ) {
 /**
  * Returns the ids of all script modules registered for any entity.
  *
- * @return array<string, string[]> The lists of module ids, keyed by
- *                                 `{$kind}/{$name}`. Empty until the `init`
- *                                 action has completed: a read before then
- *                                 is refused.
+ * @return array<string, array<string, string[]>> The lists of module ids,
+ *                                                keyed by kind, then by
+ *                                                name. Empty until the
+ *                                                `init` action has
+ *                                                completed: a read before
+ *                                                then is refused.
  */
 function gutenberg_get_all_registered_field_modules() {
 	return Gutenberg_Fields_Registry::get_instance()->get_all_registered_field_modules();
@@ -96,8 +98,8 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 		return;
 	}
 
-	$entities = gutenberg_get_all_registered_field_modules();
-	if ( empty( $entities ) ) {
+	$kinds = gutenberg_get_all_registered_field_modules();
+	if ( empty( $kinds ) ) {
 		return;
 	}
 
@@ -110,15 +112,17 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 	}
 
 	$added = false;
-	foreach ( $entities as $modules ) {
-		foreach ( $modules as $module ) {
-			if ( ! in_array( $module, $declared, true ) ) {
-				$dependencies[] = array(
-					'id'      => $module,
-					'dynamic' => true,
-				);
-				$declared[]     = $module;
-				$added          = true;
+	foreach ( $kinds as $entities ) {
+		foreach ( $entities as $modules ) {
+			foreach ( $modules as $module ) {
+				if ( ! in_array( $module, $declared, true ) ) {
+					$dependencies[] = array(
+						'id'      => $module,
+						'dynamic' => true,
+					);
+					$declared[]     = $module;
+					$added          = true;
+				}
 			}
 		}
 	}

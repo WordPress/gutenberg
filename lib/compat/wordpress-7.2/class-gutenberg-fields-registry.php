@@ -35,18 +35,21 @@
 final class Gutenberg_Fields_Registry {
 
 	/**
-	 * Registered fields, as `{$kind}/{$name}` => array of field id => definition.
+	 * Registered fields, as kind => name => array of field id => definition.
 	 *
-	 * @var array<string, array<string, array>>
+	 * Kept nested rather than under a joined `{$kind}/{$name}` key: both parts
+	 * may contain any character, so no separator keeps two entities apart.
+	 *
+	 * @var array<string, array<string, array<string, array>>>
 	 */
 	private $fields = array();
 
 	/**
-	 * Registered script modules, as `{$kind}/{$name}` => array of module id =>
+	 * Registered script modules, as kind => name => array of module id =>
 	 * list of the ids of the fields the module applies to, in registration
 	 * order.
 	 *
-	 * @var array<string, array<string, string[]>>
+	 * @var array<string, array<string, array<string, string[]>>>
 	 */
 	private $field_modules = array();
 
@@ -106,10 +109,8 @@ final class Gutenberg_Fields_Registry {
 			return false;
 		}
 
-		$entity = $this->get_entity_key( $kind, $name );
-
 		$ids = array_column( $fields, 'id' );
-		if ( count( array_unique( $ids ) ) !== count( $ids ) || array_intersect_key( array_flip( $ids ), $this->fields[ $entity ] ?? array() ) ) {
+		if ( count( array_unique( $ids ) ) !== count( $ids ) || array_intersect_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'A field can only be registered once. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
@@ -119,7 +120,7 @@ final class Gutenberg_Fields_Registry {
 		}
 
 		foreach ( $fields as $field ) {
-			$this->fields[ $entity ][ $field['id'] ] = array_merge(
+			$this->fields[ $kind ][ $name ][ $field['id'] ] = array_merge(
 				$field,
 				array(
 					'origin' => array(
@@ -129,7 +130,7 @@ final class Gutenberg_Fields_Registry {
 				)
 			);
 		}
-		$this->add_field_module( $entity, $ids, $script_module );
+		$this->add_field_module( $kind, $name, $ids, $script_module );
 
 		return true;
 	}
@@ -166,10 +167,8 @@ final class Gutenberg_Fields_Registry {
 			return false;
 		}
 
-		$entity = $this->get_entity_key( $kind, $name );
-
 		$ids = array_column( $fields, 'id' );
-		if ( array_diff_key( array_flip( $ids ), $this->fields[ $entity ] ?? array() ) ) {
+		if ( array_diff_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Only registered fields can be updated. Use register() to add a field.', 'gutenberg' ),
@@ -179,15 +178,15 @@ final class Gutenberg_Fields_Registry {
 		}
 
 		foreach ( $fields as $field ) {
-			$registered   = $this->fields[ $entity ][ $field['id'] ];
+			$registered   = $this->fields[ $kind ][ $name ][ $field['id'] ];
 			$field_origin = $registered['origin'];
 			if ( ! in_array( $origin, $field_origin['updatedBy'], true ) ) {
 				$field_origin['updatedBy'][] = $origin;
 			}
 
-			$this->fields[ $entity ][ $field['id'] ] = array_merge( $registered, $field, array( 'origin' => $field_origin ) );
+			$this->fields[ $kind ][ $name ][ $field['id'] ] = array_merge( $registered, $field, array( 'origin' => $field_origin ) );
 		}
-		$this->add_field_module( $entity, $ids, $script_module );
+		$this->add_field_module( $kind, $name, $ids, $script_module );
 
 		return true;
 	}
@@ -216,15 +215,14 @@ final class Gutenberg_Fields_Registry {
 			return array();
 		}
 
-		$entity = $this->get_entity_key( $kind, $name );
-
 		if ( null === $ids ) {
-			$unregistered = array_values( $this->fields[ $entity ] ?? array() );
-			unset( $this->fields[ $entity ], $this->field_modules[ $entity ] );
+			$unregistered = array_values( $this->fields[ $kind ][ $name ] ?? array() );
+			unset( $this->fields[ $kind ][ $name ], $this->field_modules[ $kind ][ $name ] );
+			$this->forget_empty_entity( $kind, $name );
 			return $unregistered;
 		}
 
-		$unregistered = array_intersect_key( $this->fields[ $entity ] ?? array(), array_flip( (array) $ids ) );
+		$unregistered = array_intersect_key( $this->fields[ $kind ][ $name ] ?? array(), array_flip( (array) $ids ) );
 		if ( empty( $unregistered ) ) {
 			return array();
 		}
@@ -236,22 +234,17 @@ final class Gutenberg_Fields_Registry {
 		// them are listed by get_registered_field_modules(), read beforehand.
 		$ids = array_keys( $unregistered );
 		foreach ( $ids as $id ) {
-			unset( $this->fields[ $entity ][ $id ] );
+			unset( $this->fields[ $kind ][ $name ][ $id ] );
 		}
-		foreach ( $this->field_modules[ $entity ] ?? array() as $module => $module_ids ) {
+		foreach ( $this->field_modules[ $kind ][ $name ] ?? array() as $module => $module_ids ) {
 			$remaining = array_values( array_diff( $module_ids, $ids ) );
 			if ( empty( $remaining ) ) {
-				unset( $this->field_modules[ $entity ][ $module ] );
+				unset( $this->field_modules[ $kind ][ $name ][ $module ] );
 			} else {
-				$this->field_modules[ $entity ][ $module ] = $remaining;
+				$this->field_modules[ $kind ][ $name ][ $module ] = $remaining;
 			}
 		}
-		if ( empty( $this->fields[ $entity ] ) ) {
-			unset( $this->fields[ $entity ] );
-		}
-		if ( empty( $this->field_modules[ $entity ] ) ) {
-			unset( $this->field_modules[ $entity ] );
-		}
+		$this->forget_empty_entity( $kind, $name );
 
 		return array_values( $unregistered );
 	}
@@ -265,18 +258,24 @@ final class Gutenberg_Fields_Registry {
 	 */
 	public function get_registered( $kind, $name ) {
 		$this->initialize();
-		return array_values( $this->fields[ $this->get_entity_key( $kind, $name ) ] ?? array() );
+		return array_values( $this->fields[ $kind ][ $name ] ?? array() );
 	}
 
 	/**
 	 * Returns the fields registered for every entity.
 	 *
-	 * @return array<string, array[]> The lists of field definitions, keyed by
-	 *                                `{$kind}/{$name}`.
+	 * @return array<string, array<string, array[]>> The lists of field
+	 *                                               definitions, keyed by
+	 *                                               kind, then by name.
 	 */
 	public function get_all_registered() {
 		$this->initialize();
-		return array_map( 'array_values', $this->fields );
+		return array_map(
+			static function ( $entities ) {
+				return array_map( 'array_values', $entities );
+			},
+			$this->fields
+		);
 	}
 
 	/**
@@ -290,18 +289,24 @@ final class Gutenberg_Fields_Registry {
 	 */
 	public function get_registered_field_modules( $kind, $name ) {
 		$this->initialize();
-		return $this->field_modules[ $this->get_entity_key( $kind, $name ) ] ?? array();
+		return $this->field_modules[ $kind ][ $name ] ?? array();
 	}
 
 	/**
 	 * Returns the ids of the script modules registered for every entity.
 	 *
-	 * @return array<string, string[]> The lists of module ids, keyed by
-	 *                                 `{$kind}/{$name}`.
+	 * @return array<string, array<string, string[]>> The lists of module ids,
+	 *                                                keyed by kind, then by
+	 *                                                name.
 	 */
 	public function get_all_registered_field_modules() {
 		$this->initialize();
-		return array_map( 'array_keys', $this->field_modules );
+		return array_map(
+			static function ( $entities ) {
+				return array_map( 'array_keys', $entities );
+			},
+			$this->field_modules
+		);
 	}
 
 	/**
@@ -453,32 +458,45 @@ final class Gutenberg_Fields_Registry {
 	 * Applies a script module to fields of an entity, after the fields it
 	 * already applies to.
 	 *
-	 * @param string      $entity        The entity key.
+	 * @param string      $kind          The entity kind.
+	 * @param string      $name          The entity name.
 	 * @param string[]    $ids           The ids of the fields.
 	 * @param string|null $script_module The id of the script module, if any.
 	 */
-	private function add_field_module( $entity, $ids, $script_module ) {
+	private function add_field_module( $kind, $name, $ids, $script_module ) {
 		if ( null === $script_module ) {
 			return;
 		}
 
-		$module_ids = $this->field_modules[ $entity ][ $script_module ] ?? array();
+		$module_ids = $this->field_modules[ $kind ][ $name ][ $script_module ] ?? array();
 		foreach ( $ids as $id ) {
 			if ( ! in_array( $id, $module_ids, true ) ) {
 				$module_ids[] = $id;
 			}
 		}
-		$this->field_modules[ $entity ][ $script_module ] = $module_ids;
+		$this->field_modules[ $kind ][ $name ][ $script_module ] = $module_ids;
 	}
 
 	/**
-	 * Builds the key an entity is stored under.
+	 * Forgets an entity left without fields or script modules, and its kind
+	 * once no entity of the kind is left, so the registry only lists
+	 * entities that have some.
 	 *
 	 * @param string $kind The entity kind.
 	 * @param string $name The entity name.
-	 * @return string The key.
 	 */
-	private function get_entity_key( $kind, $name ) {
-		return "{$kind}/{$name}";
+	private function forget_empty_entity( $kind, $name ) {
+		if ( empty( $this->fields[ $kind ][ $name ] ) ) {
+			unset( $this->fields[ $kind ][ $name ] );
+		}
+		if ( empty( $this->fields[ $kind ] ) ) {
+			unset( $this->fields[ $kind ] );
+		}
+		if ( empty( $this->field_modules[ $kind ][ $name ] ) ) {
+			unset( $this->field_modules[ $kind ][ $name ] );
+		}
+		if ( empty( $this->field_modules[ $kind ] ) ) {
+			unset( $this->field_modules[ $kind ] );
+		}
 	}
 }
