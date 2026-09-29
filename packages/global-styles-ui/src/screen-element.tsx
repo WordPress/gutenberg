@@ -16,6 +16,9 @@ import { useSetting, useStyle, useCanEditCSS } from './hooks';
 import { normalizeBorderStyle } from './border-utils';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates } from './utils';
+// Elements get the same default background size as blocks when an image has
+// none, both in the editor and on the front end.
+import { BACKGROUND_BLOCK_DEFAULT_VALUES } from './screen-block';
 
 const {
 	useSettingsForBlockElement,
@@ -170,6 +173,7 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 					showInheritanceLabelIndicators={ false }
 				/>
 			) }
