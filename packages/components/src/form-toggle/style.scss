@@ -25,7 +25,7 @@ $transition-duration: 0.2s;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $gray-600;
+		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: math.div($toggle-height, 2);
@@ -78,10 +78,14 @@ $transition-duration: 0.2s;
 		border: math.div($toggle-thumb-size, 2) solid transparent;
 	}
 
+	&:not(.is-checked, .is-disabled):hover .components-form-toggle__track {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
 		background-color: $components-color-accent;
-		border-color: $components-color-accent;
+		border-color: transparent;
 
 		// Windows High Contrast Mode
 		&::after {
@@ -124,11 +128,9 @@ $transition-duration: 0.2s;
 
 		&.is-checked .components-form-toggle__track {
 			background-color: $components-color-gray-400;
-			border-color: $components-color-gray-400;
+			border-color: transparent;
 
 			@media ( forced-colors: active ) {
-				border-color: GrayText;
-
 				&::after {
 					border-top-color: GrayText;
 				}
