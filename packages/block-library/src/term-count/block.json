@@ -31,11 +31,17 @@
 		},
 		"shadow": true,
 		"spacing": {
+			"margin": true,
 			"padding": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

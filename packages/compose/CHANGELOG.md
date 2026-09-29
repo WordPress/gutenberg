@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 8.9.0 (2026-09-23)
+
+### Bug Fixes
+
 -   `useFocusOutside`: Cancel the previous pending blur check so repeated blur events from portaled content do not report focus leaving after it returns ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 
 ## 8.8.0 (2026-09-10)

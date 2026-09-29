@@ -6,11 +6,10 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	searchItems,
-} from './components/inserter/search-items';
+} from './utils/search-ranking';
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
@@ -55,7 +54,6 @@ import {
 	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
-import { PrivateRichText } from './components/rich-text/';
 import { PrivateBlockPopover } from './components/block-popover';
 import { PrivateInserterLibrary } from './components/inserter/library';
 import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
@@ -95,8 +93,7 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getRichTextValues,
 	PrivateQuickInserter,
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
@@ -123,7 +120,6 @@ lock( privateApis, {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
-	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,

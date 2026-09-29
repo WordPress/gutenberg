@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { userEvent } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { createRef, useState } from '@wordpress/element';
 import * as Popover from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
@@ -774,5 +774,44 @@ describe( 'Popover', () => {
 
 			expect( customFocus ).toHaveBeenCalled();
 		} );
+	} );
+
+	it( 'closes a non-modal popover without consuming an iframe pointer interaction', async () => {
+		const user = userEvent;
+		const onCanvasClick = vi.fn();
+
+		await render(
+			<>
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title>Title</Popover.Title>
+					</Popover.Popup>
+				</Popover.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const iframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+		const canvasTarget = iframeDocument.createElement( 'button' );
+		canvasTarget.textContent = 'Edit block';
+		canvasTarget.addEventListener( 'click', onCanvasClick );
+		iframeDocument.body.appendChild( canvasTarget );
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
+
+		const frame = page.frameLocator( page.getByTitle( 'Editor canvas' ) );
+		await frame.getByRole( 'button', { name: 'Edit block' } ).click();
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
+		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

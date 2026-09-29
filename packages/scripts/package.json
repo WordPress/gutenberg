@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "35.0.0",
+	"version": "36.0.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -76,6 +76,7 @@
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
 		"stylelint": "^17.14.1",
+		"stylelint-scss": "^7.2.0",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.111.0",

@@ -122,6 +122,8 @@ jobs:
             # the dependency tree before it can compute the next version.
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+              with:
+                  cache: false
 
             - name: Compute old and new version
               id: get_version
@@ -256,6 +258,8 @@ jobs:
 
             - name: Set up npm
               uses: ./.github/setup-npm
+              with:
+                  cache: ${{ ( github.event_name == 'pull_request' || ( matrix.IS_GUTENBERG_PLUGIN && github.event_name != 'workflow_dispatch' ) ) && 'true' || 'false' }}
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}

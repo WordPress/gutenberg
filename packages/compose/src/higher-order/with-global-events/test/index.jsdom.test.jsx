@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import withGlobalEvents from '../';
 import Listener from '../listener';
 
@@ -22,6 +23,9 @@ vi.mock( import( '../listener' ), async ( importOriginal ) => {
 } );
 
 describe( 'withGlobalEvents', () => {
+	const DEPRECATION_MESSAGE =
+		'wp.compose.withGlobalEvents is deprecated since version 5.7. Please use useEffect instead.';
+
 	class OriginalComponent extends Component {
 		handleResize( event ) {
 			this.props.onResize( event );
@@ -39,6 +43,10 @@ describe( 'withGlobalEvents', () => {
 			vi.spyOn( Listener._instance, 'add' );
 			vi.spyOn( Listener._instance, 'remove' );
 		}
+	} );
+
+	afterEach( () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( 'renders with original component', () => {
@@ -59,6 +67,7 @@ describe( 'withGlobalEvents', () => {
 
 		render( <EnhancedComponent ref={ () => {} }>Hello</EnhancedComponent> );
 
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 		expect( Listener._instance.add ).toHaveBeenCalledWith(
 			'resize',
 			// If not `undefined`, then we consider handlers were properly bound to the wrapper component.
@@ -77,6 +86,7 @@ describe( 'withGlobalEvents', () => {
 				Hello
 			</EnhancedComponent>
 		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 
 		const event = { type: 'resize' };
 

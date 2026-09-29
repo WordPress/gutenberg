@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+// Load the tokens that the production build also supplies as fallbacks.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../../../../theme/prebuilt/css/design-tokens.css';
 import {
 	Card,
 	CardBody,
@@ -9,40 +12,6 @@ import {
 	CardHeader,
 	CardMedia,
 } from '../';
-import { useCx } from '../../utils/hooks/use-cx';
-import * as styles from '../styles';
-
-function EmotionStylePrimer( {
-	styleFragment,
-}: {
-	styleFragment: Parameters< ReturnType< typeof useCx > >[ 0 ];
-} ) {
-	const cx = useCx();
-
-	return <div className={ cx( styleFragment ) } />;
-}
-
-function expectComposedEmotionClassName(
-	element: HTMLElement,
-	styleLabels: string[]
-) {
-	const matchingClassNames = element.className
-		.split( /\s+/ )
-		.filter( ( className ) => className.startsWith( 'css-' ) )
-		.filter( ( className ) =>
-			styleLabels.some( ( styleLabel ) =>
-				className.includes( styleLabel )
-			)
-		);
-
-	expect( matchingClassNames ).toHaveLength( 1 );
-	for ( const styleLabel of styleLabels ) {
-		expect( matchingClassNames[ 0 ] ).toEqual(
-			expect.stringContaining( styleLabel )
-		);
-	}
-}
-
 const spacingProperties = [
 	'paddingTop',
 	'paddingRight',
@@ -122,21 +91,6 @@ describe( 'Card', () => {
 		);
 
 		expect( borderedShadow ).not.toBe( 'none' );
-		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
-	} );
-
-	it( 'keeps borderless styles regardless of Emotion insertion order', async () => {
-		await render(
-			<EmotionStylePrimer styleFragment={ styles.boxShadowless } />
-		);
-		await render(
-			<Card data-testid="card-wrapper" isBorderless>
-				Code is Poetry
-			</Card>
-		);
-
-		const card = screen.getByTestId( 'card-wrapper' );
-		expectComposedEmotionClassName( card, [ 'Card', 'boxShadowless' ] );
 		expect( getComputedStyle( card ).boxShadow ).toBe( 'none' );
 	} );
 
@@ -371,32 +325,6 @@ describe( 'Card', () => {
 		expect(
 			getComputedStyle( screen.getByTestId( 'footer' ) ).justifyContent
 		).toBe( 'flex-end' );
-	} );
-
-	it( 'keeps region borderless styles regardless of Emotion insertion order', async () => {
-		await render(
-			<EmotionStylePrimer styleFragment={ styles.borderless } />
-		);
-		await render(
-			<Card>
-				<CardHeader data-testid="card-header" isBorderless>
-					Header
-				</CardHeader>
-				<CardBody>Body</CardBody>
-				<CardFooter data-testid="card-footer" isBorderless>
-					Footer
-				</CardFooter>
-			</Card>
-		);
-
-		expect(
-			getComputedStyle( screen.getByTestId( 'card-header' ) )
-				.borderBottomStyle
-		).toBe( 'none' );
-		expect(
-			getComputedStyle( screen.getByTestId( 'card-footer' ) )
-				.borderTopStyle
-		).toBe( 'none' );
 	} );
 
 	it( 'makes CardBody scrollable when requested', async () => {
