@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/term-template",
 	"title": "Term Template",
 	"category": "theme",
@@ -9,20 +8,18 @@
 	"description": "Contains the block elements used to render a taxonomy term, like the name, description, and more.",
 	"textdomain": "default",
 	"usesContext": [ "termQuery" ],
-	"attributes": {
-		"namespace": {
-			"type": "string"
-		}
-	},
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"layout": {
-			"allowSwitching": true,
-			"allowEditing": true,
-			"default": {
-				"type": "flex"
+		"layout": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
 			}
 		},
 		"color": {
@@ -66,8 +63,9 @@
 			"color": true,
 			"width": true,
 			"style": true
-		}
+		},
+		"shadow": true
 	},
 	"style": "wp-block-term-template",
-	"variations": "file:./variations.js"
+	"editorStyle": "wp-block-term-template-editor"
 }

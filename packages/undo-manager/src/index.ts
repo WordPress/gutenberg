@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
-import isShallowEqual from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type {
 	HistoryChange as _HistoryChange,
 	HistoryChanges as _HistoryChanges,

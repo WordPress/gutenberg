@@ -1,0 +1,47 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 1",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 2",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 3",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

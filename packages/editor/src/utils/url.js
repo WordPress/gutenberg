@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { cleanForSlug as urlCleanForSlug } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 

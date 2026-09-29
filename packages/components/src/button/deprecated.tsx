@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '.';
 import type { DeprecatedIconButtonProps } from './types';
 
@@ -33,6 +22,8 @@ function UnforwardedIconButton(
 	} );
 
 	return (
+		// Disable reason: the parent component is taking care of the __next40pxDefaultSize prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button
 			{ ...props }
 			ref={ ref }

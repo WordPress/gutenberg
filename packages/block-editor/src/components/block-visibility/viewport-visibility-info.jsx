@@ -1,0 +1,129 @@
+import { useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { unseen } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Notice } from '@wordpress/ui';
+import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
+import useBlockVisibility from './use-block-visibility';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { deviceTypeKey } from '../../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
+
+const DEFAULT_VISIBILITY_STATE = {
+	currentBlockVisibility: undefined,
+	hasParentHiddenEverywhere: false,
+	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+};
+
+export default function ViewportVisibilityInfo( { clientId } ) {
+	const {
+		currentBlockVisibility,
+		selectedDeviceType,
+		viewportSettings,
+		hasParentHiddenEverywhere,
+	} = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return DEFAULT_VISIBILITY_STATE;
+			}
+			const {
+				getBlockAttributes,
+				isBlockParentHiddenEverywhere,
+				getSettings,
+			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
+
+			return {
+				currentBlockVisibility:
+					getBlockAttributes( clientId )?.metadata?.blockVisibility,
+				selectedDeviceType:
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
+				hasParentHiddenEverywhere:
+					isBlockParentHiddenEverywhere( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context.
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
+		blockVisibility: currentBlockVisibility,
+		deviceType: selectedDeviceType,
+		viewportSettings,
+		view: canvasView,
+	} );
+
+	/*
+	 * Selector to check if any parent (immediate or further up the chain) is hidden at current viewport.
+	 * Separated because it depends on currentViewport from the hook above.
+	 */
+	const isBlockParentHiddenAtViewport = useSelect(
+		( select ) => {
+			if ( ! clientId || ! currentViewport ) {
+				return false;
+			}
+			return unlock(
+				select( blockEditorStore )
+			).isBlockParentHiddenAtViewport( clientId, currentViewport );
+		},
+		[ clientId, currentViewport ]
+	);
+
+	if ( ! (
+		isBlockCurrentlyHidden ||
+		hasParentHiddenEverywhere ||
+		isBlockParentHiddenAtViewport
+	) ) {
+		return null;
+	}
+
+	// Determine label based on whether block or parent is hidden
+	let label;
+	if ( isBlockCurrentlyHidden ) {
+		// Block is currently hidden - check if hidden everywhere or at specific viewport
+		if ( currentBlockVisibility === false ) {
+			label = __( 'Hidden' );
+		} else {
+			const viewportLabel =
+				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
+				currentViewport;
+			label = sprintf(
+				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
+				__( 'Hidden on %s' ),
+				viewportLabel
+			);
+		}
+	}
+
+	// Parent is hidden - check if hidden everywhere or at specific viewport
+	if ( hasParentHiddenEverywhere ) {
+		label = __( 'Parent hidden' );
+	} else if ( isBlockParentHiddenAtViewport ) {
+		const viewportLabel =
+			BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
+			currentViewport;
+		label = sprintf(
+			/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
+			__( 'Parent hidden on %s' ),
+			viewportLabel
+		);
+	}
+
+	return (
+		<Notice.Root
+			className="block-editor-block-visibility-info"
+			icon={ unseen }
+			intent="info"
+		>
+			<Notice.Description>{ label }</Notice.Description>
+		</Notice.Root>
+	);
+}

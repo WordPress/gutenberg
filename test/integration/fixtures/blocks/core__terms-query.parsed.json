@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/terms-query",
-		"attrs": {
-			"termQueryId": 0
-		},
+		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "\n<div class=\"wp-block-terms-query\"></div>\n",
 		"innerContent": [ "\n<div class=\"wp-block-terms-query\"></div>\n" ]

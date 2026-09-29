@@ -8,9 +8,6 @@
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 0
@@ -23,12 +20,22 @@
 	"example": {
 		"viewportWidth": 350,
 		"attributes": {
-			"textAlign": "center"
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -48,6 +55,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
@@ -55,6 +63,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalWritingMode": true,
+			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -67,7 +76,8 @@
 			"color": true,
 			"width": true,
 			"style": true
-		}
+		},
+		"shadow": true
 	},
 	"editorStyle": "wp-block-site-tagline-editor",
 	"style": "wp-block-site-tagline"

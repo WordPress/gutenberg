@@ -17,12 +17,14 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"layout": true,
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
 				"backgroundImage": true
 			}
@@ -30,6 +32,7 @@
 		"dimensions": {
 			"minHeight": true
 		},
+		"shadow": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,
@@ -41,6 +44,7 @@
 		},
 		"color": {
 			"gradients": true,
+			"button": true,
 			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
@@ -51,6 +55,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -60,6 +65,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		},
 		"__experimentalBorder": {
 			"radius": true,

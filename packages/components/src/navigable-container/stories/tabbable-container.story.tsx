@@ -1,26 +1,28 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { TabbableContainer } from '..';
 
 const meta: Meta< typeof TabbableContainer > = {
-	title: 'Components/Containers/TabbableContainer',
+	title: 'Components/@wordpress-components/Containers/TabbableContainer',
 	id: 'components-tabbablecontainer',
 	component: TabbableContainer,
 	argTypes: {
 		children: { control: false },
 	},
+	args: {
+		onKeyDown: fn(),
+		onNavigate: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;

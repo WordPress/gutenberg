@@ -1,0 +1,46 @@
+[
+	{
+		"blockName": "core/post-navigation-link",
+		"attrs": {
+			"type": "previous",
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-navigation-link",
+		"attrs": {
+			"type": "previous",
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-navigation-link",
+		"attrs": {
+			"type": "previous",
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

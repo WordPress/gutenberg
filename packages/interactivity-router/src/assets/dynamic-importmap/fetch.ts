@@ -12,10 +12,6 @@
  *
  * MIT License: https://opensource.org/licenses/MIT
  */
-
-/**
- * Internal dependencies
- */
 import { type ModuleLoad } from './loader';
 
 const fetching = ( url: string, parent?: string ) => {
@@ -42,7 +38,7 @@ export async function fetchModule(
 	let res: Response;
 	try {
 		res = await fetch( url, fetchOpts );
-	} catch ( e ) {
+	} catch {
 		throw Error( `Network error${ fetching( url, parent ) }.` );
 	}
 	if ( ! res.ok ) {
