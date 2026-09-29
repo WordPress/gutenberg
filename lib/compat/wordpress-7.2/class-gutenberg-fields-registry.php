@@ -417,19 +417,10 @@ final class Gutenberg_Fields_Registry {
 			}
 		}
 
-		if ( null !== $script_module && ( ! is_string( $script_module ) || '' === $script_module ) ) {
+		if ( ! is_array( $fields ) || empty( $fields ) ) {
 			_doing_it_wrong(
 				$method,
-				__( 'The script module must be the id of a script module.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return false;
-		}
-
-		if ( ! is_array( $fields ) ) {
-			_doing_it_wrong(
-				$method,
-				__( 'The fields must be a list of field definitions.', 'gutenberg' ),
+				__( 'The fields must be a list of non-empty field definitions.', 'gutenberg' ),
 				'7.2.0'
 			);
 			return false;
@@ -444,6 +435,15 @@ final class Gutenberg_Fields_Registry {
 				);
 				return false;
 			}
+		}
+
+		if ( null !== $script_module && ( ! is_string( $script_module ) || '' === $script_module ) ) {
+			_doing_it_wrong(
+				$method,
+				__( 'The script module must be the id of a script module.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return false;
 		}
 
 		return true;
