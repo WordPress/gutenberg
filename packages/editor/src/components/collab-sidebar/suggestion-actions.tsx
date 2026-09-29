@@ -179,10 +179,8 @@ export function SuggestionActionButtons( { thread }: { thread: any } ) {
 			} }
 		>
 			<Button
-				size="compact"
-				className="editor-collab-sidebar-panel__suggestion-accept"
+				size="small"
 				icon={ check }
-				iconSize={ 24 }
 				label={ __( 'Accept suggestion' ) }
 				showTooltip
 				disabled={ decision.applyDisabled }
@@ -190,9 +188,8 @@ export function SuggestionActionButtons( { thread }: { thread: any } ) {
 				onClick={ decision.onApplyClick }
 			/>
 			<Button
-				size="compact"
+				size="small"
 				icon={ closeSmall }
-				iconSize={ 24 }
 				label={ __( 'Reject suggestion' ) }
 				showTooltip
 				disabled={ decision.busy }
