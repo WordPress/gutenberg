@@ -48,6 +48,7 @@ import {
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
+import { ELEMENTS, type ElementName } from './screen-element';
 import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';
@@ -65,23 +66,23 @@ const {
 
 interface ElementItem {
 	/** The element's key under `styles.elements`. */
-	name: string;
+	name: ElementName;
 	icon: any;
-	label: string;
 }
 
 /*
  * Elements are listed alongside blocks, grouped under subheadings, so that
  * anything styleable is one list away rather than behind its own drilldown.
- * Labels are singular to match how blocks are listed.
+ * Their labels are the titles of their screens, singular to match how blocks
+ * are listed.
  */
 const ELEMENT_GROUPS: { title: string; elements: ElementItem[] }[] = [
 	{
 		title: __( 'Elements' ),
 		elements: [
-			{ name: 'link', icon: link, label: __( 'Link' ) },
-			{ name: 'caption', icon: caption, label: __( 'Caption' ) },
-			{ name: 'cite', icon: quote, label: __( 'Citation' ) },
+			{ name: 'link', icon: link },
+			{ name: 'caption', icon: caption },
+			{ name: 'cite', icon: quote },
 		],
 	},
 	{
@@ -89,23 +90,21 @@ const ELEMENT_GROUPS: { title: string; elements: ElementItem[] }[] = [
 		elements: [
 			// `heading` styles every level at once; each level can then
 			// override it. Themes set most of their heading styles here.
-			{ name: 'heading', icon: heading, label: __( 'All headings' ) },
-			{ name: 'h1', icon: headingLevel1, label: __( 'Heading 1' ) },
-			{ name: 'h2', icon: headingLevel2, label: __( 'Heading 2' ) },
-			{ name: 'h3', icon: headingLevel3, label: __( 'Heading 3' ) },
-			{ name: 'h4', icon: headingLevel4, label: __( 'Heading 4' ) },
-			{ name: 'h5', icon: headingLevel5, label: __( 'Heading 5' ) },
-			{ name: 'h6', icon: headingLevel6, label: __( 'Heading 6' ) },
+			{ name: 'heading', icon: heading },
+			{ name: 'h1', icon: headingLevel1 },
+			{ name: 'h2', icon: headingLevel2 },
+			{ name: 'h3', icon: headingLevel3 },
+			{ name: 'h4', icon: headingLevel4 },
+			{ name: 'h5', icon: headingLevel5 },
+			{ name: 'h6', icon: headingLevel6 },
 		],
 	},
 	{
 		title: __( 'Form controls' ),
 		elements: [
-			{ name: 'textInput', icon: formInput, label: __( 'Input' ) },
-			{ name: 'select', icon: chevronUpDown, label: __( 'Select' ) },
-			// Disambiguated from the Button block, which sits further down
-			// the same list.
-			{ name: 'button', icon: button, label: __( 'Button (element)' ) },
+			{ name: 'textInput', icon: formInput },
+			{ name: 'select', icon: chevronUpDown },
+			{ name: 'button', icon: button },
 		],
 	},
 ];
@@ -259,7 +258,7 @@ function ElementMenuItem( {
 					className="global-styles-ui-block-types-item__icon"
 					icon={ element.icon }
 				/>
-				<FlexItem>{ element.label }</FlexItem>
+				<FlexItem>{ ELEMENTS[ element.name ].title }</FlexItem>
 				{ isCustomized && (
 					<>
 						<VisuallyHidden>
@@ -332,7 +331,9 @@ function getFilteredElementGroups(
 		elements: group.elements.filter(
 			( element ) =>
 				( ! search ||
-					element.label.toLowerCase().includes( search ) ) &&
+					ELEMENTS[ element.name ].title
+						.toLowerCase()
+						.includes( search ) ) &&
 				( styleFilter !== 'customized' ||
 					customizedElementNames.has( element.name ) )
 		),

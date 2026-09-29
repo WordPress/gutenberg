@@ -34,7 +34,11 @@ const {
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
-const elements = {
+/*
+ * The elements that have their own screen. Their titles double as their labels
+ * in the Blocks & Elements list, so the two always match.
+ */
+export const ELEMENTS = {
 	text: {
 		description: __( 'Manage the fonts used on the site.' ),
 		title: __( 'Text' ),
@@ -89,11 +93,13 @@ const elements = {
 	},
 	button: {
 		description: __( 'Manage the appearance of buttons.' ),
-		title: __( 'Button' ),
+		// Disambiguated from the Button block, whose screen is also titled
+		// "Button" and which sits in the same list.
+		title: __( 'Button (element)' ),
 	},
 };
 
-type ElementName = keyof typeof elements;
+export type ElementName = keyof typeof ELEMENTS;
 
 interface ScreenElementProps {
 	/**
@@ -234,15 +240,15 @@ function ScreenElement( {
 		[ element, showStateControls ]
 	);
 
-	if ( ! Object.hasOwn( elements, element ) ) {
+	if ( ! Object.hasOwn( ELEMENTS, element ) ) {
 		return null;
 	}
 
 	return (
 		<>
 			<ScreenHeader
-				title={ elements[ element ].title }
-				description={ elements[ element ].description }
+				title={ ELEMENTS[ element ].title }
+				description={ ELEMENTS[ element ].description }
 				pseudoStates={ pseudoStates }
 				selectedPseudoState={ selectedPseudoState }
 				onChangePseudoState={ setSelectedPseudoState }
@@ -252,7 +258,7 @@ function ScreenElement( {
 			</Spacer>
 			<ElementStylePanels
 				element={ element }
-				label={ elements[ element ].title }
+				label={ ELEMENTS[ element ].title }
 				state={
 					selectedPseudoState === 'default'
 						? undefined
