@@ -32,13 +32,7 @@ export const CustomSize: Story = {
 };
 
 export const CustomColor: Story = {
-	args: {
-		color: '#d92d20',
-		style: {
-			width: 'var(--wpds-dimension-size-lg)',
-			height: 'var(--wpds-dimension-size-lg)',
-		},
-	},
+	args: { color: '#d92d20' },
 };
 
 export const CurrentColor: Story = {
