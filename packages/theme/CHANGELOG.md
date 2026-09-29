@@ -10,6 +10,7 @@
 
 ### Internal
 
+-   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
 
 ### Documentation
