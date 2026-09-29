@@ -1279,6 +1279,80 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A reaction may only be added on the current user's own behalf, even by
+	 * a moderator.
+	 */
+	public function test_cannot_create_reaction_for_another_user() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'parent'  => $note_id,
+					'content' => 'heart',
+					'type'    => 'reaction',
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_author', $response, 403 );
+		$this->assertEmpty(
+			get_comments(
+				array(
+					'parent' => $note_id,
+					'type'   => 'reaction',
+					'status' => 'all',
+				)
+			),
+			'No reaction should have been stored.'
+		);
+	}
+
+	/**
+	 * Author fields in the request must not detach a reaction from its user,
+	 * which would hide it from the uniqueness check and the summary.
+	 */
+	public function test_create_reaction_ignores_request_author_fields() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$body = wp_json_encode(
+			array(
+				'post'         => $post_id,
+				'parent'       => $note_id,
+				'content'      => 'heart',
+				'type'         => 'reaction',
+				'author_name'  => 'Someone Else',
+				'author_email' => 'someone@example.com',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( $body );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$reaction = get_comment( $response->get_data()['id'] );
+		$this->assertSame( (string) self::$editor_id, $reaction->user_id, 'The reaction should belong to the current user.' );
+		$this->assertNotSame( 'someone@example.com', $reaction->comment_author_email );
+
+		$duplicate = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$duplicate->add_header( 'Content-Type', 'application/json' );
+		$duplicate->set_body( $body );
+
+		$this->assertErrorResponse( 'rest_comment_duplicate_reaction', rest_get_server()->dispatch( $duplicate ), 409 );
+	}
+
+	/**
 	 * The cleanup in create_item() must repoint to the surviving row even when
 	 * a competing request has already deleted this request's own row - the
 	 * losing side of the same race the sibling test covers from the winner.

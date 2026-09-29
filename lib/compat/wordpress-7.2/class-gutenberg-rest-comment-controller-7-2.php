@@ -315,6 +315,20 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// A reaction is always first-person: the uniqueness check and the
+		// reaction summary key on the current user, so one stored against
+		// somebody else could never be counted or removed.
+		if (
+			! empty( $request['type'] ) && 'reaction' === $request['type'] &&
+			isset( $request['author'] ) && get_current_user_id() !== (int) $request['author']
+		) {
+			return new WP_Error(
+				'rest_comment_invalid_author',
+				__( 'Sorry, you are not allowed to add a reaction on behalf of another user.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		if ( isset( $request['author_ip'] ) && ! current_user_can( 'moderate_comments' ) ) {
 			if ( empty( $_SERVER['REMOTE_ADDR'] ) || $request['author_ip'] !== $_SERVER['REMOTE_ADDR'] ) {
 				return new WP_Error(
@@ -578,6 +592,18 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			&& empty( $prepared_comment['comment_author_url'] );
 
 		if ( is_user_logged_in() && $missing_author ) {
+			$user = wp_get_current_user();
+
+			$prepared_comment['user_id']              = $user->ID;
+			$prepared_comment['comment_author']       = $user->display_name;
+			$prepared_comment['comment_author_email'] = $user->user_email;
+			$prepared_comment['comment_author_url']   = $user->user_url;
+		}
+
+		// Pin a reaction to the current user, whatever author details the
+		// request carried. Author fields alone leave `user_id` at 0, which
+		// the uniqueness check and the reaction summary both key on.
+		if ( null !== $reaction_slug ) {
 			$user = wp_get_current_user();
 
 			$prepared_comment['user_id']              = $user->ID;
