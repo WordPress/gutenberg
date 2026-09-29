@@ -77,18 +77,6 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		&:hover {
 			color: $components-color-accent;
 		}
-
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-
-		&:focus-visible {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
 	}
 
 	&.is-unstyled-link {
