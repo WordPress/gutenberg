@@ -20,7 +20,7 @@
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 -   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
--   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order.
+-   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 
 ### Internal
 
