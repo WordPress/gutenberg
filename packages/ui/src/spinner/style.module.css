@@ -10,20 +10,13 @@
 			overflow: visible;
 			opacity: 1;
 			background-color: transparent;
+			color: var(--wpds-color-foreground-content-neutral);
 		}
 
-		.track,
 		.indicator {
 			fill: transparent;
-			stroke-width: 1.5px;
-		}
-
-		.track {
-			stroke: var(--wpds-color-background-track-neutral);
-		}
-
-		.indicator {
-			stroke: var(--wpds-color-background-thumb-brand);
+			stroke: currentColor;
+			stroke-width: var(--wpds-border-width-focus);
 			stroke-linecap: round;
 			transform-origin: 50% 50%;
 

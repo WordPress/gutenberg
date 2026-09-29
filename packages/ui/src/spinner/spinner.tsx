@@ -18,16 +18,9 @@ export const Spinner = forwardRef< SVGSVGElement, ComponentProps< 'svg' > >(
 				{ ...props }
 				ref={ ref }
 			>
-				<circle
-					className={ styles.track }
-					cx="50"
-					cy="50"
-					r="50"
-					vectorEffect="non-scaling-stroke"
-				/>
 				<path
 					className={ styles.indicator }
-					d="m 50 0 a 50 50 0 0 1 50 50"
+					d="m 50 0 a 50 50 0 0 1 0 100"
 					vectorEffect="non-scaling-stroke"
 				/>
 			</svg>
