@@ -679,6 +679,41 @@ describe( 'rejectSuggestion (block-move)', () => {
 			''
 		);
 	} );
+
+	it( 'restores a nested same-parent move after a reload regenerated the ids', async () => {
+		const first = createBlock( PARAGRAPH, { content: 'First' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		// Current order inside the group: [First, Moved]; the block was
+		// suggested-moved from index 0 in an earlier session.
+		const group = createBlock( GROUP, {}, [ first, moved ] );
+
+		const { registry, getProvider } = setup( [ group ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 3,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					// The group's id from the session that recorded the move.
+					fromParentClientId: 'previous-session-group',
+					fromIndex: 0,
+					toParentClientId: 'previous-session-group',
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) ).toBe(
+			group.clientId
+		);
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+	} );
 } );
 
 describe( 'rejectSuggestion (attribute-set)', () => {

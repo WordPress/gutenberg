@@ -1004,6 +1004,29 @@ export function useSuggestionsProvider() {
 						const clearAttrs = clearSuggestionMarkerAttributes(
 							selectBlockAttributes( clientId )
 						);
+						const liveParent =
+							selectBlockRootClientId( clientId ) ?? '';
+						/*
+						 * The recorded parents are session-local client ids,
+						 * regenerated whenever the post is parsed again. A move
+						 * within one parent needs no recorded id at all: the
+						 * block's live parent is the parent it came from. A move
+						 * across parents restores to the recorded parent only
+						 * while that block still exists; after a reload it
+						 * cannot be resolved, so the block is restored within
+						 * its current parent (a documented limitation).
+						 */
+						const recordedFrom =
+							structuralOp.fromParentClientId ?? '';
+						const recordedTo = structuralOp.toParentClientId ?? '';
+						let restoreParent = liveParent;
+						if (
+							recordedFrom !== recordedTo &&
+							( recordedFrom === '' ||
+								selectBlockAttributes( recordedFrom ) )
+						) {
+							restoreParent = recordedFrom;
+						}
 						requestInterceptorBypass( clientId );
 						clearOverlay( clientId );
 						/*
@@ -1032,8 +1055,8 @@ export function useSuggestionsProvider() {
 								 * no-op. `moveBlockToPosition` expects '' (not null)
 								 * for the root.
 								 */
-								selectBlockRootClientId( clientId ) ?? '',
-								structuralOp.fromParentClientId ?? '',
+								liveParent,
+								restoreParent,
 								structuralOp.fromIndex ?? 0
 							);
 						} );
