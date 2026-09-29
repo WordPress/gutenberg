@@ -14,3 +14,7 @@
 .nested-with-fallback {
 	color: var(--my-custom-color, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }
+
+.escaped {
+	border-radius: v\61r(--wpds-border-radius-\73m, 2px);
+}
