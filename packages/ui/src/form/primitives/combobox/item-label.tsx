@@ -9,17 +9,18 @@ import type { ComboboxItemLabelProps } from './types';
  * every item. Its content is the item's accessible name. The selected value
  * still uses the item's `label` or the content of `Combobox.Value`.
  */
-export const ItemLabel = forwardRef< HTMLSpanElement, ComboboxItemLabelProps >(
-	function ItemLabelComponent( { className, ...restProps }, ref ) {
-		return (
-			<Text
-				ref={ ref }
-				variant="body-md"
-				className={ clsx( itemPopupStyles[ 'item-label' ], className ) }
-				{ ...restProps }
-			/>
-		);
-	}
-);
+const ForwardedItemLabel = forwardRef<
+	HTMLSpanElement,
+	ComboboxItemLabelProps
+>( function ItemLabel( { className, ...restProps }, ref ) {
+	return (
+		<Text
+			ref={ ref }
+			variant="body-md"
+			className={ clsx( itemPopupStyles[ 'item-label' ], className ) }
+			{ ...restProps }
+		/>
+	);
+} );
 
-ItemLabel.displayName = 'ItemLabel';
+export { ForwardedItemLabel as ItemLabel };

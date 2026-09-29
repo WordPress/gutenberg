@@ -7,10 +7,10 @@ import type { AutocompleteItemLabelProps } from './types';
 /**
  * The primary label and accessible name of an autocomplete item.
  */
-export const ItemLabel = forwardRef<
+const ForwardedItemLabel = forwardRef<
 	HTMLSpanElement,
 	AutocompleteItemLabelProps
->( function ItemLabelComponent( { className, ...restProps }, ref ) {
+>( function ItemLabel( { className, ...restProps }, ref ) {
 	return (
 		<Text
 			ref={ ref }
@@ -21,4 +21,4 @@ export const ItemLabel = forwardRef<
 	);
 } );
 
-ItemLabel.displayName = 'ItemLabel';
+export { ForwardedItemLabel as ItemLabel };

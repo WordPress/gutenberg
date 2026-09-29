@@ -15,10 +15,10 @@ type InternalItemDescriptionProps = ComboboxItemDescriptionProps & {
  * item's accessible description. Use it as a direct child after
  * `Combobox.ItemLabel`. Content should be text or non-interactive inline markup.
  */
-const ItemDescription = forwardRef<
+const ForwardedItemDescription = forwardRef<
 	HTMLSpanElement,
 	ComboboxItemDescriptionProps
->( function ItemDescriptionComponent( props, ref ) {
+>( function ItemDescription( props, ref ) {
 	const { className, validationToken, ...restProps } =
 		props as InternalItemDescriptionProps;
 	if (
@@ -43,6 +43,7 @@ const ItemDescription = forwardRef<
 	);
 } );
 
-ItemDescription.displayName = 'ItemDescription';
-
-export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };
+export {
+	ITEM_DESCRIPTION_DIRECT_CHILD,
+	ForwardedItemDescription as ItemDescription,
+};

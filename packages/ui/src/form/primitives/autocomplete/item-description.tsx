@@ -14,10 +14,10 @@ type InternalItemDescriptionProps = AutocompleteItemDescriptionProps & {
  * Supplementary content for an autocomplete item. Its text contributes to the
  * item's accessible description.
  */
-const ItemDescription = forwardRef<
+const ForwardedItemDescription = forwardRef<
 	HTMLSpanElement,
 	AutocompleteItemDescriptionProps
->( function ItemDescriptionComponent( props, ref ) {
+>( function ItemDescription( props, ref ) {
 	const { className, validationToken, ...restProps } =
 		props as InternalItemDescriptionProps;
 	if (
@@ -42,6 +42,7 @@ const ItemDescription = forwardRef<
 	);
 } );
 
-ItemDescription.displayName = 'ItemDescription';
-
-export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };
+export {
+	ITEM_DESCRIPTION_DIRECT_CHILD,
+	ForwardedItemDescription as ItemDescription,
+};
