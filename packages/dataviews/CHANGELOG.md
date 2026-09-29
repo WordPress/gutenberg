@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
+
 ### Documentation
 
 -   Document that a custom `sort` receives the field values returned by `getValue`, not the items ([#83483](https://github.com/WordPress/gutenberg/pull/83483)).
