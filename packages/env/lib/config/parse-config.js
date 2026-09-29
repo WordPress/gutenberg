@@ -36,6 +36,7 @@ module.exports = function parseConfig( config, options ) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
+		mariadbVersion: config.mariadbVersion,
 		coreSource: includeTestsPath(
 			parseSourceString( config.core, options ),
 			options
