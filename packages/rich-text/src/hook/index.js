@@ -12,10 +12,9 @@ import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 
 /**
- * Whether the element holds focus, directly or through an editing host that
- * contains it. Anything focused within the host counts: applying a selection
- * inside the element then moves focus to the host. The body is the active
- * element whenever nothing has focus, hence the `:focus` check.
+ * Whether the element or a focused editing host containing it holds focus.
+ * The body is the active element whenever nothing has focus, hence the
+ * `:focus` check.
  *
  * @param {HTMLElement} element The editable element.
  *
@@ -23,14 +22,11 @@ import { useFormatTypes } from './use-format-types';
  */
 function hasFocus( element ) {
 	const { activeElement } = element.ownerDocument;
-	if ( activeElement === element ) {
-		return true;
-	}
-	const host = element.parentElement?.closest( '[contenteditable="true"]' );
 	return (
-		!! host &&
-		host.contains( activeElement ) &&
-		activeElement.matches( ':focus' )
+		activeElement === element ||
+		( activeElement?.contentEditable === 'true' &&
+			activeElement.contains( element ) &&
+			activeElement.matches( ':focus' ) )
 	);
 }
 
