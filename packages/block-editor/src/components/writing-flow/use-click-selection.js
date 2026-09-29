@@ -123,11 +123,9 @@ export default function useClickSelection() {
 					clickedClientId !== startClientId &&
 					canHostEditableRoot( clickedClientId )
 				) {
-					// Selecting the block makes its field inert under the
-					// engaged wrapper. Left to the re-render, that lands
-					// mid-click, after the browser placed the caret and focus
-					// in the field, and drops both. Do it now, so the default
-					// action places the caret through the host instead.
+					// Select the block now, before the browser acts on the
+					// click, so the wrapper is the editing host when the
+					// default action places the caret and focus.
 					const editable = event.target.closest(
 						'[contenteditable="true"]'
 					);
@@ -137,10 +135,6 @@ export default function useClickSelection() {
 						getBlockClientId( editable ) === clickedClientId
 					) {
 						setContentEditableWrapper( node, true );
-						// Remove the attribute rather than set "inherit":
-						// Gecko does not map the invalid value to the inherit
-						// state and treats the element as non-editable.
-						editable.removeAttribute( 'contenteditable' );
 						selectBlock( clickedClientId, null );
 					}
 				}

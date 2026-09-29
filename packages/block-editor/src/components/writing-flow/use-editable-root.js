@@ -2,28 +2,17 @@ import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import {
-	getBlockClientId,
-	getSelectionEditableElement,
-	isInsideRootBlock,
-} from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
-
-const EDITABLE_SELECTOR = '[contenteditable="true"]';
-// Marks the field the switch handed to the host.
-const HOSTED_ATTRIBUTE = 'data-wp-hosted-field';
 
 /**
  * Keeps the writing flow wrapper contentEditable while the selected block
  * supports `editableRoot`, so the native selection can extend across blocks.
  * The switch is imperative and happens when the selection changes, in the
- * same tick: the wrapper becomes the editing host and the selected block's
- * field stops being an editable element of its own, together. Rich text
- * renders the same state for the field, so a later render does not restore
- * its attributes. While the wrapper is editable it must also hold focus: a
- * nested editable element cannot retain focus once an ancestor becomes an
- * editing host (the first DOM mutation moves focus to the host,
- * inconsistently across browsers).
+ * same tick. While the wrapper is editable it must also hold focus: a nested
+ * editable element cannot retain focus once an ancestor becomes an editing
+ * host (the first DOM mutation moves focus to the host, inconsistently
+ * across browsers).
  */
 export default function useEditableRoot() {
 	const registry = useRegistry();
@@ -40,38 +29,7 @@ export default function useEditableRoot() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			// The block's own editable element: the block element itself
-			// (paragraph) or a descendant (list item), not a nested block's.
-			function getField( clientId ) {
-				const blockElement = node.querySelector(
-					`[data-block="${ clientId }"]`
-				);
-				if ( ! blockElement ) {
-					return;
-				}
-				if ( blockElement.matches( EDITABLE_SELECTOR ) ) {
-					return blockElement;
-				}
-				return Array.from(
-					blockElement.querySelectorAll( EDITABLE_SELECTOR )
-				).find( ( field ) => isInsideRootBlock( blockElement, field ) );
-			}
-
-			// Makes the field the switch handed to the host an editable
-			// element again, unless rich text rendered it since.
-			function releaseField() {
-				const field = node.querySelector( `[${ HOSTED_ATTRIBUTE }]` );
-				if ( ! field ) {
-					return;
-				}
-				if ( ! field.hasAttribute( 'contenteditable' ) ) {
-					field.setAttribute( 'contenteditable', 'true' );
-				}
-				field.removeAttribute( HOSTED_ATTRIBUTE );
-			}
-
 			function disengage() {
-				releaseField();
 				setContentEditableWrapper( node, false );
 
 				// If the wrapper held focus, return focus to the editable
@@ -102,8 +60,7 @@ export default function useEditableRoot() {
 				// observer disables both together when the selection
 				// collapses. Removing the attributes here would strip the
 				// accessible name off the focused editing host at the moment
-				// cross-block editing begins. The fields stay inert too: rich
-				// text renders every multi-selected block's field inert.
+				// cross-block editing begins.
 				if ( hasMultiSelection() || isMultiSelecting() ) {
 					return;
 				}
@@ -114,11 +71,9 @@ export default function useEditableRoot() {
 
 				if ( ! enabled ) {
 					// The selection observer may have disabled the wrapper
-					// already; the field it hosted is released regardless.
+					// already.
 					if ( node.contentEditable === 'true' ) {
 						disengage();
-					} else {
-						releaseField();
 					}
 					return;
 				}
@@ -138,27 +93,7 @@ export default function useEditableRoot() {
 					selection.collapse( activeElement, 0 );
 				}
 
-				// The selection observer may have disengaged the host when a
-				// multi-selection collapsed back into the hosted block.
-				if ( ! setContentEditableWrapper( node, true ) ) {
-					return;
-				}
-
-				const hosted = node.querySelector( `[${ HOSTED_ATTRIBUTE }]` );
-				if ( hosted && getBlockClientId( hosted ) === clientId ) {
-					return;
-				}
-
-				// The field is edited through the host now. Remove the
-				// attribute so it is not an editing host nested in it. A
-				// field that rich text rendered without the attribute, or
-				// that is not editable (a locked binding), is left as it is.
-				releaseField();
-				const field = getField( clientId );
-				if ( field ) {
-					field.setAttribute( HOSTED_ATTRIBUTE, '' );
-					field.removeAttribute( 'contenteditable' );
-				}
+				setContentEditableWrapper( node, true );
 			}
 
 			sync();
@@ -168,8 +103,6 @@ export default function useEditableRoot() {
 				unsubscribe();
 				if ( node.contentEditable === 'true' ) {
 					disengage();
-				} else {
-					releaseField();
 				}
 			};
 		},

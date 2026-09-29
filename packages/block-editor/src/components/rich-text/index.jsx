@@ -477,10 +477,9 @@ function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
-	// Under the editing host the element is edited through the host (no
-	// contenteditable attribute, see below), so `focus()` on it would move
-	// focus off the host. Keep it working: place the caret in the element and
-	// focus the host instead.
+	// Under the editing host, `focus()` on the element would move focus off
+	// the host. Keep it working: place the caret in the element and focus the
+	// host instead.
 	const focusUnderHostRef = useRefEffect(
 		( element ) => {
 			if ( ! isEditingHost ) {
@@ -623,11 +622,13 @@ function RichTextWrapper(
 					focusUnderHostRef,
 				] ) }
 				contentEditable={
-					// Under the editing host the field is editable through the
-					// host, not an editing host of its own. The attribute must
-					// be absent, not "inherit": Gecko treats the invalid value
-					// as non-editable.
-					isEditingHost ? undefined : ! shouldDisableEditing
+					// A multi-selected block's field is inside the host's
+					// range and must not be an editing host of its own there.
+					// The attribute must be absent, not "inherit": Gecko
+					// treats the invalid value as non-editable.
+					isEditingHost && ! isBlockSelected
+						? undefined
+						: ! shouldDisableEditing
 				}
 				suppressContentEditableWarning
 				className={ clsx(
