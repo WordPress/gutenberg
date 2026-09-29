@@ -55,22 +55,10 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
-		// Find all tabbables within node. Under the editing host the
-		// selected block's fields are editable through the host and not
-		// tabbable: find them by the block attribute they edit.
-		let textInputs = focus.tabbable
+		// Find all tabbables within node.
+		const textInputs = focus.tabbable
 			.find( ref.current )
 			.filter( ( node ) => isTextField( node ) );
-		if ( ! textInputs.length ) {
-			textInputs = Array.from(
-				ref.current.querySelectorAll( '[data-wp-block-attribute-key]' )
-			).filter(
-				( node ) =>
-					node.isContentEditable &&
-					! node.hasAttribute( 'contenteditable' ) &&
-					isInsideRootBlock( ref.current, node )
-			);
-		}
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -97,48 +85,26 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			}
 		}
 		// Do not place a caret when the target already contains one:
-		// while an editing host contains the target (the block supports
-		// `editableRoot`), the caret can be inside it without the target
-		// holding focus. Only a caret the rich text synchronized to the
-		// store (offsets present) is deliberate; a leftover one yields to
-		// an explicitly requested edge position (initialPosition -1).
+		// while a focused editing host contains the target (the block
+		// supports `editableRoot`), the caret can be inside it without the
+		// target holding focus. Only a caret the rich text synchronized to
+		// the store (offsets present) is deliberate; a leftover one yields
+		// to an explicitly requested edge position (initialPosition -1).
+		const { activeElement } = ownerDocument;
 		const selection = ownerDocument.defaultView.getSelection();
 		const { clientId: selectionClientId, offset } = getSelectionStart();
 		const hasCaret =
-			!! selection.anchorNode && target.contains( selection.anchorNode );
+			activeElement?.isContentEditable &&
+			activeElement.contains( target ) &&
+			!! selection.anchorNode &&
+			target.contains( selection.anchorNode );
 		const isDeliberate =
 			initialPosition === 0 ||
 			( offset !== undefined && selectionClientId === clientId );
 
-		if ( hasCaret && isDeliberate ) {
-			// The field applies the store selection when focused, so only
-			// move focus, unless an editing host containing the target has
-			// it.
-			const { activeElement } = ownerDocument;
-			const isHosted =
-				activeElement?.isContentEditable &&
-				activeElement.contains( target ) &&
-				ownerDocument.hasFocus();
-			if ( ! isHosted ) {
-				target.focus();
-			}
-			return;
+		if ( ! ( hasCaret && isDeliberate ) ) {
+			placeCaretAtHorizontalEdge( target, isReverse );
 		}
-
-		// Under the editing host the target is editable through the host
-		// and not a focus target of its own (no contenteditable attribute):
-		// place the caret at its edge directly. Focusing it then focuses
-		// the host (see RichText), which adopts the caret.
-		if ( target.isContentEditable && target.contentEditable !== 'true' ) {
-			selection.collapse(
-				target,
-				isReverse ? target.childNodes.length : 0
-			);
-			target.focus();
-			return;
-		}
-
-		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 
 	return ref;

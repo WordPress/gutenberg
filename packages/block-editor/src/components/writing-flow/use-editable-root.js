@@ -1,4 +1,4 @@
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
@@ -8,28 +8,74 @@ import { unlock } from '../../lock-unlock';
 /**
  * Keeps the writing flow wrapper contentEditable while the selected block
  * supports `editableRoot`, so the native selection can extend across blocks.
- * The switch is imperative and happens when the selection changes, in the
- * same tick. While the wrapper is editable it must also hold focus: a nested
- * editable element cannot retain focus once an ancestor becomes an editing
- * host (the first DOM mutation moves focus to the host, inconsistently
- * across browsers).
+ * While the wrapper is editable it must also hold focus: a nested editable
+ * element cannot retain focus once an ancestor becomes an editing host (the
+ * first DOM mutation moves focus to the host, inconsistently across
+ * browsers).
  */
 export default function useEditableRoot() {
 	const registry = useRegistry();
+	const enabled = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
+			unlock( select( blockEditorStore ) );
+		return (
+			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
+		);
+	}, [] );
 
 	return useRefEffect(
 		( node ) => {
+			if ( ! enabled ) {
+				return;
+			}
+
 			const {
 				getSelectedBlockClientId,
-				canHostEditableRoot,
-				isZoomOut,
 				hasMultiSelection,
 				isMultiSelecting,
-			} = unlock( registry.select( blockEditorStore ) );
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
+			} = registry.select( blockEditorStore );
 
-			function disengage() {
+			// Focus is moved separately below, only when an editable
+			// element belonging to the selected block holds it.
+			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
+				return;
+			}
+
+			// Move focus from the block's editable element to the wrapper,
+			// but only when an editable element belonging to the selected
+			// block has focus. Never steal focus from other regions (e.g.
+			// List View), UI elements (e.g. buttons), or other editables
+			// within the wrapper (e.g. the post title). The selection is
+			// preserved. If the selection is still outside the focused
+			// element, a mousedown just focused it and the browser has not
+			// placed the caret yet; moving focus now would cancel the
+			// pending caret placement. The selection observer moves focus
+			// once the selection lands.
+			const { activeElement } = node.ownerDocument;
+			const selection = node.ownerDocument.defaultView.getSelection();
+			if (
+				activeElement !== node &&
+				activeElement?.isContentEditable &&
+				node.contains( activeElement ) &&
+				getBlockClientId( activeElement ) ===
+					getSelectedBlockClientId() &&
+				selection.anchorNode &&
+				activeElement.contains( selection.anchorNode )
+			) {
+				node.focus();
+			}
+
+			return () => {
+				// A multi-selection owns the wrapper as its editing host
+				// now: the host and its textbox semantics remain, and the
+				// selection observer disables both together when the
+				// selection collapses. Removing the attributes here would
+				// strip the accessible name off the focused editing host at
+				// the moment cross-block editing begins.
+				if ( hasMultiSelection() || isMultiSelecting() ) {
+					return;
+				}
+
 				setContentEditableWrapper( node, false );
 
 				// If the wrapper held focus, return focus to the editable
@@ -39,9 +85,9 @@ export default function useEditableRoot() {
 				// when the selection moved to another block through the
 				// store, the stale DOM selection must not reclaim block
 				// selection through its focus handler.
-				if ( ownerDocument.activeElement === node ) {
+				if ( node.ownerDocument.activeElement === node ) {
 					const editable = getSelectionEditableElement(
-						defaultView.getSelection(),
+						node.ownerDocument.defaultView.getSelection(),
 						node
 					);
 					if (
@@ -52,60 +98,8 @@ export default function useEditableRoot() {
 						editable.focus();
 					}
 				}
-			}
-
-			function sync() {
-				// A multi-selection owns the wrapper as its editing host: the
-				// host and its textbox semantics remain, and the selection
-				// observer disables both together when the selection
-				// collapses. Removing the attributes here would strip the
-				// accessible name off the focused editing host at the moment
-				// cross-block editing begins.
-				if ( hasMultiSelection() || isMultiSelecting() ) {
-					return;
-				}
-
-				const clientId = getSelectedBlockClientId();
-				const enabled =
-					! isZoomOut() && canHostEditableRoot( clientId );
-
-				if ( ! enabled ) {
-					// The selection observer may have disabled the wrapper
-					// already.
-					if ( node.contentEditable === 'true' ) {
-						disengage();
-					}
-					return;
-				}
-
-				// A block's focus handler selects the block before the
-				// browser places the caret in the focused field (WebKit
-				// does so after the focus event, and then in the wrapper
-				// once the host took focus). Place it at the start of the
-				// field, as the browser would.
-				const { activeElement } = ownerDocument;
-				const selection = defaultView.getSelection();
-				if (
-					activeElement !== node &&
-					node.contains( activeElement ) &&
-					! selection.anchorNode
-				) {
-					selection.collapse( activeElement, 0 );
-				}
-
-				setContentEditableWrapper( node, true );
-			}
-
-			sync();
-			const unsubscribe = registry.subscribe( sync, blockEditorStore );
-
-			return () => {
-				unsubscribe();
-				if ( node.contentEditable === 'true' ) {
-					disengage();
-				}
 			};
 		},
-		[ registry ]
+		[ enabled, registry ]
 	);
 }

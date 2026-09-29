@@ -21,13 +21,11 @@ import { useFormatTypes } from './use-format-types';
  * @return {boolean} Whether the element has focus.
  */
 function hasFocus( element ) {
-	const { ownerDocument } = element;
-	const { activeElement } = ownerDocument;
+	const { activeElement } = element.ownerDocument;
 	return (
 		activeElement === element ||
 		( activeElement?.contentEditable === 'true' &&
-			activeElement.contains( element ) &&
-			ownerDocument.hasFocus() )
+			activeElement.contains( element ) )
 	);
 }
 

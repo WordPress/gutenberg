@@ -1,5 +1,4 @@
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
-const FIELD_SELECTOR = '[data-wp-block-attribute-key]';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
@@ -56,21 +55,9 @@ export function getSelectionEditableElement(
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
 			? ( anchorNode as Element )
 			: anchorNode.parentElement;
-	let editable = element?.closest( '[contenteditable="true"]' );
+	const editable = element?.closest( '[contenteditable="true"]' );
 
-	// While the root is the editing host, the selected block's field is
-	// editable through it and has no contenteditable attribute of its own:
-	// find it by the block attribute it edits.
-	if ( editable === root ) {
-		editable = element?.closest( FIELD_SELECTOR );
-	}
-
-	if (
-		! editable ||
-		editable === root ||
-		! ( editable as HTMLElement ).isContentEditable ||
-		! editable.contains( focusNode )
-	) {
+	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
 		return;
 	}
 

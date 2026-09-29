@@ -19,7 +19,6 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
-		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
@@ -118,25 +117,6 @@ export default function useClickSelection() {
 					// multiselection (focus moved to first block's multi-
 					// controls).
 					selectBlock( clickedClientId );
-				} else if (
-					clickedClientId &&
-					clickedClientId !== startClientId &&
-					canHostEditableRoot( clickedClientId )
-				) {
-					// Select the block now, before the browser acts on the
-					// click, so the wrapper is the editing host when the
-					// default action places the caret and focus.
-					const editable = event.target.closest(
-						'[contenteditable="true"]'
-					);
-
-					if (
-						editable &&
-						getBlockClientId( editable ) === clickedClientId
-					) {
-						setContentEditableWrapper( node, true );
-						selectBlock( clickedClientId, null );
-					}
 				}
 			}
 

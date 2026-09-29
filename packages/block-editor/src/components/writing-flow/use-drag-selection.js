@@ -100,15 +100,16 @@ export default function useDragSelection() {
 					return;
 				}
 
-				// Only start multi selecting when the mouse leaves a field:
-				// one editable on its own, or the selected block's, editable
-				// through the editing host. In preview mode, allow drag
-				// selection from blocks since they are not contenteditable.
-				const isField =
-					target.contentEditable === 'true' ||
-					( target.isContentEditable &&
-						target.hasAttribute( 'data-wp-block-attribute-key' ) );
-				if ( ! isField && ! getSettings().isPreviewMode ) {
+				// Check the attribute, not the contentEditable attribute. All
+				// child elements of the content editable wrapper are editable
+				// and return true for this property. We only want to start
+				// multi selecting when the mouse leaves the wrapper.
+				// In preview mode, allow drag selection from blocks since they
+				// are not contenteditable.
+				if (
+					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					! getSettings().isPreviewMode
+				) {
 					return;
 				}
 
