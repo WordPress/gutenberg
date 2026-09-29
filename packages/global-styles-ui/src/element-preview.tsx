@@ -6,11 +6,20 @@ import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
 	store as blockEditorStore,
+	transformStyles,
 	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
+import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
+import type { GlobalStylesStyles } from '@wordpress/global-styles-engine';
 
 interface ElementPreviewProps {
 	element: string;
+	/**
+	 * The styles of the selected state, such as `:hover`, if any. The preview
+	 * is inert and can't trigger the state, so it shows these styles on top of
+	 * the sample's own.
+	 */
+	stateStyles?: GlobalStylesStyles;
 }
 
 /*
@@ -59,17 +68,35 @@ const PREVIEW_CSS = `
  * properties copied across by hand.
  *
  * @param props
- * @param props.element The element being previewed.
+ * @param props.element     The element being previewed.
+ * @param props.stateStyles The styles of the selected state, if any.
  */
-export default function ElementPreview( { element }: ElementPreviewProps ) {
+export default function ElementPreview( {
+	element,
+	stateStyles,
+}: ElementPreviewProps ) {
 	const styles = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().styles,
 		[]
 	);
 
+	// Show the selected state by rendering its styles as the element's own.
+	// The link element's selector (0,0,1) is weaker than a theme's `:link` and
+	// `:any-link` rules (0,1,0), which the sample always matches, so scope the
+	// state's styles to the canvas body to outrank them.
+	const stateCSS = useMemo( () => {
+		if ( ! stateStyles ) {
+			return '';
+		}
+		return transformStyles(
+			[ { css: generatePreviewStateStyles( stateStyles, element ) } ],
+			'.editor-styles-wrapper'
+		).join( '' );
+	}, [ stateStyles, element ] );
+
 	const editorStyles = useMemo(
-		() => [ ...( styles ?? [] ), { css: PREVIEW_CSS } ],
-		[ styles ]
+		() => [ ...( styles ?? [] ), { css: PREVIEW_CSS }, { css: stateCSS } ],
+		[ styles, stateCSS ]
 	);
 
 	// Show a caption on the image the Image block uses for its own example,
@@ -81,11 +108,13 @@ export default function ElementPreview( { element }: ElementPreviewProps ) {
 	switch ( element ) {
 		case 'button':
 			// The class is half of the element's selector, so a button only
-			// picks up the element's styles when it carries it.
+			// picks up the element's styles when it carries it. It's a link, as
+			// Button blocks are on the site, so the link-only states such as
+			// `:any-link` apply to it the same way.
 			sample = (
-				<button className="wp-element-button" type="button">
+				<a className="wp-element-button" href="#anchor">
 					{ __( 'Call to action' ) }
-				</button>
+				</a>
 			);
 			break;
 		case 'textInput':

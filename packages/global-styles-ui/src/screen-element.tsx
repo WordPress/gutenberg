@@ -237,6 +237,15 @@ function ScreenElement( {
 		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
 		[ element, showStateControls ]
 	);
+	const state =
+		selectedPseudoState === 'default' ? undefined : selectedPseudoState;
+	const [ stateStyles ] = useStyle< GlobalStylesStyles >(
+		`elements.${ element }`,
+		'',
+		'merged',
+		false,
+		state
+	);
 
 	if ( ! Object.hasOwn( ELEMENTS, element ) ) {
 		return null;
@@ -251,15 +260,14 @@ function ScreenElement( {
 				selectedPseudoState={ selectedPseudoState }
 				onChangePseudoState={ setSelectedPseudoState }
 			/>
-			<ElementPreview element={ element } />
+			<ElementPreview
+				element={ element }
+				stateStyles={ state ? stateStyles : undefined }
+			/>
 			<ElementStylePanels
 				element={ element }
 				label={ ELEMENTS[ element ].title }
-				state={
-					selectedPseudoState === 'default'
-						? undefined
-						: selectedPseudoState
-				}
+				state={ state }
 			/>
 		</>
 	);
