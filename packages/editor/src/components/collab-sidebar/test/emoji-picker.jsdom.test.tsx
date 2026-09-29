@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { dispatch } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 import EmojiPicker, {
 	chunkRows,
 	getGroupLabel,
@@ -13,6 +14,7 @@ import EmojiPicker, {
 	searchEmojis,
 } from '../emoji-picker';
 import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
+import { FREQUENT_EMOJIS_PREFERENCE_KEY } from '../frequent-emojis';
 import type { EmojibaseEntry } from '../emojibase-data';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -254,6 +256,13 @@ describe( 'EmojiPicker search announcements', () => {
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
+		// Picks persist in the shared preferences store, and a leftover
+		// "Frequently used" row shifts every grid position below it.
+		dispatch( preferencesStore ).set(
+			'core',
+			FREQUENT_EMOJIS_PREFERENCE_KEY,
+			[]
+		);
 		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
