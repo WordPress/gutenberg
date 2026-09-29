@@ -9,8 +9,8 @@
 			/* Preserve the thin default of the original ProgressBar. */
 			height: 1.5px;
 			border-radius: var(--wpds-border-radius-lg);
-			color: var(--wpds-color-background-track-neutral);
-			background-color: currentColor;
+			color: var(--wpds-color-foreground-content-neutral);
+			background-color: var(--wpds-color-background-track-neutral);
 
 			@media (forced-colors: active) {
 				outline: var(--wpds-border-width-xs) solid CanvasText;
@@ -31,7 +31,7 @@
 			inset-block-start: 0;
 			height: 100%;
 			border-radius: inherit;
-			background-color: var(--wpds-color-foreground-content-neutral);
+			background-color: currentColor;
 
 			@media not (prefers-reduced-motion) {
 				transition: width var(--wpds-motion-duration-xl) ease-in-out;
@@ -50,13 +50,12 @@
 			}
 		}
 
-		.is-brand .indicator {
-			background-color: var(--wpds-color-background-thumb-brand);
+		.is-brand {
+			color: var(--wpds-color-background-thumb-brand);
 		}
 
 		@media (forced-colors: active) {
-			.indicator,
-			.is-brand .indicator {
+			.indicator {
 				forced-color-adjust: none;
 				background-color: CanvasText;
 			}

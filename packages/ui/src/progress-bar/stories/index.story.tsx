@@ -39,16 +39,16 @@ export const Brand: Story = {
 };
 
 /**
- * The color prop sets the track background independently of the indicator tone.
+ * The color prop overrides the indicator tone and keeps the track neutral.
  */
 export const CustomColor: Story = {
-	args: { value: 60, tone: 'brand', size: 'medium', color: '#e9d5ff' },
+	args: { value: 60, tone: 'brand', size: 'medium', color: '#8b2fc9' },
 };
 
 export const CurrentColor: Story = {
 	args: { value: 60, tone: 'brand', size: 'medium', color: 'currentColor' },
 	render: ( args ) => (
-		<Stack style={ { color: '#e9d5ff' } }>
+		<Stack style={ { color: '#8b2fc9' } }>
 			<ProgressBar { ...args } />
 		</Stack>
 	),

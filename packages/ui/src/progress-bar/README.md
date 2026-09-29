@@ -20,16 +20,16 @@ Omit `value` or pass `null` for indeterminate progress. Use `min` and `max` for 
 | `value` | A number between `min` and `max`, or `null` | `null` |
 | `size` | `small`, `medium`, `large` | `small` |
 | `tone` | `neutral`, `brand` | `neutral` |
-| `color` | Any CSS color value for the track | `var(--wpds-color-background-track-neutral)` |
+| `color` | Any CSS color value for the filled indicator | Determined by `tone` |
 | `min` | Minimum value | `0` |
 | `max` | Maximum value | `100` |
 
-`size` controls thickness. Small is 1.5px; medium and large use the theme's size tokens, which default to 4px and 8px. `tone` controls the filled indicator. Both tones use a neutral track by default. Brand uses the WPDS brand thumb token. Default colors and corner radius follow `@wordpress/theme`.
+`size` controls thickness. Small is 1.5px; medium and large use the theme's size tokens, which default to 4px and 8px. `tone` controls the filled indicator. The track remains neutral for both tones and custom colors. Brand uses the WPDS brand thumb token. Default colors and corner radius follow `@wordpress/theme`.
 
-Use `color` to customize the track background independently of `tone`. It accepts any CSS color value, including CSS variables and `currentColor` to inherit the surrounding text color. When supplied, `color` takes precedence over `style.color` and preserves the other inline styles.
+Use `tone` to choose the indicator color. Set `color` to override it with a custom indicator color. It accepts any CSS color value, including CSS variables and `currentColor` to inherit the surrounding text color. When supplied, `color` takes precedence over `tone` and `style.color` and preserves the other inline styles.
 
 ```tsx
-<ProgressBar value={ 60 } tone="brand" color="#e9d5ff" />
+<ProgressBar value={ 60 } tone="brand" color="#8b2fc9" />
 ```
 
 The component supports `render`, `className`, `style`, and ref forwarding. The ref points to the root `div`, which has the `progressbar` role. Use `style` or `className` to constrain the width.
