@@ -79,6 +79,11 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 			color: $components-color-accent;
 		}
 
+		&:focus {
+			// Override style from wp-admin common.css.
+			box-shadow: none;
+		}
+
 		&:focus-visible {
 			@include outset-ring__focus();
 		}
