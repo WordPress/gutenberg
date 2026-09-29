@@ -6,9 +6,13 @@
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
+### Enhancements
+
+-   Update `use-recommended-components` rule to prefer `Badge` from `@wordpress/ui` over the private `@wordpress/components` `Badge`. ([#82379](https://github.com/WordPress/gutenberg/pull/82379))
+
 ### Bug Fixes
 
--   Pin `typescript-eslint` to `8.60.0`, whose peer range includes TypeScript 6.0. Later versions report `const Foo = forwardRef( function Foo() {} )` under `@typescript-eslint/no-shadow` ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+-   Update `typescript-eslint` to `^8.70.1`, whose peer range includes TypeScript 6.0 ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 
 ## 27.0.0 (2026-09-23)
 

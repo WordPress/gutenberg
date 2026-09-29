@@ -603,11 +603,10 @@ export default dedupePlugins( [
 		],
 		rules: {
 			...config.rules,
-			// Callback factories, Promise.all/returned assertions and generated titles
-			// need compatibility checks in step 3 of the same issue.
-			'vitest/valid-describe-callback': 'off',
-			'vitest/valid-expect-in-promise': 'off',
-			'vitest/valid-title': 'off',
+			'vitest/valid-describe-callback': 'error',
+			'vitest/valid-expect-in-promise': 'error',
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
+			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
 			'vitest/no-alias-methods': 'error',
@@ -641,24 +640,6 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			// The parser helper already passed these checks under its own Jest
-			// override. Keep that stricter baseline while suites await step 3.
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': 'error',
-		},
-	},
-	{
-		files: [ 'test/unit/config/console.vitest.js' ],
-		rules: {
-			// aroundEach receives an awaited runTest callback. The deprecated rule
-			// mistakes it for a done callback; reassess in #83089 step 3.
-			'vitest/no-done-callback': 'off',
-		},
-	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[
