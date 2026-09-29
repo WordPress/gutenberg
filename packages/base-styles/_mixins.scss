@@ -552,6 +552,10 @@
 }
 
 @mixin wordpress-admin-schemes() {
+	body.admin-color-fresh {
+		@include admin-scheme(#007cba);
+	}
+
 	body.admin-color-light {
 		@include admin-scheme(#007cba);
 	}
