@@ -104,7 +104,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	 *
 	 * @param string[] $preload_paths Paths to preload.
 	 */
-	$preload_paths = apply_filters( '{{PAGE_SLUG}}-wp-admin_preload_paths', $preload_paths );
+	$preload_paths = apply_filters( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths', $preload_paths );
 
 	// Use rest_preload_api_request to gather the preloaded data
 	$preload_data = array_reduce(
