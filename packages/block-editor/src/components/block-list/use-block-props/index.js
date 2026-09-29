@@ -135,6 +135,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,
+		isEditingHost,
 		defaultClassName,
 		isSectionBlock,
 		isWithinSectionBlock,
@@ -219,7 +220,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	}
 
 	return {
-		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
+		tabIndex: ( () => {
+			if ( blockEditingMode === 'disabled' ) {
+				return -1;
+			}
+			// Under the editing host the block element is not a focus
+			// target, like its field (see the writing flow switch).
+			return isEditingHost ? undefined : 0;
+		} )(),
 		draggable: canMove && ! hasChildSelected ? true : undefined,
 		...wrapperProps,
 		...props,
