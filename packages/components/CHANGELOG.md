@@ -15,6 +15,10 @@
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 -   `ItemGroup`: Use design system's outline focus ring instead of previous box-shadow implementation ([#83764](https://github.com/WordPress/gutenberg/pull/83764)).
 
+### Deprecations
+
+-   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
+
 ### Bug Fixes
 
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).

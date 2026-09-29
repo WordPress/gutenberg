@@ -4,17 +4,12 @@ import {
 	BlockEditorProvider,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 import styles from './style.lazy.scss?inline';
 import { editorStyles } from '../editor-styles';
 
 export default function EditorFullPage() {
 	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	// Ensures that the CSS intended for the playground (especially the style resets)
 	// are only loaded for the playground and don't leak into other stories.
