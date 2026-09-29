@@ -16,7 +16,10 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * give each `RadioGroup` its own accessible name.
  */
 export const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
-	function RadioGroup( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedRadioGroup(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return <_RadioGroup ref={ ref } render={ render } { ...restProps } />;
 	}
 );

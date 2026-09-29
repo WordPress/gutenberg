@@ -47,6 +47,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
+import { isPlainObject } from '../utils/object';
 import { unlock } from '../lock-unlock';
 import BlockStylePanels from '../components/block-inspector/block-style-panels';
 
@@ -280,10 +281,6 @@ export function getStateStylesCSS( stateStyles, selector ) {
 	return [ importantCSS, textAlignCSS, fallbackCSS, backgroundResetCSS ]
 		.filter( Boolean )
 		.join( '\n' );
-}
-
-function isPlainObject( value ) {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
 }
 
 function mergeStyleObjects( target = {}, source = {} ) {
