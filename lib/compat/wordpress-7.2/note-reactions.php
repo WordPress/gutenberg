@@ -95,6 +95,27 @@ remove_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10 );
 add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
 
 /**
+ * Excludes internal comment types from comment feeds.
+ *
+ * WP_Query builds the comment feed SQL directly (not via WP_Comment_Query)
+ * and only hardcodes the 'note' exclusion, so reactions would otherwise
+ * appear in public comment feeds.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @param string $cwhere The WHERE clause of the comment feed query.
+ * @return string The modified WHERE clause.
+ */
+function gutenberg_exclude_internal_comment_types_from_feed_7_2( $cwhere ) {
+	global $wpdb;
+	$internal_types    = gutenberg_get_internal_comment_types();
+	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+	return $cwhere . ' AND ' . $wpdb->prepare( "{$wpdb->comments}.comment_type NOT IN ( $type_placeholders )", $internal_types );
+}
+add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from_feed_7_2' );
+
+/**
  * Filter the comment count query to exclude notes and reactions.
  *
  * Replaces the 6.9 implementation to also exclude 'reaction' type.
