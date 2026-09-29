@@ -5,7 +5,6 @@ import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Card,
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Notice,
 	Spinner,
 	Stack,

@@ -39,6 +39,7 @@ const ALLOWLIST = {
 			'KeyboardShortcutDescription',
 			'KeyboardShortcutDisplay',
 			'Link',
+			'Notice',
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
@@ -132,6 +133,7 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
