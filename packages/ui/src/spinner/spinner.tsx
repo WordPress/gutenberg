@@ -7,7 +7,7 @@ import styles from './style.module.css';
  * A component used to notify users that their action is being processed.
  */
 export const Spinner = forwardRef< SVGSVGElement, ComponentProps< 'svg' > >(
-	function Spinner( { className, ...props }, ref ) {
+	function UnforwardedSpinner( { className, ...props }, ref ) {
 		return (
 			<svg
 				className={ clsx( styles.spinner, className ) }

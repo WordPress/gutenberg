@@ -27,6 +27,10 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import {
+	getAttributeChanges,
+	applyAttributeChanges,
+} from '../../utils/multi-selection-attributes';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -256,20 +260,48 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( nextAttributes ) {
-			const { getMultiSelectedBlockClientIds } =
+			const { getMultiSelectedBlockClientIds, getBlockAttributes } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
 			const { clientId, attributes } = ownProps;
-			const clientIds = multiSelectedBlockClientIds.length
-				? multiSelectedBlockClientIds
-				: [ clientId ];
 			const newAttributes =
 				typeof nextAttributes === 'function'
 					? nextAttributes( attributes )
 					: nextAttributes;
 
-			updateBlockAttributes( clientIds, newAttributes );
+			if ( ! multiSelectedBlockClientIds.length ) {
+				updateBlockAttributes( clientId, newAttributes );
+				return;
+			}
+
+			// Only the first block of a multi-selection renders its inspector
+			// and toolbar. For a multi-block attribute update, take that
+			// first block's attributes and get only the changed values
+			// from the update.
+			const changes = getAttributeChanges(
+				attributes ?? {},
+				newAttributes ?? {}
+			);
+
+			if ( ! changes ) {
+				return;
+			}
+
+			// Apply the changed attributes to every block in the selection.
+			const updatesByClientId = {};
+			for ( const selectedClientId of multiSelectedBlockClientIds ) {
+				updatesByClientId[ selectedClientId ] = applyAttributeChanges(
+					getBlockAttributes( selectedClientId ) ?? {},
+					changes
+				);
+			}
+
+			updateBlockAttributes(
+				multiSelectedBlockClientIds,
+				updatesByClientId,
+				{ uniqueByBlock: true }
+			);
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
