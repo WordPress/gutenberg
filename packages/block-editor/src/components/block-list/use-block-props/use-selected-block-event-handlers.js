@@ -304,12 +304,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			}
 
 			/**
-			 * Starts the visuals of a multi-selection drag: the grabbed
-			 * block hangs below and right of the pointer, one block of
-			 * the selection peeks out over its top edge and one under
-			 * its bottom edge, slightly turned, and a count of all
-			 * dragged blocks sits on its top right corner. The rest of
-			 * the selection hides in place.
+			 * Starts the visuals of a multi-selection drag: the pressed
+			 * block hangs below and right of the pointer, the next block
+			 * of the selection slides out from underneath it, slightly
+			 * turned, and a count of all dragged blocks sits on its top
+			 * right corner. The rest of the selection hides in place.
 			 *
 			 * @param {DragEvent}   event       Drag event.
 			 * @param {string[]}    clientIds   The dragged block client IDs.
@@ -326,48 +325,15 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					)
 					.filter( Boolean );
 
-				// Every block of the selection visible on screen joins
-				// the stack; the rest hides in place. When fewer than
-				// five are visible, the nearest out of view blocks fill
-				// the stack up to five, so it still reads as a stack.
-				const pileNodes = blockNodes.filter( ( blockNode ) => {
-					if ( blockNode === node ) {
-						return true;
-					}
-					const rect = blockNode.getBoundingClientRect();
-					return (
-						rect.bottom > 0 && rect.top < defaultView.innerHeight
-					);
-				} );
-				const minCount = Math.min( 5, blockNodes.length );
-
-				if ( pileNodes.length < minCount ) {
-					const anchorPlace = blockNodes.indexOf( node );
-					const fillers = blockNodes
-						.filter(
-							( blockNode ) => ! pileNodes.includes( blockNode )
-						)
-						.sort(
-							( a, b ) =>
-								Math.abs(
-									blockNodes.indexOf( a ) - anchorPlace
-								) -
-								Math.abs(
-									blockNodes.indexOf( b ) - anchorPlace
-								)
-						);
-
-					while ( pileNodes.length < minCount && fillers.length ) {
-						pileNodes.push( fillers.shift() );
-					}
-
-					pileNodes.sort(
-						( a, b ) =>
-							blockNodes.indexOf( a ) - blockNodes.indexOf( b )
-					);
-				}
-
-				const anchorIndex = pileNodes.indexOf( node );
+				// The pressed block is the drag visual. The block after it
+				// (or before it, for the last block) slides out from
+				// underneath, so the visual reads as a stack. The rest of
+				// the selection hides in place.
+				const anchorPlace = blockNodes.indexOf( node );
+				const backNode =
+					blockNodes[ anchorPlace + 1 ] ??
+					blockNodes[ anchorPlace - 1 ];
+				const pileNodes = backNode ? [ node, backNode ] : [ node ];
 				const restNodes = blockNodes.filter(
 					( blockNode ) => ! pileNodes.includes( blockNode )
 				);
@@ -387,89 +353,73 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				}
 
 				const inverted = 1 / _scale;
-				const rects = pileNodes.map( ( blockNode ) =>
-					blockNode.getBoundingClientRect()
-				);
-				const anchorRect = rects[ anchorIndex ];
-				// One rule: every block scales towards the same diagonal,
-				// and only ever down. Wide blocks come out long and thin,
-				// tall ones narrow.
+				// Every block scales towards the same diagonal, and only
+				// ever down. Wide blocks come out long and thin, tall ones
+				// narrow.
 				const cardScale = ( rect ) =>
 					Math.min( 1, 420 / Math.hypot( rect.width, rect.height ) );
+				const anchorRect = node.getBoundingClientRect();
 				const dragScale = cardScale( anchorRect );
-				const scales = rects.map( cardScale );
 				const grabX = event.clientX;
 				const grabY = event.clientY;
-				// The whole stack hangs just below and right of the
-				// pointer, wherever the press landed in the block.
+				// The visual hangs just below and right of the pointer,
+				// wherever the press landed in the block.
 				const anchorVisual = {
 					left: grabX + 8,
 					top: grabY + 10,
 					width: anchorRect.width * dragScale,
 					height: anchorRect.height * dragScale,
 				};
-				const tileVisuals = pileNodes.map( ( blockNode, index ) => {
-					const width = rects[ index ].width * scales[ index ];
-					const height = rects[ index ].height * scales[ index ];
 
-					if ( index === anchorIndex ) {
-						return anchorVisual;
-					}
-
-					// Centered on the grabbed block, peeking out over its
-					// top or under its bottom edge; a taller block tucks
-					// the rest of itself behind the stack.
-					const left =
-						anchorVisual.left + ( anchorVisual.width - width ) / 2;
-
-					const depth = Math.abs( index - anchorIndex );
-
-					if ( index < anchorIndex ) {
-						return {
-							left,
-							top: anchorVisual.top - 12 * depth,
-							width,
-							height,
-						};
-					}
-
-					return {
-						left,
-						top:
-							anchorVisual.top +
-							anchorVisual.height +
-							16 * depth -
-							height,
-						width,
-						height,
-					};
-				} );
-				const turns = pileNodes.map( ( blockNode, index ) => {
-					if ( index === anchorIndex ) {
-						return 0;
-					}
-					const depth = Math.abs( index - anchorIndex );
-					return index < anchorIndex
-						? -2 - ( depth - 1 ) * 1.2
-						: 1.6 + ( depth - 1 ) * 1.2;
-				} );
-				const translations = pileNodes.map( ( blockNode, index ) => {
-					const tile = tileVisuals[ index ];
-					const rect = rects[ index ];
-					const scale = scales[ index ];
-					// Scaling happens around the center; compensate the
-					// shift so the box still lands on its slot.
+				// Scaling happens around the center; compensate the shift
+				// so the box still lands on its slot.
+				function translationTo( rect, scale, left, top ) {
 					return {
 						x:
-							tile.left -
+							left -
 							rect.left -
 							( rect.width * ( 1 - scale ) ) / 2,
-						y:
-							tile.top -
-							rect.top -
-							( rect.height * ( 1 - scale ) ) / 2,
+						y: top - rect.top - ( rect.height * ( 1 - scale ) ) / 2,
 					};
+				}
+
+				const cards = pileNodes.map( ( blockNode, index ) => {
+					const rect = blockNode.getBoundingClientRect();
+					const scale = cardScale( rect );
+
+					if ( index === 0 ) {
+						const to = translationTo(
+							rect,
+							scale,
+							anchorVisual.left,
+							anchorVisual.top
+						);
+						return { scale, turn: 0, from: { x: 0, y: 0 }, to };
+					}
+
+					const width = rect.width * scale;
+					const height = rect.height * scale;
+					// It starts centered under the pressed block and slides
+					// out a little to the left, its bottom edge peeking out
+					// below, slightly turned.
+					const from = translationTo(
+						rect,
+						scale,
+						anchorVisual.left + ( anchorVisual.width - width ) / 2,
+						anchorVisual.top + ( anchorVisual.height - height ) / 2
+					);
+					const to = translationTo(
+						rect,
+						scale,
+						anchorVisual.left - 12,
+						anchorVisual.top + anchorVisual.height + 24 - height
+					);
+					return { scale, turn: 1.5, from, to };
 				} );
+				const toTransform = ( { x, y }, scale, turn ) =>
+					`translate(${ x * inverted }px, ${
+						y * inverted
+					}px) scale(${ scale }) rotate(${ turn }deg)`;
 				const restoreCallbacks = [];
 
 				pileNodes.forEach( ( blockNode, index ) => {
@@ -515,14 +465,13 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					} );
 
 					const { style } = blockNode;
+					const { scale, from } = cards[ index ];
 					style.position = 'relative';
-					style.zIndex = `${
-						1000 - Math.abs( index - anchorIndex )
-					}`;
+					style.zIndex = `${ 1000 - index }`;
 					style.transformOrigin = '50% 50%';
 					style.pointerEvents = 'none';
-					style.transition = 'transform 0.2s ease-out';
 					style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.15)';
+					style.transform = toTransform( from, index ? scale : 1, 0 );
 
 					// If the block has no background color, use the
 					// nearest ancestor's, so it does not show the content
@@ -552,14 +501,13 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				} );
 
 				// Flush the starting styles, then set the targets, so the
-				// blocks animate from their places into the stack. The
-				// blocks are opaque, so the stacking order alone keeps
-				// the layers from showing through each other.
+				// pressed block animates from its place to the pointer and
+				// the block behind it slides out from underneath.
 				void pileNodes[ 0 ].offsetHeight;
 				pileNodes.forEach( ( blockNode, index ) => {
-					const translateX = translations[ index ].x * inverted;
-					const translateY = translations[ index ].y * inverted;
-					blockNode.style.transform = `translate(${ translateX }px, ${ translateY }px) scale(${ scales[ index ] }) rotate(${ turns[ index ] }deg)`;
+					const { scale, turn, to } = cards[ index ];
+					blockNode.style.transition = 'transform 0.2s ease-out';
+					blockNode.style.transform = toTransform( to, scale, turn );
 				} );
 
 				// The other selected blocks hide in place; their spots
