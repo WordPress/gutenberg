@@ -25,6 +25,10 @@ import {
 	clearSuggestionMarkerAttributes,
 	useSuggestionsProvider,
 } from '../provider';
+import {
+	SuggestionOverlayProvider,
+	useSuggestionOverlay,
+} from '../overlay-context';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -674,6 +678,172 @@ describe( 'rejectSuggestion (block-move)', () => {
 		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
 			''
 		);
+	} );
+
+	it( 'restores a nested same-parent move after a reload regenerated the ids', async () => {
+		const first = createBlock( PARAGRAPH, { content: 'First' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		// Current order inside the group: [First, Moved]; the block was
+		// suggested-moved from index 0 in an earlier session.
+		const group = createBlock( GROUP, {}, [ first, moved ] );
+
+		const { registry, getProvider } = setup( [ group ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 3,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					// The group's id from the session that recorded the move.
+					fromParentClientId: 'previous-session-group',
+					fromIndex: 0,
+					toParentClientId: 'previous-session-group',
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) ).toBe(
+			group.clientId
+		);
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+	} );
+} );
+
+describe( 'rejectSuggestion (attribute-set)', () => {
+	const PARAGRAPH = 'core/test-reject-attribute-paragraph';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				align: { type: 'string' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Reject Attribute Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup( initialBlocks: any[] ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => ( { type: 'SAVE_ENTITY_RECORD' } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+		function Capture() {
+			providerHandle = useSuggestionsProvider();
+			overlayHandle = useSuggestionOverlay();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<Capture />
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		return {
+			getProvider: () => providerHandle,
+			getOverlay: () => overlayHandle,
+		};
+	}
+
+	function attributePayload() {
+		return {
+			schemaVersion: 2,
+			blockName: PARAGRAPH,
+			baseRevision: null,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'align',
+					before: null,
+					after: 'center',
+				},
+			],
+		};
+	}
+
+	function proposeAlignment(
+		getOverlay: () => ReturnType< typeof useSuggestionOverlay >,
+		clientId: string,
+		commentId: number
+	) {
+		act( () => {
+			getOverlay().captureBaseline( clientId, PARAGRAPH, {
+				content: 'Hello',
+			} );
+		} );
+		act( () => {
+			getOverlay().setOverlayAttributes( clientId, { align: 'center' } );
+			getOverlay().setCommentId( clientId, commentId );
+		} );
+	}
+
+	it( 'drops the overlay entry so the rejected value stops rendering', async () => {
+		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
+		const { getProvider, getOverlay } = setup( [ block ] );
+		proposeAlignment( getOverlay, block.clientId, 7 );
+		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 7,
+				clientId: block.clientId,
+				payload: attributePayload(),
+			} );
+		} );
+
+		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( false );
+	} );
+
+	it( 'keeps an overlay entry that now belongs to another suggestion', async () => {
+		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
+		const { getProvider, getOverlay } = setup( [ block ] );
+		proposeAlignment( getOverlay, block.clientId, 8 );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 7,
+				clientId: block.clientId,
+				payload: attributePayload(),
+			} );
+		} );
+
+		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
 	} );
 } );
 

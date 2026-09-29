@@ -11,15 +11,19 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 		parent::set_up();
 
 		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the core icons that
-		 * `init` only registers once. Re-register them when empty so order-dependent tests pass.
+		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
+		 * icons that `init` only registers once. Replay the registration so order-dependent
+		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
+		 * collection at once, so drop whatever survived rather than topping up.
 		 */
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
+		$collections_registry = WP_Icon_Collections_Registry::get_instance();
+		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
+			if ( $collections_registry->is_registered( $collection_slug ) ) {
+				$collections_registry->unregister( $collection_slug );
+			}
 		}
-		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
-			gutenberg_register_default_icons();
-		}
+		gutenberg_register_default_icon_collections();
+		gutenberg_register_default_icons();
 	}
 
 	public function test_wp_get_icon_returns_svg_for_known_icon() {
@@ -98,5 +102,22 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 	public function test_wp_get_icon_escapes_attributes() {
 		$output = wp_get_icon( 'core/plus', array( 'class' => '"><script>alert(1)</script>' ) );
 		$this->assertStringNotContainsString( '<script>', $output );
+	}
+
+	public function test_core_collection_is_public() {
+		$collection = WP_Icon_Collections_Registry::get_instance()->get_registered( 'core' );
+
+		$this->assertIsArray( $collection, 'The core collection should be registered.' );
+		$this->assertTrue( $collection['public'], 'The core collection should be public.' );
+	}
+
+	public function test_core_admin_collection_is_not_public() {
+		$collection = WP_Icon_Collections_Registry::get_instance()->get_registered( 'core-admin' );
+
+		$this->assertIsArray( $collection, 'The core-admin collection should be registered.' );
+		$this->assertFalse(
+			$collection['public'],
+			'The core-admin collection should not be public, so that the admin icons stay out of the REST API.'
+		);
 	}
 }

@@ -3,11 +3,11 @@ import { applyFilters } from '@wordpress/hooks';
 import customClassName from '../custom-class-name';
 
 describe( 'custom className', () => {
-	const blockSettings = {
+	const getBlockSettings = () => ( {
 		save: () => <div className="default" />,
 		category: 'text',
 		title: 'block title',
-	};
+	} );
 
 	describe( 'addAttribute()', () => {
 		const addAttribute = applyFilters.bind(
@@ -17,7 +17,7 @@ describe( 'custom className', () => {
 
 		it( 'should do nothing if the block settings disable custom className support', () => {
 			const settings = addAttribute( {
-				...blockSettings,
+				...getBlockSettings(),
 				supports: {
 					customClassName: false,
 				},
@@ -27,7 +27,7 @@ describe( 'custom className', () => {
 		} );
 
 		it( 'should assign a new custom className attribute', () => {
-			const settings = addAttribute( blockSettings );
+			const settings = addAttribute( getBlockSettings() );
 
 			expect( settings.attributes ).toHaveProperty( 'className' );
 		} );
@@ -39,7 +39,7 @@ describe( 'custom className', () => {
 			const extraProps = customClassName.addSaveProps(
 				{},
 				{
-					...blockSettings,
+					...getBlockSettings(),
 					supports: {
 						customClassName: false,
 					},
@@ -54,7 +54,7 @@ describe( 'custom className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = customClassName.addSaveProps(
 				{ className: 'foo' },
-				blockSettings,
+				getBlockSettings(),
 				attributes
 			);
 
