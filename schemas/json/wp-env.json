@@ -33,6 +33,23 @@
 					],
 					"default": null
 				},
+				"mariadbVersion": {
+					"description": "The MariaDB version to use in the Docker runtime: \"lts\", \"latest\", or a version such as \"10.11\". If null is specified, wp-env will use the \"lts\" image.",
+					"oneOf": [
+						{
+							"type": "string",
+							"enum": [ "lts", "latest" ]
+						},
+						{
+							"type": "string",
+							"pattern": "^[0-9]+(?:\\.[0-9]+)*$"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"default": null
+				},
 				"plugins": {
 					"description": "A list of plugins to install and activate in the environment.",
 					"type": "array",
@@ -113,6 +130,7 @@
 			"enum": [
 				"core",
 				"phpVersion",
+				"mariadbVersion",
 				"plugins",
 				"themes",
 				"port",
