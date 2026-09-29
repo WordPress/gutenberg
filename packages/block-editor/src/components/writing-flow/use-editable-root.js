@@ -131,15 +131,18 @@ export default function useEditableRoot() {
 
 				// A block's focus handler selects the block before the
 				// browser places the caret in the focused field (WebKit
-				// does so after the focus event). Leave the field alone
-				// until then: the selection observer syncs the caret to
-				// the store, which runs the switch again.
+				// does so after the focus event). Switching then would
+				// blur the field and leave the caret at the start of the
+				// wrapper: wait for the caret instead.
 				const { activeElement } = ownerDocument;
 				if (
 					activeElement !== node &&
 					node.contains( activeElement ) &&
 					! defaultView.getSelection().anchorNode
 				) {
+					ownerDocument.addEventListener( 'selectionchange', sync, {
+						once: true,
+					} );
 					return;
 				}
 
@@ -176,6 +179,7 @@ export default function useEditableRoot() {
 
 			return () => {
 				unsubscribe();
+				ownerDocument.removeEventListener( 'selectionchange', sync );
 				if ( node.contentEditable === 'true' ) {
 					disengage();
 				} else {
