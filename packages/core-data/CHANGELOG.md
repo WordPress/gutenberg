@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `__experimentalFetchLinkSuggestions`: search posts, terms, post formats and media in one request to the new `/wp-block-editor/v1/link-suggestions` endpoint, which ranks and pages the results in SQL. `page` and `perPage` now page through one ranked list across every type, and results are no longer sorted in the browser. `type` and `subtype` accept arrays, `typeExclude` and `subtypeExclude` leave types out, and `preferTypes` ranks chosen types first. Searches are split into terms as `WP_Query` splits them, so a quoted phrase is one term and a word typed with a minus leaves out results holding it.
+-   `__experimentalFetchLinkSuggestions`: search posts, terms, post formats and media in one request to the new `/wp-block-editor/v1/link-suggestions` endpoint, which ranks and pages the results in SQL. `page` and `perPage` now page through one ranked list across every type, and results are no longer sorted in the browser. `type` and `subtype` accept arrays, `typeExclude` and `subtypeExclude` leave types out, and `preferTypes` ranks chosen types first. Searches are split into terms as `WP_Query` splits them, so a quoted phrase is one term and a word typed with a minus leaves out results holding it ([#83795](https://github.com/WordPress/gutenberg/pull/83795)).
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 
 ### Internal
