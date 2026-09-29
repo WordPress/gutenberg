@@ -508,9 +508,10 @@ function RichTextWrapper(
 					selection.collapse( element, 0 );
 				}
 
-				// The body is the active element whenever nothing has
-				// focus, so check `:focus` rather than `activeElement`.
-				if ( ! host.matches( ':focus' ) ) {
+				if (
+					ownerDocument.activeElement !== host ||
+					! ownerDocument.hasFocus()
+				) {
 					const range = selection.getRangeAt( 0 ).cloneRange();
 					host.focus( { preventScroll: true, ...options } );
 					// Gecko moves the selection when an editing host takes
