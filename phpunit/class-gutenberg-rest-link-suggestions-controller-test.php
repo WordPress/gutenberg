@@ -357,6 +357,18 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		);
 	}
 
+	public function test_splits_titles_into_words_at_anything_but_letters_and_numbers() {
+		$this->create_post( 'Hot Teapots', 'page', 1 );
+		$this->create_post( "Coffee\u{00B7}Tea", 'page', 2 );
+
+		// A middle dot separates words as a space does, as `tokenize()` in core-data splits them,
+		// so the second title holds "tea" whole.
+		$this->assertSame(
+			array( "Coffee\u{00B7}Tea", 'Hot Teapots' ),
+			$this->get_titles( array( 'search' => 'tea' ) )
+		);
+	}
+
 	public function test_ranks_a_title_beginning_with_the_search_from_the_first_character() {
 		$this->create_post( 'Tips for travel with a young baby', 'page', 1 );
 		$this->create_post( 'A day trip from Stockholm to Swedish countryside towns', 'page', 2 );

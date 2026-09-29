@@ -79,8 +79,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	);
 
 	/**
-	 * Characters that separate words, matching what `tokenize()` in core-data splits on for the
-	 * punctuation found in titles.
+	 * Characters that separate words where the database cannot split titles with a regular
+	 * expression: the punctuation found in titles.
 	 */
 	const WORD_SEPARATORS = array(
 		"\t",
@@ -426,7 +426,18 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 
 		$parts = array_filter( $parts );
 
-		return $parts ? implode( ' UNION ALL ', $parts ) : null;
+		if ( ! $parts ) {
+			return null;
+		}
+
+		// Normalize titles in each branch: the union is stored as a table, so each title is
+		// normalized once, not again for every score that reads it.
+		$titled = array();
+		foreach ( $parts as $part ) {
+			$titled[] = "SELECT b.*, {$this->get_plain_title_sql( 'b.title' )} AS plain, {$this->get_title_words_sql( 'b.title' )} AS title_words FROM ( $part ) AS b";
+		}
+
+		return implode( ' UNION ALL ', $titled );
 	}
 
 	/**
@@ -737,10 +748,17 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL expression.
 	 */
 	private function get_title_words_sql( $column ) {
-		$sql = "LOWER( $column )";
-		foreach ( self::WORD_SEPARATORS as $separator ) {
-			$sql = "REPLACE( $sql, {$this->quote( $separator )}, ' ' )";
+		if ( $this->supports_window_functions() ) {
+			// The same databases can split at anything but letters and numbers, as `tokenize()`
+			// in core-data does.
+			$sql = "REGEXP_REPLACE( LOWER( $column ), '[^\\\\p{L}\\\\p{N}]+', ' ' )";
+		} else {
+			$sql = "LOWER( $column )";
+			foreach ( self::WORD_SEPARATORS as $separator ) {
+				$sql = "REPLACE( $sql, {$this->quote( $separator )}, ' ' )";
+			}
 		}
+
 		return "CONCAT( ' ', $sql, ' ' )";
 	}
 
@@ -754,8 +772,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL.
 	 */
 	private function get_ranked_sql( $candidates, $search, $words, $preferred ) {
-		$columns = "c.*, {$this->get_type_rank_sql( $preferred )} AS type_rank, {$this->get_plain_title_sql( 'c.title' )} AS plain, {$this->get_title_words_sql( 'c.title' )} AS title_words";
-		$titled  = "SELECT $columns FROM ( $candidates ) AS c";
+		$titled = "SELECT c.*, {$this->get_type_rank_sql( $preferred )} AS type_rank FROM ( $candidates ) AS c";
 
 		if ( ! $words ) {
 			return "SELECT * FROM ( $titled ) AS scored";
@@ -849,8 +866,9 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether the database can number rows within groups, which MySQL 8.0 and MariaDB 10.2
-	 * added. Older databases rank results by how well they match alone.
+	 * Whether the database can number rows within groups and split text with a regular
+	 * expression, which MySQL 8.0 and MariaDB 10.2 have. Older databases rank results by how
+	 * well they match alone, and split titles at common punctuation.
 	 *
 	 * @return bool
 	 */
