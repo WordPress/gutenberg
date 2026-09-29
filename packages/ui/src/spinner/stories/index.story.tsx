@@ -6,6 +6,9 @@ const meta: Meta< typeof Spinner > = {
 	title: 'Components/@wordpress-ui/Spinner',
 	id: 'design-system-components-spinner',
 	component: Spinner,
+	argTypes: {
+		color: { control: 'text' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -25,4 +28,19 @@ export const CustomSize: Story = {
 			height: 'var(--wpds-dimension-size-lg)',
 		},
 	},
+};
+
+export const CustomColor: Story = {
+	args: { color: 'rebeccapurple' },
+};
+
+export const CurrentColor: Story = {
+	args: { color: 'currentColor' },
+	render: ( args ) => (
+		<div
+			style={ { color: 'var(--wpds-color-foreground-content-neutral)' } }
+		>
+			<Spinner { ...args } />
+		</div>
+	),
 };

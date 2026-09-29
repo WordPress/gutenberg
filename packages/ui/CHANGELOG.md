@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `Spinner`: Show a foreground-colored half-circle without a track, matching the `Button` loading indicator ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
+-   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
 
 ### Bug Fixes
 
