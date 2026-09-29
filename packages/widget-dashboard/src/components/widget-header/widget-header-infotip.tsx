@@ -37,7 +37,7 @@ export interface WidgetInfotipProps {
 export const WidgetInfotip = forwardRef<
 	HTMLButtonElement,
 	WidgetInfotipProps
->( function WidgetInfotip(
+>( function UnforwardedWidgetInfotip(
 	{ title, showTitle = false, content, links },
 	ref
 ): React.ReactNode {
