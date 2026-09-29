@@ -3,13 +3,6 @@ import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
-const baseTestIgnore: Array< string | RegExp > = [];
-if ( Array.isArray( baseConfig.testIgnore ) ) {
-	baseTestIgnore.push( ...baseConfig.testIgnore );
-} else if ( baseConfig.testIgnore ) {
-	baseTestIgnore.push( baseConfig.testIgnore );
-}
-
 const flakinessOptions = {
 	/*
 	 * Tests dashboard is available at https://flakiness.io/WordPress/gutenberg
@@ -47,13 +40,6 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
-	// The default suite runs RTC tests on the HTTP polling provider. Specs
-	// that rely on WebSocket-only semantics live under `websocket-only/` and
-	// are picked up by playwright.rtc-websocket.config.ts instead.
-	testIgnore: [
-		...baseTestIgnore,
-		'**/specs/editor/collaboration/websocket-only/**',
-	],
 	projects: [
 		{
 			name: 'chromium',

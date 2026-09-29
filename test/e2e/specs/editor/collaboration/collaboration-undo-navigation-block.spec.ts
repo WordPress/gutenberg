@@ -38,9 +38,8 @@ import { type UserCredentials } from './fixtures/collaboration-utils';
  * - Failure correlates exactly with User B firing a tracked wp_navigation
  *   edit shortly after the keystroke. With no WebSocket latency this fires
  *   in most but not all runs; with RTC_WS_DELAY=50 it fired in 12/12 runs.
- *   For a deterministic failure, run:
- *
- *       RTC_WS_DELAY=50 npm run test:e2e:rtc-websocket -- test/e2e/specs/editor/collaboration/collaboration-undo-navigation-block.spec.ts
+ *   The WebSocket test harness now lives in the gutenberg-sync-engines
+ *   plugin (`npm run test:e2e:websocket` there, with RTC_WS_DELAY=50).
  *
  * - The collaborator must be an administrator. wp_navigation requires the
  *   edit_theme_options capability, so an editor-role collaborator cannot
