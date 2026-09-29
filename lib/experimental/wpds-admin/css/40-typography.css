@@ -10,10 +10,30 @@
  *     body-lg      16 / 24     reading prose
  *     heading-xl   20 / 24     emphasis weight
  *
- * Line heights are expressed as a ratio derived from the two tokens, so they
- * inherit proportionally instead of pinning every descendant to one pixel
- * height. A plain number is declared first as a fallback for engines that will
- * not divide two lengths in `calc()`.
+ * Line heights are the pixel tokens, set directly, as the design system sets
+ * them. An earlier version of this file derived each one as
+ * `calc(line-height-token / font-size-token)` so it would inherit
+ * proportionally; that pattern is gone. `@wordpress/ui` sets a px line-height
+ * token in 33 places and never divides one by a font size, so the arithmetic
+ * was ours rather than the system's.
+ *
+ * The `body` rule is the one where this is a real change rather than a tidier
+ * spelling, because it is the only line-height here that exists to be
+ * inherited. wp-admin is built the other way around — 250 relative
+ * line-heights against 23 in pixels, and WordPress's own `body` is
+ * `line-height: 1.4em` — so the risk was that pinning the floor hands one
+ * pixel height to every descendant that does not set its own, whatever size it
+ * happens to be.
+ *
+ * Measured, that does not happen: no text on the Dashboard, Posts, Plugins,
+ * Tools, Themes or the post editor ends up with a line box shorter than its own
+ * font size. The reason is those 250 relative line-heights — nearly everything
+ * in wp-admin with a distinctive size already declares one, so the inherited
+ * value rarely reaches text it was not measured against. What is left is
+ * looseness rather than breakage: on the Posts screen 147 elements sit between
+ * 1.5 and 1.8, and 21 above 1.8, mostly 11px and 12px text taking the 20px box.
+ * The About screen's six tight line boxes are `about.css`'s own `line-height: 1`
+ * and predate this file.
  *
  * Scope is deliberately small. Bare `h1`, `h2` and `h3` are left alone: WordPress
  * makes 43 contextual heading rules, and a rule here would outrank all of them
@@ -44,9 +64,7 @@
 	body {
 		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
-		/* body-md: 20 / 14. Fallback first for engines without length division. */
-		line-height: 1.42857;
-		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+		line-height: var(--wpds-typography-line-height-sm);
 	}
 
 	/* -----------------------------------------------------------------------
@@ -187,8 +205,15 @@
 	#wpadminbar .quicklinks .menupop.hover ul li .ab-item,
 	#wpadminbar.nojs .quicklinks .menupop:hover ul li .ab-item,
 	#wpadminbar .shortlink-input {
-		/* Mirrors WordPress's own `height: 26px` on these selectors. */
-		line-height: 26px;
+		/*
+		 * `line-height-md` and the matching `size-sm` height, in place of
+		 * WordPress's 26px. This is a deliberate 2px change, not a token swap: it
+		 * declares a height, which this stylesheet otherwise leaves to wp-admin,
+		 * and it moves every admin bar submenu item — including the ones plugins
+		 * add through `admin_bar_menu`, which all inherit `.ab-item`.
+		 */
+		height: var(--wpds-dimension-size-sm);
+		line-height: var(--wpds-typography-line-height-md);
 	}
 
 	/* -----------------------------------------------------------------------
@@ -206,8 +231,7 @@
 		font-family: var(--wpds-typography-font-family-heading);
 		font-size: var(--wpds-typography-font-size-xl);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-		line-height: 1.2;
-		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-xl));
+		line-height: var(--wpds-typography-line-height-md);
 	}
 
 	/* -----------------------------------------------------------------------
@@ -287,33 +311,28 @@
 
 	h1:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-2xl);
-		line-height: 1.25;
-		line-height: calc(var(--wpds-typography-line-height-2xl) / var(--wpds-typography-font-size-2xl));
+		line-height: var(--wpds-typography-line-height-2xl);
 	}
 
 	h2:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-xl);
-		line-height: 1.2;
-		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-xl));
+		line-height: var(--wpds-typography-line-height-md);
 	}
 
 	h3:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-lg);
-		line-height: 1.25;
-		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-lg));
+		line-height: var(--wpds-typography-line-height-sm);
 	}
 
 	h4:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-md);
-		line-height: 1.42857;
-		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+		line-height: var(--wpds-typography-line-height-sm);
 	}
 
 	h5:not(:where(.postbox, .stuffbox) *),
 	h6:not(:where(.postbox, .stuffbox) *) {
 		font-size: var(--wpds-typography-font-size-xs);
-		line-height: 1.6;
-		line-height: calc(var(--wpds-typography-line-height-xs) / var(--wpds-typography-font-size-xs));
+		line-height: var(--wpds-typography-line-height-xs);
 	}
 
 	/* -----------------------------------------------------------------------
@@ -388,9 +407,7 @@
 	.row-title,
 	.inline-edit-row p.howto {
 		font-size: var(--wpds-typography-font-size-md);
-		/* body-md: 20 / 14. */
-		line-height: 1.42857;
-		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+		line-height: var(--wpds-typography-line-height-sm);
 	}
 
 	/* -----------------------------------------------------------------------
