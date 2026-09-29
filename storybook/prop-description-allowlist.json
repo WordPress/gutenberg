@@ -22,7 +22,6 @@
 	"Autocomplete.Root>Autocomplete.Value:children",
 	"BaseControl:className",
 	"BaseControl>BaseControl.VisualLabel",
-	"CheckboxControl:heading",
 	"ComboboxControl:className",
 	"Composite>Composite.Context",
 	"Field.Root:children",

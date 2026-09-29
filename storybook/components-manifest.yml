@@ -262,16 +262,73 @@
             - className
             - render
             - style
+- name: Checkbox
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - indeterminate
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: CheckboxControl
   props:
-      - __nextHasNoMarginBottom
       - checked
+      - className
+      - defaultChecked
+      - description
+      - details
       - disabled
-      - heading
-      - help
+      - form
+      - hideLabelFromVision
+      - id
       - indeterminate
+      - inputRef
       - label
-      - onChange
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: CheckboxGroup
+  props:
+      - allValues
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: CheckboxGroup.NestedItems
+        props:
+            - align
+            - children
+            - className
+            - direction
+            - gap
+            - justify
+            - render
+            - style
+            - wrap
 - name: Collapsible.Root
   props:
       - children

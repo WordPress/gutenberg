@@ -23,6 +23,9 @@ const ALLOWLIST = {
 			'Badge',
 			'Calendar',
 			'Card',
+			'Checkbox',
+			'CheckboxControl',
+			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
 			'ControlWithError',
@@ -59,8 +62,6 @@ const ALLOWLIST = {
 			'AlertDialog',
 			'Breadcrumb',
 			'Button',
-			'Checkbox',
-			'CheckboxGroup',
 			'Combobox',
 			'Dialog',
 			'Drawer',
@@ -121,6 +122,8 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		CheckboxControl:
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
