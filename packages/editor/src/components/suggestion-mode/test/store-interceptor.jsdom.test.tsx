@@ -1262,6 +1262,35 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'keeps the replacement group id when a moved insertion is re-anchored', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const inserted = createBlock( TEST_BLOCK_NAME, {
+			content: 'New',
+			metadata: {
+				suggestion: {
+					type: 'pending-insert',
+					authorId: null,
+					groupId: 'g-1',
+				},
+			},
+		} );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, inserted ],
+		} );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( inserted.clientId, '', '', 0 );
+		} );
+		await flushSubscribers();
+
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( { type: 'block-insert-after', groupId: 'g-1' } );
+	} );
+
 	it( 'tags a child moved out of a pending insertion as its own insertion', async () => {
 		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
 		const { registry } = setup( { initialBlocks: [ a ] } );

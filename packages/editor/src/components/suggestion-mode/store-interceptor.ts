@@ -1539,6 +1539,12 @@ export default function SuggestionStoreInterceptor() {
 							isDispatchingOwnWrite = false;
 						}
 					}
+					// A replacement's insertion half keeps the group id that
+					// ties it to its removal half.
+					const groupId =
+						ownMarker === 'pending-insert'
+							? currentAttrs.metadata?.suggestion?.groupId
+							: undefined;
 					setStructuralOpRef.current?.( move.clientId, block.name, {
 						type: 'block-insert-after',
 						clientId: move.clientId,
@@ -1546,6 +1552,7 @@ export default function SuggestionStoreInterceptor() {
 						anchorClientId: move.toAnchorClientId,
 						parentClientId: move.toParentClientId,
 						block,
+						...( groupId ? { groupId } : {} ),
 					} );
 					continue;
 				}
