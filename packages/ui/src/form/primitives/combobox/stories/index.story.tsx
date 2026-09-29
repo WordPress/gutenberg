@@ -282,10 +282,11 @@ export const AsyncItems: Story = {
 				items={ items }
 				value={ value }
 				open={ open }
-				onValueChange={ ( newValue ) => {
+				onValueChange={ ( newValue, ...changeArgs ) => {
 					setValue(
 						( newValue ?? undefined ) as FixtureItem | undefined
 					);
+					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
 					setOpen( nextOpen );

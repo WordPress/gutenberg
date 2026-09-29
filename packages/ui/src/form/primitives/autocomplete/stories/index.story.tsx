@@ -105,7 +105,7 @@ export const OpenOnlyOnMatch: Story = {
 				onOpenChange={ ( nextOpen ) => {
 					setOpen( nextOpen && filteredItems.length > 0 );
 				} }
-				onValueChange={ ( value ) => {
+				onValueChange={ ( value, ...changeArgs ) => {
 					const matches = URLS.filter( ( bookmark ) =>
 						bookmark.value
 							.toLowerCase()
@@ -113,6 +113,7 @@ export const OpenOnlyOnMatch: Story = {
 					);
 					setFilteredItems( matches );
 					setOpen( value.length > 0 && matches.length > 0 );
+					args.onValueChange?.( value, ...changeArgs );
 				} }
 				filteredItems={ filteredItems }
 			>
@@ -171,7 +172,7 @@ export const AsyncItems: Story = {
 				{ ...args }
 				items={ results }
 				value={ query }
-				onValueChange={ ( newValue ) => {
+				onValueChange={ ( newValue, ...changeArgs ) => {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
@@ -186,6 +187,7 @@ export const AsyncItems: Story = {
 						);
 						setLoading( false );
 					}, 500 );
+					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 			>
 				<Autocomplete.Input
@@ -253,7 +255,10 @@ export const Inline: Story = {
 			<Autocomplete.Root
 				{ ...args }
 				value={ value }
-				onValueChange={ setValue }
+				onValueChange={ ( newValue, ...changeArgs ) => {
+					setValue( newValue );
+					args.onValueChange?.( newValue, ...changeArgs );
+				} }
 			>
 				<Autocomplete.Input
 					aria-label="Command"
@@ -335,7 +340,7 @@ export const WithSearchIconAndClearButton: Story = {
  * Experimental: Inline autocomplete triggered by `@`.
  */
 export const InlineMentionAutocomplete: Story = {
-	render: function Template() {
+	render: function Template( args ) {
 		const inputRef = useRef< HTMLInputElement >( null );
 		const [ value, setValue ] = useState( '' );
 		const [ open, setOpen ] = useState( false );
@@ -420,7 +425,10 @@ export const InlineMentionAutocomplete: Story = {
 			<Autocomplete.Root
 				items={ USERS }
 				value={ value }
-				onValueChange={ handleValueChange }
+				onValueChange={ ( newValue, ...changeArgs ) => {
+					handleValueChange( newValue, ...changeArgs );
+					args.onValueChange?.( newValue, ...changeArgs );
+				} }
 				filteredItems={ filteredItems }
 				open={ open }
 				onOpenChange={ ( nextOpen ) => {

@@ -50,13 +50,16 @@ export const Default: Story = {
  * documentation for a full example.
  */
 export const WithParentCheckbox: Story = {
-	render: function Template() {
+	render: function Template( args ) {
 		const [ fruitValue, setFruitValue ] = useState( [ 'apple' ] );
 
 		return (
 			<CheckboxGroup
 				value={ fruitValue }
-				onValueChange={ setFruitValue }
+				onValueChange={ ( nextValue, ...changeArgs ) => {
+					setFruitValue( nextValue );
+					args.onValueChange?.( nextValue, ...changeArgs );
+				} }
 				allValues={ [ 'apple', 'orange', 'banana' ] }
 				aria-label="Fruit"
 			>
