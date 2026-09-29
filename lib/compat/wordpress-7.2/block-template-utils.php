@@ -23,24 +23,23 @@ function gutenberg_prepare_post_template_choices( $templates, $query, $template_
 	}
 
 	$slug = sanitize_title( $query['slug'] );
-	if ( '' === $slug ) {
-		return $templates;
-	}
-	$posts = get_posts(
-		array(
-			'name'           => $slug,
-			'post_type'      => $query['post_type'],
-			'post_status'    => 'any',
-			'posts_per_page' => 2,
-			'fields'         => 'ids',
-		)
-	);
-	// Drafts and hierarchical posts can share a slug. Offer generic choices.
-	if ( count( $posts ) > 1 ) {
-		$slug = null;
+	if ( '' !== $slug ) {
+		$posts = get_posts(
+			array(
+				'name'           => $slug,
+				'post_type'      => $query['post_type'],
+				'post_status'    => 'any',
+				'posts_per_page' => 2,
+				'fields'         => 'ids',
+			)
+		);
+		// Drafts and hierarchical posts can share a slug. Offer generic choices.
+		if ( count( $posts ) > 1 ) {
+			$slug = '';
+		}
 	}
 	$template_slug = 'page' === $query['post_type'] ? 'page' : 'single-' . $query['post_type'];
-	if ( null !== $slug ) {
+	if ( '' !== $slug ) {
 		$template_slug .= '-' . $slug;
 	}
 	$default = resolve_block_template( $template_slug, get_template_hierarchy( $template_slug ), '' );

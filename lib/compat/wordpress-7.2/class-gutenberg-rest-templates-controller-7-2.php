@@ -52,12 +52,13 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 	 * @return WP_REST_Response Response object.
 	 */
 	public function get_items( $request ) {
-		if ( 'wp_template' !== $this->post_type || ! isset( $request['slug'], $request['post_type'] ) || '' === $request['slug'] || $request->is_method( 'HEAD' ) ) {
+		if ( 'wp_template' !== $this->post_type || ! isset( $request['post_type'] ) || $request->is_method( 'HEAD' ) ) {
 			return parent::get_items( $request );
 		}
 
 		$query = array(
-			'slug'      => $request['slug'],
+			// An omitted slug asks for the generic default template.
+			'slug'      => isset( $request['slug'] ) ? $request['slug'] : '',
 			'post_type' => $request['post_type'],
 		);
 		if ( isset( $request['wp_id'] ) ) {
