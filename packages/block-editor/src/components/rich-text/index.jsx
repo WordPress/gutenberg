@@ -386,10 +386,20 @@ function RichTextWrapper(
 		const { activeElement, body } = focusedDocument;
 		const canvas = element.parentElement?.closest( '[contenteditable]' );
 
-		// Under an editing host, focus() on the field focuses the host and
-		// keeps the caret in the field (see focusUnderHostRef).
-		if ( activeElement === body || canvas?.contains( activeElement ) ) {
+		if ( activeElement !== body && ! canvas?.contains( activeElement ) ) {
+			return;
+		}
+
+		// Under an editing host the field is not a focus target: the host
+		// takes focus and the rich text hook restores the caret.
+		const host = element.hasAttribute( 'contenteditable' )
+			? null
+			: element.parentElement?.closest( '[contenteditable="true"]' );
+
+		if ( ! host ) {
 			element.focus();
+		} else if ( activeElement !== host ) {
+			host.focus( { preventScroll: true } );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
