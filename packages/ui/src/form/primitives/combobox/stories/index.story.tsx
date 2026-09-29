@@ -91,14 +91,11 @@ export const Default: Story = {
 };
 
 /**
- * Use `Combobox.Separator` to divide related options in the popup.
+ * Use `Combobox.Separator` to set an "Other" choice apart from the fruit.
  */
 export const WithSeparator: Story = {
 	args: {
-		items: [
-			{ label: 'Suggested', items: ITEMS.slice( 0, 2 ) },
-			{ label: 'More fruit', items: ITEMS.slice( 2, 4 ) },
-		],
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup aria-label="Fruit" key="popup">
@@ -108,26 +105,16 @@ export const WithSeparator: Story = {
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ ( group: FixtureGroup, index: number ) => (
-								<Fragment key={ group.label }>
-									{ index > 0 && <Combobox.Separator /> }
-									<Combobox.Group items={ group.items }>
-										<Combobox.GroupLabel>
-											{ group.label }
-										</Combobox.GroupLabel>
-										<Combobox.Collection>
-											{ ( item: FixtureItem ) => (
-												<Combobox.Item
-													key={ item.value }
-													value={ item }
-												>
-													<Combobox.ItemLabel>
-														{ item.label }
-													</Combobox.ItemLabel>
-												</Combobox.Item>
-											) }
-										</Combobox.Collection>
-									</Combobox.Group>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.value }>
+									{ item.value === 'other' && index > 0 && (
+										<Combobox.Separator />
+									) }
+									<Combobox.Item value={ item }>
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
 								</Fragment>
 							) }
 						</Combobox.Collection>

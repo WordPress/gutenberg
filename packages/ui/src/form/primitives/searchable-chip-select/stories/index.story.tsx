@@ -147,31 +147,22 @@ export const Grouped: Story = {
 };
 
 /**
- * Use `SearchableChipSelect.Separator` to divide visible groups of items.
+ * Use `SearchableChipSelect.Separator` to set an "Other" choice apart from the fruit.
  */
 export const WithSeparator: Story = {
 	args: {
-		...Grouped.args,
-		children: ( group: FixtureGroup, index: number ) => (
-			<Fragment key={ group.label }>
-				{ index > 0 && <SearchableChipSelect.Separator /> }
-				<SearchableChipSelect.Group items={ group.items }>
-					<SearchableChipSelect.GroupLabel>
-						{ group.label }
-					</SearchableChipSelect.GroupLabel>
-					<SearchableChipSelect.Collection>
-						{ ( item: FixtureItem ) => (
-							<SearchableChipSelect.Item
-								key={ item.value }
-								value={ item }
-							>
-								<SearchableChipSelect.ItemLabel>
-									{ item.label }
-								</SearchableChipSelect.ItemLabel>
-							</SearchableChipSelect.Item>
-						) }
-					</SearchableChipSelect.Collection>
-				</SearchableChipSelect.Group>
+		...Default.args,
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: ( item: FixtureItem, index: number ) => (
+			<Fragment key={ item.value }>
+				{ item.value === 'other' && index > 0 && (
+					<SearchableChipSelect.Separator />
+				) }
+				<SearchableChipSelect.Item value={ item }>
+					<SearchableChipSelect.ItemLabel>
+						{ item.label }
+					</SearchableChipSelect.ItemLabel>
+				</SearchableChipSelect.Item>
 			</Fragment>
 		),
 	},

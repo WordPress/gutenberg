@@ -293,13 +293,14 @@ export const Grouped: Story = {
 };
 
 /**
- * Use `SearchableChipSelectControl.Separator` to divide visible groups of items.
+ * Use `SearchableChipSelectControl.Separator` to set an "Other" choice apart from the fruit.
  */
 export const WithSeparator: Story = {
-	...Grouped,
+	...SearchableChipSelectStories.WithSeparator,
 	args: {
-		...Grouped.args,
-		children: SearchableChipSelectStories.WithSeparator.args?.children,
+		...SearchableChipSelectStories.WithSeparator.args,
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
 	},
 };
 

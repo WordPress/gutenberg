@@ -128,45 +128,32 @@ export const WithItemDescriptions: Story = {
 };
 
 /**
- * Use `Autocomplete.Separator` to divide related suggestions in the popup.
+ * Use `Autocomplete.Separator` to set a distinct suggestion apart from commands.
  */
 export const WithSeparator: Story = {
 	args: {
-		items: [
-			{ label: 'Suggested', items: URLS.slice( 0, 2 ) },
-			{ label: 'More links', items: URLS.slice( 2, 4 ) },
-		],
+		items: [ ...COMMANDS.slice( 0, 3 ), { id: 'help', value: 'Get help' } ],
 		openOnInputClick: true,
 		children: [
 			<Autocomplete.Input
-				aria-label="URL"
-				placeholder="Enter a URL"
+				aria-label="Command"
+				placeholder="Type a command"
 				key="input"
 			/>,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.List>
 					<Autocomplete.ListBody>
 						<Autocomplete.Collection>
-							{ ( group: FixtureGroup, index: number ) => (
-								<Fragment key={ group.label }>
-									{ index > 0 && <Autocomplete.Separator /> }
-									<Autocomplete.Group items={ group.items }>
-										<Autocomplete.GroupLabel>
-											{ group.label }
-										</Autocomplete.GroupLabel>
-										<Autocomplete.Collection>
-											{ ( item: FixtureItem ) => (
-												<Autocomplete.Item
-													key={ item.id }
-													value={ item }
-												>
-													<Autocomplete.ItemLabel>
-														{ item.value }
-													</Autocomplete.ItemLabel>
-												</Autocomplete.Item>
-											) }
-										</Autocomplete.Collection>
-									</Autocomplete.Group>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.id }>
+									{ item.id === 'help' && index > 0 && (
+										<Autocomplete.Separator />
+									) }
+									<Autocomplete.Item value={ item }>
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
+									</Autocomplete.Item>
 								</Fragment>
 							) }
 						</Autocomplete.Collection>

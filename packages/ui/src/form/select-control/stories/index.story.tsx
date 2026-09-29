@@ -54,17 +54,21 @@ export const Default: Story = {
 	},
 };
 
-const separatorItems = [ ...defaultItems, { value: '3', label: 'Item 3' } ];
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
 
 /**
- * Use `SelectControl.Separator` when composing popup items as children.
+ * Use `SelectControl.Separator` to set an "Other" choice apart from the fruit.
  */
 export const WithSeparator: Story = {
 	args: {
-		label: 'Item',
+		label: 'Fruit',
 		items: separatorItems,
 		children: [
-			...defaultItems.map( ( item ) => (
+			...separatorItems.slice( 0, 2 ).map( ( item ) => (
 				<SelectControl.Item
 					key={ item.value }
 					value={ item }
@@ -77,11 +81,11 @@ export const WithSeparator: Story = {
 			) ),
 			<SelectControl.Separator key="separator" />,
 			<SelectControl.Item
-				key="item-3"
+				key="other"
 				value={ separatorItems[ 2 ] }
-				label="Item 3"
+				label="Other"
 			>
-				<SelectControl.ItemLabel>Item 3</SelectControl.ItemLabel>
+				<SelectControl.ItemLabel>Other</SelectControl.ItemLabel>
 			</SelectControl.Item>,
 		],
 	},

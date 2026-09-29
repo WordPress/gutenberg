@@ -37,6 +37,12 @@ const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
 	label: `Item ${ index + 1 }`,
 } ) );
 
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
+
 export const Default: Story = {
 	args: {
 		items: defaultItems,
@@ -54,25 +60,23 @@ export const Default: Story = {
 };
 
 /**
- * Use `Select.Separator` to divide related options in the popup.
+ * Use `Select.Separator` to set an "Other" choice apart from the fruit.
  */
 export const WithSeparator: Story = {
 	args: {
-		items: defaultItems.slice( 0, 4 ),
+		items: separatorItems,
 		children: [
-			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Trigger aria-label="Fruit" key="trigger" />,
 			<Select.Popup key="popup">
-				{ defaultItems.slice( 0, 2 ).map( ( item ) => (
+				{ separatorItems.slice( 0, 2 ).map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
 						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>
 				) ) }
 				<Select.Separator />
-				{ defaultItems.slice( 2, 4 ).map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
-					</Select.Item>
-				) ) }
+				<Select.Item value={ separatorItems[ 2 ] }>
+					<Select.ItemLabel>Other</Select.ItemLabel>
+				</Select.Item>
 			</Select.Popup>,
 		],
 	},
