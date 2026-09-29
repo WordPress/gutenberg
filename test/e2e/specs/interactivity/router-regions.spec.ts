@@ -2,7 +2,15 @@ import { type Locator } from '@playwright/test';
 import { test, expect } from './fixtures';
 
 test.describe( 'Router regions', () => {
-	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+	let originalSiteTitle: string;
+
+	test.beforeAll( async ( { requestUtils, interactivityUtils: utils } ) => {
+		// The page title assertions below include the site title, which
+		// wp-env derives from the checkout directory name. Pin it so the
+		// tests do not depend on where the repository was cloned.
+		originalSiteTitle = ( await requestUtils.getSiteSettings() ).title;
+		await requestUtils.updateSiteSettings( { title: 'gutenberg' } );
+
 		await utils.activatePlugins();
 		const next = await utils.addPostWithBlock( 'test/router-regions', {
 			alias: 'router regions - page 2',
@@ -83,9 +91,10 @@ test.describe( 'Router regions', () => {
 		await page.goto( utils.getLink( 'router regions - page 1' ) );
 	} );
 
-	test.afterAll( async ( { interactivityUtils: utils } ) => {
+	test.afterAll( async ( { requestUtils, interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();
+		await requestUtils.updateSiteSettings( { title: originalSiteTitle } );
 	} );
 
 	test( 'should be the only part hydrated', async ( { page } ) => {

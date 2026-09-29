@@ -21,6 +21,10 @@
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
+### Internal
+
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
+
 ## 15.1.0 (2026-09-23)
 
 ### Enhancements
