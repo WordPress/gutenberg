@@ -30,7 +30,7 @@ describe( 'prefersReducedMotion', () => {
 	} );
 
 	it( 'returns false when the browser does not support matchMedia', () => {
-		window.matchMedia = undefined as unknown as typeof window.matchMedia;
+		delete ( window as Partial< Window > ).matchMedia;
 
 		expect( prefersReducedMotion() ).toBe( false );
 	} );
