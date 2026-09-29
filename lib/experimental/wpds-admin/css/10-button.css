@@ -52,11 +52,24 @@
 		 * Height belongs to buttons.css. Appearance is ours.
 		 */
 		margin: 0;
-		padding: 4px 12px;
+		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
 		font-family: inherit;
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-		line-height: 1;
+		/*
+		 * `normal`, not `1`. A line box exactly as tall as the font is shorter than
+		 * the font's own ascender-plus-descender — measured, 13px against 15px — so a
+		 * descender has nowhere to go. On the `.button` anchors it simply overflows,
+		 * which is invisible, but `#submit` is an `<input type="submit">` and those
+		 * clip their content by default, so "Save Changes" lost the tail of its "g".
+		 * Same defect the text inputs had in 20-input.css.
+		 *
+		 * There is no token for this: the line-height tokens are pixel values on a
+		 * 4px rhythm (16, 20, 24…) meant to pair with a size, and the smallest of
+		 * them would pin the label's box rather than let the font size it. `normal`
+		 * cannot clip and does not compete with the contextual heights WordPress sets.
+		 */
+		line-height: normal;
 		text-decoration: none;
 		white-space: nowrap;
 		/*
@@ -204,6 +217,19 @@
 
 	.wrap .page-title-action {
 		font-weight: var(--wpds-typography-font-weight-emphasis);
+	}
+
+	/*
+	 * And the focus ring, for the same reason. WordPress rings this control with
+	 * `box-shadow: 0 0 0 1px` plus an accent border and a transparent outline for
+	 * forced-colors mode, while every button above takes an `outline`. Side by
+	 * side the two rings read as different controls. Appearance again, so it is
+	 * safe to take; the geometry stays WordPress's.
+	 */
+	.wrap .page-title-action:focus {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: var(--wpds-border-width-focus);
+		box-shadow: none;
 	}
 
 	/* -----------------------------------------------------------------------

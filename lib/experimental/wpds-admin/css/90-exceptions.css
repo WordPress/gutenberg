@@ -29,7 +29,7 @@
 	 */
 	.wp-core-ui .button.button-compact,
 	.wp-core-ui .button-group.button-compact .button {
-		padding: 0 12px;
+		padding: 0 var(--wpds-dimension-padding-md);
 	}
 
 	/*
@@ -38,8 +38,8 @@
 	 */
 	.wp-core-ui .button.button-small,
 	.wp-core-ui .button-group.button-small .button {
-		padding: 0 8px;
-		font-size: 11px;
+		padding: 0 var(--wpds-dimension-padding-sm);
+		font-size: var(--wpds-typography-font-size-xs);
 	}
 
 	/*
