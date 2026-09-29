@@ -10,7 +10,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * `Autocomplete.Collection` components iterate over them.
  */
 export const Group = forwardRef< HTMLDivElement, AutocompleteGroupProps >(
-	function Group( { className, children, ...restProps }, ref ) {
+	function UnforwardedGroup( { className, children, ...restProps }, ref ) {
 		return (
 			<_Autocomplete.Group
 				className={ clsx( itemPopupStyles.group, className ) }

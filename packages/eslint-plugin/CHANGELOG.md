@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+
+### Bug Fixes
+
+-   Update `typescript-eslint` to `^8.70.1`, whose peer range includes TypeScript 6.0 ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+
 ## 27.0.0 (2026-09-23)
 
 ### Breaking Changes

@@ -9,7 +9,7 @@ import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { ComboboxPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
-	function Popup(
+	function UnforwardedPopup(
 		{ className, portal, positioner, width, ...restProps },
 		ref
 	) {

@@ -20,23 +20,28 @@ const gapTokens: Record< GapSize, string > = {
  * A flexible layout component using CSS Flexbox for consistent spacing and alignment.
  * Built on design tokens for predictable spacing values.
  */
-export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
-	{ direction, gap, align, justify, wrap, render, ...props },
-	ref
-) {
-	const style: React.CSSProperties = {
-		gap: gap && gapTokens[ gap ],
-		alignItems: align,
-		justifyContent: justify,
-		flexDirection: direction,
-		flexWrap: wrap,
-	};
+export const Stack = forwardRef< HTMLDivElement, StackProps >(
+	function UnforwardedStack(
+		{ direction, gap, align, justify, wrap, render, ...props },
+		ref
+	) {
+		const style: React.CSSProperties = {
+			gap: gap && gapTokens[ gap ],
+			alignItems: align,
+			justifyContent: justify,
+			flexDirection: direction,
+			flexWrap: wrap,
+		};
 
-	const element = useRender( {
-		render,
-		ref,
-		props: mergeProps< 'div' >( props, { style, className: styles.stack } ),
-	} );
+		const element = useRender( {
+			render,
+			ref,
+			props: mergeProps< 'div' >( props, {
+				style,
+				className: styles.stack,
+			} ),
+		} );
 
-	return element;
-} );
+		return element;
+	}
+);

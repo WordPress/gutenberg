@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
+-   Keep the editor open with an error notice when saving attachment details fails ([#83560](https://github.com/WordPress/gutenberg/pull/83560)).
+-   Stop the crop's source-pixel snap from recording its own undo entry. A handle crop that magnified the image past 1:1 added an undo step that changed nothing visible, and redoing back onto that crop cleared the rest of the redo history ([#83571](https://github.com/WordPress/gutenberg/pull/83571)).
+
 ## 0.19.0 (2026-09-23)
 
 ### Bug Fixes

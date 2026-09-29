@@ -6,6 +6,10 @@
 
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
+### Internal
+
+-   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
+
 ## 1.23.0 (2026-09-23)
 
 ### Enhancements

@@ -12,7 +12,7 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components/@wordpress-components/Actions/Menu',
+	title: 'Components/@wordpress-components/Deprecated/Menu',
 	component: Menu,
 	subcomponents: {
 		Item: Menu.Item,
@@ -43,9 +43,9 @@ const meta: Meta< typeof Menu > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
+			notes: 'Deprecated. When building for the Gutenberg repo, use [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		},
 	},
 };
@@ -167,7 +167,7 @@ export const WithSubmenu: StoryObj< typeof Menu > = {
 };
 
 export const WithCheckboxes: StoryObj< typeof Menu > = {
-	render: function WithCheckboxes( props: Props ) {
+	render: function WithCheckboxesRender( props: Props ) {
 		const [ isAChecked, setAChecked ] = useState( false );
 		const [ isBChecked, setBChecked ] = useState( true );
 		const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] =
@@ -317,7 +317,7 @@ export const WithCheckboxes: StoryObj< typeof Menu > = {
 };
 
 export const WithRadios: StoryObj< typeof Menu > = {
-	render: function WithRadios( props: Props ) {
+	render: function WithRadiosRender( props: Props ) {
 		const [ radioValue, setRadioValue ] = useState( 'two' );
 		const onRadioChange: React.ComponentProps<
 			typeof Menu.RadioItem
@@ -389,7 +389,7 @@ export const WithRadios: StoryObj< typeof Menu > = {
 };
 
 export const WithModal: StoryObj< typeof Menu > = {
-	render: function WithModal( props: Props ) {
+	render: function WithModalRender( props: Props ) {
 		const [ isModalOpen, setModalOpen ] = useState( false );
 
 		return (
@@ -566,7 +566,7 @@ export const ToolbarVariant: StoryObj< typeof Menu > = {
 };
 
 export const InsideModal: StoryObj< typeof Menu > = {
-	render: function InsideModal( props: Props ) {
+	render: function InsideModalRender( props: Props ) {
 		const [ isModalOpen, setModalOpen ] = useState( false );
 		return (
 			<>
