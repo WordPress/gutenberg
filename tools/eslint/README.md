@@ -18,3 +18,5 @@ Moving all ESLint plugins and config into a single package keeps the root `packa
 Unit tests and shared helpers use the public `@wordpress/eslint-plugin` `test-unit` configuration. Internal overrides and their reasons are documented in `config.mjs`; [#83089](https://github.com/WordPress/gutenberg/issues/83089) tracks the remaining rule decisions.
 
 `npm run lint:js` first runs `validate-test-config.mjs` to check the Node, jsdom, Browser, shared-helper and legacy E2E configurations, including repository-specific exceptions.
+
+The [optional Vitest rule audit](./vitest-rule-audit.md) records the internal rules adopted after the baseline migration, overlap with convention checks, and reasons for leaving other rules disabled.
