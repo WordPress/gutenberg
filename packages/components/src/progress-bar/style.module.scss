@@ -1,13 +1,10 @@
-@use "../utils/theme-variables" as *;
-
 $indeterminate-indicator-width: 50%;
 
 .track {
 	position: relative;
 	overflow: hidden;
 	height: 1.5px;
-	/* Text color at 10% opacity */
-	background-color: color-mix(in srgb, $components-color-foreground, transparent 90%);
+	background-color: var(--wpds-color-stroke-surface-neutral);
 	border-radius: 9999px;
 
 	// Windows high contrast mode.
@@ -25,8 +22,7 @@ $indeterminate-indicator-width: 50%;
 	top: 0;
 	height: 100%;
 	border-radius: 9999px;
-	/* Text color at 90% opacity */
-	background-color: color-mix(in srgb, $components-color-foreground, transparent 10%);
+	background-color: var(--wpds-color-foreground-content-neutral);
 
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
