@@ -8,7 +8,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { Menu } from '@wordpress/ui';
 import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import MoreMenuSubmenu from '../more-menu/more-menu-submenu';
-import { ALL_NOTES_SIDEBAR, FLOATING_NOTES_SIDEBAR } from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 
 type NotesDisplayMode = 'full' | 'hidden';
 
@@ -60,9 +60,9 @@ export function NotesDisplayModeMenu( {
 
 	function setDisplayMode( mode: NotesDisplayMode ) {
 		setPreference( 'core', 'notesDisplayMode', mode );
-		// Showing notes is an explicit request, so it replaces any open sidebar.
-		if ( mode === 'full' && hasFloatingNotes ) {
-			enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+		// Floating notes yield to "All notes", so showing them closes it.
+		if ( mode === 'full' && hasFloatingNotes && isAllNotesOpen ) {
+			disableComplementaryArea( 'core' );
 		}
 		speak(
 			mode === 'hidden' ? __( 'Notes hidden.' ) : __( 'Notes shown.' )
