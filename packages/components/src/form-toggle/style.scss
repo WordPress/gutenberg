@@ -104,7 +104,7 @@ $transition-duration: 0.2s;
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
-		@include button-style-outset__focus(var(--wp-components-color-accent, var(--wpds-color-stroke-focus)));
+		@include button-style-outset__focus(var(--wpds-color-stroke-focus));
 	}
 
 	&.is-checked {
