@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+-   Media & Text: Lower the specificity of the content area's default padding so themes can override it, including through the block's custom CSS in `theme.json` ([#83563](https://github.com/WordPress/gutenberg/pull/83563)).
 -   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
 
 ### Bug Fixes
