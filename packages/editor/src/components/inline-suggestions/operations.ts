@@ -277,6 +277,50 @@ export function valueAdditionRunToExtend(
  * @param suggestionId Suggestion (marker) id.
  * @return New RichTextData with the marked run removed, or the original value.
  */
+/**
+ * The runs inside a resolved range whose characters carry a given suggestion
+ * id, last run first.
+ *
+ * `findSuggestionRange` spans first-to-last character carrying the id, so a
+ * fragmented marker can interleave ANOTHER suggestion's marker inside the span
+ * (e.g. a copy/paste split the run and a second suggestion landed in the gap).
+ * Resolving the span wholesale would resolve the inner suggestion too, so
+ * callers act on these runs only. Back-to-front, so a caller that removes text
+ * keeps earlier offsets valid as the text shrinks.
+ *
+ * @param record       Rich-text record.
+ * @param range        Range returned by `findSuggestionRange`.
+ * @param range.start  Range start offset.
+ * @param range.end    Range end offset.
+ * @param suggestionId Suggestion (marker) id.
+ * @return `[ start, end ]` pairs, last run first.
+ */
+function runsCarryingId(
+	record: any,
+	range: { start: number; end: number },
+	suggestionId: number | string
+): Array< [ number, number ] > {
+	const target = String( suggestionId );
+	const carriesId = ( index: number ) =>
+		record.formats[ index ]?.some(
+			( f: any ) =>
+				f.type === SUGGESTION_FORMAT_NAME &&
+				f.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] === target
+		);
+	const runs: Array< [ number, number ] > = [];
+	let runEnd = null;
+	for ( let i = range.end - 1; i >= range.start - 1; i-- ) {
+		const hit = i >= range.start && carriesId( i );
+		if ( hit && runEnd === null ) {
+			runEnd = i + 1;
+		} else if ( ! hit && runEnd !== null ) {
+			runs.push( [ i + 1, runEnd ] );
+			runEnd = null;
+		}
+	}
+	return runs;
+}
+
 function removeMarkedRange( value: any, suggestionId: number | string ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
@@ -286,31 +330,13 @@ function removeMarkedRange( value: any, suggestionId: number | string ) {
 		return value;
 	}
 	const record = create( { html: value.toHTMLString() } );
-	/*
-	 * The resolved range spans first-to-last character carrying the id, so a
-	 * fragmented marker can interleave ANOTHER suggestion's marker inside the
-	 * span (e.g. a copy/paste split the run and a second suggestion landed in
-	 * the gap). Removing the span wholesale would delete the inner marker's
-	 * text along with it, so remove only the characters that actually carry
-	 * THIS id — back-to-front, so earlier offsets stay valid as text shrinks.
-	 */
-	const target = String( suggestionId );
-	const carriesId = ( index: number ) =>
-		record.formats[ index ]?.some(
-			( f: any ) =>
-				f.type === SUGGESTION_FORMAT_NAME &&
-				f.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] === target
-		);
 	let result = record;
-	let runEnd = null;
-	for ( let i = range.end - 1; i >= range.start - 1; i-- ) {
-		const hit = i >= range.start && carriesId( i );
-		if ( hit && runEnd === null ) {
-			runEnd = i + 1;
-		} else if ( ! hit && runEnd !== null ) {
-			result = remove( result, i + 1, runEnd );
-			runEnd = null;
-		}
+	for ( const [ start, end ] of runsCarryingId(
+		record,
+		range,
+		suggestionId
+	) ) {
+		result = remove( result, start, end );
 	}
 	return new RichTextData( result as any );
 }
@@ -334,14 +360,15 @@ function unwrapMarker( value: any, suggestionId: number | string ) {
 		return value;
 	}
 	const record = create( { html: value.toHTMLString() } );
-	return new RichTextData(
-		removeFormat(
-			record,
-			SUGGESTION_FORMAT_NAME,
-			range.start,
-			range.end
-		) as any
-	);
+	let result = record;
+	for ( const [ start, end ] of runsCarryingId(
+		record,
+		range,
+		suggestionId
+	) ) {
+		result = removeFormat( result, SUGGESTION_FORMAT_NAME, start, end );
+	}
+	return new RichTextData( result as any );
 }
 
 /**

@@ -30,6 +30,7 @@
  *                        edits don't list the same format twice. The two
  *                        directions are opposite proposals, so they get
  *                        opposite labels.
+ *   - **Change link: …** — an existing link's old → new destination.
  *   - **Link: …**      — the URL a link format points at, so a formatting
  *                        line about a link says *which* link is proposed.
  *
@@ -389,6 +390,36 @@ function collectLinkTargets(
 }
 
 /**
+ * Describe a change to an existing link's destination. Retargeting a link
+ * keeps the same anchor tag, so the format diff sees nothing and the visible
+ * text is unchanged; without this the reviewer would accept a new URL they
+ * were never shown.
+ *
+ * @param before HTML before the edit.
+ * @param after  HTML after the edit.
+ * @return `old → new`, or `null` when the link targets did not change.
+ */
+function describeLinkChange( before: string, after: string ): string | null {
+	const beforeUrls = linkTargets( before );
+	const afterUrls = linkTargets( after );
+	if (
+		afterUrls.length === 0 ||
+		beforeUrls.join( '\n' ) === afterUrls.join( '\n' )
+	) {
+		return null;
+	}
+	if ( beforeUrls.length === 0 ) {
+		return afterUrls.join( ', ' );
+	}
+	return sprintf(
+		/* translators: 1: link URL before the change. 2: proposed link URL. */
+		__( '%1$s → %2$s' ),
+		beforeUrls.join( ', ' ),
+		afterUrls.join( ', ' )
+	);
+}
+
+/**
  * Join an array of label strings with a comma, using `__()`-friendly
  * punctuation. Deduplicated and lowercased for display.
  *
@@ -571,6 +602,7 @@ export function summarizeOperations(
 	const addedFormats: string[] = [];
 	const removedFormats: string[] = [];
 	const linkUrls: string[] = [];
+	const linkChanges: string[] = [];
 
 	for ( const op of operations ) {
 		if ( op.type === 'block-remove' ) {
@@ -618,7 +650,15 @@ export function summarizeOperations(
 						op.afterHTML ?? ''
 					);
 				} else {
-					attributeLabels.push( op.attribute );
+					const linkChange = describeLinkChange(
+						op.beforeHTML ?? '',
+						op.afterHTML ?? ''
+					);
+					if ( linkChange ) {
+						linkChanges.push( linkChange );
+					} else {
+						attributeLabels.push( op.attribute );
+					}
 				}
 				continue;
 			}
@@ -718,7 +758,12 @@ export function summarizeOperations(
 				removedFormats.push( ...removed );
 				collectLinkTargets( linkUrls, before, after );
 			} else {
-				attributeLabels.push( op.attribute );
+				const linkChange = describeLinkChange( before, after );
+				if ( linkChange ) {
+					linkChanges.push( linkChange );
+				} else {
+					attributeLabels.push( op.attribute );
+				}
 			}
 			continue;
 		}
@@ -778,6 +823,13 @@ export function summarizeOperations(
 		lines.push( {
 			label: __( 'Link:' ),
 			value: Array.from( new Set( linkUrls ) ).join( ', ' ),
+		} );
+	}
+
+	for ( const linkChange of new Set( linkChanges ) ) {
+		lines.push( {
+			label: __( 'Change link:' ),
+			value: linkChange,
 		} );
 	}
 

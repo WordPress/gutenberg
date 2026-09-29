@@ -372,28 +372,23 @@ describe( 'Autocomplete', () => {
 	/* eslint-enable testing-library/no-node-access */
 
 	describe( 'when disabled', () => {
-		it.each( [ true, false ] )(
-			'shows the clear tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledAutocompleteWithClear( disabled );
+		it( 'does not show the clear tooltip when disabled', async () => {
+			await renderDisabledAutocompleteWithClear( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
 
-				const clearButton = screen.getByLabelText( 'Clear', {
-					selector: 'button',
-				} );
-				await user.hover( clearButton );
+			expect( screen.queryByText( 'Clear' ) ).not.toBeInTheDocument();
+		} );
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Clear' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Clear' ) )
-						.toBeVisible();
-				}
-			}
-		);
+		it( 'shows the clear tooltip when enabled', async () => {
+			await renderDisabledAutocompleteWithClear( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
+
+			await expect.element( screen.getByText( 'Clear' ) ).toBeVisible();
+		} );
 	} );
 
 	describe( 'grouped items', () => {

@@ -2,6 +2,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import Tracks from './tracks';
 
@@ -27,6 +28,10 @@ export default function save( { attributes } ) {
 	// `aspect-ratio: auto W/H`, whose `auto` keyword is unreliable during load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const videoStyle = {
+		...( aspectRatio && { aspectRatio } ),
+		...getShadowClassesAndStyles( attributes ).style,
+	};
 	return (
 		<figure { ...useBlockProps.save() }>
 			{ src && (
@@ -41,7 +46,11 @@ export default function save( { attributes } ) {
 					playsInline={ playsInline }
 					width={ width }
 					height={ height }
-					style={ aspectRatio ? { aspectRatio } : undefined }
+					style={
+						Object.keys( videoStyle ).length
+							? videoStyle
+							: undefined
+					}
 				>
 					<Tracks tracks={ tracks } />
 				</video>

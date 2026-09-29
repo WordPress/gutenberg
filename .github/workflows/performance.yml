@@ -201,7 +201,7 @@ jobs:
               if: steps.reused.outputs.ok != 'true'
               run: npm run build -- --skip-types || npm run build
 
-            # The list comes from bin/plugin-files.txt on the tested commit, so older refs
+            # The list comes from tools/release/plugin-files.mts on the tested commit, so older refs
             # are packaged the same way. They may lack some of the files.
             - name: Package plugin
               if: steps.reused.outputs.ok != 'true'

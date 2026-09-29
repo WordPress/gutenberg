@@ -8,7 +8,7 @@ import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Feedback/Notice',
+	title: 'Components/@wordpress-components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
 	subcomponents: { NoticeList },

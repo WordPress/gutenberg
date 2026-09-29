@@ -3,7 +3,7 @@ import Badge from '..';
 
 const meta: Meta< typeof Badge > = {
 	component: Badge,
-	title: 'Components/Containers/Badge',
+	title: 'Components/@wordpress-components/Containers/Badge',
 	id: 'components-badge',
 	tags: [ 'status-private' ],
 	parameters: {

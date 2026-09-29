@@ -1,7 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;
+
+const DEPRECATION_MESSAGE =
+	'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+afterEach( () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+} );
 
 const testStore = {
 	reducer: ( state = null, action ) => {
@@ -29,10 +41,8 @@ describe( 'getIsResolving', () => {
 		registry.registerStore( 'testStore', testStore );
 	} );
 
-	const DEPRECATION_MESSAGE =
-		'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
-
 	it( 'should return undefined if no state by reducerKey, selectorName', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		const result = registry
 			.select( 'testStore' )
 			.getIsResolving( 'getFoo', [] );
