@@ -4,13 +4,10 @@ import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 /**
  * Tracks the width of the element the returned ref is attached to.
  *
- * The element is measured as soon as it attaches, during the commit phase, so
- * the first paint already knows its width. A resize observer alone reports
- * only after that first paint, which leaves a frame rendered at width `0`: the
- * grid layout derives its column count from this width, so it lays every item
- * out in a single full-width column before snapping to the real one.
+ * The element is measured when it attaches, so a width is available for the
+ * first paint. The resize observer keeps the width up to date from then on.
  *
- * The observer then keeps the width current as the element resizes.
+ * Detaching leaves the last width in place; reattaching measures again.
  *
  * @return The element's width, and the ref to attach to it.
  */
@@ -20,9 +17,9 @@ export default function useContainerWidth< T extends HTMLElement >(): [
 ] {
 	const [ width, setWidth ] = useState( 0 );
 
-	// `offsetWidth` rather than `getBoundingClientRect()`: both are border-box
-	// widths, matching what the observer reports, but `offsetWidth` ignores any
-	// transform an ancestor may be animating with.
+	// `inlineSize` is only available on an observer entry, so it can't be read
+	// here. `offsetWidth` reports the same border box and, like
+	// `borderBoxSize`, is unaffected by transforms.
 	const measureRef = useCallback( ( element?: T | null ) => {
 		if ( element ) {
 			setWidth( element.offsetWidth );

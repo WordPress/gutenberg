@@ -752,10 +752,8 @@ describe( 'DataViews component', () => {
 
 	describe( 'in grid view', () => {
 		it( 'lays the grid out at its real column count on the first render', async () => {
-			// The resize observer only reports after that first render has
-			// painted. Without a measurement taken as the grid attaches, it
-			// renders once at width 0, which puts every item in a row of its
-			// own at full width before snapping to the real column count.
+			// Without a measurement as the grid attaches, the first render runs
+			// at width 0 and puts every item in a full-width row of its own.
 			const offsetWidth = Object.getOwnPropertyDescriptor(
 				window.HTMLElement.prototype,
 				'offsetWidth'
@@ -774,8 +772,7 @@ describe( 'DataViews component', () => {
 				// the three items make two rows rather than three.
 				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
 
-				// The observer then reports the same width, leaving the layout
-				// as it is.
+				// The observer reports the same width, so nothing changes.
 				await act( async () => {
 					vi.runOnlyPendingTimers();
 				} );
@@ -787,6 +784,12 @@ describe( 'DataViews component', () => {
 						window.HTMLElement.prototype,
 						'offsetWidth',
 						offsetWidth
+					);
+				} else {
+					// Nothing to put back, so remove the stub.
+					Reflect.deleteProperty(
+						window.HTMLElement.prototype,
+						'offsetWidth'
 					);
 				}
 			}
