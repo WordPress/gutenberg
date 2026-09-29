@@ -404,12 +404,9 @@ function VisualEditor( {
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
 
-	// Device previews float the margin over the backdrop, keeping the previewed
-	// width. Zoom out scales the canvas, so it has no margin.
-	const isDevicePreview = deviceType !== 'Desktop';
-	const hasCanvasMargin = ! isPreview && ! isZoomedOut && ! isDevicePreview;
-	const hasPreviewCanvasMargin =
-		! isPreview && ! isZoomedOut && isDevicePreview;
+	// A resizable canvas (device preview) or a scaled one (zoom out) has no
+	// margin.
+	const hasCanvasMargin = ! isPreview && ! isZoomedOut && ! enableResizing;
 	const hasCanvasMarginFill = !! useSlotFills( CanvasMargin.name )?.length;
 	const canvasMarginCSS =
 		hasCanvasMargin && hasCanvasMarginFill
@@ -484,7 +481,6 @@ function VisualEditor( {
 				'edit-post-visual-editor',
 				className,
 				{
-					'has-preview-canvas-margin': hasPreviewCanvasMargin,
 					// Vertical padding frames a width-constrained canvas
 					// (device preview or after a resize) as a centered preview.
 					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,

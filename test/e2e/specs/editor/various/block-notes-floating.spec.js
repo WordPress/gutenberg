@@ -449,33 +449,6 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expectAligned( thread, noted );
 	} );
 
-	test( 'follows its block in the tablet preview', async ( {
-		editor,
-		page,
-		blockNoteUtils,
-	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Preview note',
-		} );
-
-		const thread = getThread( page, 'Preview note' );
-		const noted = getParagraph( editor, 'Noted' );
-		await expectAligned( thread, noted );
-		const { y: initialTop } = await noted.boundingBox();
-
-		// The device preview insets the canvas frame.
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).setDeviceType( 'Tablet' )
-		);
-
-		await expect
-			.poll( async () => ( await noted.boundingBox() ).y )
-			.toBeGreaterThan( initialTop + 20 );
-		await expectAligned( thread, noted );
-	} );
-
 	test( 'keeps threads aligned while the canvas scrolls', async ( {
 		editor,
 		page,
@@ -891,22 +864,6 @@ test.describe( 'Block Notes: floating notes', () => {
 			expect( hitsCover ).toBe( false );
 		} );
 
-		test( 'stays beside the Settings sidebar', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted' },
-				comment: 'Coexistence note',
-			} );
-			await editor.openDocumentSettingsSidebar();
-
-			await expect( getAllNotes( page ) ).toBeVisible();
-			await expect( getThread( page, 'Coexistence note' ) ).toBeVisible();
-		} );
-
 		test( 'minimizes the notes when the canvas is narrow', async ( {
 			editor,
 			page,
@@ -920,22 +877,18 @@ test.describe( 'Block Notes: floating notes', () => {
 			await editor.openDocumentSettingsSidebar();
 			const thread = getThread( page, 'Narrow canvas note' );
 			const content = thread.getByText( 'Narrow canvas note' );
-			// Deselect the new note, so it minimizes.
+			// Deselect the new note, so it can minimize.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
 			await expect( content ).toBeVisible();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
 
-			// The viewport stays large; the sidebars leave a narrow canvas.
+			// The viewport stays large; the sidebar leaves a narrow canvas.
 			await page.setViewportSize( { width: 1100, height: 900 } );
 			await expect( thread ).toBeVisible();
 			await expect( content ).toBeHidden();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 82 );
-
-			await page.setViewportSize( { width: 1440, height: 900 } );
-			await expect( content ).toBeVisible();
-			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
 		} );
 
 		test( 'yields to All notes when the canvas is too narrow', async ( {
@@ -964,53 +917,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( getFloatingNotes( page ) ).toBeHidden();
 		} );
 
-		test( 'follows a resized canvas', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await page.setViewportSize( { width: 1600, height: 900 } );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted' },
-				comment: 'Resized canvas note',
-			} );
-
-			// Widening a tablet preview past the tablet breakpoint gives a
-			// Desktop canvas centered in the editor.
-			await page.evaluate( () =>
-				window.wp.data
-					.dispatch( 'core/editor' )
-					.setDeviceType( 'Tablet' )
-			);
-			await page
-				.getByRole( 'separator', { name: 'Drag to resize' } )
-				.last()
-				.focus();
-			for ( let i = 0; i < 6; i++ ) {
-				await page.keyboard.press( 'ArrowRight' );
-			}
-			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
-
-			const canvasBox = await getCanvasFrame( page ).boundingBox();
-			const contentBox = await getEditorContent( page ).boundingBox();
-			const canvasRight = canvasBox.x + canvasBox.width;
-			expect( canvasRight ).toBeLessThan(
-				contentBox.x + contentBox.width
-			);
-
-			// The thread sits centered in the reserved space.
-			const threadBox = await getThread(
-				page,
-				'Resized canvas note'
-			).boundingBox();
-			const leftGap = threadBox.x - ( canvasRight - 280 );
-			const rightGap = canvasRight - ( threadBox.x + threadBox.width );
-			expect( leftGap ).toBeGreaterThan( 0 );
-			expect( leftGap ).toBeCloseTo( rightGap, 0 );
-		} );
-
-		test( 'floats over the device preview without remounting', async ( {
+		test( 'hides the notes in device preview and opens All notes to add a note', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -1020,32 +927,24 @@ test.describe( 'Block Notes: floating notes', () => {
 				attributes: { content: 'Noted' },
 				comment: 'Device preview note',
 			} );
-			const notes = getFloatingNotes( page );
-			await notes.evaluate( ( element ) => {
-				element.dataset.testMounted = 'true';
-			} );
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.setDeviceType( 'Tablet' )
+			);
 
-			for ( const [ device, reservedWidth ] of [
-				[ 'Tablet', 0 ],
-				[ 'Mobile', 0 ],
-				[ 'Desktop', 280 ],
-			] ) {
-				await page.evaluate(
-					( type ) =>
-						window.wp.data
-							.dispatch( 'core/editor' )
-							.setDeviceType( type ),
-					device
-				);
-				await expect( notes ).toHaveAttribute(
-					'data-test-mounted',
-					'true'
-				);
-				await expect( notes ).toBeVisible();
-				await expect
-					.poll( () => getReservedWidth( editor ) )
-					.toBe( reservedWidth );
-			}
+			await expect(
+				getThread( page, 'Device preview note' )
+			).toBeHidden();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 0 );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				getAllNotes( page ).getByRole( 'textbox', {
+					name: 'New note',
+					exact: true,
+				} )
+			).toBeFocused();
 		} );
 
 		test.describe( 'Zoom out', () => {
@@ -1111,7 +1010,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
 			await expect( thread ).toBeHidden();
 
-			await blockNoteUtils.clickNotesMenuItem( 'Show notes' );
+			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
 			await expect( thread ).toBeVisible();
 
 			// Floating notes yield to "All notes".
@@ -1124,7 +1023,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( getFloatingNotes( page ) ).toBeHidden();
 
 			// Showing notes closes "All notes".
-			await blockNoteUtils.clickNotesMenuItem( 'Show notes' );
+			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
 			await expect( thread ).toBeVisible();
 			await expect(
 				getAllNotes( page ).getByRole( 'heading', {

@@ -65,8 +65,7 @@
 }
 
 // Matches the media query that reserves the space inside the canvas.
-.editor-resizable-editor.has-canvas-margin,
-.editor-visual-editor.has-preview-canvas-margin {
+.editor-resizable-editor.has-canvas-margin {
 	container-type: inline-size;
 
 	.editor-visual-editor__canvas-margin {
@@ -74,9 +73,4 @@
 			display: block;
 		}
 	}
-}
-
-// Push the slot past the centered preview to the editor edge.
-.editor-visual-editor.has-preview-canvas-margin .editor-visual-editor__canvas-margin {
-	inset-inline-end: calc((100% - 100cqi) / 2);
 }

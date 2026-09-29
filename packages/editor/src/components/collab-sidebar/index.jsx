@@ -87,7 +87,7 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		// The margin hides on a narrow canvas and in zoom out.
+		// The margin hides on a narrow, resizable or zoomed-out canvas.
 		const hasCanvasMargin =
 			isLargeViewport && !! canvasMarginRef?.current?.checkVisibility();
 		if ( isApproved || ! hasCanvasMargin ) {
