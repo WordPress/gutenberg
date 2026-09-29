@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
@@ -48,13 +49,14 @@ function NotesSidebar( { postId } ) {
 	}, [] );
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-	const { isDistractionFree, areNotesHidden } = useSelect( ( select ) => {
+	const { isDistractionFree, notesDisplayMode } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
 			isDistractionFree: get( 'core', 'distractionFree' ),
-			areNotesHidden: get( 'core', 'notesDisplayMode' ) === 'hidden',
+			notesDisplayMode: get( 'core', 'notesDisplayMode' ),
 		};
 	}, [] );
+	const areNotesHidden = notesDisplayMode === 'hidden';
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
@@ -191,7 +193,9 @@ function NotesSidebar( { postId } ) {
 					<div
 						role="region"
 						aria-label={ __( 'Notes' ) }
-						className="editor-collab-sidebar-overlay"
+						className={ clsx( 'editor-collab-sidebar-overlay', {
+							'is-minimized': notesDisplayMode === 'minimized',
+						} ) }
 					>
 						<Notes
 							notes={ unresolvedNotes }

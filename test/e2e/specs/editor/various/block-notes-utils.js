@@ -57,6 +57,18 @@ class BlockNoteUtils {
 		} );
 	}
 
+	// "All notes" has no toggle before the first note.
+	async showAllNotes() {
+		await this.#page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/interface' )
+				.enableComplementaryArea(
+					'core',
+					'edit-post/collab-history-sidebar'
+				)
+		);
+	}
+
 	async openBlockNoteSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )

@@ -11,6 +11,7 @@ import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -22,11 +23,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
-import {
-	CanvasMargin,
-	CANVAS_MARGIN_WIDTH,
-	CANVAS_MARGIN_MIN_CANVAS_WIDTH,
-} from './canvas-margin';
+import { CanvasMargin, getCanvasMarginCSS } from './canvas-margin';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -145,6 +142,7 @@ function VisualEditor( {
 		styles,
 		hasCanvasWidth,
 		canvasWidth,
+		areNotesMinimized,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -198,6 +196,9 @@ function VisualEditor( {
 			styles: editorSettings.styles,
 			hasCanvasWidth: _canvasWidth !== undefined,
 			canvasWidth: _canvasWidth,
+			areNotesMinimized:
+				select( preferencesStore ).get( 'core', 'notesDisplayMode' ) ===
+				'minimized',
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -410,15 +411,10 @@ function VisualEditor( {
 	const hasPreviewCanvasMargin =
 		! isPreview && ! isZoomedOut && isDevicePreview;
 	const hasCanvasMarginFill = !! useSlotFills( CanvasMargin.name )?.length;
-	const reservesCanvasMargin = hasCanvasMargin && hasCanvasMarginFill;
-
-	// Reserved inside the canvas, so the margin gets the theme background.
-	// `overflow-x: clip` keeps `100vw` content out of it.
-	const canvasMarginCSS = reservesCanvasMargin
-		? `@media (min-width:${ CANVAS_MARGIN_MIN_CANVAS_WIDTH }px){:root{padding-inline-end:${ CANVAS_MARGIN_WIDTH }px;}body{overflow-x:clip;}:root::after{content:"";position:fixed;inset-block:0;inset-inline-end:${
-				CANVAS_MARGIN_WIDTH - 1
-			}px;width:1px;background:color-mix(in srgb,currentColor 10%,transparent);pointer-events:none;}}`
-		: '';
+	const canvasMarginCSS =
+		hasCanvasMargin && hasCanvasMarginFill
+			? getCanvasMarginCSS( areNotesMinimized )
+			: '';
 
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const iframeBodyMinHeightCSS =

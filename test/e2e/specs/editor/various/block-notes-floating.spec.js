@@ -54,6 +54,18 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	}
 
+	// Space reserved for the notes inside the canvas.
+	function getReservedWidth( editor ) {
+		return editor.canvas
+			.locator( ':root' )
+			.evaluate( ( root ) =>
+				parseFloat(
+					root.ownerDocument.defaultView.getComputedStyle( root )
+						.paddingInlineEnd
+				)
+			);
+	}
+
 	function getParagraph( editor, text ) {
 		return editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -728,19 +740,93 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	} );
 
-	test.describe( 'Canvas margin', () => {
-		// Space reserved for the notes inside the canvas.
-		function getReservedWidth( editor ) {
-			return editor.canvas
-				.locator( ':root' )
-				.evaluate( ( root ) =>
-					parseFloat(
-						root.ownerDocument.defaultView.getComputedStyle( root )
-							.paddingInlineEnd
-					)
-				);
-		}
+	test.describe( 'Multiple notes per block', () => {
+		test( 'resolving one note does not affect sibling notes on the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes to resolve' },
+				comment: 'Note A',
+			} );
+			await blockNoteUtils.addNote( 'Note B' );
 
+			const notes = getFloatingNotes( page );
+
+			// Resolve Note A.
+			const threadA = notes.getByRole( 'treeitem', {
+				name: 'Note: Note A',
+			} );
+			await threadA.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( threadA ).toBeHidden();
+
+			// Note B should still be visible and unresolved (expanded).
+			const threadB = notes.getByRole( 'treeitem', {
+				name: 'Note: Note B',
+			} );
+			await expect( threadB ).toBeVisible();
+
+			// Both notes should still exist in metadata.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 2 );
+		} );
+
+		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block for auto-select' },
+				comment: 'First note',
+			} );
+			await blockNoteUtils.addNote( 'Second note' );
+
+			const notes = getFloatingNotes( page );
+
+			// Resolve the first note.
+			const firstThread = notes.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			await firstThread.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			// Resolving removes the note from the floating "Unresolved notes"
+			// view, which confirms the action completed.
+			await expect( firstThread ).toBeHidden();
+
+			// Click the title to deselect the block and its comment.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			// Click back on the original block.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Block for auto-select' } )
+				.click();
+
+			// The second (unresolved) note should be the active one.
+			const secondThread = notes.getByRole( 'treeitem', {
+				name: 'Note: Second note',
+			} );
+			await expect( secondThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+		} );
+	} );
+
+	test.describe( 'Canvas margin', () => {
 		function getCanvasFrame( page ) {
 			return page.locator( 'iframe[name="editor-canvas"]' );
 		}
@@ -821,7 +907,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( getThread( page, 'Coexistence note' ) ).toBeVisible();
 		} );
 
-		test( 'yields when the canvas is too narrow', async ( {
+		test( 'minimizes the notes when the canvas is narrow', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -833,29 +919,39 @@ test.describe( 'Block Notes: floating notes', () => {
 			} );
 			await editor.openDocumentSettingsSidebar();
 			const thread = getThread( page, 'Narrow canvas note' );
-			await expect( thread ).toBeVisible();
+			const content = thread.getByText( 'Narrow canvas note' );
+			// Deselect the new note, so it minimizes.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect( content ).toBeVisible();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
 
 			// The viewport stays large; the sidebars leave a narrow canvas.
 			await page.setViewportSize( { width: 1100, height: 900 } );
-			await expect( thread ).toBeHidden();
-			await expect.poll( () => getReservedWidth( editor ) ).toBe( 0 );
+			await expect( thread ).toBeVisible();
+			await expect( content ).toBeHidden();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 82 );
 
 			await page.setViewportSize( { width: 1440, height: 900 } );
-			await expect( thread ).toBeVisible();
+			await expect( content ).toBeVisible();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
 		} );
 
-		test( 'opens All notes to add a note when the canvas is too narrow', async ( {
+		test( 'yields to All notes when the canvas is too narrow', async ( {
 			editor,
 			page,
 		} ) => {
-			await page.setViewportSize( { width: 1100, height: 900 } );
+			await page.setViewportSize( { width: 900, height: 900 } );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Noted' },
 			} );
 			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Document Overview' } )
+				.click();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 
@@ -1035,6 +1131,33 @@ test.describe( 'Block Notes: floating notes', () => {
 					name: 'All notes',
 				} )
 			).toBeHidden();
+		} );
+
+		test( 'minimizes floating notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block notes' },
+				comment: 'A minimized note',
+			} );
+			const thread = getThread( page, 'A minimized note' );
+			const content = thread.getByText( 'A minimized note' );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Minimize notes' );
+			// Deselect the new note, so it minimizes.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect( thread ).toBeVisible();
+			await expect( content ).toBeHidden();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 82 );
+
+			// The selected thread expands.
+			await thread.click();
+			await expect( content ).toBeVisible();
 		} );
 
 		test( 'shows hidden notes when adding a note', async ( {
