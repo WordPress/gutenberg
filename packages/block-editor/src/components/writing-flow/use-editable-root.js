@@ -77,11 +77,15 @@ export default function useEditableRoot() {
 				// The field is edited through the host now. Remove the
 				// attribute so it is not an editing host nested in it, and
 				// the tabindex that made it a focus target. The field of a
-				// block that is not in the DOM yet renders like this.
+				// block that is not in the DOM yet renders like this. A
+				// field that is not editable (e.g. a locked binding) stays
+				// so: it must not inherit editability from the host.
 				releaseField();
 				const field = getField( clientId );
-				field?.removeAttribute( 'contenteditable' );
-				field?.removeAttribute( 'tabindex' );
+				if ( field?.getAttribute( 'contenteditable' ) === 'true' ) {
+					field.removeAttribute( 'contenteditable' );
+					field.removeAttribute( 'tabindex' );
+				}
 			}
 
 			function disengage() {
