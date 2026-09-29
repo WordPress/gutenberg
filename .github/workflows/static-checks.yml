@@ -87,6 +87,9 @@ jobs:
             - name: Lint dependency versions across workspaces
               run: npm run lint:deps
 
+            - name: Check peer dependencies of published packages
+              run: npm run lint:peer-deps
+
             - name: Check root dependencies
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
               run: |

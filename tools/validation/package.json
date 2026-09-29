@@ -47,6 +47,7 @@
 		"check-private-apis": "node ./check-private-apis.mjs",
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
+		"check-peer-dependencies": "node ./check-peer-dependencies.ts",
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
