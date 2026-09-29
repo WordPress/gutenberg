@@ -27,6 +27,17 @@ export interface RootProps extends Pick<
 	| 'defaultTriggerId'
 > {
 	/**
+	 * Disables menu interactions, including keyboard navigation and dismissal
+	 * with Escape or an outside click. Does not close an already open menu.
+	 *
+	 * To prevent opening an unavailable menu, set `disabled` on `Menu.Trigger`
+	 * instead. Disable individual items separately when their actions are
+	 * unavailable.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
+	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
 	children?: ReactNode;

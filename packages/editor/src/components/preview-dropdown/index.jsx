@@ -151,8 +151,9 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	];
 
 	return (
-		<Menu.Root modal={ false } disabled={ disabled }>
+		<Menu.Root modal={ false }>
 			<Menu.Trigger
+				disabled={ disabled }
 				render={
 					<Button
 						className={ clsx( 'editor-preview-dropdown__toggle', {
@@ -162,7 +163,6 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						icon={ deviceIcons[ deviceType.toLowerCase() ] }
 						label={ __( 'View' ) }
 						showTooltip={ ! showIconLabels }
-						disabled={ disabled }
 						accessibleWhenDisabled={ disabled }
 					/>
 				}

@@ -55,6 +55,33 @@ Use `Menu.RadioItem` within `Menu.RadioGroup` for mutually exclusive states, suc
 
 Do not use checked menu items only to recreate a Select. If choosing a value is the whole purpose of the control, use `SelectControl`, even when the options could look like radio menu items.
 
+## Disable the trigger or individual items
+
+Set `disabled` on `Menu.Trigger` when the menu cannot be opened, such as when no actions are available. Set `disabled` on individual items when their actions are unavailable. Disabling the trigger does not disable items in an already open menu.
+
+Avoid using `Menu.Root disabled` for these states. It disables keyboard navigation and dismissal with Escape or an outside click, and does not close an already open menu. Disabling only the trigger lets users dismiss a menu that was open when the trigger became disabled. The same distinction applies to `Menu.SubmenuRoot` and `Menu.SubmenuTrigger`.
+
+When rendering an `@wordpress/components` `Button`, keep `accessibleWhenDisabled` on the button if it should remain focusable. Put `disabled` on `Menu.Trigger`, which passes it to the rendered button and prevents the menu from opening with the keyboard or pointer.
+
+```tsx
+import { Button } from '@wordpress/components';
+import { Menu } from '@wordpress/ui';
+
+<Menu.Root>
+	<Menu.Trigger
+		disabled={ isUnavailable }
+		render={ <Button accessibleWhenDisabled /> }
+	>
+		Actions
+	</Menu.Trigger>
+	<Menu.Popup>
+		<Menu.Item disabled={ isUnavailable } onClick={ duplicate }>
+			<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+		</Menu.Item>
+	</Menu.Popup>
+</Menu.Root>;
+```
+
 ## Add prefix icons
 
 Use `Menu.PrefixIcon` in an item's `prefix` prop for an SVG icon. It defaults to 24px and centers on a single label line at the top of the item's content row. Prefer the default size for consistent menu icons.
