@@ -26,6 +26,7 @@
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
+		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/url" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],

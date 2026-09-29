@@ -1,4 +1,7 @@
-import { CheckboxControl, PanelRow } from '@wordpress/components';
+import {
+	CheckboxControl as WCCheckboxControl,
+	PanelRow,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -39,7 +42,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	return (
 		<>
 			<PanelRow>
-				<CheckboxControl
+				<WCCheckboxControl
 					label={
 						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
 					}

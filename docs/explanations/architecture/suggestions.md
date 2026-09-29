@@ -26,7 +26,7 @@ sequenceDiagram
 
     U->>B: Switch to Suggest intent, edit block
     B->>O: setAttributes → overlay (capture baseline on first edit)
-    Note right of O: Block-editor store is NEVER written
+    Note right of O: Attribute edits stay in the overlay<br/>(inline and structural edits land as pending markers)
     O->>AS: Overlay changed (debounce ~1.5s)
     AS->>P: createSuggestion or updateSuggestion
     P->>R: POST / PUT note + _wp_suggestion meta
@@ -35,7 +35,7 @@ sequenceDiagram
 
     A->>A: Open notes sidebar
     A->>P: Accept (or Reject)
-    alt baseRevision stale
+    alt targeted attribute changed since capture
         P-->>A: Confirm dialog ("Apply anyway?")
     end
     P->>B: updateBlockAttributes(applyOperations(...))
@@ -49,8 +49,8 @@ A session-scoped `editorIntent` state (orthogonal to the visual/code `editorMode
 | Intent    | Behaviour |
 |-----------|-----------|
 | `edit`    | Default — direct editing. |
-| `suggest` | Edits are diverted into an in-memory overlay; the block-editor store is never mutated. |
-| `view`    | Read-only preview via `isPreviewMode`. |
+| `suggest` | Attribute edits are diverted into an in-memory overlay and never reach the live block; inline text and structural edits are written as pending markers (see below). |
+| `view`    | Read-only: the canvas is a preview via `isPreviewMode`, and `editPost` refuses post-level field changes (excerpt, author, slug and so on). |
 
 The intent lives in the `core/editor` store's reducer (not the preferences store), so reloading the editor always returns to `edit`. It is surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag; the `setEditorIntent` / `getEditorIntent` store APIs are private while Suggest mode is experimental.
 
@@ -110,7 +110,7 @@ Same-parent move attribution is selection-first: an adjacent swap is ambiguous t
 
 ### Apply-time bypass and the collaborative round-trip
 
-Apply is a deliberate exception to the "store is never written" rule: when the post author clicks **Apply**, the merged attributes do need to land on the live block. The provider opts the next dispatch out of interception via `requestInterceptorBypass(clientId)` — without it, the interceptor would treat the apply as a new user edit and revert it back into the overlay, producing a frustrating feedback loop.
+Apply is a deliberate exception to the rule that an attribute suggestion never reaches the live block: when the post author clicks **Apply**, the merged attributes do need to land on the live block. The provider opts the next dispatch out of interception via `requestInterceptorBypass(clientId)` — without it, the interceptor would treat the apply as a new user edit and revert it back into the overlay, producing a frustrating feedback loop.
 
 In real-time collaboration the same scenario plays out across peers. When peer A clicks Apply, the dispatched attribute change syncs to peer B (the original suggester). Peer B's interceptor sees a delta from its own snapshot and would revert it, which would then sync back to peer A and undo the apply on their screen. To prevent this the interceptor calls `isAcceptedSuggestionChange()`: for each note linked to the block via `metadata.noteId`, it consults the suggestion payload and checks whether every changed attribute lands on a payload's `after` value. If so, the interceptor adopts the new attributes as its baseline rather than reverting.
 
@@ -191,7 +191,7 @@ REST/PHP surface lives in `lib/compat/wordpress-6.9/` and `lib/compat/wordpress-
 | File | Role |
 |------|------|
 | `block-comments.php`                              | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
-| `class-gutenberg-rest-comment-controller-6-9.php` | REST controller subclass remapping permissions for `note`-type comments (post editors get `edit_post`-based access; updates are gated by an allowlist of suggestion-lifecycle fields). |
+| `class-gutenberg-rest-comment-controller-7-1.php` | REST controller subclass that lets a user who can `edit_post` on the parent resolve a `note`-type comment: an update touching only suggestion-lifecycle fields takes this shortcut; any other update falls through to core's `edit_comment` check. |
 | `wordpress-7.1/block-suggestions.php`             | `gutenberg_strip_inline_suggestion_markers` — the type-aware `render_block` strip for inline `wp-suggestion` markers (del keeps text, add drops text, wrappers removed) — and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
 
 ## Suggestion Payload (v2)
@@ -218,7 +218,7 @@ Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment
 |-------|---------|
 | `schemaVersion` | Allows future schema evolution without breaking old payloads. |
 | `blockName` | Safety check — apply is refused if the block type has changed. |
-| `baseRevision` | `post_modified_gmt` at capture time. A mismatch at apply time triggers a staleness warning. |
+| `baseRevision` | `post_modified_gmt` at capture time, kept for provenance only. Accept-time conflicts are detected per attribute; see **Conflict detection** below. |
 | `operations` | Declarative transforms on the block tree. v1 emitted `attribute-set` only; v2 adds the structural variants (`block-insert-after`, `block-remove`, `block-move`), tracked in [#77434](https://github.com/WordPress/gutenberg/issues/77434). |
 
 Operations are **declarative transforms**, not HTML diffs. This makes them compatible with Yjs attribution semantics and resilient to concurrent edits on unrelated attributes.
@@ -301,7 +301,7 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 - **Sub-attribute anchoring**: resolved for inline **text and formatting** changes — these are now edit-resilient `core/suggestion` markers anchored in content and re-resolved on read (see [Inline suggestion markers](#inline-suggestion-markers)), so an unrelated edit elsewhere in the attribute no longer invalidates them. It still applies to **non-text attribute** suggestions (alignment, color), which remain whole-attribute overlay captures: if the author edits the same attribute while one is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it.
 - **Marker-planner declines**: an edit that straddles an existing marker, a format toggle whose run overlaps one, or a text diff the planner can't resolve unambiguously falls back to the whole-attribute overlay path (captured marker-stripped). Live IME composition itself is not intercepted — only the committed composition is reconciled into markers.
 - **Format markers on the front end**: the render strip treats a `format` marker like `del` (wrapper stripped, text kept), and the run carries the *proposed* formatting inline — so a pending bold/italic renders formatted on the published front end until the suggestion is resolved. Tightening the strip to restore `beforeHTML` is a follow-up.
-- **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
+- **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` with a shortcut for note comments: a user with `edit_post` on the parent may update a note when the request touches **only** suggestion-lifecycle fields (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`), so a post editor can resolve someone else's suggestion. The allowlist limits what the shortcut grants; it is **not** a guard on note content. Any other update falls through to core's `edit_comment` check, which `map_meta_cap` resolves to `edit_post` on the comment's parent, so a post editor can already rewrite the content of any note on their posts through core. Stricter author-only protection for note content would be a separate policy with its own tests. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
 - **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are rejected (the callback returns an empty string), not truncated — mid-string truncation would produce invalid JSON that `parseSuggestionPayload` would silently drop.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.
 - **Cross-parent moves on the front end**: a pending-move block saves at its *proposed* position and `gutenberg_restore_pending_move_order` puts it back before render, but only within one sibling list. Client IDs do not survive to the server, so `fromParentClientId` cannot tell a move between two different nested parents from a reorder inside one. The marker writer therefore records `crossedParents` outright, and the renderer leaves any such block where it sits rather than applying an index that counts positions in a list the block has left. Markers saved before that field existed fall back to the root-boundary check, which still catches a root origin now sitting nested (or the reverse).

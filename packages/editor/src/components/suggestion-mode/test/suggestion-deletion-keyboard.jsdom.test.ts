@@ -12,6 +12,7 @@ import {
 import {
 	collapsedDeleteDisposition,
 	collapsedDeleteTarget,
+	expandBufferedDeleteRun,
 	isBufferedDeleteRepeat,
 	isContiguousDeleteRun,
 	isDeletionTargetUnchanged,
@@ -354,5 +355,69 @@ describe( 'collapsedDeleteDisposition', () => {
 				run: { ...forwardRun( 2 ), dir: 'backward' },
 			} )
 		).toBe( 'default' );
+	} );
+} );
+
+describe( 'expandBufferedDeleteRun', () => {
+	const marker = [
+		{
+			type: SUGGESTION_FORMAT_NAME,
+			attributes: { 'data-suggestion-id': '9' },
+		},
+	];
+
+	it( 'grows one grapheme per buffered repeat', () => {
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'abcd',
+				formats: new Array( 4 ).fill( undefined ),
+				start: 3,
+				end: 4,
+				isBackward: true,
+				repeats: 2,
+			} )
+		).toEqual( { start: 1, end: 4, blocked: false } );
+	} );
+
+	it( 'stops at a foreign suggestion instead of taking it over', () => {
+		// `X` is another suggestion's addition right before `ab`. Three
+		// Backspaces were buffered from the caret after `b`; the third
+		// would have wrapped `X` in this deletion's marker.
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'Xab',
+				formats: [ marker, undefined, undefined ],
+				start: 2,
+				end: 3,
+				isBackward: true,
+				repeats: 2,
+			} )
+		).toEqual( { start: 1, end: 3, blocked: true } );
+	} );
+
+	it( 'stops at a foreign suggestion going forward', () => {
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'abX',
+				formats: [ undefined, undefined, marker ],
+				start: 0,
+				end: 1,
+				isBackward: false,
+				repeats: 3,
+			} )
+		).toEqual( { start: 0, end: 2, blocked: true } );
+	} );
+
+	it( 'clamps at the value edge without reporting a block', () => {
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'ab',
+				formats: [ undefined, undefined ],
+				start: 1,
+				end: 2,
+				isBackward: true,
+				repeats: 5,
+			} )
+		).toEqual( { start: 0, end: 2, blocked: false } );
 	} );
 } );

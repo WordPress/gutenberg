@@ -6,7 +6,7 @@ import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Utilities/Composite',
+	title: 'Components/@wordpress-components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {

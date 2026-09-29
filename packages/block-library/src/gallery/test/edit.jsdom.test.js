@@ -26,6 +26,15 @@ const IMAGE_ATTRIBUTES = {
 
 const VIEWPORT_STATE_INITIALIZER = 'test/viewport-state-initializer';
 
+const createGallery = ( attributes = {} ) =>
+	createBlock( 'core/gallery', attributes, [
+		createBlock( 'core/image', IMAGE_ATTRIBUTES ),
+		createBlock( 'core/image', {
+			...IMAGE_ATTRIBUTES,
+			id: 2,
+		} ),
+	] );
+
 // The Gallery only offers its aspect ratio control when the theme or the
 // defaults provide ratios to choose from.
 const ASPECT_RATIO_SETTINGS = {
@@ -110,16 +119,84 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
-	describe( 'Layout', () => {
-		const createGallery = ( attributes = {} ) =>
-			createBlock( 'core/gallery', attributes, [
-				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
-				createBlock( 'core/image', {
-					...IMAGE_ATTRIBUTES,
-					id: 2,
-				} ),
-			] );
+	describe( 'Order by', () => {
+		test( 'offers a sort control in Settings for a static gallery that reads as a custom order until the media resolves', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
 
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			// The attachment records never resolve in this environment, so
+			// there's nothing to sort by yet; Random doesn't need them. Custom
+			// is only choosable while Random is on, since that's all it does.
+			expect(
+				screen.getByRole( 'option', { name: 'Newest to oldest' } )
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeDisabled();
+			expect(
+				screen.getByRole( 'option', { name: 'Random' } )
+			).toBeEnabled();
+		} );
+
+		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			// The select is controlled from the `randomOrder` attribute, so
+			// its display value reflects the stored state after each change.
+			await userEvent.selectOptions( orderBy, 'random' );
+			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeEnabled();
+
+			await userEvent.selectOptions( orderBy, 'custom' );
+			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			expect(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			).toBeDisabled();
+		} );
+
+		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
+			await setup(
+				createBlock( 'core/gallery', {
+					dynamicContent: { source: 'core/attached-media' },
+				} )
+			);
+			await selectBlock( 'Block: Dynamic Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			expect( orderBy ).toHaveDisplayValue( 'Newest to oldest' );
+			expect(
+				screen.queryByRole( 'option', { name: 'Custom' } )
+			).not.toBeInTheDocument();
+			// The order lives in Settings; the Source panel is a plain
+			// PanelBody with no resettable items, hence no options menu.
+			expect(
+				screen.getByRole( 'button', { name: 'Settings options' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Source options' } )
+			).not.toBeInTheDocument();
+
+			await userEvent.selectOptions( orderBy, 'random' );
+			expect( orderBy ).toHaveDisplayValue( 'Random' );
+
+			await userEvent.selectOptions( orderBy, 'title/asc' );
+			expect( orderBy ).toHaveDisplayValue( 'A → Z' );
+		} );
+	} );
+
+	describe( 'Layout', () => {
 		test( 'keeps the custom Gallery controls for the default Flex layout', async () => {
 			await setup( createGallery() );
 			await selectBlock( 'Block: Gallery' );
@@ -149,7 +226,7 @@ describe( 'Gallery block', () => {
 				screen.getByLabelText( 'Crop images to fit' )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByLabelText( 'Randomize order' )
+				screen.queryByRole( 'combobox', { name: 'Order by' } )
 			).not.toBeInTheDocument();
 		} );
 

@@ -284,6 +284,62 @@ export function collapsedDeleteDisposition( {
 }
 
 /**
+ * Grow a new deletion run by the repeats buffered while its note was being
+ * created, one grapheme per repeat, stopping at the value's edge or at the
+ * first grapheme that already carries a suggestion marker.
+ *
+ * The buffered keystrokes were each checked against the character at the
+ * caret, but `preventDefault` never moved the caret, so every one of them
+ * checked the same character. The range they add has to be checked here, or
+ * the replay wraps a neighbouring suggestion's text in this deletion's marker
+ * and takes its identity away.
+ *
+ * @param options
+ * @param options.text       Plain text of the attribute value.
+ * @param options.formats    Per-character format stacks.
+ * @param options.start      Anchored range start.
+ * @param options.end        Anchored range end.
+ * @param options.isBackward True for Backspace, false for Delete.
+ * @param options.repeats    Buffered repeats after the first keystroke.
+ * @return The grown range, and whether a marker cut the replay short.
+ */
+export function expandBufferedDeleteRun( {
+	text,
+	formats,
+	start,
+	end,
+	isBackward,
+	repeats,
+}: {
+	text: string;
+	formats: any[];
+	start: number;
+	end: number;
+	isBackward: boolean;
+	repeats: number;
+} ): { start: number; end: number; blocked: boolean } {
+	let nextStart = start;
+	let nextEnd = end;
+	for ( let step = 0; step < repeats; step++ ) {
+		const target = isBackward
+			? {
+					start: previousGraphemeBoundary( text, nextStart ),
+					end: nextStart,
+				}
+			: { start: nextEnd, end: nextGraphemeBoundary( text, nextEnd ) };
+		if ( target.start === target.end ) {
+			break;
+		}
+		if ( formatsRangeHasSuggestion( formats, target.start, target.end ) ) {
+			return { start: nextStart, end: nextEnd, blocked: true };
+		}
+		nextStart = Math.min( nextStart, target.start );
+		nextEnd = Math.max( nextEnd, target.end );
+	}
+	return { start: nextStart, end: nextEnd, blocked: false };
+}
+
+/**
  * The in-progress collapsed-cursor deletion run; see `runRef` in the component
  * below.
  */
@@ -591,18 +647,45 @@ export default function SuggestionDeletionKeyboard() {
 					resetRun();
 					return;
 				}
+				/*
+				 * The range was anchored before the note round trip. If the
+				 * intent changed or the text moved underneath it meanwhile,
+				 * the buffered keystrokes describe characters that are no
+				 * longer there: drop the gesture and its note.
+				 */
+				const current =
+					getBlockAttributes( clientId )?.[ attributeKey ];
+				const stillSuggesting =
+					unlock(
+						registry.select( STORE_NAME )
+					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
+				const { formats } = readValueMetrics( current );
+				if (
+					! stillSuggesting ||
+					! isDeletionTargetUnchanged( text, current ) ||
+					formatsRangeHasSuggestion(
+						formats,
+						newRun.start,
+						newRun.end
+					)
+				) {
+					resetRun();
+					cleanupAbandonedNotes( clientId, [ id ] );
+					return;
+				}
 				newRun.id = id;
-				// Expand by any repeats buffered during creation, one grapheme
-				// per repeat (the boundary helpers clamp at the value's edges).
-				for ( let step = newRun.steps - 1; step > 0; step-- ) {
-					if ( isBackward ) {
-						newRun.start = previousGraphemeBoundary(
-							text,
-							newRun.start
-						);
-					} else {
-						newRun.end = nextGraphemeBoundary( text, newRun.end );
-					}
+				const grown = expandBufferedDeleteRun( {
+					text,
+					formats,
+					start: newRun.start,
+					end: newRun.end,
+					isBackward,
+					repeats: newRun.steps - 1,
+				} );
+				newRun.start = grown.start;
+				newRun.end = grown.end;
+				if ( grown.blocked ) {
+					notifyEditRefused( registry );
 				}
 				if ( isBackward ) {
 					newRun.caret = newRun.start;
@@ -621,7 +704,14 @@ export default function SuggestionDeletionKeyboard() {
 				}
 			}
 		},
-		[ openDeletionNote, writeDeletion, resetRun, cleanupAbandonedNotes ]
+		[
+			openDeletionNote,
+			writeDeletion,
+			resetRun,
+			cleanupAbandonedNotes,
+			getBlockAttributes,
+			registry,
+		]
 	);
 
 	const onBeforeInput = useCallback(

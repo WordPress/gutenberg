@@ -192,11 +192,75 @@ test.describe( 'Suggestion mode persistence', () => {
 		// Rejecting after the reload restores the original order: the
 		// same-parent origin is recoverable from fromIndex alone.
 		await decideSuggestion( page, 'Reject' );
+		// Assert the whole block tree, not just the relative order: a reject
+		// that dropped the moved block would still leave its missing index
+		// (-1) "before" the survivor.
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map( ( block ) =>
+					String( block.attributes.content )
+				)
+			)
+			.toEqual( [ 'First paragraph', 'Second paragraph' ] );
 		const serialized = await editor.getEditedPostContent();
-		expect( serialized.indexOf( 'First paragraph' ) ).toBeLessThan(
-			serialized.indexOf( 'Second paragraph' )
-		);
 		expect( serialized ).not.toContain( 'pending-move' );
+	} );
+
+	test( 'a pending move inside a group can still be rejected after a reload', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * Client IDs are regenerated when the saved content is parsed, so the
+		 * Group's id recorded with the move no longer exists after a reload.
+		 * A same-parent reject has to restore within the block's live parent.
+		 */
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'default' } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Nested first' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Nested second' },
+				},
+			],
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Nested first' } );
+		await editor.selectBlocks( mover );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await suggestionSaved;
+
+		await editor.saveDraft();
+		await page.reload();
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Nested first' } )
+		).toHaveClass( /is-suggestion-pending-move/ );
+
+		await decideSuggestion( page, 'Reject' );
+
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() )[ 0 ].innerBlocks.map(
+					( block: any ) => String( block.attributes.content )
+				)
+			)
+			.toEqual( [ 'Nested first', 'Nested second' ] );
+		expect( await editor.getEditedPostContent() ).not.toContain(
+			'pending-move'
+		);
 	} );
 
 	test( 'a pending removal survives a reload and can still be accepted', async ( {
@@ -237,6 +301,97 @@ test.describe( 'Suggestion mode persistence', () => {
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Keep me' );
 		expect( serialized ).not.toContain( 'Remove me' );
+	} );
+
+	test( 'deleting a pending removal again keeps it pending until accepted', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep me' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Remove me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const doomed = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Remove me' } );
+		await doomed.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( doomed ).toHaveClass( /is-suggestion-pending-remove/ );
+		await suggestionSaved;
+
+		// A second delete is an ordinary edit, not a review decision.
+		await doomed.click();
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( doomed ).toHaveClass( /is-suggestion-pending-remove/ );
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).length )
+			.toBe( 2 );
+
+		// Accepting it, even while still suggesting, does remove it.
+		await decideSuggestion( page, 'Accept' );
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map( ( block ) =>
+					String( block.attributes.content )
+				)
+			)
+			.toEqual( [ 'Keep me' ] );
+	} );
+
+	test( 'moving a pending insertion keeps it hidden on the front end', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Existing content' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Proposed then moved' },
+		} );
+		const proposed = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Proposed then moved' } );
+		await expect( proposed ).toHaveClass( /is-suggestion-pending-insert/ );
+		await suggestionSaved;
+
+		await editor.selectBlocks( proposed );
+		await editor.clickBlockToolbarButton( 'Move up' );
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map( ( block ) =>
+					String( block.attributes.content )
+				)
+			)
+			.toEqual( [ 'Proposed then moved', 'Existing content' ] );
+		await expect( proposed ).toHaveClass( /is-suggestion-pending-insert/ );
+		await expect( proposed ).not.toHaveClass(
+			/is-suggestion-pending-move/
+		);
+
+		await switchIntent( page, 'Editing' );
+		const postId = await editor.publishPost();
+
+		await page.goto( `/?p=${ postId }` );
+		await expect(
+			page.locator( 'body' ).getByText( 'Existing content' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'body' ).getByText( 'Proposed then moved' )
+		).toBeHidden();
 	} );
 
 	test( 'a pending insertion is hidden on the front end until accepted', async ( {
