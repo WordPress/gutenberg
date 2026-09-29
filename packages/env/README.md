@@ -483,6 +483,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | -------------- | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `"core"`       | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
 | `"phpVersion"` | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"mariadbVersion"` | `string\|null` | `null`                                 | The MariaDB version to use: `"lts"`, `"latest"`, or a version such as `"10.11"`. If `null` is specified, `lts` is used.      |
 | `"plugins"`    | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`     | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
@@ -696,6 +697,21 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 	"plugins": [ "." ]
 }
 ```
+
+### Specific MariaDB Version
+
+You can tell `wp-env` which MariaDB version the database should run, for compatibility and testing. Use `"lts"`, `"latest"`, or a version such as `"10.11"` or `"11.4.2"`. This can also be set via the environment variable `WP_ENV_MARIADB_VERSION`, which applies to every environment.
+
+```json
+{
+	"mariadbVersion": "10.11",
+	"plugins": [ "." ]
+}
+```
+
+MariaDB cannot start on a database written by a newer version. When switching to a lower version, run `wp-env destroy` first so the database is recreated.
+
+MariaDB 5.5 and 10.0 images are not published for ARM processors. On Apple silicon, run those versions under emulation by setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` before running `wp-env start`.
 
 ### Node Lifecycle Script
 
