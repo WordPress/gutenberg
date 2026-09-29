@@ -153,11 +153,6 @@ export type OptionProps< T extends PaletteElement > = {
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
-	/**
-	 * @deprecated This prop no longer has any effect.
-	 * @ignore
-	 */
-	slugPrefix?: string;
 };
 
 export type PaletteEditListViewProps< T extends PaletteElement > = {
@@ -170,9 +165,4 @@ export type PaletteEditListViewProps< T extends PaletteElement > = {
 	editingElement?: EditingElement;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
-	/**
-	 * @deprecated This prop no longer has any effect.
-	 * @ignore
-	 */
-	slugPrefix?: string;
 };
