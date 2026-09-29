@@ -7,7 +7,6 @@ import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
 import { preventFocusCapture } from './prevent-focus-capture';
-import focusUnderHost from './focus-under-host';
 
 // `inputAndSelection` must come first: it subscribes the listener that
 // synchronizes the internal record with a pending selection change at the
@@ -20,7 +19,6 @@ const allEventListeners = [
 	deleteHandler,
 	selectionChangeCompat,
 	preventFocusCapture,
-	focusUnderHost,
 ];
 
 export function useEventListeners( props ) {

@@ -11,7 +11,7 @@ import {
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId, useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
@@ -387,7 +387,7 @@ function RichTextWrapper(
 		const canvas = element.parentElement?.closest( '[contenteditable]' );
 
 		// Under an editing host, focus() on the field focuses the host and
-		// keeps the caret in the field (see the rich text hook).
+		// keeps the caret in the field (see focusUnderHostRef).
 		if ( activeElement === body || canvas?.contains( activeElement ) ) {
 			element.focus();
 		}
@@ -466,6 +466,58 @@ function RichTextWrapper(
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
+
+	// Under the editing host the element is not a focus target (no tabindex
+	// and no contenteditable attribute, see below), so `focus()` on it would
+	// do nothing. Keep it working: place the caret in the element and focus
+	// the host instead.
+	const focusUnderHostRef = useRefEffect(
+		( element ) => {
+			if ( ! isEditingHost ) {
+				return;
+			}
+
+			const { ownerDocument } = element;
+			const { focus: nativeFocus } = element;
+
+			element.focus = ( options ) => {
+				const host = element.parentElement?.closest(
+					'[contenteditable="true"]'
+				);
+
+				// The host disengaged in this commit, ahead of this
+				// override's removal: the element is a focus target again.
+				if ( ! host ) {
+					nativeFocus.call( element, options );
+					return;
+				}
+
+				const selection = ownerDocument.defaultView.getSelection();
+
+				if ( ! element.contains( selection.anchorNode ) ) {
+					selection.collapse( element, 0 );
+				}
+
+				// The body is the active element whenever nothing has
+				// focus, so check `:focus` rather than `activeElement`.
+				if ( ! host.matches( ':focus' ) ) {
+					const range = selection.getRangeAt( 0 ).cloneRange();
+					host.focus( { preventScroll: true, ...options } );
+					// Gecko moves the selection when an editing host takes
+					// focus instead of adopting the one within it.
+					if ( ! element.contains( selection.anchorNode ) ) {
+						selection.removeAllRanges();
+						selection.addRange( range );
+					}
+				}
+			};
+
+			return () => {
+				delete element.focus;
+			};
+		},
+		[ isEditingHost ]
+	);
 
 	// Setting tabIndex to 0 is unnecessary, the element is already focusable
 	// because it's contentEditable. This also fixes a Safari bug where it's
@@ -563,6 +615,7 @@ function RichTextWrapper(
 					} ),
 					anchorRef,
 					setAnchorElement,
+					focusUnderHostRef,
 				] ) }
 				contentEditable={
 					// Under the editing host the field is editable through the
