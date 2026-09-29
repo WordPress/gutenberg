@@ -303,7 +303,7 @@ Add an image or video with a text overlay.
 
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation, interactive), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -1037,7 +1037,7 @@ Displays the post count of a taxonomy term.
 
 -	**Name:** [core/term-count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-count/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** bracketType
 
 ## Term Description
