@@ -4,35 +4,17 @@ import { Menu } from '@wordpress/ui';
 import type { ComponentProps, ReactNode } from 'react';
 import MoreMenuItem from './more-menu-item';
 
-type MoreMenuGroupProps = {
+type MoreMenuSubmenuProps = {
 	/**
-	 * Label of the group. Omit it for a group that needs no heading.
+	 * Label of the item that opens the submenu.
 	 */
-	label?: string;
+	label: string;
 
 	/**
-	 * Fills of the slot.
+	 * Items of the submenu.
 	 */
 	children: ReactNode;
 };
-
-/**
- * Renders the fills of an action item slot as a group of a menu.
- */
-export default function MoreMenuGroup( {
-	label,
-	children,
-}: MoreMenuGroupProps ) {
-	return (
-		<>
-			<Menu.Separator />
-			<Menu.Group>
-				{ label && <Menu.GroupLabel>{ label }</Menu.GroupLabel> }
-				{ toMenuItems( children ) }
-			</Menu.Group>
-		</>
-	);
-}
 
 /**
  * Renders the fills that bring a menu item of their own as menu items.
@@ -46,7 +28,7 @@ export default function MoreMenuGroup( {
  *
  * @return The fills as menu items.
  */
-function toMenuItems( fills: ReactNode ) {
+export function toMenuItems( fills: ReactNode ) {
 	return Children.map( fills, ( fill ) => {
 		if (
 			! isValidElement< { href?: string } >( fill ) ||
@@ -71,4 +53,22 @@ function toMenuItems( fills: ReactNode ) {
 			</Menu.Item>
 		);
 	} );
+}
+
+/**
+ * Renders a submenu of the editor's Options menu, opened from an item that
+ * carries a label.
+ */
+export default function MoreMenuSubmenu( {
+	label,
+	children,
+}: MoreMenuSubmenuProps ) {
+	return (
+		<Menu.SubmenuRoot>
+			<Menu.SubmenuTrigger>
+				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+			</Menu.SubmenuTrigger>
+			<Menu.Popup>{ children }</Menu.Popup>
+		</Menu.SubmenuRoot>
+	);
 }
