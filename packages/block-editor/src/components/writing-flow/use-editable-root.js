@@ -51,14 +51,12 @@ export default function useEditableRoot() {
 				if ( ! blockElement ) {
 					return;
 				}
-				return [
-					blockElement,
-					...blockElement.querySelectorAll( FIELD_SELECTOR ),
-				].find(
-					( element ) =>
-						element.matches( FIELD_SELECTOR ) &&
-						isInsideRootBlock( blockElement, element )
-				);
+				if ( blockElement.matches( FIELD_SELECTOR ) ) {
+					return blockElement;
+				}
+				return Array.from(
+					blockElement.querySelectorAll( FIELD_SELECTOR )
+				).find( ( field ) => isInsideRootBlock( blockElement, field ) );
 			}
 
 			// Makes the hosted field an editable element again.
