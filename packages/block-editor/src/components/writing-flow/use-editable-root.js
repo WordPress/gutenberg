@@ -39,33 +39,33 @@ export default function useEditableRoot() {
 			const { defaultView } = ownerDocument;
 
 			// Whether this hook engaged the host, the block it hosts and the
-			// fields made inert for it, to make them editable again when the
-			// host moves on or disengages.
+			// block's field made inert for it, to make it editable again when
+			// the host moves on or disengages.
 			let engaged = false;
 			let hostedClientId = null;
-			let hostedFields = [];
+			let hostedField = null;
 
-			function getFields( clientId ) {
+			// A hosting block has a single field, which may be the block
+			// element itself (paragraph) or a descendant (list item).
+			function getField( clientId ) {
 				const blockElement = node.querySelector(
 					`[data-block="${ clientId }"]`
 				);
 				if ( ! blockElement ) {
-					return [];
+					return null;
 				}
-				return Array.from(
-					blockElement.querySelectorAll( FIELD_SELECTOR )
-				).filter(
-					( field ) =>
-						field.getAttribute( 'contenteditable' ) === 'true' &&
-						isInsideRootBlock( blockElement, field )
-				);
+				const field = blockElement.matches( FIELD_SELECTOR )
+					? blockElement
+					: blockElement.querySelector( FIELD_SELECTOR );
+				return field?.getAttribute( 'contenteditable' ) === 'true' &&
+					isInsideRootBlock( blockElement, field )
+					? field
+					: null;
 			}
 
-			function releaseFields() {
-				for ( const field of hostedFields ) {
-					field.setAttribute( 'contenteditable', 'true' );
-				}
-				hostedFields = [];
+			function releaseField() {
+				hostedField?.setAttribute( 'contenteditable', 'true' );
+				hostedField = null;
 			}
 
 			function engage( clientId ) {
@@ -100,20 +100,18 @@ export default function useEditableRoot() {
 					node.focus();
 				}
 
-				// The fields are edited through the host now. Remove the
-				// attribute so they are not editing hosts nested in it, and
-				// the tabindex that made them focus targets.
+				// The field is edited through the host now. Remove the
+				// attribute so it is not an editing host nested in it, and
+				// the tabindex that made it a focus target.
 				engaged = true;
 				hostedClientId = clientId;
-				hostedFields = getFields( clientId );
-				for ( const field of hostedFields ) {
-					field.removeAttribute( 'contenteditable' );
-					field.removeAttribute( 'tabindex' );
-				}
+				hostedField = getField( clientId );
+				hostedField?.removeAttribute( 'contenteditable' );
+				hostedField?.removeAttribute( 'tabindex' );
 			}
 
 			function disengage() {
-				releaseFields();
+				releaseField();
 				engaged = false;
 				hostedClientId = null;
 				setContentEditableWrapper( node, false );
@@ -154,7 +152,7 @@ export default function useEditableRoot() {
 				// selection observer disables both together when the
 				// selection collapses. Removing the attributes here would
 				// strip the accessible name off the focused editing host at
-				// the moment cross-block editing begins. The fields stay
+				// the moment cross-block editing begins. The field stays
 				// inert too: rich text renders every multi-selected block's
 				// field inert.
 				if ( hasMultiSelection() || isMultiSelecting() ) {
@@ -164,8 +162,8 @@ export default function useEditableRoot() {
 
 				if ( enabled ) {
 					// The host moves to another block: the previous block's
-					// fields become editable elements again.
-					releaseFields();
+					// field becomes an editable element again.
+					releaseField();
 					engage( clientId );
 				} else if ( engaged ) {
 					disengage();
