@@ -186,6 +186,30 @@ describe( 'inline addition operations', () => {
 		} );
 	} );
 
+	describe( 'acceptInlineAddition with an interleaved marker', () => {
+		it( 'keeps another suggestion that sits in the gap of a fragmented run', () => {
+			const value = RichTextData.fromHTMLString(
+				`${ add( 1, 'A' ) }${ add( 2, 'B' ) }${ add( 1, 'C' ) }`
+			);
+			const html = acceptInlineAddition( value, 1 ).toHTMLString();
+			expect( html.replace( /<[^>]+>/g, '' ) ).toBe( 'ABC' );
+			expect( html ).toContain( 'data-suggestion-id="2"' );
+			expect( html ).not.toContain( 'data-suggestion-id="1"' );
+		} );
+	} );
+
+	describe( 'rejectInlineDeletion with an interleaved marker', () => {
+		it( 'keeps another suggestion that sits in the gap of a fragmented run', () => {
+			const value = RichTextData.fromHTMLString(
+				`${ del( 1, 'A' ) }${ add( 2, 'B' ) }${ del( 1, 'C' ) }`
+			);
+			const html = rejectInlineDeletion( value, 1 ).toHTMLString();
+			expect( html.replace( /<[^>]+>/g, '' ) ).toBe( 'ABC' );
+			expect( html ).toContain( 'data-suggestion-id="2"' );
+			expect( html ).not.toContain( 'data-suggestion-id="1"' );
+		} );
+	} );
+
 	describe( 'rejectInlineAddition', () => {
 		it( 'removes the proposed text and its marker', () => {
 			const value = RichTextData.fromHTMLString(

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
+import deprecated from '@wordpress/deprecated';
 import { isValidElement } from '@wordpress/element';
 import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
@@ -12,6 +13,12 @@ function UnconnectedZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	deprecated( 'wp.components.__experimentalZStack', {
+		since: '7.2',
+		version: '7.4',
+		alternative: 'your own CSS',
+	} );
+
 	const {
 		children,
 		className,
@@ -63,6 +70,10 @@ function UnconnectedZStack(
 
 /**
  * `ZStack` allows you to stack things along the Z-axis.
+ *
+ * This component is deprecated. Write your own CSS instead.
+ *
+ * @deprecated
  *
  * ```jsx
  * import { __experimentalZStack as ZStack } from '@wordpress/components';
