@@ -131,19 +131,17 @@ export default function useEditableRoot() {
 
 				// A block's focus handler selects the block before the
 				// browser places the caret in the focused field (WebKit
-				// does so after the focus event). Switching then would
-				// blur the field and leave the caret at the start of the
-				// wrapper: wait for the caret instead.
+				// does so after the focus event, and then in the wrapper
+				// once the host took focus). Place it at the start of the
+				// field, as the browser would.
 				const { activeElement } = ownerDocument;
+				const selection = defaultView.getSelection();
 				if (
 					activeElement !== node &&
 					node.contains( activeElement ) &&
-					! defaultView.getSelection().anchorNode
+					! selection.anchorNode
 				) {
-					ownerDocument.addEventListener( 'selectionchange', sync, {
-						once: true,
-					} );
-					return;
+					selection.collapse( activeElement, 0 );
 				}
 
 				// The selection observer may have disengaged the host when a
@@ -179,7 +177,6 @@ export default function useEditableRoot() {
 
 			return () => {
 				unsubscribe();
-				ownerDocument.removeEventListener( 'selectionchange', sync );
 				if ( node.contentEditable === 'true' ) {
 					disengage();
 				} else {
