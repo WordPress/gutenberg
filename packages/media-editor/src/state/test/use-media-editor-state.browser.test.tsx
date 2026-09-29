@@ -31,7 +31,7 @@ function CropperWithHistory( {
 		<div style={ { width: 648, height: 448 } }>
 			<Cropper
 				src={ IMAGE.src }
-				controller={ controller }
+				controller={ controller.cropper }
 				freeformCrop
 				onGestureStart={ controller.beginGesture }
 				onGestureEnd={ controller.endGesture }
@@ -61,11 +61,11 @@ describe( 'useMediaEditorState with a Cropper', () => {
 				'{/Shift}'
 		);
 		await waitFor( () =>
-			expect( controller.state.zoom ).toBeGreaterThan( 1 )
+			expect( controller.cropper.state.zoom ).toBeGreaterThan( 1 )
 		);
 
 		act( () =>
-			controller.setFlip( { horizontal: true, vertical: false } )
+			controller.cropper.setFlip( { horizontal: true, vertical: false } )
 		);
 
 		for ( let i = 0; i < 10 && controller.hasUndo; i++ ) {
