@@ -6,6 +6,7 @@ import emotion from '@rolldown/plugin-emotion';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+import { createPostcssBrowserPlugin } from './postcss-browser-plugin.mjs';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -131,6 +132,27 @@ const config: StorybookConfig = {
 	},
 	viteFinal: async ( viteConfig ) => {
 		return mergeConfig( viteConfig, {
+			resolve: {
+				alias: [
+					{
+						// Source stories and package imports must share one store.
+						find: /^@wordpress\/block-editor$/,
+						replacement: path.resolve(
+							import.meta.dirname,
+							'../packages/block-editor/src/index.js'
+						),
+					},
+				],
+			},
+			optimizeDeps: {
+				rolldownOptions: {
+					plugins: [
+						createPostcssBrowserPlugin(
+							path.resolve( import.meta.dirname, '..' )
+						),
+					],
+				},
+			},
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,

@@ -13,6 +13,10 @@
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
 
+### Internal
+
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
+
 ## 15.1.0 (2026-09-23)
 
 ### Enhancements
