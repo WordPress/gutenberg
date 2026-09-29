@@ -63,6 +63,24 @@ export default function useEditableRoot() {
 				activeElement.contains( selection.anchorNode )
 			) {
 				node.focus();
+			} else if (
+				( activeElement === node ||
+					activeElement === node.ownerDocument.body ) &&
+				node.ownerDocument.hasFocus() &&
+				! activeElement.matches( ':focus' )
+			) {
+				// Removing the selected field's contenteditable attribute can
+				// blur it before this ref runs. The body is then the default
+				// active element, but it does not hold keyboard focus—even
+				// when it is the new editing host. Keep typing in the selected
+				// block when a remote insertion adds its first sibling.
+				const editable = getSelectionEditableElement( selection, node );
+				if (
+					editable &&
+					getBlockClientId( editable ) === getSelectedBlockClientId()
+				) {
+					node.focus( { preventScroll: true } );
+				}
 			}
 
 			return () => {
