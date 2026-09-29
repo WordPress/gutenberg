@@ -63,6 +63,7 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
+import { mergeServerFields } from './merge-server-fields';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -124,40 +125,6 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
-/**
- * Merges the fields registered on the server into the fields the editor
- * derives itself.
- *
- * A server field with the id of a client field overrides its properties,
- * keeping its position, so the data the server declares (label, type,
- * elements, filter operators…) wins while the client keeps providing the
- * JavaScript parts the server does not ship. A server field the client does
- * not know about is appended, in registration order.
- *
- * @param clientFields The fields the editor derives.
- * @param serverFields The fields registered on the server.
- * @return The merged fields.
- */
-function mergeServerFields< Item >(
-	clientFields: Field< Item >[],
-	serverFields: Field< Item >[]
-): Field< Item >[] {
-	const serverFieldsById = new Map(
-		serverFields.map( ( field ) => [ field.id, field ] )
-	);
-
-	const merged = clientFields.map( ( field ) => {
-		const serverField = serverFieldsById.get( field.id );
-		if ( ! serverField ) {
-			return field;
-		}
-		serverFieldsById.delete( field.id );
-		return { ...field, ...serverField };
-	} );
-
-	return [ ...merged, ...serverFieldsById.values() ];
-}
-
 /*
  * Media fields for the attachment post type.
  *
@@ -168,8 +135,8 @@ function mergeServerFields< Item >(
  * Note: media_thumbnail is not included as it's shown in the canvas preview
  */
 const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default). The date added field is
-	// registered on the server.
+	// Metadata in panels (collapsed by default).
+	'date',
 	mediaAuthorField,
 	filenameField,
 	mimeTypeField,
@@ -262,7 +229,9 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Handle attachment post type separately with media-specific fields
+		// Handle attachment post type separately with media-specific fields.
+		// A string is the id of a field registered on the server, placed
+		// where it goes, see `mergeServerFields()`.
 		let fields;
 
 		if ( postType === ATTACHMENT_POST_TYPE ) {
@@ -286,6 +255,7 @@ export const registerPostTypeSchema =
 				// The author field of the post types supporting authors is
 				// registered on the server; templates and template parts
 				// unregister it there and keep their own.
+				'author',
 				postTypeSlug === 'wp_template' && templateAuthorField,
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
@@ -303,7 +273,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				// The comment status field is registered on the server.
+				'comment_status',
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
@@ -329,7 +299,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
-				// The notes field is registered on the server.
+				'notesCount',
 				isPattern && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
@@ -364,7 +334,10 @@ export const registerPostTypeSchema =
 					{ id: 'editor-entity-fields-error', type: 'snackbar' }
 				);
 		}
-		fields = mergeServerFields( fields as Field< any >[], serverFields );
+		const mergedFields = mergeServerFields(
+			fields as Array< Field< any > | string >,
+			serverFields
+		);
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
@@ -374,7 +347,7 @@ export const registerPostTypeSchema =
 					action
 				);
 			} );
-			fields.forEach( ( field ) => {
+			mergedFields.forEach( ( field ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
 					postType,
