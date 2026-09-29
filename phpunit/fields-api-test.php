@@ -240,8 +240,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'      => 'plugin/color',
-					'dynamic' => true,
+					'id'     => 'plugin/color',
+					'import' => 'dynamic',
 				),
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
@@ -270,8 +270,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 1, count( array_keys( $ids, 'plugin/color', true ) ), 'The module is declared once.' );
 		$this->assertContains(
 			array(
-				'id'      => 'plugin/color',
-				'dynamic' => true,
+				'id'     => 'plugin/color',
+				'import' => 'dynamic',
 			),
 			$dependencies
 		);
@@ -309,8 +309,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains(
 			array(
-				'id'      => '@wordpress/fields/server-fields',
-				'dynamic' => true,
+				'id'     => '@wordpress/fields/server-fields',
+				'import' => 'dynamic',
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
 		);

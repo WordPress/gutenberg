@@ -119,8 +119,8 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 			foreach ( $modules as $module ) {
 				if ( ! in_array( $module, $declared, true ) ) {
 					$dependencies[] = array(
-						'id'      => $module,
-						'dynamic' => true,
+						'id'     => $module,
+						'import' => 'dynamic',
 					);
 					$declared[]     = $module;
 					$added          = true;
