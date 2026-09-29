@@ -14,13 +14,15 @@
  * each page is a slice of one ordered list and the total is known.
  *
  * Search terms are parsed as `WP_Query` parses them, and every term has to be found somewhere: in
- * the title, or for posts and media in the content, excerpt or file name. Results are ranked, most important first, by:
+ * the title, or for posts and media in the content or excerpt. Media is not matched by its file
+ * name, which would mean joining post meta for every attachment: its title is the file name
+ * when uploaded unless the image names itself or someone renames it. Results are ranked, most important first, by:
  *
  * 1. How many of the words typed the title holds. A match found only in the content comes last.
  * 2. Whether the title holds what was typed as one string.
  * 3. Whether the title begins with what was typed. Media still shares pages with other titles
  *    beginning with it, but is not listed above titles holding it further in unless preferred.
- * 4. The type: content, then taxonomy terms, then post formats, then media.
+ * 4. The type: pages, then other content, then taxonomy terms, then post formats, then media.
  * 5. How much of the word it was found in each word typed accounts for.
  *
  * The first three say how well a result matches. Results that match equally well share each page
@@ -233,8 +235,16 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			list( $total, $rows ) = $cached;
 		} else {
 			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Every value is escaped where the SQL is built, and the results are cached.
-			$total = (int) $wpdb->get_var( $count_sql );
-			$rows  = $wpdb->get_results( $page_sql );
+			$rows = $wpdb->get_results( $page_sql );
+
+			if ( $rows && isset( $rows[0]->total_count ) ) {
+				$total = (int) $rows[0]->total_count;
+			} elseif ( ! $rows && 1 === $page && $this->supports_window_functions() ) {
+				$total = 0;
+			} else {
+				// Without window functions, or past the last page, nothing carries the total.
+				$total = (int) $wpdb->get_var( $count_sql );
+			}
 			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			wp_cache_set( $cache_key, array( $total, $rows ), 'post-queries' );
@@ -479,7 +489,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$found      = $this->get_terms_found_sql( array( 'p.post_title', 'p.post_excerpt', 'p.post_content' ), $terms );
 		$rank       = self::TYPE_RANKS['post'];
 
-		return "SELECT 'post-type' AS kind, $rank AS base_rank, p.post_type AS subtype, p.ID AS object_id,
+		// Pages rank above other content that matches as well: a link is more often to a page.
+		return "SELECT 'post-type' AS kind, CASE WHEN p.post_type = 'page' THEN $rank + 0.5 ELSE $rank END AS base_rank, p.post_type AS subtype, p.ID AS object_id,
 				p.post_title AS title, p.post_date AS sort_date, '' AS sort_name
 			FROM {$wpdb->posts} AS p
 			WHERE p.post_type IN ( $post_types ) AND p.post_status = 'publish' AND $found";
@@ -570,7 +581,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		global $wpdb;
 
 		$found = $this->get_terms_found_sql(
-			array( 'a.post_title', 'a.post_excerpt', 'a.post_content', 'file.meta_value' ),
+			array( 'a.post_title', 'a.post_excerpt', 'a.post_content' ),
 			$terms
 		);
 		$rank  = self::TYPE_RANKS['attachment'];
@@ -579,7 +590,6 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 				a.post_title AS title, a.post_date AS sort_date, '' AS sort_name
 			FROM {$wpdb->posts} AS a
 			LEFT JOIN {$wpdb->posts} AS parent ON parent.ID = a.post_parent
-			LEFT JOIN {$wpdb->postmeta} AS file ON file.post_id = a.ID AND file.meta_key = '_wp_attached_file'
 			WHERE a.post_type = 'attachment' AND a.post_status = 'inherit'
 				AND ( {$this->get_readable_parent_sql()} ) AND $found";
 	}
@@ -815,11 +825,16 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$rank      = $this->get_order_by( $words );
 		$tie_break = implode( ', ', self::TIE_BREAK );
 
-		if ( ! $words || ! $this->supports_window_functions() ) {
+		if ( ! $this->supports_window_functions() ) {
 			return "SELECT * FROM ( $ranked ) AS ranked ORDER BY $rank $limit";
 		}
 
-		$shared = "SELECT ranked.*, ROW_NUMBER() OVER (
+		// Every row carries how many there are across every page, so no second query counts them.
+		if ( ! $words ) {
+			return "SELECT ranked.*, COUNT(*) OVER () AS total_count FROM ( $ranked ) AS ranked ORDER BY $rank $limit";
+		}
+
+		$shared = "SELECT ranked.*, COUNT(*) OVER () AS total_count, ROW_NUMBER() OVER (
 				PARTITION BY found, contains_search, begins, type_rank, subtype
 				ORDER BY coverage DESC, $tie_break
 			) AS share

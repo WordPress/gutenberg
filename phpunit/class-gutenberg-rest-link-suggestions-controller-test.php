@@ -237,6 +237,50 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		return $count;
 	}
 
+	public function test_runs_one_query_for_a_page_of_suggestions() {
+		$this->create_post( 'Coffee Page' );
+
+		$this->assertSame(
+			1,
+			$this->count_searches(
+				function () {
+					$this->assertSame( array( 'Coffee Page' ), $this->get_titles( array( 'search' => 'coffee' ) ) );
+				}
+			)
+		);
+	}
+
+	public function test_reports_the_total_for_a_page_past_the_last() {
+		foreach ( array( 'Chai One', 'Chai Two', 'Chai Three' ) as $age => $title ) {
+			$this->create_post( $title, 'page', $age );
+		}
+
+		$response = $this->get_suggestions(
+			array(
+				'search'   => 'chai',
+				'per_page' => 1,
+				'page'     => 5,
+			)
+		);
+		$headers  = $response->get_headers();
+
+		$this->assertSame( array(), $response->get_data() );
+		$this->assertSame( 3, $headers['X-WP-Total'] );
+		$this->assertSame( 3, $headers['X-WP-TotalPages'] );
+	}
+
+	public function test_reports_no_suggestions_without_a_second_query() {
+		$searches = $this->count_searches(
+			function () {
+				$response = $this->get_suggestions( array( 'search' => 'zebra' ) );
+				$this->assertSame( array(), $response->get_data() );
+				$this->assertSame( 0, $response->get_headers()['X-WP-Total'] );
+			}
+		);
+
+		$this->assertSame( 1, $searches );
+	}
+
 	public function test_answers_a_repeated_search_from_the_cache() {
 		$this->create_post( 'Coffee Page' );
 		$search = function () {
@@ -252,7 +296,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->get_titles( array( 'search' => 'coffee' ) );
 
 		$this->create_post( 'Coffee Post', 'post', 0 );
-		$this->assertSame( array( 'Coffee Post', 'Coffee Page' ), $this->get_titles( array( 'search' => 'coffee' ) ) );
+		$this->assertSame( array( 'Coffee Page', 'Coffee Post' ), $this->get_titles( array( 'search' => 'coffee' ) ) );
 
 		self::factory()->category->create( array( 'name' => 'Coffee Category' ) );
 		$this->assertContains( 'Coffee Category', $this->get_titles( array( 'search' => 'coffee' ) ) );
@@ -430,7 +474,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$data = $this->get_suggestions( array( 'search' => 'gallery' ) )->get_data();
 
 		$this->assertSame(
-			array( 'post', 'page', 'category', 'post_tag', 'post-format', 'attachment' ),
+			array( 'page', 'post', 'category', 'post_tag', 'post-format', 'attachment' ),
 			wp_list_pluck( $data, 'subtype' )
 		);
 	}
@@ -570,18 +614,14 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		);
 	}
 
-	public function test_matches_media_by_file_name_for_words_missing_from_the_title() {
+	public function test_does_not_match_media_by_file_name() {
 		$this->create_attachment( 'Beach', 0, 'sunset-beach.jpg' );
-		$this->create_post( 'Beach' );
 
-		// Every word typed has to be found somewhere: the page has no "sunset" at all.
+		// Media is matched by its title, caption and description. Its title is the file name when
+		// uploaded, unless the image names itself or someone renames it.
 		$this->assertSame(
-			array( 'Beach' ),
+			array(),
 			$this->get_titles( array( 'search' => 'sunset beach' ) )
-		);
-		$this->assertSame(
-			array( 'attachment' ),
-			wp_list_pluck( $this->get_suggestions( array( 'search' => 'sunset beach' ) )->get_data(), 'type' )
 		);
 	}
 
@@ -754,6 +794,34 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->assertSame( 3, $headers['X-WP-Total'] );
 		$this->assertSame( 2, $headers['X-WP-TotalPages'] );
 		$this->assertSame( array( 'Chai One', 'Chai Two' ), wp_list_pluck( $response->get_data(), 'title' ) );
+	}
+
+	public function test_ranks_pages_above_other_content_that_matches_as_well() {
+		$this->create_post( 'Coffee Post', 'post', 0 );
+		$this->create_post( 'Coffee Page', 'page', 1 );
+
+		// The post is newer, which would otherwise put it first.
+		$this->assertSame( array( 'Coffee Page', 'Coffee Post' ), $this->get_titles( array( 'search' => 'coffee' ) ) );
+	}
+
+	public function test_ranks_posts_above_pages_when_posts_are_preferred() {
+		$this->create_post( 'Coffee Post', 'post', 1 );
+		$this->create_post( 'Coffee Page', 'page', 0 );
+
+		$this->assertSame(
+			array( 'Coffee Post', 'Coffee Page' ),
+			$this->get_titles(
+				array(
+					'search'       => 'coffee',
+					'prefer_types' => array(
+						array(
+							'type'    => 'post',
+							'subtype' => 'post',
+						),
+					),
+				)
+			)
+		);
 	}
 
 	public function test_ranks_the_preferred_subtype_above_the_usual_type_order() {
@@ -945,7 +1013,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 			)
 		)->get_data();
 
-		$this->assertSame( array( 'post', 'page', 'category', 'post_tag' ), wp_list_pluck( $data, 'subtype' ) );
+		$this->assertSame( array( 'page', 'post', 'category', 'post_tag' ), wp_list_pluck( $data, 'subtype' ) );
 	}
 
 	public function test_carries_the_share_onto_later_pages_when_more_types_match_than_fit() {
@@ -1057,7 +1125,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->assertSame( array( 'Brew One', 'Brew Two' ), wp_list_pluck( $data, 'title' ) );
 	}
 
-	public function test_lists_content_first_and_newest_first_when_nothing_is_typed() {
+	public function test_lists_pages_then_other_content_newest_first_when_nothing_is_typed() {
 		_delete_all_posts();
 		self::factory()->category->create( array( 'name' => 'Some Category' ) );
 		$this->create_post( 'Older', 'page', 2 );
@@ -1065,7 +1133,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->create_post( 'Middle', 'page', 1 );
 
 		$this->assertSame(
-			array( 'Newest', 'Middle', 'Older' ),
+			array( 'Middle', 'Older', 'Newest' ),
 			$this->get_titles( array( 'per_page' => 3 ) )
 		);
 	}
