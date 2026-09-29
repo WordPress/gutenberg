@@ -488,7 +488,7 @@ function ScreenBlockList() {
 			<ScreenHeader
 				title={ __( 'Blocks & Elements' ) }
 				description={ __(
-					"Customize how a block looks everywhere it's used."
+					"Customize how a block or element looks everywhere it's used."
 				) }
 			/>
 			<HStack
