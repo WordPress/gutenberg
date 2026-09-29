@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Keep filter and item actions menus dismissible when their triggers become disabled.
+-   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ### Enhancements
 
