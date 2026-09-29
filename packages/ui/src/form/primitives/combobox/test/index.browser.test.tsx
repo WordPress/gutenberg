@@ -48,7 +48,9 @@ function renderDisabledMultiSelect( disabled: boolean ) {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -115,7 +117,9 @@ describe( 'Combobox', () => {
 										}
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -169,7 +173,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -249,7 +255,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -298,7 +306,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -337,7 +347,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -397,7 +409,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -435,7 +449,9 @@ describe( 'Combobox', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Combobox.ItemLabel>
+												{ item.value }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									) }
 								</Combobox.Collection>
@@ -480,7 +496,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -557,7 +575,9 @@ describe( 'Combobox', () => {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Combobox.ItemLabel>
+															{ item.value }
+														</Combobox.ItemLabel>
 													</Combobox.Item>
 												) }
 											</Combobox.Collection>

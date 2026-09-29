@@ -88,9 +88,9 @@ export interface SelectItemLabelProps extends ComponentProps< 'div' > {
 
 export interface SelectItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content displayed below a select item label. Use as a
-	 * direct child after `Select.ItemLabel`. Content should be text or
-	 * non-interactive inline markup.
+	 * Content that contributes to the select item's accessible description.
+	 * Use as a direct child after `Select.ItemLabel`. Content should be text
+	 * or non-interactive inline markup.
 	 */
 	children: ReactNode;
 }
