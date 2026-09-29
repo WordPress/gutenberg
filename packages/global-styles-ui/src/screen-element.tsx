@@ -1,4 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	PanelBody,
 	__experimentalSpacer as Spacer,
@@ -14,6 +15,7 @@ import ElementPreview from './element-preview';
 import { useSetting, useStyle, useCanEditCSS } from './hooks';
 import { normalizeBorderStyle } from './border-utils';
 import { unlock } from './lock-unlock';
+import { getValidPseudoStates } from './utils';
 
 const {
 	useSettingsForBlockElement,
@@ -91,6 +93,11 @@ type ElementName = keyof typeof elements;
 
 interface ScreenElementProps {
 	element: ElementName;
+	/**
+	 * Whether to offer the element's states, such as hover. Follows the same
+	 * editor setting that turns off state editing for blocks.
+	 */
+	showStateControls?: boolean;
 }
 
 /**
@@ -100,13 +107,16 @@ interface ScreenElementProps {
  * @param props
  * @param props.element The element being styled.
  * @param props.label   Its display name, used in the custom CSS help text.
+ * @param props.state   The selected state, such as `:hover`, if any.
  */
 function ElementStylePanels( {
 	element,
 	label,
+	state,
 }: {
 	element: string;
 	label: string;
+	state?: string;
 } ) {
 	// "Text" is the site's base text, stored at the root of the styles rather
 	// than under `elements`. The root has its own screens for background,
@@ -117,13 +127,15 @@ function ElementStylePanels( {
 		prefix,
 		'',
 		'user',
-		false
+		false,
+		state
 	);
 	const [ inheritedStyle, setStyle ] = useStyle< GlobalStylesStyles >(
 		prefix,
 		'',
 		'merged',
-		false
+		false,
+		state
 	);
 	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
 	const settings = useSettingsForBlockElement(
@@ -199,12 +211,26 @@ function ElementStylePanels( {
 	);
 }
 
-function ScreenElement( { element }: ScreenElementProps ) {
+function ScreenElement( {
+	element,
+	showStateControls = true,
+}: ScreenElementProps ) {
+	const [ selectedPseudoState, setSelectedPseudoState ] =
+		useState< string >( 'default' );
+	// Only links and buttons have states, such as hover and focus.
+	const pseudoStates = useMemo(
+		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
+		[ element, showStateControls ]
+	);
+
 	return (
 		<>
 			<ScreenHeader
 				title={ elements[ element ].title }
 				description={ elements[ element ].description }
+				pseudoStates={ pseudoStates }
+				selectedPseudoState={ selectedPseudoState }
+				onChangePseudoState={ setSelectedPseudoState }
 			/>
 			<Spacer marginX={ 4 }>
 				<ElementPreview element={ element } />
@@ -212,6 +238,11 @@ function ScreenElement( { element }: ScreenElementProps ) {
 			<ElementStylePanels
 				element={ element }
 				label={ elements[ element ].title }
+				state={
+					selectedPseudoState === 'default'
+						? undefined
+						: selectedPseudoState
+				}
 			/>
 		</>
 	);
