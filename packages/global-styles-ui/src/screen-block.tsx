@@ -30,7 +30,7 @@ import { unlock } from './lock-unlock';
 import { getValidPseudoStates, getValidViewportStates } from './utils';
 
 // Initial control values.
-const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
 	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
