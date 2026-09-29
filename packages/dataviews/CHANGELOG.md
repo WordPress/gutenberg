@@ -22,7 +22,7 @@
 
 ### Bug Fixes
 
--   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
 -   DataForm: Hide the edit button of disabled fields in the panel layout, as it already is for read-only fields ([#82957](https://github.com/WordPress/gutenberg/pull/82957)).
 
