@@ -93,7 +93,7 @@ export default function useEditableRoot() {
 					activeElement !== node &&
 					activeElement?.isContentEditable &&
 					node.contains( activeElement ) &&
-					getBlockClientId( activeElement ) === clientId &&
+					getBlockClientId( activeElement ) &&
 					selection.anchorNode &&
 					activeElement.contains( selection.anchorNode )
 				) {
