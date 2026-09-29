@@ -139,6 +139,35 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 add_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' );
 
 /**
+ * Preloads the fields of the edited post type in the post editor.
+ *
+ * The editor reads them from the `wp/v2/fields` route before it can list the
+ * post fields, see `registerPostTypeSchema` in
+ * packages/editor/src/dataviews/store/private-actions.ts. The path must match
+ * the request of the `getFieldsConfig` core data resolver.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Block editor context.
+ * @return array Filtered preload paths.
+ */
+function _gutenberg_preload_post_editor_fields( $paths, $context ) {
+	if ( 'core/edit-post' !== $context->name || ! isset( $context->post ) ) {
+		return $paths;
+	}
+
+	$paths[] = add_query_arg(
+		array(
+			'kind' => 'postType',
+			'name' => $context->post->post_type,
+		),
+		'/wp/v2/fields'
+	);
+
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_post_editor_fields', 10, 2 );
+
+/**
  * Registers the default fields of every post type exposed in the REST API.
  *
  * These are the fields ported to the server so far; the editor still derives
