@@ -13,7 +13,8 @@ export default {
 			// by these stories outside that root in the docgen project.
 			include: [
 				'**/*.tsx',
-				'../../packages/*/src/**/*.tsx',
+				'../../packages/components/src/**/*.tsx',
+				'../../packages/ui/src/**/*.tsx',
 				'../../storybook/**/*.tsx',
 			],
 		},
