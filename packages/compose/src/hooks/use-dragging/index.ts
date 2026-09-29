@@ -34,10 +34,10 @@ export default function useDragging( {
 	}, [] );
 
 	const endDrag = useCallback(
-		function endDrag( event?: MouseEvent ): void {
+		function handleEndDrag( event?: MouseEvent ): void {
 			eventsRef.current.onDragEnd?.( event );
 			document.removeEventListener( 'mousemove', onMouseMove );
-			document.removeEventListener( 'mouseup', endDrag );
+			document.removeEventListener( 'mouseup', handleEndDrag );
 			setIsDragging( false );
 		},
 		[ onMouseMove ]

@@ -81,6 +81,10 @@ When designing props for a new component:
 
 -   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
 
+### Component status
+
+When you change a component's Storybook `parameters.componentStatus.status` or its public export, check the `@wordpress/ui` entry in the [`use-recommended-components`](../eslint-plugin/docs/rules/use-recommended-components.md) ESLint rule. `recommended` components belong in `allowed`, `use-with-caution` components in `caution`, and other statuses in neither.
+
 ## Compound Components
 
 This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
