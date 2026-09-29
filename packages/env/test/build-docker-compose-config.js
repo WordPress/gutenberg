@@ -73,4 +73,14 @@ describe( 'buildDockerComposeConfig', () => {
 			expect.arrayContaining( localSources )
 		);
 	} );
+
+	it( 'should let Docker Compose choose the MariaDB version from WP_ENV_MARIADB_VERSION', () => {
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: CONFIG, tests: CONFIG },
+		} );
+
+		expect( dockerConfig.services.mysql.image ).toBe(
+			'mariadb:${WP_ENV_MARIADB_VERSION:-latest}'
+		);
+	} );
 } );
