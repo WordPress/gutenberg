@@ -34,7 +34,7 @@ function toRouteTarget( path: string ): {
 const DashboardRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function DashboardRouteLink( { path, ...props }, ref ) {
+>( function UnforwardedDashboardRouteLink( { path, ...props }, ref ) {
 	return <Link ref={ ref } { ...toRouteTarget( path ) } { ...props } />;
 } );
 

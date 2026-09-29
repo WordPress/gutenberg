@@ -12,27 +12,29 @@ import { InputLayout } from '../input-layout';
  *
  * Prefer `InputControl` when using with a standard label and description.
  */
-export const Input = forwardRef< HTMLElement, InputProps >( function Input(
-	{ className, size = 'default', prefix, suffix, style, ...restProps },
-	ref
-) {
-	return (
-		<InputLayout
-			className={ clsx(
-				focusStyles[ 'outset-ring--focus-within' ],
-				className
-			) }
-			style={ style }
-			size={ size }
-			visuallyDisabled={ restProps.disabled }
-			prefix={ prefix }
-			suffix={ suffix }
-		>
-			<_Input
-				ref={ ref }
-				className={ clsx( defenseStyles.input, styles.input ) }
-				{ ...restProps }
-			/>
-		</InputLayout>
-	);
-} );
+export const Input = forwardRef< HTMLElement, InputProps >(
+	function UnforwardedInput(
+		{ className, size = 'default', prefix, suffix, style, ...restProps },
+		ref
+	) {
+		return (
+			<InputLayout
+				className={ clsx(
+					focusStyles[ 'outset-ring--focus-within' ],
+					className
+				) }
+				style={ style }
+				size={ size }
+				visuallyDisabled={ restProps.disabled }
+				prefix={ prefix }
+				suffix={ suffix }
+			>
+				<_Input
+					ref={ ref }
+					className={ clsx( defenseStyles.input, styles.input ) }
+					{ ...restProps }
+				/>
+			</InputLayout>
+		);
+	}
+);

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
+import type { ComponentType, ReactNode } from 'react';
 import * as Autocomplete from '../index';
 
 const ITEMS = [
@@ -19,6 +20,86 @@ function renderDisabledAutocompleteWithClear() {
 }
 
 describe( 'Autocomplete', () => {
+	it( 'uses the item label as its accessible name and describes it in order', () => {
+		const item = { value: 'apple', label: 'Apple' };
+
+		render(
+			<Autocomplete.Root items={ [ item ] } inline open>
+				<Autocomplete.List>
+					<Autocomplete.Item value={ item }>
+						<Autocomplete.ItemLabel>Apple</Autocomplete.ItemLabel>
+						<Autocomplete.ItemDescription>
+							Fresh fruit.
+						</Autocomplete.ItemDescription>
+						<Autocomplete.ItemDescription>
+							In stock.
+						</Autocomplete.ItemDescription>
+					</Autocomplete.Item>
+				</Autocomplete.List>
+			</Autocomplete.Root>
+		);
+
+		const option = screen.getByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription(
+			'Fresh fruit. In stock.'
+		);
+	} );
+
+	it( 'requires an ItemLabel as the first direct child', () => {
+		const InvalidItem = Autocomplete.Item as ComponentType< {
+			value: string;
+			children?: ReactNode;
+		} >;
+
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ [ 'Apple' ] } inline open>
+					<Autocomplete.List>
+						<InvalidItem value="Apple">Apple</InvalidItem>
+					</Autocomplete.List>
+				</Autocomplete.Root>
+			)
+		).toThrow( 'Autocomplete.ItemLabel must be the first direct child' );
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'rejects a description nested in the item label', () => {
+		const item = { value: 'apple', label: 'Apple' };
+
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ [ item ] } inline open>
+					<Autocomplete.List>
+						<Autocomplete.Item value={ item }>
+							<Autocomplete.ItemLabel>
+								Apple
+								<Autocomplete.ItemDescription>
+									Fresh fruit.
+								</Autocomplete.ItemDescription>
+							</Autocomplete.ItemLabel>
+						</Autocomplete.Item>
+					</Autocomplete.List>
+				</Autocomplete.Root>
+			)
+		).toThrow(
+			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'rejects a description outside an item', () => {
+		expect( () =>
+			render(
+				<Autocomplete.ItemDescription>
+					Fresh fruit.
+				</Autocomplete.ItemDescription>
+			)
+		).toThrow(
+			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	describe( 'when disabled', () => {
 		it( 'hides the clear button from screen readers', () => {
 			renderDisabledAutocompleteWithClear();
@@ -78,7 +159,9 @@ describe( 'Autocomplete', () => {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.emoji }
+											<Autocomplete.ItemLabel>
+												{ item.emoji }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) ) }
 								</Autocomplete.Row>
@@ -108,7 +191,9 @@ describe( 'Autocomplete', () => {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.emoji }
+											<Autocomplete.ItemLabel>
+												{ item.emoji }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) ) }
 								</Autocomplete.Row>
