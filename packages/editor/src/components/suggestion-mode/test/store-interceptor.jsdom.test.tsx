@@ -171,12 +171,21 @@ describe( 'adoptSystemMetadata', () => {
  * staged status edit, and both reads go through `core`. These registries are
  * minimal, so answer the two selectors with nothing.
  */
-function createStubCoreStore() {
+function createStubCoreStore( comments: Record< number, any > = {} ) {
 	return createReduxStore( 'core', {
 		reducer: ( state = {} ) => state,
 		selectors: {
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
+			getEntityRecord: (
+				state: any,
+				kind: string,
+				name: string,
+				id: number
+			) =>
+				kind === 'root' && name === 'comment'
+					? comments[ id ]
+					: undefined,
 		},
 	} );
 }
@@ -209,7 +218,10 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
-	function setup( { initialBlocks }: { initialBlocks?: any[] } = {} ) {
+	function setup( {
+		initialBlocks,
+		comments,
+	}: { initialBlocks?: any[]; comments?: Record< number, any > } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
@@ -219,7 +231,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.register( createStubCoreStore() );
+		registry.register( createStubCoreStore( comments ) );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
@@ -264,6 +276,45 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await act( async () => {
 			await Promise.resolve();
 		} );
+	}
+
+	function appliedRemovalNote( id: number, clientId: string ) {
+		return {
+			id,
+			status: 'approved',
+			meta: {
+				_wp_suggestion_status: 'applied',
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					blockName: TEST_BLOCK_NAME,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'block-remove',
+							clientId,
+							blockName: TEST_BLOCK_NAME,
+						},
+					],
+				} ),
+			},
+		};
+	}
+
+	// What the provider does once auto-save creates the note.
+	async function linkNote( registry: any, clientId: string, id: number ) {
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, {
+					metadata: {
+						...registry
+							.select( blockEditorStore )
+							.getBlockAttributes( clientId ).metadata,
+						noteId: id,
+					},
+				} );
+		} );
+		await flushSubscribers();
 	}
 
 	it( 'preserves a programmatic metadata.noteId update on the live block', async () => {
@@ -526,8 +577,10 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// moment after they clicked.
 		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
 		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const comments: Record< number, any > = {};
 		const { registry, getOverlay } = setup( {
 			initialBlocks: [ a, b ],
+			comments,
 		} );
 
 		// First, this client creates the pending-remove suggestion
@@ -536,11 +589,16 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
 		} );
 		await flushSubscribers();
+		await linkNote( registry, b.clientId, 4 );
 
 		expect(
 			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
 				?.metadata?.suggestion?.type
 		).toBe( 'pending-remove' );
+
+		// The accepting client resolved the note before removing the
+		// block, and the note reached this client through sync.
+		comments[ 4 ] = appliedRemovalNote( 4, b.clientId );
 
 		// Simulate the apply landing: marker-clear + removeBlock
 		// batched into a single store update (matching how YJS
@@ -564,6 +622,93 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// The orphan overlay entry is cleaned up by the PRUNE_ORPHANS
 		// effect once the block leaves the live tree.
 		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
+	} );
+
+	it( 'adopts a local apply of a pending removal made while suggesting', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const comments: Record< number, any > = {};
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b ],
+			comments,
+		} );
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+		await linkNote( registry, b.clientId, 6 );
+
+		// The provider's apply: persist the decision, clear the marker
+		// (keeping the note link), then remove the block, unbatched.
+		comments[ 6 ] = appliedRemovalNote( 6, b.clientId );
+		await act( async () => {
+			const { suggestion, ...metadata } = registry
+				.select( blockEditorStore )
+				.getBlockAttributes( b.clientId ).metadata;
+			getOverlay().requestInterceptorBypass( b.clientId );
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( b.clientId, { metadata } );
+			getOverlay().requestInterceptorBypass( b.clientId );
+			getOverlay().clearOverlay( b.clientId );
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			a.clientId,
+		] );
+	} );
+
+	it( 'keeps the block when a pending removal is deleted again', async () => {
+		// A second delete of the struck-through block is an ordinary user
+		// removal, not a review decision. Only a resolved note may let the
+		// block go.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry } = setup( { initialBlocks: [ a, b ] } );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			a.clientId,
+			b.clientId,
+		] );
+	} );
+
+	it( 'adopts the removal once the linked note records the removal as applied', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const comments: Record< number, any > = {};
+		const { registry } = setup( { initialBlocks: [ a, b ], comments } );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+		await linkNote( registry, b.clientId, 5 );
+
+		// A reviewer applied it: the note is resolved before the block goes.
+		comments[ 5 ] = appliedRemovalNote( 5, b.clientId );
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			a.clientId,
+		] );
 	} );
 
 	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {
@@ -1078,6 +1223,70 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			toAnchorClientId: d.clientId,
 			toParentClientId: null,
 		} );
+	} );
+
+	it( 'keeps a moved pending insertion a pending insertion', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a, b ] } );
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).insertBlock( inserted, 2 );
+		} );
+		await flushSubscribers();
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( inserted.clientId, '', '', 0 );
+		} );
+		await flushSubscribers();
+
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			inserted.clientId,
+			a.clientId,
+			b.clientId,
+		] );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			anchorClientId: null,
+			parentClientId: null,
+		} );
+	} );
+
+	it( 'tags a child moved out of a pending insertion as its own insertion', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const { registry } = setup( { initialBlocks: [ a ] } );
+
+		const child = createBlock( TEST_BLOCK_NAME, { content: 'Child' } );
+		const group = createBlock( TEST_BLOCK_NAME, { content: 'Group' }, [
+			child,
+		] );
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).insertBlock( group, 1 );
+		} );
+		await flushSubscribers();
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( child.clientId, group.clientId, '', 0 );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( child.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
 	} );
 
 	it( 'preserves the ORIGINAL from-position when a pending-move block is moved again', async () => {

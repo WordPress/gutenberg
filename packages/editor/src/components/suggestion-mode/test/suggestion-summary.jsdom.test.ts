@@ -691,6 +691,40 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
+	it( 'reports the old and new destination when an existing link is retargeted', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: '<a href="https://old.example">Read</a>',
+					after: '<a href="https://new.example">Read</a>',
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Change link:',
+				value: 'https://old.example → https://new.example',
+			},
+		] );
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'format',
+					beforeHTML: '<a href="https://old.example">Read</a>',
+					afterHTML: '<a href="https://new.example">Read</a>',
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Change link:',
+				value: 'https://old.example → https://new.example',
+			},
+		] );
+	} );
+
 	it( 'names the containing block on an insertion inside a container', () => {
 		// A paragraph inserted inside a Group was summarized identically to
 		// one inserted at the top level (F-27, flow ST-14).

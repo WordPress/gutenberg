@@ -1,11 +1,10 @@
 import { RawHTML } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import RichText from './';
-import { getMultilineTag } from './utils';
+import { getMultilineTag, isEmpty } from './utils';
 
 export function valueToHTMLString( value, multiline ) {
-	if ( RichText.isEmpty( value ) ) {
+	if ( isEmpty( value ) ) {
 		const multilineTag = getMultilineTag( multiline );
 		return multilineTag ? `<${ multilineTag }></${ multilineTag }>` : '';
 	}

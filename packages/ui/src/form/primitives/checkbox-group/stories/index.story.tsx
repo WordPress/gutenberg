@@ -4,7 +4,8 @@ import { Checkbox } from '../../checkbox';
 import { CheckboxGroup } from '../';
 
 const meta: Meta< typeof CheckboxGroup > = {
-	title: 'Design System/Components/Form/Primitives/CheckboxGroup',
+	title: 'Components/@wordpress-ui/Form/Primitives/CheckboxGroup',
+	id: 'design-system-components-form-primitives-checkboxgroup',
 	component: CheckboxGroup,
 	subcomponents: {
 		'CheckboxGroup.NestedItems': CheckboxGroup.NestedItems,

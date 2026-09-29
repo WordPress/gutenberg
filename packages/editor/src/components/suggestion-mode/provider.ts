@@ -1263,7 +1263,8 @@ export function useSuggestionsProvider() {
 			//   - block-move: clear the marker, then dispatch
 			//     moveBlockToPosition to put the block back at its
 			//     pre-move parent + index.
-			//   - attribute-set (no structural op): no live-block change.
+			//   - attribute-set (no structural op): no live-block change; the
+			//     overlay entry holding the proposed value is cleared.
 			const structuralOp = findStructuralOp( payload?.operations );
 
 			try {
@@ -1295,6 +1296,29 @@ export function useSuggestionsProvider() {
 						const clearAttrs = clearSuggestionMarkerAttributes(
 							selectBlockAttributes( clientId )
 						);
+						const liveParent =
+							selectBlockRootClientId( clientId ) ?? '';
+						/*
+						 * The recorded parents are session-local client ids,
+						 * regenerated whenever the post is parsed again. A move
+						 * within one parent needs no recorded id at all: the
+						 * block's live parent is the parent it came from. A move
+						 * across parents restores to the recorded parent only
+						 * while that block still exists; after a reload it
+						 * cannot be resolved, so the block is restored within
+						 * its current parent (a documented limitation).
+						 */
+						const recordedFrom =
+							structuralOp.fromParentClientId ?? '';
+						const recordedTo = structuralOp.toParentClientId ?? '';
+						let restoreParent = liveParent;
+						if (
+							recordedFrom !== recordedTo &&
+							( recordedFrom === '' ||
+								selectBlockAttributes( recordedFrom ) )
+						) {
+							restoreParent = recordedFrom;
+						}
 						requestInterceptorBypass( clientId );
 						clearOverlay( clientId );
 						/*
@@ -1323,8 +1347,8 @@ export function useSuggestionsProvider() {
 								 * no-op. `moveBlockToPosition` expects '' (not null)
 								 * for the root.
 								 */
-								selectBlockRootClientId( clientId ) ?? '',
-								structuralOp.fromParentClientId ?? '',
+								liveParent,
+								restoreParent,
 								structuralOp.fromIndex ?? 0
 							);
 						} );
@@ -1338,6 +1362,16 @@ export function useSuggestionsProvider() {
 						}
 						clearOverlay( clientId );
 					}
+				} else if ( clientId ) {
+					/*
+					 * An attribute-only suggestion lives entirely in the
+					 * overlay: the live block never took the proposed value,
+					 * so there is nothing to roll back, but the overlay entry
+					 * must go or it keeps rendering the rejected value and
+					 * feeds it into the next proposal. Guarded, because the
+					 * entry may already belong to a newer suggestion.
+					 */
+					clearOverlayForComment( clientId, commentId );
 				}
 
 				if ( ! silent ) {
