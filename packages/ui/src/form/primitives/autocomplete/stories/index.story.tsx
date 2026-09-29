@@ -340,6 +340,7 @@ export const WithSearchIconAndClearButton: Story = {
  * Experimental: Inline autocomplete triggered by `@`.
  */
 export const InlineMentionAutocomplete: Story = {
+	parameters: { controls: { disable: true } },
 	render: function Template( args ) {
 		const inputRef = useRef< HTMLInputElement >( null );
 		const [ value, setValue ] = useState( '' );

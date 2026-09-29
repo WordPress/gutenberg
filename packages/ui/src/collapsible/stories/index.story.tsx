@@ -68,7 +68,8 @@ export const Disabled: Story = {
  * match — improving discoverability without sacrificing the collapsed layout.
  */
 export const HiddenUntilFound: Story = {
-	render: function HiddenUntilFoundRender() {
+	args: { disabled: false },
+	render: function HiddenUntilFoundRender( args ) {
 		return (
 			<div>
 				<p>
@@ -76,7 +77,7 @@ export const HiddenUntilFound: Story = {
 					for &quot;hidden treasure&quot;. The collapsed panel will
 					automatically expand to reveal the match.
 				</p>
-				<Collapsible.Root>
+				<Collapsible.Root { ...args }>
 					<Collapsible.Trigger>Expand to reveal</Collapsible.Trigger>
 					<Collapsible.Panel hiddenUntilFound>
 						<p>
@@ -92,6 +93,7 @@ export const HiddenUntilFound: Story = {
 };
 
 export const Controlled: Story = {
+	parameters: { controls: { disable: true } },
 	argTypes: {
 		open: { control: false },
 		defaultOpen: { control: false },

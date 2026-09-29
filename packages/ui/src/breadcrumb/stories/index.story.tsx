@@ -15,6 +15,9 @@ const meta: Meta< typeof Breadcrumb.Root > = {
 	argTypes: {
 		children: { control: false },
 	},
+	args: {
+		'aria-label': 'Breadcrumbs',
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -28,9 +31,15 @@ export default meta;
 
 type Story = StoryObj< typeof Breadcrumb.Root >;
 
-function ExampleTrail( { ariaLabel = 'Breadcrumbs' }: { ariaLabel?: string } ) {
+function ExampleTrail( {
+	ariaLabel = 'Breadcrumbs',
+	...props
+}: { ariaLabel?: string } & Omit<
+	ComponentProps< typeof Breadcrumb.Root >,
+	'children'
+> ) {
 	return (
-		<Breadcrumb.Root aria-label={ ariaLabel }>
+		<Breadcrumb.Root aria-label={ ariaLabel } { ...props }>
 			<Breadcrumb.LinkItem href="/">Dashboard</Breadcrumb.LinkItem>
 			<Breadcrumb.LinkItem href="/products">Products</Breadcrumb.LinkItem>
 			<Breadcrumb.LinkItem href="/products/themes">
@@ -45,7 +54,7 @@ function ExampleTrail( { ariaLabel = 'Breadcrumbs' }: { ariaLabel?: string } ) {
 }
 
 export const Default: Story = {
-	render: () => <ExampleTrail />,
+	render: ( args ) => <ExampleTrail { ...args } />,
 };
 
 /**
@@ -54,6 +63,7 @@ export const Default: Story = {
  * menu. Resize the canvas to see it respond continuously.
  */
 export const ResponsiveStates: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<div
 			style={ {
@@ -122,9 +132,10 @@ export const ResponsiveStates: Story = {
 };
 
 export const LongLabelsAndRtl: Story = {
-	render: () => (
+	args: { 'aria-label': 'مسار التنقل' },
+	render: ( args ) => (
 		<div dir="rtl" style={ { inlineSize: 420, maxInlineSize: '100%' } }>
-			<Breadcrumb.Root aria-label="مسار التنقل">
+			<Breadcrumb.Root aria-label="مسار التنقل" { ...args }>
 				<Breadcrumb.LinkItem href="/">لوحة التحكم</Breadcrumb.LinkItem>
 				<Breadcrumb.LinkItem href="/appearance">
 					المظهر وإعدادات التخصيص
@@ -151,8 +162,8 @@ const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
 );
 
 export const RouterLinkComposition: Story = {
-	render: () => (
-		<Breadcrumb.Root>
+	render: ( args ) => (
+		<Breadcrumb.Root { ...args }>
 			<Breadcrumb.LinkItem href="/" render={ <RouterLink /> }>
 				Dashboard
 			</Breadcrumb.LinkItem>

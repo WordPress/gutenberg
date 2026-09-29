@@ -169,6 +169,7 @@ export const WithCustomZIndex: Story = {
  * menu popup unmounts.
  */
 export const MenuTrigger: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => {
 		const [ dialogOpen, setDialogOpen ] = useState( false );
 

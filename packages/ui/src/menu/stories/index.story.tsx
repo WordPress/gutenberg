@@ -40,6 +40,12 @@ const meta: Meta< typeof Menu.Root > = {
 	argTypes: {
 		children: { control: false },
 	},
+	args: {
+		disabled: false,
+		modal: true,
+		loopFocus: true,
+		highlightItemOnHover: true,
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -87,13 +93,13 @@ const SHORTCUTS = {
 };
 
 export const Default: Story = {
-	render: function Render() {
+	render: function Render( args ) {
 		const [ bookmarks, setBookmarks ] = useState( true );
 		const [ downloads, setDownloads ] = useState( false );
 		const [ view, setView ] = useState( 'list' );
 
 		return (
-			<Menu.Root>
+			<Menu.Root { ...args }>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
@@ -412,14 +418,14 @@ export const Submenu: Story = {
 };
 
 export const CheckboxItems: Story = {
-	render: function Render() {
+	render: function Render( args ) {
 		const [ bookmarks, setBookmarks ] = useState( true );
 		const [ downloads, setDownloads ] = useState( false );
 		const [ archived, setArchived ] = useState( true );
 		const [ shared, setShared ] = useState( false );
 
 		return (
-			<Menu.Root>
+			<Menu.Root { ...args }>
 				<Menu.Trigger>Columns</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Group>
@@ -476,12 +482,12 @@ export const CheckboxItems: Story = {
 };
 
 export const RadioItems: Story = {
-	render: function Render() {
+	render: function Render( args ) {
 		const [ alignment, setAlignment ] = useState( 'left' );
 		const [ density, setDensity ] = useState( 'comfortable' );
 
 		return (
-			<Menu.Root>
+			<Menu.Root { ...args }>
 				<Menu.Trigger>View options</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.RadioGroup

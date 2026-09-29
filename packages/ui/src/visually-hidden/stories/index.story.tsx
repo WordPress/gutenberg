@@ -19,6 +19,7 @@ export default meta;
 type Story = StoryObj< typeof VisuallyHidden >;
 
 export const Default: Story = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<>
 			<VisuallyHidden>This should not show.</VisuallyHidden>
@@ -37,6 +38,7 @@ export const Default: Story = {
  * while hiding the label text visually.
  */
 export const WithCustomElement: Story = {
+	parameters: { controls: { disable: true } },
 	render: function WithCustomElementStory() {
 		const inputId = useId();
 		return (

@@ -50,6 +50,7 @@ export const Default: Story = {
  * documentation for a full example.
  */
 export const WithParentCheckbox: Story = {
+	parameters: { controls: { disable: true } },
 	render: function Template( args ) {
 		const [ fruitValue, setFruitValue ] = useState( [ 'apple' ] );
 

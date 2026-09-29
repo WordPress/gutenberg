@@ -162,6 +162,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
  * consistency.
  */
 export const WithVisualLabel: StoryObj = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Stack direction="column" gap="sm" align="flex-start">
 			<Field.VisualLabel>Author</Field.VisualLabel>

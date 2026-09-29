@@ -56,6 +56,7 @@ export const Disabled: StoryObj< typeof Tooltip.Root > = {
  * (`side="top"`, `align="center"`, `sideOffset={ 4 }`).
  */
 export const Positioning: StoryObj< typeof Tooltip.Root > = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<div
 			style={ {
@@ -172,6 +173,7 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
  * the same delay configuration.
  */
 export const WithProvider: StoryObj< typeof Tooltip.Root > = {
+	parameters: { controls: { disable: true } },
 	render: () => (
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
