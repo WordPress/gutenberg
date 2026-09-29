@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
@@ -22,6 +23,13 @@ import { unlock } from '../../lock-unlock';
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 function PreviewMenu( { forceIsAutosaveable, disabled } ) {
+	const menuActionsRef = useRef( null );
+	useEffect( () => {
+		if ( disabled ) {
+			menuActionsRef.current?.close();
+		}
+	}, [ disabled ] );
+
 	const {
 		deviceType,
 		homeUrl,
@@ -151,7 +159,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	];
 
 	return (
-		<Menu.Root modal={ false }>
+		<Menu.Root modal={ false } actionsRef={ menuActionsRef }>
 			<Menu.Trigger
 				disabled={ disabled }
 				render={
