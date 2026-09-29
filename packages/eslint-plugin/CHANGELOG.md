@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Pin `typescript-eslint` to `8.60.0`, whose peer range includes TypeScript 6.0. Later versions report `const Foo = forwardRef( function Foo() {} )` under `@typescript-eslint/no-shadow` ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+-   Update `typescript-eslint` to `^8.70.1`, whose peer range includes TypeScript 6.0 ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 
 ## 27.0.0 (2026-09-23)
 

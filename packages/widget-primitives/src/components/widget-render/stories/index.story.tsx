@@ -850,7 +850,7 @@ const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
 const RouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function RouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
 			ref={ ref }

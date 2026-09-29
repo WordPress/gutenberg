@@ -18,7 +18,10 @@ const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
 );
 
 export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
-	function Input( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedInput(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return (
 			<_Combobox.Input ref={ ref } render={ render } { ...restProps } />
 		);
