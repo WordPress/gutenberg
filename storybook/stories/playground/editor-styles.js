@@ -8,7 +8,7 @@ import blockLibraryStylesRtl from '@wordpress/block-library/build-style/style-rt
 import blockLibraryEditorStyles from '@wordpress/block-library/build-style/editor.css?raw';
 import blockLibraryEditorStylesRtl from '@wordpress/block-library/build-style/editor-rtl.css?raw';
 
-export const editorStyles = [
+const editorStyles = [
 	{
 		css: `
         body {
@@ -66,15 +66,15 @@ export const editorStyles = [
 export const contentStyles = {
 	ltr: [
 		{ css: componentsStyles },
-		{ css: blockEditorContentStyles },
 		{ css: blockLibraryStyles },
+		{ css: blockEditorContentStyles },
 		{ css: blockLibraryEditorStyles },
 		...editorStyles,
 	],
 	rtl: [
 		{ css: componentsStylesRtl },
-		{ css: blockEditorContentStylesRtl },
 		{ css: blockLibraryStylesRtl },
+		{ css: blockEditorContentStylesRtl },
 		{ css: blockLibraryEditorStylesRtl },
 		...editorStyles,
 	],

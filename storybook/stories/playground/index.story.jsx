@@ -34,8 +34,8 @@ UndoRedo.parameters = {
 	sourceLink: 'storybook/stories/playground/with-undo-redo/index.jsx',
 };
 
-export const ZoomOut = ( props ) => {
-	return <EditorZoomOut { ...props } />;
+export const ZoomOut = ( props, { globals } ) => {
+	return <EditorZoomOut { ...props } direction={ globals.direction } />;
 };
 
 ZoomOut.parameters = {

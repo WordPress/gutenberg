@@ -9,9 +9,8 @@ import {
 } from '@wordpress/block-editor';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import { parse } from '@wordpress/blocks';
-import contentCss from '@wordpress/block-editor/build-style/content.css?raw';
 import { pattern } from './pattern';
-import { editorStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 
 // Temporary hack to access private APIs before stabilizing zoom level.
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -29,7 +28,7 @@ function EnableZoomOut( { zoomLevel } ) {
 	return null;
 }
 
-export default function EditorZoomOut( { zoomLevel } ) {
+export default function EditorZoomOut( { zoomLevel, direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
@@ -50,8 +49,10 @@ export default function EditorZoomOut( { zoomLevel } ) {
 				onChange={ updateBlocks }
 			>
 				<EnableZoomOut zoomLevel={ zoomLevel } />
-				<BlockCanvas height="500px" styles={ editorStyles }>
-					<style>{ contentCss }</style>
+				<BlockCanvas
+					height="500px"
+					styles={ contentStyles[ direction ] }
+				>
 					<BlockList />
 				</BlockCanvas>
 			</BlockEditorProvider>
