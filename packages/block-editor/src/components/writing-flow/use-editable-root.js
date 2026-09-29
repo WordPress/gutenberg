@@ -49,27 +49,24 @@ export default function useEditableRoot() {
 					`[data-block="${ clientId }"]`
 				);
 				if ( ! blockElement ) {
-					return null;
+					return;
 				}
-				return (
-					[
-						blockElement,
-						...blockElement.querySelectorAll( FIELD_SELECTOR ),
-					].find(
-						( element ) =>
-							element.matches( FIELD_SELECTOR ) &&
-							isInsideRootBlock( blockElement, element )
-					) ?? null
+				return [
+					blockElement,
+					...blockElement.querySelectorAll( FIELD_SELECTOR ),
+				].find(
+					( element ) =>
+						element.matches( FIELD_SELECTOR ) &&
+						isInsideRootBlock( blockElement, element )
 				);
 			}
 
-			// Makes the hosted field an editable element again, unless it
-			// is the one passed.
-			function releaseField( except ) {
-				const field = node.querySelector( HOSTED_FIELD_SELECTOR );
-				if ( field && field !== except ) {
-					field.setAttribute( 'contenteditable', 'true' );
-				}
+			// Makes the hosted field an editable element again.
+			function releaseField() {
+				node.querySelector( HOSTED_FIELD_SELECTOR )?.setAttribute(
+					'contenteditable',
+					'true'
+				);
 			}
 
 			function engage( clientId ) {
@@ -109,8 +106,8 @@ export default function useEditableRoot() {
 				// attribute so it is not an editing host nested in it, and
 				// the tabindex that made it a focus target. The field of a
 				// block that is not in the DOM yet renders like this.
+				releaseField();
 				const field = getField( clientId );
-				releaseField( field );
 				field?.removeAttribute( 'contenteditable' );
 				field?.removeAttribute( 'tabindex' );
 			}
