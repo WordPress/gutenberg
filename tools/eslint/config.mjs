@@ -603,11 +603,6 @@ export default dedupePlugins( [
 		],
 		rules: {
 			...config.rules,
-			// Preserve the existing warning while assertion coverage is reviewed in
-			// step 2: https://github.com/WordPress/gutenberg/issues/83089
-			'vitest/expect-expect': 'warn',
-			// Conditional assertions need the separate test review in step 2.
-			'vitest/no-conditional-expect': 'off',
 			// Callback factories, Promise.all/returned assertions and generated titles
 			// need compatibility checks in step 3 of the same issue.
 			'vitest/valid-describe-callback': 'off',
@@ -650,8 +645,7 @@ export default dedupePlugins( [
 		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
 		rules: {
 			// The parser helper already passed these checks under its own Jest
-			// override. Keep that stricter baseline while suites await steps 2 and 3.
-			'vitest/no-conditional-expect': 'error',
+			// override. Keep that stricter baseline while suites await step 3.
 			'vitest/valid-describe-callback': 'error',
 			'vitest/valid-expect-in-promise': 'error',
 			'vitest/valid-title': 'error',
@@ -697,12 +691,11 @@ export default dedupePlugins( [
 		files: [ file ],
 		rules: {
 			'vitest/expect-expect': [
-				'warn',
+				'error',
 				{ assertFunctionNames: [ 'expect', 'assert', ...helpers ] },
 			],
 		},
 	} ) ),
-
 	// This compilation fixture is transformed as source, not run as a test.
 	{
 		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],

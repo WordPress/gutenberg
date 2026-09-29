@@ -580,50 +580,40 @@ describe( 'Combobox', () => {
 	} );
 
 	describe( 'when disabled', () => {
-		it.each( [ true, false ] )(
-			'shows the chip remove tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledMultiSelect( disabled );
+		it( 'does not show the chip remove tooltip when disabled', async () => {
+			await renderDisabledMultiSelect( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Remove', { selector: 'button' } )
+			);
 
-				const removeButton = screen.getByLabelText( 'Remove', {
-					selector: 'button',
-				} );
-				await user.hover( removeButton );
+			expect( screen.queryByText( 'Remove' ) ).not.toBeInTheDocument();
+		} );
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Remove' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Remove' ) )
-						.toBeVisible();
-				}
-			}
-		);
+		it( 'shows the chip remove tooltip when enabled', async () => {
+			await renderDisabledMultiSelect( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Remove', { selector: 'button' } )
+			);
 
-		it.each( [ true, false ] )(
-			'shows the clear tooltip only when enabled (disabled=%s)',
-			async ( disabled ) => {
-				const user = userEvent;
-				await renderDisabledMultiSelect( disabled );
+			await expect.element( screen.getByText( 'Remove' ) ).toBeVisible();
+		} );
 
-				const clearButton = screen.getByLabelText( 'Clear', {
-					selector: 'button',
-				} );
-				await user.hover( clearButton );
+		it( 'does not show the clear tooltip when disabled', async () => {
+			await renderDisabledMultiSelect( true );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
 
-				if ( disabled ) {
-					expect(
-						screen.queryByText( 'Clear' )
-					).not.toBeInTheDocument();
-				} else {
-					await expect
-						.element( screen.getByText( 'Clear' ) )
-						.toBeVisible();
-				}
-			}
-		);
+			expect( screen.queryByText( 'Clear' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'shows the clear tooltip when enabled', async () => {
+			await renderDisabledMultiSelect( false );
+			await userEvent.hover(
+				screen.getByLabelText( 'Clear', { selector: 'button' } )
+			);
+
+			await expect.element( screen.getByText( 'Clear' ) ).toBeVisible();
+		} );
 	} );
 } );
