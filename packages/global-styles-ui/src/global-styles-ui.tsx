@@ -249,7 +249,10 @@ export function GlobalStylesUI( {
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/link">
-						<ScreenElement element="link" />
+						<ScreenElement
+							element="link"
+							showStateControls={ showBlockStateControls }
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/caption">
 						<ScreenElement element="caption" />
@@ -285,7 +288,10 @@ export function GlobalStylesUI( {
 						<ScreenElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/button">
-						<ScreenElement element="button" />
+						<ScreenElement
+							element="button"
+							showStateControls={ showBlockStateControls }
+						/>
 					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block ) => (
 						<Fragment key={ block.name }>
