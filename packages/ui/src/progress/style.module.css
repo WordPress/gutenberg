@@ -2,6 +2,15 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
+		.label,
+		.value {
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.value {
+			font-variant-numeric: tabular-nums;
+		}
+
 		.track {
 			position: relative;
 			overflow: hidden;
@@ -9,7 +18,6 @@
 			/* Preserve the thin default of the original ProgressBar. */
 			height: 1.5px;
 			border-radius: var(--wpds-border-radius-lg);
-			color: var(--wpds-color-foreground-content-neutral);
 			background-color: var(--wpds-color-background-track-neutral);
 
 			@media (forced-colors: active) {
@@ -31,6 +39,7 @@
 			inset-block-start: 0;
 			height: 100%;
 			border-radius: inherit;
+			color: var(--wpds-color-foreground-content-neutral);
 			background-color: currentColor;
 
 			@media not (prefers-reduced-motion) {

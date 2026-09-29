@@ -70,7 +70,7 @@ const ALLOWLIST = {
 			'IconButton',
 			'Menu',
 			'Popover',
-			'ProgressBar',
+			'Progress',
 			'Radio',
 			'RadioGroup',
 			'SearchableSelect',
