@@ -5,7 +5,7 @@ import type { AutocompleteListProps } from './types';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 
 export const List = forwardRef< HTMLDivElement, AutocompleteListProps >(
-	function List( { className, ...restProps }, ref ) {
+	function UnforwardedList( { className, ...restProps }, ref ) {
 		return (
 			<_Autocomplete.List
 				className={ clsx( itemPopupStyles.list, className ) }

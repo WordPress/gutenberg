@@ -29,6 +29,10 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 		'no-test-prefixes',
 		'expect-expect',
 		'no-conditional-expect',
+		'valid-describe-callback',
+		'valid-expect-in-promise',
+		'valid-title',
+		'require-awaited-expect-poll',
 	] ) {
 		assert.equal(
 			config.rules[ `vitest/${ rule }` ][ 0 ],
@@ -53,16 +57,6 @@ for ( const file of [ jsdomTest, browserTest ] ) {
 		rules[ 'testing-library/prefer-screen-queries' ][ 0 ],
 		file === browserTest ? 0 : 2
 	);
-}
-
-const parserHelperConfig = await eslint.calculateConfigForFile( sharedHelper );
-for ( const rule of [
-	'no-conditional-expect',
-	'valid-describe-callback',
-	'valid-expect-in-promise',
-	'valid-title',
-] ) {
-	assert.equal( parserHelperConfig.rules[ `vitest/${ rule }` ][ 0 ], 2 );
 }
 
 const legacyE2E = await eslint.calculateConfigForFile(
@@ -127,8 +121,85 @@ assert.deepEqual(
 
 assert.deepEqual(
 	await lintTestRules(
+		nodeTest,
+		"import { describe, test, expect } from 'vitest'; describe( 'valid callback', () => { test( 'valid title', async () => { await Promise.resolve().then( () => expect( true ).toBe( true ) ); await expect.poll( () => true ).toBe( true ); } ); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { describe } from 'vitest'; describe( 'invalid callback', missingCallback );"
+	),
+	[ 'vitest/valid-describe-callback' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		'packages/block-serialization-default-parser/test/index.js',
+		"import { describe } from 'vitest'; describe( 'factory callback', () => { makeTests()(); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'floating assertion', () => { Promise.resolve().then( () => expect( true ).toBe( true ) ); } );"
+	),
+	[ 'vitest/valid-expect-in-promise' ]
+);
+const awaitedPromiseAllFixture =
+	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); await Promise.all( [ check ] ); } );";
+assert.deepEqual(
+	await lintTestRules( nodeTest, awaitedPromiseAllFixture ),
+	[]
+);
+const interveningAssignmentFixture =
+	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions after an assignment', async () => { let granted = true; const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); granted = false; await Promise.all( [ check ] ); } );";
+assert.deepEqual(
+	await lintTestRules( nodeTest, interveningAssignmentFixture ),
+	[ 'vitest/valid-expect-in-promise' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 42, () => { expect( true ).toBe( true ); } );"
+	),
+	[ 'vitest/valid-title' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( description, () => { expect( true ).toBe( true ); } );"
+	),
+	[]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { test, expect } from 'vitest'; test( 'unawaited poll', () => { expect.poll( () => true ).toBe( true ); } );"
+	),
+	[ 'vitest/require-awaited-expect-poll' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { expect } from 'vitest'; const waitFor = () => expect.element( locator ).toBeVisible();"
+	),
+	[ 'vitest/require-awaited-expect-poll' ]
+);
+
+assert.deepEqual(
+	await lintTestRules(
+		browserTest,
+		"import { expect } from 'vitest'; const waitFor = () => { return expect.element( locator ).toBeVisible(); };"
+	),
+	[]
+);
+
+assert.deepEqual(
+	await lintTestRules(
 		'test/unit/config/console.vitest.js',
-		"import { aroundEach } from 'vitest'; aroundEach( async ( runTest ) => { await runTest(); } );"
+		"import { aroundEach } from 'vitest';\n// eslint-disable-next-line vitest/no-done-callback\naroundEach( async ( runTest ) => { await runTest(); } );"
 	),
 	[]
 );
