@@ -4,17 +4,26 @@
 
 ### Breaking Changes
 
+-   `Autocomplete.Item`, `Combobox.Item`, `SearchableSelect.Item`, `SearchableChipSelect.Item`, `SearchableSelectControl.Item`, and `SearchableChipSelectControl.Item` now require an `ItemLabel` as their first direct child, followed only by optional `ItemDescription` components. Wrap existing text children in `ItemLabel` ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 -   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now announce dynamic updates explicitly, for example with `speak()` from `@wordpress/a11y` ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 
 ### New Features
 
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
+### Enhancements
+
+-   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
+
 ### Bug Fixes
 
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
 -   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
 -   `CollapsibleCard`: Only show the header's focus ring when its own trigger is keyboard-focused ([#81314](https://github.com/WordPress/gutenberg/pull/81314)).
+
+### Internal
+
+-   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
 ## 0.23.0 (2026-09-23)
 
@@ -271,7 +280,7 @@
 
 ### Breaking Changes
 
--   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` now define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+-   `Icon`: The component no longer sets `fill="currentColor"` by default. Icons from `@wordpress/icons` 15.0.0 or later define how they inherit `currentColor` internally, such as through `fill` or `stroke`. Custom SVGs need to use `currentColor` for any fill or stroke that should follow the surrounding CSS `color`. Consumers should tint icons with the CSS `color` property rather than relying on inherited `fill` styles. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
 
 ### Enhancements
 
