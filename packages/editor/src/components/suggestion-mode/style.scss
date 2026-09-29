@@ -23,6 +23,12 @@
 	}
 }
 
+// Secondary status lines under a suggestion summary (resolved state, grouped
+// change hint, disabled-apply reason) read as muted metadata.
+.editor-collab-sidebar-panel__suggestion-status {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
 // Inline diff colors for the suggestion preview. Pulled from the design
 // system fallbacks so the rendering still degrades gracefully on themes
 // without `--wp-admin-theme-color` defined.
