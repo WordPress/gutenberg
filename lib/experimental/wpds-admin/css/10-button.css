@@ -160,10 +160,17 @@
 		background: var(--wpds-color-background-interactive-brand-weak-active);
 	}
 
-	/* Hide the border while pressed, keeping its width so nothing shifts. */
+	/*
+	 * Pressed takes the same border as hover. `@wordpress/ui` Button drives
+	 * hover, active and focus from one `border-color-active` custom property,
+	 * and the persistent `.active` rule below already uses that value, so an
+	 * earlier `border-color: transparent` here was the only state in this file
+	 * that dropped the edge — the button appeared to lose its outline for as
+	 * long as the pointer was down.
+	 */
 	.wp-core-ui .button:active,
 	.wp-core-ui .button-secondary:active {
-		border-color: transparent;
+		border-color: var(--wpds-color-stroke-interactive-brand-active);
 		background: var(--wpds-color-background-interactive-brand-weak-active);
 	}
 
@@ -176,6 +183,27 @@
 		border-color: var(--wpds-color-stroke-interactive-brand-active);
 		color: var(--wpds-color-foreground-interactive-brand-active);
 		background: var(--wpds-color-background-interactive-brand-weak-active);
+	}
+
+	/* -----------------------------------------------------------------------
+	   The page title action — appearance only
+
+	   "Add Post" and its siblings are `<a class="page-title-action">` with no
+	   `button` class, so none of the rules above reach them. They still look
+	   like our buttons, because WordPress draws them with
+	   `var(--wp-admin-theme-color)` and the scheme tokens now feed that — but
+	   the weight stays WordPress's 500 while every real button is at the emphasis
+	   token, which is the difference you see side by side in a list table header.
+
+	   Only the weight is taken. WordPress gives this control `min-height: 40px`,
+	   `line-height: 2.71428571` and `top: -3px` to sit it against the page
+	   title, and adopting it properly means taking on that geometry — which is
+	   the contextual sizing this experiment leaves alone on purpose. Covering
+	   the control fully is a separate question; matching the weight is not.
+	   ----------------------------------------------------------------------- */
+
+	.wrap .page-title-action {
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	/* -----------------------------------------------------------------------

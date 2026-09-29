@@ -55,7 +55,22 @@
 		 * know what those contexts are. WordPress also handles the mobile case, raising
 		 * inputs to 16px below 782px so iOS does not zoom on focus.
 		 */
-		line-height: 1;
+
+		/*
+		 * `normal`, not `1`. The `@wordpress/ui` input primitive uses `line-height: 1`,
+		 * but it sets it on a wrapper that lays out a separate inner `<input>`, where
+		 * the text has room regardless. wp-admin has no wrapper: the declaration lands
+		 * on the bare control, and a line box exactly as tall as the font is shorter
+		 * than the font's own ascender-plus-descender, so descenders are clipped by the
+		 * control's chrome — visibly on `<select>` in Firefox, and on number fields in
+		 * Settings > Media.
+		 *
+		 * `normal` lets the font's metrics size the line box, which cannot clip, and
+		 * unlike a pixel value it does not compete with the contextual heights
+		 * WordPress sets per control. Worth raising against the primitive too: `1` is
+		 * only safe there because of the markup around it.
+		 */
+		line-height: normal;
 	}
 
 	/* -----------------------------------------------------------------------
