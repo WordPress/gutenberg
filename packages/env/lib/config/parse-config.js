@@ -37,6 +37,7 @@ module.exports = async function parseConfig( config, options ) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
+		mariadbVersion: config.mariadbVersion,
 		coreSource: includeTestsPath(
 			await parseCoreSource( config.core, options ),
 			options
