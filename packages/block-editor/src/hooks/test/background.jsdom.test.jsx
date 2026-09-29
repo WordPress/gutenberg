@@ -70,6 +70,31 @@ describe( 'background', () => {
 			} );
 			expect( result.className ).toBe( 'is-style-fancy' );
 		} );
+
+		it( 'keeps the background values the panel filter keeps, such as a text gradient', () => {
+			const textGradient = {
+				gradient: 'var:preset|gradient|vivid',
+				backgroundClip: 'text',
+			};
+			const panelResetAllFilter = vi.fn( () => ( {
+				background: textGradient,
+			} ) );
+			const style = {
+				background: {
+					...textGradient,
+					backgroundImage: { url: 'image.png' },
+				},
+			};
+
+			const result = backgroundResetAllFilter(
+				{ backgroundColor: 'primary', style },
+				panelResetAllFilter
+			);
+
+			expect( panelResetAllFilter ).toHaveBeenCalledWith( style );
+			expect( result.backgroundColor ).toBeUndefined();
+			expect( result.style ).toEqual( { background: textGradient } );
+		} );
 	} );
 
 	describe( 'getBackgroundImageClasses', () => {
