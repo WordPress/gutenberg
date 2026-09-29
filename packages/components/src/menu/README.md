@@ -15,6 +15,8 @@ It is responsible for managing the state of the menu and its items, and for
 rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
 component, and the `Menu.Popover` component.
 
+This component is deprecated. When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.
+
 ## Props
 
 ### `as`

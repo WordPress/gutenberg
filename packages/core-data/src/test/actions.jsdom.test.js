@@ -11,7 +11,7 @@ import {
 	receiveCurrentUser,
 	__experimentalBatch,
 } from '../actions';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 vi.mock( '@wordpress/api-fetch' );
 
 vi.mock( import( '../batch' ), async ( importOriginal ) => {
@@ -23,11 +23,8 @@ vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	};
 } );
 
-vi.mock( '../sync', () => ( {
-	getSyncManager: vi.fn(),
-	CRDT_AUTOSAVE_SNAPSHOT_KEY: 'crdt_snapshot',
-	LOCAL_EDITOR_ORIGIN: 'local-editor',
-	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+vi.mock( '../entity-sync', () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'editEntityRecord', () => {
@@ -254,29 +251,27 @@ describe( 'editEntityRecord', () => {
 		} );
 	} );
 
-	describe( 'with SyncManager', () => {
+	describe( 'with an entity sync manager', () => {
 		let syncManager;
 
 		beforeEach( () => {
-			// Create a mock sync manager
 			syncManager = {
 				update: vi.fn(),
 			};
-			getSyncManager.mockReturnValue( syncManager );
+			getEntitySyncManager.mockReturnValue( syncManager );
 		} );
 
 		afterEach( () => {
-			getSyncManager.mockReset();
+			getEntitySyncManager.mockReset();
 		} );
 
-		it( 'passes merged edits to SyncManager#update for merged fields', () => {
+		it( 'passes merged edits to the sync manager for merged fields', () => {
 			const dispatch = vi.fn();
 			const select = {
 				getEntityConfig: () => ( {
 					kind: 'postType',
 					name: 'post',
 					mergedEdits: { meta: true },
-					syncConfig: {},
 				} ),
 				getRawEntityRecord: () => ( {
 					id: 1,
@@ -301,9 +296,9 @@ describe( 'editEntityRecord', () => {
 				dispatch,
 			} );
 
-			// Verify SyncManager#update was called with merged edits
 			expect( syncManager.update ).toHaveBeenCalledWith(
-				'postType/post',
+				'postType',
+				'post',
 				1,
 				{
 					meta: {
@@ -312,19 +307,17 @@ describe( 'editEntityRecord', () => {
 						newKey: 'newValue',
 					},
 				},
-				'local-editor',
-				{ isNewUndoLevel: true }
+				{ isCached: false, undoIgnore: false }
 			);
 		} );
 
-		it( 'passes merged edits to SyncManager#update even when value equals persisted record', () => {
+		it( 'passes merged edits to the sync manager even when value equals persisted record', () => {
 			const dispatch = vi.fn();
 			const select = {
 				getEntityConfig: () => ( {
 					kind: 'postType',
 					name: 'post',
 					mergedEdits: { meta: true },
-					syncConfig: {},
 				} ),
 				getRawEntityRecord: () => ( {
 					id: 1,
@@ -344,9 +337,10 @@ describe( 'editEntityRecord', () => {
 				meta: { key2: 'value2' },
 			} )( { select, dispatch } );
 
-			// Verify SyncManager#update was called with merged edits (not cleaned/undefined)
+			// The sync manager sees the merged edits (not cleaned/undefined)
 			expect( syncManager.update ).toHaveBeenCalledWith(
-				'postType/post',
+				'postType',
+				'post',
 				1,
 				{
 					meta: {
@@ -354,8 +348,7 @@ describe( 'editEntityRecord', () => {
 						key2: 'value2',
 					},
 				},
-				'local-editor',
-				{ isNewUndoLevel: true }
+				{ isCached: false, undoIgnore: false }
 			);
 
 			// But the local store dispatch should still receive undefined for the cleaned edit
@@ -370,14 +363,13 @@ describe( 'editEntityRecord', () => {
 			} );
 		} );
 
-		it( 'passes merged and non-merged edits correctly to SyncManager#update', () => {
+		it( 'passes merged and non-merged edits correctly to the sync manager', () => {
 			const dispatch = vi.fn();
 			const select = {
 				getEntityConfig: () => ( {
 					kind: 'postType',
 					name: 'post',
 					mergedEdits: { meta: true },
-					syncConfig: {},
 				} ),
 				getRawEntityRecord: () => ( {
 					id: 1,
@@ -399,9 +391,9 @@ describe( 'editEntityRecord', () => {
 				meta: { newKey: 'newValue' },
 			} )( { select, dispatch } );
 
-			// Verify SyncManager#update was called with merged meta but non-merged title
 			expect( syncManager.update ).toHaveBeenCalledWith(
-				'postType/post',
+				'postType',
+				'post',
 				1,
 				{
 					title: 'New Title',
@@ -410,19 +402,65 @@ describe( 'editEntityRecord', () => {
 						newKey: 'newValue',
 					},
 				},
-				'local-editor',
-				{ isNewUndoLevel: true }
+				{ isCached: false, undoIgnore: false }
 			);
 		} );
 
-		it( 'does not call SyncManager#update when syncConfig is not defined', () => {
+		it( 'passes the edit intent to the sync manager', () => {
+			const dispatch = vi.fn();
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+				} ),
+				getRawEntityRecord: () => ( { id: 1, title: 'Original' } ),
+				getEditedEntityRecord: () => ( { id: 1, title: 'Original' } ),
+				getUndoManager: () => ( {
+					addRecord: vi.fn(),
+				} ),
+			};
+
+			editEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ title: 'Typing' },
+				{ isCached: true }
+			)( { select, dispatch } );
+			editEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ title: 'Selection' },
+				{ undoIgnore: true }
+			)( { select, dispatch } );
+
+			expect( syncManager.update ).toHaveBeenNthCalledWith(
+				1,
+				'postType',
+				'post',
+				1,
+				{ title: 'Typing' },
+				{ isCached: true, undoIgnore: false }
+			);
+			expect( syncManager.update ).toHaveBeenNthCalledWith(
+				2,
+				'postType',
+				'post',
+				1,
+				{ title: 'Selection' },
+				{ isCached: false, undoIgnore: true }
+			);
+		} );
+
+		it( 'edits normally when no sync manager is registered', () => {
+			getEntitySyncManager.mockReturnValue( undefined );
 			const dispatch = vi.fn();
 			const select = {
 				getEntityConfig: () => ( {
 					kind: 'postType',
 					name: 'post',
 					mergedEdits: { meta: true },
-					// No syncConfig
 				} ),
 				getRawEntityRecord: () => ( {
 					id: 1,
@@ -444,8 +482,10 @@ describe( 'editEntityRecord', () => {
 				dispatch,
 			} );
 
-			// Verify SyncManager#update was NOT called
 			expect( syncManager.update ).not.toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( { type: 'EDIT_ENTITY_RECORD' } )
+			);
 		} );
 	} );
 } );
@@ -917,733 +957,255 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
-	it( 'preserves the live sync title when a CRDT persistence save returns stale post fields', async () => {
-		const liveSyncState = {
-			isSaved: false,
-			title: 'synced title',
-		};
-		const post = { id: 10, title: 'synced title' };
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(
-				( _objectType, _objectId, changes, _origin, options ) => {
-					if (
-						Object.prototype.hasOwnProperty.call( changes, 'title' )
-					) {
-						liveSyncState.title = changes.title;
-					}
-					if ( options?.isSave ) {
-						liveSyncState.isSaved = true;
-					}
-				}
-			),
-		};
-		const select = {
-			getRawEntityRecord: () => post,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
+	describe( 'with an entity sync manager', () => {
+		let syncManager;
 
-		const staleSaveResponse = { ...post, title: 'initial title' };
-		apiFetch.mockImplementation( () => {
-			return staleSaveResponse;
+		beforeEach( () => {
+			syncManager = {
+				beforeSave: vi.fn(),
+				afterSave: vi.fn(),
+			};
+			getEntitySyncManager.mockReturnValue( syncManager );
 		} );
-		getSyncManager.mockReturnValue( syncManager );
 
-		const result = await saveEntityRecord( 'postType', 'post', post, {
-			__unstableSkipSyncUpdate: true,
-		} )( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
-		expect( liveSyncState ).toEqual( {
-			isSaved: true,
-			title: 'synced title',
+		afterEach( () => {
+			getEntitySyncManager.mockReset();
 		} );
-		expect( result ).toBe( staleSaveResponse );
-	} );
 
-	it( 'only passes server-mutated fields to SyncManager#update after saving', async () => {
-		const persistedRecord = {
-			id: 10,
-			title: 'Initial title',
-			content: 'Initial content',
-			template: 'single',
-			modified: '2026-07-01T00:00:00',
-		};
-		const edits = {
-			id: 10,
-			content: 'Updated content',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			...persistedRecord,
-			content: edits.content,
-			modified: '2026-07-02T00:00:00',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenNthCalledWith(
-			1,
-			'postType/post',
-			10,
-			edits,
-			'local-undo-ignored'
-		);
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{
-				modified: '2026-07-02T00:00:00',
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'does not pass unchanged meta fields to SyncManager#update after saving', async () => {
-		const persistedRecord = {
-			id: 10,
-			content: 'Initial content',
-			meta: {
-				plugin_value: 'persisted',
-				peer_value: 'persisted',
-				_crdt_document: 'old-doc',
-			},
-		};
-		const edits = {
-			id: 10,
-			content: 'Updated content',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-				__unstablePrePersist: async () => ( {
-					meta: { _crdt_document: 'new-doc' },
-				} ),
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			...persistedRecord,
-			content: edits.content,
-			meta: {
-				plugin_value: 'persisted',
-				peer_value: 'persisted',
-				_crdt_document: 'new-doc',
-			},
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenNthCalledWith(
-			2,
-			'postType/post',
-			10,
-			{},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'passes only server-mutated meta fields to SyncManager#update after saving', async () => {
-		const persistedRecord = {
-			id: 10,
-			meta: {
-				unchanged: 'persisted',
-				peer_value: 'persisted',
-				edited: 'initial',
-				server_mutated: 'before',
-				settings: { color: 'blue', size: 'small' },
-			},
-		};
-		const edits = {
-			id: 10,
-			meta: {
-				edited: 'local',
-				server_mutated: 'Needs Normalizing',
-			},
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-				__unstablePrePersist: async () => ( {
-					meta: {
-						...edits.meta,
-						_crdt_document: 'new-doc',
-					},
-				} ),
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			meta: {
-				unchanged: 'persisted',
-				peer_value: 'persisted',
-				edited: 'local',
-				server_mutated: 'needs-normalizing',
-				settings: { color: 'red', size: 'small' },
-				_crdt_document: 'new-doc',
-			},
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenNthCalledWith(
-			1,
-			'postType/post',
-			10,
-			edits,
-			'local-undo-ignored'
-		);
-		expect( syncManager.update ).toHaveBeenNthCalledWith(
-			2,
-			'postType/post',
-			10,
-			{
+		it( 'merges what beforeSave returns into the request but resets edits with the original edits', async () => {
+			const persistedRecord = {
+				id: 10,
 				meta: {
-					server_mutated: 'needs-normalizing',
-					settings: { color: 'red', size: 'small' },
+					plugin_value: 'persisted',
+					_crdt_document: 'old-doc',
 				},
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'resets persisted edits using the pre-prePersist edits so the record is clean after saving', async () => {
-		const persistedRecord = {
-			id: 10,
-			meta: {
-				plugin_value: 'persisted',
-				_crdt_document: 'old-doc',
-			},
-		};
-		// Mirrors a store meta edit: `mergedEdits` snapshots the full edited
-		// meta, including the load-time CRDT document.
-		const edits = {
-			id: 10,
-			meta: {
-				plugin_value: 'edited',
-				_crdt_document: 'old-doc',
-			},
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-				// Mirrors prePersistPostType, which injects a freshly
-				// serialized CRDT snapshot into the request meta.
-				__unstablePrePersist: async ( _persisted, saveEdits ) => ( {
+			};
+			// Mirrors a store meta edit: `mergedEdits` snapshots the full
+			// edited meta, including the load-time CRDT document.
+			const edits = {
+				id: 10,
+				meta: {
+					plugin_value: 'edited',
+					_crdt_document: 'old-doc',
+				},
+			};
+			const configs = [
+				{
+					name: 'post',
+					kind: 'postType',
+					baseURL: '/wp/v2/posts',
+				},
+			];
+			// Mirrors a manager injecting a freshly serialized document
+			// into the request meta.
+			syncManager.beforeSave.mockImplementation(
+				( _kind, _name, _id, saveEdits ) => ( {
 					meta: {
 						...saveEdits.meta,
 						_crdt_document: 'new-doc',
 					},
-				} ),
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			meta: {
-				plugin_value: 'edited',
-				// The server may also mutate meta on save (e.g. a plugin
-				// normalizing a value in a save hook).
-				server_value: 'server-mutated',
-				_crdt_document: 'new-doc',
-			},
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( apiFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/posts/10',
-			method: 'PUT',
-			data: {
-				...edits,
+				} )
+			);
+			const select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => configs ),
+			};
+			const updatedRecord = {
+				id: 10,
 				meta: {
 					plugin_value: 'edited',
+					server_value: 'server-mutated',
 					_crdt_document: 'new-doc',
 				},
-			},
-		} );
+			};
+			apiFetch.mockImplementation( () => updatedRecord );
 
-		// The persisted edits passed to the reducer must be the original
-		// edits, not the prePersist-augmented request payload. Otherwise the
-		// injected CRDT snapshot makes the comparison against the state edits
-		// fail and the record stays dirty after a successful save.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			updatedRecord,
-			undefined,
-			true,
-			edits
-		);
-	} );
+			await saveEntityRecord(
+				'postType',
+				'post',
+				edits
+			)( { select, dispatch, resolveSelect } );
 
-	it( 'syncs direct save changes before pre-persisting the record', async () => {
-		const persistedRecord = {
-			id: 10,
-			status: 'auto-draft',
-			template: '',
-		};
-		const edits = {
-			id: 10,
-			template: 'page-no-title',
-		};
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const prePersist = vi.fn( async () => {
-			expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
-			expect( syncManager.update ).toHaveBeenLastCalledWith(
-				'postType/page',
+			expect( syncManager.beforeSave ).toHaveBeenCalledWith(
+				'postType',
+				'post',
 				10,
 				edits,
-				'local-undo-ignored'
+				{ persistedRecord, isAutosave: false }
 			);
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: '/wp/v2/posts/10',
+				method: 'PUT',
+				data: {
+					...edits,
+					meta: {
+						plugin_value: 'edited',
+						_crdt_document: 'new-doc',
+					},
+				},
+			} );
 
-			return { status: 'draft' };
+			// The persisted edits passed to the reducer must be the original
+			// edits, not the augmented request payload. Otherwise the
+			// injected values make the comparison against the state edits
+			// fail and the record stays dirty after a successful save.
+			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'post',
+				updatedRecord,
+				undefined,
+				true,
+				edits
+			);
+			expect( syncManager.afterSave ).toHaveBeenCalledWith(
+				'postType',
+				'post',
+				10,
+				{ savedRecord: updatedRecord, persistedRecord, edits }
+			);
 		} );
-		const configs = [
-			{
-				name: 'page',
-				kind: 'postType',
-				baseURL: '/wp/v2/pages',
-				syncConfig: {},
-				__unstablePrePersist: prePersist,
-			},
-		];
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			...persistedRecord,
-			...edits,
-			status: 'draft',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
 
-		const result = await saveEntityRecord(
-			'postType',
-			'page',
-			edits
-		)( { select, dispatch, resolveSelect } );
+		it( 'calls beforeSave before pre-persisting the record', async () => {
+			const persistedRecord = {
+				id: 10,
+				status: 'auto-draft',
+				template: '',
+			};
+			const edits = {
+				id: 10,
+				template: 'page-no-title',
+			};
+			const prePersist = vi.fn( async ( _persisted, saveEdits ) => {
+				expect( syncManager.beforeSave ).toHaveBeenCalledTimes( 1 );
+				// Pre-persist sees the edits with the manager's additions.
+				expect( saveEdits ).toEqual( { ...edits, extra: 'value' } );
 
-		expect( prePersist ).toHaveBeenCalledWith( persistedRecord, edits );
-		expect( apiFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/pages/10',
-			method: 'PUT',
-			data: { ...edits, status: 'draft' },
+				return { status: 'draft' };
+			} );
+			syncManager.beforeSave.mockReturnValue( { extra: 'value' } );
+			const configs = [
+				{
+					name: 'page',
+					kind: 'postType',
+					baseURL: '/wp/v2/pages',
+					__unstablePrePersist: prePersist,
+				},
+			];
+			const select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => configs ),
+			};
+			const updatedRecord = {
+				...persistedRecord,
+				...edits,
+				status: 'draft',
+			};
+			apiFetch.mockImplementation( () => updatedRecord );
+
+			const result = await saveEntityRecord(
+				'postType',
+				'page',
+				edits
+			)( { select, dispatch, resolveSelect } );
+
+			expect( prePersist ).toHaveBeenCalledTimes( 1 );
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: '/wp/v2/pages/10',
+				method: 'PUT',
+				data: { ...edits, extra: 'value', status: 'draft' },
+			} );
+			expect( result ).toBe( updatedRecord );
 		} );
-		expect( syncManager.update ).toHaveBeenNthCalledWith(
-			2,
-			'postType/page',
-			10,
-			{ status: 'draft' },
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
 
-	it( 'does not mark pre-synced direct save changes as saved when the request fails', async () => {
-		const persistedRecord = {
-			id: 10,
-			template: '',
-		};
-		const edits = {
-			id: 10,
-			template: 'page-no-title',
-		};
-		const configs = [
-			{
-				name: 'page',
-				kind: 'postType',
-				baseURL: '/wp/v2/pages',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const error = new Error( 'API error' );
-		apiFetch.mockRejectedValue( error );
-		getSyncManager.mockReturnValue( syncManager );
+		it( 'does not call afterSave when the request fails', async () => {
+			const persistedRecord = {
+				id: 10,
+				template: '',
+			};
+			const edits = {
+				id: 10,
+				template: 'page-no-title',
+			};
+			const configs = [
+				{
+					name: 'page',
+					kind: 'postType',
+					baseURL: '/wp/v2/pages',
+				},
+			];
+			const select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => configs ),
+			};
+			const error = new Error( 'API error' );
+			apiFetch.mockRejectedValue( error );
 
-		await expect(
-			saveEntityRecord( 'postType', 'page', edits, {
-				throwOnError: true,
-			} )( { select, dispatch, resolveSelect } )
-		).rejects.toBe( error );
+			await expect(
+				saveEntityRecord( 'postType', 'page', edits, {
+					throwOnError: true,
+				} )( { select, dispatch, resolveSelect } )
+			).rejects.toBe( error );
 
-		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/page',
-			10,
-			edits,
-			'local-undo-ignored'
-		);
-	} );
+			expect( syncManager.beforeSave ).toHaveBeenCalledTimes( 1 );
+			expect( syncManager.afterSave ).not.toHaveBeenCalled();
+		} );
 
-	it( 'passes server-normalized edited fields to SyncManager#update after saving', async () => {
-		const persistedRecord = {
-			id: 10,
-			slug: 'initial-slug',
-		};
-		const edits = {
-			id: 10,
-			slug: 'Needs Normalizing',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			slug: 'needs-normalizing',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
+		it( 'passes no persisted record to afterSave when it is missing', async () => {
+			const edits = {
+				id: 10,
+				content: 'Updated content',
+			};
+			const configs = [
+				{
+					name: 'post',
+					kind: 'postType',
+					baseURL: '/wp/v2/posts',
+				},
+			];
+			const select = {
+				getRawEntityRecord: () => undefined,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => configs ),
+			};
+			const updatedRecord = {
+				id: 10,
+				content: 'Updated content',
+				template: 'single',
+			};
+			apiFetch.mockImplementation( () => updatedRecord );
 
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
+			const result = await saveEntityRecord(
+				'postType',
+				'post',
+				edits
+			)( { select, dispatch, resolveSelect } );
 
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{
-				slug: 'needs-normalizing',
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'does not pass unchanged raw-attribute fields to SyncManager#update after saving', async () => {
-		// The raw entity record holds raw strings while the save response
-		// nests them as `{ raw, rendered }`; the comparison must not treat
-		// that shape difference as a server mutation.
-		const persistedRecord = {
-			id: 10,
-			title: 'Initial title',
-			content: '<p>Initial content</p>',
-			excerpt: 'Initial excerpt',
-			slug: 'initial-slug',
-			modified: '2026-07-01T00:00:00',
-		};
-		const edits = {
-			id: 10,
-			slug: 'updated-slug',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			title: { raw: 'Initial title', rendered: 'Initial title' },
-			content: {
-				raw: '<p>Initial content</p>',
-				rendered: '<p>Initial content</p>',
-			},
-			excerpt: { raw: 'Initial excerpt', rendered: 'Initial excerpt' },
-			slug: 'updated-slug',
-			modified: '2026-07-02T00:00:00',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{
-				modified: '2026-07-02T00:00:00',
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 2 );
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'does not pass edited raw-attribute fields to SyncManager#update when the server echoes them unchanged', async () => {
-		const persistedRecord = {
-			id: 10,
-			content: '<p>Initial content</p>',
-			modified: '2026-07-01T00:00:00',
-		};
-		const edits = {
-			id: 10,
-			content: '<p>Updated content</p>',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			content: {
-				raw: edits.content,
-				// The rendered value differs from the raw baseline, but only
-				// raw values are compared.
-				rendered: '<p class="rendered">Updated content</p>\n',
-			},
-			modified: '2026-07-02T00:00:00',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{
-				modified: '2026-07-02T00:00:00',
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'passes raw-attribute fields whose raw value the server mutated to SyncManager#update', async () => {
-		const persistedRecord = {
-			id: 10,
-			content: '<p>Initial content</p>',
-		};
-		const edits = {
-			id: 10,
-			content: '<p>Content with <script>bad</script> markup</p>',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => persistedRecord,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		// The server strips disallowed markup from the sent content.
-		const updatedRecord = {
-			id: 10,
-			content: {
-				raw: '<p>Content with bad markup</p>',
-				rendered: '<p>Content with bad markup</p>',
-			},
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			{
-				content: updatedRecord.content,
-			},
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( result ).toBe( updatedRecord );
-	} );
-
-	it( 'passes the full save response to SyncManager#update when the persisted record is missing', async () => {
-		const edits = {
-			id: 10,
-			content: 'Updated content',
-		};
-		const configs = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			},
-		];
-		const syncManager = {
-			update: vi.fn(),
-		};
-		const select = {
-			getRawEntityRecord: () => undefined,
-		};
-		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
-		const updatedRecord = {
-			id: 10,
-			content: 'Updated content',
-			template: 'single',
-		};
-		apiFetch.mockImplementation( () => updatedRecord );
-		getSyncManager.mockReturnValue( syncManager );
-
-		const result = await saveEntityRecord(
-			'postType',
-			'post',
-			edits
-		)( { select, dispatch, resolveSelect } );
-
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			10,
-			updatedRecord,
-			'local-undo-ignored',
-			{ isSave: true }
-		);
-		expect( syncManager.update ).toHaveBeenCalledTimes( 1 );
-		expect( result ).toBe( updatedRecord );
+			expect( syncManager.beforeSave ).toHaveBeenCalledWith(
+				'postType',
+				'post',
+				10,
+				edits,
+				{ persistedRecord: undefined, isAutosave: false }
+			);
+			expect( syncManager.afterSave ).toHaveBeenCalledWith(
+				'postType',
+				'post',
+				10,
+				{
+					savedRecord: updatedRecord,
+					persistedRecord: undefined,
+					edits,
+				}
+			);
+			expect( result ).toBe( updatedRecord );
+		} );
 	} );
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
@@ -1713,7 +1275,7 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( postType );
 	} );
 
-	describe( 'autosave CRDT snapshots', () => {
+	describe( 'autosaves with an entity sync manager', () => {
 		const persistedRecord = {
 			id: 10,
 			title: 'Test post',
@@ -1729,10 +1291,21 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => persistedRecord,
 			};
 			syncManager = {
-				getEntitySnapshot: vi.fn( () => 'ENCODED_SNAPSHOT' ),
-				update: vi.fn(),
+				beforeSave: vi.fn( () => ( {
+					crdt_snapshot: 'ENCODED_SNAPSHOT',
+				} ) ),
+				afterSave: vi.fn(),
 			};
-			getSyncManager.mockReturnValue( syncManager );
+			getEntitySyncManager.mockReturnValue( syncManager );
+			resolveSelect = {
+				getEntitiesConfig: vi.fn( () => [
+					{
+						name: 'post',
+						kind: 'postType',
+						baseURL: '/wp/v2/posts',
+					},
+				] ),
+			};
 			apiFetch.mockImplementation( () => ( {
 				id: 20,
 				parent: 10,
@@ -1742,93 +1315,55 @@ describe( 'saveEntityRecord', () => {
 		} );
 
 		afterEach( () => {
-			getSyncManager.mockReset();
+			getEntitySyncManager.mockReset();
 		} );
-
-		function makeResolveSelect( entityConfig ) {
-			return {
-				getEntitiesConfig: vi.fn( () => [ entityConfig ] ),
-			};
-		}
 
 		function getAutosaveRequestData() {
 			return apiFetch.mock.calls[ 0 ][ 0 ].data;
 		}
 
-		it( 'sends the current CRDT snapshot with the autosave request', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			} );
-
+		it( 'merges what beforeSave returns into the autosave request', async () => {
 			await saveEntityRecord( 'postType', 'post', persistedRecord, {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( syncManager.getEntitySnapshot ).toHaveBeenCalledWith(
-				'postType/post',
-				10
+			expect( syncManager.beforeSave ).toHaveBeenCalledWith(
+				'postType',
+				'post',
+				10,
+				persistedRecord,
+				{ persistedRecord, isAutosave: true }
 			);
 			expect( getAutosaveRequestData() ).toEqual(
 				expect.objectContaining( {
 					crdt_snapshot: 'ENCODED_SNAPSHOT',
 				} )
 			);
+			expect( syncManager.afterSave ).not.toHaveBeenCalled();
 		} );
 
-		it( 'omits the snapshot for entities without a sync config', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-			} );
+		it( 'sends the autosave unchanged when beforeSave returns nothing', async () => {
+			syncManager.beforeSave.mockReturnValue( undefined );
 
 			await saveEntityRecord( 'postType', 'post', persistedRecord, {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( syncManager.getEntitySnapshot ).not.toHaveBeenCalled();
-			expect( getAutosaveRequestData() ).not.toHaveProperty(
-				'crdt_snapshot'
-			);
+			expect( getAutosaveRequestData() ).toEqual( {
+				title: 'Test post',
+				content: 'Test content',
+				status: undefined,
+			} );
 			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
 		} );
 
-		it( 'omits the snapshot when the entity is not loaded in the sync manager', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			} );
-			syncManager.getEntitySnapshot.mockReturnValue( undefined );
-
-			await saveEntityRecord( 'postType', 'post', persistedRecord, {
-				isAutosave: true,
-			} )( { select, dispatch, resolveSelect } );
-
-			expect( getAutosaveRequestData() ).not.toHaveProperty(
-				'crdt_snapshot'
-			);
-		} );
-
-		it( 'captures the snapshot before the request is sent', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			} );
-
-			// A snapshot captured after the request would describe content
-			// the autosave did not include, which could wrongly suppress the
-			// notice. Assert the ordering directly.
+		it( 'calls beforeSave before the request is sent', async () => {
+			// Anything captured after the request would describe content
+			// the autosave did not include. Assert the ordering directly.
 			const callOrder = [];
-			syncManager.getEntitySnapshot.mockImplementation( () => {
-				callOrder.push( 'snapshot' );
-				return 'ENCODED_SNAPSHOT';
+			syncManager.beforeSave.mockImplementation( () => {
+				callOrder.push( 'beforeSave' );
+				return undefined;
 			} );
 			apiFetch.mockImplementation( () => {
 				callOrder.push( 'fetch' );
@@ -1839,47 +1374,21 @@ describe( 'saveEntityRecord', () => {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( callOrder ).toEqual( [ 'snapshot', 'fetch' ] );
+			expect( callOrder ).toEqual( [ 'beforeSave', 'fetch' ] );
 		} );
 
-		it( 'applies direct record changes to the CRDT before capturing the snapshot', async () => {
-			resolveSelect = makeResolveSelect( {
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				syncConfig: {},
-			} );
+		it( 'autosaves normally when no sync manager is registered', async () => {
+			getEntitySyncManager.mockReturnValue( undefined );
 
-			// A direct caller can pass content that never went through
-			// `editEntityRecord`, so it is not yet in the CRDT. If the
-			// snapshot were captured first, it would describe a state
-			// without this content and wrongly suppress the recovery
-			// notice on reload.
-			const callOrder = [];
-			syncManager.update = vi.fn( () => {
-				callOrder.push( 'update' );
-			} );
-			syncManager.getEntitySnapshot.mockImplementation( () => {
-				callOrder.push( 'snapshot' );
-				return 'ENCODED_SNAPSHOT';
-			} );
-
-			const record = {
-				id: 10,
-				content: 'Directly autosaved content',
-			};
-
-			await saveEntityRecord( 'postType', 'post', record, {
+			await saveEntityRecord( 'postType', 'post', persistedRecord, {
 				isAutosave: true,
 			} )( { select, dispatch, resolveSelect } );
 
-			expect( syncManager.update ).toHaveBeenCalledWith(
-				'postType/post',
-				10,
-				record,
-				'local-undo-ignored'
+			expect( syncManager.beforeSave ).not.toHaveBeenCalled();
+			expect( getAutosaveRequestData() ).not.toHaveProperty(
+				'crdt_snapshot'
 			);
-			expect( callOrder ).toEqual( [ 'update', 'snapshot' ] );
+			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
 		} );
 	} );
 } );

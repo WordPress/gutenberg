@@ -44,10 +44,10 @@ export const NameContainer = styled.div`
 
 export const PaletteHeading = styled( Heading )`
 	text-transform: uppercase;
-	line-height: ${ space( 6 ) };
 	font-weight: ${ CONFIG.fontWeightEmphasis };
 	&&& {
 		font-size: 11px;
+		line-height: ${ space( 6 ) };
 		margin-bottom: 0;
 	}
 `;
