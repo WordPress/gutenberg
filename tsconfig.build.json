@@ -33,6 +33,7 @@
 		{ "path": "packages/edit-site" },
 		{ "path": "packages/editor/tsconfig.build.json" },
 		{ "path": "packages/element/tsconfig.build.json" },
+		{ "path": "packages/entity-fields/tsconfig.build.json" },
 		{ "path": "packages/escape-html/tsconfig.build.json" },
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/fields/tsconfig.build.json" },

@@ -22,6 +22,7 @@
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/editor" },
 		{ "path": "packages/element" },
+		{ "path": "packages/entity-fields" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/fields" },
 		{ "path": "packages/global-styles-engine" },
