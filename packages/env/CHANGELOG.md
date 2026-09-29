@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Enhancement
 
 -   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
