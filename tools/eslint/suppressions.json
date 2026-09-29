@@ -2688,9 +2688,6 @@
 		}
 	},
 	"packages/block-library/src/cover/edit/index.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2876,9 +2873,6 @@
 		}
 	},
 	"packages/block-library/src/group/edit.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
