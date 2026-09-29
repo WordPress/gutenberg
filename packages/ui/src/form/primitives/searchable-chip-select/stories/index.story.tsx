@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -16,6 +17,7 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
+		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
@@ -100,25 +102,25 @@ export const Grouped: Story = {
 	args: {
 		'aria-label': 'Fruit',
 		items: GROUPED_ITEMS,
-		children: ( group: FixtureGroup ) => (
-			<SearchableChipSelect.Group
-				key={ group.label }
-				items={ group.items }
-			>
-				<SearchableChipSelect.GroupLabel>
-					{ group.label }
-				</SearchableChipSelect.GroupLabel>
-				<SearchableChipSelect.Collection>
-					{ ( item: FixtureItem ) => (
-						<SearchableChipSelect.Item
-							key={ item.value }
-							value={ item }
-						>
-							{ item.label }
-						</SearchableChipSelect.Item>
-					) }
-				</SearchableChipSelect.Collection>
-			</SearchableChipSelect.Group>
+		children: ( group: FixtureGroup, index: number ) => (
+			<Fragment key={ group.label }>
+				{ index > 0 && <SearchableChipSelect.Separator /> }
+				<SearchableChipSelect.Group items={ group.items }>
+					<SearchableChipSelect.GroupLabel>
+						{ group.label }
+					</SearchableChipSelect.GroupLabel>
+					<SearchableChipSelect.Collection>
+						{ ( item: FixtureItem ) => (
+							<SearchableChipSelect.Item
+								key={ item.value }
+								value={ item }
+							>
+								{ item.label }
+							</SearchableChipSelect.Item>
+						) }
+					</SearchableChipSelect.Collection>
+				</SearchableChipSelect.Group>
+			</Fragment>
 		),
 	},
 };

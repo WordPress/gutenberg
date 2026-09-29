@@ -91,6 +91,10 @@ export type AutocompleteRowProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type AutocompleteSeparatorProps = ComponentProps<
+	typeof _Autocomplete.Separator
+>;
+
 export type AutocompleteStatusProps = ComponentProps<
 	typeof _Autocomplete.Status
 > & {

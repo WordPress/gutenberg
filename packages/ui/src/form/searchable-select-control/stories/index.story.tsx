@@ -28,6 +28,7 @@ const meta: Meta< typeof SearchableSelectControl > = {
 		'SearchableSelectControl.Group': SearchableSelectControl.Group,
 		'SearchableSelectControl.GroupLabel':
 			SearchableSelectControl.GroupLabel,
+		'SearchableSelectControl.Separator': SearchableSelectControl.Separator,
 		'SearchableSelectControl.Item': SearchableSelectControl.Item,
 		'SearchableSelectControl.Collection':
 			SearchableSelectControl.Collection,

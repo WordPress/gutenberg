@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
 import { Spinner } from '../../../../spinner';
 import { Stack } from '../../../../stack';
@@ -29,6 +29,7 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Group': Combobox.Group,
 		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
+		'Combobox.Separator': Combobox.Separator,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
@@ -76,6 +77,52 @@ export const Default: Story = {
 								>
 									{ item.label }
 								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Combobox.Separator` to divide related options in the popup.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [
+			{ label: 'Suggested', items: ITEMS.slice( 0, 2 ) },
+			{ label: 'More fruit', items: ITEMS.slice( 2, 4 ) },
+		],
+		children: [
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( group: FixtureGroup, index: number ) => (
+								<Fragment key={ group.label }>
+									{ index > 0 && <Combobox.Separator /> }
+									<Combobox.Group items={ group.items }>
+										<Combobox.GroupLabel>
+											{ group.label }
+										</Combobox.GroupLabel>
+										<Combobox.Collection>
+											{ ( item: FixtureItem ) => (
+												<Combobox.Item
+													key={ item.value }
+													value={ item }
+												>
+													{ item.label }
+												</Combobox.Item>
+											) }
+										</Combobox.Collection>
+									</Combobox.Group>
+								</Fragment>
 							) }
 						</Combobox.Collection>
 					</Combobox.ListBody>

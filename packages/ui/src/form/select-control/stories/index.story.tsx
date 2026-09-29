@@ -18,6 +18,7 @@ const meta: Meta< typeof SelectControl > = {
 		'SelectControl.Item': SelectControl.Item,
 		'SelectControl.ItemLabel': SelectControl.ItemLabel,
 		'SelectControl.ItemDescription': SelectControl.ItemDescription,
+		'SelectControl.Separator': SelectControl.Separator,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
@@ -50,6 +51,39 @@ export const Default: Story = {
 		items: defaultItems,
 		label: 'Label',
 		description: 'This is the description.',
+	},
+};
+
+const separatorItems = [ ...defaultItems, { value: '3', label: 'Item 3' } ];
+
+/**
+ * Use `SelectControl.Separator` when composing popup items as children.
+ */
+export const WithSeparator: Story = {
+	args: {
+		label: 'Item',
+		items: separatorItems,
+		children: [
+			...defaultItems.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<SelectControl.ItemLabel>
+						{ item.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ),
+			<SelectControl.Separator key="separator" />,
+			<SelectControl.Item
+				key="item-3"
+				value={ separatorItems[ 2 ] }
+				label="Item 3"
+			>
+				<SelectControl.ItemLabel>Item 3</SelectControl.ItemLabel>
+			</SelectControl.Item>,
+		],
 	},
 };
 

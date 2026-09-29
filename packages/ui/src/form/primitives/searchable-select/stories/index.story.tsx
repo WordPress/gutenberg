@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -15,6 +16,7 @@ const meta: Meta< typeof SearchableSelect > = {
 	subcomponents: {
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
+		'SearchableSelect.Separator': SearchableSelect.Separator,
 		'SearchableSelect.Item': SearchableSelect.Item,
 		'SearchableSelect.Collection': SearchableSelect.Collection,
 	},
@@ -118,22 +120,25 @@ export const Grouped: Story = {
 	args: {
 		...Default.args,
 		items: GROUPED_ITEMS,
-		children: ( group: FixtureGroup ) => (
-			<SearchableSelect.Group key={ group.label } items={ group.items }>
-				<SearchableSelect.GroupLabel>
-					{ group.label }
-				</SearchableSelect.GroupLabel>
-				<SearchableSelect.Collection>
-					{ ( item: FixtureItem ) => (
-						<SearchableSelect.Item
-							key={ item.value }
-							value={ item }
-						>
-							{ item.label }
-						</SearchableSelect.Item>
-					) }
-				</SearchableSelect.Collection>
-			</SearchableSelect.Group>
+		children: ( group: FixtureGroup, index: number ) => (
+			<Fragment key={ group.label }>
+				{ index > 0 && <SearchableSelect.Separator /> }
+				<SearchableSelect.Group items={ group.items }>
+					<SearchableSelect.GroupLabel>
+						{ group.label }
+					</SearchableSelect.GroupLabel>
+					<SearchableSelect.Collection>
+						{ ( item: FixtureItem ) => (
+							<SearchableSelect.Item
+								key={ item.value }
+								value={ item }
+							>
+								{ item.label }
+							</SearchableSelect.Item>
+						) }
+					</SearchableSelect.Collection>
+				</SearchableSelect.Group>
+			</Fragment>
 		),
 	},
 };

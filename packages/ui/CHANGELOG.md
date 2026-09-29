@@ -8,6 +8,7 @@
 
 ### New Features
 
+-   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups.
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
 ### Bug Fixes

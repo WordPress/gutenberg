@@ -28,6 +28,8 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
+		'SearchableChipSelectControl.Separator':
+			SearchableChipSelectControl.Separator,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,

@@ -115,6 +115,10 @@ export type ComboboxRootProps<
 	Multiple extends boolean | undefined = false,
 > = _Combobox.Root.Props< Value, Multiple >;
 
+export type ComboboxSeparatorProps = ComponentProps<
+	typeof _Combobox.Separator
+>;
+
 export type ComboboxStatusProps = ComponentProps< typeof _Combobox.Status > & {
 	children?: React.ReactNode;
 };

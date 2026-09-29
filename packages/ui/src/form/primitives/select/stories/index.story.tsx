@@ -16,6 +16,7 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Item': Select.Item,
 		'Select.ItemLabel': Select.ItemLabel,
 		'Select.ItemDescription': Select.ItemDescription,
+		'Select.Separator': Select.Separator,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
@@ -43,6 +44,31 @@ export const Default: Story = {
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Select.Separator` to divide related options in the popup.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: defaultItems.slice( 0, 4 ),
+		children: [
+			<Select.Trigger aria-label="Item" key="trigger" />,
+			<Select.Popup key="popup">
+				{ defaultItems.slice( 0, 2 ).map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+				<Select.Separator />
+				{ defaultItems.slice( 2, 4 ).map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
 						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 					</Select.Item>

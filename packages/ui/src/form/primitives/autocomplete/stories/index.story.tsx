@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
@@ -37,6 +37,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
 		'Autocomplete.Item': Autocomplete.Item,
 		'Autocomplete.Row': Autocomplete.Row,
+		'Autocomplete.Separator': Autocomplete.Separator,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
 		'Autocomplete.Status': Autocomplete.Status,
@@ -80,6 +81,54 @@ export const Default: Story = {
 								>
 									{ item.value }
 								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Autocomplete.Separator` to divide related suggestions in the popup.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [
+			{ label: 'Suggested', items: URLS.slice( 0, 2 ) },
+			{ label: 'More links', items: URLS.slice( 2, 4 ) },
+		],
+		openOnInputClick: true,
+		children: [
+			<Autocomplete.Input
+				aria-label="URL"
+				placeholder="Enter a URL"
+				key="input"
+			/>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( group: FixtureGroup, index: number ) => (
+								<Fragment key={ group.label }>
+									{ index > 0 && <Autocomplete.Separator /> }
+									<Autocomplete.Group items={ group.items }>
+										<Autocomplete.GroupLabel>
+											{ group.label }
+										</Autocomplete.GroupLabel>
+										<Autocomplete.Collection>
+											{ ( item: FixtureItem ) => (
+												<Autocomplete.Item
+													key={ item.id }
+													value={ item }
+												>
+													{ item.value }
+												</Autocomplete.Item>
+											) }
+										</Autocomplete.Collection>
+									</Autocomplete.Group>
+								</Fragment>
 							) }
 						</Autocomplete.Collection>
 					</Autocomplete.ListBody>

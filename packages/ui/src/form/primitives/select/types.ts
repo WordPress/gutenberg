@@ -54,6 +54,8 @@ export type SelectGroupLabelProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type SelectSeparatorProps = ComponentProps< typeof _Select.Separator >;
+
 export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
 	ItemPopupWidthProps & {
 		/**
