@@ -2,6 +2,7 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	MediaReplaceFlow,
+	useSettings,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	privateApis as blockEditorPrivateApis,
@@ -15,6 +16,8 @@ import EmbedVideoUrlInput from './embed-video-url-input';
 import { getAllowedVideoProviders } from '../embed-video-utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+const FULL_HEIGHT = '100vh';
 
 export default function CoverBlockControls( {
 	attributes,
@@ -34,8 +37,7 @@ export default function CoverBlockControls( {
 		contentPosition,
 		id,
 		useFeaturedImage,
-		minHeight,
-		minHeightUnit,
+		style,
 		backgroundType,
 		allowedVideoProviders,
 	} = attributes;
@@ -46,48 +48,34 @@ export default function CoverBlockControls( {
 	);
 	const hasAllowedVideoProviders = filteredVideoProviders.length > 0;
 
-	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
-		useState( minHeightUnit );
+	const [ isMinHeightEnabled ] = useSettings( 'dimensions.minHeight' );
+	const minHeight = style?.dimensions?.minHeight;
+	const [ prevMinHeight, setPrevMinHeight ] = useState( minHeight );
 	const [ isEmbedUrlInputOpen, setIsEmbedUrlInputOpen ] = useState( false );
 	const isMinFullHeight =
-		minHeightUnit === 'vh' &&
-		minHeight === 100 &&
-		! attributes?.style?.dimensions?.aspectRatio;
+		minHeight === FULL_HEIGHT && ! style?.dimensions?.aspectRatio;
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const toggleMinFullHeight = () => {
-		if ( isMinFullHeight ) {
-			// If there aren't previous values, take the default ones.
-			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
-				return setAttributes( {
-					minHeight: undefined,
-					minHeightUnit: undefined,
-				} );
-			}
-
-			// Set the previous values of height.
-			return setAttributes( {
-				minHeight: prevMinHeightValue,
-				minHeightUnit: prevMinHeightUnit,
-			} );
-		}
-
-		setPrevMinHeightValue( minHeight );
-		setPrevMinHeightUnit( minHeightUnit );
-
-		// Set full height, and clear any aspect ratio value.
-		return setAttributes( {
-			minHeight: 100,
-			minHeightUnit: 'vh',
+	const setMinHeight = ( nextMinHeight ) =>
+		setAttributes( {
 			style: cleanEmptyObject( {
-				...attributes?.style,
+				...style,
 				dimensions: {
-					...attributes?.style?.dimensions,
+					...style?.dimensions,
+					minHeight: nextMinHeight,
 					aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
 				},
 			} ),
 		} );
+
+	const toggleMinFullHeight = () => {
+		if ( isMinFullHeight ) {
+			return setMinHeight(
+				prevMinHeight === FULL_HEIGHT ? undefined : prevMinHeight
+			);
+		}
+		setPrevMinHeight( minHeight );
+		return setMinHeight( FULL_HEIGHT );
 	};
 
 	return (
@@ -104,11 +92,13 @@ export default function CoverBlockControls( {
 						}
 						isDisabled={ ! hasInnerBlocks }
 					/>
-					<FullHeightAlignmentControl
-						isActive={ isMinFullHeight }
-						onToggle={ toggleMinFullHeight }
-						isDisabled={ ! hasInnerBlocks }
-					/>
+					{ isMinHeightEnabled && (
+						<FullHeightAlignmentControl
+							isActive={ isMinFullHeight }
+							onToggle={ toggleMinFullHeight }
+							isDisabled={ ! hasInnerBlocks }
+						/>
+					) }
 					{ showEditMediaButton && (
 						<ToolbarButton
 							ref={ editMediaButtonRef }
