@@ -68,6 +68,23 @@ function createRegistryWithStores() {
 const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
+/*
+ * Fallback for the fetch handlers below. Core-data loads the post type entity
+ * configs in the background, and depending on test order that request can
+ * reach a handler installed by another test; answer it rather than leave an
+ * unhandled rejection behind. Anything else is a request the test did not
+ * expect.
+ */
+const unknownPath = ( method, path ) => {
+	if ( method === 'GET' && path.startsWith( '/wp/v2/types?' ) ) {
+		return {};
+	}
+	throw {
+		code: 'unknown_path',
+		message: `Unknown path: ${ method } ${ path }`,
+	};
+};
+
 describe( 'Post actions', () => {
 	describe( 'setCanvasWidth', () => {
 		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
@@ -458,10 +475,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			// Create registry.
@@ -530,10 +544,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			const registry = createRegistryWithStores();
@@ -609,10 +620,7 @@ describe( 'Post actions', () => {
 						throw { code, message };
 					}
 
-					throw {
-						code: 'unknown_path',
-						message: `Unknown path: ${ method } ${ path }`,
-					};
+					return unknownPath( method, path );
 				} );
 
 				const registry = createRegistryWithStores();
@@ -730,10 +738,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 		}
 
@@ -989,10 +994,7 @@ describe( 'Post actions', () => {
 					}
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			// Create registry.
@@ -1074,10 +1076,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			// Create registry.
