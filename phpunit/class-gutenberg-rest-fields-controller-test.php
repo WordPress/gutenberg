@@ -508,7 +508,6 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * than arrays.
 	 *
 	 * @covers ::get_items
-	 * @covers ::cast_empty_objects
 	 */
 	public function test_empty_object_properties_serialize_as_json_objects() {
 		$this->register_fields(
