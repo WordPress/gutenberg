@@ -1,6 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { getEntitySyncManager } from '../entity-sync';
+import { isSyncEngineUnavailable } from '../sync';
+vi.mock( '../sync', () => ( {
+	isSyncEngineUnavailable: vi.fn( () => false ),
+} ) );
 import {
 	getEntityRecord,
 	getEntityRecords,
@@ -16,6 +20,9 @@ vi.mock( '../entity-sync', () => ( {
 } ) );
 
 describe( 'getEntityRecord', () => {
+	afterEach( () => {
+		delete window.__experimentalEnableRealTimeCollaboration;
+	} );
 	const POST_TYPE = { slug: 'post' };
 	const POST_TYPE_RESPONSE = { json: () => Promise.resolve( POST_TYPE ) };
 	const ENTITIES = [
@@ -48,6 +55,7 @@ describe( 'getEntityRecord', () => {
 			loadCollection: vi.fn(),
 		};
 		getEntitySyncManager.mockImplementation( () => syncManager );
+		isSyncEngineUnavailable.mockReturnValue( false );
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -285,6 +293,107 @@ describe( 'getEntityRecord', () => {
 		expect(
 			dispatch.__unstableNotifySyncUndoManagerChange
 		).toHaveBeenCalledWith( { hasRedo: false, hasUndo: true } );
+	} );
+
+	it.each( [ 'engine', 'adapter' ] )(
+		'restores post locking when the %s is unavailable',
+		async ( missing ) => {
+			// REGRESSION (review 1.1): an unresolvable engine announcement used
+			// to leave the editor with no sync AND no lock — collaboration still
+			// "enabled", the post-locked modal suppressed, concurrent editors
+			// silently overwriting each other on save.
+			const POST_RECORD = { id: 1, title: 'Test Post' };
+			const POST_RESPONSE = {
+				json: () => Promise.resolve( POST_RECORD ),
+			};
+			const ENTITIES_WITH_SYNC = [
+				{
+					name: 'post',
+					kind: 'postType',
+					baseURL: '/wp/v2/posts',
+					baseURLParams: { context: 'edit' },
+					syncConfig: {},
+				},
+			];
+
+			getEntitySyncManager.mockImplementation( () => undefined );
+			isSyncEngineUnavailable.mockImplementation(
+				() => missing === 'engine'
+			);
+			window.__experimentalEnableRealTimeCollaboration = true;
+			dispatch.setCollaborationSupported = vi.fn();
+			const createNotice = vi.fn();
+			const registryWithNotices = {
+				batch: ( callback ) => callback(),
+				dispatch: vi.fn( () => ( { createNotice } ) ),
+			};
+
+			triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+			await getEntityRecord(
+				'postType',
+				'post',
+				1
+			)( {
+				dispatch,
+				registry: registryWithNotices,
+				resolveSelect: {
+					getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
+					getEditedEntityRecord: vi.fn(),
+				},
+			} );
+
+			expect( dispatch.setCollaborationSupported ).toHaveBeenCalledWith(
+				false
+			);
+			expect( createNotice ).toHaveBeenCalledWith(
+				'warning',
+				expect.stringContaining(
+					'Real-time collaboration is unavailable'
+				),
+				expect.objectContaining( {
+					id: 'core-data-sync-engine-unavailable',
+				} )
+			);
+		}
+	);
+
+	it( 'does not touch the collaboration flag when sync is merely disabled', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		// Collaboration off entirely: no manager, but NOT an engine failure.
+		getEntitySyncManager.mockImplementation( () => undefined );
+		isSyncEngineUnavailable.mockImplementation( () => false );
+		dispatch.setCollaborationSupported = vi.fn();
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: {
+				getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
+				getEditedEntityRecord: vi.fn(),
+			},
+		} );
+
+		expect( dispatch.setCollaborationSupported ).not.toHaveBeenCalled();
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {

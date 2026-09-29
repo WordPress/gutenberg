@@ -8,6 +8,7 @@ import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as interfaceStore } from '@wordpress/interface';
 import { Tabs } from '@wordpress/ui';
+import CollaborationReviewPanel from '../collaboration-review-panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
@@ -82,6 +83,7 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				) : (
 					<PostSummary onActionPerformed={ onActionPerformed } />
 				) }
+				<CollaborationReviewPanel />
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }

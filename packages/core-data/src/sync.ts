@@ -9,7 +9,6 @@ import {
 	type Y,
 } from '@wordpress/sync';
 import {
-	registerEntitySyncManager,
 	type EntitySyncBeforeSaveContext,
 	type EntitySyncCollectionHandlers,
 	type EntitySyncEditOptions,
@@ -20,6 +19,7 @@ import {
 } from './entity-sync';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { unlock } from './lock-unlock';
+import { createSyncReviewHandlers } from './sync-review';
 import { STORE_NAME } from './name';
 import type { AnyFunction } from './types';
 import {
@@ -31,13 +31,12 @@ import { saveCRDTDoc } from './utils/save-crdt-doc';
 
 const {
 	ConnectionErrorCode,
-	createSyncManager,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
-	retrySyncConnection,
+	resolveEngineAdapter,
 } = unlock( syncPrivateApis );
 
 export {
@@ -47,7 +46,6 @@ export {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
-	retrySyncConnection,
 };
 
 /**
@@ -61,6 +59,8 @@ export {
 export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
 
 let syncManager: SyncManager;
+let engineMismatchWarned = false;
+let engineUnavailable = false;
 
 export function getSyncManager(): SyncManager | undefined {
 	if ( syncManager ) {
@@ -71,9 +71,41 @@ export function getSyncManager(): SyncManager | undefined {
 		return undefined;
 	}
 
-	syncManager = createSyncManager();
+	/*
+	 * Engine handshake: the server announces the sync engine it speaks
+	 * (window._wpCollaborationSync) and enforces it per-request with a 409.
+	 * When this client cannot provide the announced engine at the announced
+	 * protocol version, do not create a sync manager at all — entity syncing
+	 * stays off. Callers observe this via isSyncEngineUnavailable() and must
+	 * flip collaborationSupported so WordPress's regular post locking
+	 * re-engages (without that flip the degraded state would be no sync AND
+	 * no lock: concurrent editors silently overwrite each other on save).
+	 */
+	const adapter = resolveEngineAdapter();
+	if ( ! adapter ) {
+		engineUnavailable = true;
+		if ( ! engineMismatchWarned ) {
+			engineMismatchWarned = true;
+			// eslint-disable-next-line no-console
+			console.warn(
+				'Real-time collaboration is unavailable: this client does not support the sync engine announced by the server. Falling back to exclusive post locking.'
+			);
+		}
+		return undefined;
+	}
+
+	syncManager = adapter.createManager();
 
 	return syncManager;
+}
+
+/**
+ * Whether sync is unavailable because the server announced an engine this
+ * client cannot provide (as opposed to collaboration simply being disabled).
+ * Only meaningful after a getSyncManager() call attempted resolution.
+ */
+export function isSyncEngineUnavailable(): boolean {
+	return engineUnavailable;
 }
 
 /**
@@ -83,6 +115,20 @@ export function getSyncManager(): SyncManager | undefined {
  */
 export function hasSyncManager(): boolean {
 	return Boolean( syncManager );
+}
+
+/**
+ * Retry the active sync connection after a connection error (wired to the
+ * editor's connection-error modal). Transport-agnostic: it delegates to the
+ * active manager, which asks its live providers to retry — no reaching into a
+ * specific transport. A no-op when no manager exists (collaboration disabled or
+ * the announced engine is unavailable).
+ */
+export function retrySyncConnection(): void {
+	if ( ! hasSyncManager() ) {
+		return;
+	}
+	getSyncManager()?.retry?.();
 }
 
 /**
@@ -444,6 +490,7 @@ function createRecordHandlers(
 	handlers: EntitySyncRecordHandlers
 ) {
 	return {
+		...createSyncReviewHandlers( data, kind, name, recordId ),
 		editRecord: handlers.editRecord,
 		getEditedRecord: handlers.getEditedRecord,
 		refetchRecord: handlers.refetchRecord,
@@ -539,9 +586,5 @@ function createCollectionHandlers(
 	};
 }
 
-// The experiment flag is printed before this script loads, so the default
-// manager can register as soon as the module evaluates. Without the flag,
-// nothing is registered and core-data leaves entities alone.
-if ( globalThis.window?.__experimentalEnableRealTimeCollaboration ) {
-	registerEntitySyncManager( createDefaultEntitySyncManager() );
-}
+// This vendored framework has no built-in engines. The plugin registers its
+// entity adapter after registering engines and transports, before editor startup.

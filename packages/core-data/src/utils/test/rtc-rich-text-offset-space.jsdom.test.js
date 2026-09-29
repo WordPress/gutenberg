@@ -1,17 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
-import { createSyncManager } from '../../../../sync/src/manager';
-import { getProviderCreators } from '../../../../sync/src/providers';
-import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
-import { applyPostChangesToCRDTDoc } from '../crdt';
-import { mergeCrdtBlocks } from '../crdt-blocks';
-import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
 /**
  * Mock block schemas and sync providers.
  */
 vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
-
 	return {
 		...actual,
 		getBlockTypes: () => [
@@ -24,12 +17,10 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 		],
 	};
 } );
-
-vi.mock( '../../../../sync/src/providers', () => ( {
-	getProviderCreators: vi.fn(),
-} ) );
-
-const mockGetProviderCreators = vi.mocked( getProviderCreators );
+import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
+import { applyPostChangesToCRDTDoc } from '../crdt';
+import { mergeCrdtBlocks } from '../crdt-blocks';
+import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
 
 const SYNCED_PROPERTIES = new Set( [ 'blocks' ] );
 const OLD_HTML = '<em>italic</em><em>italic</em>';
@@ -87,10 +78,6 @@ function readFirstBlockContentFromDoc( ydoc ) {
 	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 	const yblocks = ymap.get( 'blocks' );
 	return readFirstBlockContentFromYBlocks( yblocks );
-}
-
-function waitForNextTick() {
-	return new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 }
 
 function createRandom( seed ) {
@@ -187,16 +174,6 @@ function assertEqualWithContext( actual, expected, context ) {
 }
 
 describe( 'RTC rich-text offset-space bug', () => {
-	beforeEach( () => {
-		vi.clearAllMocks();
-		mockGetProviderCreators.mockReturnValue( [
-			vi.fn( async () => ( {
-				destroy: vi.fn(),
-				on: vi.fn(),
-			} ) ),
-		] );
-	} );
-
 	it( 'preserves formatted paragraph content in mergeCrdtBlocks', () => {
 		const doc = new Y.Doc();
 		const yblocks = doc.getArray( 'blocks' );
@@ -404,54 +381,5 @@ describe( 'RTC rich-text offset-space bug', () => {
 		);
 
 		expect( readFirstBlockContentFromDoc( doc ) ).toBe( NEW_HTML );
-	} );
-
-	it( 'preserves formatted paragraph content in SyncManager.update', async () => {
-		let capturedDoc;
-		const manager = createSyncManager();
-		const handlers = {
-			addUndoMeta: vi.fn(),
-			editRecord: vi.fn(),
-			getEditedRecord: vi.fn( async () => ( {
-				id: 1,
-				blocks: [ makeParagraphBlock( OLD_HTML ) ],
-			} ) ),
-			onStatusChange: vi.fn(),
-			persistCRDTDoc: vi.fn(),
-			refetchRecord: vi.fn( async () => {} ),
-			restoreUndoMeta: vi.fn(),
-		};
-		const syncConfig = {
-			applyChangesToCRDTDoc: ( ydoc, changes ) => {
-				capturedDoc = ydoc;
-				applyPostChangesToCRDTDoc( ydoc, changes, SYNCED_PROPERTIES );
-			},
-			createAwareness: vi.fn(),
-			getChangesFromCRDTDoc: vi.fn( () => ( {} ) ),
-			getPersistedCRDTDoc: vi.fn( () => null ),
-		};
-
-		await manager.load(
-			syncConfig,
-			'postType/post',
-			'1',
-			{ id: 1, blocks: [ makeParagraphBlock( OLD_HTML ) ] },
-			handlers
-		);
-
-		manager.update(
-			'postType/post',
-			'1',
-			{
-				blocks: [ makeParagraphBlock( NEW_HTML ) ],
-				selection: getSelection(),
-			},
-			'LOCAL_EDITOR_ORIGIN'
-		);
-		await waitForNextTick();
-
-		expect( readFirstBlockContentFromDoc( capturedDoc ) ).toBe( NEW_HTML );
-
-		manager.unload( 'postType/post', '1' );
 	} );
 } );

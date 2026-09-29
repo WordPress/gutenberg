@@ -5936,6 +5936,36 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collaboration-review-panel/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaboration-review-panel/markers.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaboration-review-panel/review-group.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaboration-review-panel/test/block-card.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaboration-review-panel/test/insertion-card.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collaboration-review-panel/test/review-group.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/collapsible-block-toolbar/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

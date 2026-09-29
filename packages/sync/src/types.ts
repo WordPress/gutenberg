@@ -1,26 +1,28 @@
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
+import type { EngineSessionCodec } from './engines/session';
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
 		__experimentalEnableRealTimeCollaboration?: boolean;
+		_wpCollaborationUserId?: number;
+		_wpCollaborationWebSocketUrl?: string;
+		_wpCollaborationSync?: {
+			engine?: string;
+			engineProtocol?: number;
+			transports?: string[];
+			transportProtocol?: number;
+		};
 	}
 }
 
 export type CRDTDoc = Y.Doc;
-export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-
-// An origin is a value passed by the transactor to identify the source of a
-// change. It can be any value, and is not used internally by Yjs. Origins are
-// preserved locally, while a remote change will have the provider instance as
-// its origin.
-export type Origin = any;
 
 // Object data represents any entity record. There are not any expectations that
 // can hold on its shape, beyond a record with string keys and unknown values.
@@ -47,6 +49,12 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
+	/**
+	 * Best-effort: reconnect / poll immediately after a connection error.
+	 * Called by the manager's `retry()` (driven by the editor's connection-
+	 * error UI). Optional — transports without an explicit retry are skipped.
+	 */
+	retry?: () => void;
 }
 
 /**
@@ -89,22 +97,14 @@ export type OnStatusChangeCallback = (
 ) => void;
 
 /**
- * Options passed to a provider creator function when initializing a sync provider.
+ * Options passed to a provider creator function when initializing a sync
+ * provider. Providers receive an engine session codec — never the engine's
+ * internal state (e.g. a Y.Doc) — so transports stay engine-agnostic.
  */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
-	ydoc: Y.Doc;
-	awareness?: Awareness;
-
-	/**
-	 * The Yjs module used by the editor. Providers must use this instance
-	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
-	 * on the same document cause silent data corruption:
-	 *
-	 * https://github.com/yjs/yjs/issues/438
-	 */
-	Y: typeof Y;
+	session: EngineSessionCodec;
 }
 
 export type ProviderCreator = (
@@ -114,6 +114,92 @@ export type ProviderCreator = (
 export interface CollectionHandlers {
 	onStatusChange: OnStatusChangeCallback;
 	refetchRecords: () => Promise< void >;
+}
+
+/**
+ * One open escalation in the review list: a parked edit that a user can
+ * restore or discard. See prototypes/sync/PROPOSAL-REVIEW.md.
+ */
+export interface SyncReviewItem {
+	/** The parked proposal's id (the escalated intent's intentId). */
+	id: string;
+	/** Groups rule-4 unit members (txnId, or the id for singletons). */
+	unitId: string;
+	/** Whether the current client authored the escalated edit. */
+	isLocal: boolean;
+	actorId: string;
+	reason: string;
+	intentType: string;
+	/** The lost content, when the intent type carries any. */
+	summary?: string;
+	/** Target-field excerpt captured at escalation time. */
+	excerpt?: string;
+	/**
+	 * The target block's engine identity (syncId), when the intent
+	 * addresses one — lets UI anchor the conflict to a block in the
+	 * editor. Absent for document-level intents (e.g. entity properties).
+	 */
+	targetId?: string;
+	/**
+	 * The target block's TOP-LEVEL index in the document, for engines
+	 * whose review items address blocks positionally rather than by a
+	 * persistent identity (e.g. de-rtc contests). A UI anchor of last
+	 * resort: `targetId` wins when both are present.
+	 */
+	targetIndex?: number;
+	/**
+	 * For a parked NEW-block proposal (insert_block): the block it would
+	 * create, its readable content, and where it would land — so the
+	 * editor can render it inline at that position for approval (the block
+	 * is not in the reviewer's canvas, so `targetId` cannot anchor it).
+	 */
+	proposedInsertion?: {
+		blockType?: string;
+		html: string;
+		afterSiblingId?: string;
+		parentId?: string;
+	};
+}
+
+/**
+ * The review surface an engine with an escalation lane exposes: the open
+ * parked-conflict list per entity, a change subscription, and the two
+ * resolution verbs. When a `SyncEngine` supplies one (its optional
+ * `review` member), the generic manager presents the items through the
+ * record handlers (`onProposalsChange`/`onEscalation`) and delegates
+ * `SyncManager.resolveProposal`/`restoreProposal` to it — so any composed
+ * engine gets the framework review UI without its own plumbing.
+ */
+export interface SyncReviewSource {
+	getOpenItems: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => SyncReviewItem[];
+	/** Returns an unsubscribe function. */
+	subscribe: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		listener: () => void
+	) => () => void;
+	/**
+	 * Closes a parked proposal. The `restored` resolution is sent AFTER
+	 * the recovered content was re-authored as ordinary edits.
+	 */
+	resolveProposal: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string,
+		resolution: 'restored' | 'dismissed'
+	) => void;
+	/**
+	 * Best-effort restore of the parked content as ordinary local edits
+	 * under the restorer's capability, then resolves as restored.
+	 */
+	restoreProposal: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string
+	) => void;
 }
 
 export interface SyncManagerUpdateOptions {
@@ -134,6 +220,28 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	/**
+	 * Called when the sync engine sets an edit aside for review instead of
+	 * merging it (an escalation). `isLocal` distinguishes the current
+	 * client's own edit from a collaborator's; `proposalId` addresses the
+	 * parked proposal for resolution, and `summary`/`excerpt` carry the
+	 * lost content and its context for display. Fires only for OPEN
+	 * proposals (a proposal resolved in the same delivery batch never
+	 * notifies). Optional: managers fall back to console output.
+	 */
+	onEscalation?: ( escalation: {
+		reason: string;
+		isLocal: boolean;
+		proposalId: string;
+		summary?: string;
+		excerpt?: string;
+	} ) => void;
+
+	/**
+	 * Called with the full open-proposal review list whenever it changes
+	 * (a proposal arrived or was resolved). Optional.
+	 */
+	onProposalsChange?: ( proposals: SyncReviewItem[] ) => void;
 	onStatusChange: OnStatusChangeCallback;
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
@@ -160,6 +268,42 @@ export interface SyncConfig {
 		objectId: ObjectID | null
 	) => boolean;
 	supportsPersistence?: boolean;
+	/**
+	 * Names a block type's rich-text attributes (backed by the block
+	 * registry). Engines with rich-text-coordinate capture (the intent log)
+	 * use it to decide which attributes become text fields; omitted, only
+	 * the conventional `content` attribute is captured.
+	 */
+	richTextFields?: ( blockName: string ) => string[];
+	/**
+	 * Whether a block type keeps its markup in innerContent fragments
+	 * rather than any attribute (core/html). Such blocks sync their full
+	 * inner HTML as the engine's content field.
+	 */
+	isRawContentBlock?: ( blockName: string ) => boolean;
+	/**
+	 * The full inner HTML of a raw-content block (static fragments plus
+	 * serialized inner blocks) — typically backed by the block
+	 * serializer's getBlockContent.
+	 */
+	serializeRawContent?: ( block: {
+		name: string;
+		attributes: Record< string, unknown >;
+		innerBlocks: unknown[];
+		innerContent?: Array< string | null >;
+	} ) => string;
+	/**
+	 * Where a raw-content block's HTML lives on the editor block:
+	 * innerContent fragments (core/html) or attributes (core/freeform's
+	 * raw-sourced content). Omitted, innerContent form is used.
+	 */
+	hydrateRawContent?: (
+		blockName: string,
+		html: string
+	) => {
+		attributes?: Record< string, unknown >;
+		innerContent?: Array< string | null >;
+	};
 }
 
 export interface SyncManager {
@@ -194,8 +338,37 @@ export interface SyncManager {
 	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
+	/**
+	 * Closes a parked proposal (engines with an escalation lane). The
+	 * `restored` resolution is sent AFTER the caller re-authored the
+	 * recovered content as ordinary edits.
+	 */
+	resolveProposal?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string,
+		resolution: 'restored' | 'dismissed'
+	) => void;
+	/**
+	 * Best-effort restore of a parked proposal's content as ordinary
+	 * intents (text appends to the target field; attr/property writes
+	 * re-apply at current versions), then resolves it as restored.
+	 */
+	restoreProposal?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string
+	) => void;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
+	/**
+	 * Retries the active connection(s) after a connection error — the
+	 * transport-agnostic replacement for reaching into a specific transport.
+	 * Best-effort: it asks every live provider to retry (see
+	 * `ProviderCreatorResult.retry`). Wired to the editor's connection-error
+	 * modal through `core-data`'s `retrySyncConnection`.
+	 */
+	retry?: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,

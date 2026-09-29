@@ -115,6 +115,18 @@
 
 -   Add an `initialViewport` prop to the editor provider, setting the width each entity opens at from the breakpoints the theme defines, so a host no longer has to dispatch `setDeviceType` from outside the provider and race the settings it reads ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
+### Enhancements
+
+-   Show a dedicated "Collaboration settings changed" message in the sync connection error modal when the server reports a sync engine mismatch (the site's collaboration engine changed mid-session).
+
+### New Features
+
+-   Parked new-block proposals (e.g. a collaborator's Custom HTML that needs approval) now render as an inline card in the canvas where the block would land, showing the proposed content as inert text with Approve/Discard — so approval happens in context, not only in the sidebar. Approving re-authors the content under the approver's account.
+-   Restore is now reserved for users who can publish unfiltered HTML on `requires-approval` conflicts (restoring IS the approval); other users see why and keep Discard. UI hint only — ingest re-enforces the capability regardless.
+-   The review surfaces explain `requires-approval` conflicts (collaborative edits parked because their author may not publish unfiltered HTML) and note that restoring publishes the content under the reviewer's account.
+-   Conflicts are now resolvable in context: blocks with edits set aside for review get an in-canvas marker badge that opens the conflict (attribution, lost content, Restore/Discard) anchored to the block, and the sidebar panel's entries link to the conflicted block. The panel remains the only surface for conflicts whose block no longer exists.
+-   Add a "Collaboration conflicts" panel to the document settings sidebar listing edits set aside after a sync conflict, with per-conflict Restore/Discard actions and a bulk "Discard all".
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

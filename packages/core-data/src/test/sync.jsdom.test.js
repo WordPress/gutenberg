@@ -1,27 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
-	() => {
-		const manager = {
-			load: vi.fn(),
-			loadCollection: vi.fn(),
-			update: vi.fn(),
-			unload: vi.fn(),
-			unloadAll: vi.fn(),
-			getEntitySnapshot: vi.fn(),
-			createPersistedCRDTDoc: vi.fn(),
-			undoManager: undefined,
-		};
-		return {
-			mockSyncManager: manager,
-			mockCreateSyncManager: vi.fn( () => manager ),
-			mockSaveCRDTDoc: vi.fn(),
-		};
-	}
-);
+const {
+	mockSyncManager,
+	mockCreateSyncManager,
+	mockSaveCRDTDoc,
+	mockResolveEngineAdapter,
+} = vi.hoisted( () => {
+	const manager = {
+		load: vi.fn(),
+		loadCollection: vi.fn(),
+		update: vi.fn(),
+		unload: vi.fn(),
+		unloadAll: vi.fn(),
+		getEntitySnapshot: vi.fn(),
+		createPersistedCRDTDoc: vi.fn(),
+		undoManager: undefined,
+	};
+	return {
+		mockSyncManager: manager,
+		mockCreateSyncManager: vi.fn( () => manager ),
+		mockSaveCRDTDoc: vi.fn(),
+		mockResolveEngineAdapter: vi.fn(),
+	};
+} );
 
 vi.mock( '@wordpress/sync', () => ( {
 	privateApis: {
-		createSyncManager: mockCreateSyncManager,
+		resolveEngineAdapter: ( ...args ) =>
+			mockResolveEngineAdapter( ...args ) ?? {
+				createManager: mockCreateSyncManager,
+			},
 		ConnectionErrorCode: {},
 		Delta: class {},
 		CRDT_DOC_META_PERSISTENCE_KEY: 'crdt-doc-meta',
@@ -103,6 +110,7 @@ function mockStore( entityConfig ) {
 describe( 'getSyncManager', () => {
 	afterEach( () => {
 		delete window.__experimentalEnableRealTimeCollaboration;
+		mockResolveEngineAdapter.mockClear();
 		mockCreateSyncManager.mockClear();
 	} );
 
@@ -114,7 +122,7 @@ describe( 'getSyncManager', () => {
 			const { getSyncManager } = await loadSync();
 
 			expect( getSyncManager() ).toBeUndefined();
-			expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+			expect( mockResolveEngineAdapter ).not.toHaveBeenCalled();
 		}
 	);
 
@@ -137,6 +145,17 @@ describe( 'getSyncManager', () => {
 		expect( getSyncManager() ).toBe( existingSyncManager );
 		expect( mockCreateSyncManager ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it( 'creates no sync manager and reports the engine as unavailable when no engine adapter resolves', async () => {
+		window.__experimentalEnableRealTimeCollaboration = true;
+		mockResolveEngineAdapter.mockReturnValueOnce( false );
+		const { getSyncManager, isSyncEngineUnavailable } = await loadSync();
+
+		expect( getSyncManager() ).toBeUndefined();
+		expect( isSyncEngineUnavailable() ).toBe( true );
+		expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+		expect( console ).toHaveWarned();
+	} );
 } );
 
 describe( 'the default entity sync manager', () => {
@@ -153,7 +172,7 @@ describe( 'the default entity sync manager', () => {
 		mockSyncManager.undoManager = undefined;
 	} );
 
-	it( 'registers itself through the interface only when the flag is on', async () => {
+	it( 'leaves registration to the plugin even when the experiment is on', async () => {
 		await loadSync();
 		let { getEntitySyncManager } = await import( '../entity-sync' );
 		expect( getEntitySyncManager() ).toBeUndefined();
@@ -161,13 +180,7 @@ describe( 'the default entity sync manager', () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 		await loadSync();
 		( { getEntitySyncManager } = await import( '../entity-sync' ) );
-		expect( getEntitySyncManager() ).toEqual(
-			expect.objectContaining( {
-				load: expect.any( Function ),
-				update: expect.any( Function ),
-				unloadAll: expect.any( Function ),
-			} )
-		);
+		expect( getEntitySyncManager() ).toBeUndefined();
 	} );
 
 	describe( 'with the flag on', () => {
@@ -223,6 +236,8 @@ describe( 'the default entity sync manager', () => {
 					editRecord: handlers.editRecord,
 					getEditedRecord: handlers.getEditedRecord,
 					onStatusChange: expect.any( Function ),
+					onProposalsChange: expect.any( Function ),
+					onEscalation: expect.any( Function ),
 					onUndoStackChange: handlers.onUndoStackChange,
 					persistCRDTDoc: expect.any( Function ),
 					refetchRecord: handlers.refetchRecord,

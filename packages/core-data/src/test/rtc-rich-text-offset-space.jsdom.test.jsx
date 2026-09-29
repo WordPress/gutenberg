@@ -117,11 +117,6 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 	} );
 
 	afterEach( () => {
-		if ( vi.isFakeTimers() ) {
-			// Finish selection updates before destroying their document.
-			vi.runOnlyPendingTimers();
-			vi.useRealTimers();
-		}
 		crdtDoc.destroy();
 		unregisterSyncManager();
 		if (
@@ -151,8 +146,6 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		);
 
 		await waitFor( () => expect( blocks ).toHaveLength( 1 ) );
-		// Keep the async render setup on real timers.
-		vi.useFakeTimers();
 
 		const selection = {
 			selectionStart: {
@@ -183,6 +176,11 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 
 		act( () => {
 			onInput( nextBlocks, { selection } );
+		} );
+
+		// Let deferred selection updates finish before destroying the document.
+		await act( async () => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 		} );
 
 		expect( readFirstBlockContentFromDoc( crdtDoc ) ).toBe( NEW_HTML );

@@ -2,9 +2,12 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getEntitySyncManager } from './entity-sync';
+import { isSyncEngineUnavailable } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -143,12 +146,40 @@ export const getEntityRecord =
 					? undefined
 					: getEntitySyncManager();
 
-			if (
+			const shouldLoadSync =
 				syncManager &&
 				isNumericID( key ) &&
 				! query &&
-				false !== syncManager.shouldSync?.( kind, name, key )
+				false !== syncManager.shouldSync?.( kind, name, key );
+
+			// A missing plugin adapter must also restore post locking. No engine
+			// lookup has run in that case, so engineUnavailable is still false.
+			const missingAdapter =
+				! syncManager &&
+				entityConfig.syncConfig &&
+				globalThis.window?.__experimentalEnableRealTimeCollaboration;
+			if (
+				! shouldLoadSync &&
+				( missingAdapter || isSyncEngineUnavailable() )
 			) {
+				if ( select?.isCollaborationSupported?.() !== false ) {
+					dispatch.setCollaborationSupported( false );
+					registry
+						.dispatch( noticesStore )
+						.createNotice(
+							'warning',
+							__(
+								'Real-time collaboration is unavailable: this site uses a collaboration engine this editor does not support. Standard post locking is in effect; try refreshing the page.'
+							),
+							{
+								id: 'core-data-sync-engine-unavailable',
+								isDismissible: true,
+							}
+						);
+				}
+			}
+
+			if ( shouldLoadSync ) {
 				// Use the new transient "read/write" config to compute transients for
 				// the sync manager. Otherwise these transients are not available
 				// if / until the record is edited. Use a copy of the record so that
