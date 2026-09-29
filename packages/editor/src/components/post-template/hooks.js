@@ -65,7 +65,7 @@ export function useAvailableTemplates() {
 	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates( postType, postSlug || '' );
+	const templates = useTemplates( postType, postSlug || undefined );
 	// The filtered order does not define the hierarchy default.
 	const defaultTemplateId = useSelect(
 		( select ) => {

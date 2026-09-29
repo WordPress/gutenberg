@@ -29,7 +29,7 @@ add_filter(
 		if ( 'wp_template' !== $template_type || ! isset( $query['slug'], $query['post_type'] ) ) {
 			return $templates;
 		}
-		if ( in_array( $query['slug'], array( '', 'filtered-empty' ), true ) ) {
+		if ( 'filtered-empty' === $query['slug'] ) {
 			return array();
 		}
 		if ( 'filtered-choices' === $query['slug'] ) {

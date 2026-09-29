@@ -35,7 +35,7 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 					if ( is_wp_error( $valid ) ) {
 						return $valid;
 					}
-					if ( ! isset( $request['post_type'] ) ) {
+					if ( '' !== sanitize_title( $value ) && ! isset( $request['post_type'] ) ) {
 						return new WP_Error( 'rest_invalid_param', __( 'Provide post_type when requesting templates for a post slug.', 'gutenberg' ) );
 					}
 					return true;
@@ -52,7 +52,7 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 	 * @return WP_REST_Response Response object.
 	 */
 	public function get_items( $request ) {
-		if ( 'wp_template' !== $this->post_type || ! isset( $request['slug'], $request['post_type'] ) || $request->is_method( 'HEAD' ) ) {
+		if ( 'wp_template' !== $this->post_type || ! isset( $request['slug'], $request['post_type'] ) || '' === $request['slug'] || $request->is_method( 'HEAD' ) ) {
 			return parent::get_items( $request );
 		}
 

@@ -81,7 +81,7 @@ function BlockThemeTemplateEdit( {
 			select( coreStore ).getEntityRecords< WpTemplate >(
 				'postType',
 				'wp_template',
-				{ per_page: -1, post_type: postType, slug: slug || '' }
+				{ per_page: -1, post_type: postType, slug: slug || undefined }
 			) ?? EMPTY_ARRAY,
 		[ postType, slug ]
 	);

@@ -206,10 +206,17 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertContains( 'block-theme//page-home', $seen_ids );
 	}
 
-	public function test_empty_slug_offers_the_generic_default() {
+	public function test_empty_slug_uses_the_regular_template_collection() {
 		$response = $this->get_page_template_choices( '' );
-		$ids      = wp_list_pluck( $response->get_data(), 'id' );
-		$this->assertSame( 'block-theme//page', $ids[0] );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$regular_response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $regular_response->get_data(), $response->get_data() );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'slug', '' );
+		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
 	}
 
 	public function test_ambiguous_draft_slug_offers_the_generic_default() {
@@ -234,6 +241,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				array(
 					'post_type'   => 'page',
 					'post_status' => $status,
+					'post_name'   => 'filtered-' . $status,
 				)
 			);
 			update_post_meta( $post_id, '_wp_page_template', 'custom-hero-template' );
