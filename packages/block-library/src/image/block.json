@@ -22,6 +22,10 @@
 			"type": "string",
 			"role": "local"
 		},
+		"pendingMediaEdit": {
+			"type": "object",
+			"role": "local"
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",

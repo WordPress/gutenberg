@@ -10,6 +10,11 @@ import {
 	buildModifiers,
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
+import {
+	createPendingCropPreview,
+	getPendingCropperState,
+	type MediaEditorPendingCrop,
+} from './pending-crop';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.
@@ -34,10 +39,20 @@ export interface MediaEditorSaveResult {
 		id: number;
 		url?: string;
 	};
+	/**
+	 * Set when the crop was deferred rather than saved. `id` and `url` are
+	 * then still the original's, and the host commits the crop later.
+	 */
+	pendingCrop?: MediaEditorPendingCrop;
 }
 
 interface UseSaveMediaEditorArgs {
 	cropper: MediaEditorController;
+	/**
+	 * Hand a crop back to the host as a pending edit instead of saving it.
+	 * Details edits are still saved straight away.
+	 */
+	deferCrop?: boolean;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -79,8 +94,43 @@ function getMetadataEdits(
 	return metadataEdits;
 }
 
+/**
+ * Builds a pending crop, or returns `undefined` if its preview can't be
+ * rendered, in which case the caller saves the crop straight away instead.
+ *
+ * @param cropper   The editor controller.
+ * @param modifiers The crop's `/edit` modifiers.
+ * @param mimeType  The original's MIME type.
+ * @return The pending crop, or `undefined`.
+ */
+async function getPendingCrop(
+	cropper: MediaEditorController,
+	modifiers: Modifier[],
+	mimeType?: string
+): Promise< MediaEditorPendingCrop | undefined > {
+	try {
+		return {
+			modifiers,
+			cropperState: getPendingCropperState( cropper.state ),
+			aspectRatioValue: cropper.cropOptions.aspectRatioValue,
+			previewUrl: await createPendingCropPreview(
+				cropper.state,
+				mimeType
+			),
+		};
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Could not preview the crop, so it will be saved now.',
+			error
+		);
+		return undefined;
+	}
+}
+
 export function useSaveMediaEditor( {
 	cropper,
+	deferCrop = false,
 	id,
 	isImage,
 	media,
@@ -101,6 +151,35 @@ export function useSaveMediaEditor( {
 		try {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( cropper );
+			const pendingCrop =
+				deferCrop && modifiers.length > 0
+					? await getPendingCrop(
+							cropper,
+							modifiers,
+							media?.mime_type
+						)
+					: undefined;
+
+			if ( pendingCrop ) {
+				// The crop is the host's to commit. Only Details edits, which
+				// belong to this attachment either way, are saved now.
+				saved = ( await saveEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) ) as Media | undefined;
+				const next = ( saved ?? media ) as Media | null;
+				if ( next ) {
+					onSaved?.( {
+						id,
+						url: next.source_url,
+						media: next,
+						pendingCrop,
+					} );
+				}
+				return;
+			}
+
 			const previous =
 				modifiers.length > 0 && media
 					? {
@@ -193,6 +272,7 @@ export function useSaveMediaEditor( {
 		clearEntityRecordEdits,
 		createErrorNotice,
 		cropper,
+		deferCrop,
 		id,
 		isImage,
 		media,

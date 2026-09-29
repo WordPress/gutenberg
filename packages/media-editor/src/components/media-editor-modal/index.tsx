@@ -49,16 +49,25 @@ export function MediaEditorModal( {
 	fields = [],
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate, getOnClose } =
-			select( mediaEditorStore );
-		return {
-			isModalOpen: isOpen(),
-			id: getId(),
-			onUpdate: getOnUpdate(),
-			onClose: getOnClose(),
-		};
-	}, [] );
+	const { isModalOpen, id, deferCrop, pendingCrop, onUpdate, onClose } =
+		useSelect( ( select ) => {
+			const {
+				isOpen,
+				getId,
+				getDeferCrop,
+				getPendingCrop,
+				getOnUpdate,
+				getOnClose,
+			} = select( mediaEditorStore );
+			return {
+				isModalOpen: isOpen(),
+				id: getId(),
+				deferCrop: getDeferCrop(),
+				pendingCrop: getPendingCrop(),
+				onUpdate: getOnUpdate(),
+				onClose: getOnClose(),
+			};
+		}, [] );
 
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -90,15 +99,23 @@ export function MediaEditorModal( {
 			id={ id }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
+			deferCrop={ deferCrop }
+			pendingCrop={ pendingCrop ?? undefined }
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
 			onClose={ handleClose }
-			onSaved={ ( { id: savedId, url, previous } ) => {
+			onSaved={ ( {
+				id: savedId,
+				url,
+				previous,
+				pendingCrop: nextPendingCrop,
+			} ) => {
 				if ( savedId && onUpdate ) {
 					const update: MediaEditorModalUpdate = {
 						id: savedId,
 						url,
+						pendingCrop: nextPendingCrop,
 					};
 					onUpdate( update );
 				}

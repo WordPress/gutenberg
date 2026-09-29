@@ -128,9 +128,20 @@ export interface MediaEditorController extends CropperController {
 	adjustCropRectForViewport: ( rect: NormalizedRect ) => void;
 }
 
+/**
+ * An earlier edit to resume once the image loads. Unlike the other initial
+ * state it isn't part of the clean baseline, so the editor starts dirty and
+ * resetting goes back to the unedited image.
+ */
+export interface MediaEditorResumeState {
+	cropper: Omit< CropperState, 'image' >;
+	cropOptions?: Partial< CropOptionsSlice >;
+}
+
 interface InitialMediaEditorState {
 	cropper?: Partial< CropperState >;
 	cropOptions?: Partial< CropOptionsSlice >;
+	resume?: MediaEditorResumeState;
 }
 
 /**
@@ -184,6 +195,9 @@ export function useMediaEditorState(
 	// synchronously, so multiple actions in one event see the latest
 	// reducer output before React commits.
 	const stateRef = useRef( state );
+	// Applied once, by the first `setImage`: the geometry only means anything
+	// against the image it was made on.
+	const resumeRef = useRef( initialState?.resume );
 	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
 
 	// History stacks: full composite snapshots. Refs avoid re-renders
@@ -292,9 +306,23 @@ export function useMediaEditorState(
 			action: { type: 'SET_IMAGE' as const, payload: image },
 		};
 		const next = mediaEditorReducer( stateRef.current, action );
-		stateRef.current = next;
-		dispatch( action );
 		setInitialBaseline( next );
+		const resume = resumeRef.current;
+		resumeRef.current = undefined;
+		if ( resume ) {
+			const resumed: MediaEditorState = {
+				cropper: enforceContainment( {
+					...next.cropper,
+					...resume.cropper,
+				} ),
+				cropOptions: { ...next.cropOptions, ...resume.cropOptions },
+			};
+			stateRef.current = resumed;
+			dispatch( { type: 'RESTORE_SNAPSHOT', payload: resumed } );
+		} else {
+			stateRef.current = next;
+			dispatch( action );
+		}
 		isGestureOpenRef.current = false;
 		gestureSnapshotRef.current = null;
 		historyRef.current = [];
