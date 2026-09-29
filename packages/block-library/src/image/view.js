@@ -244,12 +244,6 @@ const { state, actions, callbacks } = store(
 					}, 450 );
 				}
 			},
-			handleImageContainerClick: withSyncEvent( ( event ) => {
-				// Clicking the image should not close the lightbox — only the
-				// Close button, Escape key, or clicking the background (scrim)
-				// should.
-				event.stopPropagation();
-			} ),
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
 				const nextIndex = state.hasPreviousImage
