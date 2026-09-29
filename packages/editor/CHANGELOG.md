@@ -30,6 +30,10 @@
 -   Suggest mode: extend a format suggestion on a second toggle instead of opening a second one. Toggling a further format over a run that already carries the suggester's own pending `format` marker recorded a suggestion whose before and after were both empty - unreviewable and unapplyable - and made every marker in the block disappear. The existing suggestion is now revised in place, a toggle that restores the original run retracts it rather than storing a note that proposes nothing, and a note that has replies is revised rather than withdrawn ([#81665](https://github.com/WordPress/gutenberg/pull/81665)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there when its click would change the status, rather than dropping the status edit and saving the post anyway; a plain save of a published or scheduled post stays available so the suggestion markers can be persisted. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
 
+### Internal
+
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
+
 ## 15.1.0 (2026-09-23)
 
 ### Enhancements
