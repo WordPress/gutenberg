@@ -172,7 +172,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 		version: '3.7',
 		services: {
 			mysql: {
-				image: 'mariadb:lts',
+				image: `mariadb:${
+					config.env.development.mariadbVersion ?? 'lts'
+				}`,
 				ports: [ '3306' ],
 				environment: {
 					MYSQL_ROOT_HOST: '%',
@@ -183,7 +185,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			'tests-mysql': {
-				image: 'mariadb:lts',
+				image: `mariadb:${ config.env.tests.mariadbVersion ?? 'lts' }`,
 				ports: [ '3306' ],
 				environment: {
 					MYSQL_ROOT_HOST: '%',

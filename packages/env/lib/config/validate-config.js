@@ -154,6 +154,32 @@ function checkVersion( configFile, configKey, version ) {
 }
 
 /**
+ * Validates a MariaDB version and throws if it isn't valid. Accepts the
+ * "lts" and "latest" image tags or a numeric version such as "10.11".
+ *
+ * @param {string} configFile The config file we're validating.
+ * @param {string} configKey  The configuration key we're validating.
+ * @param {string} version    The version that we're checking.
+ */
+function checkMariaDBVersion( configFile, configKey, version ) {
+	if ( typeof version !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string.`
+		);
+	}
+
+	if ( version === 'lts' || version === 'latest' ) {
+		return;
+	}
+
+	if ( ! /^[0-9]+(?:\.[0-9]+)*$/.test( version ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be "lts", "latest", or a version such as "10.11" or "11.4.2".`
+		);
+	}
+}
+
+/**
  * Validates the url and throws if it isn't valid.
  *
  * @param {string} configFile The config file we're validating.
@@ -177,5 +203,6 @@ module.exports = {
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
+	checkMariaDBVersion,
 	checkValidURL,
 };
