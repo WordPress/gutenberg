@@ -47,6 +47,13 @@ export default {
 			range: '',
 		},
 		{
+			label: '`typescript-eslint` 8.60.1+ reports `const Foo = forwardRef( function Foo() {} )` under `no-shadow`. Pin 8.60.0 until those names are updated.',
+			dependencies: [ 'typescript-eslint', '@typescript-eslint/parser' ],
+			packages: [ '**' ],
+			dependencyTypes: [ 'prod', 'dev' ],
+			range: '',
+		},
+		{
 			label: 'All dependencies must use caret ranges.',
 			packages: [ '**' ],
 			dependencyTypes: [ 'prod', 'dev' ],

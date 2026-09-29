@@ -9,6 +9,7 @@ import type {
 	BlockBindingsSource,
 	BlockShortcut,
 	BlockType,
+	BlockVariation,
 } from '../types';
 
 /**
@@ -243,6 +244,21 @@ export function getUnprocessedBlockTypes(
 	state: BlockStoreState
 ): Record< string, Partial< BlockType > > {
 	return state.unprocessedBlockTypes;
+}
+
+/**
+ * Returns the registered block variations of every block type, keyed by block
+ * name. The reference changes whenever a variation is added or removed, so it
+ * can serve as a cache dependency.
+ *
+ * @param state Data state.
+ *
+ * @return Block variations keyed by block name.
+ */
+export function getBlockVariationsRaw(
+	state: BlockStoreState
+): Record< string, BlockVariation[] > {
+	return state.blockVariations;
 }
 
 /**
