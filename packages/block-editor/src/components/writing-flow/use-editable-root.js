@@ -10,10 +10,8 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const FIELD_SELECTOR = '[data-wp-block-attribute-key]';
-// A field edited through the host has no contenteditable attribute of its
-// own. Rich text renders the selected hosting block's field like that too,
-// so the DOM says which field is hosted.
-const HOSTED_FIELD_SELECTOR = `${ FIELD_SELECTOR }:not([contenteditable])`;
+// Marks the field the switch handed to the host, holding the tabindex it had.
+const HOSTED_ATTRIBUTE = 'data-wp-hosted-field';
 
 /**
  * Keeps the writing flow wrapper contentEditable while the selected block
@@ -59,12 +57,23 @@ export default function useEditableRoot() {
 				).find( ( field ) => isInsideRootBlock( blockElement, field ) );
 			}
 
-			// Makes the hosted field an editable element again.
+			// Makes the field the switch handed to the host an editable
+			// element again, unless rich text rendered it since.
 			function releaseField() {
-				node.querySelector( HOSTED_FIELD_SELECTOR )?.setAttribute(
-					'contenteditable',
-					'true'
-				);
+				const field = node.querySelector( `[${ HOSTED_ATTRIBUTE }]` );
+				if ( ! field ) {
+					return;
+				}
+				if ( ! field.hasAttribute( 'contenteditable' ) ) {
+					field.setAttribute( 'contenteditable', 'true' );
+					if ( field.getAttribute( HOSTED_ATTRIBUTE ) ) {
+						field.setAttribute(
+							'tabindex',
+							field.getAttribute( HOSTED_ATTRIBUTE )
+						);
+					}
+				}
+				field.removeAttribute( HOSTED_ATTRIBUTE );
 			}
 
 			function engage( clientId ) {
@@ -81,6 +90,10 @@ export default function useEditableRoot() {
 				releaseField();
 				const field = getField( clientId );
 				if ( field?.getAttribute( 'contenteditable' ) === 'true' ) {
+					field.setAttribute(
+						HOSTED_ATTRIBUTE,
+						field.getAttribute( 'tabindex' ) ?? ''
+					);
 					field.removeAttribute( 'contenteditable' );
 					field.removeAttribute( 'tabindex' );
 				}
