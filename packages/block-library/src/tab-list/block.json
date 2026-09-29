@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab-list",
 	"title": "Tab List",
@@ -16,8 +15,9 @@
 			"selector": "button",
 			"query": {
 				"label": {
-					"type": "string",
-					"source": "html"
+					"type": "rich-text",
+					"source": "rich-text",
+					"role": "content"
 				}
 			},
 			"default": []
@@ -25,15 +25,9 @@
 	},
 	"supports": {
 		"html": false,
-		"reusable": false,
+		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
-		"dimensions": {
-			"aspectRatio": false,
-			"height": false,
-			"minHeight": false,
-			"width": false
-		},
 		"color": {
 			"background": true,
 			"text": true,
@@ -57,22 +51,18 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"flexWrap": "nowrap",
-				"orientation": "horizontal"
+				"flexWrap": "wrap"
 			},
-			"allowSwitching": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true
+			"allowVerticalAlignment": false,
+			"allowOrientation": false,
+			"allowWrap": false
 		},
 		"spacing": {
 			"padding": true,
-			"margin": true,
 			"blockGap": true,
 			"__experimentalSkipSerialization": [ "padding" ],
 			"__experimentalDefaultControls": {
 				"padding": true,
-				"margin": true,
 				"blockGap": true
 			}
 		}
@@ -87,7 +77,6 @@
 			"padding": ".wp-block-tab-list button"
 		}
 	},
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./editor.css",
-	"style": "file:./style-index.css"
+	"style": "wp-block-tab-list",
+	"editorStyle": "wp-block-tab-list-editor"
 }

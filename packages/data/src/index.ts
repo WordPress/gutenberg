@@ -1,10 +1,6 @@
-/**
- * Internal dependencies
- */
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 import { combineReducers as combineReducersModule } from './redux-store';
-
 import type {
 	StoreDescriptor,
 	ReduxStoreConfig,
@@ -30,6 +26,7 @@ export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { createSelector } from './create-selector';
+export type { EnhancedSelector, GetDependants } from './create-selector';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 export { keyedReducer } from './redux-store/keyed-reducer';
@@ -128,8 +125,7 @@ export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
  */
 export const suspendSelect = (
 	storeNameOrDescriptor:
-		| string
-		| StoreDescriptor< ReduxStoreConfig< any, any, any > >
+		string | StoreDescriptor< ReduxStoreConfig< any, any, any > >
 ): any => defaultRegistry.suspendSelect( storeNameOrDescriptor );
 
 /**
@@ -159,8 +155,7 @@ export const suspendSelect = (
 export const subscribe = (
 	listener: () => void,
 	storeNameOrDescriptor?:
-		| string
-		| StoreDescriptor< ReduxStoreConfig< any, any, any > >
+		string | StoreDescriptor< ReduxStoreConfig< any, any, any > >
 ): ( () => void ) =>
 	defaultRegistry.subscribe( listener, storeNameOrDescriptor );
 

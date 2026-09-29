@@ -1,10 +1,22 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
+import {
+	displayShortcut,
+	shortcutAriaLabel,
+	ariaKeyShortcut,
+} from '@wordpress/keycodes';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '@wordpress/ui';
 import { Button } from '../index';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Components/Button',
+	title: 'Components/@wordpress-ui/Button',
+	id: 'design-system-components-button',
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,
@@ -156,12 +168,7 @@ export const WithIcon: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Button.Icon icon={ wordpress } />
-				Button
-			</>
-		),
+		children: [ <Button.Icon icon={ wordpress } key="icon" />, 'Button' ],
 	},
 };
 
@@ -185,5 +192,56 @@ export const Pressed: Story = {
 		tone: 'neutral',
 		variant: 'minimal',
 		'aria-pressed': true,
+	},
+};
+
+/**
+ * `Button` has no dedicated `shortcut` prop. Use the keyboard shortcut
+ * utilities to compose a visual hint in the tooltip, `aria-keyshortcuts` for
+ * assistive technology, and a visually hidden description. Consumers remain
+ * responsible for registering the shortcut and handling the corresponding
+ * keyboard event.
+ */
+export const WithKeyboardShortcut: Story = {
+	args: {
+		children: 'Save',
+	},
+	render: ( {
+		children,
+		'aria-describedby': consumerDescribedBy,
+		'aria-keyshortcuts': consumerKeyShortcuts,
+		...args
+	} ) => {
+		const shortcut = {
+			displayShortcut: displayShortcut.primary( 's' ),
+			ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+			label: shortcutAriaLabel.primary( 's' ),
+		};
+		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+			'aria-describedby': consumerDescribedBy,
+			'aria-keyshortcuts': consumerKeyShortcuts,
+			shortcut,
+		} );
+
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={ <Button { ...args } /> }
+					{ ...targetProps }
+				>
+					{ children }
+					{ descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
+				</Tooltip.Trigger>
+				<Tooltip.Popup>
+					{ children }{ ' ' }
+					<KeyboardShortcutDisplay shortcut={ shortcut } />
+				</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	},
 };

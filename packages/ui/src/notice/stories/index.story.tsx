@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
-	title: 'Design System/Components/Notice',
+	title: 'Components/@wordpress-ui/Notice',
+	id: 'design-system-components-notice',
 	component: Notice.Root,
 	subcomponents: {
 		'Notice.Title': Notice.Title,
@@ -13,6 +15,12 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
+		docs: {
+			description: {
+				component:
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+			},
+		},
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -26,22 +34,20 @@ type Story = StoryObj< typeof Notice.Root >;
 
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<Notice.Title>Notice Title</Notice.Title>
-				<Notice.Description>
-					Description text with details about this notification.
-				</Notice.Description>
-				<Notice.Actions>
-					<Notice.ActionButton>Primary button</Notice.ActionButton>
-					<Notice.ActionButton variant="outline">
-						Secondary button
-					</Notice.ActionButton>
-					<Notice.ActionLink href="#">Link</Notice.ActionLink>
-				</Notice.Actions>
-				<Notice.CloseIcon />
-			</>
-		),
+		children: [
+			<Notice.Title key="title">Notice Title</Notice.Title>,
+			<Notice.Description key="description">
+				Description text with details about this notification.
+			</Notice.Description>,
+			<Notice.Actions key="actions">
+				<Notice.ActionButton>Primary button</Notice.ActionButton>
+				<Notice.ActionButton variant="outline">
+					Secondary button
+				</Notice.ActionButton>
+				<Notice.ActionLink href="#">Link</Notice.ActionLink>
+			</Notice.Actions>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
 	},
 };
 
@@ -83,18 +89,16 @@ export const Error: Story = {
 export const NonDismissible: Story = {
 	args: {
 		intent: 'warning',
-		children: (
-			<>
-				<Notice.Title>Action Required</Notice.Title>
-				<Notice.Description>
-					This notice cannot be dismissed by the user.
-				</Notice.Description>
-				<Notice.Actions>
-					<Notice.ActionButton>Take Action</Notice.ActionButton>
-					<Notice.ActionLink href="#">Visit link</Notice.ActionLink>
-				</Notice.Actions>
-			</>
-		),
+		children: [
+			<Notice.Title key="title">Action Required</Notice.Title>,
+			<Notice.Description key="description">
+				This notice cannot be dismissed by the user.
+			</Notice.Description>,
+			<Notice.Actions key="actions">
+				<Notice.ActionButton>Take Action</Notice.ActionButton>
+				<Notice.ActionLink href="#">Visit link</Notice.ActionLink>
+			</Notice.Actions>,
+		],
 	},
 };
 
@@ -105,30 +109,26 @@ export const WithoutIcon: Story = {
 	args: {
 		intent: 'info',
 		icon: null,
-		children: (
-			<>
-				<Notice.Title>No Icon</Notice.Title>
-				<Notice.Description>
-					This notice has no decorative icon displayed.
-				</Notice.Description>
-				<Notice.CloseIcon />
-			</>
-		),
+		children: [
+			<Notice.Title key="title">No Icon</Notice.Title>,
+			<Notice.Description key="description">
+				This notice has no decorative icon displayed.
+			</Notice.Description>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
 	},
 };
 
 export const WithoutActions: Story = {
 	args: {
 		intent: 'info',
-		children: (
-			<>
-				<Notice.Title>Simple Notice</Notice.Title>
-				<Notice.Description>
-					A dismissable notice without any action buttons or links.
-				</Notice.Description>
-				<Notice.CloseIcon />
-			</>
-		),
+		children: [
+			<Notice.Title key="title">Simple Notice</Notice.Title>,
+			<Notice.Description key="description">
+				A dismissable notice without any action buttons or links.
+			</Notice.Description>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
 	},
 };
 
@@ -137,12 +137,10 @@ export const WithoutActions: Story = {
  */
 export const TitleOnly: Story = {
 	args: {
-		children: (
-			<>
-				<Notice.Title>Just a title</Notice.Title>
-				<Notice.CloseIcon />
-			</>
-		),
+		children: [
+			<Notice.Title key="title">Just a title</Notice.Title>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
 	},
 };
 
@@ -152,13 +150,26 @@ export const TitleOnly: Story = {
 export const DescriptionOnly: Story = {
 	args: {
 		intent: 'info',
-		children: (
-			<>
-				<Notice.Description>
-					Just a description without title or actions.
-				</Notice.Description>
-				<Notice.CloseIcon />
-			</>
-		),
+		children: [
+			<Notice.Description key="description">
+				Just a description without title or actions.
+			</Notice.Description>,
+			<Notice.CloseIcon key="closeIcon" />,
+		],
+	},
+};
+
+/**
+ * Pass a custom icon via the `icon` prop to override the default intent icon.
+ */
+export const CustomIcon: Story = {
+	args: {
+		intent: 'info',
+		icon: unseen,
+		children: [
+			<Notice.Description key="description">
+				Parent block is hidden on Desktop
+			</Notice.Description>,
+		],
 	},
 };

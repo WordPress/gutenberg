@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isEmpty, isPhrasingContent } from '@wordpress/dom';
 
 export default function normaliseBlocks(

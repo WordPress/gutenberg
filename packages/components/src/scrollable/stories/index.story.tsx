@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
-import { Scrollable } from '..';
+import Scrollable from '../deprecated';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components/Scrollable',
+	title: 'Components/@wordpress-components/Deprecated/Scrollable',
+	id: 'components-scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },
@@ -34,7 +24,7 @@ const meta: Meta< typeof Scrollable > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Write your own CSS instead.',
 		},
 	},
 };
@@ -75,6 +65,7 @@ const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
 						right: 0,
 					} }
 					type="text"
+					aria-label="Element out of view"
 					value="Focus me"
 					readOnly
 				/>

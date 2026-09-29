@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs, getQueryArg, removeQueryArgs } from '@wordpress/url';
-/**
- * Internal dependencies
- */
 import type { APIFetchMiddleware } from '../types';
 
 /**

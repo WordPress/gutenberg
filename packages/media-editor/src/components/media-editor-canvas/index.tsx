@@ -1,32 +1,24 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper } from '../../image-editor';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
 
 export interface MediaEditorCanvasProps {
-	/** Focus the crop area when the canvas mounts. */
-	focusOnMount?: boolean;
 	/** Whether external placement activity should reveal the grid. */
 	isPlacementActive?: boolean;
 	/** Fires when a canvas cropper gesture begins. */
 	onGestureStart?: () => void;
 	/** Fires when a canvas cropper gesture ends. */
 	onGestureEnd?: () => void;
+	/**
+	 * Disable crop interaction on the canvas. Set while the edit is saving,
+	 * so a drag cannot change the crop after the request was built.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -38,16 +30,16 @@ export interface MediaEditorCanvasProps {
  * guards can render a spinner or fall through to `<MediaPreview>`.
  *
  * @param props
- * @param props.focusOnMount
  * @param props.isPlacementActive
  * @param props.onGestureStart
  * @param props.onGestureEnd
+ * @param props.disabled
  */
 export default function MediaEditorCanvas( {
-	focusOnMount,
 	isPlacementActive = false,
 	onGestureStart,
 	onGestureEnd,
+	disabled = false,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useMediaEditor();
@@ -154,10 +146,11 @@ export default function MediaEditorCanvas( {
 			 * The cropper stays mounted while loading (hidden behind the
 			 * spinner) so the image decodes off-screen and reveals in one paint
 			 * instead of streaming in top-to-bottom. Until it's revealed it's
-			 * non-interactive (`pointer-events: none` in CSS), and focus is
-			 * withheld by gating `focusOnMount` on the loaded state — the
-			 * cropper's focus effect keys off that prop, so focus lands on the
-			 * crop area only once it's visible.
+			 * non-interactive (`pointer-events: none` in CSS).
+			 *
+			 * The crop area is never focused programmatically: the modal keeps
+			 * initial focus on the dialog frame, and users reach the crop area
+			 * by tabbing to it.
 			 */ }
 			<div
 				className={ clsx( 'media-editor-canvas__cropper', {
@@ -169,11 +162,11 @@ export default function MediaEditorCanvas( {
 					controller={ controller }
 					aspectRatio={ aspectRatio }
 					freeformCrop
-					focusOnMount={ focusOnMount && status === 'loaded' }
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }
 					onGestureStart={ handleGestureStart }
 					onGestureEnd={ handleGestureEnd }
+					disabled={ disabled }
 				/>
 			</div>
 		</div>

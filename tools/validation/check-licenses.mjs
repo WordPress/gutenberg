@@ -1,16 +1,8 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
-
-/**
- * Internal dependencies
- */
 const require = createRequire( import.meta.url );
 const {
 	checkDeps,

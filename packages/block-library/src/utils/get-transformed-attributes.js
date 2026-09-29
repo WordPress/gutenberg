@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 
 /**

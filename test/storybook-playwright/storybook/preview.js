@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import * as basePreviewConfig from '@wordpress/storybook/preview';
 import { WithTextOverflowContainers } from '../../../storybook/decorators/with-text-overflow-containers';
 import { WithCustomControls } from './decorators/with-custom-controls';

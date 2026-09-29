@@ -1,5 +1,4 @@
 import { useEffect, useState } from '@wordpress/element';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorProvider,
@@ -9,11 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import { parse } from '@wordpress/blocks';
+import contentCss from '@wordpress/block-editor/build-style/content.css?raw';
 import { pattern } from './pattern';
 import { editorStyles } from '../editor-styles';
-// Reason: Styles are contained in BlockCanvas iframe.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import contentCss from '../../../../packages/block-editor/build-style/content.css?raw';
 
 // Temporary hack to access private APIs before stabilizing zoom level.
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -35,7 +32,6 @@ export default function EditorZoomOut( { zoomLevel } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
-		registerCoreBlocks();
 		updateBlocks( parse( pattern ) );
 	}, [] );
 

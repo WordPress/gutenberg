@@ -1,6 +1,6 @@
 // Motion configuration for dropdown-like popovers.
 // Keep constants in sync with: packages/ui/src/utils/css/dropdown-motion.module.css
-// Values should stay in sync with --wpds-motion-* design tokens.
+// Values should stay in sync with the WPDS motion design tokens.
 
 export const DROPDOWN_MOTION = Object.freeze( {
 	SLIDE_DISTANCE: 4,
@@ -25,9 +25,11 @@ const convertEasingToString = ( easing: {
 	return easing.function;
 };
 
-// Note: --wpds-* tokens can't be used here directly because the build-time
-// fallback injection is not compatible with Emotion. This file is consumed
-// by Menu's Emotion styles.
+// Note: WPDS design tokens can't be referenced here directly. The build-time
+// fallback injection is incompatible with Emotion, and even mentioning a token's
+// full CSS custom property name in this file makes the esbuild fallback plugin
+// claim it and break the Emotion transform. This file is consumed by Menu's
+// Emotion styles.
 export const DROPDOWN_MOTION_CSS = Object.freeze( {
 	SLIDE_DISTANCE: `${ DROPDOWN_MOTION.SLIDE_DISTANCE }px`,
 	SLIDE_DURATION: `${ DROPDOWN_MOTION.SLIDE_DURATION }ms`,

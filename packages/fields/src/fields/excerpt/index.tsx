@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import {
 	ExternalLink,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 const excerptField: Field< BasePost > = {
@@ -29,19 +22,13 @@ const excerptField: Field< BasePost > = {
 		</ExternalLink>
 	),
 	render: ( { item } ) => {
-		let excerpt;
-		if ( typeof item.excerpt === 'string' ) {
-			excerpt = !! item.excerpt
-				? decodeEntities( item.excerpt )
-				: __( 'Add an excerpt' );
-		} else {
-			excerpt = decodeEntities( item.excerpt?.raw || '' );
-		}
-		return (
+		const excerpt =
+			typeof item.excerpt === 'string' ? item.excerpt : item.excerpt?.raw;
+		return excerpt ? (
 			<WCText align="left" numberOfLines={ 3 } truncate>
-				{ excerpt }
+				{ decodeEntities( excerpt ) }
 			</WCText>
-		);
+		) : null;
 	},
 	Edit: {
 		control: 'textarea',

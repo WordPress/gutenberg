@@ -114,7 +114,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<TextControl
-							__next40pxDefaultSize
 							label="Text Field"
 							help="Additional help text"
 							value={ textField }
@@ -204,7 +203,6 @@ function MyBlockEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<InspectorAdvancedControls>
 				<TextControl
-					__next40pxDefaultSize
 					label="HTML anchor"
 					value={ attributes.anchor }
 					onChange={ ( nextValue ) => {

@@ -2,9 +2,15 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
-import { patchReactLegacyElement } from './codemod-react-legacy-element.mjs';
+import {
+	createPatcher,
+	patchTransitionalSymbols,
+	patchCoerceRef,
+	patchInertAttribute,
+} from './codemod-react-legacy-element.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../../..' );
@@ -14,58 +20,84 @@ const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 // Resolve vendor packages from this workspace, instead of root.
 const WORKSPACE_DIR = path.resolve( __dirname, '..' );
 
+// Patchers that adapt React 19 to also accept legacy (React 17/18) elements.
+// The `react` core bundle only needs the element-symbol patch, while the
+// `react-dom` bundle additionally needs the DOM-only ref and `inert` patches.
+const patchReact = createPatcher( patchTransitionalSymbols );
+const patchReactDOM = createPatcher(
+	patchTransitionalSymbols,
+	patchCoerceRef,
+	patchInertAttribute
+);
+
+const requireFromWorkspace = createRequire(
+	path.join( WORKSPACE_DIR, 'package.json' )
+);
+
+/**
+ * Read the React version a vendor package resolves to.
+ *
+ * @param {string} pkg Vendor package name, e.g. `@wordpress/react-18`.
+ * @return {Promise<string>} The installed `react` version, e.g. `18.3.1`.
+ */
+async function getReactVersion( pkg ) {
+	const requireFromVendor = createRequire(
+		requireFromWorkspace.resolve( `${ pkg }/package.json` )
+	);
+	const manifest = await readFile(
+		requireFromVendor.resolve( 'react/package.json' ),
+		'utf-8'
+	);
+	return JSON.parse( manifest ).version;
+}
+
+const REACT_18_VERSION = await getReactVersion( '@wordpress/react-18' );
+const REACT_19_VERSION = await getReactVersion( '@wordpress/react-19' );
+
 const VENDOR_SCRIPTS = [
 	{
-		name: 'react',
+		name: '@wordpress/react-18/react',
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
-		name: 'react-dom',
+		name: '@wordpress/react-18/react-dom',
 		global: 'ReactDOM',
 		handle: 'react-dom',
 		dependencies: [ 'react' ],
-		contents: [
-			'module.exports = {',
-			'  ...require("react-dom"),',
-			'  ...require("react-dom/client"),',
-			'};',
-		].join( '\n' ),
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
-		name: 'react/jsx-runtime',
+		name: '@wordpress/react-18/react-jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
 		dependencies: [ 'react' ],
-		version: '18.3.1',
+		version: REACT_18_VERSION,
 	},
 	{
 		name: '@wordpress/react-19/react',
 		global: 'React',
 		handle: 'react-19',
 		dependencies: [ 'wp-polyfill' ],
-		version: '19.2.7',
-		// Patch React 19 to also accept legacy (React 17/18) elements.
-		patchLegacyElement: true,
+		version: REACT_19_VERSION,
+		patch: patchReact,
 	},
 	{
 		name: '@wordpress/react-19/react-dom',
 		global: 'ReactDOM',
 		handle: 'react-dom-19',
 		dependencies: [ 'react' ],
-		version: '19.2.7',
-		// Patch React 19 to also accept legacy (React 17/18) elements.
-		patchLegacyElement: true,
+		version: REACT_19_VERSION,
+		patch: patchReactDOM,
 	},
 	{
 		name: '@wordpress/react-19/react-jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime-19',
 		dependencies: [ 'react' ],
-		version: '19.2.7',
+		version: REACT_19_VERSION,
 	},
 ];
 
@@ -75,7 +107,7 @@ const VENDOR_SCRIPTS = [
  * @param {Object}   config              Vendor script configuration.
  * @param {string}   config.handle       WordPress script handle.
  * @param {string[]} config.dependencies WordPress script dependencies.
- * @param {string}   config.version      Package version (`18` or `19`).
+ * @param {string}   config.version      Bundled React version (e.g. `18.3.1`).
  */
 async function generateAssetFile( config ) {
 	const { handle, version, dependencies } = config;
@@ -91,14 +123,15 @@ async function generateAssetFile( config ) {
 }
 
 /**
- * Applies the legacy-element codemod to a built vendor file. The original,
- * unpatched source is written alongside it with an `-orig` suffix (e.g.
- * `react-19-orig.js`) so the patch can be diffed.
+ * Applies a codemod patcher to a built vendor file. The original, unpatched
+ * source is written alongside it with an `-orig` suffix (e.g. `react-19-orig.js`)
+ * so the patch can be diffed.
  *
- * @param {string} fileName Built file name (e.g., `react-19.js`).
+ * @param {string}   fileName Built file name (e.g., `react-19.js`).
+ * @param {Function} patch    The patcher to apply, `( code, filename ) => string`.
  * @return {Promise<void>} Promise that resolves once the file is patched.
  */
-async function patchVendorOutput( fileName ) {
+async function patchVendorOutput( fileName, patch ) {
 	const filePath = path.join( VENDORS_DIR, fileName );
 	const code = await readFile( filePath, 'utf-8' );
 
@@ -106,7 +139,7 @@ async function patchVendorOutput( fileName ) {
 	const origFileName = `${ fileName.slice( 0, -ext.length ) }-orig${ ext }`;
 
 	await writeFile( path.join( VENDORS_DIR, origFileName ), code );
-	await writeFile( filePath, patchReactLegacyElement( code, fileName ) );
+	await writeFile( filePath, patch( code, fileName ) );
 }
 
 /**
@@ -114,14 +147,15 @@ async function patchVendorOutput( fileName ) {
  * This is used to build packages like React that don't ship UMD builds.
  *
  * @param {Object}   config              Vendor script configuration.
- * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.name         Entry point name (e.g., '@wordpress/react-18/react').
  * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
  * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
  * @param {string[]} config.dependencies WordPress script dependencies.
+ * @param {Function} [config.patch]      Optional codemod patcher applied to the built output.
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle, contents, dependencies } = config;
+	const { name, global, handle, dependencies } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -153,22 +187,13 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
+		entryPoints: [ name ],
 		// Resolve imports from this workspace's dependencies.
 		absWorkingDir: WORKSPACE_DIR,
 		plugins: dependencies?.includes( 'react' )
 			? [ reactExternalPlugin ]
 			: [],
 	};
-
-	if ( contents ) {
-		esbuildOptions.stdin = {
-			contents,
-			resolveDir: WORKSPACE_DIR,
-			loader: 'js',
-		};
-	} else {
-		esbuildOptions.entryPoints = [ name ];
-	}
 
 	await Promise.all( [
 		esbuild.build( {
@@ -184,10 +209,10 @@ async function bundleVendorScript( config ) {
 		generateAssetFile( config ),
 	] );
 
-	if ( config.patchLegacyElement ) {
+	if ( config.patch ) {
 		await Promise.all( [
-			patchVendorOutput( handle + '.js' ),
-			patchVendorOutput( handle + '.min.js' ),
+			patchVendorOutput( handle + '.js', config.patch ),
+			patchVendorOutput( handle + '.min.js', config.patch ),
 		] );
 	}
 }

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useRef, useCallback, useEffect } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { funnel } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { AddFilterMenu } from './add-filter';
 import DataViewsContext from '../dataviews-context';
 import type { View } from '../../types';

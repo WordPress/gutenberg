@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { setImmutably } from '../object';
 
 describe( 'setImmutably', () => {
