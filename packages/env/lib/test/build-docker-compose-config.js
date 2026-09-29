@@ -184,6 +184,125 @@ describe( 'buildDockerComposeConfig', () => {
 		).toBe( '1' );
 	} );
 
+	describe( 'mariadbVersion', () => {
+		const MODERN_HEALTHCHECK = {
+			test: [
+				'CMD',
+				'healthcheck.sh',
+				'--connect',
+				'--innodb_initialized',
+			],
+			interval: '5s',
+			timeout: '10s',
+			retries: 12,
+			start_period: '60s',
+		};
+
+		const PINNED_HEALTHCHECK = {
+			test: [
+				'CMD-SHELL',
+				'if command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+			],
+			interval: '5s',
+			timeout: '10s',
+			retries: 12,
+			start_period: '60s',
+		};
+
+		function buildWithVersions( development, tests ) {
+			return buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, mariadbVersion: development },
+					tests: { ...CONFIG, mariadbVersion: tests },
+				},
+			} );
+		}
+
+		it( 'uses mariadb:lts and the current health check by default', () => {
+			const config = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: { development: CONFIG, tests: CONFIG },
+			} );
+
+			for ( const service of [ 'mysql', 'tests-mysql' ] ) {
+				expect( config.services[ service ].image ).toBe(
+					'mariadb:lts'
+				);
+				expect( config.services[ service ].healthcheck ).toEqual(
+					MODERN_HEALTHCHECK
+				);
+			}
+		} );
+
+		it( 'treats null the same as unset', () => {
+			const config = buildWithVersions( null, null );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:lts' );
+			expect( config.services.mysql.healthcheck ).toEqual(
+				MODERN_HEALTHCHECK
+			);
+		} );
+
+		it( 'uses each environment’s own version', () => {
+			const config = buildWithVersions( '10.3', 'latest' );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:10.3' );
+			expect( config.services.mysql.healthcheck ).toEqual(
+				PINNED_HEALTHCHECK
+			);
+			expect( config.services[ 'tests-mysql' ].image ).toBe(
+				'mariadb:latest'
+			);
+			expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
+				MODERN_HEALTHCHECK
+			);
+		} );
+
+		it.each( [
+			'5',
+			'5.5',
+			'10.0',
+			'10.3',
+			'10.3.39',
+			'10.5.8',
+			'10.6.4',
+			'10',
+			'10.11',
+			'11',
+			'11.4.2',
+		] )(
+			'uses the health check that detects healthcheck.sh for %j',
+			( version ) => {
+				const config = buildWithVersions( version, version );
+
+				expect( config.services.mysql.image ).toBe(
+					`mariadb:${ version }`
+				);
+				expect( config.services.mysql.healthcheck ).toEqual(
+					PINNED_HEALTHCHECK
+				);
+				expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
+					PINNED_HEALTHCHECK
+				);
+			}
+		);
+
+		it.each( [ 'lts', 'latest' ] )(
+			'uses the current health check for %j',
+			( version ) => {
+				const config = buildWithVersions( version, version );
+
+				expect( config.services.mysql.image ).toBe(
+					`mariadb:${ version }`
+				);
+				expect( config.services.mysql.healthcheck ).toEqual(
+					MODERN_HEALTHCHECK
+				);
+			}
+		);
+	} );
+
 	it( 'should use service_healthy condition for WordPress depends_on', () => {
 		const config = buildDockerComposeConfig( {
 			workDirectoryPath: '/some/path',
