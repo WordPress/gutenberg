@@ -8,6 +8,7 @@ const meta: Meta< typeof ProgressBar > = {
 	id: 'design-system-components-progress-bar',
 	component: ProgressBar,
 	argTypes: {
+		color: { control: 'text' },
 		value: { control: { type: 'number', min: 0, max: 100 } },
 		size: { control: 'select', options: [ 'small', 'medium', 'large' ] },
 		tone: { control: 'select', options: [ 'neutral', 'brand' ] },
@@ -35,6 +36,22 @@ export const Determinate: Story = {
 
 export const Brand: Story = {
 	args: { value: 60, tone: 'brand', size: 'medium' },
+};
+
+/**
+ * The color prop sets the track background independently of the indicator tone.
+ */
+export const CustomColor: Story = {
+	args: { value: 60, tone: 'brand', size: 'medium', color: '#e9d5ff' },
+};
+
+export const CurrentColor: Story = {
+	args: { value: 60, tone: 'brand', size: 'medium', color: 'currentColor' },
+	render: ( args ) => (
+		<Stack style={ { color: '#e9d5ff' } }>
+			<ProgressBar { ...args } />
+		</Stack>
+	),
 };
 
 /**

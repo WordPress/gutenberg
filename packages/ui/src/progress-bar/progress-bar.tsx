@@ -12,13 +12,22 @@ import styles from './style.module.css';
  */
 export const ProgressBar = forwardRef< HTMLDivElement, ProgressBarProps >(
 	function UnforwardedProgressBar(
-		{ value = null, size = 'small', tone = 'neutral', className, ...props },
+		{
+			value = null,
+			size = 'small',
+			tone = 'neutral',
+			color,
+			className,
+			style,
+			...props
+		},
 		ref
 	) {
 		return (
 			<_Progress.Root
 				ref={ ref }
 				value={ value }
+				style={ color === undefined ? style : { ...style, color } }
 				aria-label={ __( 'Loading' ) }
 				getAriaValueText={ ( formattedValue ) =>
 					formattedValue || __( 'In progress' )

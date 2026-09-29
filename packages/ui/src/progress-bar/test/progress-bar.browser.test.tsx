@@ -6,7 +6,6 @@ import { ThemeProvider } from '@wordpress/theme';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/theme/design-tokens.css';
 import { ProgressBar } from '../index';
-import { Spinner } from '../../spinner';
 
 describe( 'ProgressBar', () => {
 	it( 'shows a thin neutral bar by default', async () => {
@@ -80,13 +79,19 @@ describe( 'ProgressBar', () => {
 		[ 'dark', '#1e1e1e', '#3858e9' ],
 		[ 'custom', '#ffffff', '#008060' ],
 	] )(
-		'matches Spinner brand color and keeps a neutral track in a %s theme',
+		'uses the brand token and keeps a neutral track in a %s theme',
 		async ( _, background, primary ) => {
 			await render(
 				<ThemeProvider color={ { background, primary } }>
 					<ProgressBar aria-label="Neutral" value={ 50 } />
 					<ProgressBar aria-label="Brand" value={ 50 } tone="brand" />
-					<Spinner role="img" aria-label="Loading" />
+					<div
+						data-testid="brand-color-reference"
+						style={ {
+							backgroundColor:
+								'var(--wpds-color-background-thumb-brand)',
+						} }
+					/>
 				</ThemeProvider>
 			);
 			const neutral = screen.getByRole( 'progressbar', {
@@ -99,12 +104,10 @@ describe( 'ProgressBar', () => {
 			expect( getComputedStyle( brand ).backgroundColor ).toBe(
 				getComputedStyle( neutral ).backgroundColor
 			);
-			// The spinner path is its non-interactive filled indicator.
-			const spinnerIndicator =
-				// eslint-disable-next-line testing-library/no-node-access
-				screen.getByRole( 'img' ).lastElementChild!;
 			expect( indicator.backgroundColor ).toBe(
-				getComputedStyle( spinnerIndicator ).stroke
+				getComputedStyle(
+					screen.getByTestId( 'brand-color-reference' )
+				).backgroundColor
 			);
 			expect( indicator.backgroundColor ).not.toBe(
 				getComputedStyle( brand ).backgroundColor

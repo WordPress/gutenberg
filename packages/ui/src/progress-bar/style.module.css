@@ -6,10 +6,11 @@
 			position: relative;
 			overflow: hidden;
 			width: 100%;
-			/* Match the thin stroke used by Spinner. */
+			/* Preserve the thin default of the original ProgressBar. */
 			height: 1.5px;
 			border-radius: var(--wpds-border-radius-lg);
-			background-color: var(--wpds-color-background-track-neutral);
+			color: var(--wpds-color-background-track-neutral);
+			background-color: currentColor;
 
 			@media (forced-colors: active) {
 				outline: var(--wpds-border-width-xs) solid CanvasText;

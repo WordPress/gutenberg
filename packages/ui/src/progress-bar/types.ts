@@ -3,7 +3,7 @@ import type { ComponentProps } from '../utils/types';
 
 export interface ProgressBarProps extends Omit<
 	ComponentProps< typeof _Progress.Root >,
-	'value'
+	'value' | 'color'
 > {
 	/**
 	 * The current value, between `min` and `max`. Omit it or use `null` when
@@ -22,9 +22,17 @@ export interface ProgressBarProps extends Omit<
 	size?: 'small' | 'medium' | 'large';
 
 	/**
-	 * The color intent of the filled indicator. The track remains neutral.
+	 * The color intent of the filled indicator. Use `color` to customize the track.
 	 *
 	 * @default "neutral"
 	 */
 	tone?: 'neutral' | 'brand';
+
+	/**
+	 * The track background color. Accepts any CSS color value, including
+	 * `currentColor` to inherit the surrounding text color.
+	 *
+	 * @default 'var(--wpds-color-background-track-neutral)'
+	 */
+	color?: string;
 }
