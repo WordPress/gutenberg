@@ -21,10 +21,10 @@ import groups, {
  * renders its own panel. When there is no Styles tab, a single panel renders
  * both groups so that no control is dropped.
  *
- * @param {Object}  props                      Component props.
- * @param {boolean} props.initialOpen          Whether the panel starts expanded.
- * @param {boolean} props.showSettingsControls Whether to render the `advanced` group.
- * @param {boolean} props.showStylesControls   Whether to render the `advanced-styles` group.
+ * @param {Object}  props                        Component props.
+ * @param {boolean} [props.initialOpen]          Whether the panel starts expanded.
+ * @param {boolean} [props.showSettingsControls] Whether to render the `advanced` group.
+ * @param {boolean} [props.showStylesControls]   Whether to render the `advanced-styles` group.
  */
 const AdvancedControls = ( {
 	initialOpen = false,
