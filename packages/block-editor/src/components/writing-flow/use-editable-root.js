@@ -63,15 +63,12 @@ export default function useEditableRoot() {
 				);
 			}
 
-			// Makes every hosted field an editable element again, except
-			// the one passed.
-			function releaseFields( except ) {
-				for ( const field of node.querySelectorAll(
-					HOSTED_FIELD_SELECTOR
-				) ) {
-					if ( field !== except ) {
-						field.setAttribute( 'contenteditable', 'true' );
-					}
+			// Makes the hosted field an editable element again, unless it
+			// is the one passed.
+			function releaseField( except ) {
+				const field = node.querySelector( HOSTED_FIELD_SELECTOR );
+				if ( field && field !== except ) {
+					field.setAttribute( 'contenteditable', 'true' );
 				}
 			}
 
@@ -113,13 +110,13 @@ export default function useEditableRoot() {
 				// the tabindex that made it a focus target. The field of a
 				// block that is not in the DOM yet renders like this.
 				const field = getField( clientId );
-				releaseFields( field );
+				releaseField( field );
 				field?.removeAttribute( 'contenteditable' );
 				field?.removeAttribute( 'tabindex' );
 			}
 
 			function disengage() {
-				releaseFields();
+				releaseField();
 				setContentEditableWrapper( node, false );
 
 				// If the wrapper held focus, return focus to the editable
