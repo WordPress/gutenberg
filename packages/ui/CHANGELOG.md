@@ -27,6 +27,10 @@
 
 -   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
+### Documentation
+
+-   `Menu`: Explain when to disable triggers and items, and how disabling the root affects dismissal ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes

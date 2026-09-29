@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
-
 ### Enhancements
 
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
+
+### Bug Fixes
+
+-   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ### Documentation
 
