@@ -70,36 +70,8 @@ export default function useEditableRoot() {
 			}
 
 			function engage( clientId ) {
-				// Focus is moved separately below, only when an editable
-				// element belonging to a block holds it.
-				if (
-					! setContentEditableWrapper( node, true, { focus: false } )
-				) {
+				if ( ! setContentEditableWrapper( node, true ) ) {
 					return;
-				}
-
-				// Move focus from a block's editable element to the wrapper,
-				// including the block the host moves away from: the rich
-				// text hook applies the new selection only while the host
-				// holds focus. Never steal focus from other regions (e.g.
-				// List View), UI elements (e.g. buttons), or other editables
-				// within the wrapper (e.g. the post title). The selection is
-				// preserved. If the selection is still outside the focused
-				// element, a mousedown just focused it and the browser has
-				// not placed the caret yet; moving focus now would cancel the
-				// pending caret placement. The selection observer moves focus
-				// once the selection lands.
-				const { activeElement } = ownerDocument;
-				const selection = defaultView.getSelection();
-				if (
-					activeElement !== node &&
-					activeElement?.isContentEditable &&
-					node.contains( activeElement ) &&
-					getBlockClientId( activeElement ) &&
-					selection.anchorNode &&
-					activeElement.contains( selection.anchorNode )
-				) {
-					node.focus();
 				}
 
 				// The field is edited through the host now. Remove the
@@ -166,7 +138,7 @@ export default function useEditableRoot() {
 					// Already hosted. The selection observer may have
 					// disengaged the host when a multi-selection collapsed
 					// back into this block.
-					setContentEditableWrapper( node, true, { focus: false } );
+					setContentEditableWrapper( node, true );
 					return;
 				}
 
