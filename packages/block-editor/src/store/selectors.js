@@ -13,7 +13,11 @@ import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { createSelector, createRegistrySelector } from '@wordpress/data';
+import {
+	createSelector,
+	createRegistrySelector,
+	select as globalSelect,
+} from '@wordpress/data';
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -2414,6 +2418,146 @@ const buildBlockVariationItem = ( state, item ) => ( variation ) => {
 	};
 };
 
+const buildReusableBlockInserterItem = ( state ) => ( reusableBlock ) => {
+	const icon = ! reusableBlock.wp_pattern_sync_status
+		? {
+				src: symbol,
+				foreground: 'var(--wp-block-synced-color)',
+			}
+		: symbol;
+	const userPattern = mapUserPattern( reusableBlock );
+	const { time, count = 0 } = getInsertUsage( state, userPattern.name ) || {};
+	const frecency = calculateFrecency( time, count );
+
+	return {
+		id: userPattern.name,
+		name: 'core/block',
+		initialAttributes: { ref: reusableBlock.id },
+		title: userPattern.title,
+		icon,
+		category: 'reusable',
+		keywords: [ 'reusable' ],
+		isDisabled: false,
+		utility: 1, // Deprecated.
+		frecency,
+		content: userPattern.content,
+		get blocks() {
+			return getParsedPattern( userPattern ).blocks;
+		},
+		syncStatus: userPattern.syncStatus,
+	};
+};
+
+/*
+ * The two lists below are built independently of the root, so an item is the
+ * same object for every root and `getInserterItems` only filters. The nesting
+ * is for identity, not speed: the per-root cache cannot keep the objects.
+ */
+
+// Read from the default registry, like `getBlockTypes()`.
+const getBlockVariationsRaw = () =>
+	unlock( globalSelect( blocksStore ) ).getBlockVariationsRaw();
+
+/**
+ * Returns an inserter item for every registered block type that supports the
+ * inserter, variations expanded and core blocks first.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {WPEditorInserterItem[]} Block type inserter items.
+ */
+const getBlockTypeInserterItems = createSelector(
+	( state ) => {
+		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+			buildScope: 'inserter',
+		} );
+
+		const items = getBlockTypes()
+			.filter( ( blockType ) =>
+				hasBlockSupport( blockType, 'inserter', true )
+			)
+			.map( buildBlockTypeInserterItem )
+			.reduce( ( accumulator, item ) => {
+				const { variations = [] } = item;
+				// Exclude any block type item that is to be replaced by a default variation.
+				if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+					accumulator.push( item );
+				}
+				if ( variations.length ) {
+					const variationMapper = getItemFromVariation( state, item );
+					accumulator.push( ...variations.map( variationMapper ) );
+				}
+				return accumulator;
+			}, [] );
+
+		// Ensure core blocks are prioritized in the returned results,
+		// because third party blocks can be registered earlier than
+		// the core blocks (usually by using the `init` action),
+		// thus affecting the display order.
+		const groupByType = ( blocks, block ) => {
+			const { core, noncore } = blocks;
+			const type = block.name.startsWith( 'core/' ) ? core : noncore;
+
+			type.push( block );
+			return blocks;
+		};
+		const { core: coreItems, noncore: nonCoreItems } = items.reduce(
+			groupByType,
+			{ core: [], noncore: [] }
+		);
+		return [ ...coreItems, ...nonCoreItems ];
+	},
+	( state ) => [
+		getBlockTypes(),
+		getBlockVariationsRaw(),
+		state.blocks.order,
+		state.preferences.insertUsage,
+	]
+);
+
+/**
+ * Returns an inserter item for every reusable block.
+ *
+ * @param {Object} state          Editor state.
+ * @param {Array}  reusableBlocks Reusable blocks, from `getReusableBlocks`.
+ *
+ * @return {WPEditorInserterItem[]} Reusable block inserter items.
+ */
+const getReusableBlockInserterItems = createSelector(
+	( state, reusableBlocks ) =>
+		reusableBlocks.map( buildReusableBlockInserterItem( state ) ),
+	( state, reusableBlocks ) => [
+		reusableBlocks,
+		state.preferences.insertUsage,
+	]
+);
+
+const itemsWithRootFlag = new WeakMap();
+
+/**
+ * Returns a copy of the item carrying `isAllowedInCurrentRoot`, cached per
+ * item and flag so it is the same object for every root.
+ *
+ * @param {WPEditorInserterItem} item                   Inserter item.
+ * @param {boolean}              isAllowedInCurrentRoot Whether the item can be inserted in the root.
+ *
+ * @return {WPEditorInserterItem} The flagged item.
+ */
+function withIsAllowedInCurrentRoot( item, isAllowedInCurrentRoot ) {
+	let variants = itemsWithRootFlag.get( item );
+	if ( ! variants ) {
+		variants = new Map();
+		itemsWithRootFlag.set( item, variants );
+	}
+	if ( ! variants.has( isAllowedInCurrentRoot ) ) {
+		variants.set( isAllowedInCurrentRoot, {
+			...item,
+			isAllowedInCurrentRoot,
+		} );
+	}
+	return variants.get( isAllowedInCurrentRoot );
+}
+
 /**
  * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
@@ -2446,63 +2590,25 @@ const buildBlockVariationItem = ( state, item ) => ( variation ) => {
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null, options = DEFAULT_INSERTER_OPTIONS ) => {
-			const buildReusableBlockInserterItem = ( reusableBlock ) => {
-				const icon = ! reusableBlock.wp_pattern_sync_status
-					? {
-							src: symbol,
-							foreground: 'var(--wp-block-synced-color)',
-						}
-					: symbol;
-				const userPattern = mapUserPattern( reusableBlock );
-				const { time, count = 0 } =
-					getInsertUsage( state, userPattern.name ) || {};
-				const frecency = calculateFrecency( time, count );
-
-				return {
-					id: userPattern.name,
-					name: 'core/block',
-					initialAttributes: { ref: reusableBlock.id },
-					title: userPattern.title,
-					icon,
-					category: 'reusable',
-					keywords: [ 'reusable' ],
-					isDisabled: false,
-					utility: 1, // Deprecated.
-					frecency,
-					content: userPattern.content,
-					get blocks() {
-						return getParsedPattern( userPattern ).blocks;
-					},
-					syncStatus: userPattern.syncStatus,
-				};
-			};
-
 			const patternInserterItems = canInsertBlockTypeUnmemoized(
 				state,
 				'core/block',
 				rootClientId
 			)
-				? unlock( select( STORE_NAME ) )
-						.getReusableBlocks()
-						.map( buildReusableBlockInserterItem )
+				? getReusableBlockInserterItems(
+						state,
+						unlock( select( STORE_NAME ) ).getReusableBlocks()
+					)
 				: [];
 
-			const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-				buildScope: 'inserter',
-			} );
-
-			let blockTypeInserterItems = getBlockTypes()
-				.filter( ( blockType ) =>
-					hasBlockSupport( blockType, 'inserter', true )
-				)
-				.map( buildBlockTypeInserterItem );
+			let blockTypeInserterItems = getBlockTypeInserterItems( state );
 
 			if ( options[ isFiltered ] !== false ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
-					( blockType ) =>
+					( item ) =>
 						canIncludeBlockTypeInInserter(
 							state,
-							blockType,
+							item,
 							rootClientId
 						)
 				);
@@ -2543,56 +2649,20 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					) {
 						continue;
 					}
-					allowedItems.push( {
-						...blockType,
-						isAllowedInCurrentRoot,
-					} );
+					allowedItems.push(
+						withIsAllowedInCurrentRoot(
+							blockType,
+							isAllowedInCurrentRoot
+						)
+					);
 				}
 				blockTypeInserterItems = allowedItems;
 			}
 
-			const items = blockTypeInserterItems.reduce(
-				( accumulator, item ) => {
-					const { variations = [] } = item;
-					// Exclude any block type item that is to be replaced by a default variation.
-					if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
-						accumulator.push( item );
-					}
-					if ( variations.length ) {
-						const variationMapper = getItemFromVariation(
-							state,
-							item
-						);
-						accumulator.push(
-							...variations.map( variationMapper )
-						);
-					}
-					return accumulator;
-				},
-				[]
-			);
-
-			// Ensure core blocks are prioritized in the returned results,
-			// because third party blocks can be registered earlier than
-			// the core blocks (usually by using the `init` action),
-			// thus affecting the display order.
-			// We don't sort reusable blocks as they are handled differently.
-			const groupByType = ( blocks, block ) => {
-				const { core, noncore } = blocks;
-				const type = block.name.startsWith( 'core/' ) ? core : noncore;
-
-				type.push( block );
-				return blocks;
-			};
-			const { core: coreItems, noncore: nonCoreItems } = items.reduce(
-				groupByType,
-				{ core: [], noncore: [] }
-			);
-			const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-			return [ ...sortedBlockTypes, ...patternInserterItems ];
+			return [ ...blockTypeInserterItems, ...patternInserterItems ];
 		},
 		( state, rootClientId ) => [
-			getBlockTypes(),
+			getBlockTypeInserterItems( state ),
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 			state.blocks.order,
 			state.preferences.insertUsage,
