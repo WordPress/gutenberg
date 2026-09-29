@@ -6,6 +6,10 @@
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
+### Bug Fixes
+
+-   Pin `typescript-eslint` to `8.60.0`, whose peer range includes TypeScript 6.0. Later versions report `const Foo = forwardRef( function Foo() {} )` under `@typescript-eslint/no-shadow` ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+
 ## 27.0.0 (2026-09-23)
 
 ### Breaking Changes
