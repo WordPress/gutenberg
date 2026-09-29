@@ -52,9 +52,13 @@
 	grid-column: 2;
 	grid-row: 1;
 	/*rtl:end:ignore*/
-	padding: 0 8% 0 8%;
 	word-break: normal;
 	overflow-wrap: anywhere;
+}
+
+// Zero specificity so the default padding can be overridden by theme.json or theme styles.
+:where(.wp-block-media-text > .wp-block-media-text__content) {
+	padding: 0 8%;
 }
 
 .wp-block-media-text.has-media-on-the-right > .wp-block-media-text__media {

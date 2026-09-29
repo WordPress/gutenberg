@@ -16,7 +16,7 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
  * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
-	function Button(
+	function UnforwardedButton(
 		{
 			tone = 'brand',
 			variant = 'solid',
