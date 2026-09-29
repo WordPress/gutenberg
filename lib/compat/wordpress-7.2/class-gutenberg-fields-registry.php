@@ -349,9 +349,10 @@ final class Gutenberg_Fields_Registry {
 		 * to register fields.
 		 *
 		 * The first read happens wherever the fields are needed: while
-		 * handling a REST request as well as on `admin_init`. A callback
-		 * should register fields and nothing else; script modules, styles,
-		 * and their enqueue hooks belong on `init`.
+		 * handling a REST request as well as on `admin_footer` of the pages
+		 * that load the editor script. A callback should register fields and
+		 * nothing else; script modules, styles, and their enqueue hooks
+		 * belong on `init`.
 		 *
 		 * @since 7.2.0
 		 *

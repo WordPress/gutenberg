@@ -74,16 +74,18 @@ function gutenberg_get_all_registered_field_modules() {
  * import map; the module is fetched when it is imported.
  *
  * Reading the registry fires `fields_api_init`, so the fields and their
- * script modules are registered on demand. It still has to run after `init`,
- * for the supports the default fields derive from to be final, and it runs
- * early on `admin_init`: before the pages rendered outside the admin
- * template, which render and exit on `admin_init` at the default priority.
+ * script modules are registered on demand. It only reads the registry on the
+ * pages that load the editor script, not on every admin request (heartbeat,
+ * Ajax, other screens). It runs on `admin_footer`, the last action before the
+ * import map is printed that fires both in the admin template and in the pages
+ * rendered outside it, which print the import map themselves. By then `init`
+ * has completed, so the supports the default fields derive from are final.
  * The registry only accepts registrations while the action fires, so the
  * modules declared here are the modules of every field the page can show.
  *
- * When called by the `admin_init` action, which passes no arguments,
- * `$scripts` is an empty string and the global registry is used.
- * In other scenarios (tests), the scripts are given directly.
+ * When called by the `admin_footer` action, `$scripts` is the hook suffix of
+ * the page and the global registry is used. In other scenarios (tests), the
+ * scripts are given directly.
  *
  * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
  */
@@ -94,7 +96,7 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 
 	// Field registration as well as actions live in packages/editor/src/dataviews/store/private-actions.ts
 	// which means any screen that wants to use this mechanism needs to load the editor script.
-	if ( ! $scripts->query( 'wp-editor', 'registered' ) ) {
+	if ( ! $scripts->query( 'wp-editor', 'enqueued' ) && ! $scripts->query( 'wp-editor', 'done' ) ) {
 		return;
 	}
 
@@ -132,7 +134,7 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 	}
 }
-add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
+add_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' );
 
 /**
  * Registers the default fields of every post type exposed in the REST API.
@@ -152,8 +154,8 @@ add_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script', 5 );
  * and plugins add or remove supports on `init` too, with
  * add_post_type_support() and remove_post_type_support(). Hence it runs on
  * `fields_api_init`, which the registry fires on its first read, after
- * `init`: while handling a REST request, or on `admin_init` when the editor
- * script is wired up. At priority 0, so a plugin altering the defaults on
+ * `init`: while handling a REST request, or on `admin_footer` when the page
+ * loads the editor script. At priority 0, so a plugin altering the defaults on
  * the registry at the default priority sees them registered.
  *
  * The post types whose fields differ from the defaults derived from their
