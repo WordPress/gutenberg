@@ -11,7 +11,7 @@
 
 ### Enhancements
 
--   `FormToggle`: Match the `@wordpress/ui` `Switch` border and checked colors, including hover and disabled states ([#83773](https://github.com/WordPress/gutenberg/pull/83773)).
+-   `FormToggle`: Match the `@wordpress/ui` `Switch` track, thumb, and border colors across unchecked, checked, hover, and disabled states ([#83773](https://github.com/WordPress/gutenberg/pull/83773)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Darken the field border on hover to the active stroke color used by `@wordpress/ui`. Disabled and borderless fields keep their resting border ([#83306](https://github.com/WordPress/gutenberg/pull/83306)).
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 
