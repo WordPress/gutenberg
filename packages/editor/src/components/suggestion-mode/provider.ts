@@ -469,7 +469,8 @@ export function useSuggestionsProvider() {
 		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
-	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
+	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
+		useSuggestionOverlay();
 	const registry = useRegistry();
 
 	const createSuggestion = useCallback(
@@ -970,7 +971,8 @@ export function useSuggestionsProvider() {
 			//   - block-move: clear the marker, then dispatch
 			//     moveBlockToPosition to put the block back at its
 			//     pre-move parent + index.
-			//   - attribute-set (no structural op): no live-block change.
+			//   - attribute-set (no structural op): no live-block change; the
+			//     overlay entry holding the proposed value is cleared.
 			const structuralOp = findStructuralOp( payload?.operations );
 
 			try {
@@ -1045,6 +1047,16 @@ export function useSuggestionsProvider() {
 						}
 						clearOverlay( clientId );
 					}
+				} else if ( clientId ) {
+					/*
+					 * An attribute-only suggestion lives entirely in the
+					 * overlay: the live block never took the proposed value,
+					 * so there is nothing to roll back, but the overlay entry
+					 * must go or it keeps rendering the rejected value and
+					 * feeds it into the next proposal. Guarded, because the
+					 * entry may already belong to a newer suggestion.
+					 */
+					clearOverlayForComment( clientId, commentId );
 				}
 
 				createNotice( 'snackbar' as any, __( 'Suggestion rejected.' ), {
@@ -1069,6 +1081,7 @@ export function useSuggestionsProvider() {
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
+			clearOverlayForComment,
 			registry,
 		]
 	);
