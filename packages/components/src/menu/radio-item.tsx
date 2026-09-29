@@ -17,7 +17,7 @@ const radioCheck = (
 export const RadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< RadioItemProps, 'div', false >
->( function RadioItem(
+>( function UnforwardedRadioItem(
 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {

@@ -7,7 +7,7 @@ import type { CompositeHoverProps } from './types';
 export const CompositeHover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeHoverProps, 'div', false >
->( function CompositeHover( props, ref ) {
+>( function UnforwardedCompositeHover( props, ref ) {
 	const context = useCompositeContext();
 
 	// @ts-expect-error The store prop is undocumented and only used by the
