@@ -660,18 +660,20 @@ test.describe( 'Draggable block', () => {
 		] );
 
 		// Select the first two paragraphs.
-		await editor.canvas
-			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
-			.click();
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Shift+ArrowDown' );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraphs.nth( 0 ).click();
+		await paragraphs.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
 
-		const selectedClientIds = await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getSelectedBlockClientIds()
-		);
-		expect( selectedClientIds ).toHaveLength( 2 );
+		const getSelectedClientIds = () =>
+			page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientIds()
+			);
+		await expect.poll( getSelectedClientIds ).toHaveLength( 2 );
+		const selectedClientIds = await getSelectedClientIds();
 		const [ , , thirdClientId ] = await page.evaluate( () =>
 			window.wp.data.select( 'core/block-editor' ).getBlockOrder()
 		);
