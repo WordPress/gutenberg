@@ -9,7 +9,7 @@ import type { ModalProps } from '../types';
 const meta: Meta< typeof Modal > = {
 	tags: [ 'manifest' ],
 	component: Modal,
-	title: 'Components/Overlays/Modal',
+	title: 'Components/@wordpress-components/Overlays/Modal',
 	id: 'components-modal',
 	argTypes: {
 		children: {

@@ -21,6 +21,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"type": "module",
 	"exports": {
 		"./tsconfig/*": "./tsconfig/tsconfig.*"
 	},

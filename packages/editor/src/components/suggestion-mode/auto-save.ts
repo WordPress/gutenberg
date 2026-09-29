@@ -255,17 +255,19 @@ export default function SuggestionAutoSave() {
 		const timers = timersRef.current;
 
 		/*
-		 * Leaving Suggest mode cancels every pending debounce. The component
-		 * stays mounted across intent changes (it is gated on the experiment
-		 * flag, not the intent), so without this a timer scheduled moments
-		 * before the switch still fires and POSTs a note for an edit the
-		 * user walked away from. Cancelling is not lossy: the overlay entry
-		 * keeps its unsynced fingerprint, so re-entering Suggest re-runs this
-		 * effect and reschedules the save.
+		 * Leaving Suggest mode flushes every pending debounce instead of
+		 * waiting it out. The component stays mounted across intent changes
+		 * (it is gated on the experiment flag, not the intent), and switching
+		 * to Editing is a normal step in reviewing or publishing: the edit
+		 * was made as a suggestion, so it must reach the server now. Dropping
+		 * the timer instead would leave the proposal only in React state,
+		 * lost on the next reload, and could leave a saved pending marker
+		 * with no note behind it.
 		 */
 		if ( ! isSuggestMode ) {
-			for ( const timer of timers.values() ) {
+			for ( const [ clientId, timer ] of timers ) {
 				clearTimeout( timer );
+				enqueueSync( clientId );
 			}
 			timers.clear();
 			return undefined;
