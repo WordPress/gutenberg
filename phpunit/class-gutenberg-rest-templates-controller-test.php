@@ -206,7 +206,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertContains( 'block-theme//page-home', $seen_ids );
 	}
 
-	public function test_empty_slug_uses_the_regular_template_collection() {
+	public function test_empty_slug_matches_a_post_type_only_query() {
 		$response = $this->get_page_template_choices( '' );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates' );
 		$request->set_param( 'post_type', 'page' );
@@ -285,12 +285,13 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		);
 	}
 
-	public function test_post_template_filter_does_not_change_queries_without_a_slug() {
+	public function test_post_type_only_rest_query_includes_the_generic_default() {
 		$this->get_page_template_choices( 'home' );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
 		$request->set_param( 'post_type', 'page' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertNotContains( 'block-theme//page', wp_list_pluck( $response->get_data(), 'id' ) );
+		$this->assertContains( 'block-theme//page', wp_list_pluck( $response->get_data(), 'id' ) );
+		$this->assertNotContains( 'block-theme//page', wp_list_pluck( get_block_templates( array( 'post_type' => 'page' ) ), 'id' ) );
 	}
 
 	public function test_invalid_filtered_templates_are_ignored_and_duplicates_are_removed() {
