@@ -1262,7 +1262,8 @@ export function isLockedBlock( state, clientId ) {
 		isRemoveLockedBlock( state, clientId ) ||
 		attributes?.templateLock === 'contentOnly' ||
 		( !! attributes?.metadata?.patternName &&
-			isSectionBlock( state, clientId ) )
+			( getEditedContentOnlySection( state ) === clientId ||
+				isSectionBlock( state, clientId ) ) )
 	);
 }
 

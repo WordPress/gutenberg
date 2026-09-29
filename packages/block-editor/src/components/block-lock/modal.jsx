@@ -49,13 +49,15 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
 			const { getBlockName, getBlockAttributes } = blockEditorSelect;
-			const { isSectionBlock } = unlock( blockEditorSelect );
+			const { isSectionBlock, getEditedContentOnlySection } =
+				unlock( blockEditorSelect );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			const attributes = getBlockAttributes( clientId );
 			const _isPatternSection =
 				!! attributes?.metadata?.patternName &&
-				isSectionBlock( clientId );
+				( getEditedContentOnlySection() === clientId ||
+					isSectionBlock( clientId ) );
 			const _hasTemplateLock = !! blockType?.attributes?.templateLock;
 
 			return {

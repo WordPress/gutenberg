@@ -1684,29 +1684,32 @@ describe( 'private selectors', () => {
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'returns true when block is an unsynced pattern section', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map( [
-						[
-							'block-1',
-							{ clientId: 'block-1', name: 'core/group' },
-						],
-					] ),
-					attributes: new Map( [
-						[
-							'block-1',
-							{ metadata: { patternName: 'my-pattern' } },
-						],
-					] ),
-					parents: new Map( [ [ 'block-1', '' ] ] ),
-				},
-				settings: {},
-				blockListSettings: new Map(),
-				editedContentOnlySection: undefined,
-			};
-			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
-		} );
+		it.each( [ undefined, 'block-1' ] )(
+			'returns true for an unsynced pattern with edited section %s',
+			( editedContentOnlySection ) => {
+				const state = {
+					blocks: {
+						byClientId: new Map( [
+							[
+								'block-1',
+								{ clientId: 'block-1', name: 'core/group' },
+							],
+						] ),
+						attributes: new Map( [
+							[
+								'block-1',
+								{ metadata: { patternName: 'my-pattern' } },
+							],
+						] ),
+						parents: new Map( [ [ 'block-1', '' ] ] ),
+					},
+					settings: {},
+					blockListSettings: new Map(),
+					editedContentOnlySection,
+				};
+				expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+			}
+		);
 
 		it( 'returns true when block has multiple locks', () => {
 			const state = createState( null, {

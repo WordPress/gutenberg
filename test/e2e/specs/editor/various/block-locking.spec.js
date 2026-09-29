@@ -111,6 +111,117 @@ test.describe( 'Block Locking', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
+	test( 'can lock and unlock a group layout', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group content' },
+				},
+			],
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		const layoutCheckbox = page.getByRole( 'checkbox', {
+			name: 'Lock layout',
+			exact: true,
+		} );
+		await layoutCheckbox.check();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { templateLock: 'contentOnly' } },
+			] );
+
+		await editor.clickBlockToolbarButton( 'Unlock' );
+		await expect( layoutCheckbox ).toBeChecked();
+		await layoutCheckbox.uncheck();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].attributes.templateLock
+			)
+			.toBeUndefined();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Group content' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'can unlock an unsynced pattern layout while editing the pattern', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				metadata: { patternName: 'theme/example', name: 'My pattern' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Pattern content' },
+				},
+			],
+		} );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const patternRow = page
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } )
+			.getByRole( 'row', { name: 'My pattern Options', exact: true } );
+		await patternRow
+			.getByRole( 'link', { name: 'My pattern', exact: true } )
+			.click();
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
+		await patternRow
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Unlock', exact: true } )
+			.click();
+
+		const layoutCheckbox = page.getByRole( 'checkbox', {
+			name: 'Lock layout',
+			exact: true,
+		} );
+		await expect( layoutCheckbox ).toBeChecked();
+		await layoutCheckbox.uncheck();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].attributes.metadata
+			)
+			.toEqual( { name: 'My pattern' } );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Pattern content' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'block locking supersedes template locking', async ( {
 		editor,
 		page,
