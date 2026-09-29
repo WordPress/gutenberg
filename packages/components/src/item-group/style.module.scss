@@ -1,4 +1,5 @@
 @use "../utils/theme-variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 // Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
 $surface-border-color: rgba(0, 0, 0, 0.1);
@@ -76,6 +77,10 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 
 		&:hover {
 			color: $components-color-accent;
+		}
+
+		&:focus-visible {
+			@include outset-ring__focus();
 		}
 	}
 
