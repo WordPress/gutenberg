@@ -128,6 +128,7 @@ function gutenberg_initialize_experiments_settings() {
 				'description' => $experiment['description'],
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
+				'default'     => gutenberg_get_experiment_default( $experiment['id'] ),
 			);
 
 			$properties[ $experiment['id'] ] = $property;
