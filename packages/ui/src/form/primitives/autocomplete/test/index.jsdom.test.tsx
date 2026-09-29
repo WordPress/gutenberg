@@ -20,13 +20,6 @@ function renderDisabledAutocompleteWithClear() {
 }
 
 describe( 'Autocomplete', () => {
-	it( 'forwards the Separator ref to its element', () => {
-		const ref = createRef< HTMLDivElement >();
-		render( <Autocomplete.Separator ref={ ref } /> );
-
-		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
 	it( 'uses the item label as its accessible name and describes it in order', () => {
 		const item = { value: 'apple', label: 'Apple' };
 

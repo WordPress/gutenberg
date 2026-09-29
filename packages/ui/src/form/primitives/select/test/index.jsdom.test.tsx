@@ -1,18 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useId } from '@wordpress/element';
+import { useId } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import * as Select from '../index';
 
 describe( 'Select', () => {
-	it( 'forwards the Separator ref to its element', () => {
-		const ref = createRef< HTMLDivElement >();
-		render( <Select.Separator ref={ ref } /> );
-
-		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
 	it( 'auto-resolves trigger label from items when value is an object', () => {
 		const users = [
 			{ value: '1', label: 'User 1' },

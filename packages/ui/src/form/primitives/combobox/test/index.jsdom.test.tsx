@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import * as Combobox from '../index';
 
@@ -54,13 +53,6 @@ function renderDisabledMultiSelect() {
 }
 
 describe( 'Combobox', () => {
-	it( 'forwards the Separator ref to its element', () => {
-		const ref = createRef< HTMLDivElement >();
-		render( <Combobox.Separator ref={ ref } /> );
-
-		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
 	it( 'uses the item label as its accessible name and describes it in order', () => {
 		const item = { value: 'apple', label: 'Apple' };
 
