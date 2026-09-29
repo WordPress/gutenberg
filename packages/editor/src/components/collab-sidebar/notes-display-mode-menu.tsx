@@ -10,7 +10,9 @@ import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import MoreMenuSubmenu from '../more-menu/more-menu-submenu';
 import { ALL_NOTES_SIDEBAR } from './constants';
 
-type NotesDisplayMode = 'full' | 'hidden';
+const DISPLAY_MODES = [ 'full', 'minimized', 'hidden' ] as const;
+
+type NotesDisplayMode = ( typeof DISPLAY_MODES )[ number ];
 
 type NotesDisplayModeMenuProps = {
 	/**
@@ -38,12 +40,12 @@ export function NotesDisplayModeMenu( {
 }: NotesDisplayModeMenuProps ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { displayMode, isAllNotesOpen } = useSelect( ( select ) => {
+		const mode = select( preferencesStore ).get(
+			'core',
+			'notesDisplayMode'
+		);
 		return {
-			displayMode:
-				select( preferencesStore ).get( 'core', 'notesDisplayMode' ) ===
-				'hidden'
-					? 'hidden'
-					: 'full',
+			displayMode: DISPLAY_MODES.includes( mode ) ? mode : 'full',
 			isAllNotesOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
 					'core'
@@ -61,12 +63,15 @@ export function NotesDisplayModeMenu( {
 	function setDisplayMode( mode: NotesDisplayMode ) {
 		setPreference( 'core', 'notesDisplayMode', mode );
 		// Floating notes yield to "All notes", so showing them closes it.
-		if ( mode === 'full' && hasFloatingNotes && isAllNotesOpen ) {
+		if ( mode !== 'hidden' && hasFloatingNotes && isAllNotesOpen ) {
 			disableComplementaryArea( 'core' );
 		}
-		speak(
-			mode === 'hidden' ? __( 'Notes hidden.' ) : __( 'Notes shown.' )
-		);
+		const messages = {
+			full: __( 'Notes shown.' ),
+			minimized: __( 'Notes minimized.' ),
+			hidden: __( 'Notes hidden.' ),
+		};
+		speak( messages[ mode ] );
 	}
 
 	function toggleAllNotes() {
@@ -88,6 +93,11 @@ export function NotesDisplayModeMenu( {
 						<Menu.RadioItem value="full" closeOnClick>
 							<Menu.ItemLabel>
 								{ __( 'Show notes' ) }
+							</Menu.ItemLabel>
+						</Menu.RadioItem>
+						<Menu.RadioItem value="minimized" closeOnClick>
+							<Menu.ItemLabel>
+								{ __( 'Minimize notes' ) }
 							</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem value="hidden" closeOnClick>
