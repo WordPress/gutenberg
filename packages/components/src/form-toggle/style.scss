@@ -84,8 +84,16 @@ $transition-duration: 0.2s;
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
-		background-color: $components-color-accent;
+		background-color: var(--wpds-color-background-interactive-brand-strong);
 		border-color: transparent;
+
+		@media ( forced-colors: active ) {
+			background-color: Highlight;
+
+			&::after {
+				border-top-color: Highlight;
+			}
+		}
 
 		// Windows High Contrast Mode
 		&::after {
@@ -99,9 +107,13 @@ $transition-duration: 0.2s;
 
 	&.is-checked {
 		.components-form-toggle__thumb {
-			background-color: $white;
+			background-color: var(--wpds-color-foreground-interactive-brand-strong);
 			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
 			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+
+			@media ( forced-colors: active ) {
+				background-color: HighlightText;
+			}
 		}
 	}
 
@@ -127,10 +139,12 @@ $transition-duration: 0.2s;
 		}
 
 		&.is-checked .components-form-toggle__track {
-			background-color: $components-color-gray-400;
+			background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
 			border-color: transparent;
 
 			@media ( forced-colors: active ) {
+				background-color: GrayText;
+
 				&::after {
 					border-top-color: GrayText;
 				}
@@ -138,7 +152,11 @@ $transition-duration: 0.2s;
 		}
 
 		&.is-checked .components-form-toggle__thumb {
-			background-color: $white;
+			background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+
+			@media ( forced-colors: active ) {
+				background-color: Canvas;
+			}
 		}
 	}
 }
