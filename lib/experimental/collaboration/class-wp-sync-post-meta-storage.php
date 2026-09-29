@@ -43,6 +43,14 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		const SYNC_UPDATE_META_KEY = 'wp_sync_update_data';
 
 		/**
+		 * Meta key for the room's engine lineage stamp.
+		 *
+		 * @since 7.2.0
+		 * @var string
+		 */
+		const ENGINE_META_KEY = 'wp_sync_engine';
+
+		/**
 		 * Cache of cursors by room.
 		 *
 		 * @since 7.0.0
@@ -209,6 +217,229 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 */
 		public function get_cursor( string $room ): int {
 			return $this->room_cursors[ $room ] ?? 0;
+		}
+
+		/**
+		 * Gets the sync engine lineage of a room.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Engine slug, or null for a room with no lineage.
+		 */
+		public function get_room_engine( string $room ): ?string {
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			return $this->read_room_engine_for_post( $post_id );
+		}
+
+		/**
+		 * Reads a room's engine lineage WITHOUT creating storage for it.
+		 *
+		 * `get_room_engine()` creates the room's storage post when it is
+		 * missing (its callers are about to write). Read-only lanes —
+		 * save-path preflights, diagnostics, transports deciding whether a
+		 * room needs a reset — must be able to look without bringing a
+		 * room into existence.
+		 *
+		 * @since 7.4.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Engine slug, or null when the room has no
+		 *                     storage or no lineage.
+		 */
+		public function peek_room_engine( string $room ): ?string {
+			$post_id = $this->peek_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			return $this->read_room_engine_for_post( $post_id );
+		}
+
+		/**
+		 * Reads the engine lineage stamp off a storage post.
+		 *
+		 * @since 7.4.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param int $post_id Storage post ID.
+		 * @return string|null Engine slug, or null for no lineage.
+		 */
+		private function read_room_engine_for_post( int $post_id ): ?string {
+			global $wpdb;
+
+			// Use direct database operation to avoid priming the post meta
+			// cache (see the cache-hygiene notes on the other accessors).
+			$meta_value = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id ASC LIMIT 1",
+					$post_id,
+					self::ENGINE_META_KEY
+				)
+			);
+
+			if ( ! is_string( $meta_value ) || '' === $meta_value ) {
+				return null;
+			}
+
+			return $meta_value;
+		}
+
+		/**
+		 * Stamps the sync engine lineage of a room.
+		 *
+		 * Never overwrites an existing stamp: get_room_engine() reads the
+		 * OLDEST row, so even a concurrent double-insert converges on the
+		 * first writer's engine.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room   Room identifier.
+		 * @param string $engine Engine slug.
+		 * @return bool True on success, false on failure.
+		 */
+		public function set_room_engine( string $room, string $engine ): bool {
+			global $wpdb;
+
+			if ( null !== $this->get_room_engine( $room ) ) {
+				return true;
+			}
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return false;
+			}
+
+			// Use direct database operation to avoid cache invalidation
+			// performed by post meta functions.
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => self::ENGINE_META_KEY,
+					'meta_value' => $engine,
+				),
+				array( '%d', '%s', '%s' )
+			);
+		}
+
+		/**
+		 * Reads a per-room metadata value (JSON-decoded). Engine-level
+		 * bookkeeping (compaction checkpoints, trim floors) rides here; the
+		 * key is namespaced to avoid update-row and lineage keys. Not part
+		 * of the WP_Sync_Storage interface yet — engines feature-detect via
+		 * method_exists and degrade gracefully.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @param string $key  Meta key (namespaced automatically).
+		 * @return mixed Decoded value, or null when absent.
+		 */
+		public function get_room_meta( string $room, string $key ) {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			// Direct query for cache hygiene (see other accessors).
+			$meta_value = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+					$post_id,
+					'wp_sync_room_meta_' . $key
+				)
+			);
+
+			if ( ! is_string( $meta_value ) || '' === $meta_value ) {
+				return null;
+			}
+
+			return json_decode( $meta_value, true );
+		}
+
+		/**
+		 * Writes a per-room metadata value (JSON-encoded), replacing any
+		 * previous value for the key.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room  Room identifier.
+		 * @param string $key   Meta key (namespaced automatically).
+		 * @param mixed  $value JSON-serializable value.
+		 * @return bool True on success, false on failure.
+		 */
+		public function set_room_meta( string $room, string $key, $value ): bool {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return false;
+			}
+
+			$meta_key = 'wp_sync_room_meta_' . $key;
+
+			// Direct queries for cache hygiene (see other accessors).
+			$wpdb->delete(
+				$wpdb->postmeta,
+				array(
+					'post_id'  => $post_id,
+					'meta_key' => $meta_key,
+				),
+				array( '%d', '%s' )
+			);
+
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => $meta_key,
+					'meta_value' => wp_json_encode( $value ),
+				),
+				array( '%d', '%s', '%s' )
+			);
+		}
+
+		/**
+		 * Finds the room's storage post WITHOUT creating one.
+		 *
+		 * The creating lookup below brings a room into existence on first
+		 * touch (its callers are about to write). Read-only lanes use this
+		 * instead, so that looking at a room never creates it.
+		 *
+		 * @since 7.4.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return int|null Post ID, or null when the room has no storage.
+		 */
+		private function peek_storage_post_id( string $room ): ?int {
+			$room_hash = md5( $room );
+
+			if ( isset( self::$storage_post_ids[ $room_hash ] ) ) {
+				return self::$storage_post_ids[ $room_hash ];
+			}
+
+			$post_id = $this->find_canonical_storage_post_id( $room_hash );
+			if ( is_int( $post_id ) ) {
+				self::$storage_post_ids[ $room_hash ] = $post_id;
+			}
+
+			return $post_id;
 		}
 
 		/**
@@ -500,6 +731,48 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Resets a room: deletes its update rows, engine lineage stamp,
+		 * awareness, and room meta, leaving the storage post empty and
+		 * reusable under a different engine. Never creates storage — a
+		 * room with none is already reset.
+		 *
+		 * Only safe for REBUILDABLE rooms (change feeds like global
+		 * collection/taxonomy rooms). A per-post entity room can hold
+		 * unsaved collaborative content; callers own that distinction (see
+		 * the polling transport's engine-switch reset).
+		 *
+		 * @since 7.4.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return bool True when the room holds no data afterwards.
+		 */
+		public function reset_room( string $room ): bool {
+			global $wpdb;
+
+			$post_id = $this->peek_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return true;
+			}
+
+			$deleted = $wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND ( meta_key IN ( %s, %s, %s ) OR meta_key LIKE %s )",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY,
+					self::ENGINE_META_KEY,
+					self::AWARENESS_META_KEY,
+					$wpdb->esc_like( 'wp_sync_room_meta_' ) . '%'
+				)
+			);
+
+			unset( $this->room_cursors[ $room ], $this->room_update_counts[ $room ] );
+
+			return false !== $deleted;
 		}
 	}
 }
