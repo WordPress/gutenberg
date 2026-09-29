@@ -170,15 +170,14 @@ export default function MediaEditorImageControls( {
 	);
 
 	const aspectRatioDropdown = hasAspectRatioControl ? (
-		<Menu.Root disabled={ disabled }>
+		<Menu.Root>
 			<Menu.Trigger
+				disabled={ disabled }
 				render={
 					<Button
 						size="compact"
 						icon={ aspectRatioIcon }
 						label={ __( 'Aspect ratio' ) }
-						showTooltip
-						disabled={ disabled }
 						accessibleWhenDisabled
 					/>
 				}
@@ -186,30 +185,26 @@ export default function MediaEditorImageControls( {
 			<Menu.Popup
 				positioner={ <Menu.Positioner side="top" align="center" /> }
 			>
-				<Menu.Group>
+				<Menu.RadioGroup
+					value={ aspectRatioValue }
+					onValueChange={ ( value ) => {
+						if ( ! disabled ) {
+							setAspectRatioValue( value );
+						}
+					} }
+				>
 					<Menu.GroupLabel>{ __( 'Aspect ratio' ) }</Menu.GroupLabel>
-					<Menu.RadioGroup
-						value={ aspectRatioValue }
-						onValueChange={ ( value ) => {
-							if ( ! disabled ) {
-								setAspectRatioValue( value );
-							}
-						} }
-					>
-						{ aspectRatioOptions.map( ( preset ) => (
-							<Menu.RadioItem
-								key={ preset.value }
-								value={ preset.value.toString() }
-								closeOnClick
-								disabled={ disabled }
-							>
-								<Menu.ItemLabel>
-									{ preset.label }
-								</Menu.ItemLabel>
-							</Menu.RadioItem>
-						) ) }
-					</Menu.RadioGroup>
-				</Menu.Group>
+					{ aspectRatioOptions.map( ( preset ) => (
+						<Menu.RadioItem
+							key={ preset.value }
+							value={ preset.value.toString() }
+							closeOnClick
+							disabled={ disabled }
+						>
+							<Menu.ItemLabel>{ preset.label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.RadioGroup>
 			</Menu.Popup>
 		</Menu.Root>
 	) : null;
