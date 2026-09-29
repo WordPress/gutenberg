@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Parse CSS `var()` references for PostCSS fallback injection and Stylelint validation, avoiding false positives in strings and URLs. ([#83766](https://github.com/WordPress/gutenberg/pull/83766)).
 -   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
 -   Make JavaScript token fallback transforms syntax-aware, preserve tagged-template values and source maps, and support Vite query-string module IDs. Use the TypeScript loader for `.ts`, `.mts`, and `.cts` files handled by the esbuild plugin, including files whose token values are unchanged. ([#83356](https://github.com/WordPress/gutenberg/pull/83356))
 -   Preserve Lightning CSS `from global` references and keep nested fallback variables global when injecting design token fallbacks ([#83359](https://github.com/WordPress/gutenberg/pull/83359)).
