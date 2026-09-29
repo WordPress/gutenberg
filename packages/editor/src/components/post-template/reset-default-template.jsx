@@ -4,18 +4,21 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	useAllowSwitchingTemplates,
+	useAvailableTemplates,
 	useCurrentTemplateSlug,
 	useEditedPostContext,
 } from './hooks';
 
 export default function ResetDefaultTemplate() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
-	const allowSwitchingTemplate = useAllowSwitchingTemplates();
+	const availableTemplates = useAvailableTemplates();
 	const { postType, postId } = useEditedPostContext();
 	const { editEntityRecord } = useDispatch( coreStore );
 	// The default template in a post is indicated by an empty string.
-	if ( ! currentTemplateSlug || ! allowSwitchingTemplate ) {
+	if (
+		! currentTemplateSlug ||
+		! availableTemplates?.some( ( template ) => template.isDefault )
+	) {
 		return null;
 	}
 	return (

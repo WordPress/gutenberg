@@ -163,6 +163,167 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * Requests the choices for an edited page slug.
+	 *
+	 * @param string $slug Edited slug.
+	 * @return WP_REST_Response Response.
+	 */
+	private function get_page_template_choices( $slug ) {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$request->set_param( 'slug', $slug );
+		return rest_get_server()->dispatch( $request );
+	}
+
+	public function test_post_template_choices_require_a_post_type() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'slug', 'home' );
+		$this->assertSame( 400, rest_get_server()->dispatch( $request )->get_status() );
+	}
+
+	public function test_post_template_choices_include_the_edited_slug_default_before_filtering() {
+		$seen_query = null;
+		$seen_ids   = array();
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) use ( &$seen_query, &$seen_ids ) {
+				if ( isset( $query['slug'] ) ) {
+					$seen_query = $query;
+					$seen_ids   = wp_list_pluck( $templates, 'id' );
+				}
+				return $templates;
+			},
+			10,
+			2
+		);
+		$response = $this->get_page_template_choices( 'home' );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'home', $seen_query['slug'] );
+		$this->assertSame( 'page', $seen_query['post_type'] );
+		$this->assertContains( 'block-theme//page-home', $seen_ids );
+	}
+
+	public function test_empty_slug_offers_the_generic_default() {
+		$response = $this->get_page_template_choices( '' );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+		$this->assertSame( 'block-theme//page', $ids[0] );
+	}
+
+	public function test_ambiguous_draft_slug_offers_the_generic_default() {
+		for ( $i = 0; $i < 2; $i++ ) {
+			self::factory()->post->create(
+				array(
+					'post_type'   => 'page',
+					'post_status' => 'draft',
+					'post_name'   => 'home',
+				)
+			);
+		}
+		$response = $this->get_page_template_choices( 'home' );
+		$ids      = wp_list_pluck( $response->get_data(), 'id' );
+		$this->assertSame( 'block-theme//page', $ids[0] );
+	}
+
+	public function test_filter_can_remove_every_choice_without_changing_saved_assignments() {
+		$post_ids = array();
+		foreach ( array( 'draft', 'publish' ) as $status ) {
+			$post_id = self::factory()->post->create(
+				array(
+					'post_type'   => 'page',
+					'post_status' => $status,
+				)
+			);
+			update_post_meta( $post_id, '_wp_page_template', 'custom-hero-template' );
+			$post_ids[] = $post_id;
+		}
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) {
+				return isset( $query['slug'] ) ? array() : $templates;
+			},
+			10,
+			2
+		);
+		foreach ( $post_ids as $post_id ) {
+			$response = $this->get_page_template_choices( get_post( $post_id )->post_name );
+			$this->assertSame( array(), $response->get_data() );
+			$this->assertSame( 'custom-hero-template', get_page_template_slug( $post_id ) );
+		}
+		$this->assertInstanceOf( WP_Block_Template::class, get_block_template( 'block-theme//custom-hero-template' ) );
+	}
+
+	public function test_filter_order_is_preserved_without_restoring_the_default() {
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) {
+				if ( isset( $query['slug'] ) ) {
+					return array(
+						get_block_template( 'block-theme//custom-hero-template' ),
+						get_block_template( 'block-theme//custom-single-post-template' ),
+					);
+				}
+				return $templates;
+			},
+			10,
+			2
+		);
+		$response = $this->get_page_template_choices( 'home' );
+		$this->assertSame(
+			array( 'block-theme//custom-hero-template', 'block-theme//custom-single-post-template' ),
+			wp_list_pluck( $response->get_data(), 'id' )
+		);
+	}
+
+	public function test_post_template_filter_does_not_change_queries_without_a_slug() {
+		$this->get_page_template_choices( 'home' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertNotContains( 'block-theme//page', wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	public function test_invalid_filtered_templates_are_ignored_and_duplicates_are_removed() {
+		add_filter(
+			'get_block_templates',
+			static function ( $templates, $query ) {
+				if ( isset( $query['slug'] ) ) {
+					$template = get_block_template( 'block-theme//page-home' );
+					return array( null, 'invalid', $template, $template );
+				}
+				return $templates;
+			},
+			10,
+			2
+		);
+		$response = $this->get_page_template_choices( 'home' );
+		$this->assertSame( array( 'block-theme//page-home' ), wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	public function test_post_template_choices_reject_an_invalid_slug_type() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$request->set_param( 'slug', array( 'home' ) );
+		$this->assertSame( 400, rest_get_server()->dispatch( $request )->get_status() );
+	}
+
+	public function test_post_template_choices_respect_the_wp_id_constraint() {
+		$this->get_page_template_choices( 'home' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates' );
+		$request->set_param( 'post_type', 'page' );
+		$request->set_param( 'slug', 'home' );
+		$request->set_param( 'wp_id', self::$template_post->ID );
+		$response = rest_get_server()->dispatch( $request );
+		foreach ( $response->get_data() as $template ) {
+			$this->assertSame( self::$template_post->ID, $template['wp_id'] );
+		}
+		$this->assertNotContains( 'block-theme//page-home', wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	/**
 	 * A file-backed template has no modification date, which should be exposed as
 	 * `null` rather than the `false` returned by `mysql_to_rfc3339()`.
 	 *

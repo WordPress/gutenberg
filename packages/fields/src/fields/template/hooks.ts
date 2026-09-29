@@ -1,7 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
-import { getItemTitle } from '../../actions/utils';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';
 
@@ -64,25 +63,23 @@ function getTemplateSlugToCheck(
 	return postType === 'page' ? 'page' : `single-${ postType }`;
 }
 
-const NAME_NOT_FOUND = '';
-
 /**
- * Hook that resolves the human-readable label for the default template
+ * Hook that resolves the default template
  * that would apply to a post, given its type, ID and slug.
  *
  * @param postType The post type.
  * @param postId   The post ID.
  * @param slug     The post slug.
  */
-export function useDefaultTemplateLabel(
+export function useDefaultTemplate(
 	postType: string | undefined,
 	postId: string | number | undefined,
 	slug: string | undefined
-): string {
+): WpTemplate | undefined {
 	return useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
-				return NAME_NOT_FOUND;
+				return undefined;
 			}
 
 			const postIdStr = String( postId );
@@ -103,7 +100,7 @@ export function useDefaultTemplateLabel(
 					( t ) => t.slug === 'front-page'
 				);
 				if ( frontPage ) {
-					return getItemTitle( frontPage );
+					return frontPage;
 				}
 
 				// If no front page template is found, fall back to the page template.
@@ -117,7 +114,7 @@ export function useDefaultTemplateLabel(
 					slug: 'home',
 				} );
 				if ( ! templateId ) {
-					return NAME_NOT_FOUND;
+					return undefined;
 				}
 
 				const template = select(
@@ -127,7 +124,7 @@ export function useDefaultTemplateLabel(
 					'wp_template',
 					templateId
 				);
-				return template ? getItemTitle( template ) : NAME_NOT_FOUND;
+				return template;
 			}
 
 			// Check any other case.
@@ -136,7 +133,7 @@ export function useDefaultTemplateLabel(
 				slug: slugToCheck,
 			} );
 			if ( ! templateId ) {
-				return NAME_NOT_FOUND;
+				return undefined;
 			}
 
 			const template = select( coreStore ).getEntityRecord< WpTemplate >(
@@ -144,8 +141,55 @@ export function useDefaultTemplateLabel(
 				'wp_template',
 				templateId
 			);
-			return template ? getItemTitle( template ) : NAME_NOT_FOUND;
+			return template;
 		},
 		[ postType, postId, slug ]
+	);
+}
+
+/**
+ * Resolves the active template independently of the filtered choices.
+ *
+ * @param postType     The post type.
+ * @param postId       The post ID.
+ * @param slug         The edited post slug.
+ * @param assignedSlug The edited template assignment.
+ */
+export function usePostTemplate(
+	postType: string,
+	postId: string | number,
+	slug: string | undefined,
+	assignedSlug: string | undefined
+) {
+	const defaultTemplate = useDefaultTemplate( postType, postId, slug );
+	return useSelect(
+		( select ) => {
+			const core = select( coreStore );
+			const { getHomePage, getPostsPageId } = unlock( core );
+			const singlePostId = String( postId );
+			const isPostsPage =
+				postType === 'page' && getPostsPageId() === singlePostId;
+			const hasFrontPageTemplate =
+				postType === 'page' &&
+				getHomePage()?.postId === singlePostId &&
+				defaultTemplate?.slug === 'front-page';
+			const canSwitchTemplate = ! isPostsPage && ! hasFrontPageTemplate;
+			let currentTemplate = defaultTemplate;
+			if ( canSwitchTemplate && assignedSlug ) {
+				const allTemplates = core.getEntityRecords< WpTemplate >(
+					'postType',
+					'wp_template',
+					{ per_page: -1 }
+				);
+				// Loading is not evidence that the assigned template is missing.
+				currentTemplate = allTemplates
+					? ( allTemplates.find(
+							( template ) => template.slug === assignedSlug
+						) ?? defaultTemplate )
+					: undefined;
+			}
+			return { currentTemplate, defaultTemplate, canSwitchTemplate };
+		},
+		[ postId, postType, assignedSlug, defaultTemplate ]
 	);
 }

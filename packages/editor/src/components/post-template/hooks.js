@@ -45,16 +45,15 @@ export function useAllowSwitchingTemplates() {
 	);
 }
 
-function useTemplates( postType ) {
+function useTemplates( postType, postSlug ) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 				post_type: postType,
-				// We look at the combined templates for now (old endpoint)
-				// because posts only accept slugs for templates, not IDs.
+				...( postSlug !== undefined && { slug: postSlug } ),
 			} ),
-		[ postType ]
+		[ postType, postSlug ]
 	);
 }
 
@@ -63,68 +62,48 @@ export function useAvailableTemplates() {
 	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates( postType );
-	// Add the default template to the available ones. We don't care about
-	// possible assignment to postspage/homepage because it's guarded by
-	// `allowSwitchingTemplate` above.
-	const defaultTemplate = useSelect(
+	const templates = useTemplates( postType, postSlug || '' );
+	// The filtered order does not define the hierarchy default.
+	const defaultTemplateId = useSelect(
 		( select ) => {
-			// Only append the default template if the experiment is enabled.
-			if ( ! window?.__experimentalDataFormInspector ) {
-				return null;
-			}
-			// If the default template is already assigned, no need
-			// to add it to the available templates.
-			if ( ! currentTemplateSlug ) {
-				return null;
-			}
-			const { getDefaultTemplateId, getEntityRecord } =
-				select( coreStore );
-			let slug;
-			if ( postSlug ) {
-				slug =
-					postType === 'page'
-						? `${ postType }-${ postSlug }`
-						: `single-${ postType }-${ postSlug }`;
-			} else {
-				slug = postType === 'page' ? 'page' : `single-${ postType }`;
-			}
-			const templateId = getDefaultTemplateId( { slug } );
-			if ( ! templateId ) {
-				return null;
-			}
-			return getEntityRecord( 'postType', 'wp_template', templateId );
+			const base = postType === 'page' ? 'page' : `single-${ postType }`;
+			return select( coreStore ).getDefaultTemplateId( {
+				slug: postSlug ? `${ base }-${ postSlug }` : base,
+			} );
 		},
-		[ currentTemplateSlug, postSlug, postType ]
+		[ postType, postSlug ]
 	);
 	return useMemo(
 		() =>
 			allowSwitchingTemplate &&
-			[
-				...( templates || [] ).filter(
+			defaultTemplateId !== undefined &&
+			( templates || [] )
+				.filter(
 					( template ) =>
-						template.is_custom &&
 						template.slug !== currentTemplateSlug &&
-						!! template.content.raw // Skip empty templates.
+						!! template.content.raw &&
+						( currentTemplateSlug ||
+							template.id !== defaultTemplateId )
+				)
+				.map( ( template ) =>
+					template.id === defaultTemplateId
+						? {
+								...template,
+								title: {
+									rendered: sprintf(
+										// translators: %s: Template name.
+										__( '%s (default)' ),
+										template.title.rendered
+									),
+								},
+								isDefault: true,
+							}
+						: { ...template, isDefault: false }
 				),
-				defaultTemplate && {
-					...defaultTemplate,
-					title: {
-						rendered: sprintf(
-							// translators: %s: Template name
-							__( '%s (default)' ),
-							defaultTemplate.title.rendered
-						),
-					},
-					// That's extra custom prop in order to update to an empty template
-					// when we select the default template.
-					isDefault: true,
-				},
-			].filter( Boolean ),
 		[
 			templates,
-			defaultTemplate,
 			currentTemplateSlug,
+			defaultTemplateId,
 			allowSwitchingTemplate,
 		]
 	);

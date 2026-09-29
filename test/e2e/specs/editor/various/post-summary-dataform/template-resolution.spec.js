@@ -3,7 +3,7 @@ const {
 	expect,
 	Editor,
 } = require( '@wordpress/e2e-test-utils-playwright' );
-const { EXPERIMENTS, openPostSummary } = require( './utils' );
+const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
 /*
  * Mirrors the '`page_for_posts` setting' tests of
@@ -174,4 +174,82 @@ test.describe( 'Template resolution (DataForm inspector)', () => {
 			).toHaveAccessibleDescription( 'Index' );
 		} );
 	} );
+} );
+
+test.describe( 'Filtered template choices (DataForm inspector)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+	} );
+
+	test.beforeEach( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [] );
+		await requestUtils.deleteAllPages();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	for ( const context of EDITOR_CONTEXTS ) {
+		test( `preserves the active template and saves an alternative in the ${ context.name }`, async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPage( {
+				title: 'Filtered page',
+				slug: 'filtered-choices',
+				status: 'publish',
+				template: 'filtered-current',
+			} );
+			await context.open(
+				{ admin },
+				{ postId: post.id, postType: 'page' }
+			);
+			const summary = await openPostSummary( { editor, page } );
+			await expect(
+				summary.getByText( 'Filtered current', { exact: true } )
+			).toBeVisible();
+			await summary
+				.getByRole( 'button', { name: 'Edit Template' } )
+				.click();
+			const select = page.getByRole( 'combobox', { name: 'Template' } );
+			await expect( select ).toHaveValue( 'filtered-current' );
+			await expect(
+				select.getByRole( 'option', { name: 'Filtered current' } )
+			).toBeDisabled();
+			await select.selectOption( { label: 'Filtered alternative' } );
+			await page.keyboard.press( 'Escape' );
+			await context.save( { page, editor } );
+			await context.open(
+				{ admin },
+				{ postId: post.id, postType: 'page' }
+			);
+			const reopened = await openPostSummary( { editor, page } );
+			await expect(
+				reopened.getByText( 'Filtered alternative', { exact: true } )
+			).toBeVisible();
+			const saved = await requestUtils.rest( {
+				path: `/wp/v2/pages/${ post.id }`,
+			} );
+			expect( saved.template ).toBe( 'filtered-alternative' );
+			await page.goto( `?page_id=${ post.id }` );
+			await expect(
+				page.getByText( 'Rendering filtered alternative', {
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+	}
 } );

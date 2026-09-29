@@ -3,7 +3,9 @@
 /**
  * Core class used to access templates via the REST API before WordPress 7.2.
  *
- * This class extension exists to prevent a fatal error when a `null` template
+ * Extends the templates collection with post-specific choices.
+ *
+ * This class extension also prevents a fatal error when a `null` template
  * reaches `prepare_item_for_response`, which reads and assigns properties on
  * it. Core's `update_item` can pass `null` there from either of its two
  * unchecked `get_block_template()` refetches: after writing an update, and on
@@ -14,6 +16,65 @@
  * @see WP_REST_Templates_Controller
  */
 class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controller {
+	/**
+	 * Adds the edited post slug to template collection queries.
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$params = parent::get_collection_params();
+		if ( 'wp_template' === $this->post_type ) {
+			$params['slug'] = array(
+				'description'       => __( 'Slug of the post to get available templates for.', 'gutenberg' ),
+				'type'              => 'string',
+				'sanitize_callback' => static function ( $value ) {
+					return is_string( $value ) ? sanitize_title( $value ) : $value;
+				},
+				'validate_callback' => static function ( $value, $request, $param ) {
+					$valid = rest_validate_request_arg( $value, $request, $param );
+					if ( is_wp_error( $valid ) ) {
+						return $valid;
+					}
+					if ( ! isset( $request['post_type'] ) ) {
+						return new WP_Error( 'rest_invalid_param', __( 'Provide post_type when requesting templates for a post slug.', 'gutenberg' ) );
+					}
+					return true;
+				},
+			);
+		}
+		return $params;
+	}
+
+	/**
+	 * Retrieves filtered choices, independently of the active template.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function get_items( $request ) {
+		if ( 'wp_template' !== $this->post_type || ! isset( $request['slug'], $request['post_type'] ) || $request->is_method( 'HEAD' ) ) {
+			return parent::get_items( $request );
+		}
+
+		$query = array(
+			'slug'      => $request['slug'],
+			'post_type' => $request['post_type'],
+		);
+		if ( isset( $request['wp_id'] ) ) {
+			$query['wp_id'] = $request['wp_id'];
+		}
+		$items     = get_block_templates( $query, $this->post_type );
+		$templates = array();
+		foreach ( is_array( $items ) ? $items : array() as $template ) {
+			if ( ! $template instanceof WP_Block_Template || ! is_string( $template->id ) || '' === $template->id || ( isset( $query['wp_id'] ) && (int) $template->wp_id !== $query['wp_id'] ) ) {
+				continue;
+			}
+			$data                       = $this->prepare_item_for_response( $template, $request );
+			$templates[ $template->id ] = $this->prepare_response_for_collection( $data );
+		}
+		return rest_ensure_response( array_values( $templates ) );
+	}
+
 	/**
 	 * Prepares a single template output for response.
 	 *

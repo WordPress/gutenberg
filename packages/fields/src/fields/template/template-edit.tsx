@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
+import { usePostTemplate, useTemplateFieldMode } from './hooks';
 import { unlock } from '../../lock-unlock';
 
 type TemplateEditComponentProps = Omit<
@@ -73,57 +73,61 @@ function BlockThemeTemplateEdit( {
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
-	const { templates, canSwitchTemplate } = useSelect(
-		( select ) => {
-			const allTemplates =
-				select( coreStore ).getEntityRecords< WpTemplate >(
-					'postType',
-					'wp_template',
-					{
-						per_page: -1,
-						post_type: postType,
-					}
-				) ?? EMPTY_ARRAY;
-
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreStore )
-			);
-			const singlePostId = String( postId );
-			const isPostsPage = getPostsPageId() === singlePostId;
-			const isFrontPage =
-				postType === 'page' && getHomePage()?.postId === singlePostId;
-
-			return {
-				templates: allTemplates,
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
-			};
-		},
-		[ postId, postType ]
+	const assignedSlug = field.getValue( { item: data } );
+	const { currentTemplate, defaultTemplate, canSwitchTemplate } =
+		usePostTemplate( postType, postId, slug, assignedSlug );
+	const templates = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords< WpTemplate >(
+				'postType',
+				'wp_template',
+				{ per_page: -1, post_type: postType, slug: slug || '' }
+			) ?? EMPTY_ARRAY,
+		[ postType, slug ]
 	);
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
-	);
-	const value = field.getValue( { item: data } );
 	const options = useMemo( () => {
 		const templateOptions = templates.map( ( template ) => ( {
 			label: getItemTitle( template ),
-			value: template.slug,
+			value: template.id === defaultTemplate?.id ? '' : template.slug,
+			disabled: false,
 		} ) );
-		return [
-			{ label: defaultTemplateLabel, value: '' },
-			...templateOptions,
-		];
-	}, [ templates, defaultTemplateLabel ] );
+		if (
+			currentTemplate &&
+			! templates.some(
+				( template ) => template.id === currentTemplate.id
+			)
+		) {
+			templateOptions.unshift( {
+				label: getItemTitle( currentTemplate ),
+				value:
+					currentTemplate.id === defaultTemplate?.id
+						? ''
+						: currentTemplate.slug,
+				disabled: true,
+			} );
+		}
+		return templateOptions;
+	}, [ templates, currentTemplate, defaultTemplate ] );
+	if ( ! currentTemplate ) {
+		return null;
+	}
+	const hasAlternative = templates.some(
+		( template ) => template.id !== currentTemplate.id
+	);
 	return (
 		<WCSelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={ value }
+			value={
+				currentTemplate.id === defaultTemplate?.id
+					? ''
+					: currentTemplate.slug
+			}
 			options={ options }
 			onChange={ onChange }
-			disabled={ ! canSwitchTemplate }
+			disabled={
+				! canSwitchTemplate || ! defaultTemplate || ! hasAlternative
+			}
 		/>
 	);
 }

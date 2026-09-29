@@ -329,3 +329,58 @@ addAction(
 	}
 );
 ```
+
+
+## Block template choices
+
+For block themes, the editor requests available template choices from `/wp/v2/templates` with the edited post's `slug` and `post_type`. These parameters are passed to the existing [`get_block_templates`](https://developer.wordpress.org/reference/hooks/get_block_templates/) PHP filter. Requests without `slug` keep their existing behavior. The post slug may be empty for a new post or a saved draft. Slugs are not unique post identifiers: an empty or ambiguous slug uses generic post-type choices, and an edited slug may not match the saved post.
+
+The hierarchy default is included before callbacks at the usual priority of 10. Plugins can remove it, reorder the choices, or return an empty list. For example, this restricts the choices for a page with the edited slug `catalog`:
+
+```php
+add_filter(
+	'get_block_templates',
+	function ( $templates, $query, $template_type ) {
+		if ( 'wp_template' !== $template_type || 'page' !== ( $query['post_type'] ?? null ) || 'catalog' !== ( $query['slug'] ?? null ) ) {
+			return $templates;
+		}
+
+		return array_values(
+			array_filter(
+				$templates,
+				function ( $template ) {
+					return 'catalog-layout' === $template->slug;
+				}
+			)
+		);
+	},
+	10,
+	3
+);
+```
+
+Filtering controls the available alternatives. It does not change the assignment, template hierarchy, or frontend rendering. The active template remains visible even when excluded. Without a custom assignment, the active template is the hierarchy default. An excluded template stops being offered after the user switches away from it. Returning one alternative still allows switching to it; returning no alternatives disables switching. The first result is never treated as a new default. Existing homepage and posts-page restrictions continue to apply.
+
+### Set an initial template for new posts
+
+A saved draft already has an established assignment, just like a published post. To initialize a template only for new posts created through the standard editor, use `wp_after_insert_post` when an `auto-draft` is first inserted. The following example uses an existing custom block template named `landing-page`, registered for pages in the active theme or by a plugin:
+
+```php
+add_action(
+	'wp_after_insert_post',
+	function ( $post_id, $post, $update ) {
+		if ( $update || 'auto-draft' !== $post->post_status || 'page' !== $post->post_type ) {
+			return;
+		}
+
+		$templates = wp_get_theme()->get_page_templates( $post );
+		if ( isset( $templates['landing-page'] ) && ! metadata_exists( 'post', $post_id, '_wp_page_template' ) ) {
+			update_post_meta( $post_id, '_wp_page_template', 'landing-page' );
+		}
+	},
+	10,
+	3
+);
+```
+
+This stores an initial assignment that survives saving and reopening. It does not redefine the hierarchy default or overwrite subsequent user choices. Code that creates drafts directly through the REST API should provide the `template` field in its creation request; it does not necessarily pass through the standard editor's auto-draft creation flow.
