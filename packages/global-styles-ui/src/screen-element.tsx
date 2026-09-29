@@ -3,6 +3,7 @@ import { useMemo, useState } from '@wordpress/element';
 import {
 	PanelBody,
 	__experimentalSpacer as Spacer,
+	useNavigator,
 } from '@wordpress/components';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -95,7 +96,11 @@ const elements = {
 type ElementName = keyof typeof elements;
 
 interface ScreenElementProps {
-	element: ElementName;
+	/**
+	 * The element to style. Read from the `:element` path parameter when not
+	 * given, which is how the elements in the block list open.
+	 */
+	element?: ElementName;
 	/**
 	 * Whether to offer the element's states, such as hover. Follows the same
 	 * editor setting that turns off state editing for blocks.
@@ -216,9 +221,11 @@ function ElementStylePanels( {
 }
 
 function ScreenElement( {
-	element,
+	element: elementProp,
 	showStateControls = true,
 }: ScreenElementProps ) {
+	const { params } = useNavigator();
+	const element = ( elementProp ?? params.element ) as ElementName;
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
 	// Only links and buttons have states, such as hover and focus.
@@ -226,6 +233,10 @@ function ScreenElement( {
 		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
 		[ element, showStateControls ]
 	);
+
+	if ( ! Object.hasOwn( elements, element ) ) {
+		return null;
+	}
 
 	return (
 		<>
