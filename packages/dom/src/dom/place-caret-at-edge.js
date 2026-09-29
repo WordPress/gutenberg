@@ -45,16 +45,7 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	// A focused ancestor (an editing host) keeps focus: the caret is placed
-	// within it. Only the body is active while nothing has focus, hence the
-	// `:focus` check.
-	const { activeElement } = container.ownerDocument;
-	if (
-		! activeElement?.matches( ':focus' ) ||
-		! activeElement.contains( container )
-	) {
-		container.focus();
-	}
+	container.focus();
 
 	if ( isInputOrTextArea( container ) ) {
 		// The element may not support selection setting.
