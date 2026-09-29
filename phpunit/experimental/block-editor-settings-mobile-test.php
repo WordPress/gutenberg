@@ -46,6 +46,41 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 			'/wp-block-editor/v1/settings',
 			$routes
 		);
+		$this->assertArrayHasKey(
+			'/wp-block-editor/v1/assets',
+			$routes
+		);
+	}
+
+	public function test_get_assets_includes_script_translations() {
+		wp_set_current_user( self::$admin_id );
+
+		$mock_translations = function( $translations, $file, $handle, $domain ) {
+			if ( 'my-plugin' === $domain ) {
+				return '{"locale_data":{"my-plugin":{"":{"domain":"my-plugin","lang":"fr"},"Hello":["Bonjour"]}}}';
+			}
+			return $translations;
+		};
+		add_filter( 'pre_load_script_translations', $mock_translations, 10, 4 );
+
+		$handle = 'test-plugin-script';
+		wp_register_script( $handle, 'https://example.com/test.js', array( 'wp-i18n' ), '1.0' );
+		wp_enqueue_script( $handle );
+		wp_set_script_translations( $handle, 'my-plugin' );
+
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/assets' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'pre_load_script_translations', $mock_translations, 10 );
+		wp_deregister_script( $handle );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'inline_scripts', $data );
+		$this->assertArrayHasKey( 'before', $data['inline_scripts'] );
+		$this->assertArrayHasKey( $handle, $data['inline_scripts']['before'] );
+		$this->assertStringContainsString( 'my-plugin', $data['inline_scripts']['before'][ $handle ] );
+		$this->assertStringContainsString( 'setLocaleData', $data['inline_scripts']['before'][ $handle ] );
 	}
 
 	public function test_get_items() {
