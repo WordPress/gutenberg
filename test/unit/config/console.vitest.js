@@ -153,6 +153,8 @@ function setConsoleMethodSpy( [ methodName ] ) {
 			resetSpy();
 		}
 	} );
+	// The deprecated rule mistakes the awaited runTest hook for a done callback.
+	// eslint-disable-next-line vitest/no-done-callback
 	aroundEach( async ( runTest ) => {
 		try {
 			await runTest();

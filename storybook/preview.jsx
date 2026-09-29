@@ -83,6 +83,7 @@ export const parameters = {
 		test: 'error',
 	},
 	controls: {
+		expanded: true,
 		sort: 'requiredFirst',
 	},
 	backgrounds: {

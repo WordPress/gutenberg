@@ -9,23 +9,13 @@ import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
 import { store as coreDataStore } from '../index';
-import { CRDT_RECORD_MAP_KEY, getSyncManager } from '../sync';
+import { registerEntitySyncManager } from '../entity-sync';
+import { CRDT_RECORD_MAP_KEY } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
 
 vi.mock( '@wordpress/api-fetch' );
-
-/**
- * Mock sync manager accessor.
- */
-vi.mock( import( '../sync' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	getSyncManager: vi.fn(),
-	LOCAL_EDITOR_ORIGIN: 'local-editor',
-} ) );
-
-const mockGetSyncManager = vi.mocked( getSyncManager );
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -34,7 +24,6 @@ const postTypeConfig = {
 	transientEdits: { blocks: true, selection: true },
 	mergedEdits: { meta: true },
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
-	syncConfig: {},
 };
 
 const postTypeEntity = {
@@ -86,6 +75,7 @@ function readFirstBlockContentFromDoc( doc ) {
 
 describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 	let crdtDoc;
+	let unregisterSyncManager;
 
 	beforeEach( () => {
 		crdtDoc = new Y.Doc();
@@ -110,14 +100,19 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 			),
 		} );
 
-		mockGetSyncManager.mockReturnValue( {
-			update: vi.fn( ( _objectType, _objectId, changes ) => {
+		// A minimal entity sync manager: every edit lands in the CRDT
+		// document the way the Yjs engine applies it.
+		unregisterSyncManager = registerEntitySyncManager( {
+			load: () => {},
+			update: ( _kind, _name, _recordId, changes ) => {
 				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
 					SYNCED_PROPERTIES
 				);
-			} ),
+			},
+			unload: () => {},
+			unloadAll: () => {},
 		} );
 	} );
 
@@ -128,7 +123,7 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 			vi.useRealTimers();
 		}
 		crdtDoc.destroy();
-		mockGetSyncManager.mockReset();
+		unregisterSyncManager();
 		if (
 			getBlockTypes().some( ( block ) => block.name === 'core/paragraph' )
 		) {

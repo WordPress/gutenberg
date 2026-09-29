@@ -41,12 +41,23 @@ on:
             - 'packages/widget-dashboard/**'
             - 'packages/widget-primitives/**'
             - 'packages/wp-build/**'
+            - '!packages/*/**/*.md'
             - 'packages/*/CHANGELOG.md'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/**/stories/**'
             - '!packages/*/**/test/**'
             - '!packages/*/**/__tests__/**'
+            - '!packages/*/**/*.stories.*'
+            - '!packages/*/**/*.mdx'
+            - '!packages/*/**/storybook.d.ts'
+            - '!packages/*/tsconfig.stories.json'
+            - '!packages/*/tsconfig.test.json'
+            - '!packages/*/tsconfig.bin.json'
+            - '!packages/*/.stylelintrc*'
+            - '!packages/*/.eslintrc*'
+            - '!packages/*/.prettierrc*'
+            - '!packages/*/.gitignore'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -127,8 +138,23 @@ jobs:
                   # The workflow's `paths:` filter triggers on the union of all
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
+                  # Files that don't warrant a CHANGELOG entry:
+                  ignored="^${PACKAGE_PATH}/("
+                  # Tests and stories.
+                  ignored+="(.+/)?(stories|test|__tests__)/"
+                  # Markdown: docs, READMEs and the CHANGELOG itself.
+                  ignored+="|.+\.(md|mdx)$"
+                  # Storybook files outside a stories directory.
+                  ignored+="|(.+/)?([^/]+\.stories\.[^/]+|storybook\.d\.ts)$"
+                  # Dev tooling configs at the package root. Configs a package
+                  # ships, such as `packages/scripts/config/`, and TypeScript
+                  # configs that can affect the build (`tsconfig.json`,
+                  # `tsconfig.build.json`, `tsconfig.plugins.json`) still count.
+                  ignored+="|(tsconfig\.(stories|test|bin)\.json|\.(stylelintrc|eslintrc|prettierrc)[^/]*|\.gitignore)$"
+                  ignored+=")"
+
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/((.+/)?(stories|test|__tests__)/|CHANGELOG\.md$)" || true)
+                      | grep -Ev "$ignored" || true)
 
                   if [ -z "$relevant_changes" ]; then
                       echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
