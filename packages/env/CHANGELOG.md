@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ## 4.1.3 (2021-11-07)
 
 ### Bug Fix
