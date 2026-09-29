@@ -1680,6 +1680,19 @@ export function generateThumbnails( id: QueueItemId ) {
 			needsClientRotation = exifOrientation !== 1;
 		}
 
+		const { bigImageSizeThreshold } = settings;
+		let needsScaling = false;
+		if ( bigImageSizeThreshold && attachment.id ) {
+			// Check if the image actually exceeds the threshold.
+			// Only create a scaled version for images larger than the threshold,
+			// matching WordPress core's wp_create_image_subsizes() behavior.
+			const bitmap = await createImageBitmap( item.sourceFile );
+			needsScaling =
+				bitmap.width > bigImageSizeThreshold ||
+				bitmap.height > bigImageSizeThreshold;
+			bitmap.close();
+		}
+
 		// Rotate the source once and reuse it for the sideloaded "original"
 		// (original_image metadata) and, for the client-rotation case, as the
 		// thumbnail/scaled source. Images that were scaled
@@ -1687,8 +1700,7 @@ export function generateThumbnails( id: QueueItemId ) {
 		// is skipped for them, matching WordPress core.
 		let rotatedSource: File | undefined;
 		{
-			const needsRotation =
-				exifOrientation !== 1 && ! item.file.name.includes( '-scaled' );
+			const needsRotation = exifOrientation !== 1 && ! needsScaling;
 
 			if ( ( needsRotation || needsClientRotation ) && attachment.id ) {
 				try {
@@ -1873,62 +1885,46 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 
 			// Create and sideload the scaled version if it exceeds the threshold.
-			{
-				const { bigImageSizeThreshold } = settings;
-				if ( bigImageSizeThreshold && attachment.id ) {
-					// Check if the image actually exceeds the threshold.
-					// Only create a scaled version for images larger than the threshold,
-					// matching WordPress core's wp_create_image_subsizes() behavior.
-					const bitmap = await createImageBitmap( thumbnailSource );
-					const needsScaling =
-						bitmap.width > bigImageSizeThreshold ||
-						bitmap.height > bigImageSizeThreshold;
-					bitmap.close();
+			if ( needsScaling && attachment.id && bigImageSizeThreshold ) {
+				// Rename sourceFile to match the server attachment filename.
+				const sourceForScaled = attachment.filename
+					? renameFile( thumbnailSource, attachment.filename )
+					: thumbnailSource;
 
-					if ( needsScaling ) {
-						// Rename sourceFile to match the server attachment filename.
-						const sourceForScaled = attachment.filename
-							? renameFile( thumbnailSource, attachment.filename )
-							: thumbnailSource;
-
-						// Add scaling to queue. The resize step is UltraHDR-aware
-						// and will preserve the gain map automatically.
-						const scaledOperations: Operation[] = [
-							[
-								OperationType.ResizeCrop,
-								{
-									resize: {
-										width: bigImageSizeThreshold,
-										height: bigImageSizeThreshold,
-									},
-									isThresholdResize: true,
-									quality: defaultQuality,
-								},
-							],
-						];
-
-						if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
-							// Add transcoding if format conversion is configured.
-							scaledOperations.push(
-								thumbnailTranscodeOperation
-							);
-						}
-
-						scaledOperations.push( OperationType.Upload );
-
-						dispatch.addSideloadItem( {
-							file: sourceForScaled,
-							batchId,
-							parentId: item.id,
-							additionalData: {
-								post: attachment.id,
-								image_size: 'scaled',
-								convert_format: false,
+				// Add scaling to queue. The resize step is UltraHDR-aware
+				// and will preserve the gain map automatically.
+				const scaledOperations: Operation[] = [
+					[
+						OperationType.ResizeCrop,
+						{
+							resize: {
+								width: bigImageSizeThreshold,
+								height: bigImageSizeThreshold,
 							},
-							operations: scaledOperations,
-						} );
-					}
+							isThresholdResize: true,
+							quality: defaultQuality,
+						},
+					],
+				];
+
+				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+					// Add transcoding if format conversion is configured.
+					scaledOperations.push( thumbnailTranscodeOperation );
 				}
+
+				scaledOperations.push( OperationType.Upload );
+
+				dispatch.addSideloadItem( {
+					file: sourceForScaled,
+					batchId,
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'scaled',
+						convert_format: false,
+					},
+					operations: scaledOperations,
+				} );
 			}
 		}
 
