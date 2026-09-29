@@ -12,21 +12,22 @@ import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 
 /**
- * Whether the element or a focused editing host containing it holds focus.
- * The body is the active element whenever nothing has focus, hence the
- * `:focus` check.
+ * Whether a selection may be set into the element: it (or an editing host
+ * around it) has focus. Otherwise the focus handler sets the selection once
+ * focus arrives.
  *
  * @param {HTMLElement} element The editable element.
  *
  * @return {boolean} Whether the element has focus.
  */
 function hasFocus( element ) {
-	const { activeElement } = element.ownerDocument;
+	const { ownerDocument } = element;
+	const { activeElement } = ownerDocument;
 	return (
 		activeElement === element ||
 		( activeElement?.contentEditable === 'true' &&
 			activeElement.contains( element ) &&
-			activeElement.matches( ':focus' ) )
+			ownerDocument.hasFocus() )
 	);
 }
 
