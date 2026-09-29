@@ -51,8 +51,7 @@
  * than run together into a phrase nobody typed.
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { __experimentalText as WCText } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -881,9 +880,9 @@ export default function SuggestionSummary( {
 			className="editor-collab-sidebar-panel__suggestion-summary"
 		>
 			{ lines.map( ( line, index ) => (
-				<WCText key={ index } size="13px">
+				<Text key={ index } variant="body-md">
 					<strong>{ line.label }</strong> <em>{ line.value }</em>
-				</WCText>
+				</Text>
 			) ) }
 		</Stack>
 	);

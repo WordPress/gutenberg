@@ -61,7 +61,10 @@ export interface WidgetChromeProps {
  * the missing and resolving states.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index, className, headerToolbar }, ref ) {
+	function UnforwardedWidgetChrome(
+		{ widget, index, className, headerToolbar },
+		ref
+	) {
 		const { widgetTypes, isResolvingWidgetTypes, editMode } =
 			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
