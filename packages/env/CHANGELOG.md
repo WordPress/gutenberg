@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the database container ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ## 1.6.0-rc.0 (2020-06-24)
 
 ### Bug Fixes
