@@ -22,11 +22,11 @@ import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
 
 /**
- * Returns the help text explaining where avatars come from. Users who can
- * manage the site's settings also get a link to the Discussion settings, where
- * the default avatar is chosen.
+ * Returns the help text explaining where avatars come from, with a link to the
+ * Discussion settings where the default avatar is chosen. Only users who can
+ * manage the site's settings get it, since nobody else can act on it.
  *
- * @return {React.ReactNode} Help text.
+ * @return {React.ReactNode|null} Help text, or `null` when the user can't manage settings.
  */
 function useAvatarHelpText() {
 	const canManageSettings = useSelect(
@@ -39,9 +39,7 @@ function useAvatarHelpText() {
 	);
 
 	if ( ! canManageSettings ) {
-		return __(
-			'Avatars use the Gravatar service. Default avatar can be changed from Discussion settings.'
-		);
+		return null;
 	}
 
 	return createInterpolateElement(
@@ -87,7 +85,11 @@ const AvatarInspectorControls = ( {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
-				<Text className="wp-block-avatar__help-text">{ helpText }</Text>
+				{ helpText && (
+					<Text className="wp-block-avatar__help-text">
+						{ helpText }
+					</Text>
+				) }
 				<ToolsPanelItem
 					label={ __( 'Image size' ) }
 					isShownByDefault
