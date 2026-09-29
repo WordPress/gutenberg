@@ -1,6 +1,4 @@
-import { useEffect } from '@wordpress/element';
 import { useStateWithHistory } from '@wordpress/compose';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
@@ -14,10 +12,6 @@ import styles from './style.module.css';
 export default function EditorWithUndoRedo() {
 	const { value, setValue, hasUndo, hasRedo, undo, redo } =
 		useStateWithHistory( { blocks: [] } );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
