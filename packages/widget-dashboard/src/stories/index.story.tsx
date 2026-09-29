@@ -485,7 +485,10 @@ const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 const DemoRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedDemoRouteLink(
+	{ path, onClick, children, ...props },
+	ref
+) {
 	return (
 		<a
 			ref={ ref }

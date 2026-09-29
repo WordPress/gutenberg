@@ -11,22 +11,21 @@ import type { RadioProps } from './types';
  *
  * Must be rendered inside a `RadioGroup`.
  */
-export const Radio = forwardRef< HTMLSpanElement, RadioProps >( function Radio(
-	{ className, ...props },
-	ref
-) {
-	return (
-		<_Radio.Root
-			ref={ ref }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				focusStyles[ 'outset-ring--focus' ],
-				styles.root,
-				className
-			) }
-			{ ...props }
-		>
-			<_Radio.Indicator className={ styles.indicator } />
-		</_Radio.Root>
-	);
-} );
+export const Radio = forwardRef< HTMLSpanElement, RadioProps >(
+	function UnforwardedRadio( { className, ...props }, ref ) {
+		return (
+			<_Radio.Root
+				ref={ ref }
+				className={ clsx(
+					resetStyles[ 'box-sizing' ],
+					focusStyles[ 'outset-ring--focus' ],
+					styles.root,
+					className
+				) }
+				{ ...props }
+			>
+				<_Radio.Indicator className={ styles.indicator } />
+			</_Radio.Root>
+		);
+	}
+);

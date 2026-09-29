@@ -9,7 +9,11 @@ import {
 	useState,
 } from '@wordpress/element';
 import { Placeholder, SandBox, Spinner } from '@wordpress/components';
-import { compose, useResizeObserver } from '@wordpress/compose';
+import {
+	compose,
+	useReducedMotion,
+	useResizeObserver,
+} from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -445,6 +449,8 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
+	const prefersReducedMotion = useReducedMotion();
+
 	// Compute embed HTML for editor display via SandBox
 	const embedHtml = useMemo( () => {
 		if (
@@ -453,8 +459,10 @@ function CoverEdit( {
 		) {
 			return null;
 		}
-		return getBackgroundEmbedHtml( embedPreview.html );
-	}, [ embedPreview, backgroundType ] );
+		return getBackgroundEmbedHtml( embedPreview.html, {
+			autoplay: ! prefersReducedMotion,
+		} );
+	}, [ embedPreview, backgroundType, prefersReducedMotion ] );
 
 	// Set while the media editor has pointed the cover at a freshly
 	// generated file the browser hasn't finished loading; cleared by the
@@ -528,6 +536,14 @@ function CoverEdit( {
 
 	const mediaElement = useRef();
 	const editMediaButtonRef = useRef();
+
+	// `autoPlay` only applies when the video loads, so pause a video that is
+	// already playing when the user turns on reduced motion.
+	useEffect( () => {
+		if ( prefersReducedMotion && isVideoBackground ) {
+			mediaElement.current?.pause();
+		}
+	}, [ prefersReducedMotion, isVideoBackground ] );
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
@@ -836,7 +852,7 @@ function CoverEdit( {
 					<video
 						ref={ mediaElement }
 						className="wp-block-cover__video-background"
-						autoPlay
+						autoPlay={ ! prefersReducedMotion }
 						muted
 						loop
 						src={ url }

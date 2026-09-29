@@ -3,7 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { FieldControlProps } from './types';
 
 export const Control = forwardRef< HTMLInputElement, FieldControlProps >(
-	function Control( props, ref ) {
+	function UnforwardedControl( props, ref ) {
 		return <_Field.Control ref={ ref } { ...props } />;
 	}
 );
