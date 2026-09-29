@@ -22,7 +22,7 @@ import { type IconButtonProps } from './types';
  * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
-	function IconButton(
+	function UnforwardedIconButton(
 		{
 			label,
 			className,

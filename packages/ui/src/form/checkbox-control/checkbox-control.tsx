@@ -28,7 +28,7 @@ const TextContainer = ( {
 export const CheckboxControl = forwardRef<
 	HTMLSpanElement,
 	CheckboxControlProps
->( function CheckboxControl(
+>( function UnforwardedCheckboxControl(
 	{
 		label,
 		description,

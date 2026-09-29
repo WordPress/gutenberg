@@ -144,7 +144,7 @@ export function usePreviewRange( {
  * support, and customizable labels for internationalization.
  */
 export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
-	function RangeCalendar(
+	function UnforwardedRangeCalendar(
 		{
 			defaultValue,
 			value: valueProp,
