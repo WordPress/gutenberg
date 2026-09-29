@@ -17,6 +17,7 @@ export * from './link';
 export * as Menu from './menu';
 export * as Notice from './notice';
 export * as Popover from './popover';
+export * from './progress-bar';
 export * from './skeleton';
 export * from './spinner';
 export * from './stack';
