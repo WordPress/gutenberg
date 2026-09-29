@@ -63,6 +63,43 @@ describe( 'Autocomplete', () => {
 		expect( console ).toHaveErrored();
 	} );
 
+	it( 'rejects a description nested in the item label', () => {
+		const item = { value: 'apple', label: 'Apple' };
+
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ [ item ] } inline open>
+					<Autocomplete.List>
+						<Autocomplete.Item value={ item }>
+							<Autocomplete.ItemLabel>
+								Apple
+								<Autocomplete.ItemDescription>
+									Fresh fruit.
+								</Autocomplete.ItemDescription>
+							</Autocomplete.ItemLabel>
+						</Autocomplete.Item>
+					</Autocomplete.List>
+				</Autocomplete.Root>
+			)
+		).toThrow(
+			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'rejects a description outside an item', () => {
+		expect( () =>
+			render(
+				<Autocomplete.ItemDescription>
+					Fresh fruit.
+				</Autocomplete.ItemDescription>
+			)
+		).toThrow(
+			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	describe( 'when disabled', () => {
 		it( 'hides the clear button from screen readers', () => {
 			renderDisabledAutocompleteWithClear();

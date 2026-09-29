@@ -4,14 +4,31 @@ import { Text } from '../../../text';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { AutocompleteItemDescriptionProps } from './types';
 
+const ITEM_DESCRIPTION_DIRECT_CHILD = Symbol();
+
+type InternalItemDescriptionProps = AutocompleteItemDescriptionProps & {
+	validationToken?: typeof ITEM_DESCRIPTION_DIRECT_CHILD;
+};
+
 /**
  * Supplementary content for an autocomplete item. Its text contributes to the
  * item's accessible description.
  */
-export const ItemDescription = forwardRef<
+const ItemDescription = forwardRef<
 	HTMLSpanElement,
 	AutocompleteItemDescriptionProps
->( function ItemDescription( { className, ...restProps }, ref ) {
+>( function ItemDescription( props, ref ) {
+	const { className, validationToken, ...restProps } =
+		props as InternalItemDescriptionProps;
+	if (
+		process.env.NODE_ENV !== 'production' &&
+		validationToken !== ITEM_DESCRIPTION_DIRECT_CHILD
+	) {
+		throw new Error(
+			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
+		);
+	}
+
 	return (
 		<Text
 			ref={ ref }
@@ -24,3 +41,5 @@ export const ItemDescription = forwardRef<
 		/>
 	);
 } );
+
+export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };

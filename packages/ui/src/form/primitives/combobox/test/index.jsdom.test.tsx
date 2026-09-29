@@ -96,6 +96,43 @@ describe( 'Combobox', () => {
 		expect( console ).toHaveErrored();
 	} );
 
+	it( 'rejects a description nested in the item label', () => {
+		const item = { value: 'apple', label: 'Apple' };
+
+		expect( () =>
+			render(
+				<Combobox.Root items={ [ item ] } inline open>
+					<Combobox.List>
+						<Combobox.Item value={ item }>
+							<Combobox.ItemLabel>
+								Apple
+								<Combobox.ItemDescription>
+									Fresh fruit.
+								</Combobox.ItemDescription>
+							</Combobox.ItemLabel>
+						</Combobox.Item>
+					</Combobox.List>
+				</Combobox.Root>
+			)
+		).toThrow(
+			'ItemDescription: Missing direct item parent. Render ItemDescription as a direct child of Item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'rejects a description outside an item', () => {
+		expect( () =>
+			render(
+				<Combobox.ItemDescription>
+					Fresh fruit.
+				</Combobox.ItemDescription>
+			)
+		).toThrow(
+			'ItemDescription: Missing direct item parent. Render ItemDescription as a direct child of Item.'
+		);
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'renders a default trigger placeholder when no value is selected', () => {
 		render(
 			<Combobox.Root items={ ITEMS }>
