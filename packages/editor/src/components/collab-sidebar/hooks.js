@@ -228,6 +228,14 @@ function applyReactionDelta( note, emoji, addedReactionId ) {
 	return { ...note, reaction_summary: summary };
 }
 
+/*
+ * Per-note count of landed reaction mutations. Each toggle refetches the
+ * whole `reaction_summary`, so a refresh issued before a later mutation
+ * landed would overwrite that mutation's result; the counter lets it tell.
+ * Module-level so every `useNoteActions` instance shares it.
+ */
+const reactionMutationCounts = new Map();
+
 export function useNoteActions( reactionsMap = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
@@ -520,6 +528,10 @@ export function useNoteActions( reactionsMap = {} ) {
 			// The mutation has landed, so fold its known effect into the
 			// cached record first. That keeps the next toggle correct even
 			// if the refetch below never succeeds.
+			const mutationCount =
+				( reactionMutationCounts.get( commentId ) ?? 0 ) + 1;
+			reactionMutationCounts.set( commentId, mutationCount );
+
 			const cached = getEntityRecord( 'root', 'comment', commentId );
 			if ( cached ) {
 				receiveEntityRecords( 'root', 'comment', [
@@ -546,6 +558,13 @@ export function useNoteActions( reactionsMap = {} ) {
 						_fields: 'id,reaction_summary',
 					} ),
 				} );
+				// A newer mutation landed after this snapshot was requested;
+				// its own refresh will carry the authoritative summary.
+				if (
+					reactionMutationCounts.get( commentId ) !== mutationCount
+				) {
+					return;
+				}
 				const latest = getEntityRecord( 'root', 'comment', commentId );
 				if ( latest ) {
 					receiveEntityRecords( 'root', 'comment', [
