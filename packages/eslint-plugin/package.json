@@ -58,12 +58,12 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^16.0.0",
 		"requireindex": "^1.2.0",
-		"typescript-eslint": "^8.70.0"
+		"typescript-eslint": "8.60.0"
 	},
 	"devDependencies": {
 		"@types/eslint": "^9",
 		"@types/estree": "^1.0.8",
-		"@typescript-eslint/parser": "^8.70.0",
+		"@typescript-eslint/parser": "8.60.0",
 		"eslint": "^10.0.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vitest": "^5.0.0"

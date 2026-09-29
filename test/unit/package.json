@@ -27,7 +27,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^24.13.3",
-		"@typescript-eslint/parser": "^8.70.0",
+		"@typescript-eslint/parser": "8.60.0",
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^5.0.0",
 		"@wordpress/html-entities": "file:../../packages/html-entities",
