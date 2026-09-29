@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Mark the `@types/node` peer dependency as optional, since it is only needed for type checking.
+-   Mark the `@types/node` peer dependency as optional, since it is only needed for type checking ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
 ## 2.1.0 (2026-09-23)
 
