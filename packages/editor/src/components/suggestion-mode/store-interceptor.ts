@@ -363,6 +363,38 @@ function isAcceptedSuggestionChange(
 }
 
 /**
+ * Whether a block that left the live tree was removed by an applied
+ * `block-remove` suggestion rather than by the user. A pending-remove marker
+ * alone cannot tell the two apart: deleting the struck-through block again
+ * produces exactly the state an accepted removal does. The linked note is the
+ * confirmation — the provider records the decision on it before it removes
+ * the block, and the note reaches collaborators through sync.
+ *
+ * @param coreSelect Selectors for the core-data store, or `null` when the
+ *                   store isn't registered (e.g. unit tests).
+ * @param attributes The removed block's last known attributes.
+ * @return True when a linked note records its removal as applied.
+ */
+export function isAppliedRemoval(
+	coreSelect: any,
+	attributes: Record< string, any > | null | undefined
+): boolean {
+	if ( ! coreSelect?.getEntityRecord ) {
+		return false;
+	}
+	return readNoteIds( attributes?.metadata ).some( ( noteId ) => {
+		const comment = coreSelect.getEntityRecord( 'root', 'comment', noteId );
+		if ( comment?.meta?._wp_suggestion_status !== 'applied' ) {
+			return false;
+		}
+		const payload = parseSuggestionPayload( comment?.meta?._wp_suggestion );
+		return !! payload?.operations.some(
+			( op ) => op.type === 'block-remove'
+		);
+	} );
+}
+
+/**
  * Marker shape stored at `metadata.suggestion` on a block to indicate a
  * pending structural suggestion. The block stays in the live tree; the
  * marker drives the visual treatment and tells the auto-save loop to
@@ -1215,6 +1247,60 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 				/*
+				 * Rearranging a pending insertion is not a move of baseline
+				 * content: it has no published position to go back to, and
+				 * the server leaves it out of the published render only
+				 * while it stays `pending-insert`. Keep the insertion and
+				 * record where it now sits. A child carried out of a pending
+				 * insertion was never published either, so it becomes an
+				 * insertion of its own; while it stays inside one, it is
+				 * still part of that insertion and needs nothing.
+				 */
+				const ownMarker = currentAttrs.metadata?.suggestion?.type;
+				const leftInsertion =
+					move.fromParentClientId !== null &&
+					isPartOfPendingInsertion(
+						blockEditor,
+						move.fromParentClientId
+					);
+				if ( ownMarker === 'pending-insert' || leftInsertion ) {
+					if (
+						ownMarker !== 'pending-insert' &&
+						isPartOfPendingInsertion( blockEditor, move.clientId )
+					) {
+						continue;
+					}
+					if ( ownMarker !== 'pending-insert' ) {
+						isDispatchingOwnWrite = true;
+						try {
+							blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+							blockEditorDispatch.updateBlockAttributes(
+								move.clientId,
+								{
+									metadata: withSuggestionMarker(
+										currentAttrs.metadata,
+										{
+											type: 'pending-insert',
+											authorId: currentUserId,
+										}
+									),
+								}
+							);
+						} finally {
+							isDispatchingOwnWrite = false;
+						}
+					}
+					setStructuralOpRef.current?.( move.clientId, block.name, {
+						type: 'block-insert-after',
+						clientId: move.clientId,
+						blockName: block.name,
+						anchorClientId: move.toAnchorClientId,
+						parentClientId: move.toParentClientId,
+						block,
+					} );
+					continue;
+				}
+				/*
 				 * A block that is moved AGAIN while already carrying a
 				 * pending-move marker must keep its ORIGINAL from* fields.
 				 * `detectMovedBlocks` diffs against the previous tick, so its
@@ -1298,12 +1384,19 @@ export default function SuggestionStoreInterceptor() {
 					// the apply / reject bounces back through
 					// sync and undoes the change on the accepting
 					// client a moment after they clicked.
+					//
+					// A pending-remove marker is not proof on its own: a
+					// user deleting the struck-through block again leaves
+					// the same trace. Only a linked note that records the
+					// removal as applied confirms the decision; anything
+					// else is re-inserted and stays pending.
+					const trackedAttributes =
+						tree.blocksByClientId.get( clientId )?.attributes;
 					const trackedMarker =
-						tree.blocksByClientId.get( clientId )?.attributes
-							?.metadata?.suggestion?.type;
+						trackedAttributes?.metadata?.suggestion?.type;
 					if (
-						trackedMarker === 'pending-remove' ||
-						trackedMarker === 'pending-insert'
+						trackedMarker === 'pending-insert' ||
+						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );
 						continue;

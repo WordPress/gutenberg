@@ -4,7 +4,8 @@ import { View } from '../../view';
 
 const meta: Meta< typeof Flex > = {
 	component: Flex,
-	title: 'Components/Flex',
+	id: 'components-flex',
+	title: 'Components/@wordpress-components/Flex',
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },

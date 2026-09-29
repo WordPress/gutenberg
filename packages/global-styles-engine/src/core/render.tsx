@@ -702,7 +702,7 @@ export function getStylesDeclarations(
 		) {
 			return;
 		}
-		const cssProperty = rule.key.startsWith( '--' )
+		const cssProperty = rule.key.startsWith( '-' )
 			? rule.key
 			: kebabCase( rule.key );
 

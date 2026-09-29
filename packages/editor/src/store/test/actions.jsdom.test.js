@@ -10,7 +10,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import warning from '@wordpress/warning';
 import { store as editorStore } from '..';
 import * as actions from '../actions';
-import { EDITOR_INTENT_SUGGEST } from '../constants';
+import { EDITOR_INTENT_SUGGEST, EDITOR_INTENT_VIEW } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -365,6 +365,52 @@ describe( 'Post actions', () => {
 					.select( coreStore )
 					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
 			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'refuses a post settings edit while viewing', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_VIEW
+			);
+
+			registry
+				.dispatch( editorStore )
+				.editPost( { excerpt: 'new crackers' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'excerpt' )
+			).toBe( draftPost.excerpt );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.filter( ( { id } ) => id === 'editor-view-read-only' )
+			).toHaveLength( 1 );
+		} );
+
+		it( 'lets block content edits through while viewing', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_VIEW
+			);
+
+			/*
+			 * `savePost` and block sync write `content`/`blocks`; the canvas
+			 * owns their read-only handling, so the post-level guard must not
+			 * block them.
+			 */
+			registry.dispatch( editorStore ).editPost( { content: 'baz' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'content' )
+			).toBe( 'baz' );
 		} );
 
 		it( 'applies a post status edit while editing', () => {

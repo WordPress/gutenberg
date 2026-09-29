@@ -3,7 +3,8 @@ import { Button } from '@wordpress/components';
 import Warning from '../';
 
 const meta = {
-	title: 'BlockEditor/Warning',
+	id: 'blockeditor-warning',
+	title: 'Editor/Block Editor/Warning',
 	component: Warning,
 	parameters: {
 		docs: {

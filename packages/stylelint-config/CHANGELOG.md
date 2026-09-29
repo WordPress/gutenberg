@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
