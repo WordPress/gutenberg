@@ -5,6 +5,8 @@ import blockEditorContentStyles from '@wordpress/block-editor/build-style/conten
 import blockEditorContentStylesRtl from '@wordpress/block-editor/build-style/content-rtl.css?raw';
 import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
 import blockLibraryStylesRtl from '@wordpress/block-library/build-style/style-rtl.css?raw';
+import blockLibraryThemeStyles from '@wordpress/block-library/build-style/theme.css?raw';
+import blockLibraryThemeStylesRtl from '@wordpress/block-library/build-style/theme-rtl.css?raw';
 import blockLibraryEditorStyles from '@wordpress/block-library/build-style/editor.css?raw';
 import blockLibraryEditorStylesRtl from '@wordpress/block-library/build-style/editor-rtl.css?raw';
 
@@ -68,6 +70,7 @@ export const contentStyles = {
 		{ css: componentsStyles },
 		{ css: blockLibraryStyles },
 		{ css: blockEditorContentStyles },
+		{ css: blockLibraryThemeStyles },
 		{ css: blockLibraryEditorStyles },
 		...editorStyles,
 	],
@@ -75,6 +78,7 @@ export const contentStyles = {
 		{ css: componentsStylesRtl },
 		{ css: blockLibraryStylesRtl },
 		{ css: blockEditorContentStylesRtl },
+		{ css: blockLibraryThemeStylesRtl },
 		{ css: blockLibraryEditorStylesRtl },
 		...editorStyles,
 	],
