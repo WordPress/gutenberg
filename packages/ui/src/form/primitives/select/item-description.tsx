@@ -12,7 +12,7 @@ import type { SelectItemDescriptionProps } from './types';
 export const ItemDescription = forwardRef<
 	HTMLSpanElement,
 	SelectItemDescriptionProps
->( function ItemDescription( { className, ...restProps }, ref ) {
+>( function UnforwardedItemDescription( { className, ...restProps }, ref ) {
 	return (
 		<Text
 			ref={ ref }
