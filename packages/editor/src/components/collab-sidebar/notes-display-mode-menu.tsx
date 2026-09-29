@@ -67,7 +67,7 @@ export function NotesDisplayModeMenu( {
 			disableComplementaryArea( 'core' );
 		}
 		const messages = {
-			full: __( 'Notes shown.' ),
+			full: __( 'Notes expanded.' ),
 			minimized: __( 'Notes minimized.' ),
 			hidden: __( 'Notes hidden.' ),
 		};
@@ -92,7 +92,7 @@ export function NotesDisplayModeMenu( {
 					>
 						<Menu.RadioItem value="full" closeOnClick>
 							<Menu.ItemLabel>
-								{ __( 'Show notes' ) }
+								{ __( 'Expand notes' ) }
 							</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem value="minimized" closeOnClick>
