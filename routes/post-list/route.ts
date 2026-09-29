@@ -1,6 +1,7 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { notFound } from '@wordpress/route';
+import { loadEntityFields } from '@wordpress/entity-fields';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
@@ -19,6 +20,13 @@ export const route = {
 		} catch {
 			throw notFound();
 		}
+	},
+	loader: async ( { params }: { params: { type: string } } ) => {
+		// Warm up the fields the stage renders. A failure is reported by the stage.
+		await loadEntityFields( {
+			kind: 'postType',
+			name: params.type,
+		} ).catch( () => {} );
 	},
 	title: async ( { params }: { params: { type: string } } ) => {
 		const postType = await resolveSelect( coreStore ).getPostType(

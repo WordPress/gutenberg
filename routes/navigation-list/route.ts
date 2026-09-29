@@ -2,6 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
+import { loadEntityFields } from '@wordpress/entity-fields';
 import { loadNavigationViewConfig } from './view-utils';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -69,6 +70,12 @@ export const route = {
 			} ),
 			// Preload post type object (what usePostFields needs)
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
+			// Warm up the fields the stage renders. A failure is reported by
+			// the stage.
+			loadEntityFields( {
+				kind: 'postType',
+				name: NAVIGATION_POST_TYPE,
+			} ).catch( () => {} ),
 			// Preload users data (what usePostFields needs for author field)
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,

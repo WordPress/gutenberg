@@ -15,6 +15,7 @@
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/editor": "file:../../packages/editor",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/entity-fields": "file:../../packages/entity-fields",
 		"@wordpress/fields": "file:../../packages/fields",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
