@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Declare `react-dom` and the React types as peer dependencies, forwarding the peers of `@tanstack/react-router`, so strict package managers such as Yarn PnP can resolve them.
+
 ## 0.22.0 (2026-09-23)
 
 ## 0.21.0 (2026-09-10)

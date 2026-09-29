@@ -12,6 +12,10 @@
 -   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 -   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).
 
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them.
+
 ## 17.0.0 (2026-09-23)
 
 ### Breaking Changes

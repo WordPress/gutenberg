@@ -49,6 +49,20 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/url": "file:../url"
 	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
+	},
 	"publishConfig": {
 		"access": "public"
 	}

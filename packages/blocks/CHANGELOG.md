@@ -6,6 +6,7 @@
 
 -   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).
 -   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them.
 
 ## 16.1.0 (2026-09-23)
 
