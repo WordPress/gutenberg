@@ -9,6 +9,8 @@ const JUSTIFICATION_VALUES = {
 	center: 'center',
 	right: 'flex-end',
 	'space-between': 'space-between',
+	'space-around': 'space-around',
+	'space-evenly': 'space-evenly',
 };
 
 /**

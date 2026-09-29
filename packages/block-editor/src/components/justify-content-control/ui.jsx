@@ -4,20 +4,31 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifySpaceAround,
+	justifySpaceEvenly,
 	justifyStretch,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 const icons = {
 	left: justifyLeft,
 	center: justifyCenter,
 	right: justifyRight,
 	'space-between': justifySpaceBetween,
+	'space-around': justifySpaceAround,
+	'space-evenly': justifySpaceEvenly,
 	stretch: justifyStretch,
 };
 
 function JustifyContentUI( {
-	allowedControls = [ 'left', 'center', 'right', 'space-between' ],
+	allowedControls = [
+		'left',
+		'center',
+		'right',
+		'space-between',
+		'space-around',
+		'space-evenly',
+	],
 	isCollapsed = true,
 	onChange,
 	value,
@@ -40,30 +51,44 @@ function JustifyContentUI( {
 		{
 			name: 'left',
 			icon: justifyLeft,
-			title: __( 'Justify items left' ),
+			title: _x( 'Left', 'Flex layout justification option' ),
 			isActive: 'left' === value,
 			onClick: () => handleClick( 'left' ),
 		},
 		{
 			name: 'center',
 			icon: justifyCenter,
-			title: __( 'Justify items center' ),
+			title: _x( 'Center', 'Flex layout justification option' ),
 			isActive: 'center' === value,
 			onClick: () => handleClick( 'center' ),
 		},
 		{
 			name: 'right',
 			icon: justifyRight,
-			title: __( 'Justify items right' ),
+			title: _x( 'Right', 'Flex layout justification option' ),
 			isActive: 'right' === value,
 			onClick: () => handleClick( 'right' ),
 		},
 		{
 			name: 'space-between',
 			icon: justifySpaceBetween,
-			title: __( 'Space between items' ),
+			title: __( 'Space between' ),
 			isActive: 'space-between' === value,
 			onClick: () => handleClick( 'space-between' ),
+		},
+		{
+			name: 'space-around',
+			icon: justifySpaceAround,
+			title: __( 'Space around' ),
+			isActive: 'space-around' === value,
+			onClick: () => handleClick( 'space-around' ),
+		},
+		{
+			name: 'space-evenly',
+			icon: justifySpaceEvenly,
+			title: __( 'Space evenly' ),
+			isActive: 'space-evenly' === value,
+			onClick: () => handleClick( 'space-evenly' ),
 		},
 		{
 			name: 'stretch',

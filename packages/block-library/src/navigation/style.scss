@@ -171,6 +171,16 @@ $navigation-icon-size: 24px;
 		--navigation-layout-justification-setting: space-between;
 		--navigation-layout-justify: space-between;
 	}
+
+	&.items-justified-space-around {
+		--navigation-layout-justification-setting: space-around;
+		--navigation-layout-justify: space-around;
+	}
+
+	&.items-justified-space-evenly {
+		--navigation-layout-justification-setting: space-evenly;
+		--navigation-layout-justify: space-evenly;
+	}
 }
 
 // Low specificity padding to not override global styles.
@@ -458,11 +468,15 @@ button.wp-block-navigation-item__content {
  * Justifications.
  */
 
-// When justified space-between, open submenus leftward for last menu item.
+// When using distributed justification, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
 .wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-space-around .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-around > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-space-evenly .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-evenly > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
 .wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
 	// First submenu.

@@ -2,7 +2,7 @@
 
 The `JustifyContentControl` component renders a toolbar that displays justify options for the selected block.
 
-This component is used to set the flex justification for the elements in the block, allowing to justify `left`, `center`, `right`, and `space-between`. In comparison, the alignment options are for the block itself.
+This component is used to set the flex justification for the elements in the block, allowing to justify `left`, `center`, `right`, `space-between`, `space-around`, and `space-evenly`. In comparison, the alignment options are for the block itself.
 
 See the Navigation block for an example usage.
 
@@ -33,6 +33,8 @@ const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
     items-justified-center
     items-justified-right
     items-justified-space-between
+    items-justified-space-around
+    items-justified-space-evenly
 
 _Note:_ In this example that we render `JustifyContentControl` as a child of the `BlockControls` component.
 
@@ -41,7 +43,7 @@ _Note:_ In this example that we render `JustifyContentControl` as a child of the
 #### `allowedControls`
 
 -   **Type:** `string[]`
--   **Default:** `[ 'left', 'center', 'right', 'space-between' ]`
+-   **Default:** `[ 'left', 'center', 'right', 'space-between', 'space-around', 'space-evenly' ]`
 
 An array of strings for what controls to show, by default it shows all.
 
@@ -50,7 +52,7 @@ An array of strings for what controls to show, by default it shows all.
 -   **Type:** `Function`
 -   **Required:** Yes
 
-A callback function invoked when the toolbar's justification value is changed via an interaction with any of the toolbar's buttons. Called with the new alignment value (ie: `left`, `center`, `right`, `space-between`, `undefined`) as the only argument.
+A callback function invoked when the toolbar's justification value is changed via an interaction with any of the toolbar's buttons. Called with the new alignment value (ie: `left`, `center`, `right`, `space-between`, `space-around`, `space-evenly`, `undefined`) as the only argument.
 
 #### `popoverProps`
 
@@ -65,7 +67,7 @@ Use this object to modify props available for the `Popover` component that are n
 
 -   **Type:** `String`
 -   **Default:** `undefined`
--   **Options:**: `left`, `center`, `right`, `space-between`
+-   **Options:**: `left`, `center`, `right`, `space-between`, `space-around`, `space-evenly`
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 

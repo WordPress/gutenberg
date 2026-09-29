@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Buttons and Navigation: Add Space around and Space evenly justification options ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).

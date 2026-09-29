@@ -1,10 +1,5 @@
 import { __, _x } from '@wordpress/i18n';
 import {
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-	justifySpaceBetween,
-	justifyStretch,
 	justifyTop,
 	justifyCenterVertical,
 	justifyBottom,
@@ -20,6 +15,7 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -37,6 +33,8 @@ const justifyContentMap = {
 	right: 'flex-end',
 	center: 'center',
 	'space-between': 'space-between',
+	'space-around': 'space-around',
+	'space-evenly': 'space-evenly',
 };
 
 // Used with the vertical (column) flex orientation.
@@ -187,6 +185,7 @@ export default {
 					>
 						{ allowJustification && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-justification-item"
 								label={ __( 'Justification' ) }
 								hasValue={ hasJustificationValue }
 								onDeselect={ resetJustification }
@@ -201,6 +200,7 @@ export default {
 						) }
 						{ allowOrientation && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-orientation-item"
 								label={ __( 'Orientation' ) }
 								hasValue={ hasOrientationValue }
 								onDeselect={ resetOrientation }
@@ -494,7 +494,7 @@ function FlexLayoutJustifyContentControl( {
 	};
 	const allowedControls = [ 'left', 'center', 'right' ];
 	if ( orientation === 'horizontal' ) {
-		allowedControls.push( 'space-between' );
+		allowedControls.push( 'space-between', 'space-around', 'space-evenly' );
 	} else {
 		allowedControls.push( 'stretch' );
 	}
@@ -512,52 +512,61 @@ function FlexLayoutJustifyContentControl( {
 	const justificationOptions = [
 		{
 			value: 'left',
-			icon: justifyLeft,
-			label: __( 'Justify items left' ),
+			label: _x( 'Left', 'Flex layout justification option' ),
+			description: __( 'Space after the items.' ),
 		},
 		{
 			value: 'center',
-			icon: justifyCenter,
-			label: __( 'Justify items center' ),
+			label: _x( 'Center', 'Flex layout justification option' ),
+			description: __( 'Space on both sides.' ),
 		},
 		{
 			value: 'right',
-			icon: justifyRight,
-			label: __( 'Justify items right' ),
+			label: _x( 'Right', 'Flex layout justification option' ),
+			description: __( 'Space before the items.' ),
 		},
 	];
 	if ( orientation === 'horizontal' ) {
-		justificationOptions.push( {
-			value: 'space-between',
-			icon: justifySpaceBetween,
-			label: __( 'Space between items' ),
-		} );
+		justificationOptions.push(
+			{
+				value: 'space-between',
+				label: __( 'Space between' ),
+				description: __( 'No space at the edges.' ),
+			},
+			{
+				value: 'space-around',
+				label: __( 'Space around' ),
+				description: __( 'Half space at the edges.' ),
+			},
+			{
+				value: 'space-evenly',
+				label: __( 'Space evenly' ),
+				description: __( 'Equal space at the edges.' ),
+			}
+		);
 	} else {
 		justificationOptions.push( {
 			value: 'stretch',
-			icon: justifyStretch,
 			label: __( 'Stretch items' ),
+			description: __( 'Fill the available space.' ),
 		} );
 	}
 
+	const selectedOption =
+		justificationOptions.find(
+			( option ) => option.value === justifyContent
+		) ?? justificationOptions[ 0 ];
+
 	return (
-		<ToggleGroupControl
-			label={ __( 'Justification' ) }
-			value={ justifyContent }
-			onChange={ onJustificationChange }
+		<SelectControl
 			className="block-editor-hooks__flex-layout-justification-controls"
-		>
-			{ justificationOptions.map( ( { value, icon, label } ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ value }
-						value={ value }
-						icon={ icon }
-						label={ label }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+			label={ __( 'Justification' ) }
+			items={ justificationOptions }
+			value={ selectedOption }
+			onValueChange={ ( selectedItem ) =>
+				onJustificationChange( selectedItem.value )
+			}
+		/>
 	);
 }
 
@@ -603,7 +612,11 @@ function OrientationControl( { layout, onChange } ) {
 					if ( verticalAlignment === 'stretch' ) {
 						newVerticalAlignment = 'top';
 					}
-					if ( justifyContent === 'space-between' ) {
+					if (
+						justifyContent === 'space-between' ||
+						justifyContent === 'space-around' ||
+						justifyContent === 'space-evenly'
+					) {
 						newJustification = 'left';
 					}
 				}
