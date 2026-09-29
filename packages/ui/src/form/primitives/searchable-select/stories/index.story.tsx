@@ -137,6 +137,34 @@ export const Grouped: Story = {
 	args: {
 		...Default.args,
 		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableSelect.Group key={ group.label } items={ group.items }>
+				<SearchableSelect.GroupLabel>
+					{ group.label }
+				</SearchableSelect.GroupLabel>
+				<SearchableSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							<SearchableSelect.ItemLabel>
+								{ item.label }
+							</SearchableSelect.ItemLabel>
+						</SearchableSelect.Item>
+					) }
+				</SearchableSelect.Collection>
+			</SearchableSelect.Group>
+		),
+	},
+};
+
+/**
+ * Use `SearchableSelect.Separator` to divide visible groups of items.
+ */
+export const WithSeparator: Story = {
+	args: {
+		...Grouped.args,
 		children: ( group: FixtureGroup, index: number ) => (
 			<Fragment key={ group.label }>
 				{ index > 0 && <SearchableSelect.Separator /> }

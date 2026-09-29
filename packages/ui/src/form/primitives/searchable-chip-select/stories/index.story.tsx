@@ -121,6 +121,37 @@ export const Grouped: Story = {
 	args: {
 		'aria-label': 'Fruit',
 		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableChipSelect.Group
+				key={ group.label }
+				items={ group.items }
+			>
+				<SearchableChipSelect.GroupLabel>
+					{ group.label }
+				</SearchableChipSelect.GroupLabel>
+				<SearchableChipSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableChipSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
+						</SearchableChipSelect.Item>
+					) }
+				</SearchableChipSelect.Collection>
+			</SearchableChipSelect.Group>
+		),
+	},
+};
+
+/**
+ * Use `SearchableChipSelect.Separator` to divide visible groups of items.
+ */
+export const WithSeparator: Story = {
+	args: {
+		...Grouped.args,
 		children: ( group: FixtureGroup, index: number ) => (
 			<Fragment key={ group.label }>
 				{ index > 0 && <SearchableChipSelect.Separator /> }

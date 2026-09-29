@@ -285,6 +285,17 @@ export const Grouped: Story = {
 };
 
 /**
+ * Use `SearchableSelectControl.Separator` to divide visible groups of items.
+ */
+export const WithSeparator: Story = {
+	...Grouped,
+	args: {
+		...Grouped.args,
+		children: SearchableSelectStories.WithSeparator.args?.children,
+	},
+};
+
+/**
  * Grouped items with a creatable footer item. Include the creatable item in
  * `items` as a creatable-only group. Handle the creation of the item in
  * `onValueChange`.
