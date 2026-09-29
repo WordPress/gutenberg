@@ -11,7 +11,7 @@ import { formDecorator } from '../../stories/shared';
 import { ValidatedInputControl } from '../validated-input-control';
 
 const meta: Meta< typeof ControlWithError > = {
-	title: 'Design System/Components/Form/With Validation/Overview',
+	title: 'Components/@wordpress-ui/Form/With Validation/Overview',
 	id: 'design-system-form-with-validation-overview',
 	parameters: {
 		controls: { disable: true },

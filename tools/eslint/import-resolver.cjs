@@ -74,6 +74,8 @@ exports.resolve = function ( source, file, config ) {
 			extensions: [
 				'.tsx',
 				'.ts',
+				'.mts',
+				'.cts',
 				'.mjs',
 				'.js',
 				'.jsx',

@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 
 const noop = () => {};
@@ -42,7 +42,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 
 			// If render property is not provided, use CheckboxControl
 			return (
-				<CheckboxControl
+				<WCCheckboxControl
 					className="block-editor-link-control__setting"
 					key={ setting.id }
 					label={ setting.title }

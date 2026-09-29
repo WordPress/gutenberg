@@ -587,12 +587,20 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		}
 	}
 
-	if ( $is_flex_layout || $has_viewport_aspect_ratio ) {
+	/*
+	 * Only generate the gap styles — and, when nothing else needs it, the unique
+	 * classname that exists solely to scope them — if the theme has not opted out
+	 * of layout styles. The responsive aspect ratio rules are not layout styles,
+	 * so they keep rendering either way.
+	 */
+	$should_generate_gap_styles = $is_flex_layout && ! current_theme_supports( 'disable-layout-styles' );
+
+	if ( $should_generate_gap_styles || $has_viewport_aspect_ratio ) {
 		$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
 		$processed_content->add_class( $unique_gallery_classname );
 		$gallery_styles = array();
 
-		if ( $is_flex_layout ) {
+		if ( $should_generate_gap_styles ) {
 			// Add a style tag for the --wp--style--unstable-gallery-gap var. The
 			// Gallery's custom Flex layout recalculates Image block widths based on
 			// the current gap so it can maintain the selected number of columns.
@@ -627,7 +635,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
 
-			if ( $is_flex_layout ) {
+			if ( $should_generate_gap_styles ) {
 				$has_viewport_block_gap        = is_array( $viewport_style ) &&
 					is_array( $viewport_style['spacing'] ?? null ) &&
 					array_key_exists( 'blockGap', $viewport_style['spacing'] );

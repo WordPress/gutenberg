@@ -7,6 +7,11 @@ import {
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// Keep the matrix popover above the block toolbar, as in the editor.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Browser fixtures need the styles WordPress normally enqueues.
+import '../../../../block-editor/src/components/block-popover/style.scss';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Browser fixtures need the styles WordPress normally enqueues.
+import '../../../../components/src/popover/style.scss';
 const defaultSettings = {
 	__experimentalFeatures: {
 		color: {
@@ -63,6 +68,16 @@ async function openStylesTabIfAvailable() {
 
 	if ( stylesTab ) {
 		await userEvent.click( stylesTab );
+	}
+}
+
+async function openSettingsTabIfAvailable() {
+	const settingsTab = screen.queryByRole( 'tab', {
+		name: 'Settings',
+	} );
+
+	if ( settingsTab ) {
+		await userEvent.click( settingsTab );
 	}
 }
 
@@ -207,11 +222,12 @@ describe( 'Cover block', () => {
 					} )
 				).not.toBeInTheDocument();
 			} );
-			test( 'does not display settings tab when media settings are empty', async () => {
+			test( 'does not display settings panel in the settings tab when the block has no media', async () => {
 				await createAndSelectBlock();
 
+				await openSettingsTabIfAvailable();
 				expect(
-					screen.queryByRole( 'tab', {
+					screen.queryByRole( 'heading', {
 						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
@@ -227,6 +243,7 @@ describe( 'Cover block', () => {
 				} );
 
 				await selectBlock( 'Block: Cover' );
+				await openSettingsTabIfAvailable();
 				expect(
 					await screen.findByRole( 'heading', { name: 'Settings' } )
 				).toBeInTheDocument();
@@ -241,6 +258,7 @@ describe( 'Cover block', () => {
 				'has-parallax'
 			);
 			await selectBlock( 'Block: Cover' );
+			await openSettingsTabIfAvailable();
 			await userEvent.click(
 				await screen.findByLabelText( 'Fixed background' )
 			);
@@ -257,6 +275,7 @@ describe( 'Cover block', () => {
 				'is-repeated'
 			);
 			await selectBlock( 'Block: Cover' );
+			await openSettingsTabIfAvailable();
 			await userEvent.click(
 				await screen.findByLabelText( 'Repeated background' )
 			);
@@ -271,6 +290,7 @@ describe( 'Cover block', () => {
 			} );
 
 			await selectBlock( 'Block: Cover' );
+			await openSettingsTabIfAvailable();
 			await userEvent.clear( await screen.findByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
 
@@ -288,6 +308,7 @@ describe( 'Cover block', () => {
 			} );
 
 			await selectBlock( 'Block: Cover' );
+			await openSettingsTabIfAvailable();
 			await userEvent.type(
 				await screen.findByLabelText( 'Alternative text' ),
 				'Me'

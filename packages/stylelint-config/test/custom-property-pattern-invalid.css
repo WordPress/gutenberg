@@ -1,0 +1,9 @@
+.override {
+	--_gcd-heading-font-weight: 600;
+	--_wp-ui-elevation-sm: 0 1px 2px #000;
+}
+
+.usage {
+	font-weight: var(--_gcd-heading-font-weight);
+	box-shadow: var(--_wp-ui-elevation-sm);
+}

@@ -21,16 +21,21 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"type": "module",
 	"exports": {
-		"./tsconfig/*": "./tsconfig/*"
+		"./tsconfig/*": "./tsconfig/tsconfig.*"
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
+		"@types/node": "^24.13.3",
 		"@types/react": "^18.3.27",
 		"@wordpress/data": "file:../../packages/data",
 		"vitest": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"list-experimental-apis": "node scripts/list-experimental-apis.mts"
 	}
 }

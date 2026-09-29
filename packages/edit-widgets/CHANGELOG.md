@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 6.56.0 (2026-09-23)
+
+### Bug Fixes
+
 -   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ## 6.55.0 (2026-09-10)

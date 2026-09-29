@@ -1332,7 +1332,7 @@ async function transpilePackage( packageName ) {
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
 	const emotionPlugin = babel( {
-		filter: /\.[jt]sx?$/,
+		filter: /\.[cm]?[jt]sx?$/,
 		config: {
 			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
 		},
@@ -1387,7 +1387,10 @@ async function transpilePackage( packageName ) {
 					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
 					const newExt =
 						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
-					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+					relativePath = relativePath.replace(
+						/\.[cm]?[jt]sx?$/,
+						newExt
+					);
 
 					return {
 						path: relativePath,
