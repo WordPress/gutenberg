@@ -864,6 +864,135 @@ test.describe( 'Block Notes: floating notes', () => {
 			expect( hitsCover ).toBe( false );
 		} );
 
+		test( 'keeps notices at the full width of the canvas', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted' },
+				comment: 'Notice note',
+			} );
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/notices' )
+					.createNotice( 'info', 'Full width notice' )
+			);
+
+			const notice = page
+				.locator( '.components-notice' )
+				.filter( { hasText: 'Full width notice' } );
+			await expect( notice ).toBeVisible();
+			const noticeBox = await notice.boundingBox();
+			const canvasBox = await getCanvasFrame( page ).boundingBox();
+
+			// A notes column beside the canvas would cut the notice ~280px short.
+			expect(
+				canvasBox.x +
+					canvasBox.width -
+					( noticeBox.x + noticeBox.width )
+			).toBeLessThan( 40 );
+		} );
+
+		test( 'draws a divider at the edge of the reserved space', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted' },
+				comment: 'Divider note',
+			} );
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
+
+			const divider = await editor.canvas
+				.locator( ':root' )
+				.evaluate( ( root ) => {
+					const view = root.ownerDocument.defaultView;
+					const style = view.getComputedStyle( root, '::after' );
+					return {
+						position: style.position,
+						insetInlineEnd: parseFloat( style.insetInlineEnd ),
+						width: parseFloat( style.width ),
+						height: parseFloat( style.height ),
+						viewportHeight: view.innerHeight,
+					};
+				} );
+
+			expect( divider.position ).toBe( 'fixed' );
+			expect( divider.width ).toBe( 1 );
+			// Flush with clipped full-width content, without covering it.
+			expect( divider.insetInlineEnd + divider.width ).toBe( 280 );
+			expect( divider.height ).toBe( divider.viewportHeight );
+		} );
+
+		test( 'keeps the thread inside the reserved space beside the scrollbar', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			// Tall enough to give the canvas a scrollbar.
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/cover',
+				attributes: {
+					align: 'full',
+					customOverlayColor: '#111111',
+					minHeight: 2000,
+				},
+				comment: 'Scrollbar note',
+			} );
+
+			const threadBox = await getThread(
+				page,
+				'Scrollbar note'
+			).boundingBox();
+			const canvasBox = await getCanvasFrame( page ).boundingBox();
+			// The reserved space ends where the scrollbar begins.
+			const contentEdge = await editor.canvas
+				.locator( ':root' )
+				.evaluate( ( root ) => root.clientWidth );
+			const reservedEnd = canvasBox.x + contentEdge;
+			const reservedStart = reservedEnd - 280;
+
+			expect( threadBox.x ).toBeGreaterThan( reservedStart );
+			expect( threadBox.x + threadBox.width ).toBeLessThan( reservedEnd );
+		} );
+
+		test( 'stays visible beside the Settings sidebar', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted' },
+				comment: 'Settings note',
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			await expect( getAllNotes( page ) ).toBeVisible();
+			await expect( getThread( page, 'Settings note' ) ).toBeVisible();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
+		} );
+
+		test( 'hides the notes on small viewports', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted' },
+				comment: 'Small viewport note',
+			} );
+
+			await page.setViewportSize( { width: 600, height: 900 } );
+
+			await expect( getFloatingNotes( page ) ).toBeHidden();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 0 );
+		} );
+
 		test( 'minimizes the notes when the canvas is narrow', async ( {
 			editor,
 			page,
