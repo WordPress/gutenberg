@@ -1,5 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
@@ -22,6 +22,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	prefix?: React.ReactNode;
 	/**
 	 * Accessible label for the remove button.
+	 * Keep this to the action (for example `Remove`). The chip label describes
+	 * the button.
 	 *
 	 * @default __( 'Remove' )
 	 */
@@ -59,8 +61,40 @@ export type ComboboxInputGroupProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
-export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
-	children?: React.ReactNode;
+export type ComboboxItemLabelProps = ComponentProps< 'span' > & {
+	/**
+	 * The primary label and accessible name of a combobox item.
+	 */
+	children: ReactNode;
+};
+
+export type ComboboxItemDescriptionProps = ComponentProps< 'span' > & {
+	/**
+	 * Content that contributes to the combobox item's accessible description.
+	 */
+	children: ReactNode;
+};
+
+type ComboboxItemChildren =
+	| ReactElement< ComboboxItemLabelProps >
+	| [
+			ReactElement< ComboboxItemLabelProps >,
+			...(
+				| ReactElement< ComboboxItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
+export type ComboboxItemProps = Omit<
+	ComponentProps< typeof _Combobox.Item >,
+	'children'
+> & {
+	/**
+	 * One direct ItemLabel, followed by zero or more ItemDescription components.
+	 */
+	children: ComboboxItemChildren;
 	/**
 	 * The variant of the item.
 	 *

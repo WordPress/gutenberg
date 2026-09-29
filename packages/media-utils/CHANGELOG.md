@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 5.56.0 (2026-09-23)
+
+### New Features
+
+-   `MediaUpload`: Add a `featuredImageFlow` prop that opens the featured image media frame. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
+### Deprecations
+
+-   `MediaUpload`: Deprecate the `unstableFeaturedImageFlow` prop in favor of `featuredImageFlow`. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
 ## 5.55.0 (2026-09-10)
 
 ### New Features

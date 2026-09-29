@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-import { describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {
@@ -13,7 +13,11 @@ describe( 'block.json schema', () => {
 		[ 'test/integration/fixtures/block-schemas/*.json' ],
 		{ onlyFiles: true }
 	);
-	const ajv = new Ajv();
+	let ajv;
+
+	beforeEach( () => {
+		ajv = new Ajv();
+	} );
 
 	test( 'strictly adheres to the draft-07 meta schema', () => {
 		// Use ajv.compile instead of ajv.validateSchema to validate the schema

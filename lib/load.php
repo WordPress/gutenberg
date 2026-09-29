@@ -77,6 +77,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-icon-collections-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';

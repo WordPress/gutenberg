@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/abilities",
-	"version": "0.21.0",
+	"version": "0.22.0",
 	"description": "JavaScript client for WordPress Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",
@@ -53,6 +52,20 @@
 	},
 	"devDependencies": {
 		"vitest": "^5.0.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

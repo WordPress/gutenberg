@@ -4,10 +4,14 @@ import { Checkbox } from '../../checkbox';
 import { CheckboxGroup } from '../';
 
 const meta: Meta< typeof CheckboxGroup > = {
-	title: 'Design System/Components/Form/Primitives/CheckboxGroup',
+	title: 'Components/@wordpress-ui/Form/Primitives/CheckboxGroup',
+	id: 'design-system-components-form-primitives-checkboxgroup',
 	component: CheckboxGroup,
 	subcomponents: {
 		'CheckboxGroup.NestedItems': CheckboxGroup.NestedItems,
+	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
 	},
 	parameters: {
 		componentStatus: {
@@ -46,13 +50,16 @@ export const Default: Story = {
  * documentation for a full example.
  */
 export const WithParentCheckbox: Story = {
-	render: function Template() {
+	render: function Template( args ) {
 		const [ fruitValue, setFruitValue ] = useState( [ 'apple' ] );
 
 		return (
 			<CheckboxGroup
 				value={ fruitValue }
-				onValueChange={ setFruitValue }
+				onValueChange={ ( nextValue, ...changeArgs ) => {
+					setFruitValue( nextValue );
+					args.onValueChange?.( nextValue, ...changeArgs );
+				} }
 				allValues={ [ 'apple', 'orange', 'banana' ] }
 				aria-label="Fruit"
 			>
