@@ -17,6 +17,9 @@ const meta: Meta< typeof SearchableChipSelect > = {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
+		'SearchableChipSelect.ItemLabel': SearchableChipSelect.ItemLabel,
+		'SearchableChipSelect.ItemDescription':
+			SearchableChipSelect.ItemDescription,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
 		'SearchableChipSelect.Collection': SearchableChipSelect.Collection,
@@ -41,6 +44,20 @@ export const Default: Story = {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
 		'aria-label': 'Fruit',
+	},
+};
+
+/**
+ * Item descriptions supplement each popup item and are not copied to chips.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		...Default.args,
+		defaultValue: [],
+		items: [
+			{ value: 'apple', label: 'Apple', description: 'A crisp fruit.' },
+			{ value: 'banana', label: 'Banana', description: 'A soft fruit.' },
+		],
 	},
 };
 
@@ -72,7 +89,9 @@ export const WithCustomChipsAndItems: Story = {
 			) ),
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableChipSelect.Item key={ item.value } value={ item }>
-				😋 { item.label }
+				<SearchableChipSelect.ItemLabel>
+					😋 { item.label }
+				</SearchableChipSelect.ItemLabel>
 			</SearchableChipSelect.Item>
 		),
 	},
@@ -114,7 +133,9 @@ export const Grouped: Story = {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
 						</SearchableChipSelect.Item>
 					) }
 				</SearchableChipSelect.Collection>
