@@ -146,16 +146,30 @@ async function fetchNoteReactions(
 	const reactions: ReactionComment[] = [];
 
 	for ( let page = 1; page <= MAX_REACTION_PAGES; page++ ) {
-		const batch = await apiFetch< ReactionComment[] >( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				parent: noteId,
-				type: 'reaction',
-				status: 'all',
-				page,
-				per_page: REACTIONS_PER_PAGE,
-				_fields: 'author_name,content',
-			} ),
-		} );
+		let batch: ReactionComment[];
+		try {
+			batch = await apiFetch< ReactionComment[] >( {
+				path: addQueryArgs( '/wp/v2/comments', {
+					parent: noteId,
+					type: 'reaction',
+					status: 'all',
+					page,
+					per_page: REACTIONS_PER_PAGE,
+					_fields: 'author_name,content',
+				} ),
+			} );
+		} catch ( error ) {
+			// A full last page (exactly 100, 200, ... reactions) sends the
+			// walk one page past the end, which the endpoint rejects.
+			if (
+				page > 1 &&
+				( error as { code?: string } )?.code ===
+					'rest_comment_invalid_page_number'
+			) {
+				return reactions;
+			}
+			throw error;
+		}
 
 		reactions.push( ...batch );
 

@@ -476,6 +476,44 @@ describe( 'ReactionDisplay', () => {
 		expect( apiFetch ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'names reactors when the last page is exactly full', async () => {
+		const user = userEvent.setup();
+		// Exactly 100 reactions: the walk asks for a second page, which the
+		// endpoint rejects as out of range.
+		const fullPage = Array.from( { length: 100 }, ( _, i ) => ( {
+			author_name: i === 0 ? 'Alice' : `Rocketeer ${ i }`,
+			content: { raw: i === 0 ? 'heart' : 'rocket' },
+		} ) );
+		mockApiFetch.mockResolvedValueOnce( fullPage ).mockRejectedValueOnce( {
+			code: 'rest_comment_invalid_page_number',
+			message:
+				'The page number requested is larger than the number of pages available.',
+			data: { status: 400 },
+		} );
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1, reacted: true, my_reaction_id: 7 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart',
+				} )
+			).toBeVisible()
+		);
+		expect( apiFetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'keeps the count-based label when the reaction walk is truncated', async () => {
 		const user = userEvent.setup();
 		// Every page comes back full, so the walk hits its page cap without
