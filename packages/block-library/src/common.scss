@@ -280,4 +280,30 @@ html :where(.is-position-sticky) {
 		border-bottom: 0.065em solid;
 	}
 }
+
+// Polyfill for the `columnspacing` attribute of `mtable`, the space between
+// the columns of a table, which converted LaTeX relies on: `aligned` has none,
+// `cases` and matrices their own. Firefox renders it natively; the other
+// engines give every cell a fixed padding instead, so there the attribute is
+// read into the cells with the typed form of `attr()` (Chrome 133, Safari
+// Technology Preview). The feature query keeps an engine without it on its
+// default spacing rather than none, and excludes Firefox, where the padding
+// would add to the attribute. The rules go once the engines render the
+// attribute.
+/*!rtl:begin:ignore*/
+@supports (padding-left: attr(x type(<length>))) and (not (-moz-appearance: none)) {
+	mtable[columnspacing] {
+		--wp--mathml--columnspacing: attr(columnspacing type(<length>));
+	}
+
+	// In MathML the space sits between the columns, and the sides have none.
+	mtable[columnspacing] > mtr > mtd {
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	mtable[columnspacing] > mtr > mtd + mtd {
+		padding-left: var(--wp--mathml--columnspacing);
+	}
+}
 /*!rtl:end:ignore*/
