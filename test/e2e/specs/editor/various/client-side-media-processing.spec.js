@@ -1146,7 +1146,18 @@ test.describe( 'Client-side media processing', () => {
 				.getByRole( 'button', { name: 'Optimize', exact: true } )
 				.click();
 			await page
-				.getByRole( 'button', { name: 'Optimize image' } )
+				.getByRole( 'button', { name: 'Optimize image', exact: true } )
+				.click();
+
+			// Nothing is uploaded until the comparison is approved.
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Optimize image',
+			} );
+			await expect( dialog.getByText( /Optimized: \d/ ) ).toBeVisible( {
+				timeout: 60_000,
+			} );
+			await dialog
+				.getByRole( 'button', { name: 'Use optimized image' } )
 				.click();
 
 			// The success snackbar confirms the optimization completed.
@@ -1173,6 +1184,108 @@ test.describe( 'Client-side media processing', () => {
 			// Re-encoding at the default quality should not grow the file.
 			expect( optimized.media_details.filesize ).toBeLessThanOrEqual(
 				originalSize
+			);
+		} );
+
+		test( 'uploads the quality picked in the comparison dialog', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const original = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				// A photo-like fixture: the solid-colour ones encode to the same
+				// size at any quality.
+				'1024x768_e2e_test_image_rotated.jpeg'
+			);
+
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Optimize', exact: true } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Optimize image', exact: true } )
+				.click();
+
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Optimize image',
+			} );
+			const optimizedSize = dialog.getByText( /Optimized: \d/ );
+			await expect( optimizedSize ).toBeVisible( { timeout: 60_000 } );
+			const defaultSizeText = await optimizedSize.textContent();
+
+			await dialog
+				.getByRole( 'checkbox', { name: 'Adjust quality' } )
+				.click();
+			await dialog
+				.getByRole( 'spinbutton', { name: 'Quality' } )
+				.fill( '10' );
+
+			// The preview is re-encoded at the new quality.
+			await expect( optimizedSize ).not.toHaveText( defaultSizeText, {
+				timeout: 60_000,
+			} );
+			const useOptimized = dialog.getByRole( 'button', {
+				name: 'Use optimized image',
+			} );
+			await expect( useOptimized ).toBeEnabled( { timeout: 60_000 } );
+			await useOptimized.click();
+
+			await expect(
+				page
+					.locator( '.components-snackbar' )
+					.filter( { hasText: /image optimized/i } )
+			).toBeVisible( { timeout: 60_000 } );
+			await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+			const newId = await mediaProcessingUtils.getSelectedBlockImageId();
+			expect( newId ).not.toBe( original.id );
+			const optimized = await mediaProcessingUtils.getMediaDetails(
+				requestUtils,
+				newId
+			);
+
+			// The upload uses the low quality previewed in the dialog.
+			expect( optimized.media_details.filesize ).toBeLessThan(
+				original.media_details.filesize
+			);
+		} );
+
+		test( 'leaves the block untouched when the comparison is cancelled', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const original = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Optimize', exact: true } )
+				.click();
+			await page
+				.getByRole( 'button', { name: 'Optimize image', exact: true } )
+				.click();
+
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Optimize image',
+			} );
+			await expect( dialog.getByText( /Optimized: \d/ ) ).toBeVisible( {
+				timeout: 60_000,
+			} );
+			await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect( dialog ).toBeHidden();
+
+			expect( await mediaProcessingUtils.getSelectedBlockImageId() ).toBe(
+				original.id
 			);
 		} );
 	} );

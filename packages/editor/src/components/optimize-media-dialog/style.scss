@@ -1,0 +1,73 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-optimize-media-dialog__compare {
+	position: relative;
+	overflow: hidden;
+	border-radius: $radius-small;
+	background: $gray-100;
+	line-height: 0;
+
+	img {
+		display: block;
+		width: 100%;
+		max-height: min(50vh, 480px);
+		object-fit: contain;
+	}
+}
+
+.editor-optimize-media-dialog__after {
+	position: absolute;
+	inset: 0;
+	height: 100%;
+	clip-path: inset(0 0 0 var(--editor-optimize-media-position));
+}
+
+.editor-optimize-media-dialog__divider {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: var(--editor-optimize-media-position);
+	width: 2px;
+	transform: translateX(-50%);
+	background: $white;
+	box-shadow: 0 0 0 1px rgba($black, 0.2);
+	pointer-events: none;
+}
+
+.editor-optimize-media-dialog__label {
+	position: absolute;
+	top: $grid-unit-10;
+	padding: $grid-unit-05 $grid-unit-10;
+	border-radius: $radius-small;
+	background: rgba($black, 0.6);
+	color: $white;
+	font-size: $helptext-font-size;
+	line-height: $default-line-height;
+	pointer-events: none;
+
+	&.is-before {
+		left: $grid-unit-10;
+	}
+
+	&.is-after {
+		right: $grid-unit-10;
+	}
+}
+
+// A transparent range input covers the image, so dragging anywhere moves the
+// divider and the comparison stays keyboard accessible.
+.editor-optimize-media-dialog__handle {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: ew-resize;
+}
+
+.editor-optimize-media-dialog__compare:has(.editor-optimize-media-dialog__handle:focus-visible) {
+	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: 2px;
+}
