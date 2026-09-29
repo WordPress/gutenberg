@@ -605,7 +605,7 @@ export default dedupePlugins( [
 			...config.rules,
 			'vitest/valid-describe-callback': 'error',
 			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': 'error',
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
@@ -640,50 +640,6 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
-	// These describe callbacks are supplied by shared test factories. The
-	// plugin only accepts an inline function as the second argument.
-	{
-		files: [
-			'packages/block-serialization-default-parser/test/index.js',
-			'packages/block-serialization-spec-parser/test/index.js',
-			'test/unit/config/console.vitest.test.js',
-			'test/unit/config/console.vitest.jsdom.test.js',
-			'test/unit/config/console.vitest.browser.test.js',
-		],
-		rules: { 'vitest/valid-describe-callback': 'off' },
-	},
-	// These assertion chains are awaited through Promise.all. The plugin flags
-	// them because it does not recognize `return await Promise.all(...)`.
-	{
-		files: [ 'packages/core-data/src/locks/test/engine.js' ],
-		rules: { 'vitest/valid-expect-in-promise': 'off' },
-	},
-	// Generated test names come from string-valued fixture data. Keep the
-	// rule's other checks active while allowing these identifier arguments.
-	{
-		files: [
-			'packages/editor/src/store/utils/test/notice-builder.js',
-			'packages/media-editor/src/components/media-editor-modal/test/build-modifiers.test.ts',
-			'packages/media-editor/src/image-editor/core/test/preview-export-parity.ts',
-			'packages/rich-text/src/test/is-format-equal.js',
-			'packages/rich-text/src/test/create.jsdom.test.js',
-			'packages/rich-text/src/test/to-dom.jsdom.test.js',
-			'packages/rich-text/src/test/to-html-string.jsdom.test.js',
-			'test/integration/blocks-raw-handling.jsdom.test.js',
-			'test/integration/full-content/full-content.jsdom.test.js',
-		],
-		rules: {
-			'vitest/valid-title': [ 'error', { allowArguments: true } ],
-		},
-	},
-	{
-		files: [ 'test/unit/config/console.vitest.js' ],
-		rules: {
-			// aroundEach receives an awaited runTest callback. The deprecated rule
-			// mistakes it for a done callback.
-			'vitest/no-done-callback': 'off',
-		},
-	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[

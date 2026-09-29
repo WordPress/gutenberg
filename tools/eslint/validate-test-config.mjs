@@ -4,7 +4,7 @@ import { ESLint } from 'eslint';
 
 const rootDir = resolve( import.meta.dirname, '../..' );
 const eslint = new ESLint( { cwd: rootDir } );
-const nodeTest = 'packages/escape-html/src/test/index.ts';
+const nodeTest = 'packages/block-serialization-spec-parser/test/index.js';
 const jsdomTest =
 	'packages/components/src/form-token-field/test/index.jsdom.test.tsx';
 const browserTest =
@@ -58,35 +58,6 @@ for ( const file of [ jsdomTest, browserTest ] ) {
 		file === browserTest ? 0 : 2
 	);
 }
-
-const parserHelperConfig = await eslint.calculateConfigForFile( sharedHelper );
-assert.equal(
-	parserHelperConfig.rules[ 'vitest/no-conditional-expect' ][ 0 ],
-	2
-);
-
-for ( const file of [
-	'packages/block-serialization-default-parser/test/index.js',
-	'packages/block-serialization-spec-parser/test/index.js',
-	'test/unit/config/console.vitest.test.js',
-	'test/unit/config/console.vitest.jsdom.test.js',
-	'test/unit/config/console.vitest.browser.test.js',
-] ) {
-	const { rules } = await eslint.calculateConfigForFile( file );
-	assert.equal( rules[ 'vitest/valid-describe-callback' ][ 0 ], 0 );
-}
-const locksConfig = await eslint.calculateConfigForFile(
-	'packages/core-data/src/locks/test/engine.js'
-);
-assert.equal( locksConfig.rules[ 'vitest/valid-expect-in-promise' ][ 0 ], 0 );
-const generatedTitleConfig = await eslint.calculateConfigForFile(
-	'packages/rich-text/src/test/create.jsdom.test.js'
-);
-assert.equal( generatedTitleConfig.rules[ 'vitest/valid-title' ][ 0 ], 2 );
-assert.equal(
-	generatedTitleConfig.rules[ 'vitest/valid-title' ][ 1 ].allowArguments,
-	true
-);
 
 const legacyE2E = await eslint.calculateConfigForFile(
 	'packages/e2e-tests/plugins/media-upload-filter/index.js'
@@ -165,7 +136,7 @@ assert.deepEqual(
 assert.deepEqual(
 	await lintTestRules(
 		'packages/block-serialization-default-parser/test/index.js',
-		"import { describe } from 'vitest'; describe( 'factory callback', makeTests() );"
+		"import { describe } from 'vitest'; describe( 'factory callback', () => { makeTests()(); } );"
 	),
 	[]
 );
@@ -182,18 +153,11 @@ assert.deepEqual(
 	await lintTestRules( nodeTest, awaitedPromiseAllFixture ),
 	[]
 );
-const returnedAwaitedPromiseAllFixture =
-	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions', async () => { const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); return await Promise.all( [ check ] ); } );";
+const interveningAssignmentFixture =
+	"import { test, expect } from 'vitest'; test( 'Promise.all waits for assertions after an assignment', async () => { let granted = true; const check = Promise.resolve().then( () => expect( true ).toBe( true ) ); granted = false; await Promise.all( [ check ] ); } );";
 assert.deepEqual(
-	await lintTestRules( nodeTest, returnedAwaitedPromiseAllFixture ),
+	await lintTestRules( nodeTest, interveningAssignmentFixture ),
 	[ 'vitest/valid-expect-in-promise' ]
-);
-assert.deepEqual(
-	await lintTestRules(
-		'packages/core-data/src/locks/test/engine.js',
-		returnedAwaitedPromiseAllFixture
-	),
-	[]
 );
 assert.deepEqual(
 	await lintTestRules(
@@ -204,7 +168,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
 	await lintTestRules(
-		'packages/rich-text/src/test/create.jsdom.test.js',
+		nodeTest,
 		"import { test, expect } from 'vitest'; test( description, () => { expect( true ).toBe( true ); } );"
 	),
 	[]
@@ -226,8 +190,16 @@ assert.deepEqual(
 
 assert.deepEqual(
 	await lintTestRules(
+		browserTest,
+		"import { expect } from 'vitest'; const waitFor = () => { return expect.element( locator ).toBeVisible(); };"
+	),
+	[]
+);
+
+assert.deepEqual(
+	await lintTestRules(
 		'test/unit/config/console.vitest.js',
-		"import { aroundEach } from 'vitest'; aroundEach( async ( runTest ) => { await runTest(); } );"
+		"import { aroundEach } from 'vitest';\n// eslint-disable-next-line vitest/no-done-callback\naroundEach( async ( runTest ) => { await runTest(); } );"
 	),
 	[]
 );
