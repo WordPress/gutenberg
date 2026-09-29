@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
@@ -142,8 +143,9 @@ export function getBackgroundImageClasses( style ) {
 // background color, and the gradient. The Background panel owns the gradient
 // control for both the newer `background.gradient` support and the legacy
 // `color.gradient` path, so "Reset all" clears the legacy value too,
-// regardless of which path stored it.
-export function backgroundResetAllFilter( attributes ) {
+// regardless of which path stored it. `panelResetAllFilter` lets the panel
+// keep the parts of `style.background` it doesn't own, like a text gradient.
+export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
 	const updatedClassName = attributes.className?.includes( 'has-background' )
 		? attributes.className
 				.split( ' ' )
@@ -157,7 +159,7 @@ export function backgroundResetAllFilter( attributes ) {
 		gradient: undefined,
 		style: cleanEmptyObject( {
 			...attributes.style,
-			background: undefined,
+			background: panelResetAllFilter?.( attributes.style )?.background,
 			color: {
 				...attributes.style?.color,
 				background: undefined,
@@ -167,11 +169,17 @@ export function backgroundResetAllFilter( attributes ) {
 	};
 }
 
-function BackgroundInspectorControl( { children } ) {
+function BackgroundInspectorControl( { children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) =>
+			backgroundResetAllFilter( attributes, resetAllFilter ),
+		[ resetAllFilter ]
+	);
+
 	return (
 		<InspectorControls
 			group="background"
-			resetAllFilter={ backgroundResetAllFilter }
+			resetAllFilter={ attributesResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
