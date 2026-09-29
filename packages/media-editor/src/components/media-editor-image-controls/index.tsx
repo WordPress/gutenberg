@@ -1,13 +1,9 @@
-import {
-	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
 	aspectRatio as aspectRatioIcon,
-	check,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -174,39 +170,43 @@ export default function MediaEditorImageControls( {
 	);
 
 	const aspectRatioDropdown = hasAspectRatioControl ? (
-		<DropdownMenu
-			icon={ aspectRatioIcon }
-			label={ __( 'Aspect ratio' ) }
-			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact', disabled } }
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup label={ __( 'Aspect ratio' ) }>
-					{ aspectRatioOptions.map( ( preset ) => {
-						const value = preset.value.toString();
-						const isSelected = value === aspectRatioValue;
-						return (
-							<MenuItem
-								key={ value }
-								role="menuitemradio"
-								isSelected={ isSelected }
-								icon={ isSelected ? check : undefined }
-								disabled={ disabled }
-								onClick={ () => {
-									if ( disabled ) {
-										return;
-									}
-									setAspectRatioValue( value );
-									onClose();
-								} }
-							>
-								{ preset.label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+		<Menu.Root>
+			<Menu.Trigger
+				disabled={ disabled }
+				render={
+					<Button
+						size="compact"
+						icon={ aspectRatioIcon }
+						label={ __( 'Aspect ratio' ) }
+						accessibleWhenDisabled
+					/>
+				}
+			/>
+			<Menu.Popup
+				positioner={ <Menu.Positioner side="top" align="center" /> }
+			>
+				<Menu.RadioGroup
+					value={ aspectRatioValue }
+					onValueChange={ ( value ) => {
+						if ( ! disabled ) {
+							setAspectRatioValue( value );
+						}
+					} }
+				>
+					<Menu.GroupLabel>{ __( 'Aspect ratio' ) }</Menu.GroupLabel>
+					{ aspectRatioOptions.map( ( preset ) => (
+						<Menu.RadioItem
+							key={ preset.value }
+							value={ preset.value.toString() }
+							closeOnClick
+							disabled={ disabled }
+						>
+							<Menu.ItemLabel>{ preset.label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.RadioGroup>
+			</Menu.Popup>
+		</Menu.Root>
 	) : null;
 
 	if ( withLabels ) {
