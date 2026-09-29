@@ -14,10 +14,6 @@ type InlineNoticesProps = {
 };
 
 function hasRenderableChildren( children: ReactNode ): boolean {
-	// `Children.toArray` flattens the array that more than one child arrives
-	// as, and drops the nothings along the way — `null`, `undefined` and the
-	// booleans a `&&` leaves behind — so only the empty string is left to
-	// check for.
 	return Children.toArray( children ).some( ( child ) => child !== '' );
 }
 

@@ -43,6 +43,14 @@ export type Notice = {
 	spokenMessage: string | null;
 
 	/**
+	 * A fuller account of what went wrong, as plain text, for when the message
+	 * cannot say everything a developer needs. It sits behind a disclosure and
+	 * is offered for copying together with the message. Only applies when type
+	 * is `default`.
+	 */
+	detail?: string;
+
+	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
 	 * and SHOULD NOT be used for notices. It is subject to removal without notice.
 	 */
@@ -130,6 +138,14 @@ export type NoticeOptions = {
 	 * Called when the notice is dismissed.
 	 */
 	onDismiss?: VoidFunction;
+
+	/**
+	 * A fuller account of what went wrong, as plain text, for when the message
+	 * cannot say everything a developer needs. It sits behind a disclosure and
+	 * is offered for copying together with the message. Only applies when type
+	 * is set to `default`.
+	 */
+	detail?: string;
 
 	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,

@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `createNotice`: Accept a `detail` option, holding a fuller account of what went wrong as plain text for when the message cannot say everything a developer needs. It reaches the rendered notice, where it sits behind a disclosure and is offered for copying together with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
 ### Bug Fixes
 
 -   `InlineNotices`: Render nothing when every child renders nothing ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).

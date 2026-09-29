@@ -1,6 +1,6 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
-import { escapeHTML } from '@wordpress/escape-html';
+import { __unstableStripHTML } from '@wordpress/dom';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
@@ -39,6 +39,24 @@ const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 // the server. Their messages restate what the notice already says, so there are
 // no details worth disclosing.
 const CLIENT_GENERATED_ERROR_CODES = [ 'offline_error', 'fetch_error' ];
+
+// A server message is the only account of a failure, so markup in it is
+// stripped rather than the message being dropped. Block boundaries become line
+// breaks first, since `stripHTML` joins text nodes with nothing between them
+// and would otherwise run two sentences together.
+function getFailureDetail( message ) {
+	// Only strip when there is a tag to strip: parsing a message that merely
+	// contains a `<`, as a parse error does, would take everything after it.
+	if ( ! /<\/?[a-z][^>]*>/i.test( message ) ) {
+		return message;
+	}
+
+	return __unstableStripHTML(
+		message.replace( /<\/(?:p|div|li|h[1-6]|tr)>|<br\s*\/?>/gi, '$&\n' )
+	)
+		.replace( /\n{3,}/g, '\n\n' )
+		.trim();
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -345,28 +363,14 @@ export const savePost =
 				args.length &&
 				! ( options.isAutosave && isManualSaveFailureShown )
 			) {
-				const [ noticeMessage ] = args;
 				if (
 					error.message &&
-					! CLIENT_GENERATED_ERROR_CODES.includes( error.code ) &&
-					! /<\/?[^>]*>/.test( error.message )
+					! CLIENT_GENERATED_ERROR_CODES.includes( error.code )
 				) {
-					args[ 0 ] = `${ escapeHTML(
-						noticeMessage
-					) } <details class="editor-save-error-details"><summary>${ escapeHTML(
-						__( 'Show details' )
-					) }</summary><span class="editor-save-error-details__message">${ escapeHTML(
-						error.message
-					) }</span></details>`;
 					args[ 1 ] = {
 						...args[ 1 ],
-						__unstableHTML: true,
-						speak: false,
+						detail: getFailureDetail( error.message ),
 					};
-					// The notices store doesn't support a separate spoken message
-					// when rendering raw HTML content, so announce the plain text
-					// manually to avoid reading the markup aloud.
-					speak( noticeMessage, 'assertive' );
 				}
 
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );

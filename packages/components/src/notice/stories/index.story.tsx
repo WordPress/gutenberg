@@ -136,6 +136,20 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
 
 /**
+ * A `detail` holds a fuller account of what went wrong — the server's own
+ * report of a failure, say — behind a disclosure, and offers it for copying
+ * together with the message. Keep the message readable on its own: the detail
+ * is for the account a developer or an assistant needs.
+ */
+export const WithDetail = Template.bind( {} );
+WithDetail.args = {
+	...Default.args,
+	status: 'error',
+	children: 'Updating failed. Please try updating again.',
+	detail: 'The title field was rejected by a server-side rule.\nRemove “Break save” from the title, then try again.',
+};
+
+/**
  * Action buttons can be disabled.
  */
 export const WithDisabledAction = Template.bind( {} );
