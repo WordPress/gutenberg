@@ -5,12 +5,10 @@ import {
 	BlockCanvas,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 import styles from './style.module.css';
 
-const contentStyles = [ ...blockLibraryContentStyles, ...editorStyles ];
-
-export default function EditorBox() {
+export default function EditorBox( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
@@ -32,7 +30,10 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockCanvas height="500px" styles={ contentStyles } />
+				<BlockCanvas
+					height="500px"
+					styles={ contentStyles[ direction ] }
+				/>
 			</BlockEditorProvider>
 		</div>
 	);

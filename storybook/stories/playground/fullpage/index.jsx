@@ -7,11 +7,9 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 import styles from './style.lazy.scss?inline';
-import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 
-const contentStyles = [ ...blockLibraryContentStyles, ...editorStyles ];
-
-export default function EditorFullPage() {
+export default function EditorFullPage( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
@@ -43,7 +41,10 @@ export default function EditorFullPage() {
 					<BlockInspector />
 				</div>
 				<div className="playground__content">
-					<BlockCanvas height="100%" styles={ contentStyles } />
+					<BlockCanvas
+						height="100%"
+						styles={ contentStyles[ direction ] }
+					/>
 				</div>
 			</BlockEditorProvider>
 		</div>

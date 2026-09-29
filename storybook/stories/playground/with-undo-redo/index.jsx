@@ -8,12 +8,10 @@ import {
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
-import { editorStyles, blockLibraryContentStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 import styles from './style.module.css';
 
-const contentStyles = [ ...blockLibraryContentStyles, ...editorStyles ];
-
-export default function EditorWithUndoRedo() {
+export default function EditorWithUndoRedo( { direction = 'ltr' } ) {
 	const { value, setValue, hasUndo, hasRedo, undo, redo } =
 		useStateWithHistory( { blocks: [] } );
 
@@ -59,7 +57,10 @@ export default function EditorWithUndoRedo() {
 					/>
 					<BlockToolbar hideDragHandle />
 				</div>
-				<BlockCanvas height="100%" styles={ contentStyles } />
+				<BlockCanvas
+					height="100%"
+					styles={ contentStyles[ direction ] }
+				/>
 			</BlockEditorProvider>
 		</div>
 	);

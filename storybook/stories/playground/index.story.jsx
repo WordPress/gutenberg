@@ -10,24 +10,24 @@ export default {
 	},
 };
 
-export const _default = () => {
-	return <EditorFullPage />;
+export const _default = ( _args, { globals } ) => {
+	return <EditorFullPage direction={ globals.direction } />;
 };
 
 _default.parameters = {
 	sourceLink: 'storybook/stories/playground/fullpage/index.jsx',
 };
 
-export const Box = () => {
-	return <EditorBox />;
+export const Box = ( _args, { globals } ) => {
+	return <EditorBox direction={ globals.direction } />;
 };
 
 Box.parameters = {
 	sourceLink: 'storybook/stories/playground/box/index.jsx',
 };
 
-export const UndoRedo = () => {
-	return <EditorWithUndoRedo />;
+export const UndoRedo = ( _args, { globals } ) => {
+	return <EditorWithUndoRedo direction={ globals.direction } />;
 };
 
 UndoRedo.parameters = {
