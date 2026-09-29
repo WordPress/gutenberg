@@ -121,7 +121,7 @@ Last edited date field for BasePost.
 
 A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
 
-This component is intended to be used as the `Edit` property of a field definition when registering fields with `registerEntityField` from `@wordpress/editor`.
+This component is intended to be used as the `Edit` property of a field definition, for example in the script module of a field registered on the server.
 
 _Usage_
 

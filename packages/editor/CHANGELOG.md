@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, are deprecated. Register and unregister fields in PHP on the `fields_api_init` action instead, with a script module for their JavaScript parts.
+
 ### Enhancements
 
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
