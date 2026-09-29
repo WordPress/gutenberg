@@ -7,6 +7,8 @@ const supportedMatchers = {
 	warn: 'toHaveWarned',
 };
 
+const callStates = new WeakMap();
+
 function createErrorMessage( state, spyInfo ) {
 	const { spy, pass, calls, matcherName, methodName, expected } = spyInfo;
 	const hint = pass ? `.not${ matcherName }` : matcherName;
@@ -32,9 +34,19 @@ function createErrorMessage( state, spyInfo ) {
 
 function createSpyInfo( state, spy, matcherName, methodName, expected ) {
 	const calls = spy.mock.calls;
-	const pass = expected
-		? calls.some( ( call ) => state.equals( call, expected ) )
-		: calls.length > 0;
+	const matchingCalls = expected
+		? calls.filter( ( call ) => state.equals( call, expected ) )
+		: calls;
+	const pass = matchingCalls.length > 0;
+
+	// Match all observed duplicates, without consuming the mock's history or
+	// allowing a negative assertion to account for unrelated calls.
+	if ( pass && ! state.isNot ) {
+		const callState = callStates.get( spy );
+		matchingCalls.forEach( ( call ) =>
+			callState?.expectedCalls.add( call )
+		);
+	}
 
 	return {
 		pass,
@@ -58,26 +70,22 @@ expect.extend(
 				...result,
 				[ matcherName ]( received ) {
 					const spy = received[ methodName ];
-					const spyInfo = createSpyInfo(
+					return createSpyInfo(
 						this,
 						spy,
 						`.${ matcherName }`,
 						methodName
 					);
-					spy.assertionsNumber += 1;
-					return spyInfo;
 				},
 				[ matcherNameWith ]( received, ...expected ) {
 					const spy = received[ methodName ];
-					const spyInfo = createSpyInfo(
+					return createSpyInfo(
 						this,
 						spy,
 						`.${ matcherNameWith }`,
 						methodName,
 						expected
 					);
-					spy.assertionsNumber += 1;
-					return spyInfo;
 				},
 			};
 		},
@@ -85,38 +93,76 @@ expect.extend(
 	)
 );
 
-function setConsoleMethodSpy( [ methodName, matcherName ] ) {
+function createConsoleSpy( methodName ) {
+	const spy = vi.fn().mockName( `console.${ methodName }` );
+	const callState = { expectedCalls: new Set(), clearedCalls: [] };
+	callStates.set( spy, callState );
+	const mockClear = spy.mockClear;
+	spy.mockClear = () => {
+		// mockReset, mockRestore and the vi.*AllMocks helpers also use
+		// mockClear. Preserve calls they would otherwise erase.
+		callState.clearedCalls.push(
+			...spy.mock.calls.filter(
+				( call ) => ! callState.expectedCalls.has( call )
+			)
+		);
+		return mockClear();
+	};
+	return spy;
+}
+
+function setConsoleMethodSpy( [ methodName ] ) {
 	let spy;
 
 	function resetSpy() {
 		// eslint-disable-next-line no-console
 		if ( console[ methodName ] !== spy ) {
-			spy = vi.fn().mockName( `console.${ methodName }` );
+			spy = createConsoleSpy( methodName );
 			// eslint-disable-next-line no-console
 			console[ methodName ] = spy;
 		}
+		const callState = callStates.get( spy );
 
 		spy.mockReset();
 		spy.mockImplementation( () => undefined );
-		spy.assertionsNumber = 0;
+		callState.expectedCalls.clear();
+		callState.clearedCalls = [];
 	}
 
 	function assertExpectedCalls() {
-		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
-			expect( console ).not[ matcherName ]();
+		const callState = callStates.get( spy );
+		const unexpectedCalls = [
+			...callState.clearedCalls,
+			...spy.mock.calls.filter(
+				( call ) => ! callState.expectedCalls.has( call )
+			),
+		];
+		if ( unexpectedCalls.length > 0 ) {
+			expect(
+				unexpectedCalls,
+				`console.${ methodName }() should not be used unless explicitly expected.`
+			).toEqual( [] );
 		}
 	}
 
 	beforeAll( resetSpy );
 	beforeEach( () => {
-		assertExpectedCalls();
-		resetSpy();
+		try {
+			assertExpectedCalls();
+		} finally {
+			resetSpy();
+		}
 	} );
 	aroundEach( async ( runTest ) => {
 		try {
 			await runTest();
 		} finally {
-			assertExpectedCalls();
+			try {
+				assertExpectedCalls();
+			} finally {
+				// A failing check must not leak its calls into the next test.
+				resetSpy();
+			}
 		}
 	} );
 }

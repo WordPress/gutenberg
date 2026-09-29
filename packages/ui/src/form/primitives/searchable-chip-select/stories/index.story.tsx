@@ -47,6 +47,7 @@ export const Default: Story = {
 /**
  * To customize what is rendered inside the chips, pass a
  * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * The chip is named from its content. Pass `aria-label` when that content is not a usable name.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.

@@ -65,7 +65,7 @@ export function hasGroupedItems(
 
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
-	'children' | 'items' | 'multiple'
+	'children' | 'items' | 'multiple' | 'readOnly'
 > &
 	Partial<
 		Pick<
@@ -107,6 +107,9 @@ export type SearchableChipSelectProps = Omit<
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
 		 * A render function for custom rendering the selected chips.
+		 *
+		 * The chip is named from its content. Pass `aria-label` when that
+		 * content is not a usable name.
 		 *
 		 * ```jsx
 		 * chipsContent={ ( value ) =>

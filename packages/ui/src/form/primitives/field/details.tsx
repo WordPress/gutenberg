@@ -19,7 +19,7 @@ import { VisuallyHidden } from '../../../visually-hidden';
  * so the readout is not unnecessarily verbose for screen reader users.
  */
 export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
-	function Details( { className, ...restProps }, ref ) {
+	function UnforwardedDetails( { className, ...restProps }, ref ) {
 		return (
 			<>
 				{ /* VisuallyHidden is the host so that _Field.Description's

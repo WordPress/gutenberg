@@ -1038,6 +1038,7 @@
       - defaultSize
       - enable
       - grid
+      - gridGap
       - handleClasses
       - handleComponent
       - handleStyles
@@ -1119,7 +1120,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1212,7 +1212,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder

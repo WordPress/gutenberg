@@ -786,7 +786,7 @@ class DockerRuntime {
 			hostUser.fullUser,
 		];
 
-		if ( ! process.stdout.isTTY ) {
+		if ( ! process.stdout.isTTY || ! process.stdin.isTTY ) {
 			composeCommand.push( '-T' );
 		}
 

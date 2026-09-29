@@ -15,6 +15,12 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
+		docs: {
+			description: {
+				component:
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+			},
+		},
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
