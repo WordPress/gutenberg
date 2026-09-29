@@ -385,7 +385,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'     => '@wordpress/fields/server-fields',
+					'id'     => '@wordpress/core-fields',
 					'fields' => array( 'author' ),
 				),
 			),

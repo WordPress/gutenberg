@@ -145,8 +145,8 @@ add_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' );
  * the rest client-side in packages/editor/src/dataviews/store/private-actions.ts
  * and merges these into them. The JavaScript parts of the fields that have
  * any (the author field: its render component, elements, value setter, and
- * visibility) ship in the `@wordpress/fields/server-fields` script module,
- * see packages/fields/src/server-fields.ts, registered along with the field.
+ * visibility) ship in the `@wordpress/core-fields` script module,
+ * see packages/core-fields/src/index.ts, registered along with the field.
  *
  * The fields depend on the supports of the post type, which are not final
  * until `init` completes: core registers its post types on `init` at
@@ -187,7 +187,7 @@ function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry
 						),
 					),
 				),
-				'@wordpress/fields/server-fields'
+				'@wordpress/core-fields'
 			);
 		}
 

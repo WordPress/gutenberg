@@ -1,0 +1,37 @@
+# Core Fields
+
+JavaScript parts of the fields WordPress core registers on the server for the Fields API.
+
+The Fields API declares fields in PHP. What PHP cannot serialize, such as a field's `render` component or its `getElements` callback, ships in a script module registered along with the fields. This package is that script module for the fields WordPress core registers: its default export is an object keyed by field id, holding the JavaScript parts of each field.
+
+The client never imports this package directly. `loadEntityFields` and `useEntityFields` from `@wordpress/views` import it on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id.
+
+## Installation
+
+Install the module:
+
+```bash
+npm install @wordpress/core-fields --save
+```
+
+_This package assumes that your code will run in an ES2015+ environment. If you're using an environment that has limited or no support for such language features and/or APIs, you should include the polyfill shipped in `@wordpress/babel-preset-default` in your code._
+
+## Usage
+
+The package is loaded as the `@wordpress/core-fields` script module. A plugin's own script module follows the same shape, keyed by the ids of the fields the plugin registers in PHP:
+
+```js
+export default {
+	'acme/reading-time': {
+		render: ( { item } ) => `${ item.reading_time } min`,
+	},
+};
+```
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

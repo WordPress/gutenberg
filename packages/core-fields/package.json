@@ -1,0 +1,68 @@
+{
+	"name": "@wordpress/core-fields",
+	"version": "0.1.0-prerelease",
+	"description": "JavaScript parts of the fields WordPress core registers on the server for the Fields API.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"dataviews",
+		"fields",
+		"core"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-fields/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/core-fields"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		".": "./build-module/index.mjs"
+	},
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/fields": "file:../fields"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

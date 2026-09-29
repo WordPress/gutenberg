@@ -2340,6 +2340,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-fields",
+		"slug": "packages-core-fields",
+		"markdown_source": "../packages/core-fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-interactive-template",
 		"slug": "packages-create-block-interactive-template",
 		"markdown_source": "../packages/create-block-interactive-template/README.md",
