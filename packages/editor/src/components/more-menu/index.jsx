@@ -10,8 +10,8 @@ import { Menu } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
 import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';
-import MoreMenuGroup from './more-menu-group';
 import MoreMenuPreferenceItem from './more-menu-preference-item';
+import MoreMenuSubmenu, { toMenuItems } from './more-menu-submenu';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -69,58 +69,64 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 			>
 				<Menu.Group>
 					<Menu.GroupLabel>{ _x( 'View', 'noun' ) }</Menu.GroupLabel>
-					<MoreMenuPreferenceItem
-						scope="core"
-						name="fixedToolbar"
-						onToggle={ turnOffDistractionFree }
-						label={ __( 'Top toolbar' ) }
-						info={ __(
-							'Access all block and document tools in a single place'
+					<MoreMenuSubmenu label={ __( 'Appearance' ) }>
+						<MoreMenuPreferenceItem
+							scope="core"
+							name="fixedToolbar"
+							onToggle={ turnOffDistractionFree }
+							label={ __( 'Top toolbar' ) }
+							info={ __(
+								'Access all block and document tools in a single place'
+							) }
+							messageActivated={ __( 'Top toolbar activated.' ) }
+							messageDeactivated={ __(
+								'Top toolbar deactivated.'
+							) }
+						/>
+						<MoreMenuPreferenceItem
+							scope="core"
+							name="distractionFree"
+							label={ __( 'Distraction free' ) }
+							info={ __( 'Write with calmness' ) }
+							handleToggling={ false }
+							onToggle={ () =>
+								toggleDistractionFree( { createNotice: false } )
+							}
+							messageActivated={ __(
+								'Distraction free mode activated.'
+							) }
+							messageDeactivated={ __(
+								'Distraction free mode deactivated.'
+							) }
+							shortcut={ keyboardShortcut.primaryShift( '\\' ) }
+						/>
+						<MoreMenuPreferenceItem
+							scope="core"
+							name="focusMode"
+							label={ __( 'Spotlight mode' ) }
+							info={ __( 'Focus on one block at a time' ) }
+							messageActivated={ __(
+								'Spotlight mode activated.'
+							) }
+							messageDeactivated={ __(
+								'Spotlight mode deactivated.'
+							) }
+						/>
+						<ViewMoreMenuGroup.Slot />
+					</MoreMenuSubmenu>
+					<ActionItem.Slot
+						name="core/plugin-more-menu"
+						fillProps={ { as: MoreMenuItem } }
+					>
+						{ ( items ) => (
+							<MoreMenuSubmenu label={ __( 'Panels' ) }>
+								{ toMenuItems( items ) }
+							</MoreMenuSubmenu>
 						) }
-						messageActivated={ __( 'Top toolbar activated.' ) }
-						messageDeactivated={ __( 'Top toolbar deactivated.' ) }
-					/>
-					<MoreMenuPreferenceItem
-						scope="core"
-						name="distractionFree"
-						label={ __( 'Distraction free' ) }
-						info={ __( 'Write with calmness' ) }
-						handleToggling={ false }
-						onToggle={ () =>
-							toggleDistractionFree( { createNotice: false } )
-						}
-						messageActivated={ __(
-							'Distraction free mode activated.'
-						) }
-						messageDeactivated={ __(
-							'Distraction free mode deactivated.'
-						) }
-						shortcut={ keyboardShortcut.primaryShift( '\\' ) }
-					/>
-					<MoreMenuPreferenceItem
-						scope="core"
-						name="focusMode"
-						label={ __( 'Spotlight mode' ) }
-						info={ __( 'Focus on one block at a time' ) }
-						messageActivated={ __( 'Spotlight mode activated.' ) }
-						messageDeactivated={ __(
-							'Spotlight mode deactivated.'
-						) }
-					/>
-					<ViewMoreMenuGroup.Slot />
+					</ActionItem.Slot>
 				</Menu.Group>
 				<Menu.Separator />
 				<ModeSwitcher />
-				<ActionItem.Slot
-					name="core/plugin-more-menu"
-					fillProps={ { as: MoreMenuItem } }
-				>
-					{ ( items ) => (
-						<MoreMenuGroup label={ __( 'Panels' ) }>
-							{ items }
-						</MoreMenuGroup>
-					) }
-				</ActionItem.Slot>
 				<Menu.Separator />
 				<Menu.Group>
 					<Menu.GroupLabel>{ __( 'Tools' ) }</Menu.GroupLabel>

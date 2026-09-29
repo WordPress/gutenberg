@@ -9,7 +9,7 @@ import resetStyles from '../../../utils/css/resets.module.css';
 import type { ComboboxItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
-	function Item(
+	function UnforwardedItem(
 		{ className, children, variant = 'default', ...restProps },
 		ref
 	) {

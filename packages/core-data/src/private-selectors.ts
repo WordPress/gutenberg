@@ -3,7 +3,7 @@ import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
-import { getSyncManager } from './sync';
+import { getEntitySyncManager } from './entity-sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -19,8 +19,8 @@ const EMPTY_OBJECT = {};
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
-	// undoManager is undefined until the first sync-enabled entity is loaded.
-	return getSyncManager()?.undoManager ?? state.undoManager;
+	// A registered entity sync manager may substitute its own undo manager.
+	return getEntitySyncManager()?.undoManager ?? state.undoManager;
 }
 
 /**
