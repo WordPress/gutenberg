@@ -73,24 +73,20 @@ function getMounts(
 }
 
 /**
- * MariaDB versions whose images predate `healthcheck.sh` and `mariadb-admin`.
- * A major-only "5" is included because the `mariadb:5` tag is 5.5.
- */
-const LEGACY_MARIADB_VERSIONS = [ '5', '5.5', '10.0', '10.1', '10.2', '10.3' ];
-
-/**
  * Gets the database healthcheck for the given MariaDB version.
  *
- * Images from 10.4 onward ship MariaDB's `healthcheck.sh`:
+ * The default `lts` and `latest` images ship MariaDB's `healthcheck.sh`:
  * --connect verifies a TCP connection and that the entrypoint has finished,
  * and --innodb_initialized ensures InnoDB is fully initialized. The
  * MARIADB_AUTO_UPGRADE env var ensures its healthcheck user exists for
  * existing installations.
  *
- * Older images have neither `healthcheck.sh` nor `mariadb-admin`, so they are
- * pinged with `mysqladmin` over TCP. Using 127.0.0.1 rather than localhost
- * avoids the Unix socket, which the temporary server used to initialize a new
- * volume answers before the real server is listening.
+ * Images for a pinned version may predate `healthcheck.sh` (it was added to
+ * the images in 2023, and older tags were never rebuilt), so for those the
+ * script is used when present and `mysqladmin` is pinged over TCP otherwise.
+ * Using 127.0.0.1 rather than localhost avoids the Unix socket, which the
+ * temporary server used to initialize a new volume answers before the real
+ * server is listening.
  *
  * Timing is generous to support slow CI environments.
  *
@@ -99,15 +95,15 @@ const LEGACY_MARIADB_VERSIONS = [ '5', '5.5', '10.0', '10.1', '10.2', '10.3' ];
  * @return {Object} A docker-compose healthcheck object.
  */
 function getMariaDBHealthcheck( mariadbVersion ) {
-	const majorMinor = ( mariadbVersion ?? '' )
-		.split( '.' )
-		.slice( 0, 2 )
-		.join( '.' );
+	const isPinned =
+		!! mariadbVersion &&
+		mariadbVersion !== 'lts' &&
+		mariadbVersion !== 'latest';
 
-	const test = LEGACY_MARIADB_VERSIONS.includes( majorMinor )
+	const test = isPinned
 		? [
 				'CMD-SHELL',
-				'mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"',
+				'if command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 			]
 		: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ];
 

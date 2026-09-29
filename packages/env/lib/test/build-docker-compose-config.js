@@ -206,10 +206,10 @@ describe( 'buildDockerComposeConfig', () => {
 			start_period: '60s',
 		};
 
-		const LEGACY_HEALTHCHECK = {
+		const PINNED_HEALTHCHECK = {
 			test: [
 				'CMD-SHELL',
-				'mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"',
+				'if command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 			],
 			interval: '5s',
 			timeout: '10s',
@@ -257,7 +257,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 			expect( config.services.mysql.image ).toBe( 'mariadb:10.3' );
 			expect( config.services.mysql.healthcheck ).toEqual(
-				LEGACY_HEALTHCHECK
+				PINNED_HEALTHCHECK
 			);
 			expect( config.services[ 'tests-mysql' ].image ).toBe(
 				'mariadb:latest'
@@ -267,8 +267,20 @@ describe( 'buildDockerComposeConfig', () => {
 			);
 		} );
 
-		it.each( [ '5', '5.5', '10.0', '10.1', '10.2', '10.3', '10.3.39' ] )(
-			'uses the legacy health check for %j',
+		it.each( [
+			'5',
+			'5.5',
+			'10.0',
+			'10.3',
+			'10.3.39',
+			'10.5.8',
+			'10.6.4',
+			'10',
+			'10.11',
+			'11',
+			'11.4.2',
+		] )(
+			'uses the health check that detects healthcheck.sh for %j',
 			( version ) => {
 				const config = buildWithVersions( version, version );
 
@@ -276,15 +288,15 @@ describe( 'buildDockerComposeConfig', () => {
 					`mariadb:${ version }`
 				);
 				expect( config.services.mysql.healthcheck ).toEqual(
-					LEGACY_HEALTHCHECK
+					PINNED_HEALTHCHECK
 				);
 				expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
-					LEGACY_HEALTHCHECK
+					PINNED_HEALTHCHECK
 				);
 			}
 		);
 
-		it.each( [ 'lts', 'latest', '10', '10.4', '10.11', '11', '11.4.2' ] )(
+		it.each( [ 'lts', 'latest' ] )(
 			'uses the current health check for %j',
 			( version ) => {
 				const config = buildWithVersions( version, version );
