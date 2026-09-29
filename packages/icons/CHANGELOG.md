@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+-   Add the `formInput` icon, used by the Global Styles form control screens ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 
 ### Enhancements
 
@@ -28,7 +29,6 @@
 
 ### Enhancements
 
--   Add the `formInput` icon, used by the Global Styles form control screens ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Redraw a further 236 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` and `commentAuthorAvatar` drawings. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller, and several drawings in the final batch change by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
 -   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
 -   `manifest.json`: The `public` field now only controls whether an icon ships to WordPress Core ([#83277](https://github.com/WordPress/gutenberg/pull/83277)).
@@ -125,7 +125,7 @@
 
 ### Breaking Changes
 
--   Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 
