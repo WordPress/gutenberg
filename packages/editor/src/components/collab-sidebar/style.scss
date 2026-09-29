@@ -539,6 +539,14 @@ mark.wp-note {
 	min-inline-size: var(--emoji-picker-grid-width);
 }
 
+// While browsing, the category heading spaces the grid from the input.
+// Search results have no heading, so pad them instead: the full picker
+// padding below the input (with the search row's bottom padding) and
+// the same below the last row.
+.editor-collab-sidebar-panel__picker-list.is-searching {
+	padding-block: calc(var(--emoji-picker-padding) - var(--wpds-dimension-padding-sm)) var(--emoji-picker-padding);
+}
+
 .editor-collab-sidebar-panel__picker-group + .editor-collab-sidebar-panel__picker-group {
 	margin-block-start: var(--emoji-picker-padding);
 }

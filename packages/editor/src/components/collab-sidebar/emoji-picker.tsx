@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
 	Autocomplete,
@@ -449,7 +450,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 					</Autocomplete.Empty>
 					<Autocomplete.List
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
-						className="editor-collab-sidebar-panel__picker-list"
+						className={ clsx(
+							'editor-collab-sidebar-panel__picker-list',
+							{ 'is-searching': isSearching }
+						) }
 					>
 						{ isSearching
 							? renderRows( items as EmojiOption[] )
