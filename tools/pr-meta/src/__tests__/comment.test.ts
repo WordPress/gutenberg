@@ -713,6 +713,47 @@ describe( 'keeping the end when truncating', () => {
 		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
 	} );
 
+	/* A trailer's lines are single spaced, so its first blank line is past it. */
+	it( 'keeps a trailer longer than the budget allows around it', () => {
+		const definition = getSection( 'props' )!;
+		const trailer = `\`\`\`\n${ 'Co-authored-by: someone <someone@git.wordpress.org>\n'.repeat(
+			400
+		) }\`\`\``;
+		const body = `${ 'Filler.\n\n'.repeat( 2000 ) }${ trailer }`;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section ).toContain( 'Co-authored-by: someone' );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+	} );
+
+	it( 'keeps every truncated section inside its budget', () => {
+		for ( const definition of SECTIONS ) {
+			const merged = bodyOf(
+				mergeSection(
+					undefined,
+					{
+						id: definition.id,
+						body: 'Line.\n'.repeat( definition.budget ),
+						sha: HEAD,
+						runUrl: 'https://example.com/run',
+					},
+					HEAD
+				)
+			);
+			const section = parseSections( merged ).find(
+				( s ) => s.id === definition.id
+			)!;
+
+			expect( section.body.length ).toBeLessThanOrEqual(
+				definition.budget
+			);
+		}
+	} );
+
 	/* With no line break to cut at, the end cannot be kept safely. */
 	it( 'does not start the kept part inside a fence opener', () => {
 		const definition = getSection( 'props' )!;

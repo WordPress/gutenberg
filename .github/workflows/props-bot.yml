@@ -114,8 +114,9 @@ jobs:
         name: Update PR meta comment
         needs: props-bot
         # Only when the list was gathered: an empty body from a failed run would
-        # clear a props list nothing had disproved.
-        if: ${{ needs.props-bot.result == 'success' }}
+        # clear a props list nothing had disproved. `!cancelled()` because an
+        # implicit `success()` would also weigh the skipped label job.
+        if: ${{ !cancelled() && needs.props-bot.result == 'success' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read

@@ -199,6 +199,9 @@ export function isParseable( commentBody: string ): boolean {
 	return delimiters.length === parseSections( commentBody ).length * 2;
 }
 
+/* Enough for a reopened or closed fence and its newlines. */
+const REPAIR_ROOM = 16;
+
 /* A section written by a newer revision of this action still has to fit. */
 const UNKNOWN_SECTION: SectionDefinition = {
 	id: 'unknown',
@@ -218,22 +221,25 @@ function truncate(
 
 	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
 	const note = `<sub>Truncated.${ link }</sub>`;
+	/* The note and any repaired markup have to fit the budget as well. */
+	const room = definition.budget - note.length - REPAIR_ROOM;
 
 	/*
-	 * Some sections keep their ending instead, where props holds the trailer a
-	 * committer copies. Reopen a fence the dropped part left open, or its
-	 * closing line would fence everything after it.
+	 * Keeping the ending, where props holds the trailer a committer copies.
+	 * Cut at the first line break, never at the first paragraph break: inside
+	 * a fence of single-spaced lines that break comes after the closing
+	 * marker, which would drop the trailer the budget was widened for.
 	 */
-	/* Never mid-line: that could split a fence opener, fencing the rest. */
-	const cut = body.slice( -definition.budget );
-	const paragraph = cut.indexOf( '\n\n' );
-	const boundary = paragraph >= 0 ? paragraph + 2 : cut.indexOf( '\n' ) + 1;
+	if ( definition.keep === 'end' ) {
+		const cut = body.slice( -room );
+		const boundary = cut.indexOf( '\n' ) + 1;
 
-	if ( definition.keep === 'end' && boundary > 0 ) {
-		const kept = cut.slice( boundary );
-		const dropped = body.slice( 0, body.length - kept.length );
+		if ( boundary > 0 ) {
+			const kept = cut.slice( boundary );
+			const dropped = body.slice( 0, body.length - kept.length );
 
-		return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+			return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+		}
 	}
 
 	/*
@@ -241,7 +247,7 @@ function truncate(
 	 * than mid-sentence, then close whatever the cut left open. A note
 	 * appended inside a fence renders as code, taking its link with it.
 	 */
-	const head = body.slice( 0, definition.budget );
+	const head = body.slice( 0, room );
 	const lastBreak = head.lastIndexOf( '\n\n' );
 	const kept = lastBreak > 0 ? head.slice( 0, lastBreak ) : head;
 
@@ -458,7 +464,7 @@ export function mergeSection(
 	/* Leading spaces stay: trimming them would turn indented code into a fence. */
 	const body = demoteHeadings( sanitizeBody( update.body ) )
 		.replace( /^[\r\n]+/, '' )
-		.replace( /\s+$/, '' );
+		.trimEnd();
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);

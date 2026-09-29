@@ -51,7 +51,9 @@ Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and charact
 
 A producer renders its markdown without knowing where it will sit, so any headings in a body are demoted to sit below the section heading, keeping their relative hierarchy. Headings inside a code fence are left alone, and a body deep enough to need a seventh level flattens at the sixth, markdown having no more. Setext headings, the ones underlined with `=` or `-`, are not demoted.
 
-A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open.
+A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open, which is what a body that folds its own items already needs.
+
+`keep` decides which end survives truncation. The default drops the ending, which suits a section whose first lines matter most. `keep: 'end'` drops the beginning instead, for a body like props that closes with the part a reader acts on, and reopens a code fence the dropped start left open.
 
 `scope` decides how staleness is handled. `commit` sections describe one commit, carry its SHA, and are rejected if they arrive from a rerun of an older one. `pr-state` sections describe the pull request as it currently is and carry no SHA.
 
