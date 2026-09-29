@@ -11,6 +11,7 @@ import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import {
 	useMergeRefs,
 	useResizeObserver,
@@ -21,6 +22,11 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
+import {
+	CanvasMargin,
+	CANVAS_MARGIN_WIDTH,
+	CANVAS_MARGIN_MIN_CANVAS_WIDTH,
+} from './canvas-margin';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -397,6 +403,23 @@ function VisualEditor( {
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
 
+	// Device previews float the margin over the backdrop, keeping the previewed
+	// width. Zoom out scales the canvas, so it has no margin.
+	const isDevicePreview = deviceType !== 'Desktop';
+	const hasCanvasMargin = ! isPreview && ! isZoomedOut && ! isDevicePreview;
+	const hasPreviewCanvasMargin =
+		! isPreview && ! isZoomedOut && isDevicePreview;
+	const hasCanvasMarginFill = !! useSlotFills( CanvasMargin.name )?.length;
+	const reservesCanvasMargin = hasCanvasMargin && hasCanvasMarginFill;
+
+	// Reserved inside the canvas, so the margin gets the theme background.
+	// `overflow-x: clip` keeps `100vw` content out of it.
+	const canvasMarginCSS = reservesCanvasMargin
+		? `@media (min-width:${ CANVAS_MARGIN_MIN_CANVAS_WIDTH }px){:root{padding-inline-end:${ CANVAS_MARGIN_WIDTH }px;}body{overflow-x:clip;}:root::after{content:"";position:fixed;inset-block:0;inset-inline-end:${
+				CANVAS_MARGIN_WIDTH - 1
+			}px;width:1px;background:color-mix(in srgb,currentColor 10%,transparent);pointer-events:none;}}`
+		: '';
+
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const iframeBodyMinHeightCSS =
 		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
@@ -424,7 +447,7 @@ function VisualEditor( {
 					isNavigationPreview
 						? `.block-editor-iframe__body{${ centerContentCSS }padding:var(--wp--style--block-gap,2em);}`
 						: ''
-				}`,
+				}${ canvasMarginCSS }`,
 				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
@@ -437,6 +460,7 @@ function VisualEditor( {
 		iframeBodyMinHeightCSS,
 		isNavigationPreview,
 		paddingStyle,
+		canvasMarginCSS,
 	] );
 
 	const typewriterRef = useTypewriter();
@@ -464,6 +488,7 @@ function VisualEditor( {
 				'edit-post-visual-editor',
 				className,
 				{
+					'has-preview-canvas-margin': hasPreviewCanvasMargin,
 					// Vertical padding frames a width-constrained canvas
 					// (device preview or after a resize) as a centered preview.
 					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
@@ -475,6 +500,7 @@ function VisualEditor( {
 		>
 			<SyncConnectionErrorModal />
 			<ResizableEditor
+				className={ clsx( { 'has-canvas-margin': hasCanvasMargin } ) }
 				enableResizing={ enableResizing }
 				width={
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
@@ -574,6 +600,12 @@ function VisualEditor( {
 						) }
 					</RecursionProvider>
 				</BlockCanvas>
+				{ ! isPreview && (
+					<CanvasMargin.Slot
+						bubblesVirtually
+						className="editor-visual-editor__canvas-margin"
+					/>
+				) }
 			</ResizableEditor>
 		</div>
 	);

@@ -17,9 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
@@ -412,37 +410,6 @@ export function useNoteActions() {
 	return { onCreate, onEdit, onDelete };
 }
 
-export function useEnableFloatingSidebar( enabled = false ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		if ( ! enabled ) {
-			return;
-		}
-
-		const { getActiveComplementaryArea } =
-			registry.select( interfaceStore );
-		const { disableComplementaryArea, enableComplementaryArea } =
-			registry.dispatch( interfaceStore );
-
-		// Hiding the complementary area only changes the preferences store.
-		const unsubscribe = registry.subscribe( () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		} );
-
-		return () => {
-			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core' );
-			}
-		};
-	}, [ enabled, registry ] );
-}
-
 /**
  * Keeps the selected note in step with the selected block, and focuses the
  * selected note's thread when the selection asks for it.
@@ -527,10 +494,11 @@ export function useFloatingBoard( {
 
 	// Only floating mode needs measurements; without a subscriber the store
 	// drops its observer.
-	const { heights, anchorRects, canvas, frameOffset } = useSyncExternalStore(
-		isFloating ? store.subscribe : subscribeNoop,
-		store.getSnapshot
-	);
+	const { heights, anchorRects, canvas, frameOffset, scrollbarWidth } =
+		useSyncExternalStore(
+			isFloating ? store.subscribe : subscribeNoop,
+			store.getSnapshot
+		);
 
 	// Moving blocks shifts anchors without resizing anything or re-registering.
 	useLayoutEffect( () => {
@@ -578,15 +546,22 @@ export function useFloatingBoard( {
 		};
 	}, [ sidebarRef, isFloating, canvas ] );
 
-	// Shifts the threads by the canvas frame's offset from the panel.
+	// Offsets the threads by the canvas frame and its scrollbar.
 	useLayoutEffect( () => {
 		const panel = sidebarRef?.current;
 		if ( ! isFloating || ! panel ) {
 			return;
 		}
 		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
-		return () => panel.style.removeProperty( '--canvas-offset' );
-	}, [ sidebarRef, isFloating, frameOffset ] );
+		panel.style.setProperty(
+			'--canvas-scrollbar-width',
+			`${ scrollbarWidth }px`
+		);
+		return () => {
+			panel.style.removeProperty( '--canvas-offset' );
+			panel.style.removeProperty( '--canvas-scrollbar-width' );
+		};
+	}, [ sidebarRef, isFloating, frameOffset, scrollbarWidth ] );
 
 	return {
 		notePositions,
