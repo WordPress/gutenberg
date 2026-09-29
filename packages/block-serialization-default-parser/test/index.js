@@ -8,10 +8,9 @@ import { parse } from '../src';
 
 const testRunner = { describe, expect, test };
 
-describe(
-	'block-serialization-default-parser-js',
-	jsTester( parse, testRunner )
-);
+describe( 'block-serialization-default-parser-js', () => {
+	jsTester( parse, testRunner )();
+} );
 
 phpTester(
 	'block-serialization-default-parser-php',
