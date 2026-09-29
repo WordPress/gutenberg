@@ -309,7 +309,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains(
 			array(
-				'id'     => '@wordpress/fields/server-fields',
+				'id'     => '@wordpress/core-fields',
 				'import' => 'dynamic',
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
@@ -414,7 +414,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		self::reset_registry();
 
 		$this->assertSame(
-			array( '@wordpress/fields/server-fields' => array( 'author' ) ),
+			array( '@wordpress/core-fields' => array( 'author' ) ),
 			gutenberg_get_registered_field_modules( 'postType', 'post' )
 		);
 		$this->assertContains( 'comment_status', array_column( gutenberg_get_registered_fields( 'postType', 'post' ), 'id' ), 'The comment status field is registered without a module.' );
@@ -795,7 +795,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$fields[0]['origin']
 		);
 		$modules = gutenberg_get_registered_field_modules( 'postType', 'page' );
-		$this->assertContains( 'author', $modules['@wordpress/fields/server-fields'], 'The field keeps its modules.' );
+		$this->assertContains( 'author', $modules['@wordpress/core-fields'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
 

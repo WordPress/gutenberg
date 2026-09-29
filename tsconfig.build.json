@@ -19,6 +19,7 @@
 		{ "path": "packages/compose/tsconfig.build.json" },
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-data/tsconfig.build.json" },
+		{ "path": "packages/core-fields" },
 		{ "path": "packages/data" },
 		{ "path": "packages/data-controls" },
 		{ "path": "packages/dataviews/tsconfig.build.json" },
