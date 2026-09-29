@@ -64,8 +64,10 @@ import {
 	type MediaEditorSaveResult,
 } from './use-save-media-editor';
 import { useCropOptions } from './use-crop-options';
+import type { MediaEditorPendingCrop } from './pending-crop';
 
 export type { MediaEditorSaveResult } from './use-save-media-editor';
+export type { MediaEditorPendingCrop } from './pending-crop';
 
 // Embed query for the attachment's author and parent post. Shared between
 // the `getEntityRecord` read and the matching `invalidateResolution` so the
@@ -141,6 +143,10 @@ export interface MediaEditorProps {
 	form?: Form;
 	id: number;
 	aspectRatioPresets?: AspectRatioPreset[];
+	/** Return crops through `onSaved` as `pendingCrop` instead of saving them. */
+	deferCrop?: boolean;
+	/** A pending crop from an earlier session to continue editing. */
+	pendingCrop?: MediaEditorPendingCrop;
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
 	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
@@ -519,6 +525,8 @@ function MediaEditorContent( {
 	form,
 	id,
 	aspectRatioPresets,
+	deferCrop,
+	pendingCrop,
 	onClose,
 	onSaved,
 	renderFrame,
@@ -527,6 +535,23 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const session = useMediaEditor();
+
+	// Apply a pending crop from an earlier session once, after the canvas has
+	// loaded the image.
+	const pendingCropRef = useRef( pendingCrop );
+	const hasSourceImage = !! session.cropper.state.image;
+	const { resume } = session;
+	useEffect( () => {
+		const resumeFrom = pendingCropRef.current;
+		if ( ! hasSourceImage || ! resumeFrom ) {
+			return;
+		}
+		pendingCropRef.current = undefined;
+		resume( {
+			cropper: resumeFrom.cropperState,
+			cropOptions: { aspectRatioValue: resumeFrom.aspectRatioValue },
+		} );
+	}, [ hasSourceImage, resume ] );
 	// Width decides whether the settings panel docks beside the canvas or
 	// takes the whole body. It docks from `small` (600px): the modal is the
 	// viewport less a 16px margin either side, so a 320px panel and the
@@ -742,6 +767,7 @@ function MediaEditorContent( {
 		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		session,
+		deferCrop,
 		id,
 		isImage,
 		media: sourceMedia,

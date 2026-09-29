@@ -21,6 +21,7 @@ import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
  * @property {number}        maxUploadFileSize         Maximum upload file size
  * @property {boolean}       supportsLayout            Whether the editor supports layouts.
  * @property {boolean}       autoAttachMediaEnabled    Whether media in Image or Gallery blocks not yet attached to the post should be automatically attached on save.
+ * @property {boolean}       deferMediaEditorCrops     Whether crops made in the media editor are held on the block and only saved to the media library when the post is saved. Only for hosts that save through `savePost`.
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	...SETTINGS_DEFAULTS,
@@ -33,4 +34,5 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	enableCustomFields: undefined,
 	defaultRenderingMode: 'post-only',
 	autoAttachMediaEnabled: true,
+	deferMediaEditorCrops: false,
 };

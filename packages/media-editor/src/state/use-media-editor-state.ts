@@ -85,6 +85,14 @@ function areCropperImagesEqual(
 }
 
 /**
+ * Edits from an earlier session, to apply to the same image again.
+ */
+export interface MediaEditorResumeState {
+	cropper: Omit< CropperState, 'image' >;
+	cropOptions?: Partial< CropOptionsSlice >;
+}
+
+/**
  * The media editor session exposed by `useMediaEditorState`.
  *
  * The session owns what is being edited and how: the source image,
@@ -126,6 +134,13 @@ export interface MediaEditorSession {
 	 * no-op.
 	 */
 	setSourceImage: ( image: CropperState[ 'image' ] ) => void;
+	/**
+	 * Apply edits from an earlier session to the loaded image. Not recorded
+	 * in history, and the baseline stays the unedited image, so the session
+	 * is dirty afterwards and `reset` goes back to the original. Does nothing
+	 * before an image is loaded.
+	 */
+	resume: ( snapshot: MediaEditorResumeState ) => void;
 	/**
 	 * Whether anything in the session differs from its baseline,
 	 * including editor-only state such as the aspect-ratio preset.
@@ -358,6 +373,23 @@ export function useMediaEditorState(): MediaEditorSession {
 		dispatchWithHistory( { type: 'RESET' } );
 	}, [ dispatchWithHistory ] );
 
+	const resume = useCallback( ( snapshot: MediaEditorResumeState ) => {
+		const current = stateRef.current;
+		if ( ! current.cropper.image ) {
+			return;
+		}
+		const next: MediaEditorState = {
+			...current,
+			cropper: enforceContainment( {
+				...current.cropper,
+				...snapshot.cropper,
+			} ),
+			cropOptions: { ...current.cropOptions, ...snapshot.cropOptions },
+		};
+		stateRef.current = next;
+		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
+	}, [] );
+
 	// =====================================================================
 	// Edits-slice setters
 	// =====================================================================
@@ -480,6 +512,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			edits: state.edits,
 			setEdit,
 			setSourceImage,
+			resume,
 			reset,
 			isDirty,
 			// Only geometry changes the saved image so far.
@@ -498,6 +531,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			state.edits,
 			setEdit,
 			setSourceImage,
+			resume,
 			reset,
 			isDirty,
 			isCropperDirty,
