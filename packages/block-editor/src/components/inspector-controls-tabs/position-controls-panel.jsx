@@ -3,7 +3,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { default as InspectorControls } from '../inspector-controls';
@@ -47,38 +47,27 @@ const hasAnyPositionValue = ( style ) => {
 };
 
 const PositionControlsPanel = () => {
-	const {
-		selectedClientIds,
-		selectedBlocks,
-		selectedStateViewports,
-		hasPositionAttribute,
-	} = useSelect( ( select ) => {
-		const {
-			getBlocksByClientId,
-			getSelectedBlockClientIds,
-			getSelectedBlockStyleState,
-		} = unlock( select( blockEditorStore ) );
+	const { selectedClientIds, selectedBlocks, hasPositionAttribute } =
+		useSelect( ( select ) => {
+			const { getBlocksByClientId, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const _selectedBlocks = getBlocksByClientId( selectedBlockClientIds );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const _selectedBlocks = getBlocksByClientId(
+				selectedBlockClientIds
+			);
 
-		return {
-			selectedClientIds: selectedBlockClientIds,
-			selectedBlocks: _selectedBlocks,
-			selectedStateViewports: Object.fromEntries(
-				selectedBlockClientIds.map( ( clientId ) => [
-					clientId,
-					getPositionStateViewport(
-						getSelectedBlockStyleState( clientId )
-					),
-				] )
-			),
-			hasPositionAttribute: _selectedBlocks?.some( ( { attributes } ) =>
-				hasAnyPositionValue( attributes?.style )
-			),
-		};
-	}, [] );
+			return {
+				selectedClientIds: selectedBlockClientIds,
+				selectedBlocks: _selectedBlocks,
+				hasPositionAttribute: _selectedBlocks?.some(
+					( { attributes } ) =>
+						hasAnyPositionValue( attributes?.style )
+				),
+			};
+		}, [] );
 
+	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -87,9 +76,14 @@ const PositionControlsPanel = () => {
 			return;
 		}
 
+		const { getSelectedBlockStyleState } = unlock(
+			registry.select( blockEditorStore )
+		);
 		const attributesByClientId = Object.fromEntries(
 			selectedBlocks?.map( ( { clientId, attributes } ) => {
-				const viewport = selectedStateViewports[ clientId ];
+				const viewport = getPositionStateViewport(
+					getSelectedBlockStyleState( clientId )
+				);
 				const style = { ...attributes?.style };
 
 				if ( viewport ) {

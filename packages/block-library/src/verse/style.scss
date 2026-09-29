@@ -2,11 +2,15 @@ pre.wp-block-verse {
 	box-sizing: border-box;
 	overflow: auto;
 	white-space: pre-wrap;
-
-	// Prevent text overflow off-screen when the previous block has float.
-	min-width: 1em;
 	word-break: normal;
 	overflow-wrap: break-word;
+}
+
+:root :where(pre.wp-block-verse) {
+	// Prevent text overflow off-screen when the previous block has float.
+	// :root :where() matches Global Styles specificity so a minimum width set
+	// there can win, since block library styles load first.
+	min-width: 1em;
 }
 
 :where(pre.wp-block-verse) {
