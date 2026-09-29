@@ -997,4 +997,44 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'template part' => array( 'wp_template_part', '_gutenberg_register_posttype_wp_template_part_fields' ),
 		);
 	}
+
+	/**
+	 * The post editor preloads the fields of the edited post type, with the
+	 * path the `getFieldsConfig` core data resolver requests.
+	 */
+	public function test_the_post_editor_preloads_the_fields_of_the_post_type() {
+		$post    = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
+		$context = new WP_Block_Editor_Context( array( 'post' => $post ) );
+
+		$paths = apply_filters( 'block_editor_rest_api_preload_paths', array(), $context );
+
+		$this->assertContains( '/wp/v2/fields?kind=postType&name=page', $paths );
+	}
+
+	/**
+	 * The preloaded path serves the fields of the post type.
+	 */
+	public function test_the_preloaded_fields_path_serves_the_fields() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$post    = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
+		$context = new WP_Block_Editor_Context( array( 'post' => $post ) );
+		$paths   = _gutenberg_preload_post_editor_fields( array(), $context );
+
+		$preloaded = array_reduce( $paths, 'rest_preload_api_request', array() );
+
+		$this->assertSame( 'page', $preloaded[ $paths[0] ]['body']['name'] );
+		$this->assertContains( 'author', wp_list_pluck( $preloaded[ $paths[0] ]['body']['fields'], 'id' ) );
+	}
+
+	/**
+	 * Other editors, and a post editor context without a post, are left
+	 * untouched.
+	 */
+	public function test_other_editors_do_not_preload_the_fields() {
+		$site_editor = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
+		$no_post     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-post' ) );
+
+		$this->assertSame( array(), _gutenberg_preload_post_editor_fields( array(), $site_editor ) );
+		$this->assertSame( array(), _gutenberg_preload_post_editor_fields( array(), $no_post ) );
+	}
 }
