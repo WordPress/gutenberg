@@ -21,7 +21,11 @@
  * @return array Updated block editor settings.
  */
 function gutenberg_add_emojibase_settings( $settings ) {
-	$settings['noteEmojibaseUrl']        = gutenberg_url( 'build/emojibase-data' );
+	// Without the copied data the picker would 404 on every open; leaving
+	// the URL unset makes it fall back to the quick reactions instead.
+	if ( is_dir( gutenberg_dir_path() . 'build/emojibase-data' ) ) {
+		$settings['noteEmojibaseUrl'] = gutenberg_url( 'build/emojibase-data' );
+	}
 	$settings['noteEmojiLabelOverrides'] = gutenberg_get_emoji_picker_label_overrides();
 	return $settings;
 }

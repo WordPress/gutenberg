@@ -198,10 +198,15 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		$settings = gutenberg_add_emojibase_settings( array( 'existing' => true ) );
 
 		$this->assertTrue( $settings['existing'] );
-		$this->assertStringEndsWith(
-			'build/emojibase-data',
-			$settings['noteEmojibaseUrl']
-		);
+		if ( is_dir( gutenberg_dir_path() . 'build/emojibase-data' ) ) {
+			$this->assertStringEndsWith(
+				'build/emojibase-data',
+				$settings['noteEmojibaseUrl']
+			);
+		} else {
+			// No copied data, so the picker must not be pointed at a 404.
+			$this->assertArrayNotHasKey( 'noteEmojibaseUrl', $settings );
+		}
 		$this->assertIsArray( $settings['noteEmojiLabelOverrides'] );
 		$this->assertArrayHasKey( '2764', $settings['noteEmojiLabelOverrides'] );
 	}

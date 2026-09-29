@@ -5,8 +5,8 @@
  * JS bundle. One locale is fetched per editor session, so the disk cost
  * is not a network cost.
  *
- * Runs from `tools/build-scripts/build.mjs` after wp-build populates
- * `build/`. Exits 0 when emojibase-data is missing: the editor degrades
+ * Runs from `tools/build-scripts/build.mjs` and `dev.mjs` after wp-build
+ * populates `build/`. Exits 0 when emojibase-data is missing: the editor degrades
  * by hiding the "More emojis" trigger.
  */
 
