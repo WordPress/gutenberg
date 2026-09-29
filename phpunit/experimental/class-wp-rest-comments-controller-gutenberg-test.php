@@ -1279,6 +1279,53 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Restoring a note brings back only the reactions trashed along with it,
+	 * not ones the user had already removed.
+	 */
+	public function test_untrashing_note_does_not_restore_removed_reactions() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id    = $this->create_note( $post_id, self::$editor_id );
+		$removed_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		wp_trash_comment( $removed_id );
+		$live_id = $this->create_reaction( $post_id, $note_id, self::$author_id, 'rocket' );
+
+		wp_trash_comment( $note_id );
+		wp_untrash_comment( $note_id );
+
+		$this->assertSame( 'trash', wp_get_comment_status( $removed_id ), 'A reaction the user removed was restored with its note.' );
+		$this->assertSame( 'approved', wp_get_comment_status( $live_id ), 'The live reaction was not restored with its note.' );
+		$this->assertSame( '', get_comment_meta( $live_id, '_wp_trash_meta_with_note', true ), 'The restored reaction kept its cascade flag.' );
+	}
+
+	/**
+	 * Trashing a note trashes its reactions, so permanently deleting it
+	 * afterwards must still find and delete them.
+	 */
+	public function test_permanently_deleting_trashed_note_deletes_its_reactions() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$removed_id  = $this->create_reaction( $post_id, $note_id, self::$author_id, 'rocket' );
+		wp_trash_comment( $removed_id );
+
+		wp_trash_comment( $note_id );
+		wp_delete_comment( $note_id, true );
+
+		$this->assertNull( get_comment( $reaction_id ), 'A reaction trashed with its note outlived it.' );
+		$this->assertNull( get_comment( $removed_id ), 'A previously removed reaction outlived its note.' );
+	}
+
+	/**
 	 * A reaction may only be added on the current user's own behalf, even by
 	 * a moderator.
 	 */

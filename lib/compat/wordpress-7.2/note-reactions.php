@@ -262,10 +262,11 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_set
  * @since 7.2.0
  *
  * @param WP_Comment $note   The note whose reactions to fetch.
- * @param string     $status Comment status to match. Default 'all'.
+ * @param string     $status Comment status to match. Default 'any', which
+ *                           includes trashed reactions.
  * @return int[] Reaction comment IDs.
  */
-function gutenberg_get_note_reaction_ids( $note, $status = 'all' ) {
+function gutenberg_get_note_reaction_ids( $note, $status = 'any' ) {
 	return get_comments(
 		array(
 			'parent'  => $note->comment_ID,
@@ -298,6 +299,8 @@ function gutenberg_delete_note_reactions( $comment_id, $comment ) {
 		return;
 	}
 
+	// Every status: trashing the note, or the user removing a reaction,
+	// leaves reactions in the trash.
 	foreach ( gutenberg_get_note_reaction_ids( $comment ) as $reaction_id ) {
 		wp_delete_comment( $reaction_id, true );
 	}
@@ -321,8 +324,12 @@ function gutenberg_trash_note_reactions( $comment_id, $comment ) {
 		return;
 	}
 
+	// Flag each one so restoring the note brings back only these, not
+	// reactions the user had already removed.
 	foreach ( gutenberg_get_note_reaction_ids( $comment, 'approve' ) as $reaction_id ) {
-		wp_trash_comment( $reaction_id );
+		if ( wp_trash_comment( $reaction_id ) ) {
+			add_comment_meta( $reaction_id, '_wp_trash_meta_with_note', '1', true );
+		}
 	}
 }
 add_action( 'trashed_comment', 'gutenberg_trash_note_reactions', 10, 2 );
@@ -330,8 +337,9 @@ add_action( 'trashed_comment', 'gutenberg_trash_note_reactions', 10, 2 );
 /**
  * Restores a note's reactions along with the note.
  *
- * The counterpart to gutenberg_trash_note_reactions(), so reopening a note
- * from the trash brings its reactions back with it.
+ * The counterpart to gutenberg_trash_note_reactions(): only reactions
+ * flagged as trashed along with the note come back. Ones the user removed
+ * beforehand stay in the trash.
  *
  * @since 7.2.0
  *
@@ -344,7 +352,22 @@ function gutenberg_untrash_note_reactions( $comment_id, $comment ) {
 	}
 
 	foreach ( gutenberg_get_note_reaction_ids( $comment, 'trash' ) as $reaction_id ) {
-		wp_untrash_comment( $reaction_id );
+		if ( get_comment_meta( $reaction_id, '_wp_trash_meta_with_note', true ) ) {
+			wp_untrash_comment( $reaction_id );
+		}
 	}
 }
 add_action( 'untrashed_comment', 'gutenberg_untrash_note_reactions', 10, 2 );
+
+/**
+ * Clears the flag gutenberg_trash_note_reactions() sets, however a comment
+ * leaves the trash, so a later note restore can't resurrect it.
+ *
+ * @since 7.2.0
+ *
+ * @param string $comment_id The comment ID as a numeric string.
+ */
+function gutenberg_clear_note_reaction_trash_flag( $comment_id ) {
+	delete_comment_meta( $comment_id, '_wp_trash_meta_with_note' );
+}
+add_action( 'untrashed_comment', 'gutenberg_clear_note_reaction_trash_flag', 5 );
