@@ -308,6 +308,35 @@ export default ( props ) => ( element ) => {
 		window.queueMicrotask( handleSelectionChange );
 	}
 
+	// Focus arriving on an ancestor does not fire on the element. Restore
+	// the selection from the record when the element owns it and the
+	// document selection is elsewhere, as `onFocus` does for the element.
+	function onAncestorFocus( event ) {
+		const { target } = event;
+
+		if ( target === element || ! target.contains( element ) ) {
+			return;
+		}
+
+		const { record, isSelected, applyRecord } = props.current;
+
+		if (
+			! isSelected ||
+			record.current.start === undefined ||
+			isPointerDown
+		) {
+			return;
+		}
+
+		const selection = defaultView.getSelection();
+
+		if ( element.contains( selection.anchorNode ) ) {
+			return;
+		}
+
+		applyRecord( record.current );
+	}
+
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
@@ -334,8 +363,15 @@ export default ( props ) => ( element ) => {
 		'focusin',
 		onFocus
 	);
+	const unsubscribeAncestorFocus = subscribeDelegatedListener(
+		ownerDocument,
+		'focusin',
+		onAncestorFocus
+	);
+	// A press anywhere places the caret itself: an ancestor focused by the
+	// press must not restore the selection over it.
 	const unsubscribePointerDown = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'pointerdown',
 		onPointerDown
 	);
@@ -388,6 +424,7 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribeAncestorFocus();
 		unsubscribePointerDown();
 		unsubscribePointerUp();
 		unsubscribePointerCancel();
