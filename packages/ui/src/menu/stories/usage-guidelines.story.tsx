@@ -5,7 +5,8 @@ import { SelectControl } from '../../form/select-control';
 import * as Menu from '../';
 
 const meta: Meta = {
-	title: 'Design System/Components/Menu/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Menu/Usage Guidelines',
+	id: 'design-system-components-menu-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},

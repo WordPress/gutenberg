@@ -74,13 +74,182 @@ describe( 'Combobox', () => {
 		expect( trigger ).toHaveTextContent( 'Choose an item' );
 	} );
 
+	it( 'names chips from content and describes shared Remove buttons with that label', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ], ITEMS[ 1 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
+			'Item 1'
+		);
+		expect( screen.getByLabelText( 'Item 2' ) ).toHaveAccessibleName(
+			'Item 2'
+		);
+
+		const removeButtons = screen.getAllByRole( 'button', {
+			name: 'Remove',
+		} );
+		expect( removeButtons ).toHaveLength( 2 );
+		expect( removeButtons[ 0 ] ).toHaveAccessibleDescription( 'Item 1' );
+		expect( removeButtons[ 1 ] ).toHaveAccessibleDescription( 'Item 2' );
+	} );
+
+	it( 'names chips from mixed content without an aria-label', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										<span aria-hidden="true">*</span>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( /Item 1/ ) ).toHaveAccessibleName(
+			'Item 1'
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toHaveAccessibleDescription( 'Item 1' );
+	} );
+
+	it( 'uses a consumer aria-label instead of chip content', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove
+										key={ item.id }
+										aria-label="Apple"
+									>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Apple' ) ).toHaveAccessibleName(
+			'Apple'
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toHaveAccessibleDescription( 'Apple' );
+	} );
+
+	it( 'describes the remove button with a consumer aria-labelledby', () => {
+		render(
+			<>
+				<span id="chip-name">Apple</span>
+				<Combobox.Root< Item, true >
+					items={ ITEMS }
+					multiple
+					defaultValue={ [ ITEMS[ 0 ] ] }
+				>
+					<Combobox.Chips>
+						<Combobox.Value>
+							{ ( value: Item[] ) => (
+								<>
+									{ value.map( ( item ) => (
+										<Combobox.ChipWithRemove
+											key={ item.id }
+											aria-labelledby="chip-name"
+										>
+											{ item.value }
+										</Combobox.ChipWithRemove>
+									) ) }
+								</>
+							) }
+						</Combobox.Value>
+					</Combobox.Chips>
+				</Combobox.Root>
+			</>
+		);
+
+		expect( screen.getByLabelText( 'Apple' ) ).toHaveAccessibleName(
+			'Apple'
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove' } )
+		).toHaveAccessibleDescription( 'Apple' );
+	} );
+
+	it( 'describes ChipWithRemove with the Backspace or Delete hint by default', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleDescription(
+			'Press Backspace or Delete to remove.'
+		);
+	} );
+
 	describe( 'when disabled', () => {
-		it( 'hides the chip remove button from screen readers', () => {
+		it( 'disables the chip remove button', () => {
 			renderDisabledMultiSelect();
 
 			expect(
-				screen.queryByRole( 'button', { name: 'Remove' } )
-			).not.toBeInTheDocument();
+				screen.getByRole( 'button', { name: 'Remove' } )
+			).toBeDisabled();
 		} );
 
 		it( 'hides the clear button from screen readers', () => {

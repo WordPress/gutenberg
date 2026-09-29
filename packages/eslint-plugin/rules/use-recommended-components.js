@@ -9,9 +9,12 @@ const {
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
  *
+ * Components in `caution` are marked "Use with caution". They are flagged
+ * unless the `allowUseWithCaution` option is enabled.
+ *
  * `message` supports `{{ name }}` and `{{ source }}` placeholders.
  *
- * @type {Record<string, { allowed: string[], message?: string }>}
+ * @type {Record<string, { allowed: string[], caution?: string[], message?: string }>}
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
@@ -52,6 +55,27 @@ const ALLOWLIST = {
 			'VisuallyHidden',
 			'useKeyboardShortcutProps',
 		],
+		caution: [
+			'AlertDialog',
+			'Breadcrumb',
+			'Button',
+			'Checkbox',
+			'CheckboxGroup',
+			'Combobox',
+			'Dialog',
+			'Drawer',
+			'IconButton',
+			'LinkButton',
+			'Menu',
+			'Notice',
+			'Popover',
+			'Radio',
+			'RadioGroup',
+			'SearchableSelect',
+			'SearchableSelectControl',
+			'Switch',
+			'SwitchControl',
+		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
@@ -77,15 +101,14 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalScrollable: '{{ name }} is planned for deprecation.',
+		__experimentalScrollable: 'Write your own CSS instead.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
 		__experimentalSurface:
 			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalZStack:
-			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		BaseControl:
@@ -104,7 +127,7 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
-		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
+		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
@@ -126,9 +149,20 @@ const rule = {
 				'Encourage the use of recommended UI components in a WordPress environment.',
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
 		},
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					allowUseWithCaution: {
+						type: 'boolean',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const { allowUseWithCaution = false } = context.options[ 0 ] ?? {};
 		const privateApisState = createPrivateApisState();
 
 		return {
@@ -162,7 +196,11 @@ const rule = {
 
 					if (
 						allowlistEntry &&
-						! allowlistEntry.allowed.includes( name )
+						! allowlistEntry.allowed.includes( name ) &&
+						! (
+							allowUseWithCaution &&
+							allowlistEntry.caution?.includes( name )
+						)
 					) {
 						context.report( {
 							node: specifier,
