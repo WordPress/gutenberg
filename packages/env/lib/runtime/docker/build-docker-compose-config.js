@@ -73,6 +73,54 @@ function getMounts(
 }
 
 /**
+ * MariaDB versions whose images predate `healthcheck.sh` and `mariadb-admin`.
+ * A major-only "5" is included because the `mariadb:5` tag is 5.5.
+ */
+const LEGACY_MARIADB_VERSIONS = [ '5', '5.5', '10.0', '10.1', '10.2', '10.3' ];
+
+/**
+ * Gets the database healthcheck for the given MariaDB version.
+ *
+ * Images from 10.4 onward ship MariaDB's `healthcheck.sh`:
+ * --connect verifies a TCP connection and that the entrypoint has finished,
+ * and --innodb_initialized ensures InnoDB is fully initialized. The
+ * MARIADB_AUTO_UPGRADE env var ensures its healthcheck user exists for
+ * existing installations.
+ *
+ * Older images have neither `healthcheck.sh` nor `mariadb-admin`, so they are
+ * pinged with `mysqladmin` over TCP. Using 127.0.0.1 rather than localhost
+ * avoids the Unix socket, which the temporary server used to initialize a new
+ * volume answers before the real server is listening.
+ *
+ * Timing is generous to support slow CI environments.
+ *
+ * @param {string|null|undefined} mariadbVersion The configured MariaDB version.
+ *
+ * @return {Object} A docker-compose healthcheck object.
+ */
+function getMariaDBHealthcheck( mariadbVersion ) {
+	const majorMinor = ( mariadbVersion ?? '' )
+		.split( '.' )
+		.slice( 0, 2 )
+		.join( '.' );
+
+	const test = LEGACY_MARIADB_VERSIONS.includes( majorMinor )
+		? [
+				'CMD-SHELL',
+				'mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"',
+			]
+		: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ];
+
+	return {
+		test,
+		interval: '5s',
+		timeout: '10s',
+		retries: 12,
+		start_period: '60s',
+	};
+}
+
+/**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
@@ -172,23 +220,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.development.phpmyadminPort ?? ''
 	}}:80`;
 
-	// MySQL healthcheck using MariaDB's official healthcheck.sh script.
-	// --connect: verifies TCP connection and that entrypoint has finished
-	// --innodb_initialized: ensures InnoDB storage engine is fully initialized
-	// MARIADB_AUTO_UPGRADE env var ensures healthcheck user exists for existing installations.
-	// Timing is generous to support slow CI environments.
-	const mysqlHealthcheck = {
-		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
-		interval: '5s',
-		timeout: '10s',
-		retries: 12,
-		start_period: '60s',
-	};
-
 	// Build the services object, conditionally including tests services.
 	const services = {
 		mysql: {
-			image: 'mariadb:lts',
+			image: `mariadb:${ config.env.development.mariadbVersion ?? 'lts' }`,
 			ports: [ developmentMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
@@ -198,7 +233,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql:/var/lib/mysql' ],
-			healthcheck: mysqlHealthcheck,
+			healthcheck: getMariaDBHealthcheck(
+				config.env.development.mariadbVersion
+			),
 		},
 		wordpress: {
 			depends_on: {
@@ -266,7 +303,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		}}:80`;
 
 		services[ 'tests-mysql' ] = {
-			image: 'mariadb:lts',
+			image: `mariadb:${ config.env.tests.mariadbVersion ?? 'lts' }`,
 			ports: [ testsMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
@@ -276,7 +313,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql-test:/var/lib/mysql' ],
-			healthcheck: mysqlHealthcheck,
+			healthcheck: getMariaDBHealthcheck(
+				config.env.tests.mariadbVersion
+			),
 		};
 		services[ 'tests-wordpress' ] = {
 			depends_on: {
