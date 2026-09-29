@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
+import { useCopyToClipboard } from '@wordpress/compose';
 import Notice from '../index';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
@@ -10,6 +11,14 @@ vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 } ) );
 const mockedSpeak = vi.mocked( speak );
 
+// The clipboard itself is the browser's, so what is asserted here is what the
+// component hands it.
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useCopyToClipboard: vi.fn(),
+} ) );
+const mockedUseCopyToClipboard = vi.mocked( useCopyToClipboard );
+
 function getNoticeWrapper( container: HTMLElement ) {
 	return container.firstChild;
 }
@@ -17,6 +26,8 @@ function getNoticeWrapper( container: HTMLElement ) {
 describe( 'Notice', () => {
 	beforeEach( () => {
 		mockedSpeak.mockReset();
+		mockedUseCopyToClipboard.mockReset();
+		mockedUseCopyToClipboard.mockReturnValue( () => undefined );
 	} );
 
 	it( 'should match snapshot', () => {
@@ -162,6 +173,126 @@ describe( 'Notice', () => {
 			await user.click( link );
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'detail', () => {
+		it( 'should not render a disclosure without a detail', () => {
+			render( <Notice>Updating failed.</Notice> );
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Show details' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Copy error' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should disclose the detail behind a toggle', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Notice detail="The post type is invalid.">
+					Updating failed.
+				</Notice>
+			);
+
+			// The detail stays in the document while collapsed, so that a
+			// browser's find-in-page can still turn it up.
+			const detail = screen.getByText( 'The post type is invalid.' );
+			expect( detail ).not.toBeVisible();
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Show details',
+			} );
+			expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await user.click( trigger );
+
+			expect( detail ).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Hide details' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		it( 'should offer the message and the detail together for copying', () => {
+			render(
+				<Notice status="error" detail="The post type is invalid.">
+					Updating failed.
+				</Notice>
+			);
+
+			// The message alone is not what someone pastes into a search: the
+			// server's account of the failure is the part worth having.
+			expect(
+				screen.getByRole( 'button', { name: 'Copy error' } )
+			).toBeVisible();
+			expect( mockedUseCopyToClipboard.mock.calls[ 0 ][ 0 ] ).toBe(
+				'Updating failed.\n\nThe post type is invalid.'
+			);
+		} );
+
+		it( 'should keep one row of actions when the notice has both', () => {
+			const { container } = render(
+				<Notice
+					status="error"
+					detail="The post type is invalid."
+					actions={ [ { label: 'Try again', onClick() {} } ] }
+				>
+					Updating failed.
+				</Notice>
+			);
+
+			// The disclosure and the copy button are actions like any other, so
+			// they share the notice's row rather than starting a second one.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- asserting on the single actions container.
+			const rows = container.querySelectorAll(
+				'.components-notice__actions'
+			);
+			expect( rows ).toHaveLength( 1 );
+			expect(
+				within( rows[ 0 ] as HTMLElement ).getByRole( 'button', {
+					name: 'Try again',
+				} )
+			).toBeVisible();
+			expect(
+				within( rows[ 0 ] as HTMLElement ).getByRole( 'button', {
+					name: 'Show details',
+				} )
+			).toBeVisible();
+			expect(
+				within( rows[ 0 ] as HTMLElement ).getByRole( 'button', {
+					name: 'Copy error',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'should name the copy button for a notice that is not an error', () => {
+			render(
+				<Notice status="info" detail="Three fonts were installed.">
+					Fonts installed.
+				</Notice>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Copy details' } )
+			).toBeVisible();
+		} );
+
+		it( 'should copy the spoken message when the content is not plain text', () => {
+			render(
+				<Notice
+					status="error"
+					detail="The post type is invalid."
+					spokenMessage="Updating failed."
+				>
+					<strong>Updating failed.</strong>
+				</Notice>
+			);
+
+			expect( mockedUseCopyToClipboard.mock.calls[ 0 ][ 0 ] ).toBe(
+				'Updating failed.\n\nThe post type is invalid.'
+			);
 		} );
 	} );
 } );

@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   `CheckboxControl`: Match the `@wordpress/ui` default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
+-   `Notice`: Add a `detail` prop, holding a fuller account of what went wrong as plain text. It sits behind a disclosure and is offered for copying together with the message, so a failure can be pasted into a search or an assistant without being retyped by hand ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 -   `SelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).

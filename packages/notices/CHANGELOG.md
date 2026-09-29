@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `createNotice`: Accept a `detail` option, holding a fuller account of what went wrong as plain text for when the message cannot say everything a developer needs. It reaches the rendered notice, where it sits behind a disclosure and is offered for copying together with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
 ### Bug Fixes
 
--   `InlineNotices`: Render nothing when passed several children that all render nothing. The check looked at the array itself rather than through it, so `[ false, false ]` counted as content and left an empty wrapper in the DOM.
+-   `InlineNotices`: Render nothing when passed an array of children if all its members represent empty nodes ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ## 5.55.0 (2026-09-10)
 

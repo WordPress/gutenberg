@@ -114,6 +114,14 @@ export type NoticeProps = {
 	 */
 	actions?: Array< NoticeAction >;
 	/**
+	 * A fuller account of what went wrong, as plain text, for when the message
+	 * cannot say everything a developer needs — the server's own report of a
+	 * failure, say. It sits behind a disclosure so it stays out of the way of
+	 * everyone else, and is offered for copying together with the message,
+	 * ready to paste into a search or an assistant.
+	 */
+	detail?: string;
+	/**
 	 * Determines whether or not the message should be parsed as custom HTML
 	 * instead of a string.
 	 */

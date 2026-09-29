@@ -10,6 +10,7 @@
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
 -   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+-   Save failures: Carry the server's account of a failure on the notice's new `detail`, rather than building it into the message as escaped HTML behind `__unstableHTML`. The notice offers it for copying, ready to paste into a search or an assistant, and markup in a server message is stripped rather than the message being dropped ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ### Bug Fixes
 

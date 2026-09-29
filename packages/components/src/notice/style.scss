@@ -58,6 +58,22 @@
 	margin-top: var(--wpds-dimension-gap-sm);
 }
 
+// Takes the place of the actions row, which it holds along with the panel, so
+// that a notice has one row of actions whether or not it discloses a detail.
+// The panel is a block rather than a flex item, so what the notice discloses
+// gets the notice's whole width instead of the width of its trigger.
+.components-notice__detail {
+	grid-column: 1;
+	grid-row: 2;
+}
+
+// Flows as one line like the notice's own message, rather than preserving the
+// line breaks that separate the sentences of a server's account of a failure.
+// Those breaks still reach the clipboard, where the text is read as data.
+.components-notice__detail-message {
+	margin: var(--wpds-dimension-gap-sm) 0 0;
+}
+
 .components-notice__dismiss {
 	grid-column: 2;
 	grid-row: 1;

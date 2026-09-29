@@ -152,6 +152,16 @@ An array of notice actions. Each member object should contain:
 
 The default `variant` of an action button is `'secondary'` if only `onClick` is provided, or `'link'` if `url` is provided.
 
+#### `detail`: `string`
+
+A fuller account of what went wrong, as plain text, for when the message cannot say everything a developer needs — the server's own report of a failure, say. It sits behind a disclosure so it stays out of the way of everyone else, and is offered for copying together with the message, ready to paste into a search or an assistant.
+
+Keep the message itself readable on its own: the detail is for the account a developer or an assistant needs, not a substitute for saying what happened.
+
+The copy button is named for the notice: "Copy error" at the `error` status, "Copy details" otherwise.
+
+- Required: No
+
 ## Related components
 
 - To create a more prominent message that requires action, use a Modal.
