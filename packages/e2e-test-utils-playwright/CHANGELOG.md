@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `RequestUtils.setGutenbergExperiments()`: An experiment left out of the call now returns to its default rather than being switched off, and an experiment can default to on. Passing an empty array resets every experiment to its default instead of disabling all of them. To pin an experiment off regardless of its default, pass a map of flags to states (`{ 'gutenberg-react-19': false }`) in place of the array.
+
 ### Bug Fixes
 
 -   Mark the `@types/node` peer dependency as optional, since it is only needed for type checking ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
