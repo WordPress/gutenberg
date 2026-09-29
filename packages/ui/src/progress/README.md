@@ -59,7 +59,7 @@ The Value child function follows Base UI's API. Check the numeric `value` for `n
 
 Track fills the available width. Its `size` controls thickness: small is 1.5px; medium and large use theme size tokens, which default to 4px and 8px. Default colors and corner radius follow `@wordpress/theme`.
 
-Indicator's `tone` controls its color. Brand uses the WPDS brand thumb token. Its `color` prop accepts any CSS color, including CSS variables and `currentColor` to inherit the surrounding text color. An explicit color overrides `tone` and `style.color`, preserving other inline styles. Track, Label, and Value keep their own colors.
+Indicator's `tone` controls its color. Neutral and brand use the corresponding WPDS background thumb tokens. Its `color` prop accepts any CSS color, including CSS variables and `currentColor` to inherit the surrounding text color. An explicit color overrides `tone` and `style.color`, preserving other inline styles. Track, Label, and Value keep their own colors.
 
 ```tsx
 <Progress.Indicator tone="brand" color="#8b2fc9" />

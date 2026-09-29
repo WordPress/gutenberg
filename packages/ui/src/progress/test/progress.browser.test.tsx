@@ -98,13 +98,13 @@ describe( 'Progress', () => {
 		[ 'dark', '#1e1e1e', '#3858e9' ],
 		[ 'custom', '#ffffff', '#008060' ],
 	] )(
-		'uses the brand token and keeps a neutral track in a %s theme',
+		'uses thumb tokens and keeps a neutral track in a %s theme',
 		async ( _, background, primary ) => {
 			await render(
 				<ThemeProvider color={ { background, primary } }>
 					<Progress.Root aria-label="Neutral" value={ 50 }>
 						<Progress.Track data-testid="neutral-track">
-							<Progress.Indicator />
+							<Progress.Indicator data-testid="neutral-indicator" />
 						</Progress.Track>
 					</Progress.Root>
 					<Progress.Root aria-label="Brand" value={ 50 }>
@@ -116,6 +116,13 @@ describe( 'Progress', () => {
 						</Progress.Track>
 					</Progress.Root>
 					<div
+						data-testid="neutral-color-reference"
+						style={ {
+							backgroundColor:
+								'var(--wpds-color-background-thumb-neutral)',
+						} }
+					/>
+					<div
 						data-testid="brand-color-reference"
 						style={ {
 							backgroundColor:
@@ -123,6 +130,17 @@ describe( 'Progress', () => {
 						} }
 					/>
 				</ThemeProvider>
+			);
+			const neutralIndicator = getComputedStyle(
+				screen.getByTestId( 'neutral-indicator' )
+			);
+			expect( neutralIndicator.backgroundColor ).toBe(
+				getComputedStyle(
+					screen.getByTestId( 'neutral-color-reference' )
+				).backgroundColor
+			);
+			expect( neutralIndicator.backgroundColor ).not.toBe(
+				'rgba(0, 0, 0, 0)'
 			);
 			const neutral = screen.getByTestId( 'neutral-track' );
 			const brand = screen.getByTestId( 'brand-track' );
