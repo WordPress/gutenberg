@@ -75,8 +75,7 @@ export default function ElementPreview( { element }: ElementPreviewProps ) {
 	// Show a caption on the image the Image block uses for its own example,
 	// rather than keeping a second copy of that URL here.
 	const imageUrl = getBlockType( 'core/image' )?.example?.attributes?.url as
-		| string
-		| undefined;
+		string | undefined;
 
 	let sample;
 	switch ( element ) {
@@ -136,13 +135,7 @@ export default function ElementPreview( { element }: ElementPreviewProps ) {
 		default: {
 			// The heading level elements are named after their tag.
 			const Tag = ( /^h[1-6]$/.test( element ) ? element : 'p' ) as
-				| 'h1'
-				| 'h2'
-				| 'h3'
-				| 'h4'
-				| 'h5'
-				| 'h6'
-				| 'p';
+				'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
 			sample = <Tag>{ __( 'Aa' ) }</Tag>;
 		}
 	}

@@ -65,13 +65,13 @@ export function normalizeBorderStyle( newStyle: any ) {
 				right: border,
 				bottom: border,
 				left: border,
-		  }
+			}
 		: {
 				color: null,
 				style: null,
 				width: null,
 				...border,
-		  };
+			};
 
 	return { ...newStyle, border: { ...updatedBorder, radius } };
 }
