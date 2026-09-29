@@ -36,6 +36,8 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Group': Autocomplete.Group,
 		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
 		'Autocomplete.Item': Autocomplete.Item,
+		'Autocomplete.ItemLabel': Autocomplete.ItemLabel,
+		'Autocomplete.ItemDescription': Autocomplete.ItemDescription,
 		'Autocomplete.Row': Autocomplete.Row,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
@@ -78,7 +80,42 @@ export const Default: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Item descriptions contribute to each suggestion's accessible description.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		items: URLS.slice( 0, 3 ),
+		children: [
+			<Autocomplete.Input aria-label="URL" key="input" />,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
+									<Autocomplete.ItemDescription>
+										Suggested URL
+									</Autocomplete.ItemDescription>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -130,7 +167,9 @@ export const OpenOnlyOnMatch: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -216,7 +255,9 @@ export const AsyncItems: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -280,7 +321,9 @@ export const Inline: Story = {
 									key={ command.id }
 									value={ command }
 								>
-									{ command.value }
+									<Autocomplete.ItemLabel>
+										{ command.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -325,7 +368,9 @@ export const WithSearchIconAndClearButton: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -456,7 +501,9 @@ export const InlineMentionAutocomplete: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -510,7 +557,9 @@ export const WithCustomZIndex: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -553,7 +602,9 @@ export const Grouped: Story = {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -585,6 +636,9 @@ const emojiPickerCellStyle: CSSProperties = {
 	aspectRatio: '1 / 1',
 	marginInline: 0,
 	padding: 'var(--wpds-dimension-padding-xs)',
+};
+
+const emojiPickerLabelStyle: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xl)',
 };
 
@@ -646,9 +700,15 @@ export const Grid: Story = {
 														emojiPickerCellStyle
 													}
 												>
-													<span aria-hidden="true">
-														{ emoji.emoji }
-													</span>
+													<Autocomplete.ItemLabel
+														style={
+															emojiPickerLabelStyle
+														}
+													>
+														<span aria-hidden="true">
+															{ emoji.emoji }
+														</span>
+													</Autocomplete.ItemLabel>
 												</Autocomplete.Item>
 											) ) }
 										</Autocomplete.Row>

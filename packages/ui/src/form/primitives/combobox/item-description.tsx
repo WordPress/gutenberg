@@ -2,23 +2,23 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../../../text';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
-import type { SelectItemDescriptionProps } from './types';
+import type { ComboboxItemDescriptionProps } from './types';
 
 const ITEM_DESCRIPTION_DIRECT_CHILD = Symbol();
 
-type InternalItemDescriptionProps = SelectItemDescriptionProps & {
+type InternalItemDescriptionProps = ComboboxItemDescriptionProps & {
 	validationToken?: typeof ITEM_DESCRIPTION_DIRECT_CHILD;
 };
 
 /**
- * Supplementary content for a select item. Its text contributes to the item's
- * accessible description. Use it as a direct child after `Select.ItemLabel`.
- * Content should be text or non-interactive inline markup.
+ * Supplementary content for a combobox item. Its text contributes to the
+ * item's accessible description. Use it as a direct child after
+ * `Combobox.ItemLabel`. Content should be text or non-interactive inline markup.
  */
-const ItemDescription = forwardRef<
+const ForwardedItemDescription = forwardRef<
 	HTMLSpanElement,
-	SelectItemDescriptionProps
->( function UnforwardedItemDescription( props, ref ) {
+	ComboboxItemDescriptionProps
+>( function ItemDescription( props, ref ) {
 	const { className, validationToken, ...restProps } =
 		props as InternalItemDescriptionProps;
 	if (
@@ -26,7 +26,7 @@ const ItemDescription = forwardRef<
 		validationToken !== ITEM_DESCRIPTION_DIRECT_CHILD
 	) {
 		throw new Error(
-			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
+			'ItemDescription: Missing direct item parent. Render ItemDescription as a direct child of Item.'
 		);
 	}
 
@@ -43,4 +43,7 @@ const ItemDescription = forwardRef<
 	);
 } );
 
-export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };
+export {
+	ITEM_DESCRIPTION_DIRECT_CHILD,
+	ForwardedItemDescription as ItemDescription,
+};
