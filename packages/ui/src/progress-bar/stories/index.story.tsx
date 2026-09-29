@@ -4,7 +4,6 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 
 const meta: Meta< typeof ProgressBar > = {
-	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/ProgressBar',
 	id: 'design-system-components-progress-bar',
 	component: ProgressBar,
