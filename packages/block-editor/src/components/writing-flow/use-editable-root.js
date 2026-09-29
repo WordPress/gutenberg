@@ -9,7 +9,7 @@ import {
 } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
-const FIELD_SELECTOR = '[data-wp-block-attribute-key]';
+const EDITABLE_SELECTOR = '[contenteditable="true"]';
 // Marks the field the switch handed to the host, holding the tabindex it had.
 const HOSTED_ATTRIBUTE = 'data-wp-hosted-field';
 
@@ -40,8 +40,8 @@ export default function useEditableRoot() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			// A hosting block has a single field, which may be the block
-			// element itself (paragraph) or a descendant (list item).
+			// The block's own editable element: the block element itself
+			// (paragraph) or a descendant (list item), not a nested block's.
 			function getField( clientId ) {
 				const blockElement = node.querySelector(
 					`[data-block="${ clientId }"]`
@@ -49,11 +49,11 @@ export default function useEditableRoot() {
 				if ( ! blockElement ) {
 					return;
 				}
-				if ( blockElement.matches( FIELD_SELECTOR ) ) {
+				if ( blockElement.matches( EDITABLE_SELECTOR ) ) {
 					return blockElement;
 				}
 				return Array.from(
-					blockElement.querySelectorAll( FIELD_SELECTOR )
+					blockElement.querySelectorAll( EDITABLE_SELECTOR )
 				).find( ( field ) => isInsideRootBlock( blockElement, field ) );
 			}
 
@@ -74,29 +74,6 @@ export default function useEditableRoot() {
 					}
 				}
 				field.removeAttribute( HOSTED_ATTRIBUTE );
-			}
-
-			function engage( clientId ) {
-				if ( ! setContentEditableWrapper( node, true ) ) {
-					return;
-				}
-
-				// The field is edited through the host now. Remove the
-				// attribute so it is not an editing host nested in it, and
-				// the tabindex that made it a focus target. The field of a
-				// block that is not in the DOM yet renders like this. A
-				// field that is not editable (e.g. a locked binding) stays
-				// so: it must not inherit editability from the host.
-				releaseField();
-				const field = getField( clientId );
-				if ( field?.getAttribute( 'contenteditable' ) === 'true' ) {
-					field.setAttribute(
-						HOSTED_ATTRIBUTE,
-						field.getAttribute( 'tabindex' ) ?? ''
-					);
-					field.removeAttribute( 'contenteditable' );
-					field.removeAttribute( 'tabindex' );
-				}
 			}
 
 			function disengage() {
@@ -148,16 +125,32 @@ export default function useEditableRoot() {
 					return;
 				}
 
-				const field = getField( clientId );
-				if ( field && ! field.hasAttribute( 'contenteditable' ) ) {
-					// Already hosted. The selection observer may have
-					// disengaged the host when a multi-selection collapsed
-					// back into this block.
-					setContentEditableWrapper( node, true );
+				// The selection observer may have disengaged the host when a
+				// multi-selection collapsed back into the hosted block.
+				if ( ! setContentEditableWrapper( node, true ) ) {
 					return;
 				}
 
-				engage( clientId );
+				const hosted = node.querySelector( `[${ HOSTED_ATTRIBUTE }]` );
+				if ( hosted && getBlockClientId( hosted ) === clientId ) {
+					return;
+				}
+
+				// The field is edited through the host now. Remove the
+				// attribute so it is not an editing host nested in it, and
+				// the tabindex that made it a focus target. A field that
+				// rich text rendered without the attribute, or that is not
+				// editable (a locked binding), is left as it is.
+				releaseField();
+				const field = getField( clientId );
+				if ( field ) {
+					field.setAttribute(
+						HOSTED_ATTRIBUTE,
+						field.getAttribute( 'tabindex' ) ?? ''
+					);
+					field.removeAttribute( 'contenteditable' );
+					field.removeAttribute( 'tabindex' );
+				}
 			}
 
 			sync();
