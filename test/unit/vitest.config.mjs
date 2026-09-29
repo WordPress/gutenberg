@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
 import { createPlaywrightProvider } from './config/playwright-provider.mjs';
 import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
-import { createPostcssBrowserPlugin } from './config/postcss-browser-plugin.mjs';
+import { createPostcssBrowserPlugin } from '../../storybook/postcss-browser-plugin.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
