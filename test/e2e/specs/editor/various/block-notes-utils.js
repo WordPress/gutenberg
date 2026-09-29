@@ -103,18 +103,15 @@ class BlockNoteUtils {
 			exact: true,
 		} );
 		await notesItem.click();
-		const checkbox = this.#page.getByRole( 'menuitemcheckbox', { name } );
-		await this.#page
+		const item = this.#page
 			.getByRole( 'menuitemradio', { name } )
-			.or( checkbox )
-			.click();
-		// Checkbox items keep the menu and its submenu open.
-		if ( await checkbox.isVisible() ) {
-			await this.#page.keyboard.press( 'Escape' );
-			await expect( checkbox ).toBeHidden();
-			await this.#page.keyboard.press( 'Escape' );
-			await expect( notesItem ).toBeHidden();
-		}
+			.or( this.#page.getByRole( 'menuitemcheckbox', { name } ) );
+		await item.click();
+		// Items keep the menu and its submenu open.
+		await this.#page.keyboard.press( 'Escape' );
+		await expect( item ).toBeHidden();
+		await this.#page.keyboard.press( 'Escape' );
+		await expect( notesItem ).toBeHidden();
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
