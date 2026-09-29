@@ -83,9 +83,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	private function unregister_all_field_modules() {
 		$this->on_fields_api_init(
 			static function ( $registry ) {
-				foreach ( array_keys( $registry->get_all_registered_field_modules() ) as $entity ) {
-					list( $kind, $name ) = explode( '/', $entity, 2 );
-					$registry->unregister( $kind, $name );
+				foreach ( $registry->get_all_registered_field_modules() as $kind => $entities ) {
+					foreach ( array_keys( $entities ) as $name ) {
+						$registry->unregister( $kind, $name );
+					}
 				}
 			}
 		);
@@ -600,6 +601,31 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Entities are told apart by their kind and name, not by a key joining
+	 * them: `a/b` + `c` and `a` + `b/c` are two entities, whose fields and
+	 * script modules do not mix.
+	 */
+	public function test_entities_whose_kind_and_name_join_alike_are_kept_apart() {
+		$result = array();
+		$this->on_fields_api_init(
+			function ( $registry ) use ( &$result ) {
+				$result['first']        = $registry->register( 'test-plugin', 'a/b', 'c', array( $this->field( 'color' ) ), 'plugin/first' );
+				$result['second']       = $registry->register( 'test-plugin', 'a', 'b/c', array( $this->field( 'color' ), $this->field( 'size' ) ), 'plugin/second' );
+				$result['unregistered'] = $registry->unregister( 'a/b', 'c' );
+			}
+		);
+
+		$this->assertTrue( $result['first'], 'The first entity registers its field.' );
+		$this->assertTrue( $result['second'], 'The second entity registers a field with the same id.' );
+		$this->assertSame( array( 'color' ), array_column( $result['unregistered'], 'id' ), 'Unregistering the first entity only removes its own field.' );
+		$this->assertSame( array(), gutenberg_get_registered_fields( 'a/b', 'c' ) );
+		$this->assertSame( array( 'color', 'size' ), array_column( gutenberg_get_registered_fields( 'a', 'b/c' ), 'id' ), 'The second entity keeps its fields.' );
+		$this->assertSame( array( 'plugin/second' => array( 'color', 'size' ) ), gutenberg_get_registered_field_modules( 'a', 'b/c' ), 'The second entity keeps only its own module.' );
+		$this->assertSame( array( 'b/c' => array( 'plugin/second' ) ), gutenberg_get_all_registered_field_modules()['a'], 'Only the second entity has modules under its kind.' );
+		$this->assertArrayNotHasKey( 'a/b', gutenberg_get_all_registered_field_modules(), 'The kind of the first entity, emptied, is forgotten.' );
+	}
+
+	/**
 	 * Unregistering returns the definitions it removes, in registration
 	 * order and with their origin, whatever the order of the ids asked for;
 	 * ids not registered are ignored, and nothing is returned when none is.
@@ -636,7 +662,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 		$this->assertSame( array(), $unregistered['empty'], 'Nothing is returned for an entity without fields.' );
 		$this->assertSame( array(), gutenberg_get_registered_fields( 'test', 'entity' ), 'The entity has no fields left.' );
-		$this->assertArrayNotHasKey( 'test/entity', gutenberg_get_all_registered_field_modules(), 'The entity has no script module left.' );
+		$this->assertArrayNotHasKey( 'test', gutenberg_get_all_registered_field_modules(), 'The entity has no script module left.' );
 	}
 
 	/**
