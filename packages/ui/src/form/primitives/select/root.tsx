@@ -1,6 +1,7 @@
 import { Select as _Select } from '@base-ui/react/select';
 import type { SelectRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
+import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-dismissal-bridge';
 
 /**
  * A component that lets users choose one option from a list.
@@ -16,9 +17,22 @@ import { DirectionProvider } from '../../../utils/direction-provider';
  * provide `isItemEqualToValue`.
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
+	const iframeDismissalProps =
+		useIframeOutsidePressBridge< _Select.Root.ChangeEventDetails >( {
+			defaultOpen: props.defaultOpen,
+			disabled: props.disabled,
+			modal: props.modal ?? true,
+			onOpenChange: ( nextOpen, eventDetails ) =>
+				props.onOpenChange?.( nextOpen, eventDetails ),
+			open: props.open,
+		} );
+
 	return (
 		<DirectionProvider>
-			<_Select.Root< Value, false > { ...props } />
+			<_Select.Root< Value, false >
+				{ ...props }
+				{ ...iframeDismissalProps }
+			/>
 		</DirectionProvider>
 	);
 }
