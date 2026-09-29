@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
 ## 36.0.0 (2026-09-23)
 
 ### Breaking Changes

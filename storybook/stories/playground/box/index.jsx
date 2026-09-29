@@ -1,5 +1,4 @@
-import { useEffect, useState } from '@wordpress/element';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { useState } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
@@ -10,10 +9,6 @@ import styles from './style.module.css';
 
 export default function EditorBox() {
 	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions

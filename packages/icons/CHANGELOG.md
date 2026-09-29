@@ -13,6 +13,10 @@
 -   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).
 -   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
 ## 17.0.0 (2026-09-23)
 
 ### Breaking Changes
