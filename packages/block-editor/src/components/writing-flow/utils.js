@@ -164,19 +164,13 @@ export function setContentEditableWrapper(
 	node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 	// Take focus only when it is within the wrapper, never from other
-	// regions or UI elements, and not from an element that has no caret
-	// yet: WebKit places the caret after the focus event, and moving focus
-	// during it places the caret in the wrapper instead. The selection
-	// observer moves focus once the caret lands. Without preventScroll,
-	// focusing the wrapper scrolls the viewport to the top of the wrapper.
+	// regions or UI elements. Without preventScroll, focusing the wrapper
+	// scrolls the viewport to the top of the wrapper.
 	const { ownerDocument } = node;
-	const { activeElement } = ownerDocument;
 	if (
 		focus &&
 		ownerDocument.hasFocus() &&
-		node.contains( activeElement ) &&
-		( activeElement === node ||
-			ownerDocument.defaultView.getSelection().anchorNode )
+		node.contains( ownerDocument.activeElement )
 	) {
 		node.focus( { preventScroll: true } );
 	}

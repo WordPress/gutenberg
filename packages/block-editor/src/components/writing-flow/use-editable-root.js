@@ -125,6 +125,20 @@ export default function useEditableRoot() {
 					return;
 				}
 
+				// A block's focus handler selects the block before the
+				// browser places the caret in the focused field (WebKit
+				// does so after the focus event). Leave the field alone
+				// until then: the selection observer syncs the caret to
+				// the store, which runs the switch again.
+				const { activeElement } = ownerDocument;
+				if (
+					activeElement !== node &&
+					node.contains( activeElement ) &&
+					! defaultView.getSelection().anchorNode
+				) {
+					return;
+				}
+
 				// The selection observer may have disengaged the host when a
 				// multi-selection collapsed back into the hosted block.
 				if ( ! setContentEditableWrapper( node, true ) ) {
