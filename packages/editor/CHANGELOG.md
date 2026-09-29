@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+-   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### Bug Fixes
 
