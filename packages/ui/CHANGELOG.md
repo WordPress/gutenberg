@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Autocomplete.Item`, `Combobox.Item`, `SearchableSelect.Item`, `SearchableChipSelect.Item`, `SearchableSelectControl.Item`, and `SearchableChipSelectControl.Item` now require an `ItemLabel` as their first direct child, followed only by optional `ItemDescription` components. Wrap existing text children in `ItemLabel` ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 -   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now announce dynamic updates explicitly, for example with `speak()` from `@wordpress/a11y` ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 
 ### New Features
@@ -13,6 +14,7 @@
 ### Enhancements
 
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
+-   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
 
