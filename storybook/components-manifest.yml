@@ -1038,6 +1038,7 @@
       - defaultSize
       - enable
       - grid
+      - gridGap
       - handleClasses
       - handleComponent
       - handleStyles

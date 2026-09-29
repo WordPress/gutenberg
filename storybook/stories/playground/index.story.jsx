@@ -1,7 +1,10 @@
+import { registerCoreBlocks } from '@wordpress/block-library';
 import EditorFullPage from './fullpage';
 import EditorBox from './box';
 import EditorWithUndoRedo from './with-undo-redo';
 import EditorZoomOut from './zoom-out';
+
+registerCoreBlocks();
 
 export default {
 	title: 'Playground/Block Editor',
