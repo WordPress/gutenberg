@@ -6,6 +6,8 @@ export { GroupLabel } from './group-label';
 export { InputGroup } from './input-group';
 export { Input } from './input';
 export { Item } from './item';
+export { ItemDescription } from './item-description';
+export { ItemLabel } from './item-label';
 export { List } from './list';
 export { ListBody } from './list-body';
 export { Popup } from './popup';

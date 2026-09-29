@@ -25,7 +25,7 @@ const TextContainer = ( {
 export const RadioGroupControl = forwardRef<
 	HTMLDivElement,
 	RadioGroupControlProps
->( function RadioGroupControl(
+>( function UnforwardedRadioGroupControl(
 	{
 		items,
 		className,

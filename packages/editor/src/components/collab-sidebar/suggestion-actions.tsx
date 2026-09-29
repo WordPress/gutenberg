@@ -1,11 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
-	__experimentalText as WCText,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -180,10 +179,8 @@ export function SuggestionActionButtons( { thread }: { thread: any } ) {
 			} }
 		>
 			<Button
-				size="compact"
-				className="editor-collab-sidebar-panel__suggestion-accept"
+				size="small"
 				icon={ check }
-				iconSize={ 24 }
 				label={ __( 'Accept suggestion' ) }
 				showTooltip
 				disabled={ decision.applyDisabled }
@@ -191,9 +188,8 @@ export function SuggestionActionButtons( { thread }: { thread: any } ) {
 				onClick={ decision.onApplyClick }
 			/>
 			<Button
-				size="compact"
+				size="small"
 				icon={ closeSmall }
-				iconSize={ 24 }
 				label={ __( 'Reject suggestion' ) }
 				showTooltip
 				disabled={ decision.busy }
@@ -313,27 +309,32 @@ export default function SuggestionActions( { thread }: { thread: any } ) {
 				operations={ payload.operations }
 			/>
 			{ ! isResolved && isGrouped && (
-				<WCText
-					variant="muted"
-					size="12px"
-					className="editor-collab-sidebar-panel__suggestion-group-hint"
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status editor-collab-sidebar-panel__suggestion-group-hint"
 				>
 					{ __(
 						'Part of one block change. Both halves resolve together.'
 					) }
-				</WCText>
+				</Text>
 			) }
 			{ isResolved && (
-				<WCText variant="muted" size="12px">
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status"
+				>
 					{ suggestionStatus === APPLIED
 						? __( 'Applied' )
 						: __( 'Rejected' ) }
-				</WCText>
+				</Text>
 			) }
 			{ ! isResolved && applyDisabledReason && (
-				<WCText variant="muted" size="12px">
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status"
+				>
 					{ applyDisabledReason }
-				</WCText>
+				</Text>
 			) }
 		</Stack>
 	);

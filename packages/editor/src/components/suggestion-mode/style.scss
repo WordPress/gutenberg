@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
 
 // Sidebar/chrome styles for the suggestion-mode UI. The canvas-targeted
 // visual treatments for `.block-editor-block-list__block.is-suggestion-*`
@@ -23,6 +22,12 @@
 	}
 }
 
+// Secondary status lines under a suggestion summary (resolved state, grouped
+// change hint, disabled-apply reason) read as muted metadata.
+.editor-collab-sidebar-panel__suggestion-status {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
 // Inline diff colors for the suggestion preview. Pulled from the design
 // system fallbacks so the rendering still degrades gracefully on themes
 // without `--wp-admin-theme-color` defined.
@@ -39,34 +44,8 @@
 }
 
 // Inline accept/reject buttons live in the note header, right-aligned next
-// to the author info. Force both icons to render at the same box so the
-// checkmark (a thin glyph) visually matches the close glyph next to it,
-// and thicken the check stroke so it reads at a similar visual weight to
-// the denser close glyph.
+// to the author info. They use the same small icon buttons as the note's
+// Resolve and actions menu so the header reads as one row of controls.
 .editor-collab-sidebar-panel__suggestion-header-actions {
 	margin-left: auto;
-
-	.components-button.has-icon {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
-		min-width: $grid-unit-40;
-		padding: 0;
-
-		svg {
-			width: $grid-unit-40;
-			height: $grid-unit-40;
-		}
-
-		// The check path in @wordpress/icons is drawn with a lighter weight
-		// than the close glyph, so pair the filled path with a 1px stroke to
-		// lift it to the same visual density. Target the button's class, not
-		// its aria-label: the label is translated and the selector would
-		// silently stop matching in non-English locales.
-		&.editor-collab-sidebar-panel__suggestion-accept svg path {
-			stroke: currentColor;
-			stroke-width: 1;
-			stroke-linecap: round;
-			stroke-linejoin: round;
-		}
-	}
 }
