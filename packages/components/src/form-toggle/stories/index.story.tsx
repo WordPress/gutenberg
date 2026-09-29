@@ -46,19 +46,3 @@ const Template: StoryFn< typeof FormToggle > = ( { onChange, ...args } ) => {
 
 export const Default: StoryFn< typeof FormToggle > = Template.bind( {} );
 Default.args = {};
-
-const StaticTemplate: StoryFn< typeof FormToggle > = ( args ) => (
-	<FormToggle { ...args } />
-);
-
-export const Unchecked: StoryFn< typeof FormToggle > = StaticTemplate.bind(
-	{}
-);
-Unchecked.args = { checked: false };
-
-export const Disabled: StoryFn< typeof FormToggle > = StaticTemplate.bind( {} );
-Disabled.args = { checked: false, disabled: true };
-
-export const DisabledChecked: StoryFn< typeof FormToggle > =
-	StaticTemplate.bind( {} );
-DisabledChecked.args = { checked: true, disabled: true };
