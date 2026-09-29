@@ -100,16 +100,14 @@ export function useTypewriter() {
 				: ( caretRect.top - scrollContainerY ) /
 					( defaultView.innerHeight - scrollContainerY );
 
-			// If the scroll position is at the start, the active editable element
-			// is the last one, and the caret is positioned within the initial
-			// trigger percentage of the page, do not scroll the page.
-			// The typewriter effect should not kick in until an empty page has been
-			// filled with the initial trigger percentage or the user scrolls
-			// intentionally down.
+			// If the scroll position is at the start and the caret is
+			// positioned within the initial trigger percentage of the page, do
+			// not scroll the page. The typewriter effect should not kick in
+			// until an empty page has been filled with the initial trigger
+			// percentage or the user scrolls intentionally down.
 			if (
 				scrollY === 0 &&
-				relativeScrollPosition < initialTriggerPercentage &&
-				isLastEditableNode()
+				relativeScrollPosition < initialTriggerPercentage
 			) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
@@ -174,58 +172,22 @@ export function useTypewriter() {
 		}
 
 		/**
-		 * Returns the editable element owning the selection: the active
-		 * element, or, when a focused editing host contains the node
-		 * (a selected block supports `editableRoot`), the editable
-		 * element containing the selection.
+		 * Checks if the current situation is eligible for scroll:
+		 * - The component must contain the selection.
+		 * - The selection must be within editable content.
 		 */
-		function getActiveEditableElement() {
-			const { activeElement } = ownerDocument;
-
-			if ( ! activeElement ) {
-				return null;
-			}
-
-			if (
-				! activeElement.isContentEditable ||
-				! activeElement.contains( node )
-			) {
-				return activeElement;
-			}
-
+		function isSelectionEligibleForScroll() {
 			const { anchorNode } = defaultView.getSelection();
 
-			if ( ! anchorNode ) {
-				return null;
+			if ( ! anchorNode || ! node.contains( anchorNode ) ) {
+				return false;
 			}
 
 			const element =
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			return element?.closest( '[contenteditable="true"]' ) ?? null;
-		}
-
-		/**
-		 * Checks if the current situation is eligible for scroll:
-		 * - The component must contain the selection.
-		 * - The active element must be contenteditable.
-		 */
-		function isSelectionEligibleForScroll() {
-			const activeEditableElement = getActiveEditableElement();
-			return (
-				!! activeEditableElement &&
-				node.contains( activeEditableElement ) &&
-				activeEditableElement.isContentEditable
-			);
-		}
-
-		function isLastEditableNode() {
-			const editableNodes = node.querySelectorAll(
-				'[contenteditable="true"]'
-			);
-			const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-			return lastEditableNode === getActiveEditableElement();
+			return !! element?.isContentEditable;
 		}
 
 		// When the user scrolls or resizes, the scroll position should be

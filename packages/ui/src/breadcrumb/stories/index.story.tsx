@@ -5,7 +5,8 @@ import type { ComponentProps } from 'react';
 import * as Breadcrumb from '../';
 
 const meta: Meta< typeof Breadcrumb.Root > = {
-	title: 'Design System/Components/Breadcrumb',
+	title: 'Components/@wordpress-ui/Breadcrumb',
+	id: 'design-system-components-breadcrumb',
 	component: Breadcrumb.Root,
 	subcomponents: {
 		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,

@@ -448,7 +448,7 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
 
-	it( 'drops a pending save when the user leaves Suggest intent, and resumes it on return', async () => {
+	it( 'saves a pending suggestion right away when the user leaves Suggest intent', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 
 		const { registry } = renderInSuggestMode(
@@ -465,7 +465,8 @@ describe( 'SuggestionAutoSave', () => {
 			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
 		} );
 
-		// Leave Suggest mode mid-debounce.
+		// Leave Suggest mode mid-debounce. The suggestion was already made,
+		// so it must not wait for a return to Suggest intent to persist.
 		await act( async () => {
 			vi.advanceTimersByTime( 500 );
 		} );
@@ -474,25 +475,20 @@ describe( 'SuggestionAutoSave', () => {
 				'edit'
 			);
 		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 5000 );
-		} );
+		await flushPromises();
 		await flushPromises();
 
-		expect( createSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 
-		// Returning to Suggest reschedules the still-unsynced entry.
+		// Returning to Suggest does not save the same proposal twice.
 		act( () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
 		} );
-
 		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 5000 );
 		} );
-		await flushPromises();
 		await flushPromises();
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );

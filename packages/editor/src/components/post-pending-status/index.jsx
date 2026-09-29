@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PostPendingStatusCheck from './check';
 import { store as editorStore } from '../../store';
@@ -22,7 +22,7 @@ export function PostPendingStatus() {
 
 	return (
 		<PostPendingStatusCheck>
-			<CheckboxControl
+			<WCCheckboxControl
 				label={ __( 'Pending review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
