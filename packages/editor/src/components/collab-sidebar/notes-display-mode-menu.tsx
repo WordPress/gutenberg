@@ -90,17 +90,17 @@ export function NotesDisplayModeMenu( {
 						value={ displayMode }
 						onValueChange={ setDisplayMode }
 					>
-						<Menu.RadioItem value="full" closeOnClick>
+						<Menu.RadioItem value="full">
 							<Menu.ItemLabel>
 								{ __( 'Expand notes' ) }
 							</Menu.ItemLabel>
 						</Menu.RadioItem>
-						<Menu.RadioItem value="minimized" closeOnClick>
+						<Menu.RadioItem value="minimized">
 							<Menu.ItemLabel>
 								{ __( 'Minimize notes' ) }
 							</Menu.ItemLabel>
 						</Menu.RadioItem>
-						<Menu.RadioItem value="hidden" closeOnClick>
+						<Menu.RadioItem value="hidden">
 							<Menu.ItemLabel>
 								{ __( 'Hide notes' ) }
 							</Menu.ItemLabel>

@@ -434,6 +434,17 @@ test.describe( 'Block Notes: floating notes', () => {
 		);
 
 		await expect( notice ).toBeVisible();
+		// A notes column beside the canvas would cut the notice short.
+		const noticeBox = await page
+			.locator( '.components-notice' )
+			.filter( { hasText: 'Test notice' } )
+			.boundingBox();
+		const canvasBox = await page
+			.locator( 'iframe[name="editor-canvas"]' )
+			.boundingBox();
+		expect(
+			canvasBox.x + canvasBox.width - ( noticeBox.x + noticeBox.width )
+		).toBeLessThan( 40 );
 		await expect
 			.poll( async () => ( await noted.boundingBox() ).y )
 			.toBeGreaterThan( initialTop + 20 );
