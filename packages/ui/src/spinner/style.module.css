@@ -10,7 +10,7 @@
 			overflow: visible;
 			opacity: 1;
 			background-color: transparent;
-			color: var(--wpds-color-foreground-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.indicator {
