@@ -90,41 +90,6 @@ export const Default: Story = {
 	},
 };
 
-/**
- * Use `Combobox.Separator` to set an "Other" choice apart from the fruit.
- */
-export const WithSeparator: Story = {
-	args: {
-		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
-		children: [
-			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup aria-label="Fruit" key="popup">
-				<div style={ inputWrapperStyle }>
-					<Combobox.Input aria-label="Search" placeholder="Search" />
-				</div>
-				<Combobox.List>
-					<Combobox.ListBody>
-						<Combobox.Collection>
-							{ ( item: FixtureItem, index: number ) => (
-								<Fragment key={ item.value }>
-									{ item.value === 'other' && index > 0 && (
-										<Combobox.Separator />
-									) }
-									<Combobox.Item value={ item }>
-										<Combobox.ItemLabel>
-											{ item.label }
-										</Combobox.ItemLabel>
-									</Combobox.Item>
-								</Fragment>
-							) }
-						</Combobox.Collection>
-					</Combobox.ListBody>
-				</Combobox.List>
-			</Combobox.Popup>,
-		],
-	},
-};
-
 export const Compact: Story = {
 	args: {
 		defaultValue: ITEMS[ 0 ],
@@ -495,6 +460,41 @@ export const Grouped: Story = {
 										) }
 									</Combobox.Collection>
 								</Combobox.Group>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Combobox.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: [
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.value }>
+									{ item.value === 'other' && index > 0 && (
+										<Combobox.Separator />
+									) }
+									<Combobox.Item value={ item }>
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
+								</Fragment>
 							) }
 						</Combobox.Collection>
 					</Combobox.ListBody>

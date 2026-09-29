@@ -61,37 +61,6 @@ const separatorItems = [
 ];
 
 /**
- * Use `SelectControl.Separator` to set an "Other" choice apart from the fruit.
- */
-export const WithSeparator: Story = {
-	args: {
-		label: 'Fruit',
-		items: separatorItems,
-		children: [
-			...separatorItems.slice( 0, 2 ).map( ( item ) => (
-				<SelectControl.Item
-					key={ item.value }
-					value={ item }
-					label={ item.label }
-				>
-					<SelectControl.ItemLabel>
-						{ item.label }
-					</SelectControl.ItemLabel>
-				</SelectControl.Item>
-			) ),
-			<SelectControl.Separator key="separator" />,
-			<SelectControl.Item
-				key="other"
-				value={ separatorItems[ 2 ] }
-				label="Other"
-			>
-				<SelectControl.ItemLabel>Other</SelectControl.ItemLabel>
-			</SelectControl.Item>,
-		],
-	},
-};
-
-/**
  * When no value is selected, the trigger shows the default placeholder text.
  *
  * Use the `placeholder` prop to customize text shown.
@@ -231,6 +200,37 @@ export const Grouped: Story = {
 					) ) }
 				</SelectControl.Group>
 			) ),
+		],
+	},
+};
+
+/**
+ * Use `SelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		label: 'Fruit',
+		items: separatorItems,
+		children: [
+			...separatorItems.slice( 0, 2 ).map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<SelectControl.ItemLabel>
+						{ item.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ),
+			<SelectControl.Separator key="separator" />,
+			<SelectControl.Item
+				key="other"
+				value={ separatorItems[ 2 ] }
+				label="Other"
+			>
+				<SelectControl.ItemLabel>Other</SelectControl.ItemLabel>
+			</SelectControl.Item>,
 		],
 	},
 };

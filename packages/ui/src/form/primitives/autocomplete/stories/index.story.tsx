@@ -128,43 +128,6 @@ export const WithItemDescriptions: Story = {
 };
 
 /**
- * Use `Autocomplete.Separator` to set a distinct suggestion apart from commands.
- */
-export const WithSeparator: Story = {
-	args: {
-		items: [ ...COMMANDS.slice( 0, 3 ), { id: 'help', value: 'Get help' } ],
-		openOnInputClick: true,
-		children: [
-			<Autocomplete.Input
-				aria-label="Command"
-				placeholder="Type a command"
-				key="input"
-			/>,
-			<Autocomplete.Popup key="popup">
-				<Autocomplete.List>
-					<Autocomplete.ListBody>
-						<Autocomplete.Collection>
-							{ ( item: FixtureItem, index: number ) => (
-								<Fragment key={ item.id }>
-									{ item.id === 'help' && index > 0 && (
-										<Autocomplete.Separator />
-									) }
-									<Autocomplete.Item value={ item }>
-										<Autocomplete.ItemLabel>
-											{ item.value }
-										</Autocomplete.ItemLabel>
-									</Autocomplete.Item>
-								</Fragment>
-							) }
-						</Autocomplete.Collection>
-					</Autocomplete.ListBody>
-				</Autocomplete.List>
-			</Autocomplete.Popup>,
-		],
-	},
-};
-
-/**
  * Controls the popup so it only opens when there is at least one match.
  */
 export const OpenOnlyOnMatch: Story = {
@@ -647,6 +610,43 @@ export const Grouped: Story = {
 										) }
 									</Autocomplete.Collection>
 								</Autocomplete.Group>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Autocomplete.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...COMMANDS.slice( 0, 3 ), { id: 'help', value: 'Get help' } ],
+		openOnInputClick: true,
+		children: [
+			<Autocomplete.Input
+				aria-label="Command"
+				placeholder="Type a command"
+				key="input"
+			/>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.id }>
+									{ item.id === 'help' && index > 0 && (
+										<Autocomplete.Separator />
+									) }
+									<Autocomplete.Item value={ item }>
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
+									</Autocomplete.Item>
+								</Fragment>
 							) }
 						</Autocomplete.Collection>
 					</Autocomplete.ListBody>

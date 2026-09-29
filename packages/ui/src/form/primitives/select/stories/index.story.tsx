@@ -59,29 +59,6 @@ export const Default: Story = {
 	},
 };
 
-/**
- * Use `Select.Separator` to set an "Other" choice apart from the fruit.
- */
-export const WithSeparator: Story = {
-	args: {
-		items: separatorItems,
-		children: [
-			<Select.Trigger aria-label="Fruit" key="trigger" />,
-			<Select.Popup key="popup">
-				{ separatorItems.slice( 0, 2 ).map( ( item ) => (
-					<Select.Item key={ item.value } value={ item }>
-						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
-					</Select.Item>
-				) ) }
-				<Select.Separator />
-				<Select.Item value={ separatorItems[ 2 ] }>
-					<Select.ItemLabel>Other</Select.ItemLabel>
-				</Select.Item>
-			</Select.Popup>,
-		],
-	},
-};
-
 export const Compact: Story = {
 	args: {
 		...Default.args,
@@ -183,6 +160,29 @@ export const Grouped: Story = {
 						) ) }
 					</Select.Group>
 				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Select.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: separatorItems,
+		children: [
+			<Select.Trigger aria-label="Fruit" key="trigger" />,
+			<Select.Popup key="popup">
+				{ separatorItems.slice( 0, 2 ).map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+				<Select.Separator />
+				<Select.Item value={ separatorItems[ 2 ] }>
+					<Select.ItemLabel>Other</Select.ItemLabel>
+				</Select.Item>
 			</Select.Popup>,
 		],
 	},

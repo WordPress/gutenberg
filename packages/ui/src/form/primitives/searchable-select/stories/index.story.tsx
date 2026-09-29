@@ -160,7 +160,7 @@ export const Grouped: Story = {
 };
 
 /**
- * Use `SearchableSelect.Separator` to set an "Other" choice apart from the fruit.
+ * Use `SearchableSelect.Separator` to set choices apart from each other.
  */
 export const WithSeparator: Story = {
 	args: {
