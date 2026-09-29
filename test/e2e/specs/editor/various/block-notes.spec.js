@@ -1243,6 +1243,8 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
+			// Wide enough for floating notes beside the Settings sidebar.
+			await page.setViewportSize( { width: 1440, height: 720 } );
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Block with notes to resolve' },
@@ -1250,12 +1252,10 @@ test.describe( 'Block Notes', () => {
 			} );
 			await blockNoteUtils.addNote( 'Note B' );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
+			const notes = page.getByRole( 'region', { name: 'Notes' } );
 
 			// Resolve Note A.
-			const threadA = settings.getByRole( 'treeitem', {
+			const threadA = notes.getByRole( 'treeitem', {
 				name: 'Note: Note A',
 			} );
 			await threadA.click();
@@ -1265,7 +1265,7 @@ test.describe( 'Block Notes', () => {
 			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
-			const threadB = settings.getByRole( 'treeitem', {
+			const threadB = notes.getByRole( 'treeitem', {
 				name: 'Note: Note B',
 			} );
 			await expect( threadB ).toBeVisible();
@@ -1323,6 +1323,8 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
+			// Wide enough for floating notes beside the Settings sidebar.
+			await page.setViewportSize( { width: 1440, height: 720 } );
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Block for auto-select' },
@@ -1330,12 +1332,10 @@ test.describe( 'Block Notes', () => {
 			} );
 			await blockNoteUtils.addNote( 'Second note' );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
+			const notes = page.getByRole( 'region', { name: 'Notes' } );
 
 			// Resolve the first note.
-			const firstThread = settings.getByRole( 'treeitem', {
+			const firstThread = notes.getByRole( 'treeitem', {
 				name: 'Note: First note',
 			} );
 			await firstThread.click();
@@ -1356,7 +1356,7 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			// The second (unresolved) note should be the active one.
-			const secondThread = settings.getByRole( 'treeitem', {
+			const secondThread = notes.getByRole( 'treeitem', {
 				name: 'Note: Second note',
 			} );
 			await expect( secondThread ).toHaveAttribute(

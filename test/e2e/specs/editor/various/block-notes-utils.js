@@ -50,6 +50,13 @@ class BlockNoteUtils {
 		} );
 	}
 
+	// Floating notes or the "All notes" sidebar.
+	#getNotesSurface() {
+		return this.#page.getByRole( 'region', {
+			name: /^(Notes|Editor settings)$/,
+		} );
+	}
+
 	async openBlockNoteSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -79,13 +86,23 @@ class BlockNoteUtils {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await this.#page
-			.getByRole( 'menuitem', { name: 'Notes', exact: true } )
-			.click();
+		const notesItem = this.#page.getByRole( 'menuitem', {
+			name: 'Notes',
+			exact: true,
+		} );
+		await notesItem.click();
+		const checkbox = this.#page.getByRole( 'menuitemcheckbox', { name } );
 		await this.#page
 			.getByRole( 'menuitemradio', { name } )
-			.or( this.#page.getByRole( 'menuitemcheckbox', { name } ) )
+			.or( checkbox )
 			.click();
+		// Checkbox items keep the menu and its submenu open.
+		if ( await checkbox.isVisible() ) {
+			await this.#page.keyboard.press( 'Escape' );
+			await expect( checkbox ).toBeHidden();
+			await this.#page.keyboard.press( 'Escape' );
+			await expect( notesItem ).toBeHidden();
+		}
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
@@ -107,15 +124,14 @@ class BlockNoteUtils {
 		await this.#page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( content );
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
 		await expect(
-			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+			this.#getNotesSurface().getByRole( 'treeitem', {
+				name: `Note: ${ content }`,
+			} )
 		).toBeVisible();
 	}
 
@@ -125,9 +141,7 @@ class BlockNoteUtils {
 	 * @param {string} content Reply text.
 	 */
 	async addReply( content ) {
-		const sidebar = this.#page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
+		const sidebar = this.#getNotesSurface();
 		const replyForm = sidebar.getByRole( 'textbox', { name: 'Reply to' } );
 		// The reply form doesn't focus on mount.
 		await replyForm.click();
@@ -143,8 +157,7 @@ class BlockNoteUtils {
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Actions' } )
 			.nth( index )
 			.click();

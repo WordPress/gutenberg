@@ -53,3 +53,30 @@
 		}
 	}
 }
+
+// Keep in sync with `canvas-margin.js`.
+.editor-visual-editor__canvas-margin {
+	display: none;
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 0;
+	width: 280px;
+	pointer-events: none;
+}
+
+// Matches the media query that reserves the space inside the canvas.
+.editor-resizable-editor.has-canvas-margin,
+.editor-visual-editor.has-preview-canvas-margin {
+	container-type: inline-size;
+
+	.editor-visual-editor__canvas-margin {
+		@container (min-width: 880px) {
+			display: block;
+		}
+	}
+}
+
+// Push the slot past the centered preview to the editor edge.
+.editor-visual-editor.has-preview-canvas-margin .editor-visual-editor__canvas-margin {
+	inset-inline-end: calc((100% - 100cqi) / 2);
+}
