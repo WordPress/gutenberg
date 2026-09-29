@@ -157,12 +157,6 @@ function filterElementBlockSupports(
 			return false;
 		}
 
-		// Text alignment is set on the container an element sits in, so it is
-		// offered for blocks and the root rather than per element.
-		if ( support === 'textAlign' && isElement ) {
-			return false;
-		}
-
 		return true;
 	} );
 }
