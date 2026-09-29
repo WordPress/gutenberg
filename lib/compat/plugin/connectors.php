@@ -69,4 +69,4 @@ function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 
 	return $preload_paths;
 }
-add_filter( 'options-connectors-wp-admin_preload_paths', '_gutenberg_connectors_preload_paths' );
+add_filter( 'gutenberg_options_connectors_wp_admin_preload_paths', '_gutenberg_connectors_preload_paths' );
