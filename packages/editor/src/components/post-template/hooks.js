@@ -57,6 +57,9 @@ function useTemplates( postType, postSlug ) {
 	);
 }
 
+/**
+ * @return {import('@wordpress/core-data').WpTemplate[] | null} Templates.
+ */
 export function useAvailableTemplates() {
 	const { postType, postId } = useEditedPostContext();
 	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
