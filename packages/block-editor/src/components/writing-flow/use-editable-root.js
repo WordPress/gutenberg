@@ -10,7 +10,7 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const EDITABLE_SELECTOR = '[contenteditable="true"]';
-// Marks the field the switch handed to the host, holding the tabindex it had.
+// Marks the field the switch handed to the host.
 const HOSTED_ATTRIBUTE = 'data-wp-hosted-field';
 
 /**
@@ -66,12 +66,6 @@ export default function useEditableRoot() {
 				}
 				if ( ! field.hasAttribute( 'contenteditable' ) ) {
 					field.setAttribute( 'contenteditable', 'true' );
-					if ( field.getAttribute( HOSTED_ATTRIBUTE ) ) {
-						field.setAttribute(
-							'tabindex',
-							field.getAttribute( HOSTED_ATTRIBUTE )
-						);
-					}
 				}
 				field.removeAttribute( HOSTED_ATTRIBUTE );
 			}
@@ -156,19 +150,14 @@ export default function useEditableRoot() {
 				}
 
 				// The field is edited through the host now. Remove the
-				// attribute so it is not an editing host nested in it, and
-				// the tabindex that made it a focus target. A field that
-				// rich text rendered without the attribute, or that is not
-				// editable (a locked binding), is left as it is.
+				// attribute so it is not an editing host nested in it. A
+				// field that rich text rendered without the attribute, or
+				// that is not editable (a locked binding), is left as it is.
 				releaseField();
 				const field = getField( clientId );
 				if ( field ) {
-					field.setAttribute(
-						HOSTED_ATTRIBUTE,
-						field.getAttribute( 'tabindex' ) ?? ''
-					);
+					field.setAttribute( HOSTED_ATTRIBUTE, '' );
 					field.removeAttribute( 'contenteditable' );
-					field.removeAttribute( 'tabindex' );
 				}
 			}
 

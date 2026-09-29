@@ -477,10 +477,10 @@ function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
-	// Under the editing host the element is not a focus target (no tabindex
-	// and no contenteditable attribute, see below), so `focus()` on it would
-	// do nothing. Keep it working: place the caret in the element and focus
-	// the host instead.
+	// Under the editing host the element is edited through the host (no
+	// contenteditable attribute, see below), so `focus()` on it would move
+	// focus off the host. Keep it working: place the caret in the element and
+	// focus the host instead.
 	const focusUnderHostRef = useRefEffect(
 		( element ) => {
 			if ( ! isEditingHost ) {
@@ -540,13 +540,7 @@ function RichTextWrapper(
 	// focusable areas on their own, so an explicit tabIndex restores their
 	// focusability.
 	let tabIndex = props.tabIndex;
-	if ( isEditingHost ) {
-		// The field must not be a focus target under the host: iOS focuses a
-		// focusable child on tap, thrashing focus with the host and canceling
-		// native selection gestures (double tap to select a word). Block
-		// props pass tabIndex 0, so remove it explicitly.
-		tabIndex = null;
-	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+	if ( ! isEditingHost && ! shouldDisableEditing && props.tabIndex === 0 ) {
 		tabIndex = null;
 	}
 
