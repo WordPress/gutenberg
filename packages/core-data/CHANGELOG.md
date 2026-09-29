@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).
+
 ## 8.1.0 (2026-09-23)
 
 ### Bug Fixes
