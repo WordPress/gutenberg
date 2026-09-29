@@ -36,6 +36,9 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
 	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -279,10 +282,11 @@ export const AsyncItems: Story = {
 				items={ items }
 				value={ value }
 				open={ open }
-				onValueChange={ ( newValue ) => {
+				onValueChange={ ( newValue, ...changeArgs ) => {
 					setValue(
 						( newValue ?? undefined ) as FixtureItem | undefined
 					);
+					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
 					setOpen( nextOpen );
