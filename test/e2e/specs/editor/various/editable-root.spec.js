@@ -64,17 +64,6 @@ test.describe( 'editableRoot host mode', () => {
 					)
 			)
 			.toBe( true );
-
-		// Neither the block element nor its field is a focus target under
-		// the host: a focusable element around the caret would take focus
-		// from the host on a tap.
-		const item = editor.canvas
-			.getByRole( 'document', { name: 'Block: List item' } )
-			.first();
-		await expect( item ).not.toHaveAttribute( 'tabindex' );
-		await expect(
-			item.locator( '[data-wp-block-attribute-key]' )
-		).not.toHaveAttribute( 'contenteditable' );
 	} );
 
 	test( 'a heading (no support) is not hosted', async ( {

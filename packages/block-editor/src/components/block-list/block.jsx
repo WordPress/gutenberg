@@ -629,7 +629,6 @@ function BlockListBlockProvider( props ) {
 
 				getSettings,
 				getEditedContentOnlySection,
-				canHostEditableRoot,
 				getBlockEditingMode,
 				getBlockName,
 				isFirstMultiSelectedBlock,
@@ -762,9 +761,6 @@ function BlockListBlockProvider( props ) {
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
-				// The wrapper is the editing host for this block: the block
-				// element is not a focus target then, like its field.
-				isEditingHost: _isSelected && canHostEditableRoot( clientId ),
 				isEditingContentOnlySection:
 					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
@@ -869,7 +865,6 @@ function BlockListBlockProvider( props ) {
 		isSelected = false,
 		themeSupportsLayout,
 		isEditingContentOnlySection,
-		isEditingHost,
 		blockEditingMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
@@ -930,7 +925,6 @@ function BlockListBlockProvider( props ) {
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,
-		isEditingHost,
 		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
