@@ -39,7 +39,7 @@ export const Composite = Object.assign(
 	forwardRef<
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
-	>( function Composite(
+	>( function UnforwardedComposite(
 		{
 			// Composite store props
 			activeId,

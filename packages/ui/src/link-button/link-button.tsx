@@ -13,7 +13,7 @@ import styles from './style.module.css';
  * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
-	function LinkButton(
+	function UnforwardedLinkButton(
 		{
 			tone = 'brand',
 			variant = 'solid',
