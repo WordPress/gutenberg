@@ -12,16 +12,8 @@
  * Only the fields with JavaScript parts need an entry. The comment status and
  * notes fields are plain data and have none.
  */
-import type { Field } from '@wordpress/dataviews';
+import type { FieldsScriptParts } from '@wordpress/entity-fields';
 import { authorField } from '@wordpress/fields';
-
-/**
- * The JavaScript parts of a field, keyed by field id.
- */
-type FieldsScriptParts = Record<
-	string,
-	Partial< Omit< Field< any >, 'id' > >
->;
 
 const coreFields: FieldsScriptParts = {
 	author: {

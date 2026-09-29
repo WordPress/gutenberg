@@ -4,7 +4,7 @@ JavaScript parts of the fields WordPress core registers on the server for the Fi
 
 The Fields API declares fields in PHP. What PHP cannot serialize, such as a field's `render` component or its `getElements` callback, ships in a script module registered along with the fields. This package is that script module for the fields WordPress core registers: its default export is an object keyed by field id, holding the JavaScript parts of each field.
 
-The client never imports this package directly. `loadEntityFields` and `useEntityFields` from `@wordpress/views` import it on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id.
+The client never imports this package directly. `loadEntityFields` and `useEntityFields` from [`@wordpress/entity-fields`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/entity-fields/README.md) import it on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id.
 
 ## Installation
 
@@ -18,15 +18,7 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package is loaded as the `@wordpress/core-fields` script module. A plugin's own script module follows the same shape, keyed by the ids of the fields the plugin registers in PHP:
-
-```js
-export default {
-	'acme/reading-time': {
-		render: ( { item } ) => `${ item.reading_time } min`,
-	},
-};
-```
+The package is loaded as the `@wordpress/core-fields` script module. Its default export follows the `FieldsScriptParts` shape documented in `@wordpress/entity-fields`, the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

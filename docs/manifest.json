@@ -2478,6 +2478,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/entity-fields",
+		"slug": "packages-entity-fields",
+		"markdown_source": "../packages/entity-fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/env",
 		"slug": "packages-env",
 		"markdown_source": "../packages/env/README.md",
