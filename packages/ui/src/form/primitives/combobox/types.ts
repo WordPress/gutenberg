@@ -147,8 +147,9 @@ export type ComboboxRootProps<
 	Multiple extends boolean | undefined = false,
 > = _Combobox.Root.Props< Value, Multiple >;
 
-export type ComboboxSeparatorProps = ComponentProps<
-	typeof _Combobox.Separator
+export type ComboboxSeparatorProps = Omit<
+	ComponentProps< typeof _Combobox.Separator >,
+	'orientation'
 >;
 
 export type ComboboxStatusProps = ComponentProps< typeof _Combobox.Status > & {

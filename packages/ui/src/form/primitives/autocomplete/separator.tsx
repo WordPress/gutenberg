@@ -10,7 +10,14 @@ import type { AutocompleteSeparatorProps } from './types';
 export const Separator = forwardRef<
 	HTMLDivElement,
 	AutocompleteSeparatorProps
->( function AutocompleteSeparator( { className, ...props }, ref ) {
+>( function AutocompleteSeparator(
+	{
+		className,
+		orientation: _orientation,
+		...props
+	}: _Autocomplete.Separator.Props,
+	ref
+) {
 	return (
 		<_Autocomplete.Separator
 			ref={ ref }

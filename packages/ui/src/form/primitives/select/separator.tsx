@@ -8,7 +8,14 @@ import type { SelectSeparatorProps } from './types';
  * Renders a visual separator between select items or groups.
  */
 export const Separator = forwardRef< HTMLDivElement, SelectSeparatorProps >(
-	function SelectSeparator( { className, ...props }, ref ) {
+	function SelectSeparator(
+		{
+			className,
+			orientation: _orientation,
+			...props
+		}: _Select.Separator.Props,
+		ref
+	) {
 		return (
 			<_Select.Separator
 				ref={ ref }

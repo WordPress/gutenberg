@@ -8,7 +8,14 @@ import type { ComboboxSeparatorProps } from './types';
  * Renders a visual separator between combobox items or groups.
  */
 export const Separator = forwardRef< HTMLDivElement, ComboboxSeparatorProps >(
-	function ComboboxSeparator( { className, ...props }, ref ) {
+	function ComboboxSeparator(
+		{
+			className,
+			orientation: _orientation,
+			...props
+		}: _Combobox.Separator.Props,
+		ref
+	) {
 		return (
 			<_Combobox.Separator
 				ref={ ref }
