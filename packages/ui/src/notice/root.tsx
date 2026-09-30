@@ -33,7 +33,7 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
  * 			<Notice.Actions>
  * 				<Notice.ActionButton>Action</Notice.ActionButton>
  * 			</Notice.Actions>
- * 			<Notice.CloseIcon onClick={() => {}} />
+ * 			<Notice.CloseIconButton onClick={() => {}} />
  * 		</Notice.Root>
  * 	);
  * }
