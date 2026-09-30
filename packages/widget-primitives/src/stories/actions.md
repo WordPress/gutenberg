@@ -16,7 +16,7 @@ The widget names the intent and, through the key it writes, how the action is fu
 
 Every action carries an **envelope** and exactly one **fulfillment**, which says what triggering it means. The envelope is the action's identity: an `id`, a `label`, and optionally an `icon` (a registered icon name) and a `relevance` hint.
 
-The fulfillment is named by the key that carries it, not by a separate discriminator. Today the only key is `href`, so the only fulfillment is a link: triggering the action goes to a target.
+The fulfillment is named by the key that carries it, not by a separate discriminator. A declaration has one key today, `href`, so its only fulfillment is a link: triggering the action goes to a target.
 
 ```ts
 {
@@ -66,7 +66,7 @@ The dashboard maps it as: `'high'` as text links in a persistent footer, `'mediu
 
 ## Runtime actions
 
-A declaration is static: it exists before the widget mounts and knows nothing of what the widget loads. Some verbs only exist once it does: a label with a count, a target that follows the instance's attributes, a download of the rows on screen. A mounted widget declares those through `useWidgetActions`, with the same envelope and one fulfillment: `href`, as declared, or `callback`, a function the host runs when the action is triggered, pending while a returned promise settles. The host only tracks that pending state; reporting success or failure stays the callback's.
+A declaration is static: it exists before the widget mounts. A label with a count, a target that follows the instance's attributes, or a download of the rows on screen only exist afterwards. A mounted widget declares those through `useWidgetActions`.
 
 ```ts
 const hosted = useWidgetActions(
@@ -83,12 +83,10 @@ const hosted = useWidgetActions(
 );
 ```
 
-The list is compared by value, so it needs no memoization, and a callback always runs its latest version.
+A runtime action takes the same envelope and one fulfillment: `href`, or `callback`, a function the host runs. A promise it returns keeps the action pending until it settles; reporting the outcome stays the callback's.
 
-Three rules hold the two sources together:
+-   **The list is the whole set.** It replaces the previous one, so an action that does not apply is left out. It is compared by value and needs no memoization.
+-   **A shared `id` upgrades the declared action.** The runtime action takes its place and keeps the declared `icon` and `relevance` it leaves out: a declared "Details" becomes "Review 3 items" once the counts arrive. A declared action is never withdrawn, so one that only applies sometimes is declared at runtime alone.
+-   **Placement stays the host's.** Runtime actions ride the same `relevance` scale.
 
--   **Conditioned by not declaring.** The list replaces the previous one; an action that does not apply right now is left out, and the host withdraws it.
--   **The manifest is the baseline, the runtime upgrades it.** A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out. The declared "Details" shows while loading; once the counts arrive, "Review 3 items" with the filtered target replaces it. A declared action is never withdrawn: the manifest holds what every instance offers, and an action that only applies sometimes is declared at runtime alone.
--   **Placement stays the host's.** Runtime actions ride the same `relevance` scale; the widget still never names a surface.
-
-`useWidgetActions` returns whether the host took the actions. Under a host without the `actions` capability it returns `false`, and the widget keeps rendering its own affordance, the same fallback a link keeps without `links`.
+The hook returns `false` under a host without the `actions` capability, and the widget keeps rendering its own affordance.

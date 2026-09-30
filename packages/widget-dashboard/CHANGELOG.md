@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Runtime actions: the engine lends every mounted instance the `actions` host capability, merges what the widget declares through `useWidgetActions` with the type's declared actions (a runtime action carrying a declared `id` takes its place), and routes the result to the footer and the More menu by relevance. A `callback` action materializes as a button, disabled while a returned promise settles ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
+-   Runtime actions: the footer and the More menu place the actions a mounted widget declares through `useWidgetActions`, merged with the type's actions by `id`. A `callback` action mounts a button, disabled while a promise it returns settles ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
 
 ### Enhancements
 

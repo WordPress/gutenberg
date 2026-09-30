@@ -837,11 +837,11 @@ export const RuntimeActions: StoryObj = {
 		docs: {
 			description: {
 				story: `
-A widget declares actions from what only its render knows, through \`useWidgetActions\`; the engine places them like the declared ones.
+A widget declares actions from what its render knows, through \`useWidgetActions\`.
 
-The footer starts with the declared "Details" link, the baseline the type ships. Once the check settles, the widget declares "Review 3 items" with the same \`id\`, and it takes that place: a filtered target under a label carrying the count, mounted as the host's route link. Beside it, "Download CSV" is a \`callback\` action over the checks on screen: the button stays disabled while the export runs.
+The footer starts with the declared "Details" link. Once the check settles, "Review 3 items" takes its place, and "Download CSV" appears beside it: a \`callback\` action, disabled while the export runs.
 
-"Resolve one" shrinks the list: the label follows, and once nothing is left both runtime actions are withdrawn and "Details" returns. The "More" menu keeps the declared low-relevance action throughout.
+"Resolve one" shrinks the list. Once nothing is left, both runtime actions leave and "Details" returns.
 `,
 			},
 		},

@@ -55,13 +55,11 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 
 ### `useWidgetActions( actions )`
 
-It declares the actions a mounted widget wants placed by its host, computed from what the render knows: loaded data, the instance's attributes, a feature gate.
+It declares the actions a mounted widget wants its host to place. The list is the instance's whole set: an action that does not apply is left out.
 
-The list is the instance's whole set, and an action that does not apply right now is left out. A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out.
+A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out.
 
-The list is compared by value, so it can be written inline, and a callback always runs its latest version.
-
-It returns whether the host took the actions. `false` means the host has no `actions` capability, and the widget keeps rendering its own affordances.
+The list is compared by value, so it can be written inline, and a callback always runs its latest version. The hook returns `false` when the host has no `actions` capability, and the widget keeps rendering its own affordance.
 
 ### `HostLink`
 
@@ -79,7 +77,7 @@ Applications mount the provider. `useWidgetHost` reads the bag directly, for a c
 
 `HostLink` reaches the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
 
-The second capability is `actions` (`WidgetHostActions`): `declare` takes the runtime actions of the instance the host binds it to, so the widget never names which instance it is. Hosts that place actions provide it where they mount the widget's render; `useWidgetActions` is the widget's side.
+The second capability is `actions` (`WidgetHostActions`): `declare` takes the runtime actions of one instance. A host that places actions binds it where it mounts the widget's render.
 
 ### Contract types
 
@@ -99,7 +97,7 @@ Today the only key is `href`, a link target, with optional `download` / `openInN
 
 The widget names the intent and how it is fulfilled; the host mounts the primitive and owns placement.
 
-`WidgetCallbackAction` is the runtime-only form: the same envelope with a `callback` fulfillment, a function a mounted widget declares through `useWidgetActions`, never a widget type. `WidgetRuntimeAction` is either form, what hosts materialize; `WidgetActionEnvelope` is the identity both share.
+`WidgetCallbackAction` is the runtime-only form: the same envelope with a `callback` function as fulfillment. `WidgetRuntimeAction` is either form, and `WidgetActionEnvelope` the identity both share.
 
 ### Field types
 
