@@ -273,6 +273,7 @@ async function runPerformanceTests( branches, options ) {
 						SCRIPT_DEBUG: false,
 					},
 					core: wpZipUrl || 'WordPress/WordPress',
+					mariadbVersion: '10.11',
 					plugins: [ buildDir ],
 					themes: [ path.join( testRunnerDir, 'test/emptytheme' ) ],
 					env: {
