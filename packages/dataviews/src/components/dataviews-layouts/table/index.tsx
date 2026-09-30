@@ -274,7 +274,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef, isDefaultUI } = useContext( DataViewsContext );
+	const { containerRef } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -316,21 +316,22 @@ function ViewTable< Item >( {
 	const tableSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const showBulkActions =
+		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
-		if ( ! isDefaultUI ) {
-			return;
-		}
 		const tableHead = tableHeaderRef.current;
 		const ownerDocument = tableHead?.ownerDocument;
 		if (
-			selection.length &&
+			showBulkActions &&
 			tableHead?.contains( ownerDocument?.activeElement ?? null )
 		) {
 			bulkSelectionRef.current?.focus();
 		} else if (
 			hadSelectionRef.current &&
-			! selection.length &&
+			! showBulkActions &&
 			( ownerDocument?.activeElement === ownerDocument?.body ||
 				bulkActionsRef.current?.contains(
 					ownerDocument?.activeElement ?? null
@@ -338,17 +339,15 @@ function ViewTable< Item >( {
 		) {
 			tableSelectionRef.current?.focus();
 		}
-		hadSelectionRef.current = selection.length > 0;
-	}, [ selection.length, isDefaultUI ] );
+		hadSelectionRef.current = showBulkActions;
+	}, [ showBulkActions ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
 		enabledHorizontal: !! actions?.length,
 	} );
 
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
-	const disableHeaderControls =
-		!! isDefaultUI && hasBulkActions && selection.length > 0;
+	const disableHeaderControls = showBulkActions;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -436,7 +435,7 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData ) {
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -509,41 +508,31 @@ function ViewTable< Item >( {
 					} ) }
 					onContextMenu={ handleHeaderContextMenu }
 				>
-					<tr className="dataviews-view-table__row">
+					<tr
+						className="dataviews-view-table__row"
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ disableHeaderControls ? 'true' : undefined }
+					>
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
 								onContextMenu={ handleHeaderContextMenu }
 							>
-								<span
-									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-									inert={
-										disableHeaderControls
-											? 'true'
-											: undefined
-									}
-								>
-									<BulkSelectionCheckbox
-										checkboxRef={
-											isDefaultUI
-												? tableSelectionRef
-												: undefined
-										}
-										selection={ selection }
-										onChangeSelection={ onChangeSelection }
-										data={ data }
-										actions={ actions }
-										getItemId={ getItemId }
-									/>
-								</span>
+								<BulkSelectionCheckbox
+									checkboxRef={ tableSelectionRef }
+									selection={ selection }
+									onChangeSelection={ onChangeSelection }
+									data={ data }
+									actions={ actions }
+									getItemId={ getItemId }
+								/>
 							</th>
 						) }
 						{ hasPrimaryColumn && (
 							<th scope="col">
 								{ titleField && (
 									<ColumnHeaderMenu
-										disabled={ disableHeaderControls }
 										ref={ headerMenuRef(
 											titleField.id,
 											0
@@ -602,7 +591,6 @@ function ViewTable< Item >( {
 									scope="col"
 								>
 									<ColumnHeaderMenu
-										disabled={ disableHeaderControls }
 										ref={ headerMenuRef( column, index ) }
 										fieldId={ column }
 										view={ view }
@@ -634,10 +622,10 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
-					{ isDefaultUI && hasBulkActions && (
+					{ ( hasBulkActions || isActionInProgress ) && (
 						<tr
 							className="dataviews-view-table__bulk-actions-row"
-							hidden={ ! selection.length }
+							hidden={ ! showBulkActions }
 						>
 							<td colSpan={ columnCount }>
 								<div
@@ -647,6 +635,9 @@ function ViewTable< Item >( {
 									inert={ isLoading ? 'true' : undefined }
 								>
 									<BulkActionToolbar
+										onActionInProgressChange={
+											setIsActionInProgress
+										}
 										selectionCheckboxRef={
 											bulkSelectionRef
 										}

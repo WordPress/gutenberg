@@ -7,6 +7,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
+import deprecated from '@wordpress/deprecated';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -18,7 +19,6 @@ import {
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { BulkActionToolbar } from '../components/dataviews-bulk-actions';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -247,7 +247,6 @@ function DataViews< Item >( {
 				hasInitiallyLoaded,
 				onReset,
 				intersectionObserver,
-				isDefaultUI: children === undefined || children === null,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -282,7 +281,13 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Footer: typeof DataViewsFooter;
 };
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionToolbar;
+DataViewsSubComponents.BulkActionToolbar =
+	function DeprecatedBulkActionToolbar() {
+		deprecated( 'DataViews.BulkActionToolbar', {
+			alternative: 'DataViews.Layout',
+		} );
+		return <></>;
+	};
 DataViewsSubComponents.Filters = Filters;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;

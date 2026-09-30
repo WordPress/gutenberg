@@ -45,7 +45,6 @@ type DataViewsContextType< Item > = {
 	empty?: ReactNode;
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;
-	isDefaultUI?: boolean;
 	onReset?: ( () => void ) | false;
 	intersectionObserver?: IntersectionObserver | null;
 };

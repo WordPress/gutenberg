@@ -282,3 +282,7 @@
 	z-index: 2;
 	flex-shrink: 0;
 }
+
+.dataviews-view-grid__bulk-actions-header > .dataviews-bulk-actions:not(:has(.dataviews-bulk-actions-footer__item-count)) {
+	border-bottom-color: transparent;
+}

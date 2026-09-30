@@ -11,7 +11,8 @@
 ### Enhancements
 
 -   List the fields the user can show or hide alphabetically by label in the view config's properties section and in the table's insert column submenus, instead of in the order the consumer declared them ([#83947](https://github.com/WordPress/gutenberg/pull/83947)).
--   DataViews: show bulk actions in the default table and grid headers. On mobile, group eligible actions—including those without icons—in a labeled menu. Custom compositions retain their existing placement. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
+-   DataViews: show bulk actions in table and grid headers. On mobile, group eligible actions—including those without icons—in a labeled menu. `DataViews.BulkActionToolbar` is deprecated and renders nothing; built-in layouts own placement in custom compositions too. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
+
 -   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   Filters: a filter chip now grows to at most the width of the filters row and truncates its values with an ellipsis, instead of wrapping onto several lines ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
