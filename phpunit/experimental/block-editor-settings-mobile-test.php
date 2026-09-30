@@ -55,7 +55,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	public function test_get_assets_includes_script_translations() {
 		wp_set_current_user( self::$admin_id );
 
-		$mock_translations = function( $translations, $file, $handle, $domain ) {
+		$mock_translations = function ( $translations, $file, $handle, $domain ) {
 			if ( 'my-plugin' === $domain ) {
 				return '{"locale_data":{"my-plugin":{"":{"domain":"my-plugin","lang":"fr"},"Hello":["Bonjour"]}}}';
 			}
