@@ -1,8 +1,8 @@
 import { create, RichTextData } from '@wordpress/rich-text';
 
 /**
- * Parse a block attribute value into a rich-text record, applying the cheap
- * `quickReject` substring check before the (relatively costly) parse. Shared
+ * Read a block attribute value as a rich-text record. A plain string is
+ * parsed, after the cheap `quickReject` substring check. Shared
  * by `findMarkerRange` and `findMarkerText` so both resolve offsets the same
  * way from a single code path.
  *
@@ -22,12 +22,12 @@ function parseMarkerValue(
 	if ( id === undefined || id === null ) {
 		return null;
 	}
-	let html = null;
+	// `RichTextData` already holds a parsed record; serializing it only to
+	// parse it again cost two full passes per lookup.
 	if ( value instanceof RichTextData ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
+		return { formats: value.formats, text: value.text };
 	}
+	const html = typeof value === 'string' ? value : null;
 	if ( ! html ) {
 		return null;
 	}

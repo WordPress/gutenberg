@@ -35,8 +35,9 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
-	useReducer,
 	useRef,
+	useState,
+	useSyncExternalStore,
 } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { createSuggestionWriteQueue } from './suggestion-write-queue';
@@ -163,6 +164,16 @@ export interface OverlayContextValue {
 	consumeUndoRedoAdoption: () => boolean;
 }
 
+/**
+ * The overlay API without `entries`. Every member keeps its identity for the
+ * provider's lifetime, so a consumer of `useSuggestionOverlayActions` never
+ * re-renders because some block's overlay changed.
+ */
+export type OverlayActions = Omit< OverlayContextValue, 'entries' > & {
+	getEntries: () => OverlayEntries;
+	subscribeEntries: ( listener: () => void ) => () => void;
+};
+
 type OverlayAction =
 	| {
 			type: 'CAPTURE_BASELINE';
@@ -206,7 +217,7 @@ type OverlayAction =
 
 const EMPTY_ENTRIES: OverlayEntries = Object.freeze( {} );
 
-const OverlayContext = createContext< OverlayContextValue >( {
+const DEFAULT_OVERLAY: OverlayContextValue = {
 	entries: EMPTY_ENTRIES,
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
@@ -231,6 +242,16 @@ const OverlayContext = createContext< OverlayContextValue >( {
 	getLastContentCaptureSeq: () => 0,
 	armUndoRedoAdoption: () => {},
 	consumeUndoRedoAdoption: () => false,
+};
+
+const OverlayContext = createContext< OverlayContextValue >( DEFAULT_OVERLAY );
+
+const { entries: _defaultEntries, ...DEFAULT_ACTIONS } = DEFAULT_OVERLAY;
+
+const OverlayActionsContext = createContext< OverlayActions >( {
+	...DEFAULT_ACTIONS,
+	getEntries: () => EMPTY_ENTRIES,
+	subscribeEntries: () => () => {},
 } );
 
 /**
@@ -381,6 +402,33 @@ export function overlayReducer(
 }
 
 /**
+ * A minimal external store around `overlayReducer`: `dispatch` applies the
+ * reducer synchronously and notifies subscribers only when state changed.
+ *
+ * @return Store with `get`, `subscribe`, and `dispatch`.
+ */
+function createEntriesStore() {
+	let current: OverlayEntries = EMPTY_ENTRIES;
+	const listeners = new Set< () => void >();
+	return {
+		get: () => current,
+		subscribe: ( listener: () => void ) => {
+			listeners.add( listener );
+			return () => {
+				listeners.delete( listener );
+			};
+		},
+		dispatch: ( action: OverlayAction ) => {
+			const next = overlayReducer( current, action );
+			if ( next !== current ) {
+				current = next;
+				listeners.forEach( ( listener ) => listener() );
+			}
+		},
+	};
+}
+
+/**
  * Provider exposing the suggestion overlay to descendant blocks.
  *
  * The overlay is intentionally in-memory only. It stores pending attribute
@@ -393,7 +441,19 @@ export function SuggestionOverlayProvider( {
 }: {
 	children: ReactNode;
 } ) {
-	const [ entries, dispatch ] = useReducer( overlayReducer, EMPTY_ENTRIES );
+	/*
+	 * Entries live in a small external store rather than `useReducer`, so
+	 * per-block consumers can subscribe to their own entry (`useOverlayEntry`)
+	 * instead of re-rendering on every block's overlay write, and so
+	 * `hasOverlay` reads the current state right after a dispatch.
+	 */
+	const [ entriesStore ] = useState( createEntriesStore );
+	const {
+		dispatch,
+		get: getEntries,
+		subscribe: subscribeEntries,
+	} = entriesStore;
+	const entries = useSyncExternalStore( subscribeEntries, getEntries );
 	const registry = useRegistry();
 
 	const captureBaseline = useCallback(
@@ -408,7 +468,7 @@ export function SuggestionOverlayProvider( {
 				blockName,
 				attributes,
 			} ),
-		[]
+		[ dispatch ]
 	);
 
 	const setOverlayAttributes = useCallback(
@@ -419,12 +479,12 @@ export function SuggestionOverlayProvider( {
 				attributes,
 				seq: nextCaptureSeq(),
 			} ),
-		[]
+		[ dispatch ]
 	);
 
 	const clearOverlay = useCallback(
 		( clientId: string ) => dispatch( { type: 'CLEAR_OVERLAY', clientId } ),
-		[]
+		[ dispatch ]
 	);
 
 	const clearOverlayForComment = useCallback(
@@ -434,19 +494,19 @@ export function SuggestionOverlayProvider( {
 				clientId,
 				commentId,
 			} ),
-		[]
+		[ dispatch ]
 	);
 
 	const setCommentId = useCallback(
 		( clientId: string, commentId: number | null ) =>
 			dispatch( { type: 'SET_COMMENT_ID', clientId, commentId } ),
-		[]
+		[ dispatch ]
 	);
 
 	const setSyncedOpsKey = useCallback(
 		( clientId: string, syncedOpsKey: string | null ) =>
 			dispatch( { type: 'SET_SYNCED_OPS_KEY', clientId, syncedOpsKey } ),
-		[]
+		[ dispatch ]
 	);
 
 	/*
@@ -474,19 +534,19 @@ export function SuggestionOverlayProvider( {
 				seq: nextCaptureSeq(),
 			} );
 		},
-		[]
+		[ dispatch ]
 	);
 
 	const hasEntries = Object.keys( entries ).length > 0;
 
 	const hasOverlay = useCallback(
 		( clientId: string ) => {
-			const entry = entries[ clientId ];
+			const entry = getEntries()[ clientId ];
 			return (
 				!! entry && Object.keys( entry.overlayAttributes ).length > 0
 			);
 		},
-		[ entries ]
+		[ getEntries ]
 	);
 
 	// Tracks clientIds whose next block-attribute mutation should bypass the
@@ -689,25 +749,25 @@ export function SuggestionOverlayProvider( {
 		if ( ! hasEntries ) {
 			return;
 		}
-		const getLive = registry.select(
-			BLOCK_EDITOR_STORE_NAME
-		)?.getClientIdsWithDescendants;
-		if ( ! getLive ) {
+		const blockEditor: any = registry.select( BLOCK_EDITOR_STORE_NAME );
+		if ( ! blockEditor?.getClientIdsWithDescendants ) {
 			return;
 		}
-		const live = getLive();
-		const liveSet = new Set( live );
+		// One lookup per entry; the full-tree id list is only built when an
+		// orphan is actually found.
 		const hasOrphan = Object.keys( entries ).some(
-			( key ) => ! liveSet.has( key )
+			( key ) => ! blockEditor.getBlockName( key )
 		);
 		if ( hasOrphan ) {
-			dispatch( { type: 'PRUNE_ORPHANS', liveClientIds: live } );
+			dispatch( {
+				type: 'PRUNE_ORPHANS',
+				liveClientIds: blockEditor.getClientIdsWithDescendants(),
+			} );
 		}
-	}, [ hasEntries, blockCount, entries, registry ] );
+	}, [ hasEntries, blockCount, entries, registry, dispatch ] );
 
-	const value = useMemo(
+	const actions = useMemo< OverlayActions >(
 		() => ( {
-			entries,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
@@ -730,9 +790,10 @@ export function SuggestionOverlayProvider( {
 			getLastContentCaptureSeq,
 			armUndoRedoAdoption,
 			consumeUndoRedoAdoption,
+			getEntries,
+			subscribeEntries,
 		} ),
 		[
-			entries,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
@@ -755,13 +816,22 @@ export function SuggestionOverlayProvider( {
 			getLastContentCaptureSeq,
 			armUndoRedoAdoption,
 			consumeUndoRedoAdoption,
+			getEntries,
+			subscribeEntries,
 		]
 	);
 
+	const value = useMemo(
+		() => ( { ...actions, entries } ),
+		[ actions, entries ]
+	);
+
 	return (
-		<OverlayContext.Provider value={ value }>
-			{ children }
-		</OverlayContext.Provider>
+		<OverlayActionsContext.Provider value={ actions }>
+			<OverlayContext.Provider value={ value }>
+				{ children }
+			</OverlayContext.Provider>
+		</OverlayActionsContext.Provider>
 	);
 }
 
@@ -772,4 +842,30 @@ export function SuggestionOverlayProvider( {
  */
 export function useSuggestionOverlay(): OverlayContextValue {
 	return useContext( OverlayContext );
+}
+
+/**
+ * Hook returning the overlay API without `entries`. Its value never changes
+ * identity, so per-block consumers can use it without re-rendering on other
+ * blocks' overlay writes.
+ *
+ * @return Overlay actions.
+ */
+export function useSuggestionOverlayActions(): OverlayActions {
+	return useContext( OverlayActionsContext );
+}
+
+/**
+ * Subscribe to one block's overlay entry. Re-renders only when that entry
+ * changes, which the reducer signals by replacing the entry object.
+ *
+ * @param clientId Block client id.
+ * @return The block's overlay entry, or undefined.
+ */
+export function useOverlayEntry( clientId: string ): OverlayEntry | undefined {
+	const { getEntries, subscribeEntries } = useSuggestionOverlayActions();
+	return useSyncExternalStore(
+		subscribeEntries,
+		() => getEntries()[ clientId ]
+	);
 }
