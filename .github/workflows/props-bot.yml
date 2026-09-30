@@ -33,9 +33,10 @@ on:
 # is also what keeps two gathers from writing their lists out of order.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. A fork's review run stands apart: its token cannot write, so
-    # sharing the key would let it cancel a run that could have.
-    group: ${{ github.workflow }}-${{ ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    # places. Two kinds of run stand apart, or they would cancel a refresh and
+    # then do nothing in its place: a label event that is not `props-bot`, whose
+    # jobs all skip, and a fork's review run, whose token cannot write.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
