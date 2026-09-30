@@ -1649,7 +1649,8 @@
       - politeness
       - spokenMessage
 - name: Spinner
-  props: []
+  props:
+      - color
 - name: Stack
   props:
       - align
