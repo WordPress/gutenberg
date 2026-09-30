@@ -37,14 +37,15 @@ export function usePostScheduleLabel( { full = false } = {} ) {
 }
 
 export function getFullPostScheduleLabel( dateAttribute ) {
-	const date = getDate( dateAttribute );
-
 	const timezoneAbbreviation = getTimezoneAbbreviation();
-	const formattedDate = dateI18n(
-		// translators: Use a non-breaking space between 'g:i' and 'a' if appropriate.
-		_x( 'F j, Y g:i\xa0a', 'post schedule full date format' ),
-		date
-	);
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const formattedDate = useSelect( () => {
+		const date = getDate( dateAttribute ); // Ensure `getDate` is imported or defined.
+		const dateFormat = getSettings().formats.date;
+		const timeFormat = getSettings().formats.time;
+		const fullDateFormat = `${ dateFormat } ${ timeFormat }`;
+		return date ? dateI18n( fullDateFormat, date ) : null;
+	}, [ dateAttribute ] );
 	return isRTL()
 		? `${ timezoneAbbreviation } ${ formattedDate }`
 		: `${ formattedDate } ${ timezoneAbbreviation }`;
