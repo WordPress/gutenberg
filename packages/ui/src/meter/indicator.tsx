@@ -9,14 +9,10 @@ import styles from './style.module.css';
  * The filled portion of the track representing the measured value.
  */
 export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
-	function MeterIndicator(
-		{ tone = 'neutral', color, className, style, ...props },
-		ref
-	) {
+	function MeterIndicator( { tone = 'neutral', className, ...props }, ref ) {
 		return (
 			<_Meter.Indicator
 				ref={ ref }
-				style={ color === undefined ? style : { ...style, color } }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.indicator,

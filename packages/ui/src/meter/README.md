@@ -22,7 +22,7 @@ import { Meter, Stack } from '@wordpress/ui';
 | --- | --- | --- |
 | `Meter.Root` | Shares the measured value and exposes the `meter` role. Defaults to a vertical `Stack` with a small gap. | Required `value: number`; `min`, `max`, `format`, `locale`, `getAriaValueText` |
 | `Meter.Track` | The neutral background that contains and clips the indicator. | `children` |
-| `Meter.Indicator` | The filled portion of the track. | `tone: 'neutral' \| 'brand'`, default `'neutral'`; optional `color` |
+| `Meter.Indicator` | The filled portion of the track. | `tone: 'neutral' \| 'brand'`, default `'neutral'` |
 | `Meter.Label` | Visible text automatically associated with the root through `aria-labelledby`. | `children` |
 | `Meter.Value` | Displays the root's formatted value. | Optional `children` function receiving `(formattedValue, value)` |
 
@@ -57,10 +57,6 @@ The Value child function receives the raw numeric value as its second argument. 
 
 Track fills the available width. Its height uses `--wpds-dimension-size-4xs`, which defaults to 8px. This distinguishes Meter from Progress's 1.5px track without a size prop. Both components share the same token styles for colors and corner radius.
 
-Indicator's `tone` controls its color. Neutral and brand use the corresponding WPDS background thumb tokens. Its `color` prop accepts any CSS color, including CSS variables and `currentColor` to inherit the surrounding text color. An explicit color overrides `tone` and `style.color`, preserving other inline styles. Track, Label, and Value keep their own colors.
-
-```tsx
-<Meter.Indicator tone="brand" color="#8b2fc9" />
-```
+Indicator's `tone` controls its color. Neutral and brand use the corresponding WPDS background thumb tokens. Track, Label, and Value keep their own colors.
 
 Meter does not assign colors based on thresholds. Native meter attributes such as `low`, `high`, and `optimum` are not supported.

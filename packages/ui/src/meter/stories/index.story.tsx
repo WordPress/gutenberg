@@ -4,7 +4,7 @@ import { Stack } from '../../stack';
 import * as Progress from '../../progress';
 
 type StoryArgs = React.ComponentProps< typeof Meter.Root > &
-	Pick< React.ComponentProps< typeof Meter.Indicator >, 'tone' | 'color' >;
+	Pick< React.ComponentProps< typeof Meter.Indicator >, 'tone' >;
 
 const meta: Meta< StoryArgs > = {
 	title: 'Components/@wordpress-ui/Meter',
@@ -17,8 +17,6 @@ const meta: Meta< StoryArgs > = {
 		'Meter.Value': Meter.Value,
 	},
 	argTypes: {
-		color: { control: 'text' },
-		value: { control: 'number' },
 		tone: { control: 'select', options: [ 'neutral', 'brand' ] },
 	},
 	parameters: {
@@ -29,14 +27,14 @@ const meta: Meta< StoryArgs > = {
 		},
 	},
 	args: { value: 24, tone: 'neutral' },
-	render: ( { tone, color, ...args } ) => (
+	render: ( { tone, ...args } ) => (
 		<Meter.Root { ...args }>
 			<Stack justify="space-between" gap="sm">
 				<Meter.Label>Storage used</Meter.Label>
 				<Meter.Value />
 			</Stack>
 			<Meter.Track>
-				<Meter.Indicator tone={ tone } color={ color } />
+				<Meter.Indicator tone={ tone } />
 			</Meter.Track>
 		</Meter.Root>
 	),
@@ -50,10 +48,10 @@ export const Default: Story = {};
 /** A visible label is optional when the quantity has an accessible name. */
 export const BarOnly: Story = {
 	args: { 'aria-label': 'Storage used' },
-	render: ( { tone, color, ...args } ) => (
+	render: ( { tone, ...args } ) => (
 		<Meter.Root { ...args }>
 			<Meter.Track>
-				<Meter.Indicator tone={ tone } color={ color } />
+				<Meter.Indicator tone={ tone } />
 			</Meter.Track>
 		</Meter.Root>
 	),
@@ -61,25 +59,9 @@ export const BarOnly: Story = {
 
 export const Brand: Story = { args: { tone: 'brand' } };
 
-/** The color prop overrides the indicator tone, leaving the other parts unchanged. */
-export const CustomColor: Story = {
-	args: { tone: 'brand', color: '#8b2fc9' },
-};
-
-export const CurrentColor: Story = {
-	args: { tone: 'brand', color: 'currentColor' },
-	decorators: [
-		( Story ) => (
-			<div style={ { color: '#8b2fc9' } }>
-				<Story />
-			</div>
-		),
-	],
-};
-
 /** Compare tones in light, dark, RTL, and WordPress global CSS modes. */
 export const Tones: Story = {
-	render: ( { tone: _tone, color, ...args } ) => (
+	render: ( { tone: _tone, ...args } ) => (
 		<Stack direction="column" gap="lg">
 			{ ( [ 'neutral', 'brand' ] as const ).map( ( tone ) => (
 				<Meter.Root key={ tone } { ...args }>
@@ -88,7 +70,7 @@ export const Tones: Story = {
 						<Meter.Value />
 					</Stack>
 					<Meter.Track>
-						<Meter.Indicator tone={ tone } color={ color } />
+						<Meter.Indicator tone={ tone } />
 					</Meter.Track>
 				</Meter.Root>
 			) ) }
@@ -106,11 +88,11 @@ export const CustomRange: Story = {
 			`${ formattedValue } of 10 GB used`,
 		tone: 'brand',
 	},
-	render: ( { tone, color, ...args } ) => (
+	render: ( { tone, ...args } ) => (
 		<Meter.Root { ...args }>
 			<Meter.Label>Storage used</Meter.Label>
 			<Meter.Track>
-				<Meter.Indicator tone={ tone } color={ color } />
+				<Meter.Indicator tone={ tone } />
 			</Meter.Track>
 			<Meter.Value>
 				{ ( formattedValue ) => `${ formattedValue } of 10 GB used` }
@@ -121,7 +103,7 @@ export const CustomRange: Story = {
 
 /** Meter and Progress share their colors, with different track heights. */
 export const ComparedWithProgress: Story = {
-	render: ( { tone, color, ...args } ) => (
+	render: ( { tone, ...args } ) => (
 		<Stack direction="column" gap="lg">
 			<Meter.Root { ...args }>
 				<Stack justify="space-between" gap="sm">
@@ -129,7 +111,7 @@ export const ComparedWithProgress: Story = {
 					<Meter.Value />
 				</Stack>
 				<Meter.Track>
-					<Meter.Indicator tone={ tone } color={ color } />
+					<Meter.Indicator tone={ tone } />
 				</Meter.Track>
 			</Meter.Root>
 			<Progress.Root
@@ -144,7 +126,7 @@ export const ComparedWithProgress: Story = {
 					<Progress.Value />
 				</Stack>
 				<Progress.Track>
-					<Progress.Indicator tone={ tone } color={ color } />
+					<Progress.Indicator tone={ tone } />
 				</Progress.Track>
 			</Progress.Root>
 		</Stack>
