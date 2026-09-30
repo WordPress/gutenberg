@@ -47,7 +47,6 @@ import {
 	altTextField,
 	attachedToField,
 	authorField as mediaAuthorField,
-	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
 	mediaDimensionsField,
@@ -131,7 +130,6 @@ const MEDIA_FIELDS = [
 	attachedToField,
 	titleField,
 	altTextField,
-	mediaDescriptionField,
 ];
 
 export const registerPostTypeSchema =

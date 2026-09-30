@@ -5,6 +5,7 @@ describe( 'attachment', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
 		expect( Object.keys( attachment ) ).toEqual( [
 			'caption',
+			'description',
 			'mime_type',
 		] );
 	} );
@@ -29,5 +30,13 @@ describe( 'attachment', () => {
 			} )
 		).toBe( 'Raw' );
 		expect( getValue?.( { item: {} } ) ).toBe( '' );
+	} );
+
+	it( 'reads the raw description', () => {
+		expect(
+			attachment.description.getValue?.( {
+				item: { description: { raw: 'Raw', rendered: '<p>Raw</p>' } },
+			} )
+		).toBe( 'Raw' );
 	} );
 } );
