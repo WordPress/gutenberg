@@ -5,16 +5,16 @@
  *
  * Templates support authors, yet their author is the theme, plugin, site,
  * or user that provides them rather than their post author. So they opt out
- * of the default author field, which the collection unregisters, and get
- * the author field of this collection instead, with its script module.
+ * of the default author field, see exclude_core_post_type_support_fields()
+ * in `src/index.php`, and get the author field of this collection instead,
+ * with its script module.
  *
  * @package WordPress
  */
 
 return array(
-	'origin'     => 'core',
-	'kind'       => 'postType',
-	'name'       => 'wp_template',
-	'module'     => '@wordpress/core-fields/wp_template',
-	'unregister' => array( 'author' ),
+	'origin' => 'core',
+	'kind'   => 'postType',
+	'name'   => 'wp_template',
+	'module' => '@wordpress/core-fields/wp_template',
 );

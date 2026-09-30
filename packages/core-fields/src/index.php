@@ -5,13 +5,14 @@
  *
  * The default fields every post type derives from its supports are
  * registered in code, see register_core_post_supports_fields(). Their
- * definitions are the `field.php` files of the `post_supports` folder.
+ * definitions are the `field.php` files of the `post_supports` folder. The
+ * post types whose fields differ from the defaults exclude the ones they do
+ * not get on the `fields_api_post_type_support_exclusions` filter, as a
+ * plugin would, see exclude_core_post_type_support_fields().
  *
  * The fields of a single post type are declarative collections, the other
  * folders next to this file, see wp_register_field_collection() for their
- * format. A post type whose fields differ from the defaults lists the
- * defaults it replaces or drops in the `unregister` of its collection, as a
- * plugin would.
+ * format.
  *
  * @package WordPress
  */
@@ -25,8 +26,9 @@
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  *
- * It makes no exception for any post type: a post type whose fields differ
- * unregisters the defaults it does not want, like a plugin does.
+ * It makes no exception for any post type: the fields a post type does not
+ * get are excluded on the `fields_api_post_type_support_exclusions` filter,
+ * before they are registered.
  *
  * Only the author field has JavaScript parts, but every field is registered
  * with the script module of the folder: a post type supporting only
@@ -49,9 +51,49 @@ function register_core_post_supports_fields( $registry ) {
 			'comment_status' => post_type_supports( $post_type, 'comments' ),
 			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 		);
+		$ids     = array_keys( array_filter( $applies ) );
+		if ( ! $ids ) {
+			continue;
+		}
+
+		/**
+		 * Filters the default fields a post type does not get from its
+		 * supports.
+		 *
+		 * A post type whose fields differ from the defaults excludes some
+		 * or all of them here, before they are registered, and registers
+		 * its own if needed. Callbacks compose: add to the incoming list
+		 * rather than replacing it.
+		 *
+		 * The filter runs when the registry fires `fields_api_init`, on its
+		 * first read after `init`: add callbacks on plugin load or on
+		 * `init`, not later.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string[] $excluded  The ids of the default fields the post
+		 *                            type does not get. Default empty array.
+		 * @param string   $post_type The post type.
+		 * @param string[] $ids       The ids of the default fields the post
+		 *                            type supports.
+		 */
+		$excluded = apply_filters( 'fields_api_post_type_support_exclusions', array(), $post_type, $ids );
+		if ( ! is_array( $excluded ) ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: 1: The name of a filter. 2: A post type. */
+					__( 'The %1$s filter must return a list of field ids. Nothing is excluded for the post type "%2$s".', 'gutenberg' ),
+					'<code>fields_api_post_type_support_exclusions</code>',
+					$post_type
+				),
+				'7.2.0'
+			);
+			$excluded = array();
+		}
 
 		// Keeps the alphabetical order of the folders.
-		$fields = array_values( array_intersect_key( $definitions, array_filter( $applies ) ) );
+		$fields = array_values( array_intersect_key( $definitions, array_flip( array_diff( $ids, $excluded ) ) ) );
 		if ( $fields ) {
 			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_supports' );
 		}
@@ -59,8 +101,42 @@ function register_core_post_supports_fields( $registry ) {
 }
 
 /**
+ * Excludes the default fields the core post types do not get:
+ *
+ * - Templates: `author`. Their author is the theme, plugin, site, or user
+ *   that provides them rather than their post author, so the `wp_template`
+ *   collection has its own author field.
+ * - Template parts: `author`. They declare their own author field
+ *   client-side.
+ * - Attachments: every default field. The media editor has its own fields,
+ *   declared client-side and in the `attachment` collection.
+ *
+ * @since 7.2.0
+ *
+ * @param string[] $excluded  The ids of the default fields the post type
+ *                            does not get.
+ * @param string   $post_type The post type.
+ * @param string[] $ids       The ids of the default fields the post type
+ *                            supports.
+ * @return string[] The excluded ids, with those of the core post types.
+ */
+function exclude_core_post_type_support_fields( $excluded, $post_type, $ids ) {
+	switch ( $post_type ) {
+		case 'wp_template':
+		case 'wp_template_part':
+			$excluded[] = 'author';
+			break;
+		case 'attachment':
+			$excluded = array_merge( $excluded, $ids );
+			break;
+	}
+	return $excluded;
+}
+add_filter( 'fields_api_post_type_support_exclusions', 'exclude_core_post_type_support_fields', 10, 3 );
+
+/**
  * Registers the fields of WordPress core: the defaults first, then the
- * collections of single post types, which may replace or drop them.
+ * collections of single post types.
  *
  * Hooked at priority 0, so a plugin hooking `fields_api_init` at the
  * default priority sees the core fields registered, and can update or
