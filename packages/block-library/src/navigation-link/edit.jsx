@@ -10,7 +10,6 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	getColorClassName,
 	useInnerBlocksProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
@@ -19,7 +18,6 @@ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
 	LinkUI,
@@ -103,7 +101,6 @@ export default function NavigationLinkEdit( {
 
 	const {
 		isAtMaxNesting,
-		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
 		parentBlockClientId,
@@ -137,7 +134,6 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
 						.length >= maxNestingLevel,
-				isTopLevelLink: isTopLevel,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -279,13 +275,6 @@ export default function NavigationLinkEdit( {
 		setIsLinkOpen( false );
 	}
 
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-	} = getColors( context, ! isTopLevelLink );
-
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
 			// Required to prevent the command center from opening,
@@ -304,6 +293,9 @@ export default function NavigationLinkEdit( {
 		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
 		: undefined;
 
+	// Colors inherited from the parent Navigation block are deliberately not
+	// applied here. The list item inherits them from the navigation wrapper, or
+	// from the submenu container when it sits in a submenu.
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -311,18 +303,9 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasChildren,
-			'has-text-color': !! textColor || !! customTextColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName( 'background-color', backgroundColor ) ]:
-				!! backgroundColor,
 		} ),
 		'aria-describedby': missingEntityDescriptionId,
 		'aria-invalid': hasMissingEntity,
-		style: {
-			color: ! textColor && customTextColor,
-			backgroundColor: ! backgroundColor && customBackgroundColor,
-		},
 		onKeyDown,
 	} );
 
