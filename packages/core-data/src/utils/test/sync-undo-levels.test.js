@@ -7,48 +7,68 @@ import {
 } from '../sync-undo-levels';
 
 // A stand-in for the entity sync manager: it syncs the records in
-// `syncedIds` and keeps its levels as a plain array.
+// `syncedIds` and keeps the levels of each record as plain counts.
 function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 	const synced = new Set( syncedIds );
-	let undoLevels = 0;
-	let redoLevels = 0;
+	const levels = new Map();
+	const getLevels = ( kind, name, recordId ) => {
+		const key = `${ kind }/${ name }/${ recordId }`;
+		if ( ! levels.has( key ) ) {
+			levels.set( key, { undo: 0, redo: 0 } );
+		}
+		return levels.get( key );
+	};
 
 	return {
 		synced,
 		isSynced: ( kind, name, recordId ) =>
 			synced.has( `${ kind }/${ name }/${ recordId }` ),
 		undoHistory: {
-			undo: vi.fn( () => {
-				if ( ! undoLevels ) {
+			undo: vi.fn( ( kind, name, recordId ) => {
+				const record = getLevels( kind, name, recordId );
+				if ( ! record.undo ) {
 					return false;
 				}
-				undoLevels -= 1;
-				redoLevels += 1;
+				record.undo -= 1;
+				record.redo += 1;
 				return true;
 			} ),
-			redo: vi.fn( () => {
-				if ( ! redoLevels ) {
+			redo: vi.fn( ( kind, name, recordId ) => {
+				const record = getLevels( kind, name, recordId );
+				if ( ! record.redo ) {
 					return false;
 				}
-				redoLevels -= 1;
-				undoLevels += 1;
+				record.redo -= 1;
+				record.undo += 1;
 				return true;
 			} ),
 			stopCapturing: vi.fn(),
 			clearRedo: vi.fn( () => {
-				redoLevels = 0;
+				levels.forEach( ( record ) => {
+					record.redo = 0;
+				} );
 			} ),
 		},
 		// The manager opened a level for a synced record: it reports it, and
-		// core-data records the placeholder.
-		openLevel( undoManager ) {
-			undoLevels += 1;
-			redoLevels = 0;
-			undoManager.addRecord( createSyncUndoLevelRecord() );
+		// core-data records the placeholder naming the record.
+		openLevel(
+			undoManager,
+			kind = 'postType',
+			name = 'post',
+			recordId = 1
+		) {
+			const record = getLevels( kind, name, recordId );
+			record.undo += 1;
+			record.redo = 0;
+			undoManager.addRecord(
+				createSyncUndoLevelRecord( kind, name, recordId )
+			);
 		},
-		dropLevels() {
-			undoLevels = 0;
-			redoLevels = 0;
+		// The record was unloaded: it is no longer synced and its levels
+		// are gone.
+		unload( kind = 'postType', name = 'post', recordId = 1 ) {
+			synced.delete( `${ kind }/${ name }/${ recordId }` );
+			levels.delete( `${ kind }/${ name }/${ recordId }` );
 		},
 	};
 }
@@ -209,7 +229,7 @@ describe( 'applyUndoLevel', () => {
 		recordEntityEdit( undoManager, syncManager, record );
 		syncManager.openLevel( undoManager );
 		// Its document was unloaded.
-		syncManager.dropLevels();
+		syncManager.unload();
 
 		expect( applyUndoLevel( undoManager, syncManager, 'undo' ) ).toEqual(
 			record
@@ -217,6 +237,70 @@ describe( 'applyUndoLevel', () => {
 		expect(
 			applyUndoLevel( undoManager, syncManager, 'undo' )
 		).toBeUndefined();
+	} );
+
+	it( 'delegates each sync level to the record that opened it', () => {
+		const undoManager = createUndoManager();
+		const syncManager = createSyncManager( [
+			'postType/post/1',
+			'postType/wp_template_part/2',
+		] );
+
+		syncManager.openLevel( undoManager, 'postType', 'post', 1 );
+		syncManager.openLevel( undoManager, 'postType', 'wp_template_part', 2 );
+
+		applyUndoLevel( undoManager, syncManager, 'undo' );
+		expect( syncManager.undoHistory.undo ).toHaveBeenLastCalledWith(
+			'postType',
+			'wp_template_part',
+			2
+		);
+
+		applyUndoLevel( undoManager, syncManager, 'undo' );
+		expect( syncManager.undoHistory.undo ).toHaveBeenLastCalledWith(
+			'postType',
+			'post',
+			1
+		);
+
+		applyUndoLevel( undoManager, syncManager, 'redo' );
+		expect( syncManager.undoHistory.redo ).toHaveBeenLastCalledWith(
+			'postType',
+			'post',
+			1
+		);
+	} );
+
+	it( 'does not move another record for the level of an unloaded record', () => {
+		const undoManager = createUndoManager();
+		const syncManager = createSyncManager( [
+			'postType/post/1',
+			'postType/wp_template_part/2',
+		] );
+		const record = createRecord( 3, 'a', 'b', 'site' );
+
+		// A synced post edit, a site edit, then a synced template part edit.
+		syncManager.openLevel( undoManager, 'postType', 'post', 1 );
+		recordEntityEdit( undoManager, syncManager, record );
+		syncManager.openLevel( undoManager, 'postType', 'wp_template_part', 2 );
+
+		// The template part is deleted, which unloads it.
+		syncManager.unload( 'postType', 'wp_template_part', 2 );
+
+		// Its level is skipped, and the site edit is undone before the post.
+		expect( applyUndoLevel( undoManager, syncManager, 'undo' ) ).toEqual(
+			record
+		);
+		expect( syncManager.undoHistory.undo ).not.toHaveBeenCalled();
+
+		expect( applyUndoLevel( undoManager, syncManager, 'undo' ) ).toEqual(
+			[]
+		);
+		expect( syncManager.undoHistory.undo ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			1
+		);
 	} );
 
 	it( 'skips a record for an entity that has become synced since', () => {

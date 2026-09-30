@@ -2,9 +2,11 @@ import * as Y from 'yjs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LOCAL_EDITOR_ORIGIN } from '../config';
 import { createUndoManager } from '../undo-manager';
+import type { SyncUndoManager } from '../types';
 
 describe( 'SyncUndoManager', () => {
 	const docs: Y.Doc[] = [];
+	let nextObjectId = 1;
 
 	afterEach( () => {
 		docs.splice( 0 ).forEach( ( doc ) => doc.destroy() );
@@ -16,6 +18,8 @@ describe( 'SyncUndoManager', () => {
 		return {
 			doc,
 			map: doc.getMap( 'record' ),
+			objectType: 'postType/post',
+			objectId: String( nextObjectId++ ),
 			handlers: {
 				addUndoMeta: vi.fn(),
 				onUndoLevelOpened: vi.fn(),
@@ -24,10 +28,26 @@ describe( 'SyncUndoManager', () => {
 		};
 	}
 
-	function change(
-		scope: ReturnType< typeof createScopedMap >,
-		value: string
-	) {
+	type Scope = ReturnType< typeof createScopedMap >;
+
+	function addToScope( undoManager: SyncUndoManager, scope: Scope ) {
+		undoManager.addToScope(
+			scope.objectType,
+			scope.objectId,
+			scope.map,
+			scope.handlers
+		);
+	}
+
+	function undo( undoManager: SyncUndoManager, scope: Scope ) {
+		return undoManager.undo( scope.objectType, scope.objectId );
+	}
+
+	function redo( undoManager: SyncUndoManager, scope: Scope ) {
+		return undoManager.redo( scope.objectType, scope.objectId );
+	}
+
+	function change( scope: Scope, value: string ) {
 		scope.doc.transact( () => {
 			scope.map.set( 'title', value );
 		}, LOCAL_EDITOR_ORIGIN );
@@ -38,8 +58,8 @@ describe( 'SyncUndoManager', () => {
 		const first = createScopedMap();
 		const second = createScopedMap();
 
-		undoManager.addToScope( first.map, first.handlers );
-		undoManager.addToScope( second.map, second.handlers );
+		addToScope( undoManager, first );
+		addToScope( undoManager, second );
 
 		change( first, 'First changed' );
 
@@ -56,16 +76,16 @@ describe( 'SyncUndoManager', () => {
 	it( 'does not report the stack items that undo and redo add', () => {
 		const undoManager = createUndoManager();
 		const scope = createScopedMap();
-		undoManager.addToScope( scope.map, scope.handlers );
+		addToScope( undoManager, scope );
 
 		change( scope, 'Changed' );
 		scope.handlers.onUndoLevelOpened.mockClear();
 
-		expect( undoManager.undo() ).toBe( true );
+		expect( undo( undoManager, scope ) ).toBe( true );
 		expect( scope.map.get( 'title' ) ).toBeUndefined();
 		expect( undoManager.hasRedo() ).toBe( true );
 
-		expect( undoManager.redo() ).toBe( true );
+		expect( redo( undoManager, scope ) ).toBe( true );
 		expect( scope.map.get( 'title' ) ).toBe( 'Changed' );
 
 		expect( scope.handlers.onUndoLevelOpened ).not.toHaveBeenCalled();
@@ -74,23 +94,79 @@ describe( 'SyncUndoManager', () => {
 	it( 'returns false when there is no level to move', () => {
 		const undoManager = createUndoManager();
 		const scope = createScopedMap();
-		undoManager.addToScope( scope.map, scope.handlers );
+		addToScope( undoManager, scope );
 
-		expect( undoManager.undo() ).toBe( false );
-		expect( undoManager.redo() ).toBe( false );
+		expect( undo( undoManager, scope ) ).toBe( false );
+		expect( redo( undoManager, scope ) ).toBe( false );
 
 		// A level whose document was unloaded is gone too.
 		change( scope, 'Changed' );
 		scope.doc.destroy();
 
 		expect( undoManager.hasUndo() ).toBe( false );
-		expect( undoManager.undo() ).toBe( false );
+		expect( undo( undoManager, scope ) ).toBe( false );
+	} );
+
+	it( 'only moves the levels of the entity it is asked for', () => {
+		const undoManager = createUndoManager();
+		const first = createScopedMap();
+		const second = createScopedMap();
+		addToScope( undoManager, first );
+		addToScope( undoManager, second );
+
+		change( first, 'First changed' );
+		change( second, 'Second changed' );
+
+		// The second entity has the most recent level, but the first is asked.
+		expect( undo( undoManager, first ) ).toBe( true );
+		expect( first.map.get( 'title' ) ).toBeUndefined();
+		expect( second.map.get( 'title' ) ).toBe( 'Second changed' );
+	} );
+
+	it( 'does not move another entity when the entity asked for was unloaded', () => {
+		const undoManager = createUndoManager();
+		const first = createScopedMap();
+		const second = createScopedMap();
+		addToScope( undoManager, first );
+		addToScope( undoManager, second );
+
+		change( first, 'First changed' );
+		change( second, 'Second changed' );
+		second.doc.destroy();
+
+		expect( undo( undoManager, second ) ).toBe( false );
+		expect( first.map.get( 'title' ) ).toBe( 'First changed' );
+	} );
+
+	it( 'closes the levels of other entities and drops their redo levels when one opens a level', () => {
+		const undoManager = createUndoManager();
+		const first = createScopedMap();
+		const second = createScopedMap();
+		addToScope( undoManager, first );
+		addToScope( undoManager, second );
+
+		change( first, 'First' );
+		change( second, 'Second' );
+
+		// Without closing, this would merge into the first entity's level,
+		// which now sits below the second entity's level.
+		change( first, 'First again' );
+		expect( first.handlers.onUndoLevelOpened ).toHaveBeenCalledTimes( 2 );
+
+		expect( undo( undoManager, second ) ).toBe( true );
+		expect( undoManager.hasRedo() ).toBe( true );
+
+		// A new level anywhere ends the redo history of every entity.
+		undoManager.stopCapturing();
+		change( first, 'First once more' );
+		expect( undoManager.hasRedo() ).toBe( false );
+		expect( redo( undoManager, second ) ).toBe( false );
 	} );
 
 	it( 'opens a new level after stopCapturing and drops the redo levels on clearRedo', () => {
 		const undoManager = createUndoManager();
 		const scope = createScopedMap();
-		undoManager.addToScope( scope.map, scope.handlers );
+		addToScope( undoManager, scope );
 
 		change( scope, 'First' );
 		undoManager.stopCapturing();
@@ -98,13 +174,13 @@ describe( 'SyncUndoManager', () => {
 
 		expect( scope.handlers.onUndoLevelOpened ).toHaveBeenCalledTimes( 2 );
 
-		undoManager.undo();
+		undo( undoManager, scope );
 		expect( scope.map.get( 'title' ) ).toBe( 'First' );
 		expect( undoManager.hasRedo() ).toBe( true );
 
 		undoManager.clearRedo();
 		expect( undoManager.hasRedo() ).toBe( false );
-		expect( undoManager.redo() ).toBe( false );
+		expect( redo( undoManager, scope ) ).toBe( false );
 		expect( scope.map.get( 'title' ) ).toBe( 'First' );
 	} );
 
@@ -115,7 +191,7 @@ describe( 'SyncUndoManager', () => {
 			pending.splice( 0 ).forEach( ( apply ) => apply() );
 		} );
 		const undoManager = createUndoManager( { flushPendingUpdates } );
-		undoManager.addToScope( scope.map, scope.handlers );
+		addToScope( undoManager, scope );
 
 		pending.push( () => change( scope, 'Deferred' ) );
 
@@ -128,7 +204,7 @@ describe( 'SyncUndoManager', () => {
 		pending.push( () => change( scope, 'Deferred again' ) );
 
 		// Undo applies to the deferred change, not to what came before it.
-		expect( undoManager.undo() ).toBe( true );
+		expect( undo( undoManager, scope ) ).toBe( true );
 		expect( scope.map.get( 'title' ) ).toBe( 'Deferred' );
 	} );
 
@@ -137,8 +213,8 @@ describe( 'SyncUndoManager', () => {
 		const first = createScopedMap();
 		const second = createScopedMap();
 
-		undoManager.addToScope( first.map, first.handlers );
-		undoManager.addToScope( second.map, second.handlers );
+		addToScope( undoManager, first );
+		addToScope( undoManager, second );
 
 		change( first, 'First changed' );
 
@@ -147,7 +223,7 @@ describe( 'SyncUndoManager', () => {
 		expect( first.handlers.addUndoMeta ).toHaveBeenCalledTimes( 1 );
 		expect( second.handlers.addUndoMeta ).not.toHaveBeenCalled();
 
-		undoManager.undo();
+		undo( undoManager, first );
 
 		expect( first.map.get( 'title' ) ).toBeUndefined();
 		expect( second.map.get( 'title' ) ).toBeUndefined();
@@ -171,7 +247,7 @@ describe( 'SyncUndoManager', () => {
 		expect( first.handlers.addUndoMeta ).toHaveBeenCalledTimes( 1 );
 		expect( second.handlers.addUndoMeta ).toHaveBeenCalledTimes( 1 );
 
-		undoManager.undo();
+		undo( undoManager, second );
 
 		expect( first.map.get( 'title' ) ).toBe( 'First changed again' );
 		expect( second.map.get( 'title' ) ).toBeUndefined();
@@ -180,7 +256,7 @@ describe( 'SyncUndoManager', () => {
 		expect( first.handlers.restoreUndoMeta ).not.toHaveBeenCalled();
 		expect( second.handlers.restoreUndoMeta ).toHaveBeenCalledTimes( 1 );
 
-		undoManager.redo();
+		redo( undoManager, second );
 
 		expect( first.map.get( 'title' ) ).toBe( 'First changed again' );
 		expect( second.map.get( 'title' ) ).toBe( 'Second changed' );

@@ -203,14 +203,17 @@ export interface SyncManager {
 }
 
 /**
- * The undo history of the entities a sync manager has loaded. Yjs tracks
- * their changes, one level per stack item, and reports each new level through
- * the record's `onUndoLevelOpened` handler. It is not an undo manager for the
- * editor: the consumer keeps its own and delegates a level here when that
- * level is the one to undo or redo.
+ * The undo history of the entities a sync manager has loaded, one Yjs undo
+ * manager per entity. Yjs tracks their changes, one level per stack item, and
+ * reports each new level through the record's `onUndoLevelOpened` handler. It
+ * is not an undo manager for the editor: the consumer keeps its own, in which
+ * each level names its entity, and delegates the level to that entity here
+ * when it is the one to undo or redo.
  */
 export interface SyncUndoManager {
 	addToScope: (
+		objectType: ObjectType,
+		objectId: ObjectID,
 		ymap: Y.Map< any >,
 		handlers: Pick<
 			RecordHandlers,
@@ -220,7 +223,7 @@ export interface SyncUndoManager {
 	clearRedo: () => void;
 	hasRedo: () => boolean;
 	hasUndo: () => boolean;
-	redo: () => boolean;
+	redo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	stopCapturing: () => void;
-	undo: () => boolean;
+	undo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 }

@@ -248,12 +248,18 @@ describe( 'recordSyncUndoLevel', () => {
 		const select = { getUndoManager: () => undoManager };
 		const dispatch = vi.fn();
 
-		recordSyncUndoLevel()( { select, dispatch } );
+		recordSyncUndoLevel( 'postType', 'post', 1 )( { select, dispatch } );
 
 		expect( undoManager.addRecord ).toHaveBeenCalledTimes( 1 );
 		const [ record ] = undoManager.addRecord.mock.calls[ 0 ];
 		expect( record ).toHaveLength( 1 );
-		expect( record[ 0 ].id ).toEqual( expect.any( String ) );
+		// The level names the record that opened it.
+		expect( record[ 0 ].id ).toEqual( {
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			isSyncUndoLevel: true,
+		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'RECORD_SYNC_UNDO_LEVEL',
 		} );

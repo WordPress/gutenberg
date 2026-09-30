@@ -5,28 +5,33 @@
  * core-data records every edit in its own undo manager, except edits to
  * records the sync manager is syncing: the manager tracks those itself and
  * reports each undo level it opens. core-data then records a placeholder for
- * the level, so both kinds of edits are undone in the order they were made.
- * When a placeholder is undone or redone, the level is delegated back to the
- * sync manager.
+ * the level that names its record, so both kinds of edits are undone in the
+ * order they were made. When a placeholder is undone or redone, the level is
+ * delegated back to the sync manager for that record.
  */
-
-const SYNC_UNDO_LEVEL_ID = 'core/entity-sync-undo-level';
 
 let syncUndoLevelCount = 0;
 
 /**
  * Creates the undo record that stands in for one of the sync manager's undo
- * levels. Its changes carry a running count so the record is never considered
- * empty; they are never applied to an entity.
+ * levels of a record. Its changes carry a running count so the record is
+ * never considered empty; they are never applied to an entity.
+ *
+ * The `isSyncUndoLevel` key keeps the id distinct from the record's own id,
+ * so the undo manager never merges an edit to the record into a placeholder.
+ *
+ * @param {string}        kind     Kind of the record.
+ * @param {string}        name     Name of the record.
+ * @param {number|string} recordId Id of the record.
  *
  * @return {Array} The record.
  */
-export function createSyncUndoLevelRecord() {
+export function createSyncUndoLevelRecord( kind, name, recordId ) {
 	syncUndoLevelCount += 1;
 
 	return [
 		{
-			id: SYNC_UNDO_LEVEL_ID,
+			id: { kind, name, recordId, isSyncUndoLevel: true },
 			changes: {
 				level: {
 					from: syncUndoLevelCount - 1,
@@ -38,7 +43,7 @@ export function createSyncUndoLevelRecord() {
 }
 
 function isSyncUndoLevel( changes ) {
-	return SYNC_UNDO_LEVEL_ID === changes.id;
+	return true === changes.id?.isSyncUndoLevel;
 }
 
 function isSyncedRecord( syncManager, id ) {
@@ -113,11 +118,18 @@ function popUndoLevel( undoManager, syncManager, type ) {
 			! isSyncedRecord( syncManager, entry.id )
 	);
 
+	// Only the record that opened the level can move it. When the record is
+	// no longer synced, the level is stale and applies nothing.
+	const syncLevel = record.find( isSyncUndoLevel );
 	let didApplySyncLevel = false;
 
-	if ( undoHistory && record.some( isSyncUndoLevel ) ) {
-		didApplySyncLevel =
-			'undo' === type ? undoHistory.undo() : undoHistory.redo();
+	if (
+		undoHistory &&
+		syncLevel &&
+		isSyncedRecord( syncManager, syncLevel.id )
+	) {
+		const { kind, name, recordId } = syncLevel.id;
+		didApplySyncLevel = undoHistory[ type ]( kind, name, recordId );
 	}
 
 	return {
