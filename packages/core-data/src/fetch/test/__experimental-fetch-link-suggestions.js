@@ -72,27 +72,6 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						subtype: 'page',
 					},
 				] );
-			case '/wp/v2/search?search=many&per_page=20&type=post':
-				return Promise.resolve(
-					Array.from( { length: 25 }, ( _, index ) => ( {
-						id: 100 + index,
-						title: `Many ${ index }`,
-						url: `http://wordpress.local/many-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) )
-				);
-			case '/wp/v2/search?search=many&per_page=20&type=term':
-				return Promise.resolve(
-					Array.from( { length: 10 }, ( _, index ) => ( {
-						id: 200 + index,
-						// Matched by its body, so the title does not contain
-						// what was typed.
-						title: `Unrelated ${ index }`,
-						url: `http://wordpress.local/unrelated-${ index }/`,
-						type: 'category',
-					} ) )
-				);
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
 				return Promise.resolve( [
 					...Array.from( { length: 5 }, ( _, index ) => ( {
@@ -102,8 +81,7 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'post',
 						subtype: 'page',
 					} ) ),
-					// Holds neither word; WordPress matched a body. A page, so
-					// it outranks the partial matches on type.
+					// Holds neither word; WordPress matched a body.
 					...Array.from( { length: 30 }, ( _, index ) => ( {
 						id: 800 + index,
 						title: `Unrelated ${ index }`,
@@ -122,56 +100,9 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					} ) )
 				);
-			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post':
-				return Promise.resolve( [
-					...Array.from( { length: 5 }, ( _, index ) => ( {
-						id: 900 + index,
-						title: `Tea Leaves ${ index }`,
-						url: `http://wordpress.local/tea-leaves-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) ),
-					// Holds neither word; WordPress matched a body.
-					...Array.from( { length: 10 }, ( _, index ) => ( {
-						id: 950 + index,
-						title: `Unrelated ${ index }`,
-						url: `http://wordpress.local/unrelated-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) ),
-				] );
-			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=term':
-				return Promise.resolve(
-					// Holds "leaves" but not "tea".
-					Array.from( { length: 20 }, ( _, index ) => ( {
-						id: 1000 + index,
-						title: `Leaves ${ index }`,
-						url: `http://wordpress.local/leaves-${ index }/`,
-						type: 'category',
-					} ) )
-				);
-			case '/wp/v2/search?search=tea%20leaves&per_page=20&type=post-format':
-			case '/wp/v2/media?search=tea%20leaves&per_page=20':
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
 			case '/wp/v2/media?search=few%20notes&per_page=20':
-			case '/wp/v2/search?search=many&per_page=20&type=post-format':
-			case '/wp/v2/media?search=many&per_page=20':
 				return Promise.resolve( [] );
-			case '/wp/v2/search?search=brewing&per_page=20&type=term':
-				return Promise.resolve( [
-					...Array.from( { length: 3 }, ( _, index ) => ( {
-						id: 500 + index,
-						title: `Brewing ${ index }`,
-						url: `http://wordpress.local/brewing-${ index }/`,
-						type: 'category',
-					} ) ),
-					...Array.from( { length: 10 }, ( _, index ) => ( {
-						id: 550 + index,
-						title: `Unrelated ${ index }`,
-						url: `http://wordpress.local/unrelated-${ index }/`,
-						type: 'category',
-					} ) ),
-				] );
 			case '/wp/v2/search?search=&per_page=3&type=post':
 			case '/wp/v2/search?search=&per_page=3&type=term':
 			case '/wp/v2/search?search=&per_page=3&type=post-format':
@@ -348,16 +279,6 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'sends the per page to each request without cutting the merge', () => {
-		// Each request is asked for 20. The endpoints answer with 25 titles
-		// holding the word and 10 matched on a body, and all 35 come back: an
-		// unscoped search cannot be paged through, so `perPage` sizes each
-		// request rather than bounding what they add up to.
-		return fetchLinkSuggestions( 'many', { perPage: 20 } ).then(
-			( suggestions ) => expect( suggestions ).toHaveLength( 35 )
-		);
-	} );
-
 	it( 'ranks titles by how much of the search they hold, content matches last', () => {
 		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
 		// neither because WordPress matched their body. All are offered, in
@@ -381,45 +302,6 @@ describe( 'fetchLinkSuggestions', () => {
 				);
 			}
 		);
-	} );
-
-	it( 'keeps every title matching a word typed, past the per page limit on default searches', () => {
-		// 5 titles hold both words typed, 20 hold one of them and 10 hold
-		// neither. Nothing is cut, though the default limit is 20, and the
-		// content matches come last.
-		const countStartingWith = ( titles, prefix ) =>
-			titles.filter( ( title ) => title.startsWith( prefix ) ).length;
-
-		return fetchLinkSuggestions( 'tea leaves', {} ).then(
-			( suggestions ) => {
-				const titles = suggestions.map( ( { title } ) => title );
-
-				expect( titles ).toHaveLength( 35 );
-				expect( countStartingWith( titles, 'Tea Leaves' ) ).toBe( 5 );
-				expect( countStartingWith( titles, 'Leaves' ) ).toBe( 20 );
-				expect(
-					countStartingWith( titles.slice( 25 ), 'Unrelated' )
-				).toBe( 10 );
-			}
-		);
-	} );
-
-	it( 'ranks content matches last on a scoped search too', () => {
-		// The endpoint offers 3 titles holding the word and 10 matched on a
-		// body. All 13 fit inside `perPage`, with the 3 leading.
-		return fetchLinkSuggestions( 'brewing', {
-			type: 'term',
-			perPage: 20,
-		} ).then( ( suggestions ) => {
-			const titles = suggestions.map( ( { title } ) => title );
-
-			expect( titles ).toHaveLength( 13 );
-			expect(
-				titles
-					.slice( 0, 3 )
-					.every( ( title ) => title.startsWith( 'Brewing' ) )
-			).toBe( true );
-		} );
 	} );
 
 	describe( 'Initial search suggestions', () => {

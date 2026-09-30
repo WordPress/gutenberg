@@ -328,8 +328,8 @@ function getSearchType( result: SearchResult ): SearchType {
 /**
  * How much a result's type counts towards its rank.
  *
- * Earlier entries in `TYPE_ORDER` are worth more. A weight rather than a band, so a title that
- * plainly answers the search can still outrank a better-placed type that barely does.
+ * Earlier entries in `TYPE_ORDER` are worth more. The comparisons before this one come first, so
+ * a title that plainly answers the search still outranks a better-placed type that barely does.
  *
  * @param result
  *
