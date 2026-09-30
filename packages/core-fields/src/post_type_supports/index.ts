@@ -1,9 +1,9 @@
 /**
- * Script module of the `post_supports` collection:
- * `@wordpress/core-fields/post_supports`.
+ * Script module of the `post_type_supports` collection:
+ * `@wordpress/core-fields/post_type_supports`.
  *
  * The data of each field (id, type, label, filter operators…) is in its
- * `field.php`, and register_core_post_supports_fields() in `src/index.php`
+ * `field.php`, and register_core_post_type_supports_fields() in `src/index.php`
  * registers the fields for the post types they apply to; the client reads them from the `wp/v2/fields` route. What cannot
  * be serialized (callbacks and components) is in the `field.tsx` of the
  * field: the client imports this module on demand and merges each entry into

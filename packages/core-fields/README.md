@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
--   `post_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `notesCount`). They are registered in code, see below.
+-   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `notesCount`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: template parts exclude the default author field, since they declare their own client-side.
 -   `attachment`: the fields of the media editor ported to the server so far (`date`), instead of all the defaults.
@@ -21,17 +21,17 @@ Each field has a folder:
 And each folder of fields may have:
 
 -   `index.ts`, when some of its fields have JavaScript parts: its script module, whose default export maps the id of each of those fields to its `fieldExtensions`.
--   `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_supports` has none.
+-   `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_type_supports` has none.
 
 ### The default fields of every post type
 
-`register_core_post_supports_fields()`, in `src/index.php`, registers the fields of `post_supports` on every post type exposed in the REST API, from what each supports:
+`register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports:
 
 -   `author`, for the post types supporting `author`.
 -   `comment_status`, for the post types supporting `comments`.
 -   `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
 
-It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_supports` module.
+It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
 
 It makes no exception for any post type. A post type whose fields differ from the defaults excludes the ones it does not get on the `fields_api_post_type_supports_exclusions` filter, before they are registered:
 
@@ -97,7 +97,7 @@ add_filter(
 
 The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them, `wp_register_field_collection()`, and `wp_get_field_collection_fields()` with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
 
-The client never imports this package directly. `loadFields` and `useFields` from [`@wordpress/fields-loader`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields-loader/README.md) import the script module of a collection on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id among the fields registered with that module. That is why each collection with JavaScript parts has a module of its own: `post_supports` and `wp_template` both have an `author` field.
+The client never imports this package directly. `loadFields` and `useFields` from [`@wordpress/fields-loader`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields-loader/README.md) import the script module of a collection on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id among the fields registered with that module. That is why each collection with JavaScript parts has a module of its own: `post_type_supports` and `wp_template` both have an `author` field.
 
 ## Installation
 
@@ -111,7 +111,7 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package provides the `@wordpress/core-fields/post_supports` and `@wordpress/core-fields/wp_template` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
+The package provides the `@wordpress/core-fields/post_type_supports` and `@wordpress/core-fields/wp_template` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

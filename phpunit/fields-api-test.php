@@ -8,7 +8,7 @@
  * @covers ::gutenberg_get_field_collection_fields
  * @covers ::_gutenberg_get_field_collection
  * @covers ::gutenberg_register_field_collection
- * @covers ::gutenberg_register_core_post_supports_fields
+ * @covers ::gutenberg_register_core_post_type_supports_fields
  * @covers ::gutenberg_exclude_core_post_type_support_fields
  * @covers ::gutenberg_register_core_field_collections
  * @covers Gutenberg_Fields_Registry::initialize
@@ -383,7 +383,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains(
 			array(
-				'id'     => '@wordpress/core-fields/post_supports',
+				'id'     => '@wordpress/core-fields/post_type_supports',
 				'import' => 'dynamic',
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
@@ -452,7 +452,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'comment_status', 'notesCount' ), array_column( $fields, 'id' ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
-			array( '@wordpress/core-fields/post_supports' => array( 'author', 'comment_status', 'notesCount' ) ),
+			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'notesCount' ) ),
 			$modules,
 			'Every default field is registered with the module of its folder.'
 		);
@@ -515,10 +515,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$source = file_get_contents( __DIR__ . '/../packages/core-fields/src/index.php' );
 		$built  = file_get_contents( __DIR__ . '/../build/scripts/core-fields/index.php' );
 
-		$this->assertStringContainsString( 'function gutenberg_register_core_post_supports_fields( $registry )', $built );
+		$this->assertStringContainsString( 'function gutenberg_register_core_post_type_supports_fields( $registry )', $built );
 		$this->assertStringContainsString( 'function gutenberg_register_core_field_collections( $registry )', $built );
-		$this->assertStringContainsString( "gutenberg_get_field_collection_fields( __DIR__ . '/post_supports' );", $built );
-		$this->assertStringContainsString( 'gutenberg_register_core_post_supports_fields( $registry );', $built );
+		$this->assertStringContainsString( "gutenberg_get_field_collection_fields( __DIR__ . '/post_type_supports' );", $built );
+		$this->assertStringContainsString( 'gutenberg_register_core_post_type_supports_fields( $registry );', $built );
 		$this->assertStringContainsString( "gutenberg_register_field_collection( \$registry, __DIR__ . '/wp_template' );", $built );
 		$this->assertStringContainsString( "add_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );", $built );
 		$this->assertStringContainsString( "add_filter( 'fields_api_post_type_supports_exclusions', 'gutenberg_exclude_core_post_type_support_fields', 10, 3 );", $built );
@@ -526,8 +526,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'wp_get_field_collection_fields', $built );
 		$this->assertSame(
 			str_replace(
-				array( 'wp_register_field_collection', 'wp_get_field_collection_fields', 'register_core_post_supports_fields', 'exclude_core_post_type_support_fields', 'register_core_field_collections' ),
-				array( 'gutenberg_register_field_collection', 'gutenberg_get_field_collection_fields', 'gutenberg_register_core_post_supports_fields', 'gutenberg_exclude_core_post_type_support_fields', 'gutenberg_register_core_field_collections' ),
+				array( 'wp_register_field_collection', 'wp_get_field_collection_fields', 'register_core_post_type_supports_fields', 'exclude_core_post_type_support_fields', 'register_core_field_collections' ),
+				array( 'gutenberg_register_field_collection', 'gutenberg_get_field_collection_fields', 'gutenberg_register_core_post_type_supports_fields', 'gutenberg_exclude_core_post_type_support_fields', 'gutenberg_register_core_field_collections' ),
 				$source
 			),
 			$built,
@@ -537,9 +537,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * The default fields come from the `field.php` files of the
-	 * `post_supports` folder.
+	 * `post_type_supports` folder.
 	 */
-	public function test_the_default_fields_come_from_the_post_supports_folder() {
+	public function test_the_default_fields_come_from_the_post_type_supports_folder() {
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'post' ), null, 'id' );
 		$this->assertSame( 'integer', $fields['author']['type'] );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
@@ -574,7 +574,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_the_core_collections_are_registered_at_priority_zero() {
 		$this->assertSame( 0, has_action( 'fields_api_init', 'gutenberg_register_core_field_collections' ) );
 		$this->assertFalse( function_exists( 'register_core_field_collections' ), 'The Gutenberg build prefixes the function.' );
-		$this->assertFalse( function_exists( 'register_core_post_supports_fields' ), 'The Gutenberg build prefixes the function.' );
+		$this->assertFalse( function_exists( 'register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
 	}
 
 	/**
@@ -601,7 +601,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		remove_filter( 'fields_api_post_type_supports_exclusions', 'gutenberg_exclude_core_post_type_support_fields' );
 		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
 		$this->core_collections_unhooked = true;
-		$this->on_fields_api_init( 'gutenberg_register_core_post_supports_fields', 0 );
+		$this->on_fields_api_init( 'gutenberg_register_core_post_type_supports_fields', 0 );
 
 		foreach ( array( 'wp_template', 'wp_template_part', 'attachment' ) as $post_type ) {
 			$fields = array_column( gutenberg_get_registered_fields( 'postType', $post_type ), null, 'id' );
@@ -660,7 +660,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			2
 		);
 
-		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_supports_fields' );
+		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_type_supports_fields' );
 		self::reset_registry();
 
 		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
@@ -1175,7 +1175,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$fields[0]['origin']
 		);
 		$modules = gutenberg_get_registered_field_modules( 'postType', 'page' );
-		$this->assertContains( 'author', $modules['@wordpress/core-fields/post_supports'], 'The field keeps its modules.' );
+		$this->assertContains( 'author', $modules['@wordpress/core-fields/post_type_supports'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
 

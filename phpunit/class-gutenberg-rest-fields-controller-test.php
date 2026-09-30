@@ -417,7 +417,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'     => '@wordpress/core-fields/post_supports',
+					'id'     => '@wordpress/core-fields/post_type_supports',
 					'fields' => array( 'author', 'comment_status', 'notesCount' ),
 				),
 			),
