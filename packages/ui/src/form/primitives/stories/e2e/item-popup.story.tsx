@@ -16,13 +16,17 @@ const headingStyle: CSSProperties = {
 	marginBlock: '0 12px',
 };
 
+const avatarLabelStyle: CSSProperties = {
+	alignItems: 'center',
+	display: 'flex',
+	gap: 8,
+};
+
 const avatarStyle: CSSProperties = {
 	background: 'var(--wpds-color-background-interactive-brand-strong)',
 	borderRadius: '50%',
-	display: 'inline-block',
+	flexShrink: 0,
 	height: 16,
-	marginInlineEnd: 8,
-	verticalAlign: 'middle',
 	width: 16,
 };
 
@@ -72,7 +76,7 @@ function RichItemLayouts() {
 								</Combobox.ItemDescription>
 							</Combobox.Item>
 							<Combobox.Item value="Blueberry">
-								<Combobox.ItemLabel>
+								<Combobox.ItemLabel style={ avatarLabelStyle }>
 									<span
 										style={ avatarStyle }
 										aria-hidden="true"
@@ -123,7 +127,9 @@ function RichItemLayouts() {
 								</Autocomplete.ItemDescription>
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Avocado">
-								<Autocomplete.ItemLabel>
+								<Autocomplete.ItemLabel
+									style={ avatarLabelStyle }
+								>
 									<span
 										style={ avatarStyle }
 										aria-hidden="true"
