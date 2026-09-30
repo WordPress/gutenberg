@@ -132,7 +132,13 @@ export const ComparedWithProgress: Story = {
 					<Meter.Indicator tone={ tone } color={ color } />
 				</Meter.Track>
 			</Meter.Root>
-			<Progress.Root { ...args }>
+			<Progress.Root
+				value={ args.value }
+				min={ args.min }
+				max={ args.max }
+				format={ args.format }
+				locale={ args.locale }
+			>
 				<Stack justify="space-between" gap="sm">
 					<Progress.Label>Exporting data</Progress.Label>
 					<Progress.Value />
