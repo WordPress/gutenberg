@@ -5,8 +5,6 @@ import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
-import { Button } from '../../button';
-import { Stack } from '../../stack';
 import { Link } from '../../link';
 import { GenericIframe, useMeasure } from './utils';
 
@@ -897,13 +895,14 @@ export const HighContrast: Story = {
 			<Popover.Trigger key="trigger">Open popover</Popover.Trigger>,
 			<Popover.Popup variant="high-contrast" key="popup">
 				<Popover.Arrow />
-				<Popover.Title>Formatting</Popover.Title>
-				<Stack direction="row" gap="xs">
-					<Button variant="minimal">Bold</Button>
-					<Button variant="minimal">Italic</Button>
-					<Button variant="minimal">Underline</Button>
-					<Button variant="minimal">Link</Button>
-				</Stack>
+				<VisuallyHidden render={ <Popover.Title /> }>
+					High contrast popover
+				</VisuallyHidden>
+				<Popover.Description>
+					This is a paragraph of text inside a high contrast popover.
+					The popup has a strong border, small corner radius, and no
+					shadow.
+				</Popover.Description>
 			</Popover.Popup>,
 		],
 	},
