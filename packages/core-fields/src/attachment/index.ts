@@ -13,11 +13,13 @@
  */
 
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
+import { fieldExtensions as altText } from './alt_text/field';
 import { fieldExtensions as caption } from './caption/field';
 import { fieldExtensions as description } from './description/field';
 import { fieldExtensions as mimeType } from './mime_type/field';
 
 const fields: FieldsScriptParts = {
+	alt_text: altText,
 	caption,
 	description,
 	mime_type: mimeType,

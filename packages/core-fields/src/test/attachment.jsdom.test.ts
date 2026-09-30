@@ -4,6 +4,7 @@ import attachment from '../attachment';
 describe( 'attachment', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
 		expect( Object.keys( attachment ) ).toEqual( [
+			'alt_text',
 			'caption',
 			'description',
 			'mime_type',
@@ -38,5 +39,11 @@ describe( 'attachment', () => {
 				item: { description: { raw: 'Raw', rendered: '<p>Raw</p>' } },
 			} )
 		).toBe( 'Raw' );
+	} );
+
+	it( 'shows the alternative text of images only', () => {
+		const { isVisible } = attachment.alt_text;
+		expect( isVisible?.( { media_type: 'image' } ) ).toBe( true );
+		expect( isVisible?.( { media_type: 'file' } ) ).toBe( false );
 	} );
 } );
