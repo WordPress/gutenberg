@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -754,45 +754,22 @@ describe( 'DataViews component', () => {
 		it( 'lays the grid out at its real column count on the first render', async () => {
 			// Without a measurement as the grid attaches, the first render runs
 			// at width 0 and puts every item in a full-width row of its own.
-			const offsetWidth = Object.getOwnPropertyDescriptor(
-				window.HTMLElement.prototype,
-				'offsetWidth'
-			);
-			Object.defineProperty(
+			vi.spyOn(
 				window.HTMLElement.prototype,
 				'offsetWidth',
-				{ configurable: true, value: 500 }
+				'get'
+			).mockReturnValue( 500 );
+
+			render( <DataViewWrapper view={ { type: 'grid' } } /> );
+
+			// 500px fits two columns at the default 230px preview size, so the
+			// three items make two rows rather than three.
+			expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
+
+			// The observer reports the same width, so nothing changes.
+			await waitFor( () =>
+				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 )
 			);
-			vi.useFakeTimers();
-
-			try {
-				render( <DataViewWrapper view={ { type: 'grid' } } /> );
-
-				// 500px fits two columns at the default 230px preview size, so
-				// the three items make two rows rather than three.
-				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
-
-				// The observer reports the same width, so nothing changes.
-				await act( async () => {
-					vi.runOnlyPendingTimers();
-				} );
-				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
-			} finally {
-				vi.useRealTimers();
-				if ( offsetWidth ) {
-					Object.defineProperty(
-						window.HTMLElement.prototype,
-						'offsetWidth',
-						offsetWidth
-					);
-				} else {
-					// Nothing to put back, so remove the stub.
-					Reflect.deleteProperty(
-						window.HTMLElement.prototype,
-						'offsetWidth'
-					);
-				}
-			}
 		} );
 
 		it( 'should display the passed in data', async () => {
