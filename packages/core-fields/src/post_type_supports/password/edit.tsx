@@ -1,6 +1,7 @@
 import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import clsx from 'clsx';
 import { InputControl, Stack } from '@wordpress/ui';
 import type { PostWithPassword } from './types';
 import styles from './style.module.css';
@@ -36,7 +37,9 @@ export default function PasswordEdit( {
 			render={ <fieldset /> }
 			direction="column"
 			gap="lg"
-			className={ styles.password }
+			// The editors style the control by the class name of the
+			// original.
+			className={ clsx( 'fields-controls__password', styles.password ) }
 		>
 			<WCCheckboxControl
 				label={ __( 'Password protected' ) }
