@@ -2,10 +2,10 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Unselected threads collapse to avatar pills, showing the author on hover
-// or focus.
+// Threads collapse to avatar pills, showing the author on hover or focus.
+// Selecting the block only highlights its thread; focusing it expands it.
 @mixin minimized-threads {
-	.editor-collab-sidebar-panel__thread.is-floating:not(.is-selected) {
+	.editor-collab-sidebar-panel__thread.is-floating:not(.is-selected.has-focus) {
 		left: auto;
 		padding: $grid-unit-10;
 

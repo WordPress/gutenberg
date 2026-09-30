@@ -1065,7 +1065,14 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( content ).toBeHidden();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 82 );
 
-			// The selected thread expands.
+			// Selecting the block highlights the thread without expanding it.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.click();
+			await expect( thread ).toHaveClass( /is-selected/ );
+			await expect( content ).toBeHidden();
+
+			// The focused thread expands.
 			await thread.click();
 			await expect( content ).toBeVisible();
 		} );
