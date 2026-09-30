@@ -34,10 +34,13 @@ function render_block_core_cover( $attributes, $content ) {
 		$oembed_html = wp_oembed_get( $url );
 
 		if ( $oembed_html ) {
-			// Extract iframe src from the oEmbed HTML.
+			// Extract iframe src from the oEmbed HTML. The attribute value is
+			// HTML encoded, so `&amp;` has to be decoded back to `&` before the
+			// query string is parsed, or every parameter after the first one is
+			// read with an `amp;` prefix and lost.
 			preg_match( '/src=["\']([^"\']+)["\']/', $oembed_html, $src_matches );
 			if ( ! empty( $src_matches[1] ) ) {
-				$iframe_src = $src_matches[1];
+				$iframe_src = html_entity_decode( $src_matches[1], ENT_QUOTES );
 
 				// Detect provider from iframe src URL.
 				$lower_src = strtolower( $iframe_src );
