@@ -26,7 +26,6 @@ import type {
 	WidgetAttributeField,
 	WidgetHost,
 	WidgetRenderProps,
-	WidgetRuntimeAction,
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
@@ -356,34 +355,30 @@ function SiteStatusWidget() {
 		return () => clearTimeout( timer );
 	}, [] );
 
-	const actions = useMemo< WidgetRuntimeAction[] >( () => {
-		if ( ! checks?.length ) {
-			return [];
-		}
-
-		return [
-			{
-				id: 'details',
-				label: `Review ${ checks.length } items`,
-				relevance: 'high',
-				href: 'admin.php?page=demo-dashboard&p=/status?filter=issues',
-			},
-			{
-				id: 'export',
-				label: 'Download CSV',
-				icon: download,
-				relevance: 'medium',
-				callback: async () => {
-					// A slow export, so the pending state is visible.
-					await wait( 1500 );
-					downloadChecks( checks );
-					setExported( checks.length );
-				},
-			},
-		];
-	}, [ checks ] );
-
-	useWidgetActions( actions );
+	useWidgetActions(
+		checks?.length
+			? [
+					{
+						id: 'details',
+						label: `Review ${ checks.length } items`,
+						relevance: 'high',
+						href: 'admin.php?page=demo-dashboard&p=/status?filter=issues',
+					},
+					{
+						id: 'export',
+						label: 'Download CSV',
+						icon: download,
+						relevance: 'medium',
+						callback: async () => {
+							// A slow export, so the pending state is visible.
+							await wait( 1500 );
+							downloadChecks( checks );
+							setExported( checks.length );
+						},
+					},
+				]
+			: []
+	);
 
 	let status = 'Checking the site…';
 	if ( checks ) {

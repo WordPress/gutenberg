@@ -69,22 +69,21 @@ The dashboard maps it as: `'high'` as text links in a persistent footer, `'mediu
 A declaration is static: it exists before the widget mounts and knows nothing of what the widget loads. Some verbs only exist once it does: a label with a count, a target that follows the instance's attributes, a download of the rows on screen. A mounted widget declares those through `useWidgetActions`, with the same envelope and one fulfillment: `href`, as declared, or `callback`, a function the host runs when the action is triggered, pending while a returned promise settles. The host only tracks that pending state; reporting success or failure stays the callback's.
 
 ```ts
-const actions = useMemo< WidgetRuntimeAction[] >(
-	() =>
-		rows.length > 0
-			? [
-					{
-						id: 'export',
-						label: __( 'Download CSV' ),
-						relevance: 'medium',
-						callback: () => downloadBlob( 'report.csv', toCsv( rows ) ),
-					},
-				]
-			: [],
-	[ rows ]
+const hosted = useWidgetActions(
+	rows.length > 0
+		? [
+				{
+					id: 'export',
+					label: __( 'Download CSV' ),
+					relevance: 'medium',
+					callback: () => downloadBlob( 'report.csv', toCsv( rows ) ),
+				},
+			]
+		: []
 );
-const hosted = useWidgetActions( actions );
 ```
+
+The list is compared by value, so it needs no memoization, and a callback always runs its latest version.
 
 Three rules hold the two sources together:
 

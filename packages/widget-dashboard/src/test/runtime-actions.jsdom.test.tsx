@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useWidgetActions } from '@wordpress/widget-primitives';
 import type {
 	ResolveWidgetModule,
@@ -43,41 +43,38 @@ function TestWidget( {
 	const exportable = attributes?.exportable ?? false;
 	const refreshable = attributes?.refreshable ?? false;
 
-	const actions = useMemo< WidgetRuntimeAction[] >( () => {
-		const list: WidgetRuntimeAction[] = [];
-		if ( count > 0 ) {
-			list.push( {
-				id: 'details',
-				label: `Review ${ count } items`,
-				relevance: 'high',
-				href: `admin.php?page=dashboard&p=/details?count=${ count }`,
-			} );
-		}
-		if ( period ) {
-			list.push( {
-				id: 'report',
-				label: 'View report',
-				relevance: 'high',
-				href: `admin.php?page=dashboard&p=/report?period=${ period }`,
-			} );
-		}
-		if ( exportable ) {
-			list.push( {
-				id: 'export',
-				label: 'Export',
-				relevance: 'medium',
-				callback: onExport,
-			} );
-		}
-		if ( refreshable ) {
-			list.push( {
-				id: 'refresh',
-				label: 'Refresh',
-				callback: onRefresh,
-			} );
-		}
-		return list;
-	}, [ count, period, exportable, refreshable ] );
+	const actions: WidgetRuntimeAction[] = [];
+	if ( count > 0 ) {
+		actions.push( {
+			id: 'details',
+			label: `Review ${ count } items`,
+			relevance: 'high',
+			href: `admin.php?page=dashboard&p=/details?count=${ count }`,
+		} );
+	}
+	if ( period ) {
+		actions.push( {
+			id: 'report',
+			label: 'View report',
+			relevance: 'high',
+			href: `admin.php?page=dashboard&p=/report?period=${ period }`,
+		} );
+	}
+	if ( exportable ) {
+		actions.push( {
+			id: 'export',
+			label: 'Export',
+			relevance: 'medium',
+			callback: onExport,
+		} );
+	}
+	if ( refreshable ) {
+		actions.push( {
+			id: 'refresh',
+			label: 'Refresh',
+			callback: onRefresh,
+		} );
+	}
 
 	const hosted = useWidgetActions( actions );
 

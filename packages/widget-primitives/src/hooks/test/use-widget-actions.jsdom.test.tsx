@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { useWidgetActions } from '../use-widget-actions';
 import { WidgetHostProvider } from '../../widget-host';
-import type { WidgetRuntimeAction } from '../../types';
+import type { WidgetCallbackAction, WidgetRuntimeAction } from '../../types';
 
 function createHost() {
 	const declare = vi.fn< ( actions: WidgetRuntimeAction[] ) => void >();
@@ -43,24 +43,43 @@ describe( 'useWidgetActions', () => {
 		expect( result.current ).toBe( false );
 	} );
 
-	it( 're-declares when the list changes and not on a re-render', () => {
+	it( 'declares again only when the list changes by value', () => {
 		const { declare, wrapper } = createHost();
-		const first: WidgetRuntimeAction[] = [ report ];
-		const second: WidgetRuntimeAction[] = [
-			report,
-			{ id: 'export', label: 'Export', callback: () => {} },
-		];
 
 		const { rerender } = renderHook(
-			( { actions } ) => useWidgetActions( actions ),
-			{ wrapper, initialProps: { actions: first } }
+			( { label } ) => useWidgetActions( [ { ...report, label } ] ),
+			{ wrapper, initialProps: { label: 'View report' } }
 		);
-		rerender( { actions: first } );
+		rerender( { label: 'View report' } );
 		expect( declare ).toHaveBeenCalledTimes( 1 );
 
-		rerender( { actions: second } );
+		rerender( { label: 'View 3 reports' } );
 		expect( declare ).toHaveBeenCalledTimes( 2 );
-		expect( declare ).toHaveBeenLastCalledWith( second );
+		expect( declare ).toHaveBeenLastCalledWith( [
+			{ ...report, label: 'View 3 reports' },
+		] );
+	} );
+
+	it( 'runs the latest callback without declaring again', () => {
+		const { declare, wrapper } = createHost();
+		const first = vi.fn();
+		const second = vi.fn();
+
+		const { rerender } = renderHook(
+			( { callback } ) =>
+				useWidgetActions( [
+					{ id: 'export', label: 'Export', callback },
+				] ),
+			{ wrapper, initialProps: { callback: first } }
+		);
+		rerender( { callback: second } );
+		expect( declare ).toHaveBeenCalledTimes( 1 );
+
+		const [ declared ] = declare.mock.calls[ 0 ][ 0 ];
+		( declared as WidgetCallbackAction ).callback();
+
+		expect( first ).not.toHaveBeenCalled();
+		expect( second ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'withdraws the actions on unmount', () => {
