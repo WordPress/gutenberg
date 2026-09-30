@@ -1,7 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { Notice } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
+import { useFields } from '@wordpress/fields-loader';
 import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
@@ -10,7 +12,6 @@ import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
-import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from './fields/revisions';
 import readingSettingsField from './fields/reading-settings';
@@ -277,7 +278,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		return map;
 	}, [ postType ] );
 
-	const _fields = usePostFields( { postType } );
+	// The actions this panel needs are registered by `usePostActions`, which
+	// `PostCardPanel` reaches through `PostActions`.
+	const {
+		fields: _fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: postType } );
 	const fields = useMemo(
 		() =>
 			_fields
@@ -393,12 +400,21 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					postId={ postId }
 					onActionPerformed={ onActionPerformed }
 				/>
-				<DataForm
-					data={ data }
-					fields={ fields }
-					form={ form }
-					onChange={ onChange }
-				/>
+				{ fieldsError && (
+					<Notice status="error" isDismissible={ false }>
+						{ fieldsError.message }
+					</Notice>
+				) }
+				{ /* A form built from no fields renders nothing but its
+				     panel chrome, so it waits for the fields to arrive. */ }
+				{ ! isLoadingFields && ! fieldsError && (
+					<DataForm
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ onChange }
+					/>
+				) }
 				{ ! isPostStatusRemoved && (
 					<>
 						<PluginPostStatusInfo.Slot>
