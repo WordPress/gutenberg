@@ -18,7 +18,7 @@ const meta: Meta< StoryArgs > = {
 	},
 	argTypes: {
 		color: { control: 'text' },
-		value: { control: { type: 'number', min: 0, max: 100 } },
+		value: { control: 'number' },
 		tone: { control: 'select', options: [ 'neutral', 'brand' ] },
 	},
 	parameters: {
