@@ -51,6 +51,22 @@ Use `Menu.CheckboxItem` for independent states, such as showing or hiding indivi
 
 Use `Menu.RadioItem` within `Menu.RadioGroup` for mutually exclusive states, such as choosing one density or view mode within a broader command menu.
 
+`Menu.RadioGroup` already provides grouping. Put `Menu.GroupLabel` inside it to label the radio group. Do not wrap it in `Menu.Group` or put `Menu.Group` inside it. This also applies to combining the two components with the `render` prop. A label in an outer group does not label the inner group. Development builds throw an error for either nesting direction, including through wrapper components.
+
+```tsx
+<Menu.RadioGroup defaultValue="compact">
+	<Menu.GroupLabel>Density</Menu.GroupLabel>
+	<Menu.RadioItem value="compact">
+		<Menu.ItemLabel>Compact</Menu.ItemLabel>
+	</Menu.RadioItem>
+	<Menu.RadioItem value="comfortable">
+		<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
+	</Menu.RadioItem>
+</Menu.RadioGroup>
+```
+
+Use `Menu.Group` for related commands, links, or checkbox items. `Menu.Group` and `Menu.RadioGroup` can be siblings in the same popup. Each submenu has its own groups.
+
 <Canvas of={ UsageGuidelinesStories.CheckedOptionsWithinACommandMenu } />
 
 Do not use checked menu items only to recreate a Select. If choosing a value is the whole purpose of the control, use `SelectControl`, even when the options could look like radio menu items.
