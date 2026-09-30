@@ -21,22 +21,10 @@ export interface RootProps extends Pick<
 	| 'modal'
 	| 'loopFocus'
 	| 'highlightItemOnHover'
-	| 'disabled'
 	| 'actionsRef'
 	| 'triggerId'
 	| 'defaultTriggerId'
 > {
-	/**
-	 * Disables menu interactions, including keyboard navigation and dismissal
-	 * with Escape or an outside click. Does not close an already open menu.
-	 *
-	 * To prevent opening an unavailable menu, set `disabled` on `Menu.Trigger`
-	 * instead. Disable individual items separately when their actions are
-	 * unavailable.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
@@ -65,7 +53,6 @@ export interface SubmenuRootProps extends Pick<
 	| 'defaultOpen'
 	| 'loopFocus'
 	| 'highlightItemOnHover'
-	| 'disabled'
 	| 'closeParentOnEsc'
 	| 'actionsRef'
 > {

@@ -59,7 +59,7 @@ Do not use checked menu items only to recreate a Select. If choosing a value is 
 
 Set `disabled` on `Menu.Trigger` when the menu cannot be opened, such as when no actions are available. Set `disabled` on individual items when their actions are unavailable. Disabling the trigger does not disable items in an already open menu.
 
-Avoid using `Menu.Root disabled` for these states. It disables keyboard navigation and dismissal with Escape or an outside click, and does not close an already open menu. Disabling only the trigger lets users dismiss a menu that was open when the trigger became disabled. The same distinction applies to `Menu.SubmenuRoot` and `Menu.SubmenuTrigger`.
+Disabling only the trigger lets users dismiss a menu that was open when the trigger became disabled. For submenus, set `disabled` on `Menu.SubmenuTrigger`. Neither `Menu.Root` nor `Menu.SubmenuRoot` supports `disabled`.
 
 When rendering an `@wordpress/components` `Button`, keep `accessibleWhenDisabled` on the button if it should remain focusable. Put `disabled` on `Menu.Trigger`, which passes it to the rendered button and prevents the menu from opening with the keyboard or pointer.
 
