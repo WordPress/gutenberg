@@ -722,4 +722,73 @@ test.describe( 'Block Notes: floating sidebar', () => {
 			await expectAligned( form, () => getSelectionTop( editor ) );
 		} );
 	} );
+
+	test.describe( 'Display mode', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.resetPreferences();
+		} );
+
+		test( 'hides and shows floating notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block notes' },
+				comment: 'A floating note',
+			} );
+			const thread = getThread( page, 'A floating note' );
+			const settingsToggle = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Settings', exact: true } );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
+			await expect( thread ).toBeHidden();
+
+			// Closing another sidebar doesn't bring hidden notes back.
+			await editor.openDocumentSettingsSidebar();
+			await settingsToggle.click();
+			await expect( thread ).toBeHidden();
+
+			// Showing notes replaces the open sidebar.
+			await editor.openDocumentSettingsSidebar();
+			await blockNoteUtils.clickNotesMenuItem( 'Show notes' );
+			await expect( thread ).toBeVisible();
+
+			// Closing another sidebar brings shown notes back.
+			await editor.openDocumentSettingsSidebar();
+			await expect( thread ).toBeHidden();
+			await settingsToggle.click();
+			await expect( thread ).toBeVisible();
+
+			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
+			await expect(
+				getSidebar( page ).getByRole( 'heading', { name: 'All notes' } )
+			).toBeVisible();
+		} );
+
+		test( 'shows hidden notes when adding a note', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block notes' },
+			} );
+			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+			await expect(
+				getSidebar( page ).getByRole( 'treeitem', {
+					name: 'New note',
+					exact: true,
+				} )
+			).toHaveClass( /is-floating/ );
+		} );
+	} );
 } );
