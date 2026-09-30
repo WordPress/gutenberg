@@ -1,5 +1,5 @@
 import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as annotationsStore } from '@wordpress/annotations';
 
 /**
@@ -18,6 +18,7 @@ import { store as annotationsStore } from '@wordpress/annotations';
  * @param ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
  */
 export function useAnnotateRanges( source: string, ranges: any[] ) {
+	const registry = useRegistry();
 	const {
 		__experimentalAddAnnotation: addAnnotation,
 		__experimentalRemoveAnnotationsBySource: removeAnnotationsBySource,
@@ -27,17 +28,21 @@ export function useAnnotateRanges( source: string, ranges: any[] ) {
 		if ( ! ranges?.length ) {
 			return;
 		}
-		for ( const range of ranges ) {
-			addAnnotation( {
-				id: range.id,
-				source,
-				blockClientId: range.clientId,
-				richTextIdentifier: range.attributeKey,
-				range: { start: range.start, end: range.end },
-			} );
-		}
+		// Batched so every annotated block re-renders once per range set,
+		// not once per range.
+		registry.batch( () => {
+			for ( const range of ranges ) {
+				addAnnotation( {
+					id: range.id,
+					source,
+					blockClientId: range.clientId,
+					richTextIdentifier: range.attributeKey,
+					range: { start: range.start, end: range.end },
+				} );
+			}
+		} );
 		return () => {
 			removeAnnotationsBySource( source );
 		};
-	}, [ source, ranges, addAnnotation, removeAnnotationsBySource ] );
+	}, [ registry, source, ranges, addAnnotation, removeAnnotationsBySource ] );
 }
