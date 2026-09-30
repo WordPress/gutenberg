@@ -1,0 +1,9 @@
+.icon {
+	block-size: 24px;
+	inline-size: 24px;
+}
+
+.icon svg {
+	fill: currentColor;
+	margin-inline-start: -4px;
+}
