@@ -8,7 +8,9 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -280,6 +282,7 @@ export default function TypographyPanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
+	const { createWarningNotice } = useDispatch( noticesStore );
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
@@ -358,7 +361,7 @@ export default function TypographyPanel( {
 		( value?.background?.backgroundClip ?? baseClip ) === 'text';
 	// Only the Default state holds the gradient, so this one cannot change it.
 	const textGradientIsFromBase = clipsToTextHere && ! isTextGradient;
-	const textColorDisabledHint = textGradientIsFromBase
+	const textGradientNotice = textGradientIsFromBase
 		? __(
 				'The text gradient set in the Default state replaces the text color.'
 			)
@@ -366,9 +369,9 @@ export default function TypographyPanel( {
 	const inheritedIsTextGradient =
 		inheritedValue?.background?.backgroundClip === 'text';
 	// `background-clip` clips every background layer at once, including the
-	// color, so applying a text gradient would wipe out a background set on
-	// this block. Only its own values are considered: clipping away one the
-	// block merely inherits is a normal override, not a loss.
+	// color, so applying a text gradient takes over a background set on this
+	// block. Only its own values are considered: clipping away one the block
+	// merely inherits is a normal override, not a loss.
 	const backgroundGradient = value?.background?.gradient;
 	const backgroundColor = value?.color?.background;
 	const clipsToText =
@@ -385,6 +388,20 @@ export default function TypographyPanel( {
 		: undefined;
 	const hasTextGradientValue = () => userTextGradient !== undefined;
 	const setTextGradient = ( newGradient, newSlug ) => {
+		// The gradient the block already had is written over by the one
+		// clipped to the text, and a background color it keeps is painted
+		// inside the text from here on. Both are worth saying once, at the
+		// moment they happen, rather than standing in the panel afterwards.
+		if ( newGradient && hasBlockBackground ) {
+			createWarningNotice(
+				backgroundGradient
+					? __(
+							'The text gradient replaced the background gradient.'
+						)
+					: __( 'The background color now paints inside the text.' ),
+				{ type: 'snackbar' }
+			);
+		}
 		let changedObject = setImmutably(
 			value,
 			[ 'background', 'gradient' ],
@@ -960,10 +977,6 @@ export default function TypographyPanel( {
 					label={ __( 'Color' ) }
 					hasValue={ hasTextColorValue }
 					resetValue={ resetTextColor }
-					// A text gradient paints the text itself, so a text
-					// colour set here would never show.
-					disabled={ clipsToTextHere }
-					disabledHint={ textColorDisabledHint }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
 					contrastWarning={ contrastWarning }
@@ -1006,16 +1019,6 @@ export default function TypographyPanel( {
 					label={ __( 'Gradient' ) }
 					hasValue={ hasTextGradientValue }
 					resetValue={ resetTextGradient }
-					disabled={ hasBlockBackground }
-					disabledHint={
-						backgroundGradient
-							? __(
-									"A text gradient can't be set while the block has a background gradient."
-								)
-							: __(
-									"A text gradient can't be set while the block has a background color."
-								)
-					}
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? textGradient ] }
 					showInheritanceLabelIndicators={
@@ -1370,6 +1373,15 @@ export default function TypographyPanel( {
 						</div>
 					) }
 				</InheritanceToolsPanelItem>
+			) }
+			{ hasTextColorEnabled && clipsToTextHere && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-typography-panel__text-gradient-notice"
+				>
+					{ textGradientNotice }
+				</Notice>
 			) }
 		</Wrapper>
 	);
