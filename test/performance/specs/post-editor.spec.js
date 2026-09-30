@@ -19,6 +19,7 @@ const results = {
 	typeWithoutInspector: [],
 	typeWithTopToolbar: [],
 	typeContainer: [],
+	typeSuggest: [],
 	focus: [],
 	firstFocus: [],
 	selectAll: [],
@@ -272,6 +273,56 @@ test.describe( 'Post Editor Performance', () => {
 			await firstParagraph.click();
 
 			await type( firstParagraph, metrics, 'typeContainer' );
+		} );
+	} );
+
+	test.describe( 'Typing (Suggest intent)', () => {
+		let draftId = null;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-suggestion-mode',
+			] );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllComments( 'note' );
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitemradio' ).first().waitFor();
+			const suggesting = page.getByRole( 'menuitemradio', {
+				name: /^Suggesting/,
+			} );
+			// The branch under comparison may predate suggest mode.
+			const hasSuggestIntent = ( await suggesting.count() ) > 0;
+			if ( hasSuggestIntent ) {
+				await suggesting.click();
+			}
+			await page.keyboard.press( 'Escape' );
+			test.skip( ! hasSuggestIntent, 'Suggest intent is unavailable.' );
+
+			const canvas = await perfUtils.getCanvas();
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeSuggest' );
 		} );
 	} );
 
