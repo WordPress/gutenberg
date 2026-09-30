@@ -22,7 +22,6 @@ import {
 	featuredImageField,
 	templatePartAuthorField,
 	templateField,
-	templateTitleField,
 	patternTitleField,
 	patternDescriptionField,
 	patternSyncStatusField,
@@ -231,11 +230,7 @@ export const registerPostTypeSchema =
 			// supporting titles.
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
-				if ( postType === 'wp_template' ) {
-					_titleField = templateTitleField;
-				} else if (
-					[ 'wp_block', 'wp_template_part' ].includes( postType )
-				) {
+				if ( [ 'wp_block', 'wp_template_part' ].includes( postType ) ) {
 					_titleField = patternTitleField;
 				}
 				if ( _titleField ) {

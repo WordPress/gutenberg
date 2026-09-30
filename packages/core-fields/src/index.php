@@ -146,8 +146,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
  *   a site rather than publish content.
  * - Pages, templates, template parts, and patterns: `title`. They have
- *   their own title fields: the `page` collection has the one of pages, and
- *   the client declares the others.
+ *   their own title fields: the `page` and `wp_template` collections have
+ *   the ones of pages and templates, and the client declares the others.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *

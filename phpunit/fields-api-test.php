@@ -892,13 +892,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' );
-		$this->assertSame( array( 'author' ), self::get_support_field_ids( 'wp_template' ), 'The default author field is not registered.' );
+		$this->assertSame( array( 'author', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The default author and title fields are not registered.' );
+		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( 'author' ),
+			array( 'author', 'title' ),
 			gutenberg_get_registered_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
-			'The template author ships its JavaScript parts in the module of its collection.'
+			'The fields of templates ship their JavaScript parts in the module of the collection.'
 		);
 	}
 
@@ -926,7 +927,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$author = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
 		$this->assertSame( 'my-plugin', $author['origin']['registeredBy'] );
-		$this->assertArrayNotHasKey( '@wordpress/core-fields/wp_template', gutenberg_get_registered_field_modules( 'postType', 'wp_template' ), 'The module of the replaced field is dropped.' );
+		$modules = gutenberg_get_registered_field_modules( 'postType', 'wp_template' );
+		$this->assertNotContains( 'author', $modules['@wordpress/core-fields/wp_template'] ?? array(), 'The module of the replaced field no longer applies to it.' );
 	}
 
 	/**

@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import wpTemplate from '../wp_template';
 
 describe( 'wp_template', () => {
+	it( 'provides the JavaScript parts of the fields that have some', () => {
+		expect( Object.keys( wpTemplate ) ).toEqual( [ 'author', 'title' ] );
+	} );
+
 	it( 'provides the JavaScript parts of the template author field', () => {
-		expect( Object.keys( wpTemplate ) ).toEqual( [ 'author' ] );
 		expect( wpTemplate.author ).toEqual( {
 			getValue: expect.any( Function ),
 			render: expect.any( Function ),
