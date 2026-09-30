@@ -19,6 +19,7 @@ function ExperimentsPage() {
 	const [ experiments, setExperiments ] = useState< Experiment[] | null >(
 		null
 	);
+	const [ isWarningDismissed, setIsWarningDismissed ] = useState( false );
 
 	useEffect( () => {
 		fetchExperiments()
@@ -151,6 +152,25 @@ function ExperimentsPage() {
 				direction="column"
 				gap="md"
 			>
+				{ ! isWarningDismissed && (
+					<div className="experiments-page__warning">
+						<strong className="experiments-page__warning-title">
+							{ __( 'Use on test sites only' ) }
+						</strong>
+						<span>
+							{ __(
+								'Experiments can change or break your site. Try them on a test site first.'
+							) }
+						</span>
+						<button
+							type="button"
+							className="experiments-page__warning-dismiss"
+							onClick={ () => setIsWarningDismissed( true ) }
+						>
+							×
+						</button>
+					</div>
+				) }
 				<Card.Root>
 					<Card.Content>
 						<Stack direction="column" gap="md">

@@ -7,3 +7,26 @@
 	max-width: 680px;
 	margin-inline: auto;
 }
+
+.experiments-page__warning {
+	display: flex;
+	gap: 8px;
+	padding: 12px 16px;
+	background: #fef8ee;
+	border-inline-start: 4px solid #f0b849;
+	border-radius: 2px;
+	color: var(--wp--preset--color--contrast, #1e1e1e);
+}
+
+.experiments-page__warning-title {
+	font-weight: 600;
+}
+
+.experiments-page__warning-dismiss {
+	margin-inline-start: auto;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 20px;
+	line-height: 1;
+}
