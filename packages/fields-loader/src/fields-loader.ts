@@ -144,7 +144,7 @@ function getResolvedFields< Item >(
  *         with an `Error` when the fields cannot be requested, or when
  *         WordPress does not provide them.
  */
-export async function loadEntityFields< Item = any >( {
+export async function loadFields< Item = any >( {
 	kind,
 	name,
 }: {
@@ -170,7 +170,7 @@ export async function loadEntityFields< Item = any >( {
 /**
  * Returns the fields registered on the server for an entity.
  *
- * The React counterpart of `loadEntityFields`: both share the request and the
+ * The React counterpart of `loadFields`: both share the request and the
  * module imports, so a route loader warms up what the hook renders.
  *
  * @param config      The entity.
@@ -180,7 +180,7 @@ export async function loadEntityFields< Item = any >( {
  *         they are still loading, and the error when they could not be
  *         requested or WordPress does not provide them.
  */
-export function useEntityFields< Item = any >( {
+export function useFields< Item = any >( {
 	kind,
 	name,
 }: {

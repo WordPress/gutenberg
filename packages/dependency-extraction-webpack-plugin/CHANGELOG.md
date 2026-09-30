@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `@wordpress/entity-fields` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-entity-fields` script.
+-   Add `@wordpress/fields-loader` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-fields-loader` script.
 
 ## 6.56.0 (2026-09-23)
 

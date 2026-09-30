@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { resolveFieldsConfig, useEntityFields } from '../entity-fields';
+import { resolveFieldsConfig, useFields } from '../fields-loader';
 
 vi.mock( '@wordpress/api-fetch' );
 
@@ -116,12 +116,12 @@ describe( 'resolveFieldsConfig', () => {
 	} );
 } );
 
-describe( 'useEntityFields', () => {
-	function renderUseEntityFields() {
+describe( 'useFields', () => {
+	function renderUseFields() {
 		const registry = createRegistry();
 		registry.register( coreStore );
 		return renderHook(
-			() => useEntityFields( { kind: 'postType', name: 'page' } ),
+			() => useFields( { kind: 'postType', name: 'page' } ),
 			{
 				wrapper: ( { children } ) => (
 					<RegistryProvider value={ registry }>
@@ -138,7 +138,7 @@ describe( 'useEntityFields', () => {
 			script_modules: [],
 		} );
 
-		const { result } = renderUseEntityFields();
+		const { result } = renderUseFields();
 
 		expect( result.current ).toEqual( { fields: [], isLoading: true } );
 		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
@@ -161,7 +161,7 @@ describe( 'useEntityFields', () => {
 		};
 		vi.mocked( apiFetch ).mockRejectedValue( restError );
 
-		const { result } = renderUseEntityFields();
+		const { result } = renderUseFields();
 
 		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
 		expect( result.current.fields ).toEqual( [] );

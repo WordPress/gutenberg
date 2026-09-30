@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/entity-fields",
+	"name": "@wordpress/fields-loader",
 	"version": "0.1.0-prerelease",
 	"description": "Load the fields WordPress entities register on the server, for use with DataViews and DataForm.",
 	"author": "The WordPress Contributors",
@@ -10,11 +10,11 @@
 		"fields",
 		"entities"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/entity-fields/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields-loader/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/entity-fields"
+		"directory": "packages/fields-loader"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

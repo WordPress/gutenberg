@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"references": [
-		{ "path": "../entity-fields/tsconfig.build.json" },
-		{ "path": "../fields/tsconfig.build.json" }
+		{ "path": "../fields/tsconfig.build.json" },
+		{ "path": "../fields-loader/tsconfig.build.json" }
 	]
 }

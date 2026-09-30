@@ -4,7 +4,7 @@ import { doAction } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import type { PostType } from '@wordpress/fields';
-import { loadEntityFields } from '@wordpress/entity-fields';
+import { loadFields } from '@wordpress/fields-loader';
 import {
 	viewPost,
 	viewPostRevisions,
@@ -168,7 +168,7 @@ export const registerPostTypeSchema =
 
 		// Runs in parallel with the lookups below; awaited once the client
 		// fields are known.
-		const serverFieldsPromise = loadEntityFields( {
+		const serverFieldsPromise = loadFields( {
 			kind: 'postType',
 			name: postType,
 		} );

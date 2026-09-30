@@ -45,8 +45,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/entity-fields": "file:../entity-fields",
-		"@wordpress/fields": "file:../fields"
+		"@wordpress/fields": "file:../fields",
+		"@wordpress/fields-loader": "file:../fields-loader"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

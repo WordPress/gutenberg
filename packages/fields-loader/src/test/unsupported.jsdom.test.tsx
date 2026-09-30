@@ -5,7 +5,7 @@ import {
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
-import { loadEntityFields, useEntityFields } from '../entity-fields';
+import { loadFields, useFields } from '../fields-loader';
 
 /*
  * A plugin can bundle this package and run it on a WordPress version whose
@@ -20,13 +20,13 @@ const UNSUPPORTED_MESSAGE =
 	'The fields registered on the server are not available in this version of WordPress.';
 
 describe( 'without the getFieldsConfig selector', () => {
-	it( 'rejects loadEntityFields with an error', async () => {
+	it( 'rejects loadFields with an error', async () => {
 		await expect(
-			loadEntityFields( { kind: 'postType', name: 'page' } )
+			loadFields( { kind: 'postType', name: 'page' } )
 		).rejects.toThrow( UNSUPPORTED_MESSAGE );
 	} );
 
-	it( 'returns an error from useEntityFields', () => {
+	it( 'returns an error from useFields', () => {
 		const registry = createRegistry();
 		registry.register(
 			createReduxStore( 'core', {
@@ -36,7 +36,7 @@ describe( 'without the getFieldsConfig selector', () => {
 		);
 
 		const { result } = renderHook(
-			() => useEntityFields( { kind: 'postType', name: 'page' } ),
+			() => useFields( { kind: 'postType', name: 'page' } ),
 			{
 				wrapper: ( { children } ) => (
 					<RegistryProvider value={ registry }>
