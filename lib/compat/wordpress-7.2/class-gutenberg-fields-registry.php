@@ -423,7 +423,7 @@ final class Gutenberg_Fields_Registry {
 			}
 		}
 
-		if ( ! is_array( $fields ) || empty( $fields ) ) {
+		if ( ! is_array( $fields ) || empty( $fields ) || ! array_is_list( $fields ) ) {
 			_doing_it_wrong(
 				$method,
 				__( 'The fields must be a list of non-empty field definitions.', 'gutenberg' ),
