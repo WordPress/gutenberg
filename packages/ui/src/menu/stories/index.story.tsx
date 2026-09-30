@@ -221,7 +221,7 @@ export const Default: Story = {
 
 /**
  * Set `variant="high-contrast"` on each popup, including submenu popups, to use
- * a strong border, small radius, and no shadow.
+ * a strong border and separators, small radius, and no shadow.
  */
 export const HighContrast: Story = {
 	render: () => <DefaultExample variant="high-contrast" />,

@@ -92,7 +92,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 	 * The visual style of the popup.
 	 *
 	 * - `'default'`: standard border, radius, and shadow.
-	 * - `'high-contrast'`: strong border, small radius, and no shadow.
+	 * - `'high-contrast'`: strong border and separators, small radius, and no shadow.
 	 *
 	 * Set the variant on each popup, including submenu popups.
 	 *
