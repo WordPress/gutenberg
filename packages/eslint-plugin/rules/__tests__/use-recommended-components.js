@@ -23,7 +23,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Checkbox, CheckboxControl, CheckboxGroup } from '@wordpress/ui';",
 
 		// "Use with caution" components are allowed when opted in.
 		{
@@ -105,15 +104,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 			],
 		},
 		// Denylist: denied components are flagged with their message.
-		{
-			code: "import { CheckboxControl } from '@wordpress/components';",
-			errors: [
-				{
-					message:
-						'Use `CheckboxControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
-				},
-			],
-		},
 		{
 			code: "import { __experimentalZStack } from '@wordpress/components';",
 			errors: [

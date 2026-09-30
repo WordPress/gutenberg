@@ -6,11 +6,12 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 
 ## Migration guides
 
-- `CheckboxControl` — use `description` in place of `help` and `onCheckedChange` in place of `onChange`. For a group heading, compose `Fieldset.Legend` with `CheckboxGroup`. See the [`CheckboxControl` Storybook documentation](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-checkboxcontrol--docs).
+- `CheckboxControl` — [`CheckboxControl` migration guide][checkboxcontrol-migration-guide]
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
 
+[checkboxcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
 [textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
 

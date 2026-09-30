@@ -1,0 +1,78 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as CheckboxControlStories from './index.story';
+
+<Meta of={ CheckboxControlStories } name="Migration Guide" />
+
+# CheckboxControl migration guide
+
+Migrate from [`CheckboxControl`](?path=/docs/components-checkboxcontrol--docs) in `@wordpress/components` to [`CheckboxControl`](?path=/docs/design-system-components-form-checkboxcontrol--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Update the import and replace the callback and help props:
+
+```jsx
+// Before
+import { CheckboxControl } from '@wordpress/components';
+
+<CheckboxControl
+	label="Is author"
+	checked={ isChecked }
+	onChange={ setChecked }
+	help="Give this user author permissions."
+/>;
+
+// After
+import { CheckboxControl } from '@wordpress/ui';
+
+<CheckboxControl
+	label="Is author"
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+	description="Give this user author permissions."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`onChange\` | \`onCheckedChange\` | Receives the next checked state as a boolean. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`checked\` | \`checked\` | Continue passing the state for a controlled checkbox. |
+| \`indeterminate\` | \`indeterminate\` | Continue passing the indeterminate state when needed. |
+| \`heading\` | A separate heading or \`Fieldset.Legend\` | See [Headings](#headings). |
+` }</Markdown>
+
+## Labels
+
+The new `CheckboxControl` requires a `label` prop with a plain `string` value. The legacy component treats `label` as optional. Give every checkbox a descriptive label, even when the text is already visible elsewhere:
+
+```jsx
+<CheckboxControl
+	label="Receive notifications"
+	hideLabelFromVision
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+/>
+```
+
+For a custom label layout, compose the [`Checkbox`](?path=/docs/design-system-components-form-primitives-checkbox--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
+
+## Headings
+
+The legacy `heading` prop is deprecated. Use a separate heading element for a single checkbox. For a heading that labels a group of checkboxes, compose `Fieldset.Legend` with `CheckboxGroup`:
+
+```jsx
+import { CheckboxControl, CheckboxGroup, Fieldset } from '@wordpress/ui';
+
+<Fieldset.Root render={ <CheckboxGroup defaultValue={ [ 'comments' ] } /> }>
+	<Fieldset.Legend>Notifications</Fieldset.Legend>
+	<CheckboxControl value="comments" label="Comments" />
+	<CheckboxControl value="mentions" label="Mentions" />
+</Fieldset.Root>;
+```
+
+See the [Checkbox Groups stories](?path=/docs/design-system-components-form-checkbox-groups--docs) for controlled and nested groups.
