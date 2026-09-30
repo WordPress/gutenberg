@@ -486,7 +486,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			unregister_post_type( 'gutenberg_book' );
 		}
 
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ), self::without_every_post_type_fields( array_column( $fields, 'id' ) ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info', 'title' ), self::without_every_post_type_fields( array_column( $fields, 'id' ) ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
 			array( '@wordpress/core-fields/post_type_supports' => array_column( $fields, 'id' ) ),
@@ -541,6 +541,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
 			'parent'            => array( 'parent', array( 'page-attributes' ) ),
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
+			'title'             => array( 'title', array( 'title' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
 		);
 	}
@@ -602,7 +603,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		foreach ( $supports as $index => $support ) {
 			$with_support[ "gutenberg_with_$index" ] = array( 'title', $support );
 		}
-		$this->register_post_types( $with_support + array( 'gutenberg_without' => array( 'title', 'author' ) ) );
+		$this->register_post_types( $with_support + array( 'gutenberg_without' => array( 'author' ) ) );
 
 		self::reset_registry();
 
@@ -713,12 +714,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$ids        = array( 'author', 'comment_status', 'notesCount' );
 		$publishing = self::PUBLISHING_FIELDS;
-		$this->assertSame( array_merge( array( 'plugin_field', 'author', 'excerpt', 'post-content-info' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
-		$this->assertSame( array_merge( array( 'author', 'excerpt', 'post-content-info' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
-		$this->assertSame( array_merge( array( 'excerpt' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
+		$this->assertSame( array_merge( array( 'plugin_field', 'author', 'excerpt', 'post-content-info', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
+		$this->assertSame( array_merge( array( 'author', 'excerpt', 'post-content-info', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array_merge( array( 'excerpt', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
 		$this->assertSame( array_merge( array( 'post-content-info' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_navigation', $ids ) );
 		$this->assertSame( array( 'plugin_field', 'author', 'comment_status', 'notesCount' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'attachment', $ids ) );
-		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ), 'It leaves the other post types alone.' );
+		$this->assertSame( array( 'plugin_field', 'title' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ) );
+		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'post', $ids ), 'It leaves the other post types alone.' );
 	}
 
 	/**
@@ -767,11 +769,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		self::reset_registry();
-		$this->assertSame( array( 'author', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::without_every_post_type_fields( $calls['gutenberg_book'] ), 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'slug', 'sticky' ), self::without_every_post_type_fields( $calls['post'] ) );
-		$this->assertSame( self::EVERY_POST_TYPE_FIELDS, $calls['gutenberg_plain'], 'A post type supporting nothing gets the defaults of every post type.' );
+		$this->assertSame( array( 'author', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::without_every_post_type_fields( $calls['gutenberg_book'] ), 'The filter receives the ids of the defaults the post type supports.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'slug', 'sticky', 'title' ), self::without_every_post_type_fields( $calls['post'] ) );
+		$this->assertSame( array( 'title' ), self::without_every_post_type_fields( $calls['gutenberg_plain'] ), 'A post type supporting titles only gets the defaults of every post type.' );
 	}
 
 	/**
@@ -792,7 +794,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_type_supports_fields' );
 		self::reset_registry();
 
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_book' ) );
 	}
 
 	/**
@@ -962,8 +964,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertSame( array( 'author', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
 	}
 
 	/**
