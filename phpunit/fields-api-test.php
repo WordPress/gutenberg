@@ -489,32 +489,89 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Templates and template parts support authors but have their own
-	 * client-side author field, so the default one is removed.
+	 * Template parts support authors but have their own client-side author
+	 * field, so the default one is removed.
 	 *
 	 * The defaults are registered at priority 0 and adjusted at priority 9,
 	 * so a callback in between sees the default author field the adjustment
 	 * then removes.
-	 *
-	 * @dataProvider data_template_post_types
-	 *
-	 * @param string $post_type The post type.
-	 * @param string $callback  The function adjusting its fields.
 	 */
-	public function test_templates_do_not_get_the_default_author_field( $post_type, $callback ) {
-		$this->assertTrue( post_type_supports( $post_type, 'author' ), 'The post type supports authors.' );
-		$this->assertSame( 9, has_action( 'fields_api_init', $callback ), 'The adjustment runs right after the defaults.' );
+	public function test_template_parts_do_not_get_the_default_author_field() {
+		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields' ), 'The adjustment runs right after the defaults.' );
 
 		$before = null;
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$before, $post_type ) {
-				$before = array_column( $registry->get_registered( 'postType', $post_type ), 'id' );
+			static function ( $registry ) use ( &$before ) {
+				$before = array_column( $registry->get_registered( 'postType', 'wp_template_part' ), 'id' );
 			},
 			5
 		);
 
 		$this->assertContains( 'author', $before, 'The default author field is registered first.' );
-		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ), 'The action leaves no author field.' );
+		$this->assertNotContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'wp_template_part' ), 'id' ), 'The action leaves no author field.' );
+	}
+
+	/**
+	 * Templates support authors but their author is the theme, plugin, site,
+	 * or user that provides them: the default author field is replaced with
+	 * the one of the `wp_template` collection, with its own script module.
+	 *
+	 * The defaults are registered at priority 0 and adjusted at priority 9,
+	 * so a callback in between sees the default author field the adjustment
+	 * then replaces.
+	 */
+	public function test_templates_get_their_own_author_field() {
+		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_fields' ), 'The adjustment runs right after the defaults.' );
+
+		$before = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$before ) {
+				$before = array_column( $registry->get_registered( 'postType', 'wp_template' ), null, 'id' );
+			},
+			5
+		);
+
+		$this->assertSame( 'integer', $before['author']['type'], 'The default author field is registered first.' );
+
+		$author = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
+		$this->assertArrayNotHasKey( 'type', $author, 'The template author is not the integer post author.' );
+		$this->assertSame( 'core', $author['origin']['registeredBy'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/wp_template' => array( 'author' ) ),
+			gutenberg_get_registered_field_modules( 'postType', 'wp_template' ),
+			'The template author ships its JavaScript parts in the module of its collection.'
+		);
+	}
+
+	/**
+	 * A plugin that replaces the author field of templates before the
+	 * adjustment keeps its own.
+	 */
+	public function test_templates_keep_the_author_field_a_plugin_registers() {
+		$this->on_fields_api_init(
+			static function ( $registry ) {
+				$registry->unregister( 'postType', 'wp_template', array( 'author' ) );
+				$registry->register(
+					'my-plugin',
+					'postType',
+					'wp_template',
+					array(
+						array(
+							'id'    => 'author',
+							'type'  => 'text',
+							'label' => 'Maker',
+						),
+					)
+				);
+			},
+			5
+		);
+
+		$author = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
+		$this->assertSame( 'my-plugin', $author['origin']['registeredBy'] );
+		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'wp_template' ) );
 	}
 
 	/**
@@ -1058,16 +1115,6 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
 		$this->assertSame( $fired + 1, did_action( 'fields_api_init' ) );
-	}
-
-	/**
-	 * @return array[]
-	 */
-	public function data_template_post_types() {
-		return array(
-			'template'      => array( 'wp_template', '_gutenberg_register_posttype_wp_template_fields' ),
-			'template part' => array( 'wp_template_part', '_gutenberg_register_posttype_wp_template_part_fields' ),
-		);
 	}
 
 	/**
