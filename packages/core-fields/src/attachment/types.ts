@@ -2,6 +2,7 @@
  * The properties of an attachment the fields of the collection read.
  */
 export interface MediaItem {
+	post?: number;
 	title?: string | { raw?: string; rendered?: string };
 	mime_type?: string;
 	media_type?: string;
@@ -16,6 +17,7 @@ export interface MediaItem {
 		}[];
 		'wp:attached-to'?: {
 			id?: number;
+			type?: string;
 			title?: string | { rendered?: string; raw?: string };
 		}[];
 	};

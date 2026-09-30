@@ -798,7 +798,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'attachment', 'author' ), 'The post type supports authors.' );
 		$this->assertTrue( post_type_supports( 'attachment', 'comments' ), 'The post type supports comments.' );
 
-		$ids    = array( 'alt_text', 'author', 'caption', 'date', 'description', 'filename', 'filesize', 'media_dimensions', 'mime_type', 'title' );
+		$ids    = array( 'alt_text', 'attached_to', 'author', 'caption', 'date', 'description', 'filename', 'filesize', 'media_dimensions', 'mime_type', 'title' );
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), null, 'id' );
 		$this->assertSame( $ids, array_keys( $fields ), 'Only the media fields are registered.' );
 		$this->assertSame( 'datetime', $fields['date']['type'], 'The media fields come from the attachment collection.' );

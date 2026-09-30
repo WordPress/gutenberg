@@ -43,7 +43,6 @@ import {
 	siteDiscussionField,
 	postsPageTitleField,
 } from '@wordpress/fields';
-import { attachedToField } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
@@ -109,13 +108,6 @@ export function setIsReady( kind: string, name: string ) {
 		name,
 	};
 }
-
-/*
- * The media fields of the attachment post type declared client-side. The
- * media editor lays them out in its own order, and media_thumbnail is not
- * included as it's shown in the canvas preview.
- */
-const MEDIA_FIELDS = [ attachedToField ];
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
@@ -196,14 +188,13 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Handle attachment post type separately with media-specific fields.
-		// The fields registered on the server follow, see
-		// `mergeServerFields()`.
-		let fields;
+		// The fields registered on the server follow the ones the editor
+		// derives, see `mergeServerFields()`. Attachments get only the fields
+		// of the `attachment` collection, which the media editor lays out in
+		// its own order.
+		let fields: Field< any >[] = [];
 
-		if ( postType === ATTACHMENT_POST_TYPE ) {
-			fields = MEDIA_FIELDS;
-		} else {
+		if ( postType !== ATTACHMENT_POST_TYPE ) {
 			const postTypeSlug = postTypeConfig.slug;
 			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
 			const isPattern = postTypeSlug === 'wp_block';
@@ -256,7 +247,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.viewable &&
 					postPreviewField,
 				isPattern && patternSyncStatusField,
-			].filter( Boolean );
+			].filter( Boolean ) as Field< any >[];
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
 				if ( postType === 'page' ) {
@@ -289,10 +280,7 @@ export const registerPostTypeSchema =
 					{ id: 'editor-entity-fields-error', type: 'snackbar' }
 				);
 		}
-		const mergedFields = mergeServerFields(
-			fields as Field< any >[],
-			serverFields
-		);
+		const mergedFields = mergeServerFields( fields, serverFields );
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {

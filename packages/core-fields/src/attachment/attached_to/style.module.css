@@ -1,0 +1,37 @@
+/*
+ * When this field is edited from a DataForm panel it renders inside a
+ * popover that floating-ui measures and places when it opens.
+ * `ComboboxControl` renders its suggestions inline, so they arrive after
+ * that measurement: the popover can't grow, and the list ends up scrolling
+ * inside a box too small to scroll comfortably — worst low on screen, where
+ * the space is smallest. See
+ * https://github.com/WordPress/gutenberg/issues/81122.
+ *
+ * Reserve the space the suggestions will need before they exist: three rows
+ * of 32px, the most `fetchLinkSuggestions` returns while it is called with
+ * `isInitialSuggestions` (see the @TODO in edit.tsx). The popover is
+ * absolutely positioned, so it contains this margin rather than collapsing
+ * it, and floating-ui measures the reserved height when it decides which way
+ * to open. The margin is transparent, so nothing is visibly reserved.
+ */
+:global(.components-popover__content):has(.attached-to) {
+	margin-block-end: 96px;
+}
+
+/*
+ * Once the suggestions are there they occupy that space instead, so the
+ * popover's total height is unchanged and it has no reason to move.
+ */
+:global(.components-popover__content):has(.attached-to):has(:global(.components-form-token-field__suggestions-list)) {
+	margin-block-end: 0;
+}
+
+/*
+ * Hold the list at the reserved height rather than letting it grow and
+ * shrink with the number of matches, which would resize the popover as you
+ * type.
+ */
+:global(.components-popover__content):has(.attached-to) :global(.components-form-token-field__suggestions-list) {
+	block-size: 96px;
+	max-block-size: none;
+}
