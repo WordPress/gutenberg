@@ -100,6 +100,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/fields-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/preload.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-fields-controller-7-2.php';
 
 	// Real-time collaboration.
