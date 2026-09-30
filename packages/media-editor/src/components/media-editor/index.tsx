@@ -37,7 +37,7 @@ import {
 	isKeyboardEvent,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
-import type { Field } from '@wordpress/dataviews';
+import { useFields } from '@wordpress/fields-loader';
 import type {
 	KeyboardEvent as ReactKeyboardEvent,
 	ReactElement,
@@ -115,7 +115,6 @@ export interface MediaEditorFrameProps {
 }
 
 export interface MediaEditorProps {
-	fields?: Field< Media >[];
 	id: number;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
@@ -498,7 +497,6 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 }
 
 function MediaEditorContent( {
-	fields = [],
 	id,
 	aspectRatioPresets,
 	onClose,
@@ -568,7 +566,28 @@ function MediaEditorContent( {
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
-	const { removeAllNotices } = useDispatch( noticesStore );
+	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+
+	// The Details tab renders the fields the server registers for an
+	// attachment. They are not needed to crop, so a failed load reports
+	// itself and leaves the rest of the editor working.
+	const { fields, error: fieldsError } = useFields< Media >( {
+		kind: 'postType',
+		name: 'attachment',
+	} );
+	useEffect( () => {
+		if ( ! fieldsError ) {
+			return;
+		}
+		createErrorNotice( fieldsError.message, {
+			id: 'media-editor-fields-error',
+			type: 'snackbar',
+			context: MEDIA_EDITOR_NOTICES_CONTEXT,
+			// The message asks the person to reload, so it waits to be read
+			// rather than clearing itself after a few seconds.
+			explicitDismiss: true,
+		} );
+	}, [ createErrorNotice, fieldsError ] );
 
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );

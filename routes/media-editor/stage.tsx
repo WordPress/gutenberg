@@ -2,7 +2,6 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import {
@@ -13,7 +12,6 @@ import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 
-const { usePostFields } = unlock( editorPrivateApis );
 const { MediaEditor } = unlock( mediaEditorPrivateApis );
 
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
@@ -56,7 +54,6 @@ function MediaEditorRoute() {
 	const { id } = useParams( { from: '/media-editor/$id' } );
 	const attachmentId = parseInt( id, 10 );
 	const navigate = useNavigate();
-	const fields = usePostFields( { postType: 'attachment' } );
 	const isStandaloneAdminPage = isMediaEditorAdminPage();
 
 	const media = useSelect(
@@ -86,7 +83,6 @@ function MediaEditorRoute() {
 	return (
 		<MediaEditor
 			id={ attachmentId }
-			fields={ fields }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {

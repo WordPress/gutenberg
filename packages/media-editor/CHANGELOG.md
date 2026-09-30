@@ -17,6 +17,7 @@
 
 ### Internal
 
+-   `MediaEditor` and `MediaEditorModal`, both private, read the attachment fields themselves with `useFields` from `@wordpress/fields-loader` and no longer take a `fields` prop. `MediaForm`, the public export, keeps its `fields` prop.
 -   Show the selected crop aspect ratio in a menu in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
 
 ## 0.19.0 (2026-09-23)
