@@ -4,6 +4,7 @@ import { ItemLabel } from '../combobox/item-label';
 import { ChipWithRemove } from '../combobox/chip-with-remove';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
+import { Separator } from '../combobox/separator';
 import { Collection } from '../combobox/collection';
 import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableChipSelect as _SearchableChipSelect } from './searchable-chip-select';
@@ -28,6 +29,7 @@ export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	ChipWithRemove,
 	Group,
 	GroupLabel,
+	Separator,
 	Collection,
 	useFilteredItems,
 } );
