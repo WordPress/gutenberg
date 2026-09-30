@@ -20,7 +20,6 @@ import {
 	deletePost,
 	duplicateTemplatePart,
 	featuredImageField,
-	parentField,
 	templatePartAuthorField,
 	titleField,
 	templateField,
@@ -212,7 +211,6 @@ export const registerPostTypeSchema =
 				isPattern &&
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
-				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				! isDesignPostType && templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
