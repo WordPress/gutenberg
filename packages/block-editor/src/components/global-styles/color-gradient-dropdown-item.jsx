@@ -7,12 +7,8 @@ import {
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Icon,
-	reset as resetIcon,
-	caution as cautionIcon,
-} from '@wordpress/icons';
-import { Stack, Tabs, Tooltip } from '@wordpress/ui';
+import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
+import { Stack, Tabs } from '@wordpress/ui';
 import ColorGradientControl from '../colors-gradients/control';
 import {
 	getInheritanceProps,
@@ -195,21 +191,13 @@ export default function ColorGradientDropdownItem( {
 	tabs,
 	colorGradientControlSettings,
 	panelId,
-	contrastWarning: contrastWarningProp,
+	contrastWarning,
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-	// Renders the toggle inert with `disabledHint` as its tooltip. Used when
-	// another control has taken over the value this one writes.
-	disabled = false,
-	disabledHint,
 } ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
-	// A disabled control can't be acted on, and the colors it reports on are
-	// not the ones being painted, so its contrast warning is dropped. The two
-	// share the same slot to the right of the toggle in any case.
-	const contrastWarning = disabled ? undefined : contrastWarningProp;
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
 	// A local override exists when the user has set a value that shadows an
@@ -241,54 +229,21 @@ export default function ColorGradientDropdownItem( {
 							{
 								'is-open': isOpen,
 								'has-contrast-warning': !! contrastWarning,
-								'has-disabled-hint':
-									disabled && !! disabledHint,
 							}
 						),
-						'aria-expanded': disabled ? undefined : isOpen,
+						'aria-expanded': isOpen,
 						ref: colorGradientDropdownButtonRef,
 					};
 
-					const toggle = (
-						<Button
-							{ ...toggleProps }
-							__next40pxDefaultSize
-							disabled={ disabled }
-							accessibleWhenDisabled
-						>
-							<LabeledColorIndicators
-								indicators={ indicators }
-								label={ label }
-							/>
-						</Button>
-					);
-
 					return (
 						<>
-							{ disabled && disabledHint ? (
-								// Wrapping rather than naming the button after
-								// the hint keeps the control's own name, with
-								// the reason as a description.
-								<Tooltip.Root>
-									<Tooltip.Trigger render={ toggle } />
-									<Tooltip.Popup>
-										{ disabledHint }
-									</Tooltip.Popup>
-								</Tooltip.Root>
-							) : (
-								toggle
-							) }
-							{ disabled && disabledHint && (
-								// The dimmed toggle alone reads as too subtle.
-								// Hover falls through to the toggle, which
-								// owns the tooltip carrying the reason.
-								<Icon
-									icon={ cautionIcon }
-									className="block-editor-panel-color-gradient-settings__disabled-hint"
+							<Button { ...toggleProps } __next40pxDefaultSize>
+								<LabeledColorIndicators
+									indicators={ indicators }
+									label={ label }
 								/>
-							) }
-							{ ! disabled &&
-								hasValue() &&
+							</Button>
+							{ hasValue() &&
 								( hasLocalOverride ? (
 									<InheritanceResetButton
 										className="block-editor-panel-color-gradient-settings__reset"

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { dispatch, select } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the
@@ -15,6 +17,7 @@ beforeEach( () => {
 
 afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
+	dispatch( noticesStore ).removeAllNotices( 'snackbar' );
 } );
 
 /**
@@ -34,6 +37,33 @@ async function renderPanel( props ) {
 			{ ...props }
 		/>
 	);
+}
+
+// The notice explaining that a text gradient has replaced the text color.
+// Scoped to the rendered panel, because it is announced into a live region on
+// the body too.
+const textGradientNotice = ( container ) =>
+	within( container ).queryByText( /replaces the text color/ );
+
+/**
+ * Picks the first gradient in the Typography panel's Gradient control.
+ */
+async function chooseFirstGradient() {
+	await userEvent.click( screen.getByRole( 'button', { name: /Gradient/ } ) );
+	const swatches = await screen.findAllByRole( 'option' );
+	await userEvent.click( swatches[ 0 ] );
+}
+
+/**
+ * Contents of the snackbars raised since the test began.
+ *
+ * @return {string[]} Snackbar notice contents.
+ */
+function snackbarContents() {
+	return select( noticesStore )
+		.getNotices()
+		.filter( ( notice ) => notice.type === 'snackbar' )
+		.map( ( notice ) => notice.content );
 }
 
 /**
@@ -1059,10 +1089,10 @@ describe( 'TypographyPanel text gradient', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'disables the gradient control for a gradient stored the legacy way', async () => {
+	it( 'reports replacing a gradient stored the legacy way', async () => {
 		// A preset gradient lives in the `gradient` attribute and a custom one
-		// in `color.gradient`. Either is a background a text gradient would
-		// clip away, so the hook folds them in and this control stands down.
+		// in `color.gradient`. Either is a background the text gradient writes
+		// over, so the hook folds them in and the replacement is reported.
 		await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1074,9 +1104,11 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		} );
 
-		expect(
-			screen.getByRole( 'button', { name: /Gradient/ } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		await chooseFirstGradient();
+
+		expect( snackbarContents() ).toEqual( [
+			'The text gradient replaced the background gradient.',
+		] );
 	} );
 
 	it( 'hides the gradient control when the theme turns the clip off', async () => {
@@ -1172,7 +1204,7 @@ describe( 'TypographyPanel text gradient', () => {
 		expect( result.color.gradient ).toBeUndefined();
 	} );
 
-	it( 'disables the gradient control while a background gradient is set', async () => {
+	it( 'keeps the gradient control usable while a background gradient is set', async () => {
 		await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1184,10 +1216,10 @@ describe( 'TypographyPanel text gradient', () => {
 
 		expect(
 			screen.getByRole( 'button', { name: /Gradient/ } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'disables the gradient control while a background color is set', async () => {
+	it( 'reports that a background color now paints inside the text', async () => {
 		await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1195,12 +1227,14 @@ describe( 'TypographyPanel text gradient', () => {
 			value: { color: { background: '#000000' } },
 		} );
 
-		expect(
-			screen.getByRole( 'button', { name: /Gradient/ } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		await chooseFirstGradient();
+
+		expect( snackbarContents() ).toEqual( [
+			'The background color now paints inside the text.',
+		] );
 	} );
 
-	it( 'disables the gradient control for a preset background color', async () => {
+	it( 'reports a preset background color the same way', async () => {
 		await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1208,12 +1242,14 @@ describe( 'TypographyPanel text gradient', () => {
 			value: { color: { background: 'var:preset|color|black' } },
 		} );
 
-		expect(
-			screen.getByRole( 'button', { name: /Gradient/ } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		await chooseFirstGradient();
+
+		expect( snackbarContents() ).toEqual( [
+			'The background color now paints inside the text.',
+		] );
 	} );
 
-	it( 'leaves the gradient control enabled for an inherited background', async () => {
+	it( 'reports nothing for an inherited background', async () => {
 		await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1223,10 +1259,10 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		} );
 
+		await chooseFirstGradient();
+
 		// Clipping away an inherited background is an override, not a loss.
-		expect(
-			screen.getByRole( 'button', { name: /Gradient/ } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect( snackbarContents() ).toEqual( [] );
 	} );
 
 	it( 'leaves the gradient control enabled for a gradient clipped to the text', async () => {
@@ -1247,8 +1283,8 @@ describe( 'TypographyPanel text gradient', () => {
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'disables the text color control while a text gradient is applied', async () => {
-		await renderPanel( {
+	it( 'says the text gradient replaces the text color, leaving the control usable', async () => {
+		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
 			defaultControls: shownControls,
@@ -1260,10 +1296,12 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		} );
 
-		// The control stays focusable so its tooltip remains reachable.
+		expect( textGradientNotice( container ) ).toHaveTextContent(
+			'The text gradient replaces the text color.'
+		);
 		expect(
 			screen.getByRole( 'button', { name: /Color/ } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'shows the contrast warning while the color control is usable', async () => {
@@ -1277,27 +1315,6 @@ describe( 'TypographyPanel text gradient', () => {
 		expect(
 			screen.getByRole( 'button', { name: /low contrast/i } )
 		).toBeInTheDocument();
-	} );
-
-	it( 'drops the contrast warning while the color control is disabled', async () => {
-		await renderPanel( {
-			settings: gradientSettings,
-			blockName: TEST_BLOCK,
-			defaultControls: shownControls,
-			value: {
-				background: {
-					gradient: 'var:preset|gradient|purple-blue',
-					backgroundClip: 'text',
-				},
-			},
-			contrastWarning: 'This color has poor contrast.',
-		} );
-
-		// Both share the slot to the right of the toggle, and the text color
-		// is no longer painted once the gradient fills it.
-		expect(
-			screen.queryByRole( 'button', { name: /low contrast/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'clears both halves of the text gradient on Reset all', async () => {
@@ -1331,8 +1348,8 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		};
 
-		it( 'disables the text color control while the default viewport clips to text', async () => {
-			await renderPanel( {
+		it( 'names the Default state while its clip governs this breakpoint', async () => {
+			const { container } = await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
 				defaultControls: shownControls,
@@ -1340,9 +1357,9 @@ describe( 'TypographyPanel text gradient', () => {
 				baseValue,
 			} );
 
-			expect(
-				screen.getByRole( 'button', { name: /Color/ } )
-			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( textGradientNotice( container ) ).toHaveTextContent(
+				'The text gradient set in the Default state replaces the text color.'
+			);
 		} );
 
 		it( 'hides the gradient control, which belongs to the Default state', async () => {
@@ -1375,8 +1392,8 @@ describe( 'TypographyPanel text gradient', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'leaves the text color usable when the breakpoint overrides the clip', async () => {
-			await renderPanel( {
+		it( 'says nothing when the breakpoint overrides the clip', async () => {
+			const { container } = await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
 				defaultControls: shownControls,
@@ -1384,9 +1401,7 @@ describe( 'TypographyPanel text gradient', () => {
 				baseValue,
 			} );
 
-			expect(
-				screen.getByRole( 'button', { name: /Color/ } )
-			).not.toHaveAttribute( 'aria-disabled', 'true' );
+			expect( textGradientNotice( container ) ).not.toBeInTheDocument();
 		} );
 	} );
 } );

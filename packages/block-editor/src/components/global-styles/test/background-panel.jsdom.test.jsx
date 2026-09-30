@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BackgroundPanel, {
 	hasBackgroundImageValue,
@@ -25,6 +25,11 @@ beforeEach( () => {
 afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
 } );
+
+// The notice explaining that the background clips to the text. Scoped to the
+// rendered panel, because it is announced into a live region on the body too.
+const clipsToTextNotice = ( container ) =>
+	within( container ).queryByText( /clips the background to the text/ );
 
 describe( 'hasBackgroundImageValue', () => {
 	it( 'should return `true` when id and url exist', () => {
@@ -625,8 +630,8 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'disables the gradient control while a text gradient is set', () => {
-		render(
+	it( 'says the background clips to the text, leaving every control usable', () => {
+		const { container } = render(
 			<BackgroundPanel
 				value={ {
 					background: {
@@ -634,20 +639,28 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 						backgroundClip: 'text',
 					},
 				} }
-				settings={ baseSettings }
+				settings={ colorSettings }
 				onChange={ () => {} }
 				panelId="test-panel"
 			/>
 		);
 
-		// The control stays focusable so its tooltip remains reachable.
+		expect( clipsToTextNotice( container ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Color' } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
 		expect(
 			screen.getByRole( 'button', { name: 'Gradient' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', {
+				name: /No background image selected/,
+			} )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'disables the gradient control while a text gradient is inherited', () => {
-		render(
+	it( 'says the background clips to the text for an inherited text gradient', () => {
+		const { container } = render(
 			<BackgroundPanel
 				value={ {} }
 				inheritedValue={ {
@@ -662,77 +675,20 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Gradient' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( clipsToTextNotice( container ) ).toBeInTheDocument();
 	} );
 
-	it( 'disables the color control while a text gradient is set', () => {
-		render(
+	it( 'says nothing while no text gradient clips the background', () => {
+		const { container } = render(
 			<BackgroundPanel
-				value={ {
-					background: {
-						gradient: TEXT_GRADIENT,
-						backgroundClip: 'text',
-					},
-				} }
+				value={ { background: { gradient: TEXT_GRADIENT } } }
 				settings={ colorSettings }
 				onChange={ () => {} }
 				panelId="test-panel"
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Color' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
-	} );
-
-	it( 'disables the image control while a text gradient is set', () => {
-		render(
-			<BackgroundPanel
-				value={ {
-					background: {
-						gradient: TEXT_GRADIENT,
-						backgroundClip: 'text',
-					},
-				} }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		expect(
-			screen.getByRole( 'button', {
-				name: /No background image selected/,
-			} )
-		).toHaveAttribute( 'aria-disabled', 'true' );
-	} );
-
-	it( 'disables the color control with the clip control shown too', () => {
-		render(
-			<BackgroundPanel
-				value={ {
-					background: {
-						gradient: TEXT_GRADIENT,
-						backgroundClip: 'text',
-					},
-				} }
-				settings={ {
-					...colorSettings,
-					background: {
-						...colorSettings.background,
-						backgroundClip: true,
-					},
-				} }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		expect(
-			screen.getByRole( 'button', { name: 'Color' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( clipsToTextNotice( container ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'hands a gradient built here to the Typography panel once clipped to the text', async () => {
@@ -753,7 +709,7 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 				panelId="test-panel"
 			/>
 		);
-		const { rerender } = render( panel( current ) );
+		const { container, rerender } = render( panel( current ) );
 
 		const enable = async ( name ) => {
 			await user.click(
@@ -781,10 +737,8 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		);
 
 		// The gradient is now a text gradient, which the Typography panel
-		// holds in a live control, so this panel stops offering it.
-		expect(
-			screen.getByRole( 'button', { name: 'Gradient' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		// holds, so this panel says what its own controls paint into.
+		expect( clipsToTextNotice( container ) ).toBeInTheDocument();
 		// The clip control stays, so the block can be returned to a box value.
 		expect(
 			screen.getByRole( 'combobox', { name: /clip/i } )
@@ -902,8 +856,8 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		},
 	};
 
-	it( 'disables the color control while the default viewport clips to text', () => {
-		render(
+	it( 'names the Default state while its clip governs this breakpoint', () => {
+		const { container } = render(
 			<BackgroundPanel
 				value={ {} }
 				baseValue={ baseValue }
@@ -913,29 +867,13 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Color' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
-	} );
-
-	it( 'disables the gradient control while the default viewport clips to text', () => {
-		render(
-			<BackgroundPanel
-				value={ {} }
-				baseValue={ baseValue }
-				settings={ colorSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
+		expect( clipsToTextNotice( container ) ).toHaveTextContent(
+			/set in the Default state/
 		);
-
-		expect(
-			screen.getByRole( 'button', { name: 'Gradient' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'keeps the controls usable when the breakpoint overrides the clip', () => {
-		render(
+	it( 'says nothing when the breakpoint overrides the clip', () => {
+		const { container } = render(
 			<BackgroundPanel
 				value={ { background: { backgroundClip: 'border-box' } } }
 				baseValue={ baseValue }
@@ -945,30 +883,7 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Color' } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
-		expect(
-			screen.getByRole( 'button', { name: 'Gradient' } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
-	} );
-
-	it( 'disables the image control while the default viewport clips to text', () => {
-		render(
-			<BackgroundPanel
-				value={ {} }
-				baseValue={ baseValue }
-				settings={ colorSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		expect(
-			screen.getByRole( 'button', {
-				name: /No background image selected/,
-			} )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( clipsToTextNotice( container ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'hides the clip control, which belongs to the Default state', () => {
@@ -1019,8 +934,8 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( "leaves the controls alone when the default viewport doesn't clip to text", () => {
-		render(
+	it( "says nothing when the default viewport doesn't clip to text", () => {
+		const { container } = render(
 			<BackgroundPanel
 				value={ {} }
 				baseValue={ {
@@ -1032,8 +947,6 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Color' } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect( clipsToTextNotice( container ) ).not.toBeInTheDocument();
 	} );
 } );

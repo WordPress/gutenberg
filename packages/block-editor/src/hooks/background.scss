@@ -13,5 +13,10 @@
 		.block-editor-background-panel__clip-item:not(.first) {
 			margin-top: $grid-unit-20;
 		}
+
+		/* Same for the notice, which is not a panel item at all. */
+		.block-editor-background-panel__clips-to-text-notice {
+			margin-top: $grid-unit-20;
+		}
 	}
 }

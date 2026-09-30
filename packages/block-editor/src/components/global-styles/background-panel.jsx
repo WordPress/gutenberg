@@ -1,7 +1,9 @@
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import {
+	Notice,
+	__experimentalToolsPanel as ToolsPanel,
+} from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, caution as cautionIcon } from '@wordpress/icons';
 import BackgroundClipControl, {
 	ALL_BACKGROUND_CLIP_VALUES,
 } from '../background-clip-control';
@@ -263,12 +265,12 @@ export default function BackgroundImagePanel( {
 	// so say so when this one cannot reach it.
 	const clipIsFromBase =
 		clipsToText && localClip === undefined && !! baseClip;
-	const backgroundImageDisabledHint = clipIsFromBase
+	const clipsToTextNotice = clipIsFromBase
 		? __(
-				"A background image can't be set while the block has a text gradient, which is set in the Default state."
+				'The text gradient set in the Default state clips the background to the text, so a color, gradient or image set here paints inside the text.'
 			)
 		: __(
-				"A background image can't be set while the block has a text gradient."
+				'The text gradient clips the background to the text, so a color, gradient or image set here paints inside the text.'
 			);
 
 	const resetAllFilter = useCallback(
@@ -475,21 +477,10 @@ export default function BackgroundImagePanel( {
 						inheritedValue={ inheritedValue }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
-						disabled={ clipsToText }
-						disabledHint={ backgroundImageDisabledHint }
 						showInheritanceLabelIndicators={
 							showInheritanceLabelIndicators
 						}
 					/>
-					{ clipsToText && (
-						// Matches the colour rows: the dimmed toggle alone
-						// reads as too subtle. Hover falls through to the
-						// toggle, which owns the tooltip.
-						<Icon
-							icon={ cautionIcon }
-							className="block-editor-panel-color-gradient-settings__disabled-hint"
-						/>
-					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
@@ -497,16 +488,6 @@ export default function BackgroundImagePanel( {
 					label={ __( 'Color' ) }
 					hasValue={ () => hasBackgroundColorValue( value ) }
 					resetValue={ resetBackgroundColor }
-					disabled={ clipsToText }
-					disabledHint={
-						clipIsFromBase
-							? __(
-									"A background color can't be set while the block has a text gradient, which is set in the Default state."
-								)
-							: __(
-									"A background color can't be set while the block has a text gradient."
-								)
-					}
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
@@ -556,16 +537,6 @@ export default function BackgroundImagePanel( {
 						hasBackgroundGradientValue( value ) && ! isTextGradient
 					}
 					resetValue={ resetGradient }
-					disabled={ clipsToText }
-					disabledHint={
-						clipIsFromBase
-							? __(
-									"A background gradient can't be set while the block has a text gradient, which is set in the Default state."
-								)
-							: __(
-									"A background gradient can't be set while the block has a text gradient."
-								)
-					}
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
 					showInheritanceLabelIndicators={
@@ -689,6 +660,15 @@ export default function BackgroundImagePanel( {
 						allowedValues={ allowedClipValues }
 					/>
 				</InheritanceToolsPanelItem>
+			) }
+			{ clipsToText && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-background-panel__clips-to-text-notice"
+				>
+					{ clipsToTextNotice }
+				</Notice>
 			) }
 		</Wrapper>
 	);
