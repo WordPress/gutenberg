@@ -1,6 +1,7 @@
 {
 	"$schema": "./schemas/json/wp-env.json",
 	"core": "WordPress/WordPress#6.9-branch",
+	"mariadbVersion": "11.8",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
