@@ -1,10 +1,12 @@
 import { Page } from '@wordpress/admin-ui';
+import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { privateApis as corePrivateApis } from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import { addQueryArgs } from '@wordpress/url';
 import { useEvent } from '@wordpress/compose';
 import { useView, useViewConfig } from '@wordpress/views';
@@ -14,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -79,9 +81,15 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
-	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	// `usePostActions` below registers the post type's schema, which is what
+	// brings in the actions; the fields come straight from the server.
+	const {
+		fields: postFields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: TEMPLATE_POST_TYPE } );
 	const fields = useMemo( () => {
-		return [ previewField, ...( postFields || [] ) ];
+		return [ previewField, ...postFields ];
 	}, [ postFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
@@ -113,13 +121,18 @@ export default function PageTemplates() {
 			headingLevel={ 2 }
 			actions={ <AddNewTemplate /> }
 		>
+			{ fieldsError && (
+				<Notice status="error" isDismissible={ false }>
+					{ fieldsError.message }
+				</Notice>
+			) }
 			<DataViews
 				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
 				data={ data }
-				isLoading={ isLoadingData }
+				isLoading={ isLoadingData || isLoadingFields }
 				view={ view }
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
