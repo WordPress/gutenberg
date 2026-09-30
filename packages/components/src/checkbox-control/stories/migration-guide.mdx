@@ -42,7 +42,6 @@ import { CheckboxControl } from '@wordpress/ui';
 | \`help\` | \`description\` | Use plain text only. |
 | \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
 | \`checked\` | \`checked\` | Continue passing the state for a controlled checkbox. |
-| \`indeterminate\` | \`indeterminate\` | Continue passing the indeterminate state when needed. |
 ` }</Markdown>
 
 ## Labels
@@ -59,3 +58,33 @@ The new `CheckboxControl` requires a `label` prop with a plain `string` value. T
 ```
 
 For a custom label layout, compose the [`Checkbox`](?path=/docs/design-system-components-form-primitives-checkbox--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
+
+## Checkbox groups
+
+If a legacy checkbox uses `indeterminate` to show that only some items are selected, move the selected items into a `CheckboxGroup` instead of calculating the parent checkbox state yourself. Pass the child values to `allValues` and mark the select-all checkbox with `parent`. The group updates the parent checkbox when children change and selects or clears all children when the parent is clicked.
+
+```jsx
+import { useState } from '@wordpress/element';
+import { CheckboxControl, CheckboxGroup } from '@wordpress/ui';
+
+function FruitCheckboxes() {
+	const [ selectedFruits, setSelectedFruits ] = useState( [ 'apple' ] );
+
+	return (
+		<CheckboxGroup
+			value={ selectedFruits }
+			onValueChange={ setSelectedFruits }
+			allValues={ [ 'apple', 'orange' ] }
+			aria-label="Fruit"
+		>
+			<CheckboxControl parent value="fruit" label="Select all fruit" />
+			<CheckboxGroup.NestedItems>
+				<CheckboxControl value="apple" label="Apple" />
+				<CheckboxControl value="orange" label="Orange" />
+			</CheckboxGroup.NestedItems>
+		</CheckboxGroup>
+	);
+}
+```
+
+See the [Checkbox Groups stories](?path=/docs/design-system-components-form-checkbox-groups--docs) for other grouping patterns.
