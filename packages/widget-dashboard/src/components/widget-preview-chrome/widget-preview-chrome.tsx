@@ -36,7 +36,11 @@ export function WidgetPreviewChrome( {
 
 	return (
 		<WidgetContextProvider value={ contextValue }>
-			<div className={ styles.viewport } { ...{ inert: '' } }>
+			<div
+				className={ styles.viewport }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert="true"
+			>
 				<div className={ styles.canvas }>
 					<Card.Root
 						render={ <section /> }

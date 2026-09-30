@@ -104,7 +104,8 @@ export function WidgetFooter( {
 			align="center"
 			gap="lg"
 			className={ styles[ 'widget-footer' ] }
-			{ ...( editMode ? { inert: 'true' } : {} ) }
+			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+			inert={ editMode ? 'true' : undefined }
 		>
 			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">

@@ -158,7 +158,8 @@ export function WidgetHeader( {
 					align="center"
 					gap="sm"
 					className={ styles.identity }
-					{ ...( editMode ? { inert: 'true' } : {} ) }
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ editMode ? 'true' : undefined }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">
