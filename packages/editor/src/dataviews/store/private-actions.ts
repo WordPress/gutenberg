@@ -36,7 +36,6 @@ import {
 	scheduledDateField,
 	lastEditedDateField,
 	formatField,
-	stickyField,
 	descriptionField,
 	readOnlyDescriptionField,
 	postsPerPageField,
@@ -233,7 +232,6 @@ export const registerPostTypeSchema =
 					! disablePostFormats &&
 					formatField,
 				! isDesignPostType && passwordField,
-				postTypeSlug === 'post' && stickyField,
 				postTypeSlug === 'wp_template' && descriptionField,
 				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
 				// The `home`/`index` template summary exposes a few fields that
