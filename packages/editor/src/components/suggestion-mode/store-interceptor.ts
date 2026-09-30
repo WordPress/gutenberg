@@ -66,6 +66,7 @@ import { parseSuggestionPayload } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import { planStoreContentEdit } from './plan-store-content-edit';
 import { unlock } from '../../lock-unlock';
+import { getBlockTreeVersion } from './block-tree-version';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -519,6 +520,51 @@ function isPartOfPendingInsertion(
 	return parents.some(
 		( id: string ) => markerType( id ) === 'pending-insert'
 	);
+}
+
+/*
+ * Blocks that are, or sit inside, a pending insertion, cached per block tree
+ * version. The per-block overlay HOC asks this for every block on every store
+ * update; walking each block's parents there cost more than all the other
+ * suggest-mode work on a keystroke.
+ */
+const pendingInsertionsByVersion = new WeakMap< object, Set< string > >();
+
+/**
+ * `isPartOfPendingInsertion`, answered from a set built once per block tree
+ * version.
+ *
+ * @param blockEditor Block-editor selectors.
+ * @param clientId    Block client ID.
+ * @return True when the block or an ancestor is a pending insert.
+ */
+function isPartOfPendingInsertionCached(
+	blockEditor: any,
+	clientId: string
+): boolean {
+	const version = getBlockTreeVersion( blockEditor );
+	if ( ! version ) {
+		return isPartOfPendingInsertion( blockEditor, clientId );
+	}
+	let pending = pendingInsertionsByVersion.get( version );
+	if ( ! pending ) {
+		pending = new Set();
+		for ( const id of blockEditor.getClientIdsWithDescendants?.() ?? [] ) {
+			if (
+				blockEditor.getBlockAttributes( id )?.metadata?.suggestion
+					?.type === 'pending-insert'
+			) {
+				pending.add( id );
+				for ( const descendant of blockEditor.getClientIdsOfDescendants?.(
+					id
+				) ?? [] ) {
+					pending.add( descendant );
+				}
+			}
+		}
+		pendingInsertionsByVersion.set( version, pending );
+	}
+	return pending.has( clientId );
 }
 
 /**
@@ -1114,16 +1160,17 @@ export default function SuggestionStoreInterceptor() {
 		}
 
 		/*
-		 * The block tree the last diffing pass saw. `registry.subscribe`
-		 * fires for every change in every store (selection, notices, entity
-		 * records), but an attribute or structure change always replaces the
-		 * `getBlocks()` tree, so an unchanged tree has nothing to capture and
-		 * the full-tree walks below can be skipped. Not while a bypass is
+		 * The block tree version the last diffing pass saw.
+		 * `registry.subscribe` fires for every change in every store
+		 * (selection, notices, entity records), but an attribute or structure
+		 * change anywhere, controlled inner blocks included, produces a new
+		 * version, so an unchanged one has nothing to capture and the
+		 * full-tree walks below can be skipped. Not while a bypass is
 		 * pending: the walk is also what consumes a bypass whose write turned
 		 * out to be a no-op, and a stranded one would let the block's next
 		 * real edit through uncaptured.
 		 */
-		let lastSeenBlocks: unknown = null;
+		let lastSeenVersion: object | null = null;
 
 		const unsubscribe = registry.subscribe( () => {
 			if ( isDispatchingOwnWrite ) {
@@ -1149,15 +1196,15 @@ export default function SuggestionStoreInterceptor() {
 				return;
 			}
 
-			const blocks = blockEditor.getBlocks?.();
+			const version = getBlockTreeVersion( blockEditor );
 			if (
-				blocks &&
-				blocks === lastSeenBlocks &&
+				version &&
+				version === lastSeenVersion &&
 				! hasInterceptorBypass()
 			) {
 				return;
 			}
-			lastSeenBlocks = blocks;
+			lastSeenVersion = version;
 
 			/*
 			 * An armed undo/redo landing: adopt the resulting state wholesale
@@ -1896,6 +1943,7 @@ export {
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
 	isPartOfPendingInsertion,
+	isPartOfPendingInsertionCached,
 	captureTreeSnapshot,
 	topLevelRemoved,
 	pairReplacedBlocks,
