@@ -30,7 +30,6 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
-import { mergeServerFields } from './merge-server-fields';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -171,10 +170,9 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// The fields registered on the server follow the ones the editor
-		// derives, see `mergeServerFields()`. Attachments get only the fields
-		// of the `attachment` collection, which the media editor lays out in
-		// its own order.
+		// The editor adds its derived fields after the fields registered on
+		// the server. Attachments get only the fields of the `attachment`
+		// collection, which the media editor lays out in its own order.
 		let fields: Field< any >[] = [];
 
 		if ( postType !== ATTACHMENT_POST_TYPE ) {
@@ -224,7 +222,13 @@ export const registerPostTypeSchema =
 					{ id: 'editor-entity-fields-error', type: 'snackbar' }
 				);
 		}
-		const mergedFields = mergeServerFields( fields, serverFields );
+		const serverFieldIds = new Set(
+			serverFields.map( ( field ) => field.id )
+		);
+		const mergedFields = [
+			...serverFields,
+			...fields.filter( ( field ) => ! serverFieldIds.has( field.id ) ),
+		];
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
