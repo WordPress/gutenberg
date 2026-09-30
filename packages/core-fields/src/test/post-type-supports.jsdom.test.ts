@@ -5,6 +5,7 @@ describe( 'post_type_supports', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
 		expect( Object.keys( postTypeSupports ) ).toEqual( [
 			'author',
+			'date',
 			'discussion',
 			'excerpt',
 			'last_edited_date',
@@ -100,5 +101,13 @@ describe( 'post_type_supports', () => {
 		);
 		expect( isVisible?.( item ) ).toBe( true );
 		expect( isVisible?.( { status: 'publish' } ) ).toBe( false );
+	} );
+
+	it( 'shows the date to the users who can publish the post', () => {
+		const { isVisible } = postTypeSupports.date;
+		expect( isVisible?.( { _links: { 'wp:action-publish': [] } } ) ).toBe(
+			true
+		);
+		expect( isVisible?.( { _links: {} } ) ).toBe( false );
 	} );
 } );

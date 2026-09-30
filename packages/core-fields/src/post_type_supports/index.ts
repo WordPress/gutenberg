@@ -15,6 +15,7 @@
 
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { fieldExtensions as author } from './author/field';
+import { fieldExtensions as date } from './date/field';
 import { fieldExtensions as discussion } from './discussion/field';
 import { fieldExtensions as excerpt } from './excerpt/field';
 import { fieldExtensions as lastEditedDate } from './last_edited_date/field';
@@ -25,6 +26,7 @@ import { fieldExtensions as sticky } from './sticky/field';
 
 const fields: FieldsScriptParts = {
 	author,
+	date,
 	discussion,
 	excerpt,
 	last_edited_date: lastEditedDate,
