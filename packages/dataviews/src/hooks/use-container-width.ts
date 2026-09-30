@@ -28,7 +28,9 @@ export default function useContainerWidth< T extends HTMLElement >(): [
 
 	const observerRef = useResizeObserver< T >(
 		( entries ) => {
-			setWidth( entries[ 0 ].borderBoxSize[ 0 ].inlineSize );
+			setWidth(
+				Math.floor( entries[ 0 ].borderBoxSize[ 0 ].inlineSize )
+			);
 		},
 		{ box: 'border-box' }
 	);
