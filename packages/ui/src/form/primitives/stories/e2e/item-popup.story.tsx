@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import * as Autocomplete from '../../autocomplete';
 import * as Combobox from '../../combobox';
 import * as Select from '../../select';
+import { Stack } from '../../../../stack';
 
 const matrixStyle: CSSProperties = {
 	display: 'grid',
@@ -16,12 +17,6 @@ const headingStyle: CSSProperties = {
 	marginBlock: '0 12px',
 };
 
-const avatarLabelStyle: CSSProperties = {
-	alignItems: 'center',
-	display: 'flex',
-	gap: 8,
-};
-
 const avatarStyle: CSSProperties = {
 	background: 'var(--wpds-color-background-interactive-brand-strong)',
 	borderRadius: '50%',
@@ -29,6 +24,10 @@ const avatarStyle: CSSProperties = {
 	height: 16,
 	width: 16,
 };
+
+const avatarLabelLayout = (
+	<Stack direction="row" gap="sm" align="center" render={ <span /> } />
+);
 
 const comboboxItems = [
 	'Apple',
@@ -76,7 +75,9 @@ function RichItemLayouts() {
 								</Combobox.ItemDescription>
 							</Combobox.Item>
 							<Combobox.Item value="Blueberry">
-								<Combobox.ItemLabel style={ avatarLabelStyle }>
+								<Combobox.ItemLabel
+									render={ avatarLabelLayout }
+								>
 									<span
 										style={ avatarStyle }
 										aria-hidden="true"
@@ -128,7 +129,7 @@ function RichItemLayouts() {
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Avocado">
 								<Autocomplete.ItemLabel
-									style={ avatarLabelStyle }
+									render={ avatarLabelLayout }
 								>
 									<span
 										style={ avatarStyle }
