@@ -54,6 +54,15 @@
 	/*rtl:end:ignore*/
 	word-break: normal;
 	overflow-wrap: anywhere;
+
+	// Quote, Pullquote and Code set overflow-wrap: break-word. That overrides
+	// the inherited anywhere and lets long unbroken text inflate the content
+	// column's min-content size (horizontal page scroll).
+	.wp-block-quote,
+	.wp-block-pullquote,
+	.wp-block-code code {
+		overflow-wrap: anywhere;
+	}
 }
 
 // Zero specificity so the default padding can be overridden by theme.json or theme styles.
