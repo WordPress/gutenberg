@@ -7,6 +7,10 @@
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
 ## 0.48.0 (2026-09-23)
 
 ### Enhancements
@@ -14,7 +18,6 @@
 -   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
 -   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
 -   Featured image field: support the `editor.MediaUpload` filter in the post summary and open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
--   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
 
 ### Bug Fixes
 
