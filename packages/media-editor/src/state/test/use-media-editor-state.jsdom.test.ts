@@ -321,4 +321,61 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.isCropperDirty ).toBe( true );
 		} );
 	} );
+
+	describe( 'resume', () => {
+		function setupResumedHook() {
+			const { result: source } = setupHook();
+			act( () => source.current.setRotation( 90 ) );
+			const { image, ...geometry } = source.current.state;
+
+			const view = renderHook( () =>
+				useMediaEditorState( {
+					resume: {
+						cropper: geometry,
+						cropOptions: { aspectRatioValue: '1' },
+					},
+				} )
+			);
+			act( () => view.result.current.setImage( IMAGE ) );
+			return view;
+		}
+
+		it( 'applies the earlier edit once the image loads', () => {
+			const { result } = setupResumedHook();
+
+			expect( result.current.state.image ).toEqual( IMAGE );
+			expect( result.current.state.rotation ).toBe( 90 );
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
+		} );
+
+		it( 'starts dirty with no undo history', () => {
+			const { result } = setupResumedHook();
+
+			expect( result.current.isCropperDirty ).toBe( true );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'resets to the unedited image', () => {
+			const { result } = setupResumedHook();
+
+			act( () => result.current.reset() );
+
+			expect( result.current.state.rotation ).toBe( 0 );
+			expect( result.current.isCropperDirty ).toBe( false );
+		} );
+
+		it( 'is not applied again to a later image', () => {
+			const { result } = setupResumedHook();
+
+			act( () =>
+				result.current.setImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			expect( result.current.isCropperDirty ).toBe( false );
+		} );
+	} );
 } );

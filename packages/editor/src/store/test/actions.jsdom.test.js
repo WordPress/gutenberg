@@ -714,6 +714,195 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( 'savePost() committing pending media edits', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/image', {
+				title: 'Image',
+				category: 'media',
+				apiVersion: 3,
+				attributes: {
+					id: { type: 'number' },
+					url: { type: 'string' },
+					pendingMediaEdit: { type: 'object', role: 'local' },
+				},
+				save: () => null,
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/image' );
+		} );
+
+		const imagePost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			content: '<!-- wp:image {"id":12,"url":"original.jpg"} /-->',
+			excerpt: 'crackers',
+			status: 'draft',
+		};
+
+		const pendingMediaEdit = {
+			sourceId: 12,
+			sourceUrl: 'original.jpg',
+			modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
+			previewUrl: 'blob:preview',
+		};
+
+		/**
+		 * Answers everything `savePost` and the crop need.
+		 *
+		 * @param {string[]} requests    Collects `METHOD path` for every call.
+		 * @param {Object}   [editError] Rejects the `/edit` request with this.
+		 */
+		function setFetchHandler( requests, editError ) {
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+				requests.push( `${ method } ${ path }` );
+
+				if (
+					method === 'POST' &&
+					path.startsWith( '/wp/v2/media/12/edit' )
+				) {
+					if ( editError ) {
+						throw editError;
+					}
+					return {
+						id: 13,
+						source_url: 'cropped.jpg',
+						post: data.post,
+					};
+				}
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/media/12' )
+				) {
+					return {
+						json: async () => ( {
+							id: 12,
+							source_url: 'original.jpg',
+							post: postId,
+						} ),
+					};
+				}
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					return { ...imagePost, ...data };
+				}
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return { json: async () => ( {} ) };
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+		}
+
+		function setUpEditor( registry ) {
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					kind: 'postType',
+					name: 'attachment',
+					baseURL: '/wp/v2/media',
+					rawAttributes: [ 'title', 'excerpt', 'content' ],
+				},
+			] );
+			registry
+				.dispatch( editorStore )
+				.updateEditorSettings( { autoAttachMediaEnabled: false } );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', imagePost );
+			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				content: imagePost.content,
+			} );
+			// Two blocks holding the same crop, as a duplicated block would.
+			registry.dispatch( editorStore ).resetEditorBlocks(
+				[ 'image-1', 'image-2' ].map( ( clientId ) => ( {
+					clientId,
+					name: 'core/image',
+					isValid: true,
+					attributes: {
+						id: 12,
+						url: 'original.jpg',
+						pendingMediaEdit,
+					},
+					innerBlocks: [],
+				} ) )
+			);
+		}
+
+		const postSaves = ( requests ) =>
+			requests.filter( ( request ) =>
+				request.startsWith( `PUT /wp/v2/posts/${ postId }` )
+			);
+
+		it( 'saves the crop once and the post with the new image', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			expect(
+				requests.filter( ( request ) =>
+					request.startsWith( 'POST /wp/v2/media/12/edit' )
+				)
+			).toHaveLength( 1 );
+			expect( postSaves( requests ) ).toHaveLength( 1 );
+
+			const blocks = registry.select( editorStore ).getEditorBlocks();
+			expect( blocks.map( ( { attributes } ) => attributes ) ).toEqual( [
+				{ id: 13, url: 'cropped.jpg', pendingMediaEdit: undefined },
+				{ id: 13, url: 'cropped.jpg', pendingMediaEdit: undefined },
+			] );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).not.toContain( 'pendingMediaEdit' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+		} );
+
+		it( 'does not save the post when the crop fails', async () => {
+			const requests = [];
+			setFetchHandler( requests, {
+				code: 'rest_image_edit_failed',
+				message: 'The image could not be edited.',
+			} );
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			expect( postSaves( requests ) ).toHaveLength( 0 );
+			expect(
+				registry.select( editorStore ).getEditorBlocks()[ 0 ].attributes
+			).toMatchObject( { id: 12, pendingMediaEdit } );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice ).toMatchObject( { status: 'error' } );
+			expect( notice.content ).toContain(
+				'An edited image could not be saved. The image could not be edited.'
+			);
+		} );
+	} );
+
 	describe( 'autosave()', () => {
 		it( 'autosaves a modified post', async () => {
 			const post = {

@@ -298,6 +298,7 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
+		pendingMediaEdit,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -398,6 +399,7 @@ export default function Image( {
 		[]
 	);
 	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
+		clientId,
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
@@ -431,6 +433,13 @@ export default function Image( {
 	// An image is uploading if it has a temporary blob URL, or if it is
 	// being processed client-side (e.g. transcoded or generating sub-sizes).
 	const isUploading = !! temporaryURL || isSideloading;
+	// A crop made in the media editor that is only saved with the post. It
+	// belongs to the image it was made on, so it's ignored once the block
+	// points at a different one.
+	const pendingPreviewUrl =
+		pendingMediaEdit && pendingMediaEdit.sourceId === id
+			? pendingMediaEdit.previewUrl
+			: undefined;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -1192,7 +1201,7 @@ export default function Image( {
 			) : (
 				<>
 					<img
-						src={ temporaryURL || url }
+						src={ temporaryURL || pendingPreviewUrl || url }
 						alt={ defaultedAlt }
 						onError={ onImageError }
 						onLoad={ onImageLoad }

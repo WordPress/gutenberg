@@ -117,6 +117,17 @@ const {
 } = unlock( privateApis );
 
 /**
+ * Post types the editor saves as their own entities rather than through
+ * `savePost`.
+ */
+const NON_POST_ENTITY_TYPES = [
+	'wp_template',
+	'wp_template_part',
+	'wp_block',
+	'wp_navigation',
+];
+
+/**
  * React hook used to compute the block editor settings to use for the post editor.
  *
  * @param {Object} settings      EditorProvider settings prop.
@@ -383,8 +394,25 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( { id, onUpdate, onClose } ) =>
-				openMediaEditorModal( { id, onUpdate, onClose } ),
+			[ openMediaEditorModalKey ]: ( {
+				id,
+				deferCrop,
+				pendingCrop,
+				onUpdate,
+				onClose,
+			} ) =>
+				openMediaEditorModal( {
+					id,
+					// A deferred crop is only committed by `savePost`, so only
+					// defer when the host opted in and the entity saves that way.
+					deferCrop:
+						!! deferCrop &&
+						!! settings.deferMediaEditorCrops &&
+						! NON_POST_ENTITY_TYPES.includes( postType ),
+					pendingCrop,
+					onUpdate,
+					onClose,
+				} ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess

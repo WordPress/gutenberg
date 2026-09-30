@@ -1,4 +1,5 @@
 import type { MediaEditorModalUpdate } from './actions';
+import type { MediaEditorPendingCrop } from '../components/media-editor/pending-crop';
 
 type OnUpdateCallback = ( updated: MediaEditorModalUpdate ) => void;
 type OnCloseCallback = () => void;
@@ -6,6 +7,8 @@ type OnCloseCallback = () => void;
 export interface State {
 	isOpen: boolean;
 	id: number | null;
+	deferCrop: boolean;
+	pendingCrop: MediaEditorPendingCrop | null;
 	onUpdate: OnUpdateCallback | null;
 	onClose: OnCloseCallback | null;
 }
@@ -13,6 +16,8 @@ export interface State {
 export const DEFAULT_STATE: State = {
 	isOpen: false,
 	id: null,
+	deferCrop: false,
+	pendingCrop: null,
 	onUpdate: null,
 	onClose: null,
 };
@@ -21,6 +26,8 @@ type Action =
 	| {
 			type: 'OPEN_MEDIA_EDITOR_MODAL';
 			id: number;
+			deferCrop: boolean;
+			pendingCrop: MediaEditorPendingCrop | null;
 			onUpdate: OnUpdateCallback | null;
 			onClose: OnCloseCallback | null;
 	  }
@@ -32,13 +39,16 @@ export default function reducer(
 ): State {
 	switch ( action.type ) {
 		case 'OPEN_MEDIA_EDITOR_MODAL': {
-			const { id, onUpdate, onClose } = action as Extract<
-				Action,
-				{ type: 'OPEN_MEDIA_EDITOR_MODAL' }
-			>;
+			const { id, deferCrop, pendingCrop, onUpdate, onClose } =
+				action as Extract<
+					Action,
+					{ type: 'OPEN_MEDIA_EDITOR_MODAL' }
+				>;
 			return {
 				isOpen: true,
 				id,
+				deferCrop,
+				pendingCrop,
 				onUpdate,
 				onClose,
 			};

@@ -2,7 +2,10 @@ export {
 	useMediaEditorState,
 	resolveAspectRatio,
 } from './use-media-editor-state';
-export type { MediaEditorController } from './use-media-editor-state';
+export type {
+	MediaEditorController,
+	MediaEditorResumeState,
+} from './use-media-editor-state';
 export {
 	MediaEditorStateProvider,
 	useMediaEditor,

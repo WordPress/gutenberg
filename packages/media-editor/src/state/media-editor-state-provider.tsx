@@ -3,6 +3,7 @@ import type { CropperState } from '../image-editor';
 import {
 	useMediaEditorState,
 	type MediaEditorController,
+	type MediaEditorResumeState,
 } from './use-media-editor-state';
 import type { CropOptionsSlice } from './types';
 
@@ -15,6 +16,8 @@ interface MediaEditorStateProviderProps {
 	initialCropperState?: Partial< CropperState >;
 	/** Optional cropOptions-slice initial state. */
 	initialCropOptions?: Partial< CropOptionsSlice >;
+	/** An earlier edit to resume once the image loads. */
+	resume?: MediaEditorResumeState;
 	/** Child components. */
 	children: React.ReactNode;
 }
@@ -27,16 +30,19 @@ interface MediaEditorStateProviderProps {
  * @param props
  * @param props.initialCropperState
  * @param props.initialCropOptions
+ * @param props.resume
  * @param props.children
  */
 export function MediaEditorStateProvider( {
 	initialCropperState,
 	initialCropOptions,
+	resume,
 	children,
 }: MediaEditorStateProviderProps ) {
 	const controller = useMediaEditorState( {
 		cropper: initialCropperState,
 		cropOptions: initialCropOptions,
+		resume,
 	} );
 
 	return (

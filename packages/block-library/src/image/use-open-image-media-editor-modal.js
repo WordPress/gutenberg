@@ -204,6 +204,12 @@ export function getNewAttachmentImageBlockAttributes(
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
+/**
+ * Blocks whose contents are saved as their own entity, not with the post, so
+ * a crop held on an image inside them would never be committed.
+ */
+const SEPARATELY_SAVED_PARENT_BLOCKS = [ 'core/block', 'core/template-part' ];
+
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	const attachment = {};
 
@@ -233,6 +239,7 @@ function hasKnownAttachmentMetadata( attachment ) {
 }
 
 export function useOpenImageMediaEditorModal( {
+	clientId,
 	attributes,
 	setAttributes,
 	onClose,
@@ -243,7 +250,15 @@ export function useOpenImageMediaEditorModal( {
 	// the update needs to read — those synced from the attachment's metadata,
 	// and those derived from which attachment the block points at; add more
 	// here if the sync policy grows.
-	const { id, url, alt, caption, sizeSlug, linkDestination } = attributes;
+	const {
+		id,
+		url,
+		alt,
+		caption,
+		sizeSlug,
+		linkDestination,
+		pendingMediaEdit,
+	} = attributes;
 	const registry = useRegistry();
 	const openMediaEditorModal = useSelect(
 		( select ) =>
@@ -261,6 +276,7 @@ export function useOpenImageMediaEditorModal( {
 		caption: caption?.toString(),
 		sizeSlug,
 		linkDestination,
+		pendingMediaEdit,
 	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
@@ -282,8 +298,9 @@ export function useOpenImageMediaEditorModal( {
 			caption: caption?.toString(),
 			sizeSlug,
 			linkDestination,
+			pendingMediaEdit,
 		};
-	}, [ alt, caption, id, linkDestination, sizeSlug, url ] );
+	}, [ alt, caption, id, linkDestination, pendingMediaEdit, sizeSlug, url ] );
 
 	// Reads the cached attachment record. The `attachment` postType entity
 	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
@@ -340,7 +357,7 @@ export function useOpenImageMediaEditorModal( {
 	);
 
 	const handleMediaUpdate = useCallback(
-		async ( { id: newId, url: newUrl } ) => {
+		async ( { id: newId, url: newUrl, pendingCrop } ) => {
 			if ( typeof newId !== 'number' ) {
 				return;
 			}
@@ -358,6 +375,20 @@ export function useOpenImageMediaEditorModal( {
 
 			const currentBlockAttributes = blockAttributesRef.current;
 			const isNewAttachment = newId !== currentBlockAttributes.id;
+
+			// A deferred crop is held on the block, which keeps pointing at
+			// the original until the post is saved. Anything else the media
+			// editor reports — a crop reset back to the original, or a crop
+			// saved to a new attachment — replaces a crop held earlier.
+			if ( pendingCrop && ! isNewAttachment ) {
+				nextAttributes.pendingMediaEdit = {
+					...pendingCrop,
+					sourceId: newId,
+					sourceUrl: newUrl,
+				};
+			} else if ( currentBlockAttributes.pendingMediaEdit ) {
+				nextAttributes.pendingMediaEdit = undefined;
+			}
 
 			if ( isNewAttachment ) {
 				nextAttributes.id = newId;
@@ -525,16 +556,31 @@ export function useOpenImageMediaEditorModal( {
 				: fallbackAttachmentRecord ) ||
 			cachedAttachmentRecord;
 
+		const isSavedWithPost = ! registry
+			.select( blockEditorStore )
+			.getBlockParentsByBlockName(
+				clientId,
+				SEPARATELY_SAVED_PARENT_BLOCKS
+			).length;
+
 		openMediaEditorModal( {
 			id,
+			deferCrop: isSavedWithPost,
+			pendingCrop:
+				pendingMediaEdit && pendingMediaEdit.sourceId === id
+					? pendingMediaEdit
+					: undefined,
 			onUpdate: handleMediaUpdate,
 			onClose,
 		} );
 	}, [
+		clientId,
 		getCachedAttachmentRecord,
 		handleMediaUpdate,
 		id,
 		onClose,
+		pendingMediaEdit,
+		registry,
 		openMediaEditorModal,
 		resolveAttachmentRecord,
 	] );

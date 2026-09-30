@@ -47,8 +47,10 @@ import {
 	type MediaEditorSaveResult,
 } from './use-save-media-editor';
 import { useCropOptions } from './use-crop-options';
+import type { MediaEditorPendingCrop } from './pending-crop';
 
 export type { MediaEditorSaveResult } from './use-save-media-editor';
+export type { MediaEditorPendingCrop } from './pending-crop';
 
 // Embed query for the attachment's author and parent post. Shared between
 // the `getEntityRecord` read and the matching `invalidateResolution` so the
@@ -103,6 +105,15 @@ export interface MediaEditorProps {
 	fields?: Field< Media >[];
 	id: number;
 	aspectRatioPresets?: AspectRatioPreset[];
+	/**
+	 * Hand crops back through `onSaved` as a `pendingCrop` instead of saving
+	 * them, for a host that commits them later.
+	 */
+	deferCrop?: boolean;
+	/**
+	 * A crop previously handed back as pending, to resume editing from.
+	 */
+	pendingCrop?: MediaEditorPendingCrop;
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
 	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
@@ -428,6 +439,7 @@ function MediaEditorContent( {
 	fields = [],
 	id,
 	aspectRatioPresets,
+	deferCrop,
 	onClose,
 	onSaved,
 	renderFrame,
@@ -603,6 +615,7 @@ function MediaEditorContent( {
 	} = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		cropper,
+		deferCrop,
 		id,
 		isImage,
 		media,
@@ -871,7 +884,17 @@ function MediaEditorContent( {
 
 export function MediaEditor( props: MediaEditorProps ) {
 	return (
-		<MediaEditorStateProvider key={ props.id }>
+		<MediaEditorStateProvider
+			key={ props.id }
+			resume={
+				props.pendingCrop && {
+					cropper: props.pendingCrop.cropperState,
+					cropOptions: {
+						aspectRatioValue: props.pendingCrop.aspectRatioValue,
+					},
+				}
+			}
+		>
 			<MediaEditorContent { ...props } />
 		</MediaEditorStateProvider>
 	);

@@ -20,7 +20,7 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -28,6 +28,9 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import attachMediaInPost from './utils/attach-media-in-post';
+import commitPendingMediaEdits, {
+	hasPendingMediaEdits,
+} from './utils/commit-pending-media-edits';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -185,6 +188,52 @@ export const editPost =
 			.editEntityRecord( 'postType', type, id, edits, options );
 	};
 
+const PENDING_MEDIA_EDITS_LOCK = 'pending-media-edits';
+
+/**
+ * Saves the media edits held on the post's blocks, such as crops made in the
+ * media editor, and points the blocks at the new images.
+ *
+ * @param {Object} thunkArgs          Thunk arguments.
+ * @param {Object} thunkArgs.select   Editor store selectors.
+ * @param {Object} thunkArgs.dispatch Editor store actions.
+ * @param {Object} thunkArgs.registry A `@wordpress/data` registry.
+ * @return {Promise<Object|false>} A save error, or `false` on success.
+ */
+async function savePendingMediaEdits( { select, dispatch, registry } ) {
+	dispatch.lockPostSaving( PENDING_MEDIA_EDITS_LOCK );
+	try {
+		const { applyTo, error } = await commitPendingMediaEdits(
+			registry,
+			select.getEditorBlocks()
+		);
+		// Applied to the blocks as they are now, not as they were when the
+		// requests went out, so nothing typed meanwhile is lost.
+		const blocks = select.getEditorBlocks();
+		const nextBlocks = applyTo( blocks );
+		if ( nextBlocks !== blocks ) {
+			dispatch.resetEditorBlocks( nextBlocks );
+		}
+		if ( ! error ) {
+			return false;
+		}
+		// A failed request is usually a plain object rather than an `Error`.
+		const reason = typeof error?.message === 'string' ? error.message : '';
+		return {
+			code: error?.code,
+			message: reason
+				? sprintf(
+						/* translators: %s: Error message. */
+						__( 'An edited image could not be saved. %s' ),
+						reason
+					)
+				: __( 'An edited image could not be saved.' ),
+		};
+	} finally {
+		dispatch.unlockPostSaving( PENDING_MEDIA_EDITS_LOCK );
+	}
+}
+
 /**
  * Action for saving the current post in the editor.
  *
@@ -195,6 +244,22 @@ export const savePost =
 	async ( { select, dispatch, registry } ) => {
 		if ( ! select.isEditedPostSaveable() ) {
 			return;
+		}
+
+		let error = false;
+
+		// Before the content is read, so the post is saved pointing at the
+		// edited images. Autosaves and previews keep the originals.
+		if (
+			! options.isAutosave &&
+			! options.isPreview &&
+			hasPendingMediaEdits( select.getEditorBlocks() )
+		) {
+			error = await savePendingMediaEdits( {
+				select,
+				dispatch,
+				registry,
+			} );
 		}
 
 		const content = select.getEditedPostContent();
@@ -218,15 +283,16 @@ export const savePost =
 		};
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
-		let error = false;
-		try {
-			edits = await applyFiltersAsync(
-				'editor.preSavePost',
-				edits,
-				options
-			);
-		} catch ( err ) {
-			error = err;
+		if ( ! error ) {
+			try {
+				edits = await applyFiltersAsync(
+					'editor.preSavePost',
+					edits,
+					options
+				);
+			} catch ( err ) {
+				error = err;
+			}
 		}
 
 		if ( ! error ) {
