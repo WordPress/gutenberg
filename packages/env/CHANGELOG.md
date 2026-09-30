@@ -11,6 +11,8 @@
 -   Point the apt sources of the buster-based WordPress images (PHP 7.1 and 7.2) at `archive.debian.org`, so building them no longer fails now that Debian 10 has reached end-of-life and left the regular mirrors.
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
 -   Allow unauthenticated apt packages when building the stretch-based WordPress images (PHP 5.6 and 7.0), since `archive.debian.org`'s own signing keys for the long-archived stretch suite have since expired.
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations when the image has the script and the healthcheck user, and pings the server over TCP with `mariadb-admin` or `mysqladmin` otherwise, so images for older MariaDB versions also become healthy ([#75046](https://github.com/WordPress/gutenberg/pull/75046), [#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Make `wp db` commands, and so `wp-env clean`, work with a `mariadbVersion` older than 11.4. The MariaDB client in the CLI image requires TLS, which those servers do not offer, so the CLI image now runs the client without verifying the server certificate, as WP-CLI does from db-command 3.0 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 
 ## 8.8.0 (2023-09-20)
 
