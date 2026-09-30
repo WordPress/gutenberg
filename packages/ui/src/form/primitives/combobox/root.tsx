@@ -1,7 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ComboboxRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
-import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-dismissal-bridge';
+import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-press-bridge';
 
 /**
  * Low-level primitive for a combobox that has an associated selection state.

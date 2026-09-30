@@ -2,7 +2,7 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
-import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-dismissal-bridge';
+import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-press-bridge';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
