@@ -113,24 +113,29 @@ async function run() {
 		return;
 	}
 
-	if ( remove && existing ) {
-		await api.deleteComment( existing.id );
-		info( 'Removed the comment, its last section having gone.' );
-		return;
-	}
-
-	if ( ! merged ) {
-		info( `Nothing to report for the "${ section }" section.` );
-		return;
-	}
-
-	/* Only once the section is in place, so nothing is lost if this fails. */
+	/*
+	 * Once the section says what it should, including saying nothing, the
+	 * standalone comment it replaced is only a second and drifting copy.
+	 */
 	const retireStandalone = async () => {
 		for ( const id of retirable ) {
 			await api.deleteComment( id );
 			info( `Retired the standalone comment ${ id }.` );
 		}
 	};
+
+	if ( remove && existing ) {
+		await api.deleteComment( existing.id );
+		info( 'Removed the comment, its last section having gone.' );
+		await retireStandalone();
+		return;
+	}
+
+	if ( ! merged ) {
+		info( `Nothing to report for the "${ section }" section.` );
+		await retireStandalone();
+		return;
+	}
 
 	/* Props runs on every comment, so most writes change nothing. */
 	if ( existing?.body === merged ) {

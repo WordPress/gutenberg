@@ -334,8 +334,10 @@ describe( 'budgets', () => {
 		);
 		const section = parseSections( merged )[ 0 ].body;
 
-		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
-		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+		// Parity alone would pass with no fence at all.
+		expect( section.match( /^```/gm ) ).toHaveLength( 2 );
+		expect( section ).toContain( 'Error: socket hang up' );
 		expect( ( section.match( /<details>/g ) ?? [] ).length ).toBe(
 			( section.match( /<\/details>/g ) ?? [] ).length
 		);
@@ -518,6 +520,13 @@ describe( 'comment limit', () => {
 
 		expect( merged.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
 		expect( merged ).toContain( 'Props.' );
+		/*
+		 * Trimming drops from the end, so the first of them has to survive:
+		 * asserting only that props remains would pass if all were discarded.
+		 */
+		expect( parseSections( merged ).map( ( s ) => s.id ) ).toContain(
+			'future-0'
+		);
 	} );
 } );
 
@@ -731,7 +740,7 @@ describe( 'keeping the end when truncating', () => {
 
 		expect( section ).toContain( 'Co-authored-by: someone' );
 		expect( section.startsWith( '<sub>Truncated.' ) ).toBe( true );
-		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
 	} );
 
 	/* A trailer's lines are single spaced, so its first blank line is past it. */
@@ -805,5 +814,64 @@ describe( 'keeping the end when truncating', () => {
 		const section = parseSections( merged )[ 0 ].body;
 
 		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+	} );
+} );
+
+describe( 'truncation repairs both edges', () => {
+	/* An open fence would swallow every section rendered after it. */
+	it.each( [
+		[ 'backtick', '```' ],
+		[ 'four backticks', '````' ],
+		[ 'tilde', '~~~' ],
+	] )( 'closes an unterminated %s fence it kept', ( _, marker ) => {
+		const body = `${ marker }\n${ 'noise\n'.repeat( 20000 ) }tail`;
+
+		let comment = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		comment = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' } )
+		);
+
+		const props = parseSections( comment ).find(
+			( s ) => s.id === 'props'
+		)!.body;
+		const escaped = marker.replace( /[`~]/g, '\\$&' );
+		const opens = props.match( new RegExp( `^${ escaped }`, 'gm' ) ) ?? [];
+
+		expect( opens.length % 2 ).toBe( 0 );
+		expect( comment ).toContain( '#### 🏷️ Labels' );
+	} );
+
+	it( 'keeps every section inside its budget and the comment inside the limit', () => {
+		const shapes = [
+			'x'.repeat( 40000 ),
+			`\`\`\`\n${ 'y\n'.repeat( 20000 ) }`,
+			`<details>\n<summary>s</summary>\n\n${ 'z\n'.repeat( 20000 ) }`,
+			'a\r\n'.repeat( 20000 ),
+		];
+
+		for ( const definition of SECTIONS ) {
+			for ( const shape of shapes ) {
+				const comment = bodyOf(
+					mergeSection(
+						undefined,
+						{
+							id: definition.id,
+							body: shape,
+							sha: HEAD,
+							runUrl: 'https://example.com/run',
+						},
+						HEAD
+					)
+				);
+				const section = parseSections( comment )[ 0 ].body;
+
+				expect( section.length ).toBeLessThanOrEqual(
+					definition.budget
+				);
+				expect( comment.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
+			}
+		}
 	} );
 } );

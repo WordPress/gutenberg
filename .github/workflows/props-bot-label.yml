@@ -7,6 +7,10 @@ on:
     pull_request_target:
         types:
             - labeled
+            # A label added while the pull request could not be acted on is a
+            # request still waiting, so these consume it when it can be.
+            - ready_for_review
+            - reopened
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -21,7 +25,12 @@ jobs:
         timeout-minutes: 5
         # Matches the gather's own guard: removing the label on a draft would
         # take away the request without anything acting on it.
-        if: ${{ 'props-bot' == github.event.label.name && ! github.event.pull_request.draft && github.event.pull_request.state == 'open' }}
+        if: |
+            (
+              github.event.action == 'labeled' && 'props-bot' == github.event.label.name ||
+              github.event.action != 'labeled' && contains( github.event.pull_request.labels.*.name, 'props-bot' )
+            ) &&
+            ! github.event.pull_request.draft && github.event.pull_request.state == 'open'
 
         steps:
             - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

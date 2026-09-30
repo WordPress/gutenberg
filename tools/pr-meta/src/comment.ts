@@ -199,8 +199,62 @@ export function isParseable( commentBody: string ): boolean {
 	return delimiters.length === parseSections( commentBody ).length * 2;
 }
 
-/* Enough for a reopened or closed fence and its newlines. */
-const REPAIR_ROOM = 16;
+/**
+ * Keeps the start of a body, closing whatever the cut left open.
+ *
+ * @param body The body to cut.
+ * @param room How many characters the cut may keep.
+ * @param note The truncation note to append.
+ * @return The shortened body.
+ */
+function keepStart( body: string, room: number, note: string ): string {
+	const head = body.slice( 0, room );
+
+	/*
+	 * A paragraph break, so the cut falls between whole items, unless that
+	 * throws most of the room away: a stack trace is one fenced block with no
+	 * blank line in it, and cutting above the fence would keep none of it.
+	 */
+	const paragraph = head.lastIndexOf( '\n\n' );
+	const boundary =
+		paragraph > room / 2 ? paragraph : head.lastIndexOf( '\n' );
+	const kept = boundary > 0 ? head.slice( 0, boundary ) : head;
+
+	return `${ kept }${ closeOpenBlocks( kept ) }\n\n${ note }`;
+}
+
+/**
+ * Keeps the end of a body, repairing the blocks at both cut edges.
+ *
+ * @param body The body to cut.
+ * @param room How many characters the cut may keep.
+ * @param note The truncation note to prepend.
+ * @return The shortened body, or nothing when there is no safe cut.
+ */
+function keepEnd(
+	body: string,
+	room: number,
+	note: string
+): string | undefined {
+	/*
+	 * Never mid-line: that could split a fence opener. Never at the first
+	 * paragraph break either, which inside a fence of single-spaced lines
+	 * falls past the closing marker and drops the trailer.
+	 */
+	const cut = body.slice( body.length - room );
+	const boundary = cut.indexOf( '\n' ) + 1;
+
+	if ( boundary <= 0 ) {
+		return undefined;
+	}
+
+	const kept = cut.slice( boundary );
+	const dropped = body.slice( 0, body.length - kept.length );
+	const reopened = `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+
+	/* The kept end can leave a block open just as the dropped start can. */
+	return `${ reopened }${ closeOpenBlocks( reopened ) }`;
+}
 
 function truncate(
 	body: string,
@@ -213,37 +267,27 @@ function truncate(
 
 	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
 	const note = `<sub>Truncated.${ link }</sub>`;
-	/* The note and any repaired markup have to fit the budget as well. */
-	const room = Math.max( definition.budget - note.length - REPAIR_ROOM, 0 );
+	const shorten = ( room: number ) =>
+		definition.keep === 'end'
+			? ( keepEnd( body, room, note ) ?? keepStart( body, room, note ) )
+			: keepStart( body, room, note );
 
 	/*
-	 * Keeping the ending, where props holds the trailer a committer copies.
-	 * Cut at the first line break, never at the first paragraph break: inside
-	 * a fence of single-spaced lines that break comes after the closing
-	 * marker, which would drop the trailer the budget was widened for.
+	 * Closing an open block costs a marker of no fixed length, so measure the
+	 * result and cut again by the overflow rather than reserving a guess.
 	 */
-	if ( definition.keep === 'end' ) {
-		const cut = body.slice( -room );
-		const boundary = cut.indexOf( '\n' ) + 1;
+	let room = definition.budget - note.length;
+	for ( let attempt = 0; attempt < 8 && room > 0; attempt++ ) {
+		const candidate = shorten( room );
 
-		if ( boundary > 0 ) {
-			const kept = cut.slice( boundary );
-			const dropped = body.slice( 0, body.length - kept.length );
-
-			return `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+		if ( candidate.length <= definition.budget ) {
+			return candidate;
 		}
+
+		room -= candidate.length - definition.budget;
 	}
 
-	/*
-	 * Cut at a paragraph break so the break falls between whole items rather
-	 * than mid-sentence, then close whatever the cut left open. A note
-	 * appended inside a fence renders as code, taking its link with it.
-	 */
-	const head = body.slice( 0, room );
-	const lastBreak = head.lastIndexOf( '\n\n' );
-	const kept = lastBreak > 0 ? head.slice( 0, lastBreak ) : head;
-
-	return `${ kept }${ closeOpenBlocks( kept ) }\n\n${ note }`;
+	return note;
 }
 
 /**

@@ -133,4 +133,43 @@ describe( 'run', () => {
 		expect( api.updateComment ).not.toHaveBeenCalled();
 		expect( api.deleteComment ).toHaveBeenCalledWith( 7 );
 	} );
+
+	/* No contributors is a result too, and it makes the standalone list stale. */
+	it( 'retires the standalone comment when the section is cleared', async () => {
+		withInputs( {
+			section: 'props',
+			body: 'Props.',
+			'retire-comments-matching': 'The following accounts',
+		} );
+		await run();
+		const written = api.createComment.mock.calls[ 0 ][ 1 ];
+		api.deleteComment.mockClear();
+
+		api.findComments.mockResolvedValue( {
+			comment: { id: 1, body: written },
+			retirable: [ 7 ],
+		} );
+		withInputs( { body: '' } );
+
+		await run();
+
+		// The unified comment goes, its last section having gone, and so does it.
+		expect( api.deleteComment.mock.calls.map( ( c ) => c[ 0 ] ) ).toEqual( [
+			1, 7,
+		] );
+	} );
+
+	it( 'retires the standalone comment when there is nothing to write', async () => {
+		withInputs( {
+			section: 'props',
+			body: '',
+			'retire-comments-matching': 'The following accounts',
+		} );
+		api.findComments.mockResolvedValue( { retirable: [ 7 ] } );
+
+		await run();
+
+		expect( api.createComment ).not.toHaveBeenCalled();
+		expect( api.deleteComment ).toHaveBeenCalledWith( 7 );
+	} );
 } );
