@@ -14,6 +14,7 @@ import {
 	lazy,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
@@ -110,6 +111,48 @@ class PickerErrorBoundary extends Component< PickerErrorBoundaryProps > {
 	render() {
 		return this.state.hasError ? null : this.props.children;
 	}
+}
+
+interface PickerFallbackProps {
+	onSelect: ( slug: string ) => void;
+	onRetry: () => void;
+}
+
+/**
+ * The curated quick row with a retry path, shown when the full picker fails.
+ *
+ * @param props          Component props.
+ * @param props.onSelect Called with the chosen curated slug.
+ * @param props.onRetry  Called to retry loading the full picker.
+ */
+function PickerFallback( { onSelect, onRetry }: PickerFallbackProps ) {
+	const ref = useRef< HTMLDivElement >( null );
+
+	/*
+	 * Replacing the focused search field drops focus to the body, where
+	 * Escape no longer closes the popover, so move it to a basic reaction.
+	 */
+	useEffect( () => {
+		const { activeElement, body } = ref.current?.ownerDocument ?? {};
+		if ( ! activeElement || activeElement === body ) {
+			ref.current?.querySelector< HTMLElement >( 'button' )?.focus();
+		}
+	}, [] );
+
+	return (
+		<div
+			ref={ ref }
+			className="editor-collab-sidebar-panel__picker-fallback"
+		>
+			<ReactionEmojiPicker onSelect={ onSelect } />
+			<div className="editor-collab-sidebar-panel__picker-fallback-note">
+				{ __( 'Couldn’t load the full emoji picker.' ) }
+				<Button variant="link" onClick={ onRetry }>
+					{ __( 'Retry' ) }
+				</Button>
+			</div>
+		</div>
+	);
 }
 
 interface AddReactionButtonProps {
@@ -241,18 +284,10 @@ export function AddReactionButton( {
 
 				if ( pickerFailed ) {
 					return (
-						<div className="editor-collab-sidebar-panel__picker-fallback">
-							<ReactionEmojiPicker onSelect={ pickCurated } />
-							<div className="editor-collab-sidebar-panel__picker-fallback-note">
-								{ __( 'Couldn’t load the full emoji picker.' ) }
-								<Button
-									variant="link"
-									onClick={ retryFullPicker }
-								>
-									{ __( 'Retry' ) }
-								</Button>
-							</div>
-						</div>
+						<PickerFallback
+							onSelect={ pickCurated }
+							onRetry={ retryFullPicker }
+						/>
 					);
 				}
 

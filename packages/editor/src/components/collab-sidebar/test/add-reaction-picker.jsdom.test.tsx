@@ -250,6 +250,58 @@ describe( 'AddReactionButton', () => {
 		}
 	} );
 
+	it( 'keeps focus in the popover when the dataset fails after the search is focused', async () => {
+		// Its own base URL, so the dataset cache from other tests is not hit.
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase-late-failure',
+		} );
+		const originalFetch = global.fetch;
+		let rejectDataset: ( error: Error ) => void = () => {};
+		global.fetch = vi.fn(
+			() =>
+				new Promise< Response >( ( _resolve, reject ) => {
+					rejectDataset = reject;
+				} )
+		);
+
+		try {
+			const user = userEvent.setup();
+			render(
+				<AddReactionButton
+					noteId={ uniqueNoteId }
+					onToggleReaction={ () => {} }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add reaction' } )
+			);
+			const search = await screen.findByRole( 'combobox' );
+			expect( search ).toHaveFocus();
+
+			// Replacing the focused search with the fallback must not drop
+			// focus to the body, or Escape stops closing the popover.
+			await act( async () => {
+				rejectDataset( new Error( 'network down' ) );
+			} );
+			expect(
+				await screen.findByRole( 'button', { name: 'Heart' } )
+			).toHaveFocus();
+
+			await user.keyboard( '{Escape}' );
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Add reaction' } )
+			).not.toBeInTheDocument();
+		} finally {
+			global.fetch = originalFetch;
+			await act( async () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
+		}
+	} );
+
 	it( 'stays focusable but inert when disabled', async () => {
 		const user = userEvent.setup();
 		render(
