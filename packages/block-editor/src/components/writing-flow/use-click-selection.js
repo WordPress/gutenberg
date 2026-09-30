@@ -39,9 +39,9 @@ export default function useClickSelection() {
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus
-				// the nearest focusable ancestor (the block element, or a
-				// container), which the handover moves straight back to the
-				// wrapper. On iOS that flicker cancels the double tap word
+				// the nearest focusable element (the field, its block element
+				// or a container), which the handover moves straight back to
+				// the wrapper. On iOS that flicker cancels the double tap word
 				// selection.
 				if (
 					placesCaretOnTap &&
