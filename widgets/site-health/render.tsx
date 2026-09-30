@@ -113,14 +113,14 @@ export default function SiteHealth() {
 	);
 	const href = counts ? reviewHref( counts ) : '';
 
-	// With items to review, this takes the declared Details action's place.
+	// With items to review, a link to them joins the declared actions.
 	const hosted = useWidgetActions(
 		issuesTotal > 0
 			? [
 					{
-						id: 'site-health-details',
+						id: 'site-health-review',
 						label: reviewLabel,
-						relevance: 'high',
+						relevance: 'medium',
 						href,
 					},
 				]
