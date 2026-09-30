@@ -6,3 +6,4 @@
 
 - Register the fields of patterns and template parts on the server.
 - Register the Posts Page title and site reading settings as fields of the `wp_template` collection.
+- Register the format field of the post types supporting `post-formats`.

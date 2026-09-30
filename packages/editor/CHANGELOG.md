@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   The format field comes from the server, which offers it when the post type supports `post-formats` and the theme supports post formats. The editor no longer registers it from the `disablePostFormats` editor setting, which only the post editor screen sets, so the field is now hidden consistently in the site editor views of a theme without post formats.
 -   The `content-preview` field is no longer registered for the post types supporting the editor. No view referenced it: the post and page views show the featured image as their media field, and the template, template part, and pattern views add their own preview field. A view that wants a content preview declares it in its own field list, as those views do.
 
 ### Deprecations
