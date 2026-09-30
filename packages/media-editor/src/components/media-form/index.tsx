@@ -7,6 +7,35 @@ import type { ReactNode } from 'react';
 import { useMediaEditorContext } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 
+// Fields that use a regular (non-panel) layout, rendered at the top.
+const REGULAR_FIELD_IDS = [ 'title', 'alt_text', 'caption', 'description' ];
+
+// Fields shown in panels, below the regular ones: the metadata first, then
+// the file information.
+const PANEL_FIELD_IDS = [
+	'date',
+	'author',
+	'filename',
+	'mime_type',
+	'filesize',
+	'media_dimensions',
+	'attached_to',
+];
+
+const ORDERED_FIELD_IDS = [ ...REGULAR_FIELD_IDS, ...PANEL_FIELD_IDS ];
+
+/**
+ * The position of a field in the default form: its index among the known
+ * fields, or after all of them.
+ *
+ * @param fieldId The id of the field.
+ * @return The rank of the field.
+ */
+function getFieldRank( fieldId: string ) {
+	const index = ORDERED_FIELD_IDS.indexOf( fieldId );
+	return index === -1 ? ORDERED_FIELD_IDS.length : index;
+}
+
 /**
  * Props for MediaForm component.
  */
@@ -40,19 +69,14 @@ export default function MediaForm( {
 		);
 	}
 
-	// Fields that use a regular (non-panel) layout, rendered at the top.
-	const regularFieldIds = [ 'title', 'alt_text', 'caption', 'description' ];
-
-	// Place the non-panel (regular layout) fields at the top of the array,
-	// with the remaining panel fields below.
-	const sortedFields = [
-		...fields.filter( ( field: Field< Media > ) =>
-			regularFieldIds.includes( field.id )
-		),
-		...fields.filter(
-			( field: Field< Media > ) => ! regularFieldIds.includes( field.id )
-		),
-	];
+	// The regular (non-panel) fields come first, then the panel fields, each
+	// group in its own order, so the form does not depend on the order the
+	// fields are registered in. The sort is stable: any other field follows,
+	// in the order it was given.
+	const sortedFields = [ ...fields ].sort(
+		( a: Field< Media >, b: Field< Media > ) =>
+			getFieldRank( a.id ) - getFieldRank( b.id )
+	);
 
 	// Default form structure with panel layout
 	const defaultForm: Form = {
@@ -61,7 +85,7 @@ export default function MediaForm( {
 		},
 		fields: sortedFields.map( ( field: Field< Media > ) => {
 			// Use regular layout for main editable fields
-			if ( regularFieldIds.includes( field.id ) ) {
+			if ( REGULAR_FIELD_IDS.includes( field.id ) ) {
 				return {
 					id: field.id,
 					layout: {

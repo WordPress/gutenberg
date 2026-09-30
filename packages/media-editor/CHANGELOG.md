@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields follow, in the order they are passed in.
+
 ### Bug Fixes
 
 -   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
