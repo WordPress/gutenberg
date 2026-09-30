@@ -113,24 +113,22 @@ function ModeSwitcher() {
 			value={ selectedMode }
 			onValueChange={ ( value ) => switchEditorMode( value ) }
 		>
-			<Menu.Group>
-				<Menu.GroupLabel>{ __( 'Editor' ) }</Menu.GroupLabel>
-				{ choices.map( ( choice ) => (
-					<Menu.RadioItem
-						key={ choice.value }
-						value={ choice.value }
-						disabled={ choice.disabled }
-						shortcut={ choice.shortcut }
-					>
-						<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
-						{ choice.info && (
-							<Menu.ItemDescription>
-								{ choice.info }
-							</Menu.ItemDescription>
-						) }
-					</Menu.RadioItem>
-				) ) }
-			</Menu.Group>
+			<Menu.GroupLabel>{ __( 'Editor' ) }</Menu.GroupLabel>
+			{ choices.map( ( choice ) => (
+				<Menu.RadioItem
+					key={ choice.value }
+					value={ choice.value }
+					disabled={ choice.disabled }
+					shortcut={ choice.shortcut }
+				>
+					<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+					{ choice.info && (
+						<Menu.ItemDescription>
+							{ choice.info }
+						</Menu.ItemDescription>
+					) }
+				</Menu.RadioItem>
+			) ) }
 		</Menu.RadioGroup>
 	);
 }
