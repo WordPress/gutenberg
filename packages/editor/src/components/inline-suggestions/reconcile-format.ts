@@ -17,11 +17,11 @@
  */
 import {
 	RichTextData,
-	create,
 	slice,
 	applyFormat,
 	removeFormat,
 } from '@wordpress/rich-text';
+import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_FORMAT_NAME,
@@ -44,23 +44,6 @@ function sliceToHTML( record: any, start: number, end: number ): string {
 	return new RichTextData(
 		slice( record, start, end ) as any
 	).toHTMLString();
-}
-
-/**
- * Parse a block attribute value into a rich-text record, tolerating plain
- * strings and other non-rich values.
- *
- * @param value Block attribute value.
- * @return Rich-text record, or null when the value isn't rich text.
- */
-function toRecord( value: any ) {
-	if ( value instanceof RichTextData ) {
-		return create( { html: value.toHTMLString() } );
-	}
-	if ( typeof value === 'string' ) {
-		return create( { html: value } );
-	}
-	return null;
 }
 
 /**
@@ -132,8 +115,8 @@ export function analyzeFormatEdit(
 	prevValue: any,
 	nextValue: any
 ): { start: number; end: number } | null {
-	const prev = toRecord( prevValue );
-	const next = toRecord( nextValue );
+	const prev = toRichTextRecord( prevValue );
+	const next = toRichTextRecord( nextValue );
 	if ( ! prev || ! next ) {
 		return null;
 	}
@@ -430,9 +413,10 @@ export function planFormatMarkers(
 	nextValue: any,
 	{ authorId }: { authorId?: number | string } = {}
 ): FormatPlan {
-	const prev = toRecord( prevValue );
-	const next = toRecord( nextValue );
-	if ( ! prev || ! next ) {
+	const prev = toRichTextRecord( prevValue );
+	const next = toRichTextRecord( nextValue );
+	// A text edit is never a format edit; bail before scanning formats.
+	if ( ! prev || ! next || prev.text !== next.text ) {
 		return { kind: 'none' };
 	}
 	const range = analyzeFormatEdit( prevValue, nextValue );
@@ -522,7 +506,7 @@ export function applyFormatPlan(
 	if ( ! plan.extendsId && ( id === undefined || id === null ) ) {
 		return nextValue;
 	}
-	const next = toRecord( nextValue );
+	const next = toRichTextRecord( nextValue );
 	if ( ! next ) {
 		return nextValue;
 	}
