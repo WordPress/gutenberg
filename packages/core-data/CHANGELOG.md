@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Wait for assigned templates to load before falling back to the default template ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+
 ### Enhancements
 
+-   Resolve templates from the choices for the edited post slug and post type, keeping the assigned template when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 
 ### Internal

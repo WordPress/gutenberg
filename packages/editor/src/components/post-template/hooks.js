@@ -3,6 +3,7 @@ import { useMemo } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export function useEditedPostContext() {
 	return useSelect( ( select ) => {
@@ -64,6 +65,17 @@ export function useAvailableTemplates() {
 	const { postType, postId } = useEditedPostContext();
 	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
+	const templateId = useSelect(
+		( select ) =>
+			postId
+				? unlock( select( coreStore ) ).getTemplateId(
+						postType,
+						postId
+					)
+				: undefined,
+		[ postType, postId ]
+	);
+
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const templates = useTemplates( postType, postSlug || undefined );
 	// The filtered order does not define the hierarchy default.
@@ -76,40 +88,39 @@ export function useAvailableTemplates() {
 		},
 		[ postType, postSlug ]
 	);
-	return useMemo(
-		() =>
-			allowSwitchingTemplate &&
-			defaultTemplateId !== undefined &&
-			( templates || [] )
-				.filter(
-					( template ) =>
-						template.slug !== currentTemplateSlug &&
-						!! template.content.raw &&
-						( currentTemplateSlug ||
-							template.id !== defaultTemplateId )
-				)
-				.map( ( template ) =>
-					template.id === defaultTemplateId
-						? {
-								...template,
-								title: {
-									rendered: sprintf(
-										// translators: %s: Template name.
-										__( '%s (default)' ),
-										template.title.rendered
-									),
-								},
-								isDefault: true,
-							}
-						: { ...template, isDefault: false }
-				),
-		[
-			templates,
-			currentTemplateSlug,
-			defaultTemplateId,
-			allowSwitchingTemplate,
-		]
-	);
+	return useMemo( () => {
+		if ( ! allowSwitchingTemplate || defaultTemplateId === undefined ) {
+			return [];
+		}
+		return ( templates || [] )
+			.filter(
+				( template ) =>
+					template.slug !== currentTemplateSlug &&
+					template.id !== templateId &&
+					!! template.content.raw
+			)
+			.map( ( template ) =>
+				template.id === defaultTemplateId
+					? {
+							...template,
+							title: {
+								rendered: sprintf(
+									// translators: %s: Template name.
+									__( '%s (default)' ),
+									template.title.rendered
+								),
+							},
+							isDefault: true,
+						}
+					: { ...template, isDefault: false }
+			);
+	}, [
+		allowSwitchingTemplate,
+		defaultTemplateId,
+		templates,
+		currentTemplateSlug,
+		templateId,
+	] );
 }
 
 export function usePostTemplatePanelMode() {
