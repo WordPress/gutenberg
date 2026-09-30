@@ -160,7 +160,6 @@
       - name: Autocomplete.Separator
         props:
             - className
-            - orientation
             - render
             - style
       - name: Autocomplete.Status
@@ -1197,7 +1196,6 @@
       - name: SearchableChipSelect.Separator
         props:
             - className
-            - orientation
             - render
             - style
 - name: SearchableChipSelectControl
@@ -1307,7 +1305,6 @@
       - name: SearchableChipSelectControl.Separator
         props:
             - className
-            - orientation
             - render
             - style
 - name: SearchableSelectControl
@@ -1408,7 +1405,6 @@
       - name: SearchableSelectControl.Separator
         props:
             - className
-            - orientation
             - render
             - style
 - name: SearchControl
@@ -1524,7 +1520,6 @@
       - name: Select.Separator
         props:
             - className
-            - orientation
             - render
             - style
       - name: Select.Trigger
@@ -1611,7 +1606,6 @@
       - name: SelectControl.Separator
         props:
             - className
-            - orientation
             - render
             - style
 - name: Shortcut
