@@ -6,15 +6,17 @@ import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
+	Notice,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
-const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+const { PostCardPanel } = unlock( editorPrivateApis );
 
 /*
  * The featured image field opens the WordPress media modal, which needs the
@@ -113,7 +115,11 @@ export function QuickEditModal( {
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
-	const _fields = usePostFields( { postType } );
+	const {
+		fields: _fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: postType } );
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
@@ -222,14 +228,21 @@ export function QuickEditModal( {
 				/>
 			</div>
 			<div className="dataviews-action-modal__quick-edit-content">
-				{ hasFinishedResolution && (
-					<DataForm
-						data={ { ...record, ...localEdits } }
-						fields={ fields }
-						form={ form }
-						onChange={ onChange }
-					/>
+				{ fieldsError && (
+					<Notice status="error" isDismissible={ false }>
+						{ fieldsError.message }
+					</Notice>
 				) }
+				{ hasFinishedResolution &&
+					! isLoadingFields &&
+					! fieldsError && (
+						<DataForm
+							data={ { ...record, ...localEdits } }
+							fields={ fields }
+							form={ form }
+							onChange={ onChange }
+						/>
+					) }
 			</div>
 			<HStack className="dataviews-action-modal__quick-edit-footer">
 				<Button
