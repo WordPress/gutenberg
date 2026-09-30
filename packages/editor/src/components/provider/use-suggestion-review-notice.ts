@@ -1,4 +1,4 @@
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -75,19 +75,18 @@ export default function useSuggestionReviewNotice() {
 	const { createInfoNotice } = useDispatch( noticesStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const hasPendingSuggestions = useSelect( ( select ) => {
+	// The regex probes run in a memo on the saved content, which changes on
+	// load and save only, rather than in `mapSelect` on every store update.
+	const { savedContent, supportsNotes } = useSelect( ( select ) => {
 		/*
 		 * With the experiment on, the intent switcher and the suggestion UI
 		 * explain themselves; the notice would be noise.
 		 */
 		if ( isSuggestionModeEnabled() ) {
-			return false;
+			return { savedContent: null, supportsNotes: false };
 		}
 		const { getCurrentPostAttribute, getCurrentPostType } =
 			select( editorStore );
-		if ( ! hasSuggestionMarkers( getCurrentPostAttribute( 'content' ) ) ) {
-			return false;
-		}
 		/*
 		 * Suggestions persist as note comments, so the sidebar the notice
 		 * points at only exists on a post type that supports notes.
@@ -96,8 +95,17 @@ export default function useSuggestionReviewNotice() {
 		const postType = postTypeSlug
 			? select( coreStore ).getPostType( postTypeSlug )
 			: null;
-		return !! postType && checkSupport( postType.supports, 'editor.notes' );
+		return {
+			savedContent: getCurrentPostAttribute( 'content' ),
+			supportsNotes:
+				!! postType &&
+				checkSupport( postType.supports, 'editor.notes' ),
+		};
 	}, [] );
+	const hasPendingSuggestions = useMemo(
+		() => supportsNotes && hasSuggestionMarkers( savedContent ),
+		[ supportsNotes, savedContent ]
+	);
 
 	useEffect( () => {
 		if ( ! hasPendingSuggestions ) {

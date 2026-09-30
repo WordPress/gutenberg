@@ -6,6 +6,7 @@ import {
 	removeFormat,
 	applyFormat,
 } from '@wordpress/rich-text';
+import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_CLASS,
 	SUGGESTION_FORMAT_NAME,
@@ -219,18 +220,18 @@ export function valueRangeHasSuggestion(
 	start: number,
 	end: number
 ): boolean {
-	let html: string | null = null;
-	if ( value && typeof value.toHTMLString === 'function' ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
+	if ( value instanceof RichTextData ) {
+		return formatsRangeHasSuggestion( value.formats, start, end );
 	}
-	if ( html === null || false === html.includes( SUGGESTION_CLASS ) ) {
+	if ( typeof value !== 'string' || ! value.includes( SUGGESTION_CLASS ) ) {
 		// Quick reject: no marker markup, nothing to overlap.
 		return false;
 	}
-	const record = create( { html } );
-	return formatsRangeHasSuggestion( record.formats, start, end );
+	return formatsRangeHasSuggestion(
+		create( { html: value } ).formats,
+		start,
+		end
+	);
 }
 
 /**
@@ -248,18 +249,15 @@ export function valueAdditionRunToExtend(
 	offset: number,
 	authorToken?: string | null
 ): { id: string; start: number; end: number } | null {
-	let html: string | null = null;
-	if ( value && typeof value.toHTMLString === 'function' ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
+	if ( value instanceof RichTextData ) {
+		return formatsAdditionRunToExtend( value.formats, offset, authorToken );
 	}
-	if ( html === null || false === html.includes( SUGGESTION_CLASS ) ) {
+	if ( typeof value !== 'string' || ! value.includes( SUGGESTION_CLASS ) ) {
 		// Quick reject: no marker markup, nothing to extend.
 		return null;
 	}
 	return formatsAdditionRunToExtend(
-		create( { html } ).formats,
+		create( { html: value } ).formats,
 		offset,
 		authorToken
 	);
@@ -329,7 +327,7 @@ function removeMarkedRange( value: any, suggestionId: number | string ) {
 	if ( ! range ) {
 		return value;
 	}
-	const record = create( { html: value.toHTMLString() } );
+	const record = toRichTextRecord( value )!;
 	let result = record;
 	for ( const [ start, end ] of runsCarryingId(
 		record,
@@ -359,7 +357,7 @@ function unwrapMarker( value: any, suggestionId: number | string ) {
 	if ( ! range ) {
 		return value;
 	}
-	const record = create( { html: value.toHTMLString() } );
+	const record = toRichTextRecord( value )!;
 	let result = record;
 	for ( const [ start, end ] of runsCarryingId(
 		record,
@@ -547,7 +545,7 @@ export function insertInlineAddition(
 	if ( ! run.text ) {
 		return value;
 	}
-	const record = create( { html: value.toHTMLString() } );
+	const record = toRichTextRecord( value )!;
 	const startIndex = start ?? record.text.length;
 	const endIndex = end ?? startIndex;
 	/*
@@ -630,7 +628,7 @@ export function growInlineAddition(
 	if ( ! run.text ) {
 		return value;
 	}
-	const record = create( { html: value.toHTMLString() } );
+	const record = toRichTextRecord( value )!;
 	// An insertion point outside the marker would leave text unmarked between
 	// the marker and the re-stamped span, or absorb text that was never part of
 	// the proposal.

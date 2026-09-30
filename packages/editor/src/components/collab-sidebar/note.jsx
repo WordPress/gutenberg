@@ -12,6 +12,7 @@ import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import SuggestionActions, {
 	SuggestionActionButtons,
+	useSuggestionDecision,
 } from './suggestion-actions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
@@ -84,6 +85,9 @@ export function Note( {
 	// header; the generic "Resolve" button would duplicate that action with
 	// a confusingly similar checkmark icon, so hide it for suggestion notes.
 	const hasSuggestionPayload = !! note?.meta?._wp_suggestion;
+	const suggestionDecision = useSuggestionDecision(
+		hasSuggestionPayload ? note : null
+	);
 	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
@@ -199,7 +203,7 @@ export function Note( {
 	const actions = showActions ? (
 		<>
 			{ hasSuggestionPayload && (
-				<SuggestionActionButtons thread={ note } />
+				<SuggestionActionButtons decision={ suggestionDecision } />
 			) }
 			{ isSelected && canResolve && onResolve && (
 				<Button
@@ -227,7 +231,12 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
-			{ hasSuggestionPayload && <SuggestionActions thread={ note } /> }
+			{ hasSuggestionPayload && (
+				<SuggestionActions
+					thread={ note }
+					decision={ suggestionDecision }
+				/>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

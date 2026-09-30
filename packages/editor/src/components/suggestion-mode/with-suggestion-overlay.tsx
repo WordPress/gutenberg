@@ -33,7 +33,10 @@ import { addFilter } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-import { useSuggestionOverlay } from './overlay-context';
+import {
+	useOverlayEntry,
+	useSuggestionOverlayActions,
+} from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
@@ -169,14 +172,16 @@ function SuggestingBlockEdit( {
 	props: any;
 } ) {
 	const { clientId, name, attributes, setAttributes } = props;
+	// Subscribes to this block's entry only, so another block's overlay
+	// write does not re-render every block in Suggest intent.
 	const {
-		entries,
 		captureBaseline,
 		setOverlayAttributes,
 		requestFormatSuggestion,
 		requestContentSuggestion,
 		isDeferredInsertion,
-	} = useSuggestionOverlay();
+	} = useSuggestionOverlayActions();
+	const overlayEntry = useOverlayEntry( clientId );
 
 	// Registry handle for the write-through check below; the live block
 	// state is read at call time, not render time, so a block that was
@@ -195,7 +200,6 @@ function SuggestingBlockEdit( {
 		attributesRef.current = attributes;
 	}, [ attributes ] );
 
-	const overlayEntry = entries[ clientId ];
 	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
 
 	// The suggester's user id, forwarded to `maybeHandleContentEdit` so a
@@ -538,7 +542,9 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
-			const { entries } = useSuggestionOverlay();
+			// Runs for every block in every intent: subscribe to this
+			// block's entry only.
+			const entry = useOverlayEntry( clientId );
 			const moveGhosts = useMoveGhosts();
 			const ghostsAfter = moveGhosts?.after?.get( clientId );
 			const ghostsBefore = moveGhosts?.before?.get( clientId );
@@ -563,7 +569,6 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				},
 				[ clientId ]
 			);
-			const entry = entries[ clientId ];
 			const hasPendingOverlay =
 				!! entry &&
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;

@@ -496,6 +496,72 @@ describe( 'SuggestionAutoSave', () => {
 } );
 
 describe( 'operationsForEntry', () => {
+	it( "does not postpone one block's save while another keeps changing", async () => {
+		createSuggestion.mockImplementation( async ( { clientId } ) => ( {
+			id: clientId === 'a' ? 1 : 2,
+		} ) );
+
+		renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'A',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'A edited' } );
+			overlayHandle.captureBaseline( 'b', 'core/paragraph', {
+				content: 'B',
+			} );
+		} );
+
+		// Keep typing in B every 500ms, past A's debounce window.
+		for ( let i = 0; i < 4; i++ ) {
+			await act( async () => {
+				overlayHandle.setOverlayAttributes( 'b', {
+					content: 'B' + 'x'.repeat( i + 1 ),
+				} );
+				vi.advanceTimersByTime( 500 );
+			} );
+		}
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledWith(
+			expect.objectContaining( { clientId: 'a' } )
+		);
+		expect( createSuggestion ).not.toHaveBeenCalledWith(
+			expect.objectContaining( { clientId: 'b' } )
+		);
+	} );
+
+	it( 'saves a pending suggestion when it unmounts', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { rerender } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		rerender( <CaptureOverlay /> );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'derives attribute-set ops from baseline + overlay when no structural op is set', () => {
 		expect(
 			operationsForEntry( {

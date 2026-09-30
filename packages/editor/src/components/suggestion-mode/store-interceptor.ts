@@ -893,6 +893,7 @@ export default function SuggestionStoreInterceptor() {
 		setOverlayAttributes,
 		setStructuralOp,
 		consumeInterceptorBypass,
+		hasInterceptorBypass,
 		markDeferredInsertion,
 		unmarkDeferredInsertion,
 		isDeferredInsertion,
@@ -1112,6 +1113,18 @@ export default function SuggestionStoreInterceptor() {
 			};
 		}
 
+		/*
+		 * The block tree the last diffing pass saw. `registry.subscribe`
+		 * fires for every change in every store (selection, notices, entity
+		 * records), but an attribute or structure change always replaces the
+		 * `getBlocks()` tree, so an unchanged tree has nothing to capture and
+		 * the full-tree walks below can be skipped. Not while a bypass is
+		 * pending: the walk is also what consumes a bypass whose write turned
+		 * out to be a no-op, and a stranded one would let the block's next
+		 * real edit through uncaptured.
+		 */
+		let lastSeenBlocks: unknown = null;
+
 		const unsubscribe = registry.subscribe( () => {
 			if ( isDispatchingOwnWrite ) {
 				return;
@@ -1135,6 +1148,16 @@ export default function SuggestionStoreInterceptor() {
 				adoptLiveTreeAsBaseline();
 				return;
 			}
+
+			const blocks = blockEditor.getBlocks?.();
+			if (
+				blocks &&
+				blocks === lastSeenBlocks &&
+				! hasInterceptorBypass()
+			) {
+				return;
+			}
+			lastSeenBlocks = blocks;
 
 			/*
 			 * An armed undo/redo landing: adopt the resulting state wholesale
@@ -1860,6 +1883,7 @@ export default function SuggestionStoreInterceptor() {
 		unmarkDeferredInsertion,
 		isDeferredInsertion,
 		clearDeferredInsertions,
+		hasInterceptorBypass,
 	] );
 
 	return null;
