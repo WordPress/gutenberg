@@ -67,11 +67,7 @@
 		cursor: var(--wpds-cursor-control);
 	}
 
-	line-height: $radio-input-size-sm;
-
-	@include break-small() {
-		line-height: $radio-input-size;
-	}
+	line-height: $radio-input-size;
 }
 
 .components-radio-control__option-description {
