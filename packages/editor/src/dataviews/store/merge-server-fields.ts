@@ -30,7 +30,7 @@ export function mergeServerFields< Item >(
 	for ( const entry of clientFields ) {
 		const id = typeof entry === 'string' ? entry : entry.id;
 		// A server field placed by id takes the place of a later client
-		// field with the same id, such as the author of templates.
+		// field with the same id.
 		if ( merged.has( id ) ) {
 			continue;
 		}

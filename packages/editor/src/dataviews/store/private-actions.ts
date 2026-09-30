@@ -28,7 +28,6 @@ import {
 	discussionField,
 	slugField,
 	statusField,
-	templateAuthorField,
 	templatePartAuthorField,
 	titleField,
 	templateField,
@@ -253,10 +252,10 @@ export const registerPostTypeSchema =
 					themeSupportsThumbnails &&
 					featuredImageField,
 				// The author field of the post types supporting authors is
-				// registered on the server; templates and template parts
-				// unregister it there and keep their own.
+				// registered on the server, templates getting their own
+				// there. Template parts unregister it there and keep their
+				// own.
 				'author',
-				postTypeSlug === 'wp_template' && templateAuthorField,
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
 				! isDesignPostType && dateField,

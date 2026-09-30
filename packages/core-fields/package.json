@@ -34,10 +34,15 @@
 			"types": "./build-types/post_supports/index.d.ts",
 			"import": "./build-module/post_supports/index.mjs"
 		},
+		"./wp_template": {
+			"types": "./build-types/wp_template/index.d.ts",
+			"import": "./build-module/wp_template/index.mjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
-		"./post_supports": "./build-module/post_supports/index.mjs"
+		"./post_supports": "./build-module/post_supports/index.mjs",
+		"./wp_template": "./build-module/wp_template/index.mjs"
 	},
 	"wpCopyFiles": {
 		"files": [

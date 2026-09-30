@@ -304,9 +304,11 @@ add_action( 'fields_api_init', '_gutenberg_register_posttype_supports_fields', 0
  * Adjusts the default fields of templates.
  *
  * Templates support authors, so they get the default author field like any
- * other post type. Yet they have their own author field, declared
- * client-side in packages/fields/src/fields/template-author/index.tsx, which
- * reads the theme or plugin that provides them instead of the post author.
+ * other post type. Yet their author is the theme, plugin, site, or user that
+ * provides them rather than the post author: the default author field is
+ * replaced with the one of the `wp_template` collection, see
+ * packages/core-fields/src/wp_template, whose JavaScript parts ship in the
+ * `@wordpress/core-fields/wp_template` script module.
  *
  * It runs right after the default fields are registered, on
  * `fields_api_init` at priority 9, so a plugin hooking the action at
@@ -315,7 +317,7 @@ add_action( 'fields_api_init', '_gutenberg_register_posttype_supports_fields', 0
  * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
 function _gutenberg_register_posttype_wp_template_fields( Gutenberg_Fields_Registry $registry ) {
-	$registry->unregister( 'postType', 'wp_template', array( 'author' ) );
+	_gutenberg_register_core_fields_collection( $registry, 'wp_template', true );
 }
 add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
 
