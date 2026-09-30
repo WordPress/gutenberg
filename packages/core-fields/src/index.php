@@ -23,6 +23,7 @@
  *
  * - `author`, for the post types supporting `author`.
  * - `comment_status`, for the post types supporting `comments`.
+ * - `discussion`, for the post types supporting `comments` or `trackbacks`.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  * - `ping_status`, for the post types supporting `trackbacks`.
@@ -50,6 +51,7 @@ function register_core_post_type_supports_fields( $registry ) {
 		$applies = array(
 			'author'         => post_type_supports( $post_type, 'author' ),
 			'comment_status' => post_type_supports( $post_type, 'comments' ),
+			'discussion'     => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
 			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 			'ping_status'    => post_type_supports( $post_type, 'trackbacks' ),
 		);
