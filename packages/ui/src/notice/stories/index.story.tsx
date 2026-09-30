@@ -10,7 +10,7 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.Title': Notice.Title,
 		'Notice.Description': Notice.Description,
 		'Notice.Actions': Notice.Actions,
-		'Notice.CloseIcon': Notice.CloseIcon,
+		'Notice.CloseIconButton': Notice.CloseIconButton,
 		'Notice.ActionButton': Notice.ActionButton,
 		'Notice.ActionLink': Notice.ActionLink,
 	},
@@ -46,7 +46,7 @@ export const Default: Story = {
 				</Notice.ActionButton>
 				<Notice.ActionLink href="#">Link</Notice.ActionLink>
 			</Notice.Actions>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -84,7 +84,7 @@ export const Error: Story = {
 };
 
 /**
- * Omit Notice.CloseIcon to make the notice non-dismissable.
+ * Omit Notice.CloseIconButton to make the notice non-dismissable.
  */
 export const NonDismissible: Story = {
 	args: {
@@ -114,7 +114,7 @@ export const WithoutIcon: Story = {
 			<Notice.Description key="description">
 				This notice has no decorative icon displayed.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -127,7 +127,7 @@ export const WithoutActions: Story = {
 			<Notice.Description key="description">
 				A dismissable notice without any action buttons or links.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -139,7 +139,7 @@ export const TitleOnly: Story = {
 	args: {
 		children: [
 			<Notice.Title key="title">Just a title</Notice.Title>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -154,7 +154,7 @@ export const DescriptionOnly: Story = {
 			<Notice.Description key="description">
 				Just a description without title or actions.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };

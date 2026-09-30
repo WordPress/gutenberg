@@ -1,6 +1,7 @@
 export * from './badge';
 export * as Breadcrumb from './breadcrumb';
 export * from './button';
+export * from './button-link';
 export * from './calendar';
 export * as Card from './card';
 export * as Collapsible from './collapsible';
@@ -13,7 +14,6 @@ export * from './form';
 export * from './icon';
 export * from './icon-button';
 export * from './link';
-export * from './link-button';
 export * as Menu from './menu';
 export * as Notice from './notice';
 export * as Popover from './popover';
