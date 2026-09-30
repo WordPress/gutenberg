@@ -18,6 +18,7 @@
 		{ "path": "../editor/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../fields/tsconfig.build.json" },
+		{ "path": "../fields-loader/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../global-styles-ui" },
 		{ "path": "../html-entities/tsconfig.build.json" },

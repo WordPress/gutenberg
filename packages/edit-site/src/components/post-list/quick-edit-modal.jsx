@@ -5,13 +5,15 @@ import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
+	Notice,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import { unlock } from '../../lock-unlock';
 
-const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+const { PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
@@ -65,7 +67,11 @@ export function QuickEditModal( {
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
-	const _fields = usePostFields( { postType } );
+	const {
+		fields: _fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: postType } );
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
@@ -164,14 +170,21 @@ export function QuickEditModal( {
 				/>
 			</div>
 			<div className="dataviews-action-modal__quick-edit-content">
-				{ hasFinishedResolution && (
-					<DataForm
-						data={ { ...record, ...localEdits } }
-						fields={ fields }
-						form={ form }
-						onChange={ onChange }
-					/>
+				{ fieldsError && (
+					<Notice status="error" isDismissible={ false }>
+						{ fieldsError.message }
+					</Notice>
 				) }
+				{ hasFinishedResolution &&
+					! isLoadingFields &&
+					! fieldsError && (
+						<DataForm
+							data={ { ...record, ...localEdits } }
+							fields={ fields }
+							form={ form }
+							onChange={ onChange }
+						/>
+					) }
 			</div>
 			<HStack className="dataviews-action-modal__quick-edit-footer">
 				<Button
