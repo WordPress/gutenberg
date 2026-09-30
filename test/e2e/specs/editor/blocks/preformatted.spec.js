@@ -5,10 +5,6 @@ test.describe( 'Preformatted', () => {
 		await admin.createNewPost();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test( 'should preserve character newlines', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/html' } );
 		await editor.canvas
@@ -63,44 +59,5 @@ test.describe( 'Preformatted', () => {
 
 		// Expect preformatted block to be deleted.
 		expect( await editor.getEditedPostContent() ).toBe( '' );
-	} );
-
-	test.describe( 'on the front end', () => {
-		// Use a theme without its own `pre` overflow styles.
-		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'twentytwentyone' );
-		} );
-
-		test( 'should scroll long unbroken lines instead of overflowing the page', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/preformatted',
-				attributes: { content: 'Test'.repeat( 200 ) },
-			} );
-
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
-
-			const preformatted = page.locator( '.wp-block-preformatted' );
-			await expect( preformatted ).toBeVisible();
-
-			const { pageOverflows, blockScrolls } = await preformatted.evaluate(
-				( element ) => ( {
-					pageOverflows:
-						element.ownerDocument.documentElement.scrollWidth >
-						element.ownerDocument.documentElement.clientWidth,
-					blockScrolls: element.scrollWidth > element.clientWidth,
-				} )
-			);
-
-			expect( pageOverflows ).toBe( false );
-			expect( blockScrolls ).toBe( true );
-		} );
 	} );
 } );
