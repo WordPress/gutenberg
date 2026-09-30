@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `content-preview` field is no longer registered for the post types supporting the editor. No view referenced it: the post and page views show the featured image as their media field, and the template, template part, and pattern views add their own preview field. A view that wants a content preview declares it in its own field list, as those views do.
+
 ### Deprecations
 
 -   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, are deprecated. Register and unregister fields in PHP on the `fields_api_init` action instead, with a script module for their JavaScript parts.

@@ -25,7 +25,6 @@ import {
 } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
-import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
 export function registerEntityAction< Item >(
@@ -198,11 +197,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				// The preview needs editor context, block-editor components, and
-				// private core-data selectors, so it stays in the editor package.
-				postTypeConfig.supports?.editor &&
-					postTypeConfig.viewable &&
-					postPreviewField,
 			].filter( Boolean ) as Field< any >[];
 		}
 
