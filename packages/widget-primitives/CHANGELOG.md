@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `useWidgetActions( actions )`: a mounted widget declares the actions it wants placed by its host, computed from what its render knows; an action is conditioned by not declaring it, and one carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out. `WidgetHost` gains the `actions` capability (`WidgetHostActions.declare`) hosts bind per instance. Types `WidgetActionEnvelope`, `WidgetCallbackAction` (the runtime-only `callback` fulfillment) and `WidgetRuntimeAction` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `useWidgetActions( actions )`: a mounted widget declares the actions it wants placed by its host, computed from what its render knows; an action is conditioned by not declaring it, and one carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out. `WidgetHost` gains the `actions` capability (`WidgetHostActions.declare`) hosts bind per instance. Types `WidgetActionEnvelope`, `WidgetCallbackAction` (the runtime-only `callback` fulfillment) and `WidgetRuntimeAction` ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
 
 ### Internal
 
