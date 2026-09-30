@@ -12,10 +12,8 @@
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../post-picker/tsconfig.build.json" },
-		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../ui/tsconfig.build.json" }
 	]
 }

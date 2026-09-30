@@ -1,167 +1,128 @@
-import {
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	store as coreStore,
-} from '@wordpress/core-data';
-import { ComboboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useDebounce, useEvent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
+import { __ } from '@wordpress/i18n';
+import { store as postPickerStore } from '@wordpress/post-picker';
+import { Stack, Text } from '@wordpress/ui';
 import type { MediaItem } from '../types';
 import { getRenderedContent } from '../utils/get-rendered-content';
 
-export type SearchResult = {
-	/**
-	 * Post or term id.
-	 */
-	id: number;
-	/**
-	 * Link url.
-	 */
-	url: string;
-	/**
-	 * Title of the link.
-	 */
-	title: string;
-	/**
-	 * The taxonomy or post type slug or type URL.
-	 */
-	type: string;
-	/**
-	 * Link kind of post-type or taxonomy
-	 */
-	kind?: string;
+type PostType = {
+	slug: string;
+	viewable?: boolean;
+	labels?: { singular_name?: string };
 };
 
 export default function MediaAttachedToEdit( {
 	data,
 	onChange,
 }: DataFormControlProps< MediaItem > ) {
-	const defaultPost =
-		!! data.post && !! data?._embedded?.[ 'wp:attached-to' ]?.[ 0 ]
-			? [
-					{
-						label: getRenderedContent(
-							data._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.title
-						),
-						value: data.post.toString(),
-					},
-				]
-			: [];
-	const [ options, setOptions ] =
-		useState< { label: string; value: string }[] >( defaultPost );
-	const [ searchResults, setSearchResults ] = useState< SearchResult[] >(
-		[]
-	);
-	const [ isLoading, setIsLoading ] = useState( false );
-	const [ value, setValue ] = useState< string | null >(
-		data?.post?.toString() ?? null
-	);
+	const isAttached = !! data.post;
+	const attachedTo = isAttached
+		? data._embedded?.[ 'wp:attached-to' ]?.[ 0 ]
+		: undefined;
 
-	const postTypes = useSelect(
-		( select ) => select( coreStore ).getPostTypes(),
-		[]
+	const { postTypeLabel, attachablePostTypes } = useSelect(
+		( select ) => {
+			const { getPostType, getPostTypes } = select( coreStore );
+			const postTypes = getPostTypes( { per_page: -1 } ) as
+				PostType[] | null;
+			return {
+				postTypeLabel: attachedTo?.type
+					? ( getPostType( attachedTo.type ) as PostType | undefined )
+							?.labels?.singular_name
+					: undefined,
+				attachablePostTypes: postTypes,
+			};
+		},
+		[ attachedTo?.type ]
 	);
+	const { pickPosts } = useDispatch( postPickerStore );
+
+	const handleChoose = async () => {
+		const postTypes = ( attachablePostTypes ?? [] )
+			.filter(
+				( postType ) =>
+					postType.viewable && postType.slug !== 'attachment'
+			)
+			.map( ( postType ) => postType.slug );
+		const posts = await pickPosts( {
+			postType: postTypes.length ? postTypes : [ 'post', 'page' ],
+			value: data.post ? [ data.post ] : undefined,
+			title: __( 'Attach to' ),
+			selectLabel: __( 'Attach' ),
+		} );
+		const post = posts?.[ 0 ];
+		if ( ! post ) {
+			return;
+		}
+		onChange( {
+			post: post.id,
+			_embedded: {
+				...data._embedded,
+				'wp:attached-to': [
+					{
+						id: post.id,
+						type: post.type,
+						link: post.link as string,
+						title: {
+							raw: post.title?.raw ?? '',
+							rendered: post.title?.rendered ?? '',
+						},
+					},
+				],
+			},
+		} );
+	};
+
 	const handleDetach = () => {
 		onChange( {
 			post: 0,
-			_embedded: { ...data?._embedded, 'wp:attached-to': undefined },
+			_embedded: { ...data._embedded, 'wp:attached-to': undefined },
 		} );
-		setValue( null );
-	};
-
-	const onValueChange = async ( filterValue: string ) => {
-		setIsLoading( true );
-		const results = await fetchLinkSuggestions(
-			filterValue,
-			/*
-			 * @TODO `fetchLinkSuggestions()` should accept `perPage` as an option argument.
-			 * `isInitialSuggestions` limits the result to 3, otherwise it's hardcoded to 20.
-			 */
-			{ type: 'post', isInitialSuggestions: true },
-			{}
-		);
-		setSearchResults( results );
-		const suggestions = results.map( ( result ) => {
-			return {
-				label: result.title,
-				value: result.id.toString(),
-			};
-		} );
-		const includeCurrent =
-			! filterValue &&
-			suggestions.findIndex( ( s ) => s.value === value ) === -1;
-		setOptions( suggestions.concat( includeCurrent ? defaultPost : [] ) );
-		setIsLoading( false );
-	};
-
-	// `onValueChange` closes over state, so it's wrapped in `useEvent` to give
-	// `useDebounce` a stable function. Debouncing an inline function instead
-	// rebuilds the timer on every render, so nothing is debounced and each
-	// keystroke fires its own request.
-	const debouncedValueChange = useDebounce( useEvent( onValueChange ), 300 );
-
-	/**
-	 * Handle selection.
-	 *
-	 * @param {Object} selectedPostId The selected post id.
-	 */
-	const handleSelectOption = ( selectedPostId: string | null ) => {
-		if ( ! selectedPostId ) {
-			handleDetach();
-			return;
-		}
-		setValue( selectedPostId );
-		if ( selectedPostId ) {
-			const selectedPost = searchResults.find(
-				( result ) => result.id === Number( selectedPostId )
-			);
-			// Although unlikely, it's technically possible for selectedPost to not be found.
-			// E.g. if the user selects an option just as new search results are loaded.
-			// TODO: Add error handling for when selectedPost is not found.
-			if ( selectedPost && postTypes ) {
-				const postType = postTypes.find(
-					( _postType: { slug: string } ) =>
-						_postType.slug === selectedPost?.type
-				);
-
-				const attachedTo = {
-					...( postType && { type: postType.slug } ),
-					id: Number( selectedPostId ),
-					title: {
-						raw: selectedPost.title,
-						rendered: selectedPost.title,
-					},
-				};
-
-				onChange( {
-					post: Number( selectedPostId ),
-					_embedded: {
-						...data?._embedded,
-						'wp:attached-to': [ attachedTo ],
-					},
-				} );
-			}
-		}
 	};
 
 	return (
-		<ComboboxControl
-			className="dataviews-media-field__attached-to"
-			isLoading={ isLoading }
-			label={ __( 'Attached to' ) }
-			help={ __( 'Attach this file to a single post or page.' ) }
-			value={ value }
-			options={ options }
-			onFilterValueChange={ ( filterValue: unknown ) =>
-				debouncedValueChange( filterValue as string )
-			}
-			onChange={ handleSelectOption }
-			hideLabelFromVision
-			// Opening the panel shouldn't imply the user has decided to change
-			// the attachment, so wait for them to search before showing the list.
-			expandOnFocus={ false }
-		/>
+		<Stack direction="column" gap="md">
+			{ isAttached ? (
+				<Stack direction="column" gap="xs">
+					<Text>
+						{ getRenderedContent( attachedTo?.title ) ||
+							__( '(no title)' ) }
+					</Text>
+					{ postTypeLabel && (
+						<Text variant="body-sm">{ postTypeLabel }</Text>
+					) }
+				</Stack>
+			) : (
+				<Text>
+					{ __( 'This file isn’t attached to any content.' ) }
+				</Text>
+			) }
+			<Text variant="body-sm">
+				{ __(
+					'A file can be attached to one post, page, or other content. Detaching doesn’t delete the file or remove it from content that uses it.'
+				) }
+			</Text>
+			<Stack direction="row" gap="sm">
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ handleChoose }
+				>
+					{ isAttached ? __( 'Change' ) : __( 'Attach' ) }
+				</Button>
+				{ isAttached && (
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ handleDetach }
+					>
+						{ __( 'Detach' ) }
+					</Button>
+				) }
+			</Stack>
+		</Stack>
 	);
 }

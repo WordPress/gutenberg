@@ -42,6 +42,7 @@
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
+		{ "path": "packages/post-picker" },
 		{ "path": "packages/preferences" },
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/report-flaky-tests" },

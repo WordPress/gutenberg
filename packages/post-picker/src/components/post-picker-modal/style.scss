@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.post-picker-modal {
+	.components-modal__content {
+		padding: 0;
+	}
+
+	.dataviews-picker-wrapper > .dataviews__view-actions {
+		padding-top: $grid-unit-10;
+	}
+}

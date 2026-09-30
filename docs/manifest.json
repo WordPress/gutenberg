@@ -2664,6 +2664,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/post-picker",
+		"slug": "packages-post-picker",
+		"markdown_source": "../packages/post-picker/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/postcss-plugins-preset",
 		"slug": "packages-postcss-plugins-preset",
 		"markdown_source": "../packages/postcss-plugins-preset/README.md",

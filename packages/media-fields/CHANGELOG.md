@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `attached_to`: Replace the search combobox with a summary of the attached content, including its content type, and buttons to attach, change, or detach. Choosing content opens the post picker from `@wordpress/post-picker`, which can search every viewable post type.
+
 ### Bug Fixes
 
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

@@ -61,6 +61,7 @@
 		{ "path": "packages/media-utils/tsconfig.build.json" },
 		{ "path": "packages/notices/tsconfig.build.json" },
 		{ "path": "packages/plugins" },
+		{ "path": "packages/post-picker/tsconfig.build.json" },
 		{ "path": "packages/preferences/tsconfig.build.json" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
