@@ -484,6 +484,176 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 
 const subscribeNoop = () => () => {};
 
+/**
+ * Extends the canvas past the lowest thread, or a short post can't scroll it
+ * into view. The canvas margin's CSS applies the property as the root's
+ * `min-height` (see `getCanvasMarginCSS`), so the room goes away with the
+ * margin. Keyed on the canvas, since a new document starts without it.
+ *
+ * @param {Object}       props
+ * @param {?HTMLElement} props.canvas        Canvas scroll container.
+ * @param {number}       props.contentHeight Content height that fits every thread.
+ * @param {boolean}      props.isFloating    Whether the notes float over the canvas.
+ */
+function useCanvasRoom( { canvas, contentHeight, isFloating } ) {
+	useLayoutEffect( () => {
+		if ( ! isFloating || ! canvas || ! contentHeight ) {
+			return;
+		}
+		// On the root element, where the margin's rule reads it, whichever
+		// element scrolls.
+		const root = canvas.ownerDocument.documentElement;
+		root.style.setProperty(
+			'--wp-editor-canvas-min-height',
+			`${ contentHeight }px`
+		);
+		return () => {
+			root.style.removeProperty( '--wp-editor-canvas-min-height' );
+		};
+	}, [ isFloating, canvas, contentHeight ] );
+}
+
+/**
+ * Mirrors the floating panel's scroll position with the canvas's. The panel
+ * is a real scroller with the canvas's scroll range, and notes are positioned
+ * in canvas content-space, so the panel's own scroll moves them with the
+ * canvas, and wheel, keys, focus and `scrollIntoView()` all work natively.
+ *
+ * @param {Object}       props
+ * @param {Object}       props.sidebarRef Ref to the floating panel.
+ * @param {?HTMLElement} props.canvas     Canvas scroll container.
+ * @param {boolean}      props.isFloating Whether the notes float over the canvas.
+ */
+function useMirroredScroll( { sidebarRef, canvas, isFloating } ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel || ! canvas ) {
+			return;
+		}
+
+		const isNear = ( a, b ) => Math.abs( a - b ) < 1;
+
+		let range;
+		const syncRange = () => {
+			const next = canvas.scrollHeight - canvas.clientHeight;
+			if ( next !== range ) {
+				range = next;
+				panel.style.setProperty(
+					'--canvas-scroll-range',
+					`${ next }px`
+				);
+			}
+		};
+
+		// A programmatic scroll fires its own `scroll` event a frame later,
+		// by which time the other side may have scrolled on (the compositor
+		// scrolls ahead of the main thread). Each side remembers where it was
+		// scrolled to and ignores that echo, or it would drag the other side
+		// back on every frame.
+		let panelEcho = -1;
+		let canvasEcho = -1;
+
+		// `instant` overrides a theme's `scroll-behavior: smooth`, which
+		// would animate every sync.
+		const scrollPanelTo = ( top ) => {
+			panel.scrollTo( { top, behavior: 'instant' } );
+			panelEcho = panel.scrollTop;
+		};
+		const fromCanvas = () => {
+			const top = canvas.scrollTop;
+			const isEcho = isNear( top, canvasEcho );
+			canvasEcho = -1;
+			if ( ! isEcho && ! isNear( panel.scrollTop, top ) ) {
+				scrollPanelTo( top );
+			}
+		};
+		// The canvas owns the position: when it can't follow (its room for
+		// a newly expanded thread isn't there yet), the panel snaps back.
+		const fromPanel = () => {
+			const top = panel.scrollTop;
+			const isEcho = isNear( top, panelEcho );
+			panelEcho = -1;
+			if ( isEcho || isNear( canvas.scrollTop, top ) ) {
+				return;
+			}
+			canvas.scrollTo( { top, behavior: 'instant' } );
+			canvasEcho = canvas.scrollTop;
+			if ( ! isNear( canvasEcho, top ) ) {
+				scrollPanelTo( canvasEcho );
+			}
+		};
+		syncRange();
+		fromCanvas();
+
+		// Range only: a clamped scroller fires its own scroll event, and
+		// syncing positions here would undo a panel scroll whose event is
+		// still pending. The body is observed too, since a theme's
+		// `html { height: 100% }` keeps the root box fixed as content grows.
+		const { body, defaultView: view } = canvas.ownerDocument;
+		const resizeObserver = new window.ResizeObserver( syncRange );
+		resizeObserver.observe( canvas );
+		resizeObserver.observe( body );
+		resizeObserver.observe( panel );
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		// Scrollable blocks fire there too, and are skipped.
+		const onCanvasScroll = ( event ) => {
+			if (
+				event.target === canvas ||
+				event.target === canvas.ownerDocument
+			) {
+				fromCanvas();
+			}
+		};
+		const listenerOptions = { passive: true, capture: true };
+		view.addEventListener( 'scroll', onCanvasScroll, listenerOptions );
+		panel.addEventListener( 'scroll', fromPanel, { passive: true } );
+		return () => {
+			resizeObserver.disconnect();
+			view.removeEventListener(
+				'scroll',
+				onCanvasScroll,
+				listenerOptions
+			);
+			panel.removeEventListener( 'scroll', fromPanel );
+			panel.style.removeProperty( '--canvas-scroll-range' );
+		};
+	}, [ sidebarRef, isFloating, canvas ] );
+}
+
+/**
+ * Offsets the threads by the canvas frame and its scrollbar.
+ *
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef     Ref to the floating panel.
+ * @param {number}  props.frameOffset    Canvas frame top, relative to the panel.
+ * @param {number}  props.scrollbarWidth Width of the canvas scrollbar.
+ * @param {boolean} props.isFloating     Whether the notes float over the canvas.
+ */
+function usePanelOffsets( {
+	sidebarRef,
+	frameOffset,
+	scrollbarWidth,
+	isFloating,
+} ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel ) {
+			return;
+		}
+		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
+		panel.style.setProperty(
+			'--canvas-scrollbar-width',
+			`${ scrollbarWidth }px`
+		);
+		return () => {
+			panel.style.removeProperty( '--canvas-offset' );
+			panel.style.removeProperty( '--canvas-scrollbar-width' );
+		};
+	}, [ sidebarRef, isFloating, frameOffset, scrollbarWidth ] );
+}
+
 export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
@@ -506,65 +676,24 @@ export function useFloatingBoard( {
 	}, [ store, threads ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
-	const notePositions = useMemo(
+	const { positions: notePositions, contentHeight } = useMemo(
 		() =>
 			calculateNotePositions( {
 				threads,
 				selectedNoteId,
 				blockRects: anchorRects,
 				heights,
-			} ).positions,
+			} ),
 		[ threads, selectedNoteId, anchorRects, heights ]
 	);
 
-	// Notes are positioned in canvas content-space; CSS inherits
-	// `--canvas-scroll` to translate each thread in sync with the canvas,
-	// so scrolling never re-renders. A layout effect, so the offset is in
-	// place before the first positions paint.
-	useLayoutEffect( () => {
-		const panel = sidebarRef?.current;
-		if ( ! isFloating || ! panel || ! canvas ) {
-			return;
-		}
-
-		const applyScroll = () => {
-			panel.style.setProperty(
-				'--canvas-scroll',
-				`${ -canvas.scrollTop }px`
-			);
-		};
-		applyScroll();
-
-		// Root scrolling elements (documentElement/body) don't fire scroll
-		// on themselves; capture on the window catches them in either canvas.
-		const view = canvas.ownerDocument.defaultView;
-		const listenerOptions = { passive: true, capture: true };
-		view.addEventListener( 'scroll', applyScroll, listenerOptions );
-		return () => {
-			view.removeEventListener( 'scroll', applyScroll, listenerOptions );
-			panel.style.removeProperty( '--canvas-scroll' );
-		};
-	}, [ sidebarRef, isFloating, canvas ] );
-
-	// Offsets the threads by the canvas frame and its scrollbar.
-	useLayoutEffect( () => {
-		const panel = sidebarRef?.current;
-		if ( ! isFloating || ! panel ) {
-			return;
-		}
-		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
-		panel.style.setProperty(
-			'--canvas-scrollbar-width',
-			`${ scrollbarWidth }px`
-		);
-		return () => {
-			panel.style.removeProperty( '--canvas-offset' );
-			panel.style.removeProperty( '--canvas-scrollbar-width' );
-		};
-	}, [ sidebarRef, isFloating, frameOffset, scrollbarWidth ] );
+	useCanvasRoom( { canvas, contentHeight, isFloating } );
+	useMirroredScroll( { sidebarRef, canvas, isFloating } );
+	usePanelOffsets( { sidebarRef, frameOffset, scrollbarWidth, isFloating } );
 
 	return {
 		notePositions,
+		heights,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
