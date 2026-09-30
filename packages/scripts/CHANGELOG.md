@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Allow passing a custom output path to the `--blocks-manifest` flag of the `build` and `start` commands, e.g. `--blocks-manifest=dist/blocks-manifest.php` ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   Allow passing a custom output path to the `--blocks-manifest` flag of the `build` and `start` commands, e.g. `--blocks-manifest=dist/blocks-manifest.php` ([#83876](https://github.com/WordPress/gutenberg/pull/83876)).
 
 ### Bug Fixes
 
