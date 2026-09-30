@@ -5,17 +5,19 @@
  * A field definition is the serializable subset of the DataViews Field API:
  * every property that is plain data (`id`, `type`, `label`, `elements`,
  * `filterBy`, `isValid`, …). Properties that are JavaScript callbacks or
- * components (`render`, `Edit` as a component, `getValue`, `setValue`,
- * `sort`, `isVisible`, `getElements`, …) cannot be declared here. They are
- * provided by a script module registered for the entity along with its
- * fields: its default export maps field ids to the properties of each field
- * that are JavaScript. An entity can have several modules. Each module applies to
- * the fields it was registered with, see gutenberg_get_registered_field_modules().
+ * components (`render`, `Edit` as a component, `getValue`, `setValue`, `sort`,
+ * `isVisible`, `getElements`, …) cannot be declared here. They are provided by
+ * a script module registered for the entity along with its fields: its default
+ * export maps field ids to the properties of each field that are JavaScript. An
+ * entity can have several modules. Each module applies to the fields it was
+ * registered with, see {@see gutenberg_get_registered_field_modules()}.
  *
- * Fields are registered on the `fields_api_init` action, and only there, on
- * the registry its callbacks receive, see Gutenberg_Fields_Registry::register(),
- * Gutenberg_Fields_Registry::update(), and Gutenberg_Fields_Registry::unregister().
- * The functions below read the registry.
+ * Fields are registered on the `fields_api_init` action, and only there, on the
+ * registry its callbacks receive, see
+ * {@see Gutenberg_Fields_Registry::register()},
+ * {@see Gutenberg_Fields_Registry::update()}, and
+ * {@see Gutenberg_Fields_Registry::unregister()}. The functions below read the
+ * registry.
  *
  * @package gutenberg
  */
