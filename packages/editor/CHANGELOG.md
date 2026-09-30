@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
--   `FlatTermSelector`: Create each typed term only once when its creation is triggered again while still in flight, and restore the typed name to the input when a creation fails instead of discarding it ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `FlatTermSelector`: Create each typed term only once when its creation is triggered again while still in flight, and restore the typed name to the input when a creation fails instead of discarding it ([#83891](https://github.com/WordPress/gutenberg/pull/83891)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
