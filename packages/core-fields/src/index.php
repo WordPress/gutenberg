@@ -59,7 +59,7 @@ function register_core_post_type_supports_fields( $registry ) {
 		// arrays, and a support without arguments as `true`.
 		$editor = get_all_post_type_supports( $post_type )['editor'] ?? null;
 
-		$applies = array(
+		$applies    = array(
 			'author'            => post_type_supports( $post_type, 'author' ),
 			'comment_status'    => post_type_supports( $post_type, 'comments' ),
 			'date'              => true,
@@ -138,8 +138,7 @@ function register_core_post_type_supports_fields( $registry ) {
  *   its own author field.
  * - Templates, template parts, and patterns: `excerpt`. Their excerpt is
  *   their description: templates and patterns edit it with their own
- *   description fields, declared client-side (the one of patterns has the
- *   `excerpt` id), and template parts do not show it.
+ *   description fields, and template parts do not show it.
  * - Templates, template parts, and navigation menus: `post-content-info`.
  *   Their content is blocks laying out a site, not text to read.
  * - The design post types (templates, template parts, patterns, and
@@ -147,8 +146,7 @@ function register_core_post_type_supports_fields( $registry ) {
  *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
  *   a site rather than publish content.
  * - Pages, templates, template parts, and patterns: `title`. They have
- *   their own title fields: the `page` and `wp_template` collections have
- *   the ones of pages and templates, and the client declares the others.
+ *   their own title fields in their collections.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -208,6 +206,7 @@ function register_core_field_collections( $registry ) {
 	wp_register_field_collection( $registry, __DIR__ . '/page' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
+	wp_register_field_collection( $registry, __DIR__ . '/wp_block' );
 	wp_register_field_collection( $registry, __DIR__ . '/attachment' );
 }
 add_action( 'fields_api_init', 'register_core_field_collections', 0 );

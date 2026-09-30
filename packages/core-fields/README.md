@@ -11,7 +11,8 @@ The fields of this package live in folders of `src`:
 -   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `title`). They are registered in code, see below.
 -   `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`).
--   `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part).
+-   `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
+-   `wp_block`: the fields patterns have instead of the defaults (`excerpt`, their description, `sync-status`, and `title`).
 -   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
 
 Each field has a folder:
@@ -58,10 +59,10 @@ The value is the list of the ids of the default fields the post type does not ge
 Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`:
 
 -   Templates and template parts exclude `author`, which the `wp_template` and `wp_template_part` collections define for them.
--   Templates, template parts, and patterns exclude `excerpt`, which is their description.
+-   Templates, template parts, and patterns exclude `excerpt`, which is their description. The template and pattern collections define their own description fields.
 -   Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
 -   The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`), since they lay out a site rather than publish content.
--   Pages, templates, template parts, and patterns exclude `title`, since they have their own title fields, in their collections or client-side.
+-   Pages, templates, template parts, and patterns exclude `title`, since their collections define their own title fields.
 -   Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
 ### Collection configuration
@@ -132,7 +133,7 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package provides the `@wordpress/core-fields/attachment`, `@wordpress/core-fields/page`, `@wordpress/core-fields/post_type_supports`, `@wordpress/core-fields/wp_template`, and `@wordpress/core-fields/wp_template_part` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
+The package provides the `@wordpress/core-fields/attachment`, `@wordpress/core-fields/page`, `@wordpress/core-fields/post_type_supports`, `@wordpress/core-fields/wp_template`, `@wordpress/core-fields/wp_template_part`, and `@wordpress/core-fields/wp_block` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

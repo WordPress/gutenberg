@@ -21,9 +21,6 @@ import {
 	duplicateTemplatePart,
 	featuredImageField,
 	templateField,
-	patternTitleField,
-	patternDescriptionField,
-	patternSyncStatusField,
 	formatField,
 	postsPerPageField,
 	siteDiscussionField,
@@ -183,7 +180,6 @@ export const registerPostTypeSchema =
 		if ( postType !== ATTACHMENT_POST_TYPE ) {
 			const postTypeSlug = postTypeConfig.slug;
 			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
-			const isPattern = postTypeSlug === 'wp_block';
 			// `post-thumbnails` is `true` or the list of post types the theme
 			// opted in.
 			const postThumbnails =
@@ -196,11 +192,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				// Patterns exclude the default excerpt field on the server:
-				// this one, with the same id, edits their description.
-				isPattern &&
-					postTypeConfig.supports?.excerpt &&
-					patternDescriptionField,
 				! isDesignPostType && templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
@@ -215,19 +206,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
-				isPattern && patternSyncStatusField,
 			].filter( Boolean ) as Field< any >[];
-			// The server registers the title of the other post types
-			// supporting titles.
-			if ( postTypeConfig.supports?.title ) {
-				let _titleField;
-				if ( [ 'wp_block', 'wp_template_part' ].includes( postType ) ) {
-					_titleField = patternTitleField;
-				}
-				if ( _titleField ) {
-					fields.push( _titleField );
-				}
-			}
 		}
 
 		let serverFields: Field< any >[] = [];
