@@ -608,6 +608,89 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that structured `after` values (a table's `body` rows, for example)
+	 * are filtered down to every string leaf, as are the attributes of a block
+	 * snapshot, for a user without `unfiltered_html`.
+	 */
+	public function test_suggestion_payload_kses_reaches_nested_values() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/table',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'body',
+						'before'    => array(),
+						'after'     => array(
+							array(
+								'cells' => array(
+									array(
+										'content' => '<script>alert(1)</script><strong>cell</strong>',
+										'tag'     => 'td',
+									),
+								),
+							),
+						),
+					),
+					array(
+						'type'      => 'block-insert-after',
+						'clientId'  => 'abc',
+						'blockName' => 'core/paragraph',
+						'block'     => array(
+							'name'        => 'core/paragraph',
+							'attributes'  => array(
+								'content' => '<img src=x onerror=alert(1)>text',
+							),
+							'innerBlocks' => array(
+								array(
+									'name'       => 'core/paragraph',
+									'attributes' => array( 'content' => '<script>alert(2)</script>inner' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data       = $response->get_data();
+		$decoded    = json_decode( get_comment_meta( $data['id'], '_wp_suggestion', true ), true );
+		$cell       = $decoded['operations'][0]['after'][0]['cells'][0];
+		$snapshot   = $decoded['operations'][1]['block'];
+		$inner_text = $snapshot['innerBlocks'][0]['attributes']['content'];
+
+		$this->assertStringNotContainsString( '<script>', $cell['content'], 'Nested `after` strings must be filtered.' );
+		$this->assertStringContainsString( '<strong>cell</strong>', $cell['content'], 'Allowed markup must survive KSES.' );
+		$this->assertSame( 'td', $cell['tag'], 'Plain string leaves must survive unchanged.' );
+		$this->assertStringNotContainsString( 'onerror', $snapshot['attributes']['content'], 'Snapshot attributes must be filtered.' );
+		$this->assertStringNotContainsString( '<script>', $inner_text, 'Inner block snapshot attributes must be filtered.' );
+	}
+
+	/**
 	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
 	 * the same freedom they have in post content.
 	 */
