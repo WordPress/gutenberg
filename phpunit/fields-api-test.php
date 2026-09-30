@@ -876,6 +876,59 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The format field needs the post type to support `post-formats` and
+	 * the theme to support post formats: a theme without formats has none
+	 * to assign. Its elements are the formats of the theme, plus
+	 * `standard`, which the themes route exposes for every theme
+	 * supporting formats, sorted by label.
+	 *
+	 * It has a test of its own rather than a row in
+	 * data_default_fields_and_their_supports(), whose fields follow a post
+	 * type support alone.
+	 */
+	public function test_the_format_field_follows_the_post_type_support_and_the_theme() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array( 'title', 'post-formats' ),
+				'gutenberg_note' => array( 'title' ),
+			)
+		);
+		$original_support = get_theme_support( 'post-formats' );
+
+		try {
+			add_theme_support( 'post-formats', array( 'gallery', 'aside' ) );
+			self::reset_registry();
+			$fields = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), null, 'id' );
+
+			$this->assertArrayHasKey( 'format', $fields );
+			$this->assertNotContains(
+				'format',
+				array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ),
+				'A post type that does not support post formats has no format field.'
+			);
+			$this->assertSame(
+				array( 'aside', 'gallery', 'standard' ),
+				array_column( $fields['format']['elements'], 'value' ),
+				'The elements are the formats of the theme, plus standard, sorted by label.'
+			);
+
+			remove_theme_support( 'post-formats' );
+			self::reset_registry();
+
+			$this->assertNotContains(
+				'format',
+				array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ),
+				'A theme without post formats has none to assign.'
+			);
+		} finally {
+			remove_theme_support( 'post-formats' );
+			if ( is_array( $original_support ) ) {
+				add_theme_support( 'post-formats', ...$original_support );
+			}
+		}
+	}
+
+	/**
 	 * Pages support titles but their title shows the page's role on the
 	 * site: they opt out of the default title field and their collection has
 	 * its own, with its own script module.

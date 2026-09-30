@@ -21,7 +21,6 @@ import {
 	duplicateTemplatePart,
 	featuredImageField,
 	templateField,
-	formatField,
 } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -123,9 +122,6 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
-		const { disablePostFormats } = registry
-			.select( editorStore )
-			.getEditorSettings();
 
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
@@ -192,11 +188,6 @@ export const registerPostTypeSchema =
 				// @wordpress/fields' unlock, which needs resolving before it can
 				// move to @wordpress/core-fields.
 				! isDesignPostType && templateField,
-				// Its availability depends on the editor-only `disablePostFormats`
-				// setting, so the editor registers it here.
-				postTypeConfig.supports?.[ 'post-formats' ] &&
-					! disablePostFormats &&
-					formatField,
 			].filter( Boolean ) as Field< any >[];
 		}
 
