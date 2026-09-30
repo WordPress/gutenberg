@@ -3,6 +3,7 @@ import { ItemDescription } from '../combobox/item-description';
 import { ItemLabel } from '../combobox/item-label';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
+import { Separator } from '../combobox/separator';
 import { Collection } from '../combobox/collection';
 import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableSelect as _SearchableSelect } from './searchable-select';
@@ -25,6 +26,7 @@ export const SearchableSelect = Object.assign( _SearchableSelect, {
 	ItemDescription,
 	Group,
 	GroupLabel,
+	Separator,
 	Collection,
 	useFilteredItems,
 } );
