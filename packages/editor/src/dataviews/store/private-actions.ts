@@ -44,7 +44,6 @@ import {
 	postsPageTitleField,
 } from '@wordpress/fields';
 import {
-	altTextField,
 	attachedToField,
 	authorField as mediaAuthorField,
 	filenameField,
@@ -129,7 +128,6 @@ const MEDIA_FIELDS = [
 	mediaDimensionsField,
 	attachedToField,
 	titleField,
-	altTextField,
 ];
 
 export const registerPostTypeSchema =
