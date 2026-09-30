@@ -49,11 +49,18 @@ export function unregisterEntityAction( kind, name, actionId ) {
 	}
 }
 
+/*
+ * Both functions below keep their parameters so an existing call still type
+ * checks, and ignore them.
+ */
+/* eslint-disable no-unused-vars */
+
 /**
- * Registers a new DataViews field.
+ * Has no effect: every field of an entity is registered on the server.
  *
- * This is an experimental API and is subject to change.
- * it's only available in the Gutenberg plugin for now.
+ * Register the field in PHP on the `fields_api_init` action instead, with a
+ * script module for the parts PHP cannot serialize (`render`, `Edit`,
+ * `getElements`…).
  *
  * @deprecated since Gutenberg 24.2. Register the field in PHP on the
  *             `fields_api_init` action instead, with a script module for its
@@ -69,20 +76,12 @@ export function registerEntityField( kind, name, config ) {
 		plugin: 'Gutenberg',
 		alternative: 'the `fields_api_init` PHP action',
 	} );
-	const { registerEntityField: _registerEntityField } = unlock(
-		dispatch( editorStore )
-	);
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		_registerEntityField( kind, name, config );
-	}
 }
 
 /**
- * Unregisters a DataViews field.
+ * Has no effect: every field of an entity is registered on the server.
  *
- * This is an experimental API and is subject to change.
- * it's only available in the Gutenberg plugin for now.
+ * Unregister the field in PHP on the `fields_api_init` action instead.
  *
  * @deprecated since Gutenberg 24.2. Unregister the field in PHP on the
  *             `fields_api_init` action instead.
@@ -97,11 +96,6 @@ export function unregisterEntityField( kind, name, fieldId ) {
 		plugin: 'Gutenberg',
 		alternative: 'the `fields_api_init` PHP action',
 	} );
-	const { unregisterEntityField: _unregisterEntityField } = unlock(
-		dispatch( editorStore )
-	);
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		_unregisterEntityField( kind, name, fieldId );
-	}
 }
+
+/* eslint-enable no-unused-vars */
