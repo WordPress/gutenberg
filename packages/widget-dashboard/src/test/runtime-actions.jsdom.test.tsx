@@ -20,6 +20,7 @@ globalThis.wpVitest.mockResizeObserver();
 
 type Attributes = {
 	count?: number;
+	period?: string;
 	exportable?: boolean;
 	refreshable?: boolean;
 };
@@ -29,11 +30,16 @@ const onRefresh = vi.fn< () => void >();
 
 /*
  * Declares from its attributes: while `count` is positive, a link taking the
- * declared Details action's place; while `exportable`, a promoted callback;
- * while `refreshable`, a callback for the menu.
+ * declared Details action's place; while `period` is set, a link whose target
+ * carries it; while `exportable`, a promoted callback; while `refreshable`, a
+ * callback for the menu.
  */
-function TestWidget( { attributes }: WidgetRenderProps< Attributes > ) {
+function TestWidget( {
+	attributes,
+	setAttributes,
+}: WidgetRenderProps< Attributes > ) {
 	const count = attributes?.count ?? 0;
+	const period = attributes?.period;
 	const exportable = attributes?.exportable ?? false;
 	const refreshable = attributes?.refreshable ?? false;
 
@@ -45,6 +51,14 @@ function TestWidget( { attributes }: WidgetRenderProps< Attributes > ) {
 				label: `Review ${ count } items`,
 				relevance: 'high',
 				href: `admin.php?page=dashboard&p=/details?count=${ count }`,
+			} );
+		}
+		if ( period ) {
+			list.push( {
+				id: 'report',
+				label: 'View report',
+				relevance: 'high',
+				href: `admin.php?page=dashboard&p=/report?period=${ period }`,
 			} );
 		}
 		if ( exportable ) {
@@ -63,11 +77,21 @@ function TestWidget( { attributes }: WidgetRenderProps< Attributes > ) {
 			} );
 		}
 		return list;
-	}, [ count, exportable, refreshable ] );
+	}, [ count, period, exportable, refreshable ] );
 
 	const hosted = useWidgetActions( actions );
 
-	return <p data-testid="hosted">{ hosted ? 'hosted' : 'self' }</p>;
+	return (
+		<>
+			<p data-testid="hosted">{ hosted ? 'hosted' : 'self' }</p>
+			<button
+				type="button"
+				onClick={ () => setAttributes?.( { period: 'month' } ) }
+			>
+				Show month
+			</button>
+		</>
+	);
 }
 
 const healthType: WidgetType = {
@@ -237,6 +261,33 @@ describe( 'runtime actions', () => {
 		expect(
 			screen.queryByRole( 'link', { name: 'Review 3 items' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'retargets a link when the attribute it derives from changes', async () => {
+		const user = userEvent.setup();
+		render(
+			<Harness layout={ instance( 'test/plain', { period: 'week' } ) } />
+		);
+
+		expect(
+			await screen.findByRole( 'link', { name: 'View report' } )
+		).toHaveAttribute(
+			'href',
+			'admin.php?page=dashboard&p=/report?period=week'
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Show month' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'link', { name: 'View report' } )
+			).toHaveAttribute(
+				'href',
+				'admin.php?page=dashboard&p=/report?period=month'
+			)
+		);
 	} );
 
 	it( 'runs a callback action from the footer', async () => {
