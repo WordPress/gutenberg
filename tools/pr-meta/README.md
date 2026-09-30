@@ -49,7 +49,9 @@ The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a lo
 
 The comment is edited in place, and GitHub only notifies on the `@mention`s in a comment when it is first created. A section that mentions someone therefore does not notify them, so it cannot be the only way they hear about something.
 
-A section is truncated when it is written, not when it is rendered, so this revision never shortens a section it did not produce. That holds only for writers running this revision: an earlier one truncates at render, so a release branch still carrying it will re-cut a section on every write, and a props list long enough to be truncated loses the trailer a committer copies. Release branches therefore need this revision before they can be trusted with a comment written by trunk.
+A section is truncated when it is written, not when it is rendered, so this revision never shortens a section it did not produce. That holds only for writers running this revision: an earlier one truncates at render, so a release branch still carrying it will re-cut a section on every write, and a props list long enough to be truncated loses the trailer a committer copies.
+
+That sets the order for backporting to a release branch. This action goes first, on its own; the workflow that adds a section goes after. A branch whose action still truncates at render will cut a section written by another branch, so giving it a producer before the action is what creates the mixed pair.
 
 ## Adding a section
 
