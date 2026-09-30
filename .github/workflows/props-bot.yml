@@ -144,6 +144,11 @@ jobs:
                   # The action comes from the default branch, which need not
                   # yet know where each of the four events carries this.
                   pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
+                  # This workflow also runs from the default branch for a pull
+                  # request targeting a release branch, whose own writers are
+                  # older and would re-cut the section. They need the action
+                  # before this section may appear there.
+                  require-base: ${{ github.event.repository.default_branch }}
                   # Retires the standalone comment on pull requests open before
                   # this landed, so no one copies its list once it stops moving.
                   # Editing a comment notifies nobody, so an unlinked

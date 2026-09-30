@@ -82,8 +82,6 @@ async function run() {
 		return;
 	}
 
-	const body = resolveBody();
-
 	/*
 	 * Every write re-renders every section, including the footers marking a
 	 * commit-scoped result as no longer current, so the head is needed
@@ -91,7 +89,22 @@ async function run() {
 	 * outer handler skips the write: rendering without it would present every
 	 * stale result as current.
 	 */
-	const headSha = await api.getHeadSha( prNumber );
+	const pullRequest = await api.getPullRequest( prNumber );
+
+	/*
+	 * A `pull_request_target` workflow comes from the default branch whatever
+	 * a pull request targets, so a caller can reach a branch whose own writers
+	 * are older than this and would re-cut the section on their next write.
+	 */
+	const requireBase = getInput( 'require-base' );
+	if ( requireBase && pullRequest.baseRef !== requireBase ) {
+		info(
+			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, not ${ requireBase }.`
+		);
+		return;
+	}
+
+	const body = resolveBody();
 
 	const {
 		body: merged,
@@ -105,7 +118,7 @@ async function run() {
 			sha: getInput( 'commit-sha' ) || undefined,
 			runUrl: getInput( 'run-url' ) || undefined,
 		},
-		headSha
+		pullRequest.headSha
 	);
 
 	if ( rejected ) {

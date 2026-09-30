@@ -7,6 +7,12 @@ export type ExistingComment = {
 	body: string;
 };
 
+export type PullRequest = {
+	headSha: string;
+	/** The branch it targets, which decides whose writers touch its comment. */
+	baseRef: string;
+};
+
 export type FoundComments = {
 	/** The unified comment, when this pull request has one. */
 	comment?: ExistingComment;
@@ -71,19 +77,25 @@ class GitHubAPI {
 	}
 
 	/**
-	 * Reads the head SHA of a pull request, to tell a result for the current
-	 * commit from one produced by a rerun of an older commit.
+	 * Reads the head and base of a pull request.
+	 *
+	 * The head tells a result for the current commit from one produced by a
+	 * rerun of an older commit. The base says which branch's writers will
+	 * touch this comment after us.
 	 *
 	 * @param prNumber Pull request number.
-	 * @return The head SHA.
+	 * @return Its head SHA and base branch.
 	 */
-	async getHeadSha( prNumber: number ): Promise< string > {
-		const pullRequest = await this.#request< { head: { sha: string } } >(
-			'GET',
-			`${ this.#base }/pulls/${ prNumber }`
-		);
+	async getPullRequest( prNumber: number ): Promise< PullRequest > {
+		const pullRequest = await this.#request< {
+			head: { sha: string };
+			base: { ref: string };
+		} >( 'GET', `${ this.#base }/pulls/${ prNumber }` );
 
-		return pullRequest.head.sha;
+		return {
+			headSha: pullRequest.head.sha,
+			baseRef: pullRequest.base.ref,
+		};
 	}
 
 	/**

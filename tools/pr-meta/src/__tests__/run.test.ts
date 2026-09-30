@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { run } from '../run.ts';
 
 const api = vi.hoisted( () => ( {
-	getHeadSha: vi.fn(),
+	getPullRequest: vi.fn(),
 	findComments: vi.fn(),
 	createComment: vi.fn(),
 	updateComment: vi.fn(),
@@ -38,7 +38,10 @@ describe( 'run', () => {
 			mock.mockReset();
 		}
 		process.env.GITHUB_REPOSITORY = 'WordPress/gutenberg';
-		api.getHeadSha.mockResolvedValue( HEAD );
+		api.getPullRequest.mockResolvedValue( {
+			headSha: HEAD,
+			baseRef: 'trunk',
+		} );
 		api.findComments.mockResolvedValue( { retirable: [] } );
 		api.createComment.mockResolvedValue( 'https://example.com/comment' );
 		api.updateComment.mockResolvedValue( 'https://example.com/comment' );
@@ -51,6 +54,7 @@ describe( 'run', () => {
 			'commit-sha': '',
 			'run-url': '',
 			'retire-comments-matching': '',
+			'require-base': '',
 		} );
 	} );
 
@@ -68,7 +72,7 @@ describe( 'run', () => {
 	 * from every stale section, presenting old results as current.
 	 */
 	it( 'writes nothing when the head cannot be read', async () => {
-		api.getHeadSha.mockRejectedValue( new Error( 'boom' ) );
+		api.getPullRequest.mockRejectedValue( new Error( 'boom' ) );
 
 		await expect( run() ).rejects.toThrow( 'boom' );
 
@@ -171,5 +175,36 @@ describe( 'run', () => {
 
 		expect( api.createComment ).not.toHaveBeenCalled();
 		expect( api.deleteComment ).toHaveBeenCalledWith( 7 );
+	} );
+
+	/*
+	 * A pull_request_target workflow runs from the default branch whatever the
+	 * pull request targets, so without this it reaches release branches whose
+	 * own writers still truncate at render.
+	 */
+	it( 'writes nothing when the pull request targets another branch', async () => {
+		api.getPullRequest.mockResolvedValue( {
+			headSha: HEAD,
+			baseRef: 'wp/7.1',
+		} );
+		withInputs( { 'require-base': 'trunk' } );
+
+		await run();
+
+		expect( api.createComment ).not.toHaveBeenCalled();
+		expect( api.updateComment ).not.toHaveBeenCalled();
+		expect( api.deleteComment ).not.toHaveBeenCalled();
+	} );
+
+	it( 'writes when the pull request targets the required branch', async () => {
+		api.getPullRequest.mockResolvedValue( {
+			headSha: HEAD,
+			baseRef: 'trunk',
+		} );
+		withInputs( { 'require-base': 'trunk' } );
+
+		await run();
+
+		expect( api.createComment ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
