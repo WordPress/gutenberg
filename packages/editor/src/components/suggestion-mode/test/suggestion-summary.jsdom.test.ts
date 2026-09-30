@@ -360,6 +360,33 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
+	it( 'summarizes a type-over as one Replace line', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					text: 'my',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Replace:', value: '“your” → “my”' } ] );
+	} );
+
+	it( 'summarizes a type-over whose new text was backspaced away as Delete', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Delete:', value: '“your”' } ] );
+	} );
+
 	it( 'summarizes an inline-suggestion format op with its direction', () => {
 		// A format suggestion changes only markup, so it surfaces which
 		// formats changed (from the captured before/after run HTML) rather

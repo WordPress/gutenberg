@@ -16,6 +16,7 @@ import {
 	isBufferedDeleteRepeat,
 	isContiguousDeleteRun,
 	isDeletionTargetUnchanged,
+	isWithinOwnAddition,
 	sliceValueToHTML,
 } from '../suggestion-deletion-keyboard';
 
@@ -419,5 +420,57 @@ describe( 'expandBufferedDeleteRun', () => {
 				repeats: 5,
 			} )
 		).toEqual( { start: 0, end: 2, blocked: false } );
+	} );
+} );
+
+describe( 'isWithinOwnAddition', () => {
+	beforeAll( () => {
+		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			registerSuggestionFormat();
+		}
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	const mark = ( type: string, author: string, text: string ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( 'is true for a character inside the author own addition', () => {
+		// "Hi " + "tpyo" proposed by user 2; Backspace at the end targets "o".
+		const value = RichTextData.fromHTMLString(
+			`Hi ${ mark( 'add', '2', 'tpyo' ) }`
+		);
+		expect( isWithinOwnAddition( value, 6, 7, '2' ) ).toBe( true );
+		expect( isWithinOwnAddition( value, 3, 7, '2' ) ).toBe( true );
+	} );
+
+	it( 'is false for another author addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hi ${ mark( 'add', '3', 'tpyo' ) }`
+		);
+		expect( isWithinOwnAddition( value, 6, 7, '2' ) ).toBe( false );
+	} );
+
+	it( 'is false for a range reaching outside the addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hi ${ mark( 'add', '2', 'tpyo' ) }`
+		);
+		expect( isWithinOwnAddition( value, 2, 7, '2' ) ).toBe( false );
+	} );
+
+	it( 'is false for a deletion marker, even the author own', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hi ${ mark( 'del', '2', 'gone' ) }`
+		);
+		expect( isWithinOwnAddition( value, 6, 7, '2' ) ).toBe( false );
+	} );
+
+	it( 'is false for unmarked text', () => {
+		const value = RichTextData.fromHTMLString( 'Hi there' );
+		expect( isWithinOwnAddition( value, 6, 7, '2' ) ).toBe( false );
 	} );
 } );
