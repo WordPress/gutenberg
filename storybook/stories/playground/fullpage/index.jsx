@@ -6,9 +6,9 @@ import {
 } from '@wordpress/block-editor';
 import '@wordpress/format-library';
 import styles from './style.lazy.scss?inline';
-import { editorStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 
-export default function EditorFullPage() {
+export default function EditorFullPage( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	// Ensures that the CSS intended for the playground (especially the style resets)
@@ -36,7 +36,10 @@ export default function EditorFullPage() {
 					<BlockInspector />
 				</div>
 				<div className="playground__content">
-					<BlockCanvas height="100%" styles={ editorStyles } />
+					<BlockCanvas
+						height="100%"
+						styles={ contentStyles[ direction ] }
+					/>
 				</div>
 			</BlockEditorProvider>
 		</div>
