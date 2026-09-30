@@ -808,9 +808,29 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template_part' ), null, 'id' );
 		$this->assertSame( array( 'author' ), self::get_support_field_ids( 'wp_template_part' ), 'The default author field is not registered.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template part author is not the integer post author.' );
+		$this->assertArrayHasKey( 'title', $fields, 'The collection registers the template part title.' );
+		$this->assertSame( 'Title', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertSame(
-			array( 'author' ),
+			array( 'author', 'title' ),
 			gutenberg_get_registered_field_modules( 'postType', 'wp_template_part' )['@wordpress/core-fields/wp_template_part']
+		);
+	}
+
+	/**
+	 * Patterns have their description, title, and sync status in their
+	 * collection instead of the default excerpt and title fields.
+	 */
+	public function test_patterns_get_their_own_fields() {
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_block' ), null, 'id' );
+		$this->assertArrayHasKey( 'excerpt', $fields );
+		$this->assertArrayHasKey( 'sync-status', $fields );
+		$this->assertArrayHasKey( 'title', $fields );
+		$this->assertSame( 'Description', $fields['excerpt']['label'] );
+		$this->assertSame( 'Title', $fields['title']['label'] );
+		$this->assertTrue( $fields['sync-status']['readOnly'] );
+		$this->assertSame(
+			array( 'excerpt', 'sync-status', 'title' ),
+			gutenberg_get_registered_field_modules( 'postType', 'wp_block' )['@wordpress/core-fields/wp_block']
 		);
 	}
 

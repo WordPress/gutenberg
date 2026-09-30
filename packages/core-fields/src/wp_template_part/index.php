@@ -7,7 +7,8 @@
  * site, or user that provides them rather than their post author.
  * So they opt out of the default author field, see
  * exclude_core_post_type_support_fields() in `src/index.php`, and get the
- * author field of this collection instead, with its script module.
+ * author field of this collection instead, with its script module. The
+ * collection also defines the title field of template parts.
  *
  * @package WordPress
  */

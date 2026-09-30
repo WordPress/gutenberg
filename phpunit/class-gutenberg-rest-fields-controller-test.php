@@ -431,6 +431,28 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The pattern collection exposes its fields and their script module.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_pattern_fields_and_their_script_module() {
+		wp_set_current_user( self::$editor_id );
+
+		$data    = $this->dispatch_request( 'postType', 'wp_block' )->get_data();
+		$ids     = array_column( $data['fields'], 'id' );
+		$modules = array_column( $data['script_modules'], 'fields', 'id' );
+
+		$this->assertContains( 'excerpt', $ids );
+		$this->assertContains( 'sync-status', $ids );
+		$this->assertContains( 'title', $ids );
+		$this->assertSame( gutenberg_get_registered_fields( 'postType', 'wp_block' ), $data['fields'] );
+		$this->assertSame(
+			array( 'excerpt', 'sync-status', 'title' ),
+			$modules['@wordpress/core-fields/wp_block']
+		);
+	}
+
+	/**
 	 * The default fields are exposed with the `core` origin.
 	 *
 	 * @covers ::get_items

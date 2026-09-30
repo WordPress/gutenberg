@@ -2,4 +2,6 @@
 
 ## Unreleased
 
-Initial release.
+### Enhancements
+
+- Register the fields of patterns and template parts on the server.
