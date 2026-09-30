@@ -16,7 +16,9 @@ import {
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
 	formatsRangeHasSuggestion,
+	removeInlineAdditionRange,
 	stripSuggestionMarkers,
+	valueAdditionRunToExtend,
 	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
@@ -93,6 +95,31 @@ export function sliceValueToHTML(
 			slice( record as any, start, end ) as any
 		).toHTMLString()
 	);
+}
+
+/**
+ * Whether `[start, end)` lies wholly inside a pending addition the editing
+ * author proposed. Deleting there corrects their own proposal, so the
+ * characters are removed rather than marked: a deletion suggestion over text
+ * that was never in the post has nothing to propose.
+ *
+ * @param value       Block attribute value.
+ * @param start       Range start (inclusive).
+ * @param end         Range end (exclusive).
+ * @param authorToken Id of the author deleting, as a string, or null.
+ * @return True when the whole range is the author's own proposed text.
+ */
+export function isWithinOwnAddition(
+	value: any,
+	start: number,
+	end: number,
+	authorToken: string | null
+): boolean {
+	if ( start >= end ) {
+		return false;
+	}
+	const run = valueAdditionRunToExtend( value, end, authorToken );
+	return Boolean( run && start >= run.start && end <= run.end );
 }
 
 /**
@@ -504,6 +531,38 @@ export default function SuggestionDeletionKeyboard() {
 		]
 	);
 
+	// Remove characters from the author's own pending addition and park the
+	// caret where they were.
+	const shrinkOwnAddition = useCallback(
+		(
+			event: any,
+			clientId: string,
+			attributeKey: string,
+			start: number,
+			end: number
+		) => {
+			event.preventDefault();
+			resetRun();
+			const value = getBlockAttributes( clientId )?.[ attributeKey ];
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, {
+				[ attributeKey ]: removeInlineAdditionRange(
+					value,
+					start,
+					end
+				),
+			} );
+			selectionChange( clientId, attributeKey, start, start );
+		},
+		[
+			getBlockAttributes,
+			updateBlockAttributes,
+			selectionChange,
+			requestInterceptorBypass,
+			resetRun,
+		]
+	);
+
 	// Selection delete: wrap the whole selected range in one marker.
 	const deleteSelection = useCallback(
 		async ( selection: {
@@ -779,9 +838,24 @@ export default function SuggestionDeletionKeyboard() {
 			} );
 			const start = domRange ? domRange.start : anchor.start;
 			const end = domRange ? domRange.end : anchor.end;
+			const value = getBlockAttributes( clientId )?.[ attributeKey ];
+			const authorToken =
+				authorId === null || authorId === undefined
+					? null
+					: String( authorId );
 
 			// Selection delete (any delete input type over a range).
 			if ( start !== end ) {
+				if ( isWithinOwnAddition( value, start, end, authorToken ) ) {
+					shrinkOwnAddition(
+						event,
+						clientId,
+						attributeKey,
+						start,
+						end
+					);
+					return;
+				}
 				// A selection overlapping an existing marker is declined; see
 				// `refuseDeletion`.
 				if (
@@ -802,15 +876,36 @@ export default function SuggestionDeletionKeyboard() {
 
 			// Collapsed-cursor delete.
 			const pos = start;
-			const { text, formats } = readValueMetrics(
-				getBlockAttributes( clientId )?.[ attributeKey ]
-			);
+			const { text, formats } = readValueMetrics( value );
 
 			const isBackward = event.inputType === 'deleteContentBackward';
 			const isForward = event.inputType === 'deleteContentForward';
 
 			// Single-character delete: mark one character and grow on repeats.
 			if ( isBackward || isForward ) {
+				/*
+				 * Backspace over text the author is still proposing fixes a
+				 * typo in the proposal. It is not a deletion suggestion.
+				 */
+				const own = collapsedDeleteTarget( text, pos, isBackward );
+				if (
+					own &&
+					isWithinOwnAddition(
+						value,
+						own.start,
+						own.end,
+						authorToken
+					)
+				) {
+					shrinkOwnAddition(
+						event,
+						clientId,
+						attributeKey,
+						own.start,
+						own.end
+					);
+					return;
+				}
 				/*
 				 * A repeat of the run in progress grows the marker it already
 				 * opened, so its target comes from the run's far edge rather
@@ -861,6 +956,23 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
+			if (
+				isWithinOwnAddition(
+					value,
+					range.start,
+					range.end,
+					authorToken
+				)
+			) {
+				shrinkOwnAddition(
+					event,
+					clientId,
+					attributeKey,
+					range.start,
+					range.end
+				);
+				return;
+			}
 			// A word/line range overlapping an existing marker is declined
 			// rather than nesting marks; see `refuseDeletion`.
 			if (
@@ -888,6 +1000,8 @@ export default function SuggestionDeletionKeyboard() {
 			deleteCharacter,
 			refuseDeletion,
 			resetRun,
+			shrinkOwnAddition,
+			authorId,
 		]
 	);
 

@@ -19,6 +19,8 @@ import {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineReplacement,
+	rejectInlineReplacement,
 	acceptInlineFormat,
 	rejectInlineFormat,
 } from '../inline-suggestions';
@@ -34,7 +36,8 @@ import {
  *   - `suggestionType` Inline marker kind (`inline-suggestion` only): `del`
  *                      wraps existing text proposed for removal, `add` wraps
  *                      proposed new text, `format` wraps a run whose
- *                      formatting changed (text unchanged).
+ *                      formatting changed (text unchanged), `replace` owns
+ *                      an `add` run and the `del` run after it.
  *   - `beforeHTML`     Original run HTML captured for a `format` suggestion,
  *                      so a reject can restore the pre-suggestion formatting.
  *   - `afterHTML`      Proposed run HTML for a `format` suggestion, used to
@@ -858,6 +861,11 @@ export function useSuggestionsProvider() {
 						originalValue,
 						commentId
 					);
+				} else if ( inlineOp.suggestionType === 'replace' ) {
+					nextValue = acceptInlineReplacement(
+						originalValue,
+						commentId
+					);
 				} else if ( inlineOp.suggestionType === 'format' ) {
 					// Accepting a format suggestion unwraps the marker, leaving
 					// the proposed formatting (already carried on the run) in
@@ -1185,6 +1193,11 @@ export function useSuggestionsProvider() {
 					let nextValue;
 					if ( inlineOp.suggestionType === 'add' ) {
 						nextValue = rejectInlineAddition(
+							originalValue,
+							commentId
+						);
+					} else if ( inlineOp.suggestionType === 'replace' ) {
+						nextValue = rejectInlineReplacement(
 							originalValue,
 							commentId
 						);
