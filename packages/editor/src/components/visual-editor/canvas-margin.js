@@ -8,7 +8,7 @@ export const CanvasMargin = createSlotFill( Symbol( 'EditorCanvasMargin' ) );
 
 // Reserved widths by the minimum canvas width that fits them. Keep in sync
 // with `style.scss`.
-const FULL_TIER = { minCanvasWidth: 880, width: 280 };
+export const FULL_TIER = { minCanvasWidth: 880, width: 280 };
 const COMPACT_TIER = { minCanvasWidth: 482, width: 82 };
 
 /**
