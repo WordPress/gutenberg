@@ -11,33 +11,23 @@ vi.mock( '../../lock-unlock', () => ( { unlock: ( value ) => value } ) );
 vi.mock( '../../store', () => ( { store: {} } ) );
 
 describe( 'registerEntityField', () => {
-	it( 'is deprecated but still registers the field', () => {
-		const field = { id: 'acme/rating' };
-
-		registerEntityField( 'postType', 'post', field );
+	it( 'is deprecated and has no effect', () => {
+		registerEntityField( 'postType', 'post', { id: 'acme/rating' } );
 
 		expect( console ).toHaveWarnedWith(
 			'wp.editor.registerEntityField is deprecated since version 24.2. Please use the `fields_api_init` PHP action instead.'
 		);
-		expect( actions.registerEntityField ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			field
-		);
+		expect( actions.registerEntityField ).not.toHaveBeenCalled();
 	} );
 } );
 
 describe( 'unregisterEntityField', () => {
-	it( 'is deprecated but still unregisters the field', () => {
+	it( 'is deprecated and has no effect', () => {
 		unregisterEntityField( 'postType', 'post', 'acme/rating' );
 
 		expect( console ).toHaveWarnedWith(
 			'wp.editor.unregisterEntityField is deprecated since version 24.2. Please use the `fields_api_init` PHP action instead.'
 		);
-		expect( actions.unregisterEntityField ).toHaveBeenCalledWith(
-			'postType',
-			'post',
-			'acme/rating'
-		);
+		expect( actions.unregisterEntityField ).not.toHaveBeenCalled();
 	} );
 } );
