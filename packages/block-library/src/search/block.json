@@ -84,7 +84,8 @@
 				"color": true,
 				"radius": true,
 				"width": true
-			}
+			},
+			"__experimentalSelector": ".wp-block-search__input, .wp-block-search__button"
 		},
 		"spacing": {
 			"margin": true
