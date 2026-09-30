@@ -544,6 +544,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertNotContains( 'comment_status', $ids, 'The action leaves no comment status field.' );
 		$this->assertContains( 'date', $ids, 'The action registers the media fields.' );
 		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'attachment' ), 'The media fields registered so far are plain data: no script module.' );
+
+		$date = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), null, 'id' )['date'];
+		$this->assertSame( 'datetime', $date['type'], 'The media fields come from the attachment collection.' );
+		$this->assertSame( 'core', $date['origin']['registeredBy'] );
 	}
 
 	/**

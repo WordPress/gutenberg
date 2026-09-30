@@ -344,10 +344,11 @@ add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fi
  * Attachments support authors and comments, so they get the default author
  * and comment status fields like any other post type. Yet the media editor
  * shows its own set of fields, declared client-side in
- * packages/media-fields/src, none of which is a default one. The default
- * fields, the ones registered by `core`, are dropped and the media fields
- * ported to the server so far are registered instead. Fields registered by
- * plugins in between are kept.
+ * packages/media-fields/src, none of which is a default one. The fields
+ * registered by `core` are replaced with the `attachment` collection, see
+ * packages/core-fields/src/attachment: the media fields ported to the server
+ * so far. They are plain data, so the collection has no script module.
+ * Fields registered by plugins in between are kept.
  *
  * It runs right after the default fields are registered, on
  * `fields_api_init` at priority 9, so a plugin hooking the action at
@@ -356,36 +357,6 @@ add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fi
  * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
 function _gutenberg_register_posttype_attachment_fields( Gutenberg_Fields_Registry $registry ) {
-	$post_type = get_post_type_object( 'attachment' );
-	if ( ! $post_type || ! $post_type->show_in_rest ) {
-		return;
-	}
-
-	// Drop the fields registered by core only: any other field a plugin registered
-	// for attachments at an earlier priority stay.
-	$defaults = array();
-	foreach ( $registry->get_registered( 'postType', 'attachment' ) as $field ) {
-		if ( 'core' === $field['origin']['registeredBy'] ) {
-			$defaults[] = $field['id'];
-		}
-	}
-	$registry->unregister( 'postType', 'attachment', $defaults );
-	$registry->register(
-		'core',
-		'postType',
-		'attachment',
-		array(
-			// packages/media-fields/src/date_added/index.tsx
-			array(
-				'id'       => 'date',
-				'type'     => 'datetime',
-				'label'    => __( 'Date added', 'gutenberg' ),
-				'filterBy' => array(
-					'operators' => array( 'before', 'after' ),
-				),
-				'readOnly' => true,
-			),
-		)
-	);
+	_gutenberg_register_core_fields_collection( $registry, 'attachment', false );
 }
 add_action( 'fields_api_init', '_gutenberg_register_posttype_attachment_fields', 9 );
