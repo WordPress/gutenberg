@@ -34,6 +34,36 @@ const del = ( id: number | string, text: string, author?: number | string ) =>
 const rtd = ( html: string ) => RichTextData.fromHTMLString( html );
 
 describe( 'analyzeTextEdit', () => {
+	// U+1F600 and U+1F601 share their high surrogate; U+1F600 and U+10600
+	// share their low surrogate. A code-unit trim would split either pair.
+	const hasLoneSurrogate = ( text: string ) =>
+		/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(
+			text
+		);
+
+	it( 'keeps a changed emoji whole when the high surrogates match', () => {
+		const edit = analyzeTextEdit( 'a \u{1F600} b', 'a \u{1F601} b' );
+		expect( edit ).toMatchObject( {
+			kind: 'replace',
+			start: 2,
+			end: 4,
+			removedText: '\u{1F600}',
+			insertedText: '\u{1F601}',
+		} );
+		expect( hasLoneSurrogate( edit.removedText ) ).toBe( false );
+		expect( hasLoneSurrogate( edit.insertedText ) ).toBe( false );
+	} );
+
+	it( 'keeps a changed emoji whole when the low surrogates match', () => {
+		const edit = analyzeTextEdit( 'a\u{1F600}', 'a\u{10600}' );
+		expect( edit ).toMatchObject( {
+			start: 1,
+			end: 3,
+			removedText: '\u{1F600}',
+			insertedText: '\u{10600}',
+		} );
+	} );
+
 	it( 'reports no change for identical text', () => {
 		expect( analyzeTextEdit( 'same', 'same' ) ).toEqual( {
 			kind: 'none',

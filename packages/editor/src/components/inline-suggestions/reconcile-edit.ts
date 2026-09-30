@@ -56,6 +56,16 @@ export interface TextEdit {
 	removedText: string;
 }
 
+const isHighSurrogate = ( text: string, index: number ) => {
+	const code = text.charCodeAt( index );
+	return code >= 0xd800 && code <= 0xdbff;
+};
+
+const isLowSurrogate = ( text: string, index: number ) => {
+	const code = text.charCodeAt( index );
+	return code >= 0xdc00 && code <= 0xdfff;
+};
+
 /**
  * Reduce a previous/next plain-text pair to a single contiguous edit by trimming
  * the common prefix and suffix. A single user action (type, delete, cut, paste,
@@ -89,6 +99,12 @@ export function analyzeTextEdit(
 		prefix++;
 	}
 
+	// Never split a surrogate pair: an emoji whose high surrogate matches
+	// would otherwise leave lone halves in the removed and inserted text.
+	if ( prefix > 0 && isHighSurrogate( prev, prefix - 1 ) ) {
+		prefix--;
+	}
+
 	let suffix = 0;
 	const maxSuffix = Math.min( prev.length - prefix, next.length - prefix );
 	while (
@@ -96,6 +112,9 @@ export function analyzeTextEdit(
 		prev[ prev.length - 1 - suffix ] === next[ next.length - 1 - suffix ]
 	) {
 		suffix++;
+	}
+	if ( suffix > 0 && isLowSurrogate( prev, prev.length - suffix ) ) {
+		suffix--;
 	}
 
 	const removedText = prev.slice( prefix, prev.length - suffix );
