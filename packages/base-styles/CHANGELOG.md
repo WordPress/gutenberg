@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `radio-control`: Keep radio circles and checked dots visually 16px and 8px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+-   `radio-control`: Keep radio circles and checked dots visually 16px and 8px on narrow screens while providing a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 
 ## 13.2.0 (2026-09-23)
 

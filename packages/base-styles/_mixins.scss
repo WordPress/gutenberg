@@ -404,6 +404,16 @@
 		transition: box-shadow 0.1s linear;
 	}
 
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: variables.$grid-unit-30;
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
+	}
+
 	&:hover {
 		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
 	}
