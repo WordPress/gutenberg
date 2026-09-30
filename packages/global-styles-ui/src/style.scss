@@ -28,8 +28,12 @@
 }
 
 .global-styles-ui-element-preview {
+	// The screen is a scrolling flex column, and this box hides its overflow,
+	// so without this it collapses when the panels below are taller than the
+	// screen.
+	flex-shrink: 0;
 	height: 120px;
-	margin-bottom: 20px;
+	margin: 0 variables.$grid-unit-20 20px;
 	border-radius: 2px;
 	overflow: hidden;
 	background: #f0f0f0;

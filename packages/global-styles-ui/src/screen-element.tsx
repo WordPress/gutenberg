@@ -1,10 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import {
-	PanelBody,
-	__experimentalSpacer as Spacer,
-	useNavigator,
-} from '@wordpress/components';
+import { PanelBody, useNavigator } from '@wordpress/components';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type {
@@ -253,9 +249,7 @@ function ScreenElement( {
 				selectedPseudoState={ selectedPseudoState }
 				onChangePseudoState={ setSelectedPseudoState }
 			/>
-			<Spacer marginX={ 4 }>
-				<ElementPreview element={ element } />
-			</Spacer>
+			<ElementPreview element={ element } />
 			<ElementStylePanels
 				element={ element }
 				label={ ELEMENTS[ element ].title }
