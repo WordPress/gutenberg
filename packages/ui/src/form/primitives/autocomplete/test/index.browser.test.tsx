@@ -30,6 +30,34 @@ function renderDisabledAutocompleteWithClear( disabled: boolean ) {
 }
 
 describe( 'Autocomplete', () => {
+	it( 'keeps the item description out of the input after selection', async () => {
+		await render(
+			<Autocomplete.Root items={ [ 'Apple' ] }>
+				<Autocomplete.Input aria-label="Fruit" />
+				<Autocomplete.Popup>
+					<Autocomplete.List>
+						<Autocomplete.Item value="Apple">
+							<Autocomplete.ItemLabel>
+								Apple
+							</Autocomplete.ItemLabel>
+							<Autocomplete.ItemDescription>
+								Fresh fruit.
+							</Autocomplete.ItemDescription>
+						</Autocomplete.Item>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await userEvent.type( input, 'App' );
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		expect( input ).toHaveValue( 'Apple' );
+	} );
+
 	it( 'forwards ref', async () => {
 		const user = userEvent;
 		const inputGroupRef = createRef< HTMLDivElement >();
@@ -37,6 +65,7 @@ describe( 'Autocomplete', () => {
 		const popupRef = createRef< HTMLDivElement >();
 		const listRef = createRef< HTMLDivElement >();
 		const listBodyRef = createRef< HTMLDivElement >();
+		const separatorRef = createRef< HTMLDivElement >();
 		const itemRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
@@ -67,12 +96,15 @@ describe( 'Autocomplete', () => {
 										}
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
 						</Autocomplete.ListBody>
 					</Autocomplete.List>
+					<Autocomplete.Separator ref={ separatorRef } />
 					<Autocomplete.Clear ref={ clearRef } />
 				</Autocomplete.Popup>
 			</Autocomplete.Root>
@@ -88,6 +120,7 @@ describe( 'Autocomplete', () => {
 		} );
 		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( separatorRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
@@ -122,7 +155,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -161,7 +196,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -205,7 +242,9 @@ describe( 'Autocomplete', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Autocomplete.ItemLabel>
+												{ item.value }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>
@@ -262,7 +301,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -300,7 +341,9 @@ describe( 'Autocomplete', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Autocomplete.ItemLabel>
+												{ item.value }
+											</Autocomplete.ItemLabel>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>
@@ -347,7 +390,9 @@ describe( 'Autocomplete', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -443,7 +488,9 @@ describe( 'Autocomplete', () => {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Autocomplete.ItemLabel>
+															{ item.value }
+														</Autocomplete.ItemLabel>
 													</Autocomplete.Item>
 												) }
 											</Autocomplete.Collection>
