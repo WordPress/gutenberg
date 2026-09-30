@@ -121,24 +121,17 @@ export function setIsReady( kind: string, name: string ) {
 }
 
 /*
- * Media fields for the attachment post type.
- *
- * Field order follows a logical grouping:
- * 1. Metadata fields in panels (date, author, file info)
- * 2. Core editable fields (title, alt text, caption, description)
- *
- * Note: media_thumbnail is not included as it's shown in the canvas preview
+ * The media fields of the attachment post type declared client-side. The
+ * media editor lays them out in its own order, and media_thumbnail is not
+ * included as it's shown in the canvas preview.
  */
-const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	'date',
+const MEDIA_FIELDS = [
 	mediaAuthorField,
 	filenameField,
 	mimeTypeField,
 	filesizeField,
 	mediaDimensionsField,
 	attachedToField,
-	// Regular layout fields (always visible).
 	titleField,
 	altTextField,
 	captionField,
@@ -225,12 +218,12 @@ export const registerPostTypeSchema =
 		].filter( Boolean );
 
 		// Handle attachment post type separately with media-specific fields.
-		// A string is the id of a field registered on the server, placed
-		// where it goes, see `mergeServerFields()`.
+		// The fields registered on the server follow, see
+		// `mergeServerFields()`.
 		let fields;
 
 		if ( postType === ATTACHMENT_POST_TYPE ) {
-			fields = ORDERED_MEDIA_FIELDS;
+			fields = MEDIA_FIELDS;
 		} else {
 			const postTypeSlug = postTypeConfig.slug;
 			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
@@ -247,11 +240,9 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				// The author field of the post types supporting authors is
-				// registered on the server, templates getting their own
-				// there. Template parts unregister it there and keep their
-				// own.
-				'author',
+				// The server registers the default author field on the post
+				// types supporting authors, and its own on templates. Template
+				// parts exclude it there and keep this one.
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
 				! isDesignPostType && dateField,
@@ -261,19 +252,16 @@ export const registerPostTypeSchema =
 				// `viewable` alone is not the full condition (the type must
 				// also be public), so the field also checks each post.
 				! isDesignPostType && postTypeConfig.viewable && slugField,
-				'excerpt',
+				// Patterns exclude the default excerpt field on the server:
+				// this one, with the same id, edits their description.
 				isPattern &&
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				'comment_status',
-				'ping_status',
-				'discussion',
 				! isDesignPostType && templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				'post-content-info',
 				! isDesignPostType && passwordField,
 				postTypeSlug === 'post' && stickyField,
 				postTypeSlug === 'wp_template' && descriptionField,
@@ -288,7 +276,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
-				'notesCount',
 				isPattern && patternSyncStatusField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
@@ -324,7 +311,7 @@ export const registerPostTypeSchema =
 				);
 		}
 		const mergedFields = mergeServerFields(
-			fields as Array< Field< any > | string >,
+			fields as Field< any >[],
 			serverFields
 		);
 
