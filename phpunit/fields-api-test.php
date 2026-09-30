@@ -18,6 +18,14 @@
 class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
+	 * The ids of the default fields every post type gets, whatever it
+	 * supports, but for the design post types, which exclude some of them.
+	 *
+	 * @var string[]
+	 */
+	const EVERY_POST_TYPE_FIELDS = array( 'last_edited_date' );
+
+	/**
 	 * The callbacks a test hooked to `fields_api_init`, as callback and
 	 * priority pairs, removed on tear down.
 	 *
@@ -201,6 +209,27 @@ class Tests_Fields_API extends WP_UnitTestCase {
 				)
 			);
 		}
+	}
+
+	/**
+	 * The ids of the fields registered on a post type, but for the defaults
+	 * every post type gets, see EVERY_POST_TYPE_FIELDS.
+	 *
+	 * @param string $post_type The post type.
+	 * @return string[] The ids, in registration order.
+	 */
+	private static function get_support_field_ids( $post_type ) {
+		return self::without_every_post_type_fields( array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' ) );
+	}
+
+	/**
+	 * Removes the defaults every post type gets from a list of field ids.
+	 *
+	 * @param string[] $ids The field ids.
+	 * @return string[] The ids, but for those of EVERY_POST_TYPE_FIELDS.
+	 */
+	private static function without_every_post_type_fields( $ids ) {
+		return array_values( array_diff( $ids, self::EVERY_POST_TYPE_FIELDS ) );
 	}
 
 	/**
@@ -449,10 +478,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			unregister_post_type( 'gutenberg_book' );
 		}
 
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ), array_column( $fields, 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ), self::without_every_post_type_fields( array_column( $fields, 'id' ) ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
-			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ) ),
+			array( '@wordpress/core-fields/post_type_supports' => array_column( $fields, 'id' ) ),
 			$modules,
 			'Every default field is registered with the module of its folder.'
 		);
@@ -505,6 +534,45 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
 		);
+	}
+
+	/**
+	 * The defaults every post type gets, whatever it supports, each with
+	 * whether the design post types exclude it.
+	 *
+	 * @return array[] The id of each field and whether the design post
+	 *                 types exclude it.
+	 */
+	public function data_default_fields_of_every_post_type() {
+		return array(
+			'last_edited_date' => array( 'last_edited_date', false ),
+		);
+	}
+
+	/**
+	 * A default field of every post type is registered on a post type
+	 * supporting nothing, and on the design post types unless they exclude
+	 * it.
+	 *
+	 * @dataProvider data_default_fields_of_every_post_type
+	 *
+	 * @param string $field_id              The id of the field.
+	 * @param bool   $excluded_for_design The design post types exclude it.
+	 */
+	public function test_a_default_field_of_every_post_type( $field_id, $excluded_for_design ) {
+		$this->assertContains( $field_id, self::EVERY_POST_TYPE_FIELDS, 'The tests know the field applies to every post type.' );
+		$this->register_post_types( array( 'gutenberg_plain' => array( 'title' ) ) );
+		self::reset_registry();
+
+		$this->assertContains( $field_id, array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_plain' ), 'id' ) );
+		foreach ( array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ) as $post_type ) {
+			$ids = array_column( gutenberg_get_registered_fields( 'postType', $post_type ), 'id' );
+			if ( $excluded_for_design ) {
+				$this->assertNotContains( $field_id, $ids, "$post_type excludes the field." );
+			} else {
+				$this->assertContains( $field_id, $ids, "$post_type gets the field." );
+			}
+		}
 	}
 
 	/**
@@ -685,11 +753,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		self::reset_registry();
-		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'sticky' ), $calls['post'] );
-		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
+		$this->assertSame( array( 'author', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::without_every_post_type_fields( $calls['gutenberg_book'] ), 'The filter receives the ids of the defaults the post type supports.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'sticky' ), self::without_every_post_type_fields( $calls['post'] ) );
+		$this->assertSame( self::EVERY_POST_TYPE_FIELDS, $calls['gutenberg_plain'], 'A post type supporting nothing gets the defaults of every post type.' );
 	}
 
 	/**
@@ -710,7 +778,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_type_supports_fields' );
 		self::reset_registry();
 
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
 	}
 
 	/**
@@ -719,7 +787,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_template_parts_do_not_get_the_default_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
-		$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'wp_template_part' ) );
+		$this->assertSame( array(), self::get_support_field_ids( 'wp_template_part' ) );
 	}
 
 	/**
@@ -763,13 +831,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_templates_get_their_own_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
-		$fields = gutenberg_get_registered_fields( 'postType', 'wp_template' );
-		$this->assertSame( array( 'author' ), array_column( $fields, 'id' ), 'The default author field is not registered.' );
-		$this->assertArrayNotHasKey( 'type', $fields[0], 'The template author is not the integer post author.' );
-		$this->assertSame( 'core', $fields[0]['origin']['registeredBy'] );
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' );
+		$this->assertSame( array( 'author' ), self::get_support_field_ids( 'wp_template' ), 'The default author field is not registered.' );
+		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
+		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( '@wordpress/core-fields/wp_template' => array( 'author' ) ),
-			gutenberg_get_registered_field_modules( 'postType', 'wp_template' ),
+			array( 'author' ),
+			gutenberg_get_registered_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
 			'The template author ships its JavaScript parts in the module of its collection.'
 		);
 	}
@@ -798,7 +866,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$author = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
 		$this->assertSame( 'my-plugin', $author['origin']['registeredBy'] );
-		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'wp_template' ) );
+		$this->assertArrayNotHasKey( '@wordpress/core-fields/wp_template', gutenberg_get_registered_field_modules( 'postType', 'wp_template' ), 'The module of the replaced field is dropped.' );
 	}
 
 	/**
@@ -851,8 +919,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
 	}
 
 	/**
@@ -887,9 +955,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'fixture', $book[0]['origin']['registeredBy'], 'The fields carry the origin of their collection.' );
 		$this->assertSame( array( 'fixture/book' => array( 'subtitle' ) ), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_book' ), 'Each field is registered with the module of its collection.' );
 
-		$this->assertSame( array( 'issue' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ) );
+		$this->assertSame( array( 'issue' ), self::get_support_field_ids( 'gutenberg_magazine' ) );
 		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_magazine' ), 'A collection without module registers none.' );
-		$this->assertSame( array( 'secret' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'id' ), 'A post type not exposed in the REST API gets its fields too.' );
+		$this->assertSame( array( 'secret' ), self::get_support_field_ids( 'gutenberg_hidden' ), 'A post type not exposed in the REST API gets its fields too.' );
 	}
 
 	/**

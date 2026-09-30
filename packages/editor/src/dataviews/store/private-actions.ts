@@ -34,7 +34,6 @@ import {
 	patternDescriptionField,
 	patternSyncStatusField,
 	scheduledDateField,
-	lastEditedDateField,
 	formatField,
 	descriptionField,
 	readOnlyDescriptionField,
@@ -216,7 +215,6 @@ export const registerPostTypeSchema =
 				! isDesignPostType && statusField,
 				! isDesignPostType && dateField,
 				! isDesignPostType && scheduledDateField,
-				lastEditedDateField,
 				// There is no post type support flag for permalinks, and
 				// `viewable` alone is not the full condition (the type must
 				// also be public), so the field also checks each post.

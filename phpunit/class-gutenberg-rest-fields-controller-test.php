@@ -418,7 +418,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			array(
 				array(
 					'id'     => '@wordpress/core-fields/post_type_supports',
-					'fields' => array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ),
+					'fields' => $ids,
 				),
 			),
 			$data['script_modules'],

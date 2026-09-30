@@ -7,6 +7,7 @@ describe( 'post_type_supports', () => {
 			'author',
 			'discussion',
 			'excerpt',
+			'last_edited_date',
 			'ping_status',
 			'post-content-info',
 			'sticky',
@@ -78,5 +79,13 @@ describe( 'post_type_supports', () => {
 		);
 		expect( isVisible?.( { _links: {} } ) ).toBe( false );
 		expect( isVisible?.( {} ) ).toBe( true );
+	} );
+
+	it( 'shows the last edited date of the posts that have one', () => {
+		const { getValue, isVisible } = postTypeSupports.last_edited_date;
+		const item = { modified: '2026-09-30T12:00:00' };
+		expect( getValue?.( { item } ) ).toBe( '2026-09-30T12:00:00' );
+		expect( isVisible?.( item ) ).toBe( true );
+		expect( isVisible?.( {} ) ).toBe( false );
 	} );
 } );
