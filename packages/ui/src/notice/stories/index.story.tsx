@@ -6,6 +6,7 @@ const meta: Meta< typeof Notice.Root > = {
 	title: 'Components/@wordpress-ui/Notice',
 	id: 'design-system-components-notice',
 	component: Notice.Root,
+	tags: [ 'manifest' ],
 	subcomponents: {
 		'Notice.Title': Notice.Title,
 		'Notice.Description': Notice.Description,
@@ -22,9 +23,8 @@ const meta: Meta< typeof Notice.Root > = {
 			},
 		},
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
