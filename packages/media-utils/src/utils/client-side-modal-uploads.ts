@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { dispatch, select, subscribe } from '@wordpress/data';
+import type { Attachment } from './types';
 
 /**
  * Routes uploads started from the editor's media modal through the client-side
@@ -61,16 +62,48 @@ type UploadStoreSelectors = {
 		mediaFinalize?: unknown;
 		allImageSizes?: Record< string, unknown >;
 	};
-	getItems: () => any[];
+	getItems: () => UploadQueueItem[];
 };
 
 type UploadStoreActions = {
 	addItems: ( args: {
 		files: File[];
 		additionalData: Record< string, unknown >;
-		onSuccess: ( attachments: any[] ) => void;
+		onSuccess: ( attachments: PipelineAttachment[] ) => void;
 		onError: ( error: unknown ) => void;
 	} ) => void;
+};
+
+/**
+ * The attachment the pipeline hands to `onSuccess`: the REST attachment after
+ * `transformAttachment()`, and only the fields the store chose to carry.
+ */
+type PipelineAttachment = Partial< Attachment >;
+
+/**
+ * The parts of `media_details` the modal tile reads.
+ */
+type AttachmentMediaDetails = {
+	file?: string;
+	width?: number;
+	height?: number;
+	sizes?: Record<
+		string,
+		{ source_url: string; width: number; height: number }
+	>;
+};
+
+/**
+ * The parts of an upload-media queue item this module reads.
+ */
+type UploadQueueItem = {
+	id: string;
+	parentId?: string;
+	progress?: number;
+	operations?: unknown[];
+	currentOperation?: string;
+	subSizes?: unknown[];
+	onSuccess?: ( attachments: PipelineAttachment[] ) => void;
 };
 
 /**
@@ -117,13 +150,71 @@ type PluploadFile = {
 };
 
 /**
+ * The parts of a plupload uploader this module relies on.
+ */
+type PluploadUploader = {
+	settings?: {
+		url?: string;
+		multipart_params?: Record< string, string >;
+	};
+	bind: (
+		event: string,
+		handler: (
+			up: PluploadUploader,
+			files: PluploadFile[]
+		) => boolean | undefined,
+		scope: unknown,
+		priority: number
+	) => void;
+	removeFile: ( file: PluploadFile ) => void;
+	refresh: () => void;
+	__clientSideUploadsBound?: boolean;
+};
+
+/**
+ * The chainable jQuery deferred `Backbone.Model.fetch()` returns.
+ */
+type JQueryLikeDeferred = {
+	fail: ( callback: () => void ) => JQueryLikeDeferred;
+	always: ( callback: () => void ) => JQueryLikeDeferred;
+};
+
+/**
+ * The parts of a `wp.media` attachment model this module touches.
+ */
+type AttachmentModel = {
+	get: ( key: string ) => unknown;
+	set: (
+		attributes: Record< string, unknown >,
+		options?: { silent?: boolean }
+	) => void;
+	unset: ( key: string, options?: { silent?: boolean } ) => void;
+	fetch: () => JQueryLikeDeferred;
+	destroy: () => void;
+};
+
+/**
+ * The parts of a `wp.Uploader` instance this module relies on.
+ */
+type WpUploader = {
+	uploader?: PluploadUploader;
+	added: ( model: AttachmentModel ) => void;
+	success: ( model: AttachmentModel ) => void;
+	error: (
+		message: string,
+		data: Record< string, unknown >,
+		file: PluploadFile
+	) => void;
+};
+
+/**
  * The bookkeeping kept for one queued upload.
  */
 type UploadEntry = {
 	/** ID of the queue item it matched, once one is known. */
 	itemId: string | null;
 	/** The `onSuccess` handed to the store, which identifies its queue item. */
-	token: ( attachments: any[] ) => void;
+	token: ( attachments: PipelineAttachment[] ) => void;
 	/** Called with an integer percentage whenever it changes. */
 	onProgress: ( percent: number ) => void;
 	/** Called when the upload fails or is dropped from the queue. */
@@ -216,6 +307,28 @@ function isPipelineReady(): boolean {
 }
 
 /**
+ * Whether a plupload uploader posts attachments the way `wp.Uploader` does by
+ * default.
+ *
+ * The patch reaches every `wp.Uploader` built after the modal opens, and a
+ * plugin can build one from the block editor for its own purposes. Core's
+ * defaults tell an attachment upload apart: it posts to `async-upload.php`
+ * with the `upload-attachment` action. Anything a plugin pointed elsewhere, or
+ * gave another action, is uploading something else and is left alone.
+ *
+ * @param up The plupload uploader instance.
+ * @return True when the uploader posts attachments.
+ */
+function isAttachmentUploader( up: PluploadUploader ): boolean {
+	const url = String( up.settings?.url ?? '' ).split( '?' )[ 0 ];
+
+	return (
+		'upload-attachment' === up.settings?.multipart_params?.action &&
+		url.endsWith( 'async-upload.php' )
+	);
+}
+
+/**
  * Whether a batch of files added to plupload can go through the pipeline.
  *
  * Suppressing plupload's built-in handler is all-or-nothing, so the whole batch
@@ -261,18 +374,18 @@ function canHandleBatch( files: PluploadFile[] ): boolean {
  * @return Additional data for the upload.
  */
 function additionalDataFromParams(
-	params: Record< string, string >
+	params: Record< string, string > = {}
 ): Record< string, unknown > {
 	const additionalData: Record< string, unknown > = {};
 
-	Object.keys( params || {} ).forEach( ( key ) => {
+	Object.keys( params ).forEach( ( key ) => {
 		if ( 'action' === key || '_wpnonce' === key || 'post_id' === key ) {
 			return;
 		}
 		additionalData[ key ] = params[ key ];
 	} );
 
-	const postId = parseInt( params?.post_id, 10 );
+	const postId = parseInt( params.post_id, 10 );
 	if ( postId ) {
 		additionalData.post = postId;
 	}
@@ -293,7 +406,7 @@ function additionalDataFromParams(
  * @param entry The bookkeeping for the upload.
  * @return Estimated progress.
  */
-function estimateProgress( item: any, entry: UploadEntry ): number {
+function estimateProgress( item: UploadQueueItem, entry: UploadEntry ): number {
 	if ( typeof item.progress === 'number' ) {
 		return item.progress;
 	}
@@ -347,7 +460,7 @@ function onStoreChange(): void {
 		return;
 	}
 
-	const items: any[] = selectUploadStore()?.getItems() ?? [];
+	const items = selectUploadStore()?.getItems() ?? [];
 	const liveIds = new Set< string >();
 	const current = [ ...entries ];
 
@@ -428,7 +541,7 @@ function queueFile(
 	file: File,
 	additionalData: Record< string, unknown >,
 	callbacks: {
-		onSuccess: ( attachment: any ) => void;
+		onSuccess: ( attachment: PipelineAttachment ) => void;
 		onError: ( error: unknown ) => void;
 		onProgress: ( percent: number ) => void;
 	}
@@ -437,7 +550,7 @@ function queueFile(
 	// `onStoreChange` tells this upload's item apart from every other one. The
 	// store can report an outcome more than once, so `release()` decides which
 	// call owns it.
-	const token = ( attachments: any[] ) => {
+	const token = ( attachments: PipelineAttachment[] ) => {
 		if ( release( entry ) ) {
 			callbacks.onSuccess( attachments[ 0 ] );
 		}
@@ -494,28 +607,28 @@ function getErrorText( error: unknown ): string {
  *
  * The pipeline returns the attachment after `transformAttachment()`, which
  * already maps `source_url`, `alt_text` and the title, but keeps the REST
- * `media_details.sizes` that the model reads as `sizes`. The raw REST fields
- * are still read as a fallback. Only used when the refetch fails, so it fills
- * in what the grid reads and leaves the rest to the next refetch.
+ * `media_details.sizes` that the model reads as `sizes`. Only used when the
+ * refetch fails, so it fills in what the grid reads and leaves the rest to the
+ * next refetch.
  *
  * @param attachment The finalized attachment.
  * @return Attributes for a `wp.media` attachment model.
  */
-function toModelAttributes( attachment: any ): Record< string, unknown > {
+function toModelAttributes(
+	attachment: PipelineAttachment
+): Record< string, unknown > {
 	const [ type, subtype ] = String( attachment.mime_type || '' ).split( '/' );
-	const details = attachment.media_details;
+	const details = attachment.media_details as
+		AttachmentMediaDetails | undefined;
 	const sizes = details?.sizes;
 
 	return {
 		id: attachment.id,
-		title:
-			typeof attachment.title === 'string'
-				? attachment.title
-				: ( attachment.title?.raw ?? attachment.title?.rendered ?? '' ),
+		title: attachment.title ?? '',
 		filename: details?.file?.split( '/' ).pop() ?? '',
-		url: attachment.url ?? attachment.source_url,
+		url: attachment.url,
 		link: attachment.link,
-		alt: attachment.alt ?? attachment.alt_text,
+		alt: attachment.alt,
 		mime: attachment.mime_type,
 		type,
 		subtype,
@@ -523,7 +636,7 @@ function toModelAttributes( attachment: any ): Record< string, unknown > {
 		height: details?.height,
 		sizes: sizes
 			? Object.fromEntries(
-					Object.entries< any >( sizes ).map( ( [ name, size ] ) => [
+					Object.entries( sizes ).map( ( [ name, size ] ) => [
 						name,
 						{
 							url: size.source_url,
@@ -553,9 +666,9 @@ function toModelAttributes( attachment: any ): Record< string, unknown > {
  * @param attachment.id ID of the finalized attachment.
  */
 function handleSuccess(
-	wpUploader: any,
-	model: any,
-	attachment: { id: number }
+	wpUploader: WpUploader,
+	model: AttachmentModel,
+	attachment: PipelineAttachment
 ): void {
 	const { wp } = window as any;
 
@@ -601,8 +714,8 @@ function handleSuccess(
  * @param file       The plupload file that failed.
  */
 function handleError(
-	wpUploader: any,
-	model: any,
+	wpUploader: WpUploader,
+	model: AttachmentModel,
 	error: unknown,
 	file: PluploadFile
 ): void {
@@ -627,7 +740,7 @@ function maybeResetQueue(): void {
 	const { wp } = window as any;
 
 	const complete = wp.Uploader.queue.all(
-		( attachment: any ) => ! attachment.get( 'uploading' )
+		( attachment: AttachmentModel ) => ! attachment.get( 'uploading' )
 	);
 
 	if ( complete ) {
@@ -649,11 +762,12 @@ function maybeResetQueue(): void {
  * @return False to suppress the built-in handler.
  */
 function handleFilesAdded(
-	wpUploader: any,
-	up: any,
+	wpUploader: WpUploader,
+	up: PluploadUploader,
 	files: PluploadFile[]
 ): boolean | undefined {
 	if (
+		! isAttachmentUploader( up ) ||
 		! ( isFullPipelineActive() || isHeicOnlyPipelineActive() ) ||
 		! isPipelineReady() ||
 		! canHandleBatch( files )
@@ -696,7 +810,8 @@ function handleFilesAdded(
 			attributes.subtype = 'jpg' === extension ? 'jpeg' : extension;
 		}
 
-		const model = wp.media.model.Attachment.create( attributes );
+		const model: AttachmentModel =
+			wp.media.model.Attachment.create( attributes );
 		wp.Uploader.queue.add( model );
 		wpUploader.added( model );
 
@@ -738,7 +853,10 @@ export function installClientSideModalUploads(): void {
 	// wp.Uploader.prototype.init is an empty stub core calls once per
 	// instance, after plupload has been initialized.
 	const originalInit = wp.Uploader.prototype.init;
-	wp.Uploader.prototype.init = function ( this: any, ...args: unknown[] ) {
+	wp.Uploader.prototype.init = function (
+		this: WpUploader,
+		...args: unknown[]
+	) {
 		originalInit.apply( this, args );
 
 		const up = this.uploader;
@@ -752,8 +870,7 @@ export function installClientSideModalUploads(): void {
 		// the built-in FilesAdded handler.
 		up.bind(
 			'FilesAdded',
-			( uploader: any, files: PluploadFile[] ) =>
-				handleFilesAdded( this, uploader, files ),
+			( uploader, files ) => handleFilesAdded( this, uploader, files ),
 			this,
 			100
 		);

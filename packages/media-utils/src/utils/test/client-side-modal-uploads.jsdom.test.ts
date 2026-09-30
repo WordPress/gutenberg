@@ -117,6 +117,7 @@ function createUploader( Uploader: any ) {
 	} > = [];
 	const up = {
 		settings: {
+			url: '/wp-admin/async-upload.php',
 			multipart_params: {
 				action: 'upload-attachment',
 				_wpnonce: 'nonce',
@@ -262,6 +263,37 @@ describe( 'installClientSideModalUploads', () => {
 
 		installClientSideModalUploads();
 		const { up, bindings } = createUploader( Uploader );
+
+		expect(
+			bindings[ 0 ].handler( up, [ createPluploadFile() ] )
+		).toBeUndefined();
+		expect( addItems ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves a plugin uploader with its own action alone', async () => {
+		// A plugin can build its own `wp.Uploader` from the block editor after
+		// the modal has opened. One that posts something other than an
+		// attachment is not the modal's, so the pipeline must not take it.
+		const { Uploader } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+		up.settings.multipart_params.action = 'my_plugin_import';
+
+		expect(
+			bindings[ 0 ].handler( up, [ createPluploadFile() ] )
+		).toBeUndefined();
+		expect( addItems ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves a plugin uploader with its own endpoint alone', async () => {
+		const { Uploader } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+		up.settings.url = 'https://example.com/wp-json/my-plugin/v1/import';
 
 		expect(
 			bindings[ 0 ].handler( up, [ createPluploadFile() ] )
