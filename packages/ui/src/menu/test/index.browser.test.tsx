@@ -1,3 +1,6 @@
+// Browser style assertions require the public theme stylesheet.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/theme/design-tokens.css';
 import type { ReactNode } from 'react';
 import {
 	afterEach,
@@ -35,6 +38,52 @@ afterEach( () => {
 } );
 
 describe( 'Menu', () => {
+	it.each( [ 'default', 'high-contrast' ] as const )(
+		'uses the %s appearance for root and submenu popups',
+		async ( variant ) => {
+			const rootRef = createRef< HTMLDivElement >();
+			const submenuRef = createRef< HTMLDivElement >();
+
+			await render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup ref={ rootRef } variant={ variant }>
+						<Menu.SubmenuRoot defaultOpen>
+							<Menu.SubmenuTrigger>
+								<Menu.ItemLabel>Move to</Menu.ItemLabel>
+							</Menu.SubmenuTrigger>
+							<Menu.Popup ref={ submenuRef } variant={ variant }>
+								<Menu.Item>
+									<Menu.ItemLabel>Sidebar</Menu.ItemLabel>
+								</Menu.Item>
+							</Menu.Popup>
+						</Menu.SubmenuRoot>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			await expect
+				.element( page.getByRole( 'menuitem', { name: 'Sidebar' } ) )
+				.toBeVisible();
+			for ( const popup of [ rootRef.current!, submenuRef.current! ] ) {
+				const style = getComputedStyle( popup );
+				expect( style.borderTopWidth ).toBe( '1px' );
+				expect( style.borderTopColor ).toBe(
+					variant === 'high-contrast'
+						? 'rgb(30, 30, 30)'
+						: 'rgb(219, 219, 219)'
+				);
+				expect( style.borderRadius ).toBe(
+					variant === 'high-contrast' ? '2px' : '4px'
+				);
+				const shadowMatcher = expect.not.stringMatching( /^none$/ );
+				expect( style.boxShadow ).toEqual(
+					variant === 'high-contrast' ? 'none' : shadowMatcher
+				);
+			}
+		}
+	);
+
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent;
 		const onCanvasClick = vi.fn();

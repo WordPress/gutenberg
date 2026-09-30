@@ -7,6 +7,7 @@
 		}
 
 		.popup {
+			--_wp-ui-popup-border-color: initial;
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
@@ -108,7 +109,7 @@
 			height: var(--wpds-border-width-xs);
 			margin-block: var(--wpds-dimension-gap-xs);
 			margin-inline: var(--wp-ui-menu-group-head-padding-inline);
-			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			background-color: var(--_wp-ui-popup-border-color, var(--wpds-color-stroke-surface-neutral-weak));
 
 			@media ( forced-colors: active ) {
 				background-color: CanvasText;
