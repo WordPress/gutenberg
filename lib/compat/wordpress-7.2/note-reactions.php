@@ -48,7 +48,14 @@ function gutenberg_get_internal_comment_types() {
 	 *
 	 * @param string[] $types List of internal comment type slugs.
 	 */
-	return apply_filters( 'gutenberg_internal_comment_types', array( 'note', 'reaction' ) );
+	$types = apply_filters( 'gutenberg_internal_comment_types', array( 'note', 'reaction' ) );
+
+	// Callers build `NOT IN ( ... )` from this list, which is invalid SQL when empty.
+	if ( ! is_array( $types ) || empty( $types ) ) {
+		return array( 'note', 'reaction' );
+	}
+
+	return array_values( $types );
 }
 
 /**
