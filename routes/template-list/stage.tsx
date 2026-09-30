@@ -12,17 +12,21 @@ import {
 	store as coreStore,
 	privateApis as corePrivateApis,
 } from '@wordpress/core-data';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	Notice,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { ViewListEntry, ViewOverrides } from './view-utils';
 import { previewField } from './fields/preview';
 import AddNewTemplate from './add-new-template';
 // Unlock WordPress private APIs
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 /**
@@ -141,7 +145,16 @@ function TemplateListView( {
 		} );
 	const records = ( templates ?? EMPTY_ARRAY ) as Template[];
 
-	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
+	// `usePostActions` below registers the post type's schema, which is what
+	// brings in the actions; the fields come straight from the server.
+	const {
+		fields: postFields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields< Template >( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+	} );
 	const fields = useMemo(
 		() => [ previewField, ...postFields ],
 		[ postFields ]
@@ -262,13 +275,18 @@ function TemplateListView( {
 					</Tabs>
 				</div>
 			) }
+			{ fieldsError && (
+				<Notice status="error" isDismissible={ false }>
+					{ fieldsError.message }
+				</Notice>
+			) }
 			<DataViews
 				data={ posts }
 				fields={ fields }
 				view={ view }
 				onChangeView={ onChangeView }
 				actions={ actions }
-				isLoading={ isLoading }
+				isLoading={ isLoading || isLoadingFields }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
