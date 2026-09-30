@@ -1,0 +1,51 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.label,
+		.value {
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.value {
+			font-variant-numeric: tabular-nums;
+		}
+
+		.track {
+			position: relative;
+			overflow: hidden;
+			width: 100%;
+			border-radius: var(--wpds-border-radius-lg);
+			background-color: var(--wpds-color-background-track-neutral);
+
+			@media (forced-colors: active) {
+				outline: var(--wpds-border-width-xs) solid CanvasText;
+				outline-offset: var(--wpds-border-width-xs);
+			}
+		}
+
+		.indicator {
+			position: absolute;
+			inset-block-start: 0;
+			height: 100%;
+			border-radius: inherit;
+			color: var(--wpds-color-background-thumb-neutral);
+			background-color: currentColor;
+
+			@media not (prefers-reduced-motion) {
+				transition: width var(--wpds-motion-duration-xl) ease-in-out;
+			}
+		}
+
+		.is-brand {
+			color: var(--wpds-color-background-thumb-brand);
+		}
+
+		@media (forced-colors: active) {
+			.indicator {
+				forced-color-adjust: none;
+				background-color: CanvasText;
+			}
+		}
+	}
+}
