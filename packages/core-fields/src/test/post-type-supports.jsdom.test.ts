@@ -13,6 +13,7 @@ describe( 'post_type_supports', () => {
 			'ping_status',
 			'post-content-info',
 			'scheduled_date',
+			'slug',
 			'status',
 			'sticky',
 		] );
@@ -129,5 +130,18 @@ describe( 'post_type_supports', () => {
 		expect( isVisible?.( { status: 'draft', _links } ) ).toBe( true );
 		expect( isVisible?.( { status: 'private', _links } ) ).toBe( false );
 		expect( isVisible?.( { status: 'draft', _links: {} } ) ).toBe( false );
+	} );
+
+	it( 'shows the slug of the posts with a permalink', () => {
+		const { isVisible } = postTypeSupports.slug;
+		expect(
+			isVisible?.( {
+				link: 'https://example.org/hello/',
+				permalink_template: 'https://example.org/%postname%/',
+			} )
+		).toBe( true );
+		expect( isVisible?.( { link: 'https://example.org/?p=1' } ) ).toBe(
+			false
+		);
 	} );
 } );

@@ -33,6 +33,7 @@
  * - `ping_status`, for the post types supporting `trackbacks`.
  * - `post-content-info`, for the post types supporting `editor`.
  * - `scheduled_date`, for every post type but the design ones.
+ * - `slug`, for the viewable post types but the design ones.
  * - `status`, for every post type but the design ones.
  * - `sticky`, for posts, the only post type with sticky posts.
  *
@@ -68,6 +69,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'ping_status'       => post_type_supports( $post_type, 'trackbacks' ),
 			'post-content-info' => post_type_supports( $post_type, 'editor' ),
 			'scheduled_date'    => true,
+			'slug'              => is_post_type_viewable( $post_type ),
 			'status'            => true,
 			'sticky'            => 'post' === $post_type,
 		);
@@ -137,8 +139,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   Their content is blocks laying out a site, not text to read.
  * - The design post types (templates, template parts, patterns, and
  *   navigation menus): the fields about publishing a post
- *   (`date`, `password`, `scheduled_date`, `status`). They lay out a site
- *   rather than publish content.
+ *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
+ *   a site rather than publish content.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -170,7 +172,7 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 			break;
 	}
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ), true ) ) {
-		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'password', 'scheduled_date', 'status' ) );
+		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'password', 'scheduled_date', 'slug', 'status' ) );
 	}
 	return $excluded_fields;
 }
