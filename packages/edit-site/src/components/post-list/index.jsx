@@ -1,5 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import { Button, Notice } from '@wordpress/components';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -9,6 +9,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
@@ -28,7 +29,7 @@ import {
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
@@ -107,9 +108,13 @@ export default function PostList( { postType } ) {
 		setSelection( newSelection );
 	}, [ postId ] );
 
-	const fields = usePostFields( {
-		postType,
-	} );
+	// `usePostActions` below registers the post type's schema, which is what
+	// brings in the actions; the fields come straight from the server.
+	const {
+		fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: postType } );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -282,6 +287,11 @@ export default function PostList( { postType } ) {
 				</>
 			}
 		>
+			{ fieldsError && (
+				<Notice status="error" isDismissible={ false }>
+					{ fieldsError.message }
+				</Notice>
+			) }
 			<DataViews
 				key={ activeView }
 				paginationInfo={ paginationInfo }
@@ -289,7 +299,10 @@ export default function PostList( { postType } ) {
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
 				isLoading={
-					isLoadingData || isLoadingNotesCount || ! hasResolved
+					isLoadingData ||
+					isLoadingNotesCount ||
+					isLoadingFields ||
+					! hasResolved
 				}
 				view={ view }
 				onChangeView={ onChangeView }
