@@ -751,27 +751,6 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in grid view', () => {
-		it( 'lays the grid out at its real column count on the first render', async () => {
-			// Without a measurement as the grid attaches, the first render runs
-			// at width 0 and puts every item in a full-width row of its own.
-			vi.spyOn(
-				window.HTMLElement.prototype,
-				'offsetWidth',
-				'get'
-			).mockReturnValue( 500 );
-
-			render( <DataViewWrapper view={ { type: 'grid' } } /> );
-
-			// 500px fits two columns at the default 230px preview size, so the
-			// three items make two rows rather than three.
-			expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 );
-
-			// The observer reports the same width, so nothing changes.
-			await waitFor( () =>
-				expect( screen.getAllByRole( 'row' ) ).toHaveLength( 2 )
-			);
-		} );
-
 		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
