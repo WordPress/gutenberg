@@ -1271,6 +1271,87 @@ describe( 'DataViews component', () => {
 		} );
 	} );
 
+	describe( 'focus management in list view', () => {
+		function DataViewsWithRemovableItems() {
+			const [ items, setItems ] = useState< Data[] >( data );
+			const view: View = {
+				type: 'list',
+				search: '',
+				page: 1,
+				perPage: 10,
+				layout: {},
+				filters: [],
+				fields: [ 'title', 'order', 'author' ],
+			};
+			const removableActions: Action< Data >[] = [
+				{
+					id: 'delete',
+					label: 'Delete',
+					isPrimary: true,
+					supportsBulk: true,
+					callback: ( selectedItems ) => {
+						setItems( ( prev ) =>
+							prev.filter(
+								( item ) =>
+									! selectedItems.some(
+										( selected ) => selected.id === item.id
+									)
+							)
+						);
+					},
+				},
+			];
+			const { data: shownData, paginationInfo } = filterSortAndPaginate(
+				items,
+				view,
+				fields
+			);
+			return (
+				<DataViews
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					onChangeView={ () => {} }
+					actions={ removableActions }
+					fields={ fields }
+					defaultLayouts={ defaultLayouts }
+				/>
+			);
+		}
+
+		it( 'should restore focus to the next row when the focused row is deleted', async () => {
+			const user = userEvent.setup();
+			const { container } = render( <DataViewsWithRemovableItems /> );
+
+			const deleteButtons = await screen.findAllByRole( 'button', {
+				name: 'Delete',
+			} );
+			expect( deleteButtons ).toHaveLength( 3 );
+
+			await user.click( deleteButtons[ 0 ] );
+
+			await waitFor( () => {
+				expect(
+					screen.getAllByRole( 'button', { name: 'Delete' } )
+				).toHaveLength( 2 );
+			} );
+
+			// The removed row is already unmounted when this runs, so the
+			// composite's usual "only move focus when it's already within the
+			// list" rule would skip the focus move and leave focus behind on
+			// the body, at the top of the page. Focus should land on the item
+			// that replaced the deleted row. `data-active-item` is the
+			// attribute the composite sets on its active item, which the list
+			// points at the replacement row.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const activeItem = container.querySelector(
+				'[data-active-item="true"]'
+			);
+			expect( activeItem ).toHaveFocus();
+		} );
+	} );
+
 	describe( 'actions on mobile viewport', () => {
 		const testActions: Action< Data >[] = [
 			{
