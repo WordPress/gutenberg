@@ -93,32 +93,6 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 						type: 'category',
 					} ) )
 				);
-			case '/wp/v2/search?search=few&per_page=20&type=post':
-				return Promise.resolve(
-					Array.from( { length: 5 }, ( _, index ) => ( {
-						id: 300 + index,
-						title: `Few ${ index }`,
-						url: `http://wordpress.local/few-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) )
-				);
-			case '/wp/v2/search?search=few&per_page=20&type=term':
-				return Promise.resolve( [
-					...Array.from( { length: 30 }, ( _, index ) => ( {
-						id: 400 + index,
-						title: `Few ${ index }`,
-						url: `http://wordpress.local/few-${ index }/`,
-						type: 'category',
-					} ) ),
-					// Matched on a body, so the title holds nothing typed.
-					...Array.from( { length: 10 }, ( _, index ) => ( {
-						id: 450 + index,
-						title: `Unrelated ${ index }`,
-						url: `http://wordpress.local/unrelated-${ index }/`,
-						type: 'category',
-					} ) ),
-				] );
 			case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
 				return Promise.resolve( [
 					...Array.from( { length: 5 }, ( _, index ) => ( {
@@ -182,8 +156,6 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 			case '/wp/v2/media?search=few%20notes&per_page=20':
 			case '/wp/v2/search?search=many&per_page=20&type=post-format':
 			case '/wp/v2/media?search=many&per_page=20':
-			case '/wp/v2/search?search=few&per_page=20&type=post-format':
-			case '/wp/v2/media?search=few&per_page=20':
 				return Promise.resolve( [] );
 			case '/wp/v2/search?search=brewing&per_page=20&type=term':
 				return Promise.resolve( [
@@ -450,21 +422,14 @@ describe( 'fetchLinkSuggestions', () => {
 		} );
 	} );
 
-	it( 'specific type searches respect the per page limit', () => {
-		// One request, so `perPage` bounds it and `page` can page through the
-		// rest. The endpoint offers 30 here; only 20 are returned.
-		return fetchLinkSuggestions( 'few', {
-			type: 'term',
-			perPage: 20,
-		} ).then( ( suggestions ) => expect( suggestions ).toHaveLength( 20 ) );
-	} );
-
 	describe( 'Initial search suggestions', () => {
-		it( 'limits unscoped initial suggestions to the per page count', () => {
+		it( 'asks every type for its own initial suggestions', () => {
+			// `perPage` is per type, so the default of 3 for initial
+			// suggestions asks each of them for 3. Media has none here.
 			return fetchLinkSuggestions( '', {
 				isInitialSuggestions: true,
 			} ).then( ( suggestions ) =>
-				expect( suggestions ).toHaveLength( 3 )
+				expect( suggestions ).toHaveLength( 9 )
 			);
 		} );
 

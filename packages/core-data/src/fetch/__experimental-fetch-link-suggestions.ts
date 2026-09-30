@@ -26,18 +26,11 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
-	 * Which page of results to return. Only meaningful for a search narrowed by `type`.
-	 * Unscoped searches across multiple types do not have paged results due to sorting
-	 * and merging results across multiple tables.
+	 * Which page of results to return.
 	 */
 	page?: number;
 	/**
-	 * The number of results to return.
-	 *
-	 * Important: perPage acts as a limiter when searching across types, as multi-type
-	 * searches do not have pagination. If left as the default, this will return up to 80 results
-	 * (20 results from each type). For a single type, perPage follows the standard
-	 * WordPress meaning of number of results per page.
+	 * Number of results to search per SearchType.
 	 */
 	perPage?: number;
 };
@@ -125,13 +118,12 @@ export default async function fetchLinkSuggestions(
 				}
 			: searchOptions;
 
-	const { type, subtype, page } = searchOptionsToUse;
-
-	// Naming a number is asking for no more than that; naming none is taking whatever a page
-	// holds, which an unscoped search may exceed.
-	const perPage =
-		searchOptionsToUse.perPage ??
-		( searchOptions.isInitialSuggestions ? 3 : 20 );
+	const {
+		type,
+		subtype,
+		page,
+		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
+	} = searchOptionsToUse;
 
 	const { disablePostFormats = false } = editorSettings;
 
@@ -251,25 +243,7 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-
-	if ( searchOptions.isInitialSuggestions || ! search ) {
-		return sortResults( results, search ).slice( 0, perPage );
-	}
-
-	const sortedResults = rankResults( results, search );
-
-	// Return everything the endpoints gave us, ranked.
-	//
-	// `perPage` and `page` are the page size and page number for each endpoint, so an unscoped
-	// search asks four of them and can return up to four times the `perPage`. Cutting that back
-	// is what used to break paging: `page` asks each endpoint for its own next page, never for
-	// what the merge threw away, so anything cut here was on no page at all. Keeping it all means
-	// consecutive pages reach every result.
-	//
-	// A search narrowed to one type is a single request, so there `perPage` is the page boundary.
-	const kept = type ? sortedResults.slice( 0, perPage ) : sortedResults;
-
-	return kept.map( ( { result } ) => result );
+	return sortResults( results, search );
 }
 
 /**
@@ -428,58 +402,29 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 	return ( covered / searchTokens.length ) * 10;
 }
 
-type ScoredResult = {
-	result: SearchResult;
-	/**
-	 * How many of the words typed the title holds.
-	 */
-	found: number;
-	/**
-	 * Whether the title holds what was typed as one string.
-	 */
-	contains: boolean;
-	/**
-	 * Whether the title begins with what was typed.
-	 */
-	begins: boolean;
-	/**
-	 * Where the result's type sits in the wanted order, the most wanted highest.
-	 */
-	type: number;
-	/**
-	 * How much of the search the title covers.
-	 */
-	score: number;
-};
-
 /**
- * Work out how well each result answers the query, and order them by it.
- *
- * The scores come back attached to the results, so that deciding how many to keep can read what a
- * result matched instead of working it out a second time.
+ * Sort search results by relevance to the given query.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
- * be ordered after all the (potentially irrelevant) post results.
+ * be ordered after less relevant body content matches.
  *
- * A title holding every word that was typed ranks above one holding some, which ranks above one
- * holding none — whatever their types, and wherever in the title those words sit. Holding them
- * together, as the string that was typed, comes next.
+ * Ordering is done by a series of comparisons. Let's assume a search of "coffee beans":
  *
- * The type comes after that, then whether the title begins with what was typed.
- *
- * Last is how much of the search the title covers, counting a whole word for much more than a word
- * found inside a longer one. How much of the *title* the search covers is deliberately not
- * considered, so a long title is never marked down for being long, and repeating a word never
- * makes a title a better answer.
+ * 1. Number of word matches in the title: "coffee beans" matches above "coffee" in the title with
+ *    "beans" in the body text of the post
+ * 2. Ordering of the title matches. "The best coffee beans today" will match above "For the best
+ *    coffee, you need the best beans" because of the separation between words
+ * 3. Content Type: content > taxonomies > post formats > media
+ * 4. Starting with search: "Coffee beans, lightly roasted" will rank above "The freshest coffee
+ *    beans"
+ * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
+ *    cat is 75% of "Cats" and only 27% of "Caterpillar"
  *
  * @param results
  * @param search
  */
-function rankResults(
-	results: SearchResult[],
-	search: string
-): ScoredResult[] {
+export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
 
 	const scored = results.map( ( result ) => ( {
@@ -508,19 +453,7 @@ function rankResults(
 			b.score - a.score
 	);
 
-	return scored;
-}
-
-/**
- * Sort search results by relevance to the given query.
- *
- * See `rankResults` for the order this puts them in.
- *
- * @param results
- * @param search
- */
-export function sortResults( results: SearchResult[], search: string ) {
-	return rankResults( results, search ).map( ( { result } ) => result );
+	return scored.map( ( { result } ) => result );
 }
 
 /**
