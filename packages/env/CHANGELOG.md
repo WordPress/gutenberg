@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   PHP 7.3 and 7.4 must use PHPUnit 9 ([#46510](https://github.com/WordPress/gutenberg/pull/46510)).
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations when the image has the script and the healthcheck user, and pings the server over TCP with `mariadb-admin` or `mysqladmin` otherwise, so images for older MariaDB versions also become healthy ([#75046](https://github.com/WordPress/gutenberg/pull/75046), [#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 
 ## 4.2.0 (2022-01-27)
 
