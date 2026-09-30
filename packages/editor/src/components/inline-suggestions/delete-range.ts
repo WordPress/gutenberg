@@ -16,6 +16,13 @@
 const isSpace = ( ch: string ) => ch === ' ' || ch === '\t' || ch === '\u00A0';
 const isNewline = ( ch: string ) => ch === '\n';
 
+// A single-character delete steps over both halves of a surrogate pair.
+const isHighSurrogate = ( text: string, index: number ) =>
+	/[\uD800-\uDBFF]/.test( text[ index ] ?? '' ) &&
+	/[\uDC00-\uDFFF]/.test( text[ index + 1 ] ?? '' );
+const isLowSurrogate = ( text: string, index: number ) =>
+	index > 0 && isHighSurrogate( text, index - 1 );
+
 /**
  * The collapsed-caret delete input types this resolves a range for, and whether
  * each grows backward (toward 0) or forward (toward the end).
@@ -93,7 +100,7 @@ export function computeDeleteRange(
 			}
 			start = i;
 		} else {
-			start = pos - 1;
+			start = isLowSurrogate( text, pos - 1 ) ? pos - 2 : pos - 1;
 		}
 	} else {
 		start = pos;
@@ -117,7 +124,7 @@ export function computeDeleteRange(
 			}
 			end = i;
 		} else {
-			end = pos + 1;
+			end = isHighSurrogate( text, pos ) ? pos + 2 : pos + 1;
 		}
 	}
 
