@@ -23,6 +23,39 @@ interface CollaboratorsPresenceProps {
 }
 
 /**
+ * Groups awareness states by WordPress user ID and returns one entry per user.
+ * Priority: isMe first (preserves "You" label), then connected over disconnected,
+ * then most recently entered tab.
+ *
+ * @param states Awareness states to deduplicate.
+ */
+function deduplicateByUserId(
+	states: PostEditorAwarenessState[]
+): PostEditorAwarenessState[] {
+	const byUserId = new Map< number, PostEditorAwarenessState >();
+	for ( const state of states ) {
+		const userId = state.collaboratorInfo.id;
+		const existing = byUserId.get( userId );
+		if ( ! existing ) {
+			byUserId.set( userId, state );
+			continue;
+		}
+		const pickNew =
+			( state.isMe && ! existing.isMe ) ||
+			( ! state.isMe &&
+				! existing.isMe &&
+				( ( state.isConnected && ! existing.isConnected ) ||
+					( state.isConnected === existing.isConnected &&
+						state.collaboratorInfo.enteredAt >
+							existing.collaboratorInfo.enteredAt ) ) );
+		if ( pickNew ) {
+			byUserId.set( userId, state );
+		}
+	}
+	return Array.from( byUserId.values() );
+}
+
+/**
  * Renders a list of avatars for the active collaborators, with a maximum of 3 visible avatars.
  * Shows a popover with all collaborators on hover.
  *
@@ -39,21 +72,29 @@ export function CollaboratorsPresence( {
 		postType
 	) as PostEditorAwarenessState[];
 
-	const otherActiveCollaborators = activeCollaborators.filter(
-		( c ) => ! c.isMe
+	const me = activeCollaborators.find( ( c ) => c.isMe );
+
+	// Filter by user ID (not just isMe) so the current user's other tabs don't appear as collaborators.
+	const otherActiveCollaborators = deduplicateByUserId(
+		activeCollaborators.filter(
+			( c ) =>
+				! c.isMe && c.collaboratorInfo.id !== me?.collaboratorInfo.id
+		)
 	);
 
-	// Always include self in the list sorted first.
+	// Always include self in the list sorted first, one entry per WP user.
 	const collaboratorsForList = useMemo( () => {
-		return [ ...activeCollaborators ].sort( ( a, b ) => {
-			if ( a.isMe && ! b.isMe ) {
-				return -1;
+		return deduplicateByUserId( [ ...activeCollaborators ] ).sort(
+			( a, b ) => {
+				if ( a.isMe && ! b.isMe ) {
+					return -1;
+				}
+				if ( ! a.isMe && b.isMe ) {
+					return 1;
+				}
+				return 0;
 			}
-			if ( ! a.isMe && b.isMe ) {
-				return 1;
-			}
-			return 0;
-		} );
+		);
 	}, [ activeCollaborators ] );
 
 	const [ cursorRegistry ] = useState( createCursorRegistry );
@@ -69,8 +110,6 @@ export function CollaboratorsPresence( {
 	if ( otherActiveCollaborators.length === 0 ) {
 		return null;
 	}
-
-	const me = activeCollaborators.find( ( c ) => c.isMe );
 
 	return (
 		<>
