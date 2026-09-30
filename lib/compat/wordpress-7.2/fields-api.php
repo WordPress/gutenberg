@@ -328,6 +328,8 @@ function _gutenberg_get_field_collection( $directory ) {
 		$error = __( 'Only the `postType` kind supports field collections for every entity of the kind: the `name` must be a string.', 'gutenberg' );
 	} elseif ( isset( $config['module'] ) && ( ! is_string( $config['module'] ) || '' === $config['module'] ) ) {
 		$error = __( 'The `module` of a field collection must be the id of a script module.', 'gutenberg' );
+	} elseif ( array_key_exists( 'unregister', $config ) && ( null === $config['name'] || ! _gutenberg_is_field_id_list_or_true( $config['unregister'] ) ) ) {
+		$error = __( 'The `unregister` of a field collection for a single entity must be true, or a list of field ids.', 'gutenberg' );
 	}
 
 	if ( null !== $error ) {
@@ -367,6 +369,27 @@ function _gutenberg_get_field_collection( $directory ) {
 			'fields' => $fields,
 		)
 	);
+}
+
+/**
+ * Checks whether a value is `true`, or a list of field ids.
+ *
+ * @param mixed $value The value to check.
+ * @return bool Whether the value is `true`, or a list of non-empty strings.
+ */
+function _gutenberg_is_field_id_list_or_true( $value ) {
+	if ( true === $value ) {
+		return true;
+	}
+	if ( ! is_array( $value ) || ! array_is_list( $value ) ) {
+		return false;
+	}
+	foreach ( $value as $id ) {
+		if ( ! is_string( $id ) || '' === $id ) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
@@ -457,10 +480,16 @@ function _gutenberg_get_excluded_post_type_supports( $post_type, $collection ) {
  * - `module` (optional): the id of the script module providing the
  *   JavaScript parts of the fields. Every field of the collection is
  *   registered with it.
+ * - `unregister` (optional): the ids of the fields registered on the entity
+ *   before the collection that it removes, or true for all of them. Only a
+ *   collection for a single entity sets it. It is how a collection replaces
+ *   or drops a field registered before it, such as a default of every post
+ *   type, as a plugin would with {@see Gutenberg_Fields_Registry::unregister()}.
  *
- * A collection for a single entity registers its fields on it. A
+ * A collection for a single entity unregisters the fields of its
+ * `unregister`, then registers its fields on the entity. A
  * collection for a post type that does not exist or is not exposed in the
- * REST API registers nothing.
+ * REST API registers and unregisters nothing.
  *
  * A collection for every post type registers, on each post type exposed in
  * the REST API, the fields whose `supports` condition the post type meets,
@@ -504,9 +533,6 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 	if ( null === $collection ) {
 		return false;
 	}
-	if ( empty( $collection['fields'] ) ) {
-		return true;
-	}
 
 	$post_types = get_post_types( array( 'show_in_rest' => true ) );
 
@@ -516,7 +542,22 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 		if ( 'postType' === $collection['kind'] && ! in_array( $collection['name'], $post_types, true ) ) {
 			return true;
 		}
+		// Before registering, so a collection can replace a field
+		// registered before it, like a default of every post type. A
+		// collection without fields of its own can still unregister some.
+		if ( true === ( $collection['unregister'] ?? null ) ) {
+			$registry->unregister( $collection['kind'], $collection['name'] );
+		} elseif ( ! empty( $collection['unregister'] ) ) {
+			$registry->unregister( $collection['kind'], $collection['name'], $collection['unregister'] );
+		}
+		if ( empty( $collection['fields'] ) ) {
+			return true;
+		}
 		return $registry->register( $collection['origin'], $collection['kind'], $collection['name'], $collection['fields'], $collection['module'] );
+	}
+
+	if ( empty( $collection['fields'] ) ) {
+		return true;
 	}
 
 	$registered = true;
