@@ -85,6 +85,11 @@ function RichItemLayouts() {
 									Pineapple with a long label that wraps onto
 									a second line in a narrow popup
 								</Combobox.ItemLabel>
+								<Combobox.ItemDescription>
+									Sweet, tangy fruit with a firm texture that
+									works well in salads, smoothies, and
+									desserts.
+								</Combobox.ItemDescription>
 							</Combobox.Item>
 							<Combobox.Item
 								value="Create fruit"
@@ -137,6 +142,11 @@ function RichItemLayouts() {
 									Pineapple with a long label that wraps onto
 									a second line in a narrow popup
 								</Autocomplete.ItemLabel>
+								<Autocomplete.ItemDescription>
+									Sweet, tangy fruit with a firm texture that
+									works well in salads, smoothies, and
+									desserts.
+								</Autocomplete.ItemDescription>
 							</Autocomplete.Item>
 						</Autocomplete.ListBody>
 					</Autocomplete.List>
@@ -177,7 +187,8 @@ function SelectItemLayouts() {
 							line
 						</Select.ItemLabel>
 						<Select.ItemDescription>
-							Tropical fruit with a sweet taste.
+							Sweet, tangy fruit with a firm texture that works
+							well in salads, smoothies, and desserts.
 						</Select.ItemDescription>
 					</Select.Item>
 				</Select.Popup>
