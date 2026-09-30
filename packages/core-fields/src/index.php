@@ -7,7 +7,7 @@
  * registered in code, see register_core_post_supports_fields(). Their
  * definitions are the `field.php` files of the `post_supports` folder. The
  * post types whose fields differ from the defaults exclude the ones they do
- * not get on the `fields_api_post_type_support_exclusions` filter, as a
+ * not get on the `fields_api_post_type_supports_exclusions` filter, as a
  * plugin would, see exclude_core_post_type_support_fields().
  *
  * The fields of a single post type are declarative collections, the other
@@ -27,7 +27,7 @@
  *   argument.
  *
  * It makes no exception for any post type: the fields a post type does not
- * get are excluded on the `fields_api_post_type_support_exclusions` filter,
+ * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
  * before they are registered.
  *
  * Only the author field has JavaScript parts, but every field is registered
@@ -51,8 +51,8 @@ function register_core_post_supports_fields( $registry ) {
 			'comment_status' => post_type_supports( $post_type, 'comments' ),
 			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 		);
-		$ids     = array_keys( array_filter( $applies ) );
-		if ( ! $ids ) {
+		$all_fields = array_keys( array_filter( $applies ) );
+		if ( ! $all_fields ) {
 			continue;
 		}
 
@@ -71,29 +71,30 @@ function register_core_post_supports_fields( $registry ) {
 		 *
 		 * @since 7.2.0
 		 *
-		 * @param string[] $excluded  The ids of the default fields the post
-		 *                            type does not get. Default empty array.
-		 * @param string   $post_type The post type.
-		 * @param string[] $ids       The ids of the default fields the post
-		 *                            type supports.
+		 * @param string[] $excluded_fields The ids of the default fields the
+		 *                                  post type does not get. Default
+		 *                                  empty array.
+		 * @param string   $post_type       The post type.
+		 * @param string[] $all_fields      The ids of the default fields the
+		 *                                  post type supports.
 		 */
-		$excluded = apply_filters( 'fields_api_post_type_support_exclusions', array(), $post_type, $ids );
-		if ( ! is_array( $excluded ) ) {
+		$excluded_fields = apply_filters( 'fields_api_post_type_supports_exclusions', array(), $post_type, $all_fields );
+		if ( ! is_array( $excluded_fields ) ) {
 			_doing_it_wrong(
 				__FUNCTION__,
 				sprintf(
 					/* translators: 1: The name of a filter. 2: A post type. */
 					__( 'The %1$s filter must return a list of field ids. Nothing is excluded for the post type "%2$s".', 'gutenberg' ),
-					'<code>fields_api_post_type_support_exclusions</code>',
+					'<code>fields_api_post_type_supports_exclusions</code>',
 					$post_type
 				),
 				'7.2.0'
 			);
-			$excluded = array();
+			$excluded_fields = array();
 		}
 
 		// Keeps the alphabetical order of the folders.
-		$fields = array_values( array_intersect_key( $definitions, array_flip( array_diff( $ids, $excluded ) ) ) );
+		$fields = array_values( array_intersect_key( $definitions, array_flip( array_diff( $all_fields, $excluded_fields ) ) ) );
 		if ( $fields ) {
 			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_supports' );
 		}
@@ -113,26 +114,26 @@ function register_core_post_supports_fields( $registry ) {
  *
  * @since 7.2.0
  *
- * @param string[] $excluded  The ids of the default fields the post type
- *                            does not get.
- * @param string   $post_type The post type.
- * @param string[] $ids       The ids of the default fields the post type
- *                            supports.
+ * @param string[] $excluded_fields The ids of the default fields the post
+ *                                  type does not get.
+ * @param string   $post_type       The post type.
+ * @param string[] $all_fields      The ids of the default fields the post
+ *                                  type supports.
  * @return string[] The excluded ids, with those of the core post types.
  */
-function exclude_core_post_type_support_fields( $excluded, $post_type, $ids ) {
+function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $all_fields ) {
 	switch ( $post_type ) {
 		case 'wp_template':
 		case 'wp_template_part':
-			$excluded[] = 'author';
+			$excluded_fields[] = 'author';
 			break;
 		case 'attachment':
-			$excluded = array_merge( $excluded, $ids );
+			$excluded_fields = array_merge( $excluded_fields, $all_fields );
 			break;
 	}
-	return $excluded;
+	return $excluded_fields;
 }
-add_filter( 'fields_api_post_type_support_exclusions', 'exclude_core_post_type_support_fields', 10, 3 );
+add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_support_fields', 10, 3 );
 
 /**
  * Registers the fields of WordPress core: the defaults first, then the

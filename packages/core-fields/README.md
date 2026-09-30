@@ -33,15 +33,15 @@ And each folder of fields may have:
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_supports` module.
 
-It makes no exception for any post type. A post type whose fields differ from the defaults excludes the ones it does not get on the `fields_api_post_type_support_exclusions` filter, before they are registered:
+It makes no exception for any post type. A post type whose fields differ from the defaults excludes the ones it does not get on the `fields_api_post_type_supports_exclusions` filter, before they are registered:
 
 ```php
-apply_filters( 'fields_api_post_type_support_exclusions', string[] $excluded, string $post_type, string[] $ids );
+apply_filters( 'fields_api_post_type_supports_exclusions', string[] $excluded_fields, string $post_type, string[] $all_fields );
 ```
 
-The value is the list of the ids of the default fields the post type does not get, empty by default. `$ids` lists the defaults the post type supports, the ones it would get; the filter does not run for a post type supporting none. Callbacks compose: add to the incoming list rather than replacing it. A value other than a list is reported with `_doing_it_wrong()` and excludes nothing. The filter runs when the registry fires `fields_api_init`, on its first read after `init`, so add callbacks on plugin load or on `init`.
+The value is the list of the ids of the default fields the post type does not get, empty by default. `$all_fields` lists the defaults the post type supports, the ones it would get; the filter does not run for a post type supporting none. Callbacks compose: add to the incoming list rather than replacing it. A value other than a list is reported with `_doing_it_wrong()` and excludes nothing. The filter runs when the registry fires `fields_api_init`, on its first read after `init`, so add callbacks on plugin load or on `init`.
 
-Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`: templates and template parts exclude `author`, which the `wp_template` collection and the client define for them, and attachments exclude every default (`$ids`), since the media editor has its own fields.
+Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`: templates and template parts exclude `author`, which the `wp_template` collection and the client define for them, and attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
 ### Collection configuration
 
@@ -83,12 +83,12 @@ add_action(
 
 // Books do not get the default comment status.
 add_filter(
-	'fields_api_post_type_support_exclusions',
-	function ( $excluded, $post_type ) {
+	'fields_api_post_type_supports_exclusions',
+	function ( $excluded_fields, $post_type ) {
 		if ( 'book' === $post_type ) {
-			$excluded[] = 'comment_status';
+			$excluded_fields[] = 'comment_status';
 		}
-		return $excluded;
+		return $excluded_fields;
 	},
 	10,
 	2
