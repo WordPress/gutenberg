@@ -42,6 +42,7 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { RichTextData } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
@@ -56,7 +57,11 @@ import {
 	parseSuggestionPayload,
 	rememberResolvedSuggestion,
 } from './provider';
-import { SUGGESTION_CLASS } from '../inline-suggestions';
+import {
+	SUGGESTION_CLASS,
+	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_ID_ATTRIBUTE,
+} from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { store as editorStore } from '../../store';
 import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
@@ -157,18 +162,34 @@ function buildAnchorIndex(
 		}
 		for ( const attribute of inlineAttributes ) {
 			const value = attributes[ attribute ];
-			const html =
-				typeof value === 'string' ? value : value?.toHTMLString?.();
-			if ( ! html || ! html.includes( SUGGESTION_CLASS ) ) {
-				continue;
-			}
-			let ids = inline.get( attribute );
-			if ( ! ids ) {
-				ids = new Set();
-				inline.set( attribute, ids );
-			}
-			for ( const match of html.matchAll( SUGGESTION_ID_PATTERN ) ) {
-				ids.add( match[ 1 ] );
+			const addId = ( id: unknown ) => {
+				let ids = inline.get( attribute );
+				if ( ! ids ) {
+					ids = new Set();
+					inline.set( attribute, ids );
+				}
+				ids.add( String( id ) );
+			};
+			if ( value instanceof RichTextData ) {
+				// Read marker ids off the parsed formats; serializing every
+				// block's content on every store update was the cost here.
+				for ( const stack of value.formats ) {
+					for ( const format of stack ?? [] ) {
+						const id =
+							format.type === SUGGESTION_FORMAT_NAME &&
+							format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
+						if ( id ) {
+							addId( id );
+						}
+					}
+				}
+			} else if (
+				typeof value === 'string' &&
+				value.includes( SUGGESTION_CLASS )
+			) {
+				for ( const match of value.matchAll( SUGGESTION_ID_PATTERN ) ) {
+					addId( match[ 1 ] );
+				}
 			}
 		}
 	}
@@ -176,6 +197,40 @@ function buildAnchorIndex(
 }
 
 type AnchorIndex = ReturnType< typeof buildAnchorIndex >;
+
+/*
+ * Index cache keyed by the `getBlocks()` tree, which the block-editor store
+ * replaces on any attribute or structure change. Store updates that leave the
+ * tree alone (selection, notices, entity records) reuse the last index.
+ */
+const anchorIndexCache = new WeakMap<
+	object,
+	{ key: string; index: AnchorIndex }
+>();
+
+/**
+ * `buildAnchorIndex`, cached per block tree and attribute set.
+ *
+ * @param blockEditor      Block-editor selectors.
+ * @param inlineAttributes Attribute names any tracked inline note anchors to.
+ * @return The index.
+ */
+function getAnchorIndex(
+	blockEditor: any,
+	inlineAttributes: Set< string >
+): AnchorIndex {
+	const blocks = blockEditor.getBlocks?.();
+	const key = [ ...inlineAttributes ].sort().join( '|' );
+	const cached = blocks ? anchorIndexCache.get( blocks ) : undefined;
+	if ( cached && cached.key === key ) {
+		return cached.index;
+	}
+	const index = buildAnchorIndex( blockEditor, inlineAttributes );
+	if ( blocks ) {
+		anchorIndexCache.set( blocks, { key, index } );
+	}
+	return index;
+}
 
 /**
  * The rich-text attributes the given notes' inline anchors live in.
@@ -301,7 +356,16 @@ export default function SuggestionNoteGC() {
 	 */
 	const presenceSignature = useSelect(
 		( select ) => {
-			const index = buildAnchorIndex(
+			// Nothing tracked (the common case outside Suggest mode): skip
+			// the block walk entirely.
+			if (
+				! suggestionNotes.length &&
+				! resolvedNotes.length &&
+				! trashedRef.current.size
+			) {
+				return '';
+			}
+			const index = getAnchorIndex(
 				select( blockEditorStore ),
 				inlineAttributesOf(
 					suggestionNotes,
@@ -360,7 +424,7 @@ export default function SuggestionNoteGC() {
 		const blockEditor = registry.select( blockEditorStore );
 		const timers = timersRef.current;
 		const indexAnchors = () =>
-			buildAnchorIndex(
+			getAnchorIndex(
 				blockEditor,
 				inlineAttributesOf(
 					suggestionNotes,

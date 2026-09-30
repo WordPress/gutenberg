@@ -18,6 +18,8 @@ import {
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
 import { findSuggestionText } from '../inline-suggestions';
 
+const EMPTY_ARRAY: Array< string | null > = [];
+
 /**
  * Read-only status constants — keep in sync with `_wp_suggestion_status`
  * enum declared in `block-comments.php`.
@@ -27,13 +29,14 @@ const REJECTED = 'rejected';
 
 /**
  * Shared accept/reject wiring for a note that carries a suggestion payload.
- * Both the header icon buttons and the body (for resolution state and the
- * staleness dialog) consume the same hook so their behavior never diverges.
+ * `Note` calls it once and hands the result to both the header icon buttons
+ * and the body, so their state never diverges and each note pays for one
+ * block-editor subscription rather than two.
  *
  * @param thread The note thread.
  * @return Controls, or null if the thread has no payload.
  */
-function useSuggestionDecision( thread: any ) {
+export function useSuggestionDecision( thread: any ) {
 	const payload = useMemo(
 		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
 		[ thread?.meta?._wp_suggestion ]
@@ -150,16 +153,23 @@ function useSuggestionDecision( thread: any ) {
 	};
 }
 
+type SuggestionDecision = NonNullable<
+	ReturnType< typeof useSuggestionDecision >
+>;
+
 /**
  * Header-slot icon buttons (check and close) for accepting or rejecting a
  * suggestion. Rendered inline with the note's author info so the decision
  * affordance is always in view, even when the thread is long.
  *
- * @param props        Props.
- * @param props.thread The note thread.
+ * @param props          Props.
+ * @param props.decision Controls from `useSuggestionDecision`.
  */
-export function SuggestionActionButtons( { thread }: { thread: any } ) {
-	const decision = useSuggestionDecision( thread );
+export function SuggestionActionButtons( {
+	decision,
+}: {
+	decision: SuggestionDecision | null;
+} ) {
 	if ( ! decision || decision.isResolved ) {
 		return null;
 	}
@@ -197,12 +207,8 @@ export function SuggestionActionButtons( { thread }: { thread: any } ) {
 				onClick={ decision.onReject }
 			/>
 			{ /*
-				Render the staleness dialog from the same hook instance that
-				owns the click handlers — `SuggestionActionButtons` and
-				`SuggestionActions` each call `useSuggestionDecision`, so
-				their `showStaleDialog` states are independent. Keeping the
-				dialog colocated with the buttons ensures the click that
-				opens it and the dialog itself share state.
+				The dialog sits beside the buttons whose click opens it; both
+				read the one `decision` object `Note` owns.
 			*/ }
 			{ showStaleDialog && (
 				<ConfirmDialog
@@ -243,33 +249,39 @@ function ResolvedSuggestionSummary( {
 	thread: any;
 	operations: any[];
 } ) {
-	const resolvedOperations = useSelect(
+	// Select only the marker texts: `useSelect` compares arrays element by
+	// element, so strings stay equal across unrelated store updates where
+	// freshly mapped op objects would re-render every note per keystroke.
+	const markerTexts = useSelect(
 		( select ) => {
 			if ( ! thread?.blockClientId ) {
-				return operations;
+				return EMPTY_ARRAY;
 			}
 			const attributes = select( blockEditorStore ).getBlockAttributes(
 				thread.blockClientId
 			);
 			if ( ! attributes ) {
-				return operations;
+				return EMPTY_ARRAY;
 			}
-			return operations.map( ( op: any ) => {
-				if (
-					op.type !== 'inline-suggestion' ||
-					! op.attribute ||
-					op.text
-				) {
-					return op;
-				}
-				const text = findSuggestionText(
-					attributes[ op.attribute ],
-					thread.id
-				);
-				return text ? { ...op, text } : op;
-			} );
+			return operations.map( ( op: any ) =>
+				op.type !== 'inline-suggestion' || ! op.attribute || op.text
+					? null
+					: findSuggestionText(
+							attributes[ op.attribute ],
+							thread.id
+						)
+			);
 		},
 		[ operations, thread?.blockClientId, thread?.id ]
+	);
+	const resolvedOperations = useMemo(
+		() =>
+			operations.map( ( op: any, index: number ) =>
+				markerTexts[ index ]
+					? { ...op, text: markerTexts[ index ] }
+					: op
+			),
+		[ operations, markerTexts ]
 	);
 
 	return <SuggestionSummary operations={ resolvedOperations } />;
@@ -281,11 +293,17 @@ function ResolvedSuggestionSummary( {
  * Accept/Reject and the staleness dialog live in the header slot via
  * `SuggestionActionButtons` so the click and the dialog share state.
  *
- * @param props        Props.
- * @param props.thread The note thread.
+ * @param props          Props.
+ * @param props.thread   The note thread.
+ * @param props.decision Controls from `useSuggestionDecision`.
  */
-export default function SuggestionActions( { thread }: { thread: any } ) {
-	const decision = useSuggestionDecision( thread );
+export default function SuggestionActions( {
+	thread,
+	decision,
+}: {
+	thread: any;
+	decision: SuggestionDecision | null;
+} ) {
 	if ( ! decision ) {
 		return null;
 	}
