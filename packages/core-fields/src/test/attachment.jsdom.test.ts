@@ -7,6 +7,7 @@ describe( 'attachment', () => {
 			'alt_text',
 			'caption',
 			'description',
+			'filename',
 			'filesize',
 			'media_dimensions',
 			'mime_type',
@@ -78,5 +79,13 @@ describe( 'attachment', () => {
 			getValue?.( { item: { media_details: { filesize: 0 } } } )
 		).toBe( '' );
 		expect( isVisible?.( {} ) ).toBe( false );
+	} );
+
+	it( 'reads the file name from the source URL', () => {
+		expect(
+			attachment.filename.getValue?.( {
+				item: { source_url: 'https://example.org/uploads/photo.jpg' },
+			} )
+		).toBe( 'photo.jpg' );
 	} );
 } );

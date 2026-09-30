@@ -46,7 +46,6 @@ import {
 import {
 	attachedToField,
 	authorField as mediaAuthorField,
-	filenameField,
 } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -119,12 +118,7 @@ export function setIsReady( kind: string, name: string ) {
  * media editor lays them out in its own order, and media_thumbnail is not
  * included as it's shown in the canvas preview.
  */
-const MEDIA_FIELDS = [
-	mediaAuthorField,
-	filenameField,
-	attachedToField,
-	titleField,
-];
+const MEDIA_FIELDS = [ mediaAuthorField, attachedToField, titleField ];
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
