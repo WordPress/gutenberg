@@ -49,8 +49,7 @@ export default function useClickSelection() {
 					clickedClientId &&
 					clickedClientId === startClientId &&
 					node.contentEditable === 'true' &&
-					node.ownerDocument.activeElement === node &&
-					event.target.closest( '[tabindex]' ) !== node
+					node.ownerDocument.activeElement === node
 				) {
 					event.preventDefault();
 					return;
