@@ -42,6 +42,14 @@
 				"90": {
 					"$value": { "value": 48, "unit": "px" },
 					"$description": "12x base spacing"
+				},
+				"100": {
+					"$value": { "value": 56, "unit": "px" },
+					"$description": "14x base spacing"
+				},
+				"110": {
+					"$value": { "value": 64, "unit": "px" },
+					"$description": "16x base spacing"
 				}
 			}
 		},
@@ -94,6 +102,20 @@
 				"$extensions": {
 					"com.figma.scopes": [ "GAP" ]
 				}
+			},
+			"4xl": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "4x extra large padding",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"5xl": {
+				"$value": "{wpds-dimension.primitive.space.90}",
+				"$description": "5x extra large padding",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
 			}
 		},
 		"gap": {
@@ -142,6 +164,13 @@
 			"3xl": {
 				"$value": "{wpds-dimension.primitive.space.80}",
 				"$description": "3x extra large gap",
+				"$extensions": {
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"4xl": {
+				"$value": "{wpds-dimension.primitive.space.90}",
+				"$description": "4x extra large gap",
 				"$extensions": {
 					"com.figma.scopes": [ "GAP" ]
 				}
@@ -200,6 +229,13 @@
 			"lg": {
 				"$value": "{wpds-dimension.primitive.space.80}",
 				"$description": "Default size for buttons and inputs",
+				"$extensions": {
+					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+				}
+			},
+			"xl": {
+				"$value": "{wpds-dimension.primitive.space.90}",
+				"$description": "Prominent call-to-action buttons, banner controls, and large touch targets",
 				"$extensions": {
 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
 				}

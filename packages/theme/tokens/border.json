@@ -38,6 +38,13 @@
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
 			},
+			"full": {
+				"$value": { "value": 9999, "unit": "px" },
+				"$description": "Pills, badges, and circular avatar containers.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]
 			}

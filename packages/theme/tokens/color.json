@@ -1348,6 +1348,14 @@
 				"error-weak": {
 					"$value": "{wpds-color.primitive.error.fgSurface3}",
 					"$description": "Foreground color for content like text with error tone and weak emphasis."
+				},
+				"brand": {
+					"$value": "{wpds-color.primitive.primary.fgSurface3}",
+					"$description": "Foreground color for content like text and icons with brand tone and normal emphasis."
+				},
+				"brand-weak": {
+					"$value": "{wpds-color.primitive.primary.fgSurface2}",
+					"$description": "Foreground color for content like text and icons with brand tone and weak emphasis."
 				}
 			},
 			"interactive": {

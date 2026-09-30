@@ -61,6 +61,10 @@
 				"$value": { "value": 32, "unit": "px" },
 				"$description": "2X large font size"
 			},
+			"3xl": {
+				"$value": { "value": 40, "unit": "px" },
+				"$description": "3X large display font size for page hero titles and major headers"
+			},
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_SIZE" ]
 			}
@@ -91,6 +95,10 @@
 				"$value": { "value": 40, "unit": "px" },
 				"$description": "2X large line height"
 			},
+			"3xl": {
+				"$value": { "value": 48, "unit": "px" },
+				"$description": "3X large display line height"
+			},
 			"$extensions": {
 				"com.figma.scopes": [ "LINE_HEIGHT" ]
 			}
@@ -101,9 +109,17 @@
 				"$value": 400,
 				"$description": "Baseline text weight for body copy and UI text"
 			},
+			"medium": {
+				"$value": 500,
+				"$description": "Intermediate text weight for tabs, badges, and secondary emphasis"
+			},
 			"emphasis": {
 				"$value": 600,
 				"$description": "Elevated text weight for labels, controls, and headings"
+			},
+			"bold": {
+				"$value": 700,
+				"$description": "Strong text weight for prominent headers and strong emphasis"
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_WEIGHT" ]
