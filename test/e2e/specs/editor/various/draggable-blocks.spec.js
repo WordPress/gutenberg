@@ -644,6 +644,7 @@ test.describe( 'Draggable block', () => {
 	test( 'starts a multi-selection drag only from the selected blocks', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
@@ -659,12 +660,15 @@ test.describe( 'Draggable block', () => {
 			{ name: 'core/paragraph', attributes: { content: '3' } },
 		] );
 
-		// Select the first two paragraphs.
+		// Select the first two paragraphs as whole blocks: select all
+		// blocks, then shrink the selection by one at the end.
 		const paragraphs = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
 		await paragraphs.nth( 0 ).click();
-		await paragraphs.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Shift+ArrowUp' );
 
 		const getSelectedClientIds = () =>
 			page.evaluate( () =>
@@ -753,7 +757,11 @@ test.describe( 'Draggable block', () => {
 			.toBe( false );
 	} );
 
-	async function multiSelectTwoParagraphs( { editor, page } ) {
+	// Selects the first two of three paragraphs as whole blocks: select all
+	// blocks, then shrink the selection by one at the end. A shift+click
+	// from text to text makes a partial text selection instead, which is
+	// not dragged as blocks.
+	async function multiSelectTwoParagraphs( { editor, page, pageUtils } ) {
 		for ( const content of [ 'First', 'Second', 'Landing' ] ) {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -764,16 +772,23 @@ test.describe( 'Draggable block', () => {
 			name: 'Block: Paragraph',
 		} );
 		await paragraphs.nth( 0 ).click();
-		await paragraphs.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Shift+ArrowUp' );
 		await expect
 			.poll( () =>
-				page.evaluate( () =>
-					window.wp.data
-						.select( 'core/block-editor' )
-						.getSelectedBlockClientIds()
-				)
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientIds,
+						__unstableIsFullySelected,
+					} = window.wp.data.select( 'core/block-editor' );
+					return (
+						__unstableIsFullySelected() &&
+						getSelectedBlockClientIds().length
+					);
+				} )
 			)
-			.toHaveLength( 2 );
+			.toBe( 2 );
 		return paragraphs;
 	}
 
@@ -811,8 +826,13 @@ test.describe( 'Draggable block', () => {
 	test( 'drags a multi-selection from anywhere inside it', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
-		const paragraphs = await multiSelectTwoParagraphs( { editor, page } );
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
 		await dragSelectionBelowLanding( { page }, paragraphs );
 		await expect.poll( () => isDraggingBlocks( page ) ).toBe( true );
 		// The first selected block follows the pointer.
@@ -830,14 +850,24 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
-	test( 'pressing Escape cancels a multi-selection drag', async ( {
+	test( 'restores the blocks when a multi-selection drag is canceled', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
-		const paragraphs = await multiSelectTwoParagraphs( { editor, page } );
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
 		await dragSelectionBelowLanding( { page }, paragraphs );
 		await expect.poll( () => isDraggingBlocks( page ) ).toBe( true );
-		await page.keyboard.press( 'Escape' );
+		// The browser cancels a drag on Escape and fires dragend without a
+		// drop. The automated drag cannot be canceled from the keyboard, so
+		// end it the same way.
+		await editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+			body.dispatchEvent( new DragEvent( 'dragend', { bubbles: true } ) );
+		} );
 		await expect.poll( () => isDraggingBlocks( page ) ).toBe( false );
 		// The blocks return to the flow when the drag is canceled.
 		await expect
@@ -845,6 +875,9 @@ test.describe( 'Draggable block', () => {
 				paragraphs.nth( 0 ).evaluate( ( n ) => n.style.position )
 			)
 			.toBe( '' );
+		// A canceled drag has no drop. The automated drag still drops where
+		// the mouse is released, so release it outside the canvas.
+		await page.mouse.move( 5, 5 );
 		await page.mouse.up();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -857,8 +890,13 @@ test.describe( 'Draggable block', () => {
 	test( 'keeps the blocks selected after dropping a multi-selection', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
-		const paragraphs = await multiSelectTwoParagraphs( { editor, page } );
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
 		await dragSelectionBelowLanding( { page }, paragraphs );
 		await page.mouse.up();
 

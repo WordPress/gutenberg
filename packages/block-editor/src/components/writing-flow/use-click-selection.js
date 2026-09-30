@@ -15,6 +15,7 @@ export default function useClickSelection() {
 		canHostEditableRoot,
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
+		__unstableIsFullySelected,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
@@ -95,6 +96,7 @@ export default function useClickSelection() {
 					// controls).
 					if (
 						clickedClientId &&
+						__unstableIsFullySelected() &&
 						( isBlockMultiSelected( clickedClientId ) ||
 							isAncestorMultiSelected( clickedClientId ) )
 					) {

@@ -1,6 +1,6 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
-import { ENTER, BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
@@ -27,6 +27,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		getSelectedBlockClientIds,
 		isZoomOut,
 		hasMultiSelection,
+		__unstableIsFullySelected,
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
@@ -82,225 +83,61 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			}
 
 			/**
-			 * Starts a multi-selection drag from plain mouse events. The
-			 * browser only starts a native drag by itself when the press
-			 * lands exactly on selected text, which makes dragging a multi
-			 * selection unreliable. From the movement threshold on, this
-			 * drives the exact same machinery as a native drag: a synthetic
-			 * dragstart runs the handler below, and synthetic dragover and
-			 * drop events feed the drop zones and the insertion indicator.
+			 * Lets the browser start a drag of the block from any press
+			 * inside a fully selected multi-selection. The canvas is an
+			 * editing host while blocks are multi-selected, and inside an
+			 * editing host the browser places a caret on press instead of
+			 * dragging the draggable block, so the host and the pressed
+			 * field are taken out of editing for the length of the press.
 			 *
 			 * @param {MouseEvent} event Mouse down event.
 			 */
 			function onMouseDown( event ) {
-				if ( event.button !== 0 || ! hasMultiSelection() ) {
-					return;
-				}
-
-				// Shift and other modifiers adjust the selection; those
-				// presses keep their native behavior.
 				if (
+					event.button !== 0 ||
 					event.shiftKey ||
 					event.metaKey ||
 					event.ctrlKey ||
-					event.altKey
+					event.altKey ||
+					! isMultiSelected ||
+					! hasMultiSelection() ||
+					! __unstableIsFullySelected()
 				) {
 					return;
 				}
 
-				// Without a constructable DataTransfer (older Safari) the
-				// synthetic flow cannot carry the block payload; the native
-				// press-on-text drag remains the only path there.
-				if ( typeof window.DataTransfer !== 'function' ) {
-					return;
-				}
-
-				// The press either drags the selection or collapses it on
-				// click; it never starts a text selection or moves the
-				// caret. Preventing the default also stops the browser
-				// from starting its own selection gesture, which Safari
-				// otherwise keeps extending during the drag.
-				event.preventDefault();
-
 				const { ownerDocument } = node;
-				const startX = event.clientX;
-				const startY = event.clientY;
-				const selectedClientIds = getSelectedBlockClientIds();
-				let dragging = false;
-				let dataTransfer = null;
-
-				function dispatchDragEvent( type, e, target ) {
-					const dragEvent = new window.DragEvent( type, {
-						bubbles: true,
-						cancelable: true,
-						clientX: e.clientX,
-						clientY: e.clientY,
-						dataTransfer,
-					} );
-					( target ?? node ).dispatchEvent( dragEvent );
-				}
-
-				// Pressing on selected text also makes the browser start
-				// its own drag of the selection, but only when the press
-				// lands exactly on the glyphs, and the two drags would
-				// fight over the same gesture. Cancel the native drag for
-				// the length of the press; the synthetic one below handles
-				// every press the same way.
-				function suppressNativeDragStart( e ) {
-					if ( e.isTrusted ) {
-						e.preventDefault();
-						e.stopImmediatePropagation();
-					}
-				}
-
-				function onMouseMove( e ) {
-					if ( ! dragging ) {
-						if (
-							Math.abs( e.clientX - startX ) < 5 &&
-							Math.abs( e.clientY - startY ) < 5
-						) {
-							return;
-						}
-						dragging = true;
-						dataTransfer = new window.DataTransfer();
-						// The press placed the caret where it landed, which
-						// collapses the multi selection to that block. Now
-						// that the press is a drag, not a click, restore the
-						// selection from before the press so the whole
-						// selection is dragged and stays selected after the
-						// drop.
-						multiSelect(
-							selectedClientIds[ 0 ],
-							selectedClientIds[ selectedClientIds.length - 1 ]
-						);
-						// The handler is called directly instead of through
-						// a dispatched dragstart event: automation tools
-						// watch dragstart events to decide whether a native
-						// drag session follows, and would wait forever on
-						// one that is dispatched from a script.
-						onDragStart( {
-							target: node,
-							clientX: startX,
-							clientY: startY,
-							dataTransfer,
-							preventDefault() {},
-						} );
-					}
-					// Stop the press from growing a text selection while
-					// the blocks are being dragged.
-					e.preventDefault();
-					const under = ownerDocument.elementFromPoint(
-						e.clientX,
-						e.clientY
-					);
-					dispatchDragEvent( 'dragover', e, under ?? node );
-				}
-
-				function suppressNextClick( e ) {
-					e.preventDefault();
-					e.stopPropagation();
-				}
-
-				function onMouseUp( e ) {
-					if ( ! dragging ) {
-						// The prevented press also prevented the browser
-						// from placing the caret for the coming click;
-						// place it where the press landed, so collapsing
-						// the selection by clicking keeps putting the
-						// caret at the click position.
-						const selection =
-							ownerDocument.defaultView.getSelection();
-						const position = ownerDocument.caretPositionFromPoint?.(
-							e.clientX,
-							e.clientY
-						);
-
-						if ( position ) {
-							selection.setPosition(
-								position.offsetNode,
-								position.offset
-							);
-						} else {
-							const range = ownerDocument.caretRangeFromPoint?.(
-								e.clientX,
-								e.clientY
-							);
-
-							if ( range ) {
-								selection.removeAllRanges();
-								selection.addRange( range );
-							}
-						}
-					}
-					if ( dragging ) {
-						const under = ownerDocument.elementFromPoint(
-							e.clientX,
-							e.clientY
-						);
-						dispatchDragEvent(
-							'drop',
-							e,
-							under ?? ownerDocument.body
-						);
-						// The press placed a caret where it landed. Remove
-						// it and select the dropped blocks, so the caret
-						// does not pull the selection to its block once the
-						// drag is over.
-						ownerDocument.defaultView
-							.getSelection()
-							.removeAllRanges();
-						multiSelect(
-							selectedClientIds[ 0 ],
-							selectedClientIds[ selectedClientIds.length - 1 ]
-						);
-						// The click after the drop would collapse the multi
-						// selection to the pressed block.
-						ownerDocument.addEventListener(
-							'click',
-							suppressNextClick,
-							{ capture: true, once: true }
-						);
-					}
-					cleanup();
-				}
-
-				function onDragKeyDown( e ) {
-					if ( e.keyCode !== ESCAPE ) {
-						return;
-					}
-					if ( dragging ) {
-						// Ends the visuals and lets the drop zones clear
-						// the insertion indicator.
-						dispatchDragEvent( 'dragend', e );
-					}
-					cleanup();
-				}
-
-				function cleanup() {
-					ownerDocument.removeEventListener(
-						'dragstart',
-						suppressNativeDragStart,
-						{ capture: true }
-					);
-					ownerDocument.removeEventListener(
-						'mousemove',
-						onMouseMove
-					);
-					ownerDocument.removeEventListener( 'mouseup', onMouseUp );
-					ownerDocument.removeEventListener(
-						'keydown',
-						onDragKeyDown
-					);
-				}
-
-				ownerDocument.addEventListener(
-					'dragstart',
-					suppressNativeDragStart,
-					{ capture: true }
+				// Multi-selected blocks are not draggable by themselves;
+				// the pressed one is, for the length of the press.
+				const hadDraggable = node.getAttribute( 'draggable' );
+				node.setAttribute( 'draggable', 'true' );
+				const editables = [
+					node.parentElement?.closest( '[contenteditable="true"]' ),
+					event.target.closest?.( '[contenteditable="true"]' ),
+				].filter(
+					( element, index, all ) =>
+						element && all.indexOf( element ) === index
 				);
-				ownerDocument.addEventListener( 'mousemove', onMouseMove );
-				ownerDocument.addEventListener( 'mouseup', onMouseUp );
-				ownerDocument.addEventListener( 'keydown', onDragKeyDown );
+
+				for ( const element of editables ) {
+					element.contentEditable = 'false';
+				}
+
+				function restore() {
+					if ( hadDraggable === null ) {
+						node.removeAttribute( 'draggable' );
+					} else {
+						node.setAttribute( 'draggable', hadDraggable );
+					}
+					for ( const element of editables ) {
+						element.contentEditable = 'true';
+					}
+					ownerDocument.removeEventListener( 'mouseup', restore );
+					ownerDocument.removeEventListener( 'dragend', restore );
+				}
+
+				ownerDocument.addEventListener( 'mouseup', restore );
+				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
 			/**
@@ -317,6 +154,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			function startPileDrag( event, clientIds, dragElement ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
+
 				const blockNodes = clientIds
 					.map( ( selectedClientId ) =>
 						ownerDocument.querySelector(
@@ -471,7 +309,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					style.position = 'relative';
 					style.zIndex = `${ 1000 - index }`;
 					style.transformOrigin = '50% 50%';
-					style.pointerEvents = 'none';
 					style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.15)';
 					style.transform = toTransform( from, index ? scale : 1, 0 );
 
@@ -575,6 +412,14 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				over();
 
 				function dragOver( e ) {
+					// The pile rides under the pointer, so it must not catch
+					// the drag events meant for the drop zones beneath it.
+					// Applied once the drag is under way: the browser cancels
+					// a drag whose source stops receiving pointer events
+					// while the drag starts.
+					for ( const blockNode of pileNodes ) {
+						blockNode.style.pointerEvents = 'none';
+					}
 					// Only move if the pointer has moved.
 					if (
 						e.clientX === lastClientX &&
@@ -645,7 +490,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				// moves the whole selection, the same way dragging the drag
 				// handle in the block toolbar does.
 				const isMultiSelectionDrag =
-					isMultiSelected && hasMultiSelection();
+					isMultiSelected &&
+					hasMultiSelection() &&
+					__unstableIsFullySelected();
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
 					event.preventDefault();
