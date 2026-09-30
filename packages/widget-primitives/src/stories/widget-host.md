@@ -92,6 +92,8 @@ const host = useMemo< WidgetHost >(
 </WidgetHostProvider>;
 ```
 
+A host that mounts an instance twice, as a drag preview does, keeps each render's list apart, so one unmounting does not withdraw the other's.
+
 ## Consuming it
 
 Most consumers touch the seam here and nowhere else. `HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.

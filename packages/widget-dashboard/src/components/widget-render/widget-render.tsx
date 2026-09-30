@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useId, useMemo } from '@wordpress/element';
 import {
 	WidgetHostProvider,
 	WidgetRender as WidgetRenderPrimitive,
@@ -20,7 +20,8 @@ interface WidgetRenderProps {
  * callback the render contract expects. When the policy denies `edit`,
  * the widget renders read-only: it receives no `setAttributes`.
  *
- * Lends the widget the `actions` capability, bound to this instance.
+ * Lends the widget the `actions` capability, bound to this render of the
+ * instance.
  *
  * @param {WidgetRenderProps} props Component props.
  */
@@ -53,6 +54,7 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 		[ widget.uuid, layout, onLayoutChange ]
 	);
 
+	const renderId = useId();
 	const host = useMemo< WidgetHost >(
 		() => ( {
 			actions: {
@@ -60,11 +62,12 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 					declareRuntimeActions(
 						runtimeActions,
 						widget.uuid,
+						renderId,
 						actions
 					),
 			},
 		} ),
-		[ runtimeActions, widget.uuid ]
+		[ runtimeActions, widget.uuid, renderId ]
 	);
 
 	return (

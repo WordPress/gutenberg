@@ -410,6 +410,36 @@ describe( 'runtime actions', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'keeps the runtime actions after the tile is dragged', async () => {
+		const user = userEvent.setup();
+		const { container } = render(
+			<Harness
+				layout={ instance( 'test/health', { count: 3 } ) }
+				editMode
+			/>
+		);
+		await screen.findByText( 'Review 3 items' );
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const handle = container.querySelector< HTMLElement >(
+			'[aria-roledescription="sortable"]'
+		)!;
+		handle.focus();
+
+		// The drag preview mounts a second render of the instance.
+		await user.keyboard( '[Space]' );
+		await waitFor( () =>
+			expect( screen.getAllByTestId( 'hosted' ) ).toHaveLength( 2 )
+		);
+
+		await user.keyboard( '[Space]' );
+		await waitFor( () =>
+			expect( screen.getAllByTestId( 'hosted' ) ).toHaveLength( 1 )
+		);
+
+		expect( screen.getByText( 'Review 3 items' ) ).toBeInTheDocument();
+	} );
+
 	it( 'places what the preview declares from the example attributes', async () => {
 		const user = userEvent.setup();
 		render( <Harness layout={ [] } editMode /> );
