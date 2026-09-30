@@ -11,7 +11,7 @@ const NO_ACTIONS: WidgetRuntimeAction[] = [];
  * previous one whenever its identity changes, so memoize it and leave out
  * the entries that do not apply right now: an action is conditioned by not
  * declaring it. A runtime action with a declared action's `id` takes its
- * place.
+ * place, keeping the declared `icon` and `relevance` it leaves out.
  *
  * Returns whether the host took the actions. `false` means the host has no
  * `actions` capability and the widget keeps rendering its own affordances.

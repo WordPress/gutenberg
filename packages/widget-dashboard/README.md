@@ -312,7 +312,7 @@ Actions carry the same `relevance` scale, mapped to surfaces of decreasing promi
 
 Every link affordance is a real anchor. Full-bleed widgets have no footer, so all of their actions stay in the menu.
 
-A mounted widget adds to that list at runtime through `useWidgetActions` from `@wordpress/widget-primitives`. The engine lends every instance the `actions` capability, merges what it declares with the type's declared actions (a runtime action carrying a declared `id` takes its place), and routes the result by the same relevance scale. The subscription sits in the chrome, so a declaration re-renders that tile's footer and toolbar, not its body.
+A mounted widget adds to that list at runtime through `useWidgetActions` from `@wordpress/widget-primitives`. The engine lends every instance the `actions` capability, merges what it declares with the type's declared actions (a runtime action carrying a declared `id` takes its place and keeps the declared `icon` and `relevance` it leaves out), and routes the result by the same relevance scale. The subscription sits in the chrome, so a declaration re-renders that tile's footer and toolbar, not its body.
 
 A `callback` action materializes as a button: text with the icon as prefix among the leading actions, icon-only on the trailing edge, a menu item in the More menu. While a returned promise settles the control is disabled, so the action does not run again.
 

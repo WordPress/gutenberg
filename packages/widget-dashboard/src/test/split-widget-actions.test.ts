@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createElement } from '@wordpress/element';
 import type {
 	WidgetAction,
 	WidgetRuntimeAction,
@@ -69,6 +70,37 @@ describe( 'mergeWidgetActions', () => {
 			)
 		).toEqual( [ review, exportCsv ] );
 	} );
+
+	it( 'keeps the declared icon and relevance a runtime action leaves out', () => {
+		const icon = createElement( 'svg' );
+		const upgrade: WidgetRuntimeAction = {
+			id: 'details',
+			label: 'Review 3 items',
+			href: 'admin.php?page=dashboard&p=/details?status=critical',
+		};
+
+		expect(
+			mergeWidgetActions( [ { ...details, icon } ], [ upgrade ] )
+		).toEqual( [ { ...upgrade, icon, relevance: 'high' } ] );
+	} );
+
+	it( 'lets a runtime action set its own icon and relevance', () => {
+		const declared = { ...details, icon: createElement( 'svg' ) };
+		const ownIcon = createElement( 'svg', { viewBox: '0 0 24 24' } );
+
+		const [ restyled ] = mergeWidgetActions(
+			[ declared ],
+			[ { ...review, relevance: 'low', icon: ownIcon } ]
+		);
+		expect( restyled.icon ).toBe( ownIcon );
+		expect( restyled.relevance ).toBe( 'low' );
+
+		const [ bare ] = mergeWidgetActions(
+			[ declared ],
+			[ { ...review, icon: undefined } ]
+		);
+		expect( bare.icon ).toBeUndefined();
+	} );
 } );
 
 describe( 'splitWidgetActions', () => {
@@ -79,6 +111,21 @@ describe( 'splitWidgetActions', () => {
 			footer: [ review, exportCsv ],
 			menu: [ status ],
 		} );
+	} );
+
+	it( 'keeps an upgraded action on the surface its declaration chose', () => {
+		const upgrade: WidgetRuntimeAction = {
+			id: 'details',
+			label: 'Review 3 items',
+			href: 'admin.php?page=dashboard&p=/details?status=critical',
+		};
+
+		const { footer, menu } = splitWidgetActions( widgetType, [ upgrade ] );
+
+		expect( footer.map( ( { label } ) => label ) ).toEqual( [
+			'Review 3 items',
+		] );
+		expect( menu ).toEqual( [ status ] );
 	} );
 
 	it( 'keeps every action in the menu for full-bleed widgets', () => {

@@ -42,7 +42,7 @@ actions: {
 }
 ```
 
-`declare` takes the actions a mounted widget wants placed for its own instance, the ones its declaration cannot know: a label with a count, a target that follows the instance's attributes, a download of the rows it loaded. The list replaces the previous one; an empty list withdraws it. A runtime action carrying a declared action's `id` takes that action's place, so a static declaration is the baseline and the runtime upgrades it once the widget knows more.
+`declare` takes the actions a mounted widget wants placed for its own instance, the ones its declaration cannot know: a label with a count, a target that follows the instance's attributes, a download of the rows it loaded. The list replaces the previous one; an empty list withdraws it. A runtime action carrying a declared action's `id` takes that action's place and keeps the declared `icon` and `relevance` it leaves out, so a static declaration is the baseline and the runtime upgrades it once the widget knows more.
 
 The host binds the capability to the instance where it mounts the widget's render, so the widget never names which instance it is. The widget's side is `useWidgetActions`, which declares in a layout effect and withdraws on unmount. Without the capability the hook returns `false`, and the widget keeps rendering its own affordances.
 

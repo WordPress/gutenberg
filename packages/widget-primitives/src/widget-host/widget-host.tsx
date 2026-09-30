@@ -44,7 +44,8 @@ export interface WidgetHostActions {
 	/**
 	 * Replaces the instance's runtime actions with `actions`. An empty
 	 * list withdraws them. A runtime action carrying a declared action's
-	 * `id` takes its place.
+	 * `id` takes its place, keeping the declared `icon` and `relevance` it
+	 * leaves out.
 	 */
 	declare: ( actions: WidgetRuntimeAction[] ) => void;
 }

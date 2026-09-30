@@ -57,7 +57,7 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 
 It declares the actions a mounted widget wants placed by its host, computed from what the render knows: loaded data, the instance's attributes, a feature gate.
 
-The list is the instance's whole set. It replaces the previous one whenever its identity changes, so memoize it. An action that does not apply right now is left out. A runtime action carrying a declared action's `id` takes its place.
+The list is the instance's whole set. It replaces the previous one whenever its identity changes, so memoize it. An action that does not apply right now is left out. A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out.
 
 It returns whether the host took the actions. `false` means the host has no `actions` capability, and the widget keeps rendering its own affordances.
 
