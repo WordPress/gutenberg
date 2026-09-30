@@ -19,10 +19,8 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
-	featuredImageField,
 } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 export function registerEntityAction< Item >(
@@ -101,8 +99,8 @@ export const registerPostTypeSchema =
 			postType
 		);
 
-		// Runs in parallel with the lookups below; awaited once the client
-		// fields are known.
+		// Runs in parallel with the lookups the actions need, and is awaited
+		// once they are done.
 		const serverFieldsPromise = loadFields( {
 			kind: 'postType',
 			name: postType,
@@ -161,36 +159,13 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// The editor adds its derived fields after the fields registered on
-		// the server. Attachments get only the fields of the `attachment`
-		// collection, which the media editor lays out in its own order.
 		let fields: Field< any >[] = [];
-
-		if ( postType !== ATTACHMENT_POST_TYPE ) {
-			const postTypeSlug = postTypeConfig.slug;
-			// `post-thumbnails` is `true` or the list of post types the theme
-			// opted in.
-			const postThumbnails =
-				currentTheme?.theme_supports?.[ 'post-thumbnails' ];
-			const themeSupportsThumbnails = Array.isArray( postThumbnails )
-				? postThumbnails.includes( postTypeSlug )
-				: !! postThumbnails;
-
-			fields = [
-				// This field uses the editor's featured image and media picker
-				// hooks, which depend on editor context.
-				postTypeConfig.supports?.thumbnail &&
-					themeSupportsThumbnails &&
-					featuredImageField,
-			].filter( Boolean ) as Field< any >[];
-		}
-
-		let serverFields: Field< any >[] = [];
 		try {
-			serverFields = await serverFieldsPromise;
+			fields = await serverFieldsPromise;
 		} catch {
-			// The fields ported to the server go missing; say so rather than
-			// letting the screen look as if they did not exist.
+			// Every field of a post type is registered on the server, so a
+			// failed load leaves the screen with none; say so rather than
+			// letting it look as if the post type had no fields.
 			registry
 				.dispatch( noticesStore )
 				.createErrorNotice(
@@ -200,13 +175,6 @@ export const registerPostTypeSchema =
 					{ id: 'editor-entity-fields-error', type: 'snackbar' }
 				);
 		}
-		const serverFieldIds = new Set(
-			serverFields.map( ( field ) => field.id )
-		);
-		const mergedFields = [
-			...serverFields,
-			...fields.filter( ( field ) => ! serverFieldIds.has( field.id ) ),
-		];
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
@@ -216,7 +184,7 @@ export const registerPostTypeSchema =
 					action
 				);
 			} );
-			mergedFields.forEach( ( field ) => {
+			fields.forEach( ( field ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
 					postType,

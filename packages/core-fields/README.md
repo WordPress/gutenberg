@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
-- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `format`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `template`, `title`). They are registered in code, see below.
+- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `featured_media`, `format`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `template`, `title`). They are registered in code, see below.
 - `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
 - `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`), plus the reading settings shown for `home` and `index` templates (`posts_page_title`, `posts_per_page`, and `default_comment_status`).
 - `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
@@ -34,6 +34,7 @@ And each folder of fields may have:
 - `date`, for every post type but the design ones.
 - `discussion`, for the post types supporting `comments` or `trackbacks`.
 - `excerpt`, for the post types supporting `excerpt`.
+- `featured_media`, for the post types supporting `thumbnail` when the theme supports post thumbnails for them, which a theme may opt into for some post types only.
 - `format`, for the post types supporting `post-formats` when the theme supports post formats. Its elements are the formats of the theme, plus `standard`.
 - `last_edited_date`, for every post type.
 - `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.

@@ -773,7 +773,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_book' ) );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::without_every_post_type_fields( $calls['gutenberg_book'] ), 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'slug', 'sticky', 'title' ), self::without_every_post_type_fields( $calls['post'] ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'featured_media', 'notesCount', 'ping_status', 'post-content-info', 'slug', 'sticky', 'title' ), self::without_every_post_type_fields( $calls['post'] ) );
 		$this->assertSame( array( 'title' ), self::without_every_post_type_fields( $calls['gutenberg_plain'] ), 'A post type supporting titles only gets the defaults of every post type.' );
 	}
 
@@ -874,6 +874,65 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'post' ), 'id' ) );
 		$this->assertNotContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 		$this->assertNotContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+	}
+
+	/**
+	 * The featured media field needs the post type to support `thumbnail`
+	 * and the theme to support post thumbnails for that post type, which a
+	 * theme may opt into for some post types only.
+	 */
+	public function test_the_featured_media_field_follows_the_post_type_support_and_the_theme() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array( 'title', 'thumbnail' ),
+				'gutenberg_note' => array( 'title', 'thumbnail' ),
+				'gutenberg_page' => array( 'title' ),
+			)
+		);
+		$original_support = get_theme_support( 'post-thumbnails' );
+
+		try {
+			// Naming post types only narrows the support when the theme does
+			// not already support post thumbnails for every post type.
+			remove_theme_support( 'post-thumbnails' );
+			add_theme_support( 'post-thumbnails', array( 'gutenberg_book' ) );
+			self::reset_registry();
+
+			$this->assertContains( 'featured_media', self::get_support_field_ids( 'gutenberg_book' ) );
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_note' ),
+				'The theme did not opt the post type into post thumbnails.'
+			);
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_page' ),
+				'The post type does not support thumbnails.'
+			);
+
+			// A theme may also opt every post type in at once.
+			remove_theme_support( 'post-thumbnails' );
+			add_theme_support( 'post-thumbnails' );
+			self::reset_registry();
+
+			$this->assertContains( 'featured_media', self::get_support_field_ids( 'gutenberg_note' ) );
+
+			remove_theme_support( 'post-thumbnails' );
+			self::reset_registry();
+
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_book' ),
+				'A theme without post thumbnails has no featured image to set.'
+			);
+		} finally {
+			remove_theme_support( 'post-thumbnails' );
+			if ( is_array( $original_support ) ) {
+				add_theme_support( 'post-thumbnails', ...$original_support );
+			} elseif ( true === $original_support ) {
+				add_theme_support( 'post-thumbnails' );
+			}
+		}
 	}
 
 	/**
