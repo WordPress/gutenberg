@@ -29,6 +29,7 @@
  * - `last_edited_date`, for every post type.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
+ * - `parent`, for the post types supporting `page-attributes`.
  * - `password`, for every post type but the design ones.
  * - `ping_status`, for the post types supporting `trackbacks`.
  * - `post-content-info`, for the post types supporting `editor`.
@@ -65,6 +66,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'excerpt'           => post_type_supports( $post_type, 'excerpt' ),
 			'last_edited_date'  => true,
 			'notesCount'        => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
+			'parent'            => post_type_supports( $post_type, 'page-attributes' ),
 			'password'          => true,
 			'ping_status'       => post_type_supports( $post_type, 'trackbacks' ),
 			'post-content-info' => post_type_supports( $post_type, 'editor' ),

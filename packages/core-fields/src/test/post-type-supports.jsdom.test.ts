@@ -9,6 +9,7 @@ describe( 'post_type_supports', () => {
 			'discussion',
 			'excerpt',
 			'last_edited_date',
+			'parent',
 			'password',
 			'ping_status',
 			'post-content-info',
@@ -143,5 +144,12 @@ describe( 'post_type_supports', () => {
 		expect( isVisible?.( { link: 'https://example.org/?p=1' } ) ).toBe(
 			false
 		);
+	} );
+
+	it( 'provides the control and the render of the parent', () => {
+		expect( postTypeSupports.parent ).toEqual( {
+			Edit: expect.any( Function ),
+			render: expect.any( Function ),
+		} );
 	} );
 } );

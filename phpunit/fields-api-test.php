@@ -539,6 +539,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		return array(
 			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
 			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
+			'parent'            => array( 'parent', array( 'page-attributes' ) ),
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
 		);
