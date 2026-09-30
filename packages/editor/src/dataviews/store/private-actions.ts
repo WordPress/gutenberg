@@ -33,7 +33,6 @@ import {
 	patternTitleField,
 	patternDescriptionField,
 	patternSyncStatusField,
-	scheduledDateField,
 	formatField,
 	descriptionField,
 	readOnlyDescriptionField,
@@ -214,7 +213,6 @@ export const registerPostTypeSchema =
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
 				! isDesignPostType && dateField,
-				! isDesignPostType && scheduledDateField,
 				// There is no post type support flag for permalinks, and
 				// `viewable` alone is not the full condition (the type must
 				// also be public), so the field also checks each post.
