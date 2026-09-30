@@ -69,6 +69,25 @@ class BlockNoteUtils {
 		return toggleButton;
 	}
 
+	/**
+	 * Clicks an item in the "Notes" submenu of the editor's Options menu.
+	 *
+	 * @param {string} name Name of the item.
+	 */
+	async clickNotesMenuItem( name ) {
+		await this.#page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await this.#page
+			.getByRole( 'menuitem', { name: 'Notes', exact: true } )
+			.click();
+		await this.#page
+			.getByRole( 'menuitemradio', { name } )
+			.or( this.#page.getByRole( 'menuitemcheckbox', { name } ) )
+			.click();
+	}
+
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
 		await test.step(
 			`Insert a ${ type } block with a note`,

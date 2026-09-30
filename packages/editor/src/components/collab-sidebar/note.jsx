@@ -20,16 +20,15 @@ function NoteActionsMenu( { items, buttonRef } ) {
 			// Let outside interactions reach the note thread's focus-out
 			// handling so it can clear the selection.
 			modal={ false }
-			disabled={ ! items.length }
 		>
 			<Menu.Trigger
+				disabled={ ! items.length }
 				render={
 					<Button
 						ref={ buttonRef }
 						size="small"
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
-						disabled={ ! items.length }
 						accessibleWhenDisabled
 					/>
 				}
