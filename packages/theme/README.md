@@ -84,7 +84,7 @@ If your application renders React content into additional documents (an iframe, 
 
 ### Developer Tools
 
-The [`@wordpress/theme-build-tools`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme-build-tools/README.md) package provides Stylelint plugins to validate token usage and build plugins to inject generated fallback values. `@wordpress/build` enables the build plugins automatically when `@wordpress/theme-build-tools` is installed.
+The [`@wordpress/theme-build-tools`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme-build-tools/README.md) package provides Stylelint plugins to validate token usage and build plugins to inject generated fallback values. `@wordpress/build` applies the build plugins automatically.
 
 ### Accessibility
 

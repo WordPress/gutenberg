@@ -38,6 +38,7 @@
 		"@emotion/babel-plugin": "^11.13.5",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"autoprefixer": "^10.4.21",
 		"browserslist": "^4.28.7",
 		"browserslist-to-esbuild": "^2.1.1",
@@ -56,16 +57,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"vitest": "^5.0.0"
-	},
-	"peerDependencies": {
-		"@wordpress/theme-build-tools": "^1.0.0-prerelease"
-	},
-	"peerDependenciesMeta": {
-		"@wordpress/theme-build-tools": {
-			"optional": true
-		}
 	},
 	"publishConfig": {
 		"access": "public"

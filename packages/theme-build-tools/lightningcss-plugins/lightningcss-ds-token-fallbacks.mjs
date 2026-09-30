@@ -1,5 +1,5 @@
 import { transform } from 'lightningcss';
-import tokenFallbacks from '@wordpress/theme/design-token-fallbacks.js';
+import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 import { getTokenFallback } from '../postcss-plugins/ds-token-fallbacks.mjs';
 
 /** @type {Map<string, import('lightningcss').TokenOrValue[]>} */
@@ -7,43 +7,47 @@ const parsedFallbacks = new Map();
 
 // Raw replacements discard CSS Modules reference metadata. Parse the generated
 // fallbacks once so the visitor can combine them with each original reference.
-transform( {
-	filename: 'design-token-fallbacks.css',
-	code: Buffer.from(
-		`:root {\n${ Object.entries( tokenFallbacks )
-			.map(
-				( [ tokenName, fallback ] ) =>
-					`\t${ tokenName }: var(${ tokenName }, ${ fallback });`
-			)
-			.join( '\n' ) }\n}`
-	),
-	visitor: {
-		Variable( variable ) {
-			if (
-				variable.fallback &&
-				Object.hasOwn( tokenFallbacks, variable.name.ident )
-			) {
-				// Generated fallbacks reference global custom properties.
-				// Keep CSS Modules from scoping them to the consumer's file.
-				const fallback = JSON.parse(
-					JSON.stringify( variable.fallback, ( key, value ) =>
-						key === 'from' && value === null
-							? { type: 'global' }
-							: value
-					)
-				);
-				parsedFallbacks.set( variable.name.ident, fallback );
-			}
+if ( tokenFallbacks ) {
+	const fallbacks = tokenFallbacks;
+	transform( {
+		filename: 'design-token-fallbacks.css',
+		code: Buffer.from(
+			`:root {\n${ Object.entries( fallbacks )
+				.map(
+					( [ tokenName, fallback ] ) =>
+						`\t${ tokenName }: var(${ tokenName }, ${ fallback });`
+				)
+				.join( '\n' ) }\n}`
+		),
+		visitor: {
+			Variable( variable ) {
+				if (
+					variable.fallback &&
+					Object.hasOwn( fallbacks, variable.name.ident )
+				) {
+					// Generated fallbacks reference global custom properties.
+					// Keep CSS Modules from scoping them to the consumer's file.
+					const fallback = JSON.parse(
+						JSON.stringify( variable.fallback, ( key, value ) =>
+							key === 'from' && value === null
+								? { type: 'global' }
+								: value
+						)
+					);
+					parsedFallbacks.set( variable.name.ident, fallback );
+				}
+			},
 		},
-	},
-} );
+	} );
+}
 
 /**
  * Lightning CSS visitor that injects design-system token fallbacks into CSS.
  *
  * Replaces bare `var(--wpds-*)` references with `var(--wpds-*, <fallback>)`.
  *
- * Existing fallbacks are left untouched. Unknown tokens throw.
+ * Existing fallbacks are left untouched. Unknown tokens throw. Does nothing
+ * when `@wordpress/theme` is not installed.
  *
  * @type {import('lightningcss').Visitor<never>}
  */
@@ -52,7 +56,7 @@ const plugin = {
 	Variable( variable ) {
 		// Leave existing fallbacks alone, including the valid empty fallback
 		// form `var(--token,)` which Lightning CSS parses as `fallback: []`.
-		if ( variable.fallback !== null ) {
+		if ( variable.fallback !== null || ! tokenFallbacks ) {
 			return;
 		}
 

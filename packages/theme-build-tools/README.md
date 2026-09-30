@@ -5,7 +5,7 @@ Build plugins and Stylelint plugins for the WordPress Design System design token
 -   The [Stylelint plugins](#stylelint-plugins) validate `--wpds-*` design token usage in CSS.
 -   The [build plugins](#build-plugins) inject the generated fallback values into `var(--wpds-*)` references, for PostCSS, Lightning CSS, esbuild, and Vite.
 
-The token names and fallback values come from the installed `@wordpress/theme` package, so they always match the design tokens stylesheet it ships.
+The token names and fallback values come from the `@wordpress/theme` package installed in your project, so they always match the design tokens stylesheet it ships. `@wordpress/theme` is an optional peer dependency: without it, the plugins leave your code unchanged and the Stylelint rule for unknown tokens is skipped.
 
 ## Installation
 
@@ -52,7 +52,7 @@ Reports manual fallbacks that can drift from the generated values.
 
 The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
-`@wordpress/build` already applies these plugins automatically when `@wordpress/theme-build-tools` is installed. You only need to configure them manually for custom build setups.
+`@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 
 | Export                                                                  | Tool          | Scope |
 | ----------------------------------------------------------------------- | ------------- | ----- |

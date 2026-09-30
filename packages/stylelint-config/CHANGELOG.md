@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Load design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Load design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme`; `plugin-wpds/no-unknown-ds-tokens` checks against the project's installed `@wordpress/theme` and is skipped without it ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 
 ## 26.0.0 (2026-09-23)
 
