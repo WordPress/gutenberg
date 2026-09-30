@@ -20,7 +20,6 @@ import {
 	deletePost,
 	duplicateTemplatePart,
 	featuredImageField,
-	templatePartAuthorField,
 	templateField,
 	patternTitleField,
 	patternDescriptionField,
@@ -197,10 +196,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				// The server registers the default author field on the post
-				// types supporting authors, and its own on templates. Template
-				// parts exclude it there and keep this one.
-				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				// Patterns exclude the default excerpt field on the server:
 				// this one, with the same id, edits their description.
 				isPattern &&

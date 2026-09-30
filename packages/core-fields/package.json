@@ -46,13 +46,18 @@
 			"types": "./build-types/wp_template/index.d.ts",
 			"import": "./build-module/wp_template/index.mjs"
 		},
+		"./wp_template_part": {
+			"types": "./build-types/wp_template_part/index.d.ts",
+			"import": "./build-module/wp_template_part/index.mjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
 		"./attachment": "./build-module/attachment/index.mjs",
 		"./page": "./build-module/page/index.mjs",
 		"./post_type_supports": "./build-module/post_type_supports/index.mjs",
-		"./wp_template": "./build-module/wp_template/index.mjs"
+		"./wp_template": "./build-module/wp_template/index.mjs",
+		"./wp_template_part": "./build-module/wp_template_part/index.mjs"
 	},
 	"wpCopyFiles": {
 		"files": [
