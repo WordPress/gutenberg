@@ -921,3 +921,48 @@ describe( 'truncation repairs both edges', () => {
 		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
 	} );
 } );
+
+describe( 'marker attributes', () => {
+	/* A space or a `>` in one stops the whole section parsing. */
+	it.each( [
+		[ 'a space', 'a a' ],
+		[ 'a closing bracket', 'a>a' ],
+		[ 'something that is not a commit', 'not-a-sha' ],
+	] )( 'rejects a commit containing %s', ( _, sha ) => {
+		const result = mergeSection(
+			undefined,
+			{ id: 'bundle-size', body: 'Size.', sha },
+			HEAD
+		);
+
+		expect( result.body ).toBeUndefined();
+		expect( result.rejected ).toMatch( /needs both/ );
+	} );
+
+	it.each( [
+		[ 'a space', 'https://example.com/a b' ],
+		[ 'a closing bracket', 'https://example.com/a>b' ],
+		[ 'no scheme', 'example.com/run' ],
+	] )( 'drops a run link containing %s', ( _, runUrl ) => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( isParseable( merged ) ).toBe( true );
+		expect( parseSections( merged )[ 0 ].runUrl ).toBeUndefined();
+	} );
+
+	/* A comment an earlier revision wrote is read back, so it is checked too. */
+	it( 'ignores an unparseable attribute read back from a comment', () => {
+		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:bundle-size sha=nonsense run=ftp://x -->\nSize.\n<!-- /pr-meta:section:bundle-size -->\n`;
+
+		const parsed = parseSections( legacy )[ 0 ];
+
+		expect( parsed.sha ).toBeUndefined();
+		expect( parsed.runUrl ).toBeUndefined();
+	} );
+} );

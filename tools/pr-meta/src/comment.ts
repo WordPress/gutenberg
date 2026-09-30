@@ -163,9 +163,9 @@ function parseAttributes(
 	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
 		const [ key, value ] = pair.split( '=' );
 		if ( key === 'sha' ) {
-			attributes.sha = value;
+			attributes.sha = safeSha( value );
 		} else if ( key === 'run' ) {
-			attributes.runUrl = value;
+			attributes.runUrl = safeRunUrl( value );
 		}
 	}
 
@@ -213,6 +213,25 @@ export function isParseable( commentBody: string ): boolean {
  * bounds what a caller passes.
  */
 const MAX_RUN_URL = 256;
+
+/*
+ * Marker attributes carry no whitespace and no `>`, or the section stops
+ * parsing. Rather than escape them, take only a value that already reads like
+ * what it claims to be, whether it arrives from a caller or from a comment a
+ * previous revision wrote.
+ */
+const SHA = /^[0-9a-f]{7,40}$/;
+const RUN_URL = /^https:\/\/[^\s>]+$/;
+
+function safeSha( value?: string ): string | undefined {
+	return value && SHA.test( value ) ? value : undefined;
+}
+
+function safeRunUrl( value?: string ): string | undefined {
+	return value && value.length <= MAX_RUN_URL && RUN_URL.test( value )
+		? value
+		: undefined;
+}
 
 function keepStart( body: string, room: number, note: string ): string {
 	const head = body.slice( 0, room );
@@ -481,6 +500,8 @@ export function mergeSection(
 	const sections = existing ? parseSections( existing ) : [];
 
 	const current = sections.find( ( section ) => section.id === update.id );
+	/* Before the check below, so an unusable one is rejected, not stored. */
+	const sha = safeSha( update.sha );
 
 	/*
 	 * A rerun of an older commit, or a run cancelled mid-flight, can finish
@@ -492,24 +513,21 @@ export function mergeSection(
 	 * and guessing lets the stale run through.
 	 */
 	if ( definition.scope === 'commit' && ( update.body || current ) ) {
-		if ( ! update.sha || ! headSha ) {
+		if ( ! sha || ! headSha ) {
 			return {
 				rejected:
 					'A commit-scoped section needs both its own commit and the current head.',
 			};
 		}
 
-		if ( update.sha !== headSha && update.sha !== current?.sha ) {
+		if ( sha !== headSha && sha !== current?.sha ) {
 			return {
-				rejected: `Result is for ${ update.sha }, which is neither the head (${ headSha }) nor the commit already reported.`,
+				rejected: `Result is for ${ sha }, which is neither the head (${ headSha }) nor the commit already reported.`,
 			};
 		}
 	}
 
-	const runUrl =
-		update.runUrl && update.runUrl.length <= MAX_RUN_URL
-			? update.runUrl
-			: undefined;
+	const runUrl = safeRunUrl( update.runUrl );
 
 	/*
 	 * Leading spaces stay: trimming them would turn indented code into a
@@ -532,7 +550,7 @@ export function mergeSection(
 				{
 					id: update.id,
 					body,
-					sha: definition.scope === 'commit' ? update.sha : undefined,
+					sha: definition.scope === 'commit' ? sha : undefined,
 					runUrl: definition.scope === 'commit' ? runUrl : undefined,
 				},
 			]
