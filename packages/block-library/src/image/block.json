@@ -109,6 +109,10 @@
 		"isDecorative": {
 			"type": "boolean",
 			"default": false
+		},
+		"showCaption": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
