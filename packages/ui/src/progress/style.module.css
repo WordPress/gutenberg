@@ -26,14 +26,6 @@
 			}
 		}
 
-		.is-medium {
-			height: var(--wpds-dimension-size-5xs);
-		}
-
-		.is-large {
-			height: var(--wpds-dimension-size-4xs);
-		}
-
 		.indicator {
 			position: absolute;
 			inset-block-start: 0;

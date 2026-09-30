@@ -10,14 +10,6 @@ export type RootProps = ComponentProps< typeof _Progress.Root > & {
 
 export type TrackProps = ComponentProps< typeof _Progress.Track > & {
 	/**
-	 * The thickness of the track: small (1.5px), medium (4px), or large (8px).
-	 * Medium and large follow the theme's size tokens.
-	 *
-	 * @default "small"
-	 */
-	size?: 'small' | 'medium' | 'large';
-
-	/**
 	 * The progress indicator to render inside the track.
 	 */
 	children?: React.ReactNode;

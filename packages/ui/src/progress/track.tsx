@@ -9,14 +9,13 @@ import styles from './style.module.css';
  * The neutral track containing the filled progress indicator.
  */
 export const Track = forwardRef< HTMLDivElement, TrackProps >(
-	function ProgressTrack( { size = 'small', className, ...props }, ref ) {
+	function ProgressTrack( { className, ...props }, ref ) {
 		return (
 			<_Progress.Track
 				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.track,
-					styles[ `is-${ size }` ],
 					className
 				) }
 				{ ...props }

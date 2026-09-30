@@ -24,45 +24,38 @@ describe( 'Progress', () => {
 		expect( indicator.backgroundColor ).toBe( 'rgb(30, 30, 30)' );
 	} );
 
-	it.each( [
-		[ 'small', '1.5px' ],
-		[ 'medium', '4px' ],
-		[ 'large', '8px' ],
-	] as const )(
-		'uses %s thickness for both progress modes',
-		async ( size, height ) => {
-			const { rerender } = await render(
-				<Progress.Root value={ 50 } aria-label="Uploading">
-					<Progress.Track size={ size } data-testid="track">
-						<Progress.Indicator data-testid="indicator" />
-					</Progress.Track>
-				</Progress.Root>
-			);
-			const progress = screen.getByTestId( 'track' );
-			const indicator = screen.getByTestId( 'indicator' );
-			expect( getComputedStyle( progress ).height ).toBe( height );
-			expect( getComputedStyle( indicator ).height ).toBe( height );
+	it( 'keeps the bar at 1.5px in both progress modes', async () => {
+		const { rerender } = await render(
+			<Progress.Root value={ 50 } aria-label="Uploading">
+				<Progress.Track data-testid="track">
+					<Progress.Indicator data-testid="indicator" />
+				</Progress.Track>
+			</Progress.Root>
+		);
+		const progress = screen.getByTestId( 'track' );
+		const indicator = screen.getByTestId( 'indicator' );
+		expect( getComputedStyle( progress ).height ).toBe( '1.5px' );
+		expect( getComputedStyle( indicator ).height ).toBe( '1.5px' );
 
-			await rerender(
-				<Progress.Root value={ null } aria-label="Uploading">
-					<Progress.Track size={ size } data-testid="track">
-						<Progress.Indicator data-testid="indicator" />
-					</Progress.Track>
-				</Progress.Root>
-			);
-			expect( getComputedStyle( progress ).height ).toBe( height );
-			expect( getComputedStyle( indicator ).height ).toBe( height );
-			expect( getComputedStyle( indicator ).width ).toBe(
-				`${ progress.getBoundingClientRect().width / 2 }px`
-			);
-			expect( getComputedStyle( indicator ).animationName ).not.toBe(
-				'none'
-			);
-			expect( getComputedStyle( indicator ).transitionProperty ).toBe(
-				'none'
-			);
-		}
-	);
+		await rerender(
+			<Progress.Root value={ null } aria-label="Uploading">
+				<Progress.Track data-testid="track">
+					<Progress.Indicator data-testid="indicator" />
+				</Progress.Track>
+			</Progress.Root>
+		);
+		expect( getComputedStyle( progress ).height ).toBe( '1.5px' );
+		expect( getComputedStyle( indicator ).height ).toBe( '1.5px' );
+		expect( getComputedStyle( indicator ).width ).toBe(
+			`${ progress.getBoundingClientRect().width / 2 }px`
+		);
+		expect( getComputedStyle( indicator ).animationName ).not.toBe(
+			'none'
+		);
+		expect( getComputedStyle( indicator ).transitionProperty ).toBe(
+			'none'
+		);
+	} );
 
 	it.each( [
 		[ 100, 0 ],
@@ -192,12 +185,12 @@ describe( 'Progress', () => {
 		);
 	} );
 
-	it( 'applies size, tone, and custom color to the bar', async () => {
+	it( 'applies tone and custom color to the bar', async () => {
 		const Example = ( { color }: { color?: string } ) => (
 			<Progress.Root value={ 60 } style={ { color: 'rgb(0, 128, 0)' } }>
 				<Progress.Label>Uploading files</Progress.Label>
 				<Progress.Value />
-				<Progress.Track size="large" data-testid="track">
+				<Progress.Track data-testid="track">
 					<Progress.Indicator
 						tone="brand"
 						color={ color }
@@ -216,7 +209,7 @@ describe( 'Progress', () => {
 		const labelColor = getComputedStyle( label ).color;
 		const valueColor = getComputedStyle( value ).color;
 		const brandColor = getComputedStyle( indicator ).backgroundColor;
-		expect( getComputedStyle( track ).height ).toBe( '8px' );
+		expect( getComputedStyle( track ).height ).toBe( '1.5px' );
 
 		await rerender( <Example color="rgb(139, 47, 201)" /> );
 		expect( getComputedStyle( indicator ).backgroundColor ).toBe(

@@ -3,7 +3,6 @@ import * as Progress from '../index';
 import { Stack } from '../../stack';
 
 type StoryArgs = React.ComponentProps< typeof Progress.Root > &
-	Pick< React.ComponentProps< typeof Progress.Track >, 'size' > &
 	Pick< React.ComponentProps< typeof Progress.Indicator >, 'tone' | 'color' >;
 
 const meta: Meta< StoryArgs > = {
@@ -19,7 +18,6 @@ const meta: Meta< StoryArgs > = {
 	argTypes: {
 		color: { control: 'text' },
 		value: { control: { type: 'number', min: 0, max: 100 } },
-		size: { control: 'select', options: [ 'small', 'medium', 'large' ] },
 		tone: { control: 'select', options: [ 'neutral', 'brand' ] },
 	},
 	parameters: {
@@ -29,14 +27,14 @@ const meta: Meta< StoryArgs > = {
 			notes: 'New component, pending design review. The existing ProgressBar in @wordpress/components remains supported.',
 		},
 	},
-	args: { value: 60, size: 'small', tone: 'neutral' },
-	render: ( { size, tone, color, ...args } ) => (
+	args: { value: 60, tone: 'neutral' },
+	render: ( { tone, color, ...args } ) => (
 		<Progress.Root { ...args }>
 			<Stack justify="space-between" gap="sm">
 				<Progress.Label>Uploading files</Progress.Label>
 				<Progress.Value />
 			</Stack>
-			<Progress.Track size={ size }>
+			<Progress.Track>
 				<Progress.Indicator tone={ tone } color={ color } />
 			</Progress.Track>
 		</Progress.Root>
@@ -54,24 +52,24 @@ export const Indeterminate: Story = { args: { value: null } };
 /** A visible label is optional when the task has an accessible name. */
 export const BarOnly: Story = {
 	args: { 'aria-label': 'Uploading files' },
-	render: ( { size, tone, color, ...args } ) => (
+	render: ( { tone, color, ...args } ) => (
 		<Progress.Root { ...args }>
-			<Progress.Track size={ size }>
+			<Progress.Track>
 				<Progress.Indicator tone={ tone } color={ color } />
 			</Progress.Track>
 		</Progress.Root>
 	),
 };
 
-export const Brand: Story = { args: { tone: 'brand', size: 'medium' } };
+export const Brand: Story = { args: { tone: 'brand' } };
 
 /** The color prop overrides the indicator tone, leaving the other parts unchanged. */
 export const CustomColor: Story = {
-	args: { tone: 'brand', size: 'medium', color: '#8b2fc9' },
+	args: { tone: 'brand', color: '#8b2fc9' },
 };
 
 export const CurrentColor: Story = {
-	args: { tone: 'brand', size: 'medium', color: 'currentColor' },
+	args: { tone: 'brand', color: 'currentColor' },
 	decorators: [
 		( Story ) => (
 			<div style={ { color: '#8b2fc9' } }>
@@ -81,29 +79,20 @@ export const CurrentColor: Story = {
 	],
 };
 
-/** Compare sizes and tones in light, dark, RTL, and WordPress global CSS modes. */
-export const SizesAndTones: Story = {
-	render: ( { size: _size, tone: _tone, color, ...args } ) => (
+/** Compare tones in light, dark, RTL, and WordPress global CSS modes. */
+export const Tones: Story = {
+	render: ( { tone: _tone, color, ...args } ) => (
 		<Stack direction="column" gap="lg">
 			{ ( [ 'neutral', 'brand' ] as const ).map( ( tone ) => (
-				<Stack key={ tone } direction="column" gap="md">
-					{ ( [ 'small', 'medium', 'large' ] as const ).map(
-						( size ) => (
-							<Progress.Root key={ size } { ...args }>
-								<Stack justify="space-between" gap="sm">
-									<Progress.Label>{ `${ tone }, ${ size }` }</Progress.Label>
-									<Progress.Value />
-								</Stack>
-								<Progress.Track size={ size }>
-									<Progress.Indicator
-										tone={ tone }
-										color={ color }
-									/>
-								</Progress.Track>
-							</Progress.Root>
-						)
-					) }
-				</Stack>
+				<Progress.Root key={ tone } { ...args }>
+					<Stack justify="space-between" gap="sm">
+						<Progress.Label>{ tone }</Progress.Label>
+						<Progress.Value />
+					</Stack>
+					<Progress.Track>
+						<Progress.Indicator tone={ tone } color={ color } />
+					</Progress.Track>
+				</Progress.Root>
 			) ) }
 		</Stack>
 	),
@@ -118,12 +107,11 @@ export const CustomRange: Story = {
 		getAriaValueText: ( formattedValue ) =>
 			`${ formattedValue } of 10 images uploaded`,
 		tone: 'brand',
-		size: 'medium',
 	},
-	render: ( { size, tone, color, ...args } ) => (
+	render: ( { tone, color, ...args } ) => (
 		<Progress.Root { ...args }>
 			<Progress.Label>Uploading images</Progress.Label>
-			<Progress.Track size={ size }>
+			<Progress.Track>
 				<Progress.Indicator tone={ tone } color={ color } />
 			</Progress.Track>
 			<Progress.Value>

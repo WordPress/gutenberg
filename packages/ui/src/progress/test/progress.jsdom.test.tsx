@@ -114,7 +114,6 @@ describe( 'Progress', () => {
 				</Progress.Label>
 				<Progress.Track
 					ref={ trackRef }
-					size="large"
 					render={ <div data-custom="track" /> }
 				>
 					<Progress.Indicator
@@ -147,7 +146,6 @@ describe( 'Progress', () => {
 		] as const ) {
 			expect( ref.current ).toHaveAttribute( 'data-custom', name );
 		}
-		expect( trackRef.current ).not.toHaveAttribute( 'size' );
 		expect( indicatorRef.current ).not.toHaveAttribute( 'tone' );
 		expect( indicatorRef.current ).not.toHaveAttribute( 'color' );
 	} );
