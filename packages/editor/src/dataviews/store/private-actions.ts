@@ -26,7 +26,6 @@ import {
 	patternDescriptionField,
 	patternSyncStatusField,
 	formatField,
-	descriptionField,
 	readOnlyDescriptionField,
 	postsPerPageField,
 	siteDiscussionField,
@@ -212,7 +211,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				postTypeSlug === 'wp_template' && descriptionField,
 				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
 				// The `home`/`index` template summary exposes a few fields that
 				// target other entities (`root/site` and the posts page).

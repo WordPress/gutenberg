@@ -15,10 +15,12 @@
 
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { fieldExtensions as author } from './author/field';
+import { fieldExtensions as description } from './description/field';
 import { fieldExtensions as title } from './title/field';
 
 const fields: FieldsScriptParts = {
 	author,
+	description,
 	title,
 };
 
