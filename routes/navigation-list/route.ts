@@ -67,9 +67,9 @@ export const route = {
 				kind: 'postType',
 				name: NAVIGATION_POST_TYPE,
 			} ),
-			// Preload post type object (what usePostFields needs)
+			// Preload the post type object, which the actions need.
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
-			// Preload users data (what usePostFields needs for author field)
+			// Preload the users, which the author field's control needs.
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,
 			} ),
