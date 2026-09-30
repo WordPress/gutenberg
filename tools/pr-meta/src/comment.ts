@@ -207,6 +207,13 @@ export function isParseable( commentBody: string ): boolean {
  * @param note The truncation note to append.
  * @return The shortened body.
  */
+/*
+ * A run URL is one this repository builds, so anything longer is not one. It
+ * is kept in the marker and the footer as well as the note, and nothing else
+ * bounds what a caller passes.
+ */
+const MAX_RUN_URL = 256;
+
 function keepStart( body: string, room: number, note: string ): string {
 	const head = body.slice( 0, room );
 
@@ -499,17 +506,22 @@ export function mergeSection(
 		}
 	}
 
-	/* Leading spaces stay: trimming them would turn indented code into a fence. */
+	const runUrl =
+		update.runUrl && update.runUrl.length <= MAX_RUN_URL
+			? update.runUrl
+			: undefined;
+
 	/*
-	 * Truncated here rather than at render, so a writer running an older
-	 * revision of this action cannot cut a section it did not produce.
+	 * Leading spaces stay: trimming them would turn indented code into a
+	 * fence. Truncated here rather than at render, so a writer running an
+	 * older revision cannot cut a section it did not produce.
 	 */
 	const body = truncate(
 		demoteHeadings( sanitizeBody( update.body ) )
 			.replace( /^[\r\n]+/, '' )
 			.trimEnd(),
 		definition,
-		update.runUrl
+		runUrl
 	);
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
@@ -521,10 +533,7 @@ export function mergeSection(
 					id: update.id,
 					body,
 					sha: definition.scope === 'commit' ? update.sha : undefined,
-					runUrl:
-						definition.scope === 'commit'
-							? update.runUrl
-							: undefined,
+					runUrl: definition.scope === 'commit' ? runUrl : undefined,
 				},
 			]
 		: remaining;

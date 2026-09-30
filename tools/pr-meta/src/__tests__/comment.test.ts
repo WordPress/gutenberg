@@ -882,19 +882,42 @@ describe( 'truncation repairs both edges', () => {
 		}
 	} );
 
-	/* The note is built from the run URL, which is not bounded either. */
-	it( 'stays within budget when the run link cannot fit', () => {
-		const definition = getSection( 'labels' )!;
+	/*
+	 * A commit-scoped section keeps the run URL in its marker and its footer as
+	 * well as the note, so nothing else bounds what a caller passes.
+	 */
+	it( 'ignores a run link too long to be one', () => {
+		const definition = getSection( 'bundle-size' )!;
 		const merged = bodyOf(
-			mergeSection( undefined, {
-				id: 'labels',
-				body: 'Warning.\n'.repeat( 5000 ),
-				runUrl: `https://example.com/${ 'u'.repeat( 70000 ) }`,
-			} )
+			mergeSection(
+				undefined,
+				{
+					id: 'bundle-size',
+					body: 'Size.\n'.repeat( 5000 ),
+					sha: HEAD,
+					runUrl: `https://example.com/${ 'u'.repeat( 70000 ) }`,
+				},
+				HEAD
+			)
 		);
-		const section = parseSections( merged )[ 0 ].body;
+		const section = parseSections( merged )[ 0 ];
 
-		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+		expect( section.body.length ).toBeLessThanOrEqual( definition.budget );
 		expect( merged.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
+		expect( section.runUrl ).toBeUndefined();
+	} );
+
+	it( 'keeps a run link of a plausible length', () => {
+		const runUrl =
+			'https://github.com/WordPress/gutenberg/actions/runs/36418586763';
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
 	} );
 } );
