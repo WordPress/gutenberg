@@ -28,6 +28,8 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
+		'SearchableChipSelectControl.Separator':
+			SearchableChipSelectControl.Separator,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
 		'SearchableChipSelectControl.ItemLabel':
 			SearchableChipSelectControl.ItemLabel,
@@ -285,6 +287,18 @@ export const Grouped: Story = {
 			GROUPED_ITEMS[ 0 ].items[ 0 ],
 			GROUPED_ITEMS[ 1 ].items[ 0 ],
 		],
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+	},
+};
+
+/**
+ * Use `SearchableChipSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableChipSelectStories.WithSeparator,
+	args: {
+		...SearchableChipSelectStories.WithSeparator.args,
 		label: 'Fruit',
 		description: 'Choose your favorite fruits.',
 	},

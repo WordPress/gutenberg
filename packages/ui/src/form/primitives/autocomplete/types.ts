@@ -121,6 +121,11 @@ export type AutocompleteRowProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type AutocompleteSeparatorProps = Omit<
+	ComponentProps< typeof _Autocomplete.Separator >,
+	'orientation'
+>;
+
 export type AutocompleteStatusProps = ComponentProps<
 	typeof _Autocomplete.Status
 > & {
