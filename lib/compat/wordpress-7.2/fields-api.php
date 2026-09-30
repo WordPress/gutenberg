@@ -22,9 +22,8 @@
  * Fields can also be declared as files, grouped in a field collection, which
  * a `fields_api_init` callback registers with
  * {@see gutenberg_register_field_collection()}. A collection is for a single
- * entity, and can unregister the fields registered on it before, to
- * replace or drop them. WordPress core registers its own fields this way,
- * from packages/core-fields: the defaults every post type derives from its
+ * entity. WordPress core registers its own fields this way, from
+ * packages/core-fields: the defaults every post type derives from its
  * supports in code, the fields of single post types as collections.
  *
  * @package gutenberg
@@ -284,8 +283,6 @@ function _gutenberg_get_field_collection( $directory ) {
 		$error = __( 'The `name` of a field collection must be a non-empty string.', 'gutenberg' );
 	} elseif ( isset( $config['module'] ) && ( ! is_string( $config['module'] ) || '' === $config['module'] ) ) {
 		$error = __( 'The `module` of a field collection must be the id of a script module.', 'gutenberg' );
-	} elseif ( array_key_exists( 'unregister', $config ) && ! _gutenberg_is_field_id_list_or_true( $config['unregister'] ) ) {
-		$error = __( 'The `unregister` of a field collection must be true, or a list of field ids.', 'gutenberg' );
 	}
 
 	if ( null !== $error ) {
@@ -308,27 +305,6 @@ function _gutenberg_get_field_collection( $directory ) {
 }
 
 /**
- * Checks whether a value is `true`, or a list of field ids.
- *
- * @param mixed $value The value to check.
- * @return bool Whether the value is `true`, or a list of non-empty strings.
- */
-function _gutenberg_is_field_id_list_or_true( $value ) {
-	if ( true === $value ) {
-		return true;
-	}
-	if ( ! is_array( $value ) || ! array_is_list( $value ) ) {
-		return false;
-	}
-	foreach ( $value as $id ) {
-		if ( ! is_string( $id ) || '' === $id ) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/**
  * Registers the fields of a field collection.
  *
  * A collection is a folder whose `index.php` returns its configuration, with
@@ -344,18 +320,12 @@ function _gutenberg_is_field_id_list_or_true( $value ) {
  * - `module` (optional): the id of the script module providing the
  *   JavaScript parts of the fields. Every field of the collection is
  *   registered with it.
- * - `unregister` (optional): the ids of the fields registered on the entity
- *   before the collection that it removes, or true for all of them. It is
- *   how a collection replaces or drops a field registered before it, such
- *   as a default of every post type, as a plugin would with
- *   {@see Gutenberg_Fields_Registry::unregister()}. Ids that are not
- *   registered are ignored.
  *
- * The collection unregisters the fields of its `unregister`, then registers
- * its fields on the entity, after the fields registered on it before. The
- * fields keep the alphabetical order of their folders. Like the registry,
- * it does not check that the entity exists: the `/wp/v2/fields` route only
- * serves the fields of the entities the REST API exposes.
+ * The collection registers its fields on the entity, after the fields
+ * registered on it before, in the alphabetical order of their folders. The
+ * registry refuses a field registered twice for the same entity. Like the
+ * registry, it does not check that the entity exists: the `/wp/v2/fields`
+ * route only serves the fields of the entities the REST API exposes.
  *
  * Fields that apply to several entities, such as the defaults every post
  * type derives from its supports, are registered in code: a
@@ -389,15 +359,6 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 	$collection = _gutenberg_get_field_collection( $directory );
 	if ( null === $collection ) {
 		return false;
-	}
-
-	// Before registering, so a collection can replace a field registered
-	// before it, like a default of every post type. A collection without
-	// fields of its own can still unregister some.
-	if ( true === ( $collection['unregister'] ?? null ) ) {
-		$registry->unregister( $collection['kind'], $collection['name'] );
-	} elseif ( ! empty( $collection['unregister'] ) ) {
-		$registry->unregister( $collection['kind'], $collection['name'], $collection['unregister'] );
 	}
 
 	if ( empty( $collection['fields'] ) ) {
