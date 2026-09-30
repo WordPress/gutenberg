@@ -495,7 +495,14 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			// clients normalize before submitting.
 			$emojis      = gutenberg_get_note_reaction_emojis();
 			$valid_slugs = wp_list_pluck( $emojis, 'value' );
-			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
+			$emoji_slug  = '';
+
+			// Accept `content` as a string or `{ raw }`, like prepare_item_for_database().
+			if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
+				$emoji_slug = wp_strip_all_tags( $request['content'] );
+			} elseif ( isset( $request['content']['raw'] ) && is_string( $request['content']['raw'] ) ) {
+				$emoji_slug = wp_strip_all_tags( $request['content']['raw'] );
+			}
 
 			$is_curated_slug = in_array( $emoji_slug, $valid_slugs, true );
 			$is_hex_key      = (bool) preg_match(

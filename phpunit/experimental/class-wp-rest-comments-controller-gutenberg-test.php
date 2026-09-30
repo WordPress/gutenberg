@@ -509,6 +509,47 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The comments API accepts `content` as a string or as `{ raw }`, so a
+	 * reaction submitted either way must validate and store the same slug.
+	 *
+	 * @dataProvider data_reaction_raw_content_slugs
+	 *
+	 * @param string $slug The reaction slug to submit as `content.raw`.
+	 */
+	public function test_create_reaction_with_raw_content( $slug ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => array( 'raw' => $slug ),
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$reaction = get_comment( $response->get_data()['id'] );
+		$this->assertSame( $slug, $reaction->comment_content );
+	}
+
+	public function data_reaction_raw_content_slugs() {
+		return array(
+			'curated slug' => array( 'heart' ),
+			'hex key'      => array( '1f44d' ),
+		);
+	}
+
+	/**
 	 * Reactions are an internal comment type and must not be world-readable,
 	 * even when approved on a public post. Only the reacting user or a user who
 	 * can edit the comment may read a reaction via GET /wp/v2/comments/{id}.
@@ -613,7 +654,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 *
 	 * @param string $parent_kind  One of 'none', 'note', or 'comment' — what the
 	 *                             reaction's `parent` field references.
-	 * @param string $content      The reaction storage key (slug) to submit.
+	 * @param string|array $content The reaction storage key (slug) to submit,
+	 *                              as a string or as `{ raw }`.
 	 * @param bool   $authenticate Whether to set the current user before posting.
 	 * @param string $error_code   Expected WP_Error code on the REST response.
 	 * @param int    $status       Expected HTTP status code.
@@ -673,6 +715,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'hex with a bad segment'       => array( 'note', '1f468-200d-dfff', true, 'rest_comment_invalid_reaction', 400 ),
 			'uppercase hex key'            => array( 'note', '1F44D', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'               => array( 'none', 'heart', false, 'rest_comment_login_required', 401 ),
+			'raw content not in list'      => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
+			'content without raw'          => array( 'note', array( 'rendered' => 'heart' ), true, 'rest_comment_invalid_reaction', 400 ),
 		);
 	}
 
