@@ -23,7 +23,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const EVERY_POST_TYPE_FIELDS = array( 'last_edited_date', 'scheduled_date' );
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'scheduled_date' );
 
 	/**
 	 * The ids of the default fields about publishing a post, which the
@@ -31,7 +31,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const PUBLISHING_FIELDS = array( 'scheduled_date' );
+	const PUBLISHING_FIELDS = array( 'date', 'scheduled_date' );
 
 	/**
 	 * The callbacks a test hooked to `fields_api_init`, as callback and
@@ -553,6 +553,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function data_default_fields_of_every_post_type() {
 		return array(
+			'date'             => array( 'date', true ),
 			'last_edited_date' => array( 'last_edited_date', false ),
 			'scheduled_date'   => array( 'scheduled_date', true ),
 		);

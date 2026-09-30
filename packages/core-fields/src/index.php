@@ -23,6 +23,7 @@
  *
  * - `author`, for the post types supporting `author`.
  * - `comment_status`, for the post types supporting `comments`.
+ * - `date`, for every post type but the design ones.
  * - `discussion`, for the post types supporting `comments` or `trackbacks`.
  * - `excerpt`, for the post types supporting `excerpt`.
  * - `last_edited_date`, for every post type.
@@ -56,6 +57,7 @@ function register_core_post_type_supports_fields( $registry ) {
 		$applies = array(
 			'author'            => post_type_supports( $post_type, 'author' ),
 			'comment_status'    => post_type_supports( $post_type, 'comments' ),
+			'date'              => true,
 			'discussion'        => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
 			'excerpt'           => post_type_supports( $post_type, 'excerpt' ),
 			'last_edited_date'  => true,
@@ -131,7 +133,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   Their content is blocks laying out a site, not text to read.
  * - The design post types (templates, template parts, patterns, and
  *   navigation menus): the fields about publishing a post
- *   (`scheduled_date`). They lay out a site rather than publish content.
+ *   (`date`, `scheduled_date`). They lay out a site rather than publish
+ *   content.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -163,7 +166,7 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 			break;
 	}
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ), true ) ) {
-		$excluded_fields = array_merge( $excluded_fields, array( 'scheduled_date' ) );
+		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'scheduled_date' ) );
 	}
 	return $excluded_fields;
 }
