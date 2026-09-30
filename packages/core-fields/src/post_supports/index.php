@@ -10,7 +10,8 @@
  *
  * The `supports` of each `field.php` declares the support it derives from.
  * A post type whose own collection redefines or drops some of these fields
- * excludes their supports with `exclude_supports`, see the `wp_template`,
+ * excludes them on the `fields_api_exclude_post_type_supports` filter, see
+ * the `exclude-post-type-supports.php` of the `wp_template`,
  * `wp_template_part`, and `attachment` collections.
  *
  * Only the author field has JavaScript parts, but every field of the
