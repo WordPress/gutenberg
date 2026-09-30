@@ -202,14 +202,6 @@ export function isParseable( commentBody: string ): boolean {
 /* Enough for a reopened or closed fence and its newlines. */
 const REPAIR_ROOM = 16;
 
-/* A section written by a newer revision of this action still has to fit. */
-const UNKNOWN_SECTION: SectionDefinition = {
-	id: 'unknown',
-	heading: '',
-	scope: 'pr-state',
-	budget: 4000,
-};
-
 function truncate(
 	body: string,
 	definition: SectionDefinition,
@@ -222,7 +214,7 @@ function truncate(
 	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
 	const note = `<sub>Truncated.${ link }</sub>`;
 	/* The note and any repaired markup have to fit the budget as well. */
-	const room = definition.budget - note.length - REPAIR_ROOM;
+	const room = Math.max( definition.budget - note.length - REPAIR_ROOM, 0 );
 
 	/*
 	 * Keeping the ending, where props holds the trailer a committer copies.
@@ -326,11 +318,7 @@ function renderSection(
 	} -->`;
 	const close = `<!-- /pr-meta:section:${ section.id } -->`;
 	const heading = definition ? `#### ${ definition.heading }\n\n` : '';
-	const body = truncate(
-		section.body,
-		definition ?? UNKNOWN_SECTION,
-		section.runUrl
-	);
+	const body = section.body;
 
 	const delimited = `${ open }\n${ body }\n${ close }`;
 
@@ -462,9 +450,17 @@ export function mergeSection(
 	}
 
 	/* Leading spaces stay: trimming them would turn indented code into a fence. */
-	const body = demoteHeadings( sanitizeBody( update.body ) )
-		.replace( /^[\r\n]+/, '' )
-		.trimEnd();
+	/*
+	 * Truncated here rather than at render, so a writer running an older
+	 * revision of this action cannot cut a section it did not produce.
+	 */
+	const body = truncate(
+		demoteHeadings( sanitizeBody( update.body ) )
+			.replace( /^[\r\n]+/, '' )
+			.trimEnd(),
+		definition,
+		update.runUrl
+	);
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);

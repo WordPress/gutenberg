@@ -416,17 +416,38 @@ describe( 'isParseable', () => {
 } );
 
 describe( 'unknown sections', () => {
-	it( 'holds a section it does not know to a budget', () => {
-		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:from-the-future -->\n${ 'x'.repeat(
-			10000
-		) }\n<!-- /pr-meta:section:from-the-future -->\n`;
+	/*
+	 * A writer only truncates what it wrote. Cutting a body it read back would
+	 * let an older revision of this action shorten a section it cannot render.
+	 */
+	it( 'leaves a section it does not know as it found it', () => {
+		const long = 'x'.repeat( 10000 );
+		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:from-the-future -->\n${ long }\n<!-- /pr-meta:section:from-the-future -->\n`;
 
 		const merged = bodyOf(
 			mergeSection( legacy, { id: 'props', body: 'Props.' } )
 		);
 
-		expect( merged ).toContain( 'Truncated.' );
-		expect( merged.length ).toBeLessThan( 10000 );
+		expect( merged ).toContain( long );
+		expect( merged ).not.toContain( 'Truncated.' );
+	} );
+
+	/* The same holds for a section this revision does know. */
+	it( 'leaves a known section it did not write as it found it', () => {
+		const long = `\`\`\`
+${ 'Co-authored-by: someone\n'.repeat( 900 ) }\`\`\``;
+		const comment = bodyOf(
+			mergeSection( undefined, { id: 'props', body: long } )
+		);
+		const stored = parseSections( comment )[ 0 ].body;
+
+		const merged = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' } )
+		);
+
+		expect(
+			parseSections( merged ).find( ( s ) => s.id === 'props' )?.body
+		).toBe( stored );
 	} );
 } );
 

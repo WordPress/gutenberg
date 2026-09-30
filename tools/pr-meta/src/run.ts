@@ -69,7 +69,11 @@ async function run() {
 	}
 
 	const api = new GitHubAPI( token, getRepo() );
-	const existing = await api.findComment( prNumber );
+	const retire = getInput( 'retire-comments-matching' );
+	const { comment: existing, retirable } = await api.findComments(
+		prNumber,
+		retire
+	);
 
 	if ( existing && ! isParseable( existing.body ) ) {
 		setFailed(
@@ -120,9 +124,18 @@ async function run() {
 		return;
 	}
 
+	/* Only once the section is in place, so nothing is lost if this fails. */
+	const retireStandalone = async () => {
+		for ( const id of retirable ) {
+			await api.deleteComment( id );
+			info( `Retired the standalone comment ${ id }.` );
+		}
+	};
+
 	/* Props runs on every comment, so most writes change nothing. */
 	if ( existing?.body === merged ) {
 		info( `The "${ section }" section is already up to date.` );
+		await retireStandalone();
 		return;
 	}
 
@@ -131,6 +144,7 @@ async function run() {
 		: await api.createComment( prNumber, merged );
 
 	info( `Wrote the "${ section }" section to ${ url }` );
+	await retireStandalone();
 }
 
 export { run };

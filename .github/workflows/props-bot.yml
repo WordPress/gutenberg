@@ -29,13 +29,13 @@ on:
         types:
             - created
 
-# Cancels all previous runs for a pull request that have not completed.
+# Cancels all previous runs for a pull request that have not completed, which
+# is also what keeps two gathers from writing their lists out of order.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. A run takes a group of its own when cancelling it would strand
-    # the label, when a fork's review token cannot write, or when it does no
-    # props work at all.
-    group: ${{ github.workflow }}-${{ github.event.action != 'labeled' && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    # places. A fork's review run stands apart: its token cannot write, so
+    # sharing the key would let it cancel a run that could have.
+    group: ${{ github.workflow }}-${{ ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -43,39 +43,9 @@ concurrency:
 permissions: {}
 
 jobs:
-    # Removes the label that asked for a refresh.
-    #
-    # Its own job, so it neither needs the gather's twenty minutes nor holds
-    # write access open for it, and so a cancellation mid-gather cannot leave
-    # the label behind with no way to ask again.
-    remove-label:
-        name: Remove the props-bot label
-        runs-on: 'ubuntu-24.04'
-        permissions:
-            pull-requests: write
-        timeout-minutes: 5
-        if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
-
-        steps:
-            - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-              env:
-                  ISSUE_NUMBER: ${{ github.event.number }}
-              with:
-                  retries: 2
-                  retry-exempt-status-codes: 418
-                  script: |
-                      github.rest.issues.removeLabel({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issue_number: process.env.ISSUE_NUMBER,
-                        name: 'props-bot'
-                      });
-
     # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
         name: Generate a list of props
-        # Beside the removal, a cancellation could strand the label.
-        needs: remove-label
         runs-on: 'ubuntu-24.04'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
@@ -90,12 +60,12 @@ jobs:
         # - A review is created or commented on.
         # - The pull request is opened, synchronized, marked ready for review, or reopened.
         # - The `props-bot` label is added to the pull request.
-        # `!cancelled()` because the removal above is skipped on every event
-        # that did not add the label.
+        # A fork's review run is skipped rather than gathered and thrown away:
+        # its token cannot write the comment at the end of it.
         if: |
-            ! cancelled() && (
+            (
               github.event_name == 'issue_comment' && github.event.issue.pull_request ||
-              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
+              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.event.pull_request.head.repo.full_name == github.repository ||
               github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
               'props-bot' == github.event.label.name
             ) &&
@@ -114,9 +84,8 @@ jobs:
         name: Update PR meta comment
         needs: props-bot
         # Only when the list was gathered: an empty body from a failed run would
-        # clear a props list nothing had disproved. `!cancelled()` because an
-        # implicit `success()` would also weigh the skipped label job.
-        if: ${{ !cancelled() && needs.props-bot.result == 'success' }}
+        # clear a props list nothing had disproved.
+        if: ${{ needs.props-bot.result == 'success' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -148,11 +117,18 @@ jobs:
                   BODY: ${{ needs.props-bot.outputs.comment-body }}
               run: |
                   mkdir -p pr-meta
+                  : > pr-meta/body.md
 
-                  # Drop the intro: it is what the standalone props bot
-                  # searches for, and it would find this comment. Its note
-                  # about refreshing goes back in wording that will not match.
-                  printf '%s\n' "$BODY" | sed '1{/^The following accounts have interacted/d;}' > pr-meta/body.md
+                  # No contributors, so an empty body clears the section rather
+                  # than leaving one that holds nothing but the note.
+                  if [ -z "$BODY" ]; then
+                    exit 0
+                  fi
+
+                  # Drop the intro wherever it sits: it is what the standalone
+                  # props bot searches for, and it would find this comment. Its
+                  # note about refreshing goes back in wording that will not.
+                  printf '%s\n' "$BODY" | sed '/^The following accounts have interacted/d' > pr-meta/body.md
 
                   cat >> pr-meta/body.md <<'EOF'
 
@@ -167,3 +143,8 @@ jobs:
                   # The action comes from the default branch, which need not
                   # yet know where each of the four events carries this.
                   pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
+                  # Retires the standalone comment on pull requests open before
+                  # this landed, so no one copies its list once it stops moving.
+                  # Editing a comment notifies nobody, so an unlinked
+                  # contributor is no longer pinged by this list.
+                  retire-comments-matching: 'The following accounts have interacted'

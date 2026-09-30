@@ -45,6 +45,12 @@ permissions:
 
 The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a local action needs the repository on disk. `sparse-checkout: tools/pr-meta` is enough. Under `pull_request_target` the checkout must stay on the base ref, never the pull request's head.
 
+## What a section gives up
+
+The comment is edited in place, and GitHub only notifies on the `@mention`s in a comment when it is first created. A section that mentions someone therefore does not notify them, so it cannot be the only way they hear about something.
+
+A writer running an older revision of this action renders every section from what it reads back, so it shows a section it does not know about verbatim rather than reformatting it. Release branches can lag trunk for a while, and that is what keeps them from reshaping a section they were never taught.
+
 ## Adding a section
 
 Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.

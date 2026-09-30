@@ -3,7 +3,7 @@ import { run } from '../run.ts';
 
 const api = vi.hoisted( () => ( {
 	getHeadSha: vi.fn(),
-	findComment: vi.fn(),
+	findComments: vi.fn(),
 	createComment: vi.fn(),
 	updateComment: vi.fn(),
 	deleteComment: vi.fn(),
@@ -39,7 +39,7 @@ describe( 'run', () => {
 		}
 		process.env.GITHUB_REPOSITORY = 'WordPress/gutenberg';
 		api.getHeadSha.mockResolvedValue( HEAD );
-		api.findComment.mockResolvedValue( undefined );
+		api.findComments.mockResolvedValue( { retirable: [] } );
 		api.createComment.mockResolvedValue( 'https://example.com/comment' );
 		api.updateComment.mockResolvedValue( 'https://example.com/comment' );
 		withInputs( {
@@ -50,6 +50,7 @@ describe( 'run', () => {
 			'pr-number': '10',
 			'commit-sha': '',
 			'run-url': '',
+			'retire-comments-matching': '',
 		} );
 	} );
 
@@ -74,5 +75,62 @@ describe( 'run', () => {
 		expect( api.createComment ).not.toHaveBeenCalled();
 		expect( api.updateComment ).not.toHaveBeenCalled();
 		expect( api.deleteComment ).not.toHaveBeenCalled();
+	} );
+
+	it( 'retires the standalone comment once the section is written', async () => {
+		withInputs( {
+			section: 'props',
+			body: 'Props.',
+			'retire-comments-matching': 'The following accounts',
+		} );
+		api.findComments.mockResolvedValue( { retirable: [ 7, 8 ] } );
+
+		await run();
+
+		expect( api.createComment ).toHaveBeenCalledTimes( 1 );
+		expect( api.deleteComment.mock.calls.map( ( c ) => c[ 0 ] ) ).toEqual( [
+			7, 8,
+		] );
+	} );
+
+	/* Retiring first would leave nothing behind if the write then failed. */
+	it( 'retires nothing when the write is skipped as stale', async () => {
+		withInputs( {
+			section: 'bundle-size',
+			body: 'Size.',
+			'commit-sha': 'b'.repeat( 40 ),
+			'retire-comments-matching': 'The following accounts',
+		} );
+		api.findComments.mockResolvedValue( { retirable: [ 7 ] } );
+
+		await run();
+
+		expect( api.createComment ).not.toHaveBeenCalled();
+		expect( api.deleteComment ).not.toHaveBeenCalled();
+	} );
+
+	/* The section being already in place is exactly when it is safe to retire. */
+	it( 'retires the standalone comment when the section is already current', async () => {
+		withInputs( {
+			section: 'props',
+			body: 'Props.',
+			'retire-comments-matching': 'The following accounts',
+		} );
+		api.createComment.mockResolvedValue( 'https://example.com/comment' );
+
+		// Write once to learn the exact body, then present it as already there.
+		await run();
+		const written = api.createComment.mock.calls[ 0 ][ 1 ];
+		api.createComment.mockClear();
+		api.deleteComment.mockClear();
+		api.findComments.mockResolvedValue( {
+			comment: { id: 1, body: written },
+			retirable: [ 7 ],
+		} );
+
+		await run();
+
+		expect( api.updateComment ).not.toHaveBeenCalled();
+		expect( api.deleteComment ).toHaveBeenCalledWith( 7 );
 	} );
 } );
