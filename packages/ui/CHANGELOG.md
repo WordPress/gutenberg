@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
+-   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
