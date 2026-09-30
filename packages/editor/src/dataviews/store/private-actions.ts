@@ -21,7 +21,6 @@ import {
 	duplicateTemplatePart,
 	featuredImageField,
 	parentField,
-	passwordField,
 	slugField,
 	templatePartAuthorField,
 	titleField,
@@ -223,7 +222,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				! isDesignPostType && passwordField,
 				postTypeSlug === 'wp_template' && descriptionField,
 				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
 				// The `home`/`index` template summary exposes a few fields that

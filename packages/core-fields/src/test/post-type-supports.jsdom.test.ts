@@ -9,6 +9,7 @@ describe( 'post_type_supports', () => {
 			'discussion',
 			'excerpt',
 			'last_edited_date',
+			'password',
 			'ping_status',
 			'post-content-info',
 			'scheduled_date',
@@ -120,5 +121,13 @@ describe( 'post_type_supports', () => {
 		expect( getValue?.( { item: { status: 'publish' } } ) ).toBe(
 			'publish'
 		);
+	} );
+
+	it( 'shows the password of the posts that can have one', () => {
+		const { isVisible } = postTypeSupports.password;
+		const _links = { 'wp:action-publish': [] };
+		expect( isVisible?.( { status: 'draft', _links } ) ).toBe( true );
+		expect( isVisible?.( { status: 'private', _links } ) ).toBe( false );
+		expect( isVisible?.( { status: 'draft', _links: {} } ) ).toBe( false );
 	} );
 } );
