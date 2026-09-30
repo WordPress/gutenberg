@@ -214,39 +214,32 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
 
 /**
- * Registers a collection of the fields WordPress core registers, from
- * packages/core-fields/src/<collection>, copied to
- * build/scripts/core-fields/<collection> by the build.
+ * Returns the fields of a collection of the fields WordPress core registers.
  *
- * A collection holds a folder per field and an `index.php`:
- *
- * - `<field>/field.php` returns the serializable part of the field. Its id is
- *   the name of the folder, unless the file sets an `id`. The fields are in
- *   the alphabetical order of their folders.
- * - `index.php` returns the function placing the fields: it receives the
- *   registry, the fields of the collection, and the id of the script module
- *   of the collection, and registers each field for the entities it applies
- *   to.
+ * The collections are in packages/core-fields/src, copied to
+ * build/scripts/core-fields by the build. A collection holds a folder per
+ * field, whose `field.php` returns the serializable part of the field, and an
+ * `index.php` registering the fields for the entities they apply to on the
+ * `fields_api_init` action. The Gutenberg plugin loads the `index.php` of each
+ * collection, see lib/load.php.
  *
  * The JavaScript parts of the fields, if any, are in `<field>/field.tsx`, and
  * the `index.ts` of the collection gathers them in the
- * `@wordpress/core-fields/<collection>` script module. Only the collections
- * that have one pass `$has_script_module`.
+ * `@wordpress/core-fields/<collection>` script module, which the `index.php`
+ * registers along with the fields.
  *
- * @param Gutenberg_Fields_Registry $registry          The registry being read.
- * @param string                    $collection        The name of the collection, e.g. `post_supports`.
- * @param bool                      $has_script_module Whether the collection has a script module.
- * @param string|null               $directory         The directory of the collections. Defaults to
- *                                                     the build output of the package.
- * @return bool Whether the collection was found.
+ * @param string $directory The directory of the collection.
+ * @return array<string, array> The fields of the collection, keyed by id, in
+ *                              the alphabetical order of their folders. The
+ *                              id of a field is the name of its folder,
+ *                              unless its `field.php` sets an `id`, and it
+ *                              comes first in the field.
  */
-function _gutenberg_register_core_fields_collection( Gutenberg_Fields_Registry $registry, $collection, $has_script_module, $directory = null ) {
-	$directory = ( $directory ?? __DIR__ . '/../../../build/scripts/core-fields' ) . '/' . $collection;
-	if ( ! is_dir( $directory ) || ! is_file( $directory . '/index.php' ) ) {
-		return false;
-	}
-
+function gutenberg_get_field_collection_fields( $directory ) {
 	$files = glob( $directory . '/*/field.php' );
+	if ( empty( $files ) ) {
+		return array();
+	}
 	sort( $files, SORT_STRING );
 
 	$fields = array();
@@ -256,70 +249,12 @@ function _gutenberg_register_core_fields_collection( Gutenberg_Fields_Registry $
 			continue;
 		}
 		// The id comes first, like in the fields registered directly.
-		$fields[] = array_merge( array( 'id' => basename( dirname( $file ) ) ), $field );
+		$field                  = array_merge( array( 'id' => basename( dirname( $file ) ) ), $field );
+		$fields[ $field['id'] ] = $field;
 	}
 
-	$place = require $directory . '/index.php';
-	$place( $registry, $fields, $has_script_module ? '@wordpress/core-fields/' . $collection : null );
-
-	return true;
+	return $fields;
 }
-
-/**
- * Registers the default fields of every post type exposed in the REST API.
- *
- * These are the fields ported to the server so far; the editor still derives
- * the rest client-side in packages/editor/src/dataviews/store/private-actions.ts
- * and merges these into them. They are the `post_supports` collection, see
- * packages/core-fields/src/post_supports: which post type gets which field
- * depends on its supports. The JavaScript parts of the fields that have any
- * (the author field: its render component, elements, value setter, and
- * visibility) ship in the `@wordpress/core-fields/post_supports` script
- * module, registered along with the field.
- *
- * The fields depend on the supports of the post type, which are not final
- * until `init` completes: core registers its post types on `init` at
- * priority 0, see
- * https://github.com/WordPress/wordpress-develop/blob/b528aeff3b96f089993c17f6dfb3d7aa96433a8b/src/wp-includes/default-filters.php#L592,
- * custom post types are usually registered at the default priority (10),
- * and plugins add or remove supports on `init` too, with
- * add_post_type_support() and remove_post_type_support(). Hence it runs on
- * `fields_api_init`, which the registry fires on its first read, after
- * `init`: while handling a REST request, or on `admin_footer` when the page
- * loads the editor script. At priority 0, so a plugin altering the defaults on
- * the registry at the default priority sees them registered.
- *
- * The post types whose fields differ from the defaults derived from their
- * supports (templates, attachments) adjust them in their own step, hooked
- * to the same action at priority 9, right after this one.
- *
- * @param Gutenberg_Fields_Registry $registry The registry being read.
- */
-function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry $registry ) {
-	_gutenberg_register_core_fields_collection( $registry, 'post_supports', true );
-}
-add_action( 'fields_api_init', '_gutenberg_register_posttype_supports_fields', 0 );
-
-/**
- * Adjusts the default fields of templates.
- *
- * Templates support authors, so they get the default author field like any
- * other post type. Yet their author is the theme, plugin, site, or user that
- * provides them rather than the post author: the default author field is
- * replaced with the one of the `wp_template` collection, see
- * packages/core-fields/src/wp_template, whose JavaScript parts ship in the
- * `@wordpress/core-fields/wp_template` script module.
- *
- * It runs right after the default fields are registered, on
- * `fields_api_init` at priority 9, so a plugin hooking the action at
- * the default priority sees the final defaults.
- *
- * @param Gutenberg_Fields_Registry $registry The registry being read.
- */
-function _gutenberg_register_posttype_wp_template_fields( Gutenberg_Fields_Registry $registry ) {
-	_gutenberg_register_core_fields_collection( $registry, 'wp_template', true );
-}
-add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_fields', 9 );
 
 /**
  * Adjusts the default fields of template parts.
@@ -339,26 +274,3 @@ function _gutenberg_register_posttype_wp_template_part_fields( Gutenberg_Fields_
 	$registry->unregister( 'postType', 'wp_template_part', array( 'author' ) );
 }
 add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );
-
-/**
- * Replaces the default fields of attachments with the media fields.
- *
- * Attachments support authors and comments, so they get the default author
- * and comment status fields like any other post type. Yet the media editor
- * shows its own set of fields, declared client-side in
- * packages/media-fields/src, none of which is a default one. The fields
- * registered by `core` are replaced with the `attachment` collection, see
- * packages/core-fields/src/attachment: the media fields ported to the server
- * so far. They are plain data, so the collection has no script module.
- * Fields registered by plugins in between are kept.
- *
- * It runs right after the default fields are registered, on
- * `fields_api_init` at priority 9, so a plugin hooking the action at
- * the default priority sees the final defaults.
- *
- * @param Gutenberg_Fields_Registry $registry The registry being read.
- */
-function _gutenberg_register_posttype_attachment_fields( Gutenberg_Fields_Registry $registry ) {
-	_gutenberg_register_core_fields_collection( $registry, 'attachment', false );
-}
-add_action( 'fields_api_init', '_gutenberg_register_posttype_attachment_fields', 9 );

@@ -1,7 +1,7 @@
 <?php
 /**
- * Places the fields of the `attachment` collection: the fields of the media
- * editor ported to the server so far.
+ * Registers the fields of the `attachment` collection: the fields of the
+ * media editor ported to the server so far.
  *
  * Attachments support authors and comments, so they get the default author
  * and comment status fields of the `post_supports` collection like any other
@@ -9,19 +9,23 @@
  * client-side in packages/media-fields/src, none of which is a default one.
  * The fields registered by `core` are dropped and the fields of this
  * collection are registered instead. Fields registered by plugins in between
- * are kept.
+ * are kept. The fields are plain data, so the collection has no script
+ * module.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
- * Replaces the default fields of attachments with the fields of the collection.
+ * Replaces the default fields of attachments with the fields of the
+ * `attachment` collection.
  *
- * @param Gutenberg_Fields_Registry $registry The registry being read.
- * @param array[]                   $fields   The fields of the collection, each with an `id`.
- * @param string|null               $module   The script module of the collection, if any.
+ * It runs right after the default fields are registered, on
+ * `fields_api_init` at priority 9, so a plugin hooking the action at the
+ * default priority sees the final defaults.
+ *
+ * @param WP_Fields_Registry $registry The registry being read.
  */
-return static function ( $registry, $fields, $module ) {
+function register_core_fields_attachment( $registry ) {
 	$post_type = get_post_type_object( 'attachment' );
 	if ( ! $post_type || ! $post_type->show_in_rest ) {
 		return;
@@ -36,5 +40,6 @@ return static function ( $registry, $fields, $module ) {
 		}
 	}
 	$registry->unregister( 'postType', 'attachment', $defaults );
-	$registry->register( 'core', 'postType', 'attachment', $fields, $module );
-};
+	$registry->register( 'core', 'postType', 'attachment', array_values( wp_get_field_collection_fields( __DIR__ ) ) );
+}
+add_action( 'fields_api_init', 'register_core_fields_attachment', 9 );

@@ -8,7 +8,7 @@
  * It has no `type`: its value is the `author_text` of the template, not the
  * integer `author` of the post.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 return array(

@@ -3,7 +3,7 @@
  * The comment status field of the post types supporting comments. It is
  * plain data: it has no JavaScript parts.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 return array(

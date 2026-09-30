@@ -5,11 +5,11 @@
  * @package gutenberg
  *
  * @covers ::_gutenberg_add_field_modules_to_editor_script
- * @covers ::_gutenberg_register_core_fields_collection
- * @covers ::_gutenberg_register_posttype_supports_fields
- * @covers ::_gutenberg_register_posttype_wp_template_fields
+ * @covers ::gutenberg_get_field_collection_fields
+ * @covers ::gutenberg_register_core_fields_post_supports
+ * @covers ::gutenberg_register_core_fields_wp_template
  * @covers ::_gutenberg_register_posttype_wp_template_part_fields
- * @covers ::_gutenberg_register_posttype_attachment_fields
+ * @covers ::gutenberg_register_core_fields_attachment
  * @covers Gutenberg_Fields_Registry::initialize
  * @covers Gutenberg_Fields_Registry::register
  * @covers Gutenberg_Fields_Registry::unregister
@@ -437,55 +437,33 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	/**
 	 * A collection lists a folder per field: the id of a field is the name
 	 * of its folder unless its `field.php` sets one, and the fields are in
-	 * the alphabetical order of their folders.
+	 * the alphabetical order of their folders, keyed by id.
 	 */
-	public function test_a_collection_registers_a_field_per_folder() {
-		$registered = null;
-		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered ) {
-				$registered = _gutenberg_register_core_fields_collection( $registry, 'fixture', true, __DIR__ . '/data/core-fields' );
-			}
-		);
+	public function test_a_collection_has_a_field_per_folder() {
+		$fields = gutenberg_get_field_collection_fields( __DIR__ . '/data/core-fields/fixture' );
 
-		$this->assertTrue( $registered, 'The collection is found.' );
-		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_fixture' );
-		$this->assertSame( array( 'zeta', 'beta' ), array_column( $fields, 'id' ), 'The folder name is the id, unless the field sets one.' );
-		$this->assertSame( 'Zeta', $fields[0]['label'] );
-		$this->assertSame(
-			array( '@wordpress/core-fields/fixture' => array( 'zeta', 'beta' ) ),
-			gutenberg_get_registered_field_modules( 'postType', 'gutenberg_fixture' ),
-			'The script module of the collection is named after it.'
-		);
+		$this->assertSame( array( 'zeta', 'beta' ), array_keys( $fields ), 'The folder name is the id, unless the field sets one; the folders set the order.' );
+		$this->assertSame( array( 'zeta', 'beta' ), array_column( $fields, 'id' ), 'Each field has its id.' );
+		$this->assertSame( 'id', array_keys( $fields['beta'] )[0], 'The id comes first.' );
+		$this->assertSame( 'Zeta', $fields['zeta']['label'] );
 	}
 
 	/**
-	 * A collection without JavaScript parts is registered without a script
-	 * module.
+	 * A missing collection has no fields.
 	 */
-	public function test_a_collection_without_a_script_module_registers_none() {
-		$this->on_fields_api_init(
-			static function ( $registry ) {
-				_gutenberg_register_core_fields_collection( $registry, 'fixture', false, __DIR__ . '/data/core-fields' );
-			}
-		);
-
-		$this->assertCount( 2, gutenberg_get_registered_fields( 'postType', 'gutenberg_fixture' ) );
-		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_fixture' ) );
+	public function test_a_missing_collection_has_no_fields() {
+		$this->assertSame( array(), gutenberg_get_field_collection_fields( __DIR__ . '/data/core-fields/missing' ) );
 	}
 
 	/**
-	 * A missing collection registers nothing, e.g. when the package is not
-	 * built.
+	 * The collections hook their registration to `fields_api_init`: the
+	 * defaults at priority 0, the adjustments right after, at priority 9.
+	 * The built collections carry the prefixed names.
 	 */
-	public function test_a_missing_collection_registers_nothing() {
-		$registered = null;
-		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered ) {
-				$registered = _gutenberg_register_core_fields_collection( $registry, 'missing', false, __DIR__ . '/data/core-fields' );
-			}
-		);
-
-		$this->assertFalse( $registered );
+	public function test_the_collections_hook_their_registration() {
+		$this->assertSame( 0, has_action( 'fields_api_init', 'gutenberg_register_core_fields_post_supports' ) );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_wp_template' ) );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_attachment' ) );
 	}
 
 	/**
@@ -523,7 +501,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_templates_get_their_own_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
-		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_fields' ), 'The adjustment runs right after the defaults.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_wp_template' ), 'The adjustment runs right after the defaults.' );
 
 		$before = null;
 		$this->on_fields_api_init(
@@ -583,7 +561,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * replaces.
 	 */
 	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
-		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_attachment_fields' ), 'The adjustment runs right after the defaults.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_attachment' ), 'The adjustment runs right after the defaults.' );
 
 		$before = null;
 		$this->on_fields_api_init(

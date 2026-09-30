@@ -4,7 +4,7 @@
  * authors. Its JavaScript parts (`getElements`, `setValue`, `render`, and
  * `isVisible`) are in `field.tsx`, next to this file.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 return array(
