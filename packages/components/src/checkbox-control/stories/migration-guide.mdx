@@ -44,6 +44,22 @@ import { CheckboxControl } from '@wordpress/ui';
 | \`checked\` | \`checked\` | Continue passing the state for a controlled checkbox. |
 ` }</Markdown>
 
+## Form values
+
+When a checked checkbox has a `name` but no `value`, the legacy component submits `"1"` with the form, while the new component submits `"on"`, the native default for checkboxes. If your form handler expects the legacy value, pass `value="1"` to the new component:
+
+```jsx
+<CheckboxControl
+	name="isAuthor"
+	value="1"
+	label="Is author"
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+/>
+```
+
+If the legacy component already has a custom `value`, keep that value instead.
+
 ## Labels
 
 The new `CheckboxControl` requires a `label` prop with a plain `string` value. The legacy component treats `label` as optional. Give every checkbox a descriptive label, even when the text is already visible elsewhere:
