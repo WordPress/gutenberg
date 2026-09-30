@@ -5,6 +5,7 @@
  * @package gutenberg
  *
  * @covers ::_gutenberg_add_field_modules_to_editor_script
+ * @covers ::_gutenberg_register_core_fields_collection
  * @covers ::_gutenberg_register_posttype_supports_fields
  * @covers ::_gutenberg_register_posttype_wp_template_fields
  * @covers ::_gutenberg_register_posttype_wp_template_part_fields
@@ -309,7 +310,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains(
 			array(
-				'id'     => '@wordpress/core-fields',
+				'id'     => '@wordpress/core-fields/post_supports',
 				'import' => 'dynamic',
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
@@ -414,10 +415,77 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		self::reset_registry();
 
 		$this->assertSame(
-			array( '@wordpress/core-fields' => array( 'author' ) ),
+			array( '@wordpress/core-fields/post_supports' => array( 'author' ) ),
 			gutenberg_get_registered_field_modules( 'postType', 'post' )
 		);
 		$this->assertContains( 'comment_status', array_column( gutenberg_get_registered_fields( 'postType', 'post' ), 'id' ), 'The comment status field is registered without a module.' );
+	}
+
+	/**
+	 * The default fields come from the `post_supports` collection, which
+	 * the build copies from packages/core-fields/src.
+	 */
+	public function test_the_default_fields_come_from_the_post_supports_collection() {
+		$this->assertFileExists( __DIR__ . '/../build/scripts/core-fields/post_supports/index.php', 'The build copies the collection.' );
+
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'post' ), null, 'id' );
+		$this->assertSame( 'integer', $fields['author']['type'] );
+		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
+		$this->assertSame( 'radio', $fields['comment_status']['Edit'] );
+	}
+
+	/**
+	 * A collection lists a folder per field: the id of a field is the name
+	 * of its folder unless its `field.php` sets one, and the fields are in
+	 * the alphabetical order of their folders.
+	 */
+	public function test_a_collection_registers_a_field_per_folder() {
+		$registered = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$registered ) {
+				$registered = _gutenberg_register_core_fields_collection( $registry, 'fixture', true, __DIR__ . '/data/core-fields' );
+			}
+		);
+
+		$this->assertTrue( $registered, 'The collection is found.' );
+		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_fixture' );
+		$this->assertSame( array( 'zeta', 'beta' ), array_column( $fields, 'id' ), 'The folder name is the id, unless the field sets one.' );
+		$this->assertSame( 'Zeta', $fields[0]['label'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/fixture' => array( 'zeta', 'beta' ) ),
+			gutenberg_get_registered_field_modules( 'postType', 'gutenberg_fixture' ),
+			'The script module of the collection is named after it.'
+		);
+	}
+
+	/**
+	 * A collection without JavaScript parts is registered without a script
+	 * module.
+	 */
+	public function test_a_collection_without_a_script_module_registers_none() {
+		$this->on_fields_api_init(
+			static function ( $registry ) {
+				_gutenberg_register_core_fields_collection( $registry, 'fixture', false, __DIR__ . '/data/core-fields' );
+			}
+		);
+
+		$this->assertCount( 2, gutenberg_get_registered_fields( 'postType', 'gutenberg_fixture' ) );
+		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_fixture' ) );
+	}
+
+	/**
+	 * A missing collection registers nothing, e.g. when the package is not
+	 * built.
+	 */
+	public function test_a_missing_collection_registers_nothing() {
+		$registered = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$registered ) {
+				$registered = _gutenberg_register_core_fields_collection( $registry, 'missing', false, __DIR__ . '/data/core-fields' );
+			}
+		);
+
+		$this->assertFalse( $registered );
 	}
 
 	/**
@@ -795,7 +863,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$fields[0]['origin']
 		);
 		$modules = gutenberg_get_registered_field_modules( 'postType', 'page' );
-		$this->assertContains( 'author', $modules['@wordpress/core-fields'], 'The field keeps its modules.' );
+		$this->assertContains( 'author', $modules['@wordpress/core-fields/post_supports'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
 
