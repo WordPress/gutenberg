@@ -17,7 +17,6 @@ $transition-duration: 0.2s;
 
 	// Unchecked state.
 	.components-form-toggle__track {
-		position: relative;
 		content: "";
 		display: inline-block;
 		box-sizing: border-box;
@@ -32,24 +31,6 @@ $transition-duration: 0.2s;
 			transition:
 				$transition-duration background-color ease,
 				$transition-duration border-color ease;
-		}
-
-		overflow: hidden;
-
-		// Windows High Contrast Mode
-		&::after {
-			content: "";
-			position: absolute;
-			inset: 0;
-			box-sizing: border-box;
-			// Expand the border to fake a solid in Windows High Contrast Mode.
-			border-top: #{ $toggle-height } solid transparent;
-
-			@media not (prefers-reduced-motion) {
-				transition: $transition-duration opacity ease;
-			}
-
-			opacity: 0;
 		}
 	}
 
@@ -91,15 +72,6 @@ $transition-duration: 0.2s;
 
 		@media ( forced-colors: active ) {
 			background-color: Highlight;
-
-			&::after {
-				border-top-color: Highlight;
-			}
-		}
-
-		// Windows High Contrast Mode
-		&::after {
-			opacity: 1;
 		}
 	}
 
@@ -147,10 +119,6 @@ $transition-duration: 0.2s;
 
 			@media ( forced-colors: active ) {
 				background-color: GrayText;
-
-				&::after {
-					border-top-color: GrayText;
-				}
 			}
 		}
 
