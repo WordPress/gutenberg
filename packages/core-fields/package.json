@@ -52,7 +52,8 @@
 			"php": {
 				"functionPrefix": "gutenberg_",
 				"prefixFunctions": [
-					"wp_register_field_collection"
+					"wp_register_field_collection",
+					"wp_get_field_collection_fields"
 				]
 			}
 		}

@@ -11,7 +11,6 @@
 
 return array(
 	'id'            => 'notesCount',
-	'supports'      => array( 'editor', 'notes' ),
 	'type'          => 'integer',
 	'label'         => __( 'Notes', 'gutenberg' ),
 	'enableSorting' => false,

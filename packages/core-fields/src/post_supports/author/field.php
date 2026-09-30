@@ -8,7 +8,6 @@
  */
 
 return array(
-	'supports' => 'author',
 	'type'     => 'integer',
 	'label'    => __( 'Author', 'gutenberg' ),
 	'filterBy' => array(

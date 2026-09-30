@@ -7,15 +7,15 @@
  * declared client-side in
  * packages/fields/src/fields/template-author/index.tsx, which reads the
  * theme or plugin that provides them instead of the post author. So they
- * opt out of the default author field of the `post_supports` collection,
- * see `exclude-post-type-supports.php`. The collection has no fields of its
- * own yet.
+ * opt out of the default author field, which the collection unregisters.
+ * The collection has no fields of its own yet.
  *
  * @package WordPress
  */
 
 return array(
-	'origin' => 'core',
-	'kind'   => 'postType',
-	'name'   => 'wp_template_part',
+	'origin'     => 'core',
+	'kind'       => 'postType',
+	'name'       => 'wp_template_part',
+	'unregister' => array( 'author' ),
 );
