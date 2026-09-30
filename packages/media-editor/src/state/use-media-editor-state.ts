@@ -90,7 +90,7 @@ function areCropperImagesEqual(
  * geometry-only controller that a `<Cropper>` takes via its
  * `controller` prop — rather than the session itself.
  */
-export interface MediaEditorController {
+export interface MediaEditorSession {
 	/**
 	 * Geometry controller for the cropper slice. Its setters record
 	 * history in the session; its `isDirty` covers geometry only.
@@ -171,7 +171,7 @@ interface InitialMediaEditorState {
  */
 export function useMediaEditorState(
 	initialState?: InitialMediaEditorState
-): MediaEditorController {
+): MediaEditorSession {
 	const [ state, dispatch ] = useReducer( mediaEditorReducer, null, () =>
 		buildInitialMediaEditorState(
 			enforceContainment( {
@@ -451,7 +451,7 @@ export function useMediaEditorState(
 		]
 	);
 
-	const session = useMemo< MediaEditorController >(
+	const session = useMemo< MediaEditorSession >(
 		() => ( {
 			cropper,
 			cropOptions: state.cropOptions,

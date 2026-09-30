@@ -5,7 +5,7 @@ import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Media } from '../media-editor-provider';
-import type { MediaEditorController } from '../../state';
+import type { MediaEditorSession } from '../../state';
 import {
 	buildModifiers,
 	type Modifier,
@@ -37,7 +37,7 @@ export interface MediaEditorSaveResult {
 }
 
 interface UseSaveMediaEditorArgs {
-	session: MediaEditorController;
+	session: MediaEditorSession;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -49,7 +49,7 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( session: MediaEditorController ): Modifier[] {
+function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	const { state } = session.cropper;
 	if ( ! session.hasOutputEdits || ! state.image ) {
 		return [];

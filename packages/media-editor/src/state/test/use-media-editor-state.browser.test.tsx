@@ -6,7 +6,7 @@ import { useEffect } from '@wordpress/element';
 import { Cropper } from '../../image-editor';
 import {
 	useMediaEditorState,
-	type MediaEditorController,
+	type MediaEditorSession,
 } from '../use-media-editor-state';
 // Browser Mode needs the package's real styles for layout and transitions.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
@@ -23,7 +23,7 @@ const IMAGE = {
 function CropperWithHistory( {
 	onController,
 }: {
-	onController: ( controller: MediaEditorController ) => void;
+	onController: ( controller: MediaEditorSession ) => void;
 } ) {
 	const controller = useMediaEditorState( { cropper: { image: IMAGE } } );
 	useEffect( () => onController( controller ), [ controller, onController ] );
@@ -42,8 +42,8 @@ function CropperWithHistory( {
 
 describe( 'useMediaEditorState with a Cropper', () => {
 	it( 'keeps redo steps after redoing a handle crop that turns on pixel snapping', async () => {
-		let controller!: MediaEditorController;
-		const onController = ( next: MediaEditorController ) => {
+		let controller!: MediaEditorSession;
+		const onController = ( next: MediaEditorSession ) => {
 			controller = next;
 		};
 		await render( <CropperWithHistory onController={ onController } /> );

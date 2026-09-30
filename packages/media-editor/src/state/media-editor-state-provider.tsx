@@ -2,11 +2,11 @@ import { createContext, useContext } from '@wordpress/element';
 import type { CropperState } from '../image-editor';
 import {
 	useMediaEditorState,
-	type MediaEditorController,
+	type MediaEditorSession,
 } from './use-media-editor-state';
 import type { CropOptionsSlice } from './types';
 
-const MediaEditorStateContext = createContext< MediaEditorController | null >(
+const MediaEditorStateContext = createContext< MediaEditorSession | null >(
 	null
 );
 
@@ -52,7 +52,7 @@ export function MediaEditorStateProvider( {
  *
  * @return The media editor session.
  */
-export function useMediaEditor(): MediaEditorController {
+export function useMediaEditor(): MediaEditorSession {
 	const context = useContext( MediaEditorStateContext );
 	if ( ! context ) {
 		throw new Error(
