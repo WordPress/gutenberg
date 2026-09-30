@@ -20,6 +20,7 @@ import { fieldExtensions as filename } from './filename/field';
 import { fieldExtensions as filesize } from './filesize/field';
 import { fieldExtensions as mediaDimensions } from './media_dimensions/field';
 import { fieldExtensions as mimeType } from './mime_type/field';
+import { fieldExtensions as title } from './title/field';
 
 const fields: FieldsScriptParts = {
 	alt_text: altText,
@@ -29,6 +30,7 @@ const fields: FieldsScriptParts = {
 	filesize,
 	media_dimensions: mediaDimensions,
 	mime_type: mimeType,
+	title,
 };
 
 export default fields;

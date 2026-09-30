@@ -11,6 +11,7 @@ describe( 'attachment', () => {
 			'filesize',
 			'media_dimensions',
 			'mime_type',
+			'title',
 		] );
 	} );
 
@@ -87,5 +88,14 @@ describe( 'attachment', () => {
 				item: { source_url: 'https://example.org/uploads/photo.jpg' },
 			} )
 		).toBe( 'photo.jpg' );
+	} );
+
+	it( 'reads the decoded title, with a fallback', () => {
+		const { getValue } = attachment.title;
+		expect(
+			getValue?.( { item: { title: { rendered: 'Tom &amp; Jerry' } } } )
+		).toBe( 'Tom & Jerry' );
+		expect( getValue?.( { item: { title: 'Plain' } } ) ).toBe( 'Plain' );
+		expect( getValue?.( { item: {} } ) ).toBe( '(no title)' );
 	} );
 } );
