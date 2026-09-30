@@ -21,7 +21,6 @@ export interface RootProps extends Pick<
 	| 'modal'
 	| 'loopFocus'
 	| 'highlightItemOnHover'
-	| 'disabled'
 	| 'actionsRef'
 	| 'triggerId'
 	| 'defaultTriggerId'
@@ -54,7 +53,6 @@ export interface SubmenuRootProps extends Pick<
 	| 'defaultOpen'
 	| 'loopFocus'
 	| 'highlightItemOnHover'
-	| 'disabled'
 	| 'closeParentOnEsc'
 	| 'actionsRef'
 > {

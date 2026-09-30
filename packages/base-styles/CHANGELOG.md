@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Default `--wp-admin-theme-color` to `#3858e9`, the WordPress 7.0 default admin color scheme, instead of the legacy `#007cba`. To keep the old color, include `admin-scheme(#007cba)` on `:root` in your own stylesheet. `wordpress-admin-schemes()` and the default custom properties now set `#007cba` for the Fresh scheme, which had used the `:root` default ([#83749](https://github.com/WordPress/gutenberg/pull/83749)).
+-   `radio-control`: Use the design system color tokens ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+
+### Bug Fixes
+
+-   `radio-control`: Keep radio circles and checked dots visually 16px and 8px on narrow screens while providing a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+
 ## 13.2.0 (2026-09-23)
 
 ### Enhancements

@@ -254,7 +254,8 @@ function RichTextWrapper(
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
-	const { selectionChange } = useDispatch( blockEditorStore );
+	const { selectionChange, __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -445,7 +446,11 @@ function RichTextWrapper(
 		ariaActiveDescendant,
 	] );
 
-	useMarkPersistent( { html: adjustedValue, value } );
+	useMarkPersistent( {
+		html: adjustedValue,
+		value,
+		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
+	} );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );

@@ -4,7 +4,28 @@
 
 ### Enhancements
 
+-   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+-   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
+-   Media & Text: Lower the specificity of the content area's default padding so themes can override it, including through the block's custom CSS in `theme.json` ([#83563](https://github.com/WordPress/gutenberg/pull/83563)).
+-   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Bug Fixes
+
+-   Tag Cloud: Space the tags of the Outline style evenly. The base link margin outranked the style's own reset, so each tag carried that margin on top of the container's gap and the horizontal spacing did not match the spacing between rows ([#70224](https://github.com/WordPress/gutenberg/pull/70224)).
+-   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
+-   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+-   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
+-   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
+
+### Internal
+
+-   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
 
 ## 11.1.0 (2026-09-23)
 
