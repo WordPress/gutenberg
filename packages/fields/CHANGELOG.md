@@ -9,6 +9,8 @@
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+### Internal
+-   `MediaEdit` and its `MediaEditProps` type moved to `@wordpress/media-utils`, which this package re-exports them from. Both exports and their behavior are unchanged.
 
 ### Bug Fixes
 

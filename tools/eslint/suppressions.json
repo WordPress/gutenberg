@@ -7364,22 +7364,6 @@
 			"count": 4
 		}
 	},
-	"packages/fields/src/components/media-edit/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
-		"no-restricted-imports": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 7
-		}
-	},
-	"packages/fields/src/components/media-edit/use-moving-animation.ts": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/fields/src/fields/author/author-view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

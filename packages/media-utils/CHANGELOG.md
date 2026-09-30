@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `MediaEdit`, the DataForm control that shows and picks the media of a field, and its `MediaEditProps` type. They come from `@wordpress/fields`, which still exports them, and live here so the fields registered on the server can render the control from a script module.
+
 ### Bug Fixes
 
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
