@@ -852,6 +852,22 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Fields that are not a list, such as fields keyed by id, are refused.
+	 */
+	public function test_registering_fields_that_are_not_a_list_is_refused() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$registered = true;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$registered ) {
+				$registered = $registry->register( 'test-plugin', 'postType', 'page', array( 'color' => array( 'id' => 'color' ) ) );
+			}
+		);
+
+		$this->assertFalse( $registered );
+		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+	}
+
+	/**
 	 * Registering only runs on the action: elsewhere it is refused and the
 	 * registry is left untouched. Before the action a registration would
 	 * keep the defaults from being registered; after it the fields have been read and
