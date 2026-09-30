@@ -10,6 +10,7 @@ describe( 'post_type_supports', () => {
 			'last_edited_date',
 			'ping_status',
 			'post-content-info',
+			'scheduled_date',
 			'sticky',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
@@ -87,5 +88,17 @@ describe( 'post_type_supports', () => {
 		expect( getValue?.( { item } ) ).toBe( '2026-09-30T12:00:00' );
 		expect( isVisible?.( item ) ).toBe( true );
 		expect( isVisible?.( {} ) ).toBe( false );
+	} );
+
+	it( 'edits the date of scheduled posts', () => {
+		const { getValue, setValue, isVisible } =
+			postTypeSupports.scheduled_date;
+		const item = { date: '2026-10-01T09:00:00', status: 'future' };
+		expect( getValue?.( { item } ) ).toBe( '2026-10-01T09:00:00' );
+		expect( setValue?.( { item, value: '2026-10-02T09:00:00' } ) ).toEqual(
+			{ date: '2026-10-02T09:00:00' }
+		);
+		expect( isVisible?.( item ) ).toBe( true );
+		expect( isVisible?.( { status: 'publish' } ) ).toBe( false );
 	} );
 } );
