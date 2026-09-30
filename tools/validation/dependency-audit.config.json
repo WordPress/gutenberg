@@ -24,13 +24,6 @@
 			"comment": "@wordpress/e2e-tests ships test-fixture plugins under plugins/ (imports of @wordpress/connectors as test data and sibling `test/*` script-modules registered by the harness, not real npm packages). Scoped to that package and path so it can never mask a real finding elsewhere.",
 			"target": "@wordpress/e2e-tests",
 			"path": "plugins/**"
-		},
-		{
-			"comment": "@wordpress/theme-build-tools optionally imports @wordpress/theme/design-token-fallbacks.js, which @wordpress/theme adds after 2.2.0. The audit resolves the optional peer range to the published 2.2.0; the plugins treat the missing export like a missing @wordpress/theme and skip fallbacks. Remove once a @wordpress/theme release with the export is published and the peer range starts from it.",
-			"target": "@wordpress/theme-build-tools",
-			"specifier": "@wordpress/theme/design-token-fallbacks.js",
-			"surface": "runtime",
-			"kind": "unresolved"
 		}
 	]
 }
