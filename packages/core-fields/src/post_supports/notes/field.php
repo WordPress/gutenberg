@@ -6,7 +6,7 @@
  * Its id is the name of the property of the post it reads, not the name of
  * the folder, hence the explicit `id`.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 return array(
