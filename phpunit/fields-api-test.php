@@ -806,7 +806,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template_part' ), null, 'id' );
-		$this->assertSame( array( 'author' ), self::get_support_field_ids( 'wp_template_part' ), 'The default author field is not registered.' );
+		$this->assertSame( array( 'author', 'title' ), self::get_support_field_ids( 'wp_template_part' ), 'The fields are the ones of the collection, not the default author and title fields.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template part author is not the integer post author.' );
 		$this->assertArrayHasKey( 'title', $fields, 'The collection registers the template part title.' );
 		$this->assertSame( 'Title', $fields['title']['label'], 'The title is the one of the collection.' );
@@ -945,12 +945,15 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * Patterns support excerpts but their excerpt is their description,
-	 * which the client edits with its own field of the same id, so they opt
-	 * out of the default excerpt field.
+	 * which their collection defines with a field of the same id, so they
+	 * opt out of the default excerpt field.
 	 */
 	public function test_patterns_do_not_get_the_default_excerpt_field() {
 		$this->assertTrue( post_type_supports( 'wp_block', 'excerpt' ), 'The post type supports excerpts.' );
-		$this->assertNotContains( 'excerpt', array_column( gutenberg_get_registered_fields( 'postType', 'wp_block' ), 'id' ) );
+
+		$modules = gutenberg_get_registered_field_modules( 'postType', 'wp_block' );
+		$this->assertContains( 'excerpt', $modules['@wordpress/core-fields/wp_block'], 'The excerpt is the description field of the collection.' );
+		$this->assertNotContains( 'excerpt', $modules['@wordpress/core-fields/post_type_supports'], 'The default excerpt field is not registered.' );
 	}
 
 	/**
@@ -973,12 +976,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' );
-		$this->assertSame( array( 'author', 'description', 'description_readonly', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The default author and title fields are not registered.' );
+		$this->assertSame( array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The fields are the ones of the collection, not the default author and title fields.' );
 		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( 'author', 'description', 'description_readonly', 'title' ),
+			array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ),
 			gutenberg_get_registered_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
 			'The fields of templates ship their JavaScript parts in the module of the collection.'
 		);
