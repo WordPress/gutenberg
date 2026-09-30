@@ -147,6 +147,7 @@ export interface OverlayContextValue {
 	hasOverlay: ( clientId: string ) => boolean;
 	requestInterceptorBypass: ( clientId: string ) => void;
 	consumeInterceptorBypass: ( clientId: string ) => boolean;
+	hasInterceptorBypass: () => boolean;
 	registerFormatHandler: ( handler: SuggestionRequestHandler ) => () => void;
 	requestFormatSuggestion: ( request: any ) => boolean;
 	registerContentHandler: ( handler: SuggestionRequestHandler ) => () => void;
@@ -229,6 +230,7 @@ const DEFAULT_OVERLAY: OverlayContextValue = {
 	hasOverlay: () => false,
 	requestInterceptorBypass: () => {},
 	consumeInterceptorBypass: () => false,
+	hasInterceptorBypass: () => false,
 	registerFormatHandler: () => () => {},
 	requestFormatSuggestion: () => false,
 	registerContentHandler: () => () => {},
@@ -582,6 +584,11 @@ export function SuggestionOverlayProvider( {
 		return true;
 	}, [] );
 
+	const hasInterceptorBypass = useCallback(
+		() => bypassClientIdsRef.current.size > 0,
+		[]
+	);
+
 	// Single slot for the format-suggestion handler. The per-block overlay HOC
 	// only *detects* a formatting-only edit (cheap, no store access); the
 	// actual note creation + marker write lives in one mounted component
@@ -778,6 +785,7 @@ export function SuggestionOverlayProvider( {
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
+			hasInterceptorBypass,
 			registerFormatHandler,
 			requestFormatSuggestion,
 			registerContentHandler,
@@ -804,6 +812,7 @@ export function SuggestionOverlayProvider( {
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
+			hasInterceptorBypass,
 			registerFormatHandler,
 			requestFormatSuggestion,
 			registerContentHandler,
