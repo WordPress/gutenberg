@@ -76,7 +76,7 @@ export function getAlignmentsInfo( layout ) {
 	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo = {};
 	const sizeRegex =
-		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax|lh|rlh)?$/i;
 	if ( sizeRegex.test( contentSize ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
