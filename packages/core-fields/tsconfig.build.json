@@ -7,12 +7,14 @@
 	"references": [
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
+		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../fields-loader/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
-		{ "path": "../ui/tsconfig.build.json" }
+		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

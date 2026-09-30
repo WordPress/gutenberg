@@ -36,7 +36,6 @@ import {
 	scheduledDateField,
 	lastEditedDateField,
 	formatField,
-	postContentInfoField,
 	stickyField,
 	descriptionField,
 	readOnlyDescriptionField,
@@ -274,9 +273,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				( ! isDesignPostType || isPattern ) &&
-					postTypeConfig.supports?.editor &&
-					postContentInfoField,
+				'post-content-info',
 				! isDesignPostType && passwordField,
 				postTypeSlug === 'post' && stickyField,
 				postTypeSlug === 'wp_template' && descriptionField,

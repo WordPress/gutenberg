@@ -449,10 +449,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			unregister_post_type( 'gutenberg_book' );
 		}
 
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount' ), array_column( $fields, 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ), array_column( $fields, 'id' ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
-			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'discussion', 'notesCount' ) ),
+			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info' ) ),
 			$modules,
 			'Every default field is registered with the module of its folder.'
 		);
@@ -500,9 +500,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function data_default_fields_and_their_supports() {
 		return array(
-			'discussion'  => array( 'discussion', array( 'comments', 'trackbacks' ) ),
-			'excerpt'     => array( 'excerpt', array( 'excerpt' ) ),
-			'ping_status' => array( 'ping_status', array( 'trackbacks' ) ),
+			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
+			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
+			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
+			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
 		);
 	}
 
@@ -585,6 +586,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'boolean', $fields['ping_status']['type'] );
 		$this->assertSame( 'Discussion', $fields['discussion']['label'] );
 		$this->assertSame( 'textarea', $fields['excerpt']['Edit']['control'] );
+		$this->assertTrue( $fields['post-content-info']['readOnly'] );
 	}
 
 	/**
@@ -622,15 +624,17 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * The core post types exclude the defaults they do not get on the
 	 * filter, like a plugin: templates and template parts the author field,
 	 * templates, template parts, and patterns the excerpt field,
-	 * attachments every default field.
+	 * templates, template parts, and navigation menus the content
+	 * information field, attachments every default field.
 	 */
 	public function test_the_core_post_types_exclude_defaults_on_the_filter() {
 		$this->assertSame( 10, has_filter( 'fields_api_post_type_supports_exclusions', 'gutenberg_exclude_core_post_type_support_fields' ) );
 
 		$ids = array( 'author', 'comment_status', 'notesCount' );
-		$this->assertSame( array( 'plugin_field', 'author', 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
-		$this->assertSame( array( 'author', 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array( 'plugin_field', 'author', 'excerpt', 'post-content-info' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
+		$this->assertSame( array( 'author', 'excerpt', 'post-content-info' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
 		$this->assertSame( array( 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
+		$this->assertSame( array( 'post-content-info' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_navigation', $ids ) );
 		$this->assertSame( array( 'plugin_field', 'author', 'comment_status', 'notesCount' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'attachment', $ids ) );
 		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ), 'It leaves the other post types alone.' );
 	}
@@ -684,7 +688,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status' ), $calls['post'] );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info' ), $calls['post'] );
 		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
 	}
 
@@ -726,6 +730,17 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_patterns_do_not_get_the_default_excerpt_field() {
 		$this->assertTrue( post_type_supports( 'wp_block', 'excerpt' ), 'The post type supports excerpts.' );
 		$this->assertNotContains( 'excerpt', array_column( gutenberg_get_registered_fields( 'postType', 'wp_block' ), 'id' ) );
+	}
+
+	/**
+	 * Navigation menus support the editor, but their content is blocks
+	 * laying out a site rather than text to read, so they opt out of the
+	 * content information field. Patterns keep it.
+	 */
+	public function test_navigation_menus_do_not_get_the_content_information_field() {
+		$this->assertTrue( post_type_supports( 'wp_navigation', 'editor' ), 'The post type supports the editor.' );
+		$this->assertNotContains( 'post-content-info', array_column( gutenberg_get_registered_fields( 'postType', 'wp_navigation' ), 'id' ) );
+		$this->assertContains( 'post-content-info', array_column( gutenberg_get_registered_fields( 'postType', 'wp_block' ), 'id' ) );
 	}
 
 	/**

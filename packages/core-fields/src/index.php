@@ -28,6 +28,7 @@
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  * - `ping_status`, for the post types supporting `trackbacks`.
+ * - `post-content-info`, for the post types supporting `editor`.
  *
  * It makes no exception for any post type: the fields a post type does not
  * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
@@ -50,12 +51,13 @@ function register_core_post_type_supports_fields( $registry ) {
 		$editor = get_all_post_type_supports( $post_type )['editor'] ?? null;
 
 		$applies = array(
-			'author'         => post_type_supports( $post_type, 'author' ),
-			'comment_status' => post_type_supports( $post_type, 'comments' ),
-			'discussion'     => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
-			'excerpt'        => post_type_supports( $post_type, 'excerpt' ),
-			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
-			'ping_status'    => post_type_supports( $post_type, 'trackbacks' ),
+			'author'            => post_type_supports( $post_type, 'author' ),
+			'comment_status'    => post_type_supports( $post_type, 'comments' ),
+			'discussion'        => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
+			'excerpt'           => post_type_supports( $post_type, 'excerpt' ),
+			'notesCount'        => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
+			'ping_status'       => post_type_supports( $post_type, 'trackbacks' ),
+			'post-content-info' => post_type_supports( $post_type, 'editor' ),
 		);
 		$all_fields = array_keys( array_filter( $applies ) );
 		if ( ! $all_fields ) {
@@ -119,6 +121,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   their description: templates and patterns edit it with their own
  *   description fields, declared client-side (the one of patterns has the
  *   `excerpt` id), and template parts do not show it.
+ * - Templates, template parts, and navigation menus: `post-content-info`.
+ *   Their content is blocks laying out a site, not text to read.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -137,9 +141,13 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 		case 'wp_template_part':
 			$excluded_fields[] = 'author';
 			$excluded_fields[] = 'excerpt';
+			$excluded_fields[] = 'post-content-info';
 			break;
 		case 'wp_block':
 			$excluded_fields[] = 'excerpt';
+			break;
+		case 'wp_navigation':
+			$excluded_fields[] = 'post-content-info';
 			break;
 		case 'attachment':
 			$excluded_fields = array_merge( $excluded_fields, $all_fields );
