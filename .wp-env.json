@@ -1,5 +1,6 @@
 {
 	"core": "WordPress/WordPress#6.1-branch",
+	"mariadbVersion": "10.6",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
