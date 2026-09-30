@@ -5,6 +5,7 @@ describe( 'attachment', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
 		expect( Object.keys( attachment ) ).toEqual( [
 			'alt_text',
+			'author',
 			'caption',
 			'description',
 			'filename',
