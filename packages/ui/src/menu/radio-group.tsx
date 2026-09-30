@@ -19,7 +19,7 @@ const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
 			parentGroup === 'group'
 		) {
 			throw new Error(
-				'Menu.RadioGroup: Cannot be nested inside Menu.Group. Remove the wrapping Menu.Group and put Menu.GroupLabel inside Menu.RadioGroup.'
+				'Menu.RadioGroup: Cannot be nested inside Menu.Group. Move Menu.RadioGroup outside Menu.Group and put its Menu.GroupLabel inside Menu.RadioGroup.'
 			);
 		}
 
