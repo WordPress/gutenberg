@@ -49,6 +49,8 @@ function ProductList( { data, view, onChangeView } ) {
 }
 ```
 
+`error.message` is translated copy written for the person looking at the screen, so a screen can render it as it is. When the REST request itself fails, it is the server's own message; otherwise it is this package's wording, and it says what to do next.
+
 Load them ahead of time, in a route loader or any other code outside React, with `loadFields`. Both share the request and the resolved fields, so the component renders what the loader loaded.
 
 ### Providing the JavaScript parts of a field

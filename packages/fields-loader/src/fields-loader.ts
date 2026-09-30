@@ -3,6 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { FieldsConfig } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import type { Field } from '@wordpress/dataviews';
+import { __ } from '@wordpress/i18n';
 
 /**
  * The JavaScript parts of the fields a script module provides, keyed by field
@@ -19,22 +20,47 @@ type ModuleImporter = ( id: string ) => Promise< unknown >;
 
 const EMPTY_FIELDS: Field< any >[] = [];
 
-/*
+let unsupportedError: Error | undefined;
+
+/**
+ * The error both entry points report on a WordPress that cannot provide the
+ * fields.
+ *
  * This package is bundled, so a plugin can ship it to a site whose WordPress
  * predates the `getFieldsConfig` selector (and the `/wp/v2/fields` route).
  * There, both entry points report this error instead of throwing.
+ *
+ * The message is user-facing copy a screen can render, so it is built on
+ * first use rather than at import time, when the translations may not have
+ * loaded yet. The one instance is then kept: `useFields` returns it from a
+ * `useSelect` mapping, which a fresh `Error` on every render would never
+ * match.
+ *
+ * @return The error.
  */
-const UNSUPPORTED_ERROR = new Error(
-	'The fields registered on the server are not available in this version of WordPress.'
-);
+function getUnsupportedError(): Error {
+	if ( ! unsupportedError ) {
+		unsupportedError = new Error(
+			__(
+				'This screen needs a newer version of WordPress to show its fields. Update WordPress, then reload the page.'
+			)
+		);
+	}
+	return unsupportedError;
+}
 
 function importModule( id: string ) {
 	return import( /* webpackIgnore: true */ /* @vite-ignore */ id );
 }
 
 /**
- * Turns a rejection into an `Error`. A failed `apiFetch` rejects with a plain
- * `{ code, message, data }` object rather than an `Error`.
+ * Turns a rejection into an `Error` a screen can show.
+ *
+ * A failed `apiFetch` rejects with a plain `{ code, message, data }` object
+ * rather than an `Error`, so the server's own message is used when there is
+ * one. Anything else — a `Response` from `parse: false`, a rejection from a
+ * custom fetch handler, nothing at all — falls back to copy of our own, so
+ * the screen always has something to render.
  *
  * @param value The rejection.
  * @return An `Error` whose `cause` is the original rejection.
@@ -43,10 +69,13 @@ function toError( value: unknown ): Error {
 	if ( value instanceof Error ) {
 		return value;
 	}
+	const serverMessage = ( value as { message?: unknown } )?.message;
 	const message =
-		typeof ( value as { message?: unknown } )?.message === 'string'
-			? ( value as { message: string } ).message
-			: 'The fields could not be loaded.';
+		typeof serverMessage === 'string' && serverMessage.trim()
+			? serverMessage
+			: __(
+					'The fields of this screen did not load. Reload the page to try again.'
+				);
 	return new Error( message, { cause: value } );
 }
 
@@ -153,7 +182,7 @@ export async function loadFields< Item = any >( {
 } ): Promise< Field< Item >[] > {
 	const { getFieldsConfig } = resolveSelect( coreStore );
 	if ( typeof getFieldsConfig !== 'function' ) {
-		throw UNSUPPORTED_ERROR;
+		throw getUnsupportedError();
 	}
 	let config: FieldsConfig | undefined;
 	try {
@@ -195,7 +224,10 @@ export function useFields< Item = any >( {
 		( select ) => {
 			const { getFieldsConfig, getResolutionError } = select( coreStore );
 			if ( typeof getFieldsConfig !== 'function' ) {
-				return { config: undefined, error: UNSUPPORTED_ERROR };
+				return {
+					config: undefined,
+					error: getUnsupportedError(),
+				};
 			}
 			return {
 				config: getFieldsConfig( kind, name ),

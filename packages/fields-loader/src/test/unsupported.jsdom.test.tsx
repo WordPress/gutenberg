@@ -17,7 +17,7 @@ vi.mock( '@wordpress/data', async ( importOriginal ) => ( {
 } ) );
 
 const UNSUPPORTED_MESSAGE =
-	'The fields registered on the server are not available in this version of WordPress.';
+	'This screen needs a newer version of WordPress to show its fields. Update WordPress, then reload the page.';
 
 describe( 'without the getFieldsConfig selector', () => {
 	it( 'rejects loadFields with an error', async () => {

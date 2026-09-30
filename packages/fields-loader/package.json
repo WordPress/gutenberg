@@ -45,7 +45,8 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/element": "file:../element"
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n"
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.3",

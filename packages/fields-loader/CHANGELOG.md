@@ -3,3 +3,5 @@
 ## Unreleased
 
 Initial release.
+
+The errors `useFields` reports and `loadFields` rejects with carry translated copy written for the person looking at the screen, so a screen can render `error.message` as it is.
