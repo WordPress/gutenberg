@@ -11,6 +11,10 @@ import {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineReplacement,
+	rejectInlineReplacement,
+	findAdditionRange,
+	removeInlineAdditionRange,
 	acceptInlineFormat,
 	rejectInlineFormat,
 	insertInlineAddition,
@@ -898,5 +902,89 @@ describe( 'suggestion range overlap detection', () => {
 				false
 			);
 		} );
+	} );
+} );
+
+describe( 'inline replacement operations', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	// A type-over: the new text, then the replaced text, under one id.
+	const mine = ( id: number | string, text: string ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+	const replaced = `This is ${ mine( 7, 'my' ) }${ del(
+		7,
+		'your'
+	) } first doc`;
+
+	it( 'accepting keeps the new text and drops the replaced text', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		expect( acceptInlineReplacement( value, 7 ).toHTMLString() ).toBe(
+			'This is my first doc'
+		);
+	} );
+
+	it( 'rejecting keeps the replaced text and drops the new text', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		expect( rejectInlineReplacement( value, 7 ).toHTMLString() ).toBe(
+			'This is your first doc'
+		);
+	} );
+
+	it( 'accepting a deletion leaves the shared-id addition alone', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		const result = acceptInlineDeletion( value, 7 );
+		expect( findSuggestionText( result, 7 ) ).toBe( 'my' );
+	} );
+
+	it( 'quotes each side by type', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		expect( findSuggestionText( value, 7, 'add' ) ).toBe( 'my' );
+		expect( findSuggestionText( value, 7, 'del' ) ).toBe( 'your' );
+	} );
+
+	it( 'extends only the add run, not the shared-id del run', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		// Caret after "my" (offset 10).
+		expect( valueAdditionRunToExtend( value, 10, '2' ) ).toEqual( {
+			id: '7',
+			start: 8,
+			end: 10,
+		} );
+		expect( findAdditionRange( value, 7 ) ).toEqual( {
+			start: 8,
+			end: 10,
+		} );
+	} );
+
+	it( 'growing the add run keeps the del run a deletion', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		const grown = growInlineAddition( value, {
+			text: 'y',
+			attributes: buildSuggestionMarkerAttributes( {
+				id: 7,
+				type: 'add',
+				authorId: 2,
+			} ),
+			markerStart: 8,
+			markerEnd: 10,
+		} );
+		expect( findSuggestionText( grown, 7, 'add' ) ).toBe( 'myy' );
+		expect( findSuggestionText( grown, 7, 'del' ) ).toBe( 'your' );
+	} );
+
+	it( 'removes characters from a pending addition', () => {
+		const value = RichTextData.fromHTMLString( replaced );
+		const shrunk = removeInlineAdditionRange( value, 9, 10 );
+		expect( findSuggestionText( shrunk, 7, 'add' ) ).toBe( 'm' );
+		expect( findSuggestionText( shrunk, 7, 'del' ) ).toBe( 'your' );
+		expect( shrunk.text ).toBe( 'This is myour first doc' );
 	} );
 } );
