@@ -30,6 +30,7 @@
 		"@typescript-eslint/parser": "^8.70.1",
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^5.0.0",
+		"@wordpress/deprecated": "file:../../packages/deprecated",
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/video-conversion": "file:../../packages/video-conversion",
 		"@wordpress/vips": "file:../../packages/vips",
