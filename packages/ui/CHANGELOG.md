@@ -13,6 +13,7 @@
 
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
+-   Add `inertValue`, which returns a value for the `inert` prop that both React 18 and React 19 render as the `inert` attribute ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 
 ### Enhancements
 
