@@ -19,12 +19,13 @@
 
 /**
  * Registers the default fields of each post type exposed in the REST API,
- * from what it supports:
+ * from what it supports, or whatever it supports:
  *
  * - `author`, for the post types supporting `author`.
  * - `comment_status`, for the post types supporting `comments`.
  * - `discussion`, for the post types supporting `comments` or `trackbacks`.
  * - `excerpt`, for the post types supporting `excerpt`.
+ * - `last_edited_date`, for every post type.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  * - `ping_status`, for the post types supporting `trackbacks`.
@@ -56,6 +57,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'comment_status'    => post_type_supports( $post_type, 'comments' ),
 			'discussion'        => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
 			'excerpt'           => post_type_supports( $post_type, 'excerpt' ),
+			'last_edited_date'  => true,
 			'notesCount'        => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 			'ping_status'       => post_type_supports( $post_type, 'trackbacks' ),
 			'post-content-info' => post_type_supports( $post_type, 'editor' ),

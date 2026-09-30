@@ -17,6 +17,7 @@ import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { fieldExtensions as author } from './author/field';
 import { fieldExtensions as discussion } from './discussion/field';
 import { fieldExtensions as excerpt } from './excerpt/field';
+import { fieldExtensions as lastEditedDate } from './last_edited_date/field';
 import { fieldExtensions as pingStatus } from './ping_status/field';
 import { fieldExtensions as postContentInfo } from './post_content_info/field';
 import { fieldExtensions as sticky } from './sticky/field';
@@ -25,6 +26,7 @@ const fields: FieldsScriptParts = {
 	author,
 	discussion,
 	excerpt,
+	last_edited_date: lastEditedDate,
 	ping_status: pingStatus,
 	'post-content-info': postContentInfo,
 	sticky,

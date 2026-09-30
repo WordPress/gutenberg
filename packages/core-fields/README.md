@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
--   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `discussion`, `excerpt`, `notesCount`, `ping_status`, `post-content-info`, `sticky`). They are registered in code, see below.
+-   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `ping_status`, `post-content-info`, `sticky`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: template parts exclude the default author field, since they declare their own client-side.
 -   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
@@ -25,12 +25,13 @@ And each folder of fields may have:
 
 ### The default fields of every post type
 
-`register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports:
+`register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports, or whatever it supports:
 
 -   `author`, for the post types supporting `author`.
 -   `comment_status`, for the post types supporting `comments`.
 -   `discussion`, for the post types supporting `comments` or `trackbacks`.
 -   `excerpt`, for the post types supporting `excerpt`.
+-   `last_edited_date`, for every post type.
 -   `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
 -   `ping_status`, for the post types supporting `trackbacks`.
 -   `post-content-info`, for the post types supporting `editor`.
