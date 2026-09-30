@@ -11,8 +11,9 @@ Migrate from [`RadioControl`](?path=/docs/components-radiocontrol--docs) in `@wo
 
 Rename the options and controlled value props, and use the new callback name:
 
+Before:
+
 ```jsx
-// Before
 import { RadioControl } from '@wordpress/components';
 
 <RadioControl
@@ -22,8 +23,11 @@ import { RadioControl } from '@wordpress/components';
 	onChange={ setVisibility }
 	help="Choose who can see this post."
 />;
+```
 
-// After
+After:
+
+```jsx
 import { RadioGroupControl } from '@wordpress/ui';
 
 <RadioGroupControl
