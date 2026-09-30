@@ -6,8 +6,7 @@ import { __ } from '@wordpress/i18n';
 type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 
 /**
- * A type to rank first: a search type, covering everything of that type, or a search type with
- * one post type or taxonomy, covering only that one.
+ * A type to rank first: a search type, or a search type and one of its subtypes.
  */
 export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
 
@@ -24,11 +23,11 @@ export type SearchOptions = {
 		'isInitialSuggestions' | 'initialSuggestionsSearchOptions'
 	>;
 	/**
-	 * Search types to search. Every type when left out.
+	 * Search types to search. Defaults to all.
 	 */
 	type?: SearchType | SearchType[];
 	/**
-	 * Post types and taxonomies to search. Every one when left out.
+	 * Post types and taxonomies to search. Defaults to all.
 	 */
 	subtype?: string | string[];
 	/**
@@ -40,8 +39,7 @@ export type SearchOptions = {
 	 */
 	subtypeExclude?: string[];
 	/**
-	 * Types to rank above the usual order, most wanted first. Everything left out keeps its usual
-	 * place behind them. Only the type is reordered: a better match still ranks first.
+	 * Types to rank first, in order. Only reorders types: a better match still ranks first.
 	 *
 	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
 	 */
@@ -72,7 +70,7 @@ type LinkSuggestionAPIResult = {
 };
 
 /**
- * The kind of link each search type makes.
+ * The `kind` of suggestion for each search type.
  */
 const KINDS: Record< SearchType, string > = {
 	post: 'post-type',
@@ -107,8 +105,7 @@ export type SearchResult = {
 /**
  * Fetches link suggestions from the WordPress API.
  *
- * Posts, terms, post formats and media are searched, ranked and paged together on the server, so
- * each page is a slice of one ordered list.
+ * Searches posts, terms, post formats and media in one ranked, paged request.
  *
  * @param search
  * @param searchOptions

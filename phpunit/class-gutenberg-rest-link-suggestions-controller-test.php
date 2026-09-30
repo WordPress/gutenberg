@@ -1,10 +1,8 @@
 <?php
 /**
- * Unit tests covering Gutenberg_REST_Link_Suggestions_Controller functionality.
+ * Tests for Gutenberg_REST_Link_Suggestions_Controller.
  *
- * The ranking cases mirror the `sortResults` tests in
- * `packages/core-data/src/fetch/test/__experimental-fetch-link-suggestions.js`, so the order the
- * endpoint returns matches the order the editor used to sort merged results into.
+ * The ranking cases come from core-data's `sortResults` tests (#83407), which this replaces.
  *
  * @package gutenberg
  */
@@ -45,7 +43,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 	}
 
 	/**
-	 * Returns the titles of the suggestions for a search, in the order the endpoint gave them.
+	 * Returns the result titles, in order.
 	 *
 	 * @param array $params Query parameters.
 	 * @return string[]
@@ -57,7 +55,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 	}
 
 	/**
-	 * Creates a published post with a date, so posts that rank the same keep a known order.
+	 * Creates a published post. `$age` sets the date, which orders results that rank the same.
 	 *
 	 * @param string $title     Post title.
 	 * @param string $post_type Post type.
@@ -216,7 +214,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 	}
 
 	/**
-	 * Counts the searches run against the database while a callback runs.
+	 * Counts search queries run by a callback.
 	 *
 	 * @param callable $callback Callback.
 	 * @return int
@@ -361,8 +359,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->create_post( 'Hot Teapots', 'page', 1 );
 		$this->create_post( "Coffee\u{00B7}Tea", 'page', 2 );
 
-		// A middle dot separates words as a space does, as `tokenize()` in core-data splits them,
-		// so the second title holds "tea" whole.
+		// A middle dot separates words, so the second title holds "tea" whole.
 		$this->assertSame(
 			array( "Coffee\u{00B7}Tea", 'Hot Teapots' ),
 			$this->get_titles( array( 'search' => 'tea' ) )
@@ -378,7 +375,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 				'A day trip from Stockholm to Swedish countryside towns',
 				'Tips for travel with a young baby',
 			),
-			// Scoped to content, as every title holding an "a" matches, such as "Uncategorized".
+			// Scoped to content: "Uncategorized" holds an "a" too.
 			$this->get_titles(
 				array(
 					'search' => 'a',
@@ -495,7 +492,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		$this->create_post( 'Barista S Best Coffee', 'page', 1, array( 'post_content' => "Barista's pick." ) );
 		$this->create_post( 'Barista\'s "Best" Coffee', 'page', 2 );
 
-		// Titles are stored with the straight quotes typed, and shown with curly ones.
+		// Titles are stored with straight quotes and shown with curly ones.
 		$this->assertSame(
 			array( "Barista\u{2019}s \u{201C}Best\u{201D} Coffee", 'Barista S Best Coffee' ),
 			array_map(
@@ -654,8 +651,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 	public function test_does_not_match_media_by_file_name() {
 		$this->create_attachment( 'Beach', 0, 'sunset-beach.jpg' );
 
-		// Media is matched by its title, caption and description. Its title is the file name when
-		// uploaded, unless the image names itself or someone renames it.
+		// Media is matched by title, caption and description only.
 		$this->assertSame(
 			array(),
 			$this->get_titles( array( 'search' => 'sunset beach' ) )
@@ -1029,7 +1025,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 	}
 
 	public function test_shares_a_page_evenly_between_post_types_and_taxonomies() {
-		// Posts are newer, so they would take every slot for content if posts and pages shared one.
+		// The posts are newer, so they would take every content slot if posts and pages shared.
 		foreach ( array( 'Brew Post A', 'Brew Post B', 'Brew Post C' ) as $age => $title ) {
 			$this->create_post( $title, 'post', $age );
 		}
@@ -1076,9 +1072,9 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 			);
 		}
 
-		// Every type gets its first turn before any type gets a second.
+		// Every type gets a first turn before any gets a second.
 		$this->assertEqualSets( array( 'post', 'page', 'category', 'post_tag' ), array_merge( $types[1], $types[2] ) );
-		// Then the second turns begin, after the last first turn.
+		// Page 3 has the last first turn and the start of the second round.
 		$this->assertCount( 2, $types[3] );
 		$this->assertContains( 'attachment', $types[3] );
 	}
@@ -1128,7 +1124,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 			)
 		)->get_data();
 
-		// The photo only mentions the word in its description, so every title match comes first.
+		// The photo only matches in its description, so every title match comes first.
 		$this->assertSame( array( 'Latte One', 'Latte Two' ), wp_list_pluck( $first, 'title' ) );
 		$this->assertSame(
 			array( 'Latte One', 'Latte Two', 'Latte Three', 'Photo' ),
@@ -1151,7 +1147,7 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 			)
 		);
 
-		// The controller as it runs on a database without window functions, such as MySQL 5.7.
+		// As on MySQL 5.7, which has no window functions.
 		$controller = new class() extends Gutenberg_REST_Link_Suggestions_Controller {
 			protected function supports_window_functions() {
 				return false;

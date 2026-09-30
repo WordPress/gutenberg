@@ -6,43 +6,31 @@
  */
 
 /**
- * Searches posts, terms, post formats and media for link suggestions in a single query.
+ * Searches posts, terms, post formats and media for links, ranked and paged in one SQL query.
  *
- * `/wp/v2/search` and `/wp/v2/media` search one kind of object per request, so the editor used
- * to make four requests, merge them and rank the merged list itself. A page of that list could
- * not be asked for. This endpoint does the matching, ranking and paging in one SQL query, so
- * each page is a slice of one ordered list and the total is known.
+ * Matching: search terms are parsed as `WP_Query` parses them. Each must be in the title, or for
+ * posts and media in the content or excerpt.
  *
- * Search terms are parsed as `WP_Query` parses them, and every term has to be found somewhere: in
- * the title, or for posts and media in the content or excerpt. Media is not matched by its file
- * name, which would mean joining post meta for every attachment: its title is the file name
- * when uploaded unless the image names itself or someone renames it. Results are ranked, most important first, by:
+ * Ranking, most important first:
  *
- * 1. How many of the words typed the title holds. A match found only in the content comes last.
- * 2. Whether the title holds what was typed as one string.
- * 3. Whether the title begins with what was typed. Media still shares pages with other titles
- *    beginning with it, but is not listed above titles holding it further in unless preferred.
- * 4. The type: pages, then other content, then taxonomy terms, then post formats, then media.
- * 5. How much of the word it was found in each word typed accounts for.
+ * 1. How many of the words typed are in the title.
+ * 2. Whether the title holds the whole search.
+ * 3. Whether the title begins with the search.
+ * 4. Type: pages, other content, terms, post formats, media.
+ * 5. How much of the title word each word typed covers ("cat" covers more of "cats" than "catalog").
  *
- * The first three say how well a result matches. Results that match equally well share each page
- * evenly between the post types and taxonomies they come from, so a page is not all posts when
- * pages, terms and media match just as well. When more of them match than a page holds, the share
- * carries on to the next page, so none is left out. A result never comes before one that matches
- * better to fill a share.
- *
- * Results that rank the same keep the order each type is listed in without a search: newest
- * first for posts and media, by name for terms.
+ * 1–3 are match quality. Results of equal quality share each page evenly between post types and
+ * taxonomies, so a page is not all posts when terms and media match as well.
  */
 class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 
 	/**
-	 * The most words of a search that are matched separately, as in `WP_Query`.
+	 * Past this many words, `WP_Query` searches for the whole phrase instead.
 	 */
 	const MAX_SEARCH_WORDS = 9;
 
 	/**
-	 * How highly each type ranks, most wanted highest.
+	 * Default rank of each search type, highest first.
 	 */
 	const TYPE_RANKS = array(
 		'post'        => 4,
@@ -52,7 +40,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	);
 
 	/**
-	 * The kind of row each search type produces.
+	 * The `kind` column each search type's rows have.
 	 */
 	const KINDS = array(
 		'post'        => 'post-type',
@@ -62,14 +50,12 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	);
 
 	/**
-	 * Orders results that rank the same: the order their type is listed in, then a unique key so
-	 * the same result never lands on two pages.
+	 * Orders results that rank the same. Ends on a unique key, so no result lands on two pages.
 	 */
 	const TIE_BREAK = array( 'sort_date DESC', 'sort_name ASC', 'kind ASC', 'subtype ASC', 'object_id ASC' );
 
 	/**
-	 * Curly quotes and the straight ones typed in their place. `get_the_title()` runs
-	 * `wptexturize`, so titles are shown with curly quotes, but only straight ones are on a keyboard.
+	 * Curly quotes and the straight ones people type for them.
 	 */
 	const CURLY_QUOTES = array(
 		"\u{2018}" => "'",
@@ -79,8 +65,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	);
 
 	/**
-	 * Characters that separate words where the database cannot split titles with a regular
-	 * expression: the punctuation found in titles.
+	 * Word separators, for databases without `REGEXP_REPLACE`.
 	 */
 	const WORD_SEPARATORS = array(
 		"\t",
@@ -159,7 +144,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Only people who can write links can ask for suggestions.
+	 * Checks the user can edit posts.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error
@@ -190,15 +175,11 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$per_page = (int) $request['per_page'];
 
 		/**
-		 * Filters the suggestions before they are searched for, so a search plugin can supply them.
+		 * Filters the suggestions before searching, so a search plugin can supply them, as with
+		 * `posts_pre_query`.
 		 *
-		 * Returning anything but null skips the search. Like `posts_pre_query`, it lets a search
-		 * service answer instead of the database.
-		 *
-		 * @param array|null      $suggestions Null to search as usual, or an array with the page of
-		 *                                     suggestions (`items`, each with the fields this
-		 *                                     endpoint returns) and how many there are across every
-		 *                                     page (`total`).
+		 * @param array|null      $suggestions Null to search as usual, or `items` (one page, in this
+		 *                                     endpoint's fields) and `total` (across all pages).
 		 * @param WP_REST_Request $request     Full details about the request.
 		 */
 		$suggestions = apply_filters( 'link_suggestions_pre_query', null, $request );
@@ -210,7 +191,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$search = $terms['ranking'];
 		$words  = $this->get_words( $search );
 
-		// Something was typed, but nothing a title could be matched on.
+		// Nothing searchable was typed, such as only punctuation.
 		if ( '' !== trim( $request['search'] ) && ! $words ) {
 			return $this->get_response( array(), 0, $per_page );
 		}
@@ -226,10 +207,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$count_sql = "SELECT COUNT(*) FROM ( $ranked ) AS ranked";
 		$page_sql  = $this->get_page_sql( $ranked, $words, $page, $per_page );
 
-		// The SQL holds everything the results depend on, down to what the current user can see,
-		// so it keys the cache. Adding or changing a post or term changes the last changed times.
-		// The placeholder `prepare()` puts in place of each `%` differs between requests, so it
-		// is taken out first.
+		// The SQL includes everything the results depend on, including what this user can see.
+		// `prepare()` swaps `%` for a placeholder that changes per request, so remove it first.
 		$cache_key = 'link-suggestions:' . md5( $wpdb->remove_placeholder_escape( $count_sql . $page_sql ) ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' );
 		$cached    = wp_cache_get( $cache_key, 'post-queries' );
 
@@ -244,7 +223,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			} elseif ( ! $rows && 1 === $page && $this->supports_window_functions() ) {
 				$total = 0;
 			} else {
-				// Without window functions, or past the last page, nothing carries the total.
+				// Past the last page, or no window functions: no row to read the total from.
 				$total = (int) $wpdb->get_var( $count_sql );
 			}
 			// phpcs:enable
@@ -261,7 +240,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Builds the response, with the totals `/wp/v2` collections send.
+	 * Builds the response, with `X-WP-Total` and `X-WP-TotalPages` headers.
 	 *
 	 * @param array $items    Suggestions.
 	 * @param int   $total    How many suggestions there are across every page.
@@ -276,7 +255,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Splits a search into words the way `tokenize()` in core-data does.
+	 * Splits a search into lowercase words, as `tokenize()` in core-data did.
 	 *
 	 * @param string $search What was typed.
 	 * @return string[] Lowercase words of letters and numbers.
@@ -287,13 +266,11 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Splits a search into the terms that have to be found, and those that must not be, as
-	 * `WP_Query` does: a quoted phrase is one term, stopwords such as "the" are dropped, and a
-	 * term typed with a minus leaves out results holding it.
+	 * Parses a search as `WP_Query` does: quoted phrases stay whole, stopwords are dropped, and a
+	 * leading minus excludes a term.
 	 *
 	 * @param string $search What was typed.
-	 * @return array Terms to find (`include`), terms to leave out (`exclude`), and what was typed
-	 *               without the terms left out (`ranking`), to rank titles by.
+	 * @return array `include` and `exclude` terms, and `ranking`: the search without excluded terms.
 	 */
 	private function get_search_terms( $search ) {
 		$terms = array(
@@ -348,8 +325,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Requires every term to be found in one of the columns, and no term left out to be found in
-	 * any, as `WP_Query` searches do.
+	 * Every included term must be in one of the columns, and no excluded term in any.
 	 *
 	 * @param string[] $columns Columns to look in.
 	 * @param array    $terms   Terms to find (`include`) and to leave out (`exclude`).
@@ -358,7 +334,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	private function get_terms_found_sql( $columns, $terms ) {
 		global $wpdb;
 
-		// `$column` is always one of the columns this class names, never a value from the request.
+		// `$column` is always a column name from this class, never input.
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$conditions = array();
 		foreach ( $terms['include'] as $term ) {
@@ -382,9 +358,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Builds the query listing everything a search could suggest, one row per object.
-	 *
-	 * Each row has the same columns whatever its type, so the rows can be ranked together.
+	 * Builds a union of matching rows from each type, all with the same columns.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @param array           $terms   Search terms, from `get_search_terms()`.
@@ -425,8 +399,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			return null;
 		}
 
-		// Normalize titles in each branch: the union is stored as a table, so each title is
-		// normalized once, not again for every score that reads it.
+		// Normalizing titles inside the union, which the database materializes, does it once per
+		// row. One layer up, it would be redone for every score that reads it.
 		$titled = array();
 		foreach ( $parts as $part ) {
 			$titled[] = "SELECT b.*, {$this->get_plain_title_sql( 'b.title' )} AS plain, {$this->get_title_words_sql( 'b.title' )} AS title_words FROM ( $part ) AS b";
@@ -436,9 +410,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether a post type or taxonomy is searched, given the ones asked for and left out.
-	 *
-	 * Post formats and media count as the subtypes "post-format" and "attachment".
+	 * Whether a subtype is searched. Post formats and media count as "post-format" and "attachment".
 	 *
 	 * @param string $subtype  Post type or taxonomy.
 	 * @param array  $subtypes Subtypes asked for (`include`) and left out (`exclude`).
@@ -450,7 +422,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Narrows a list of post types or taxonomies to those searched.
+	 * Keeps the post types or taxonomies that are searched.
 	 *
 	 * @param string[] $names    Public post types or taxonomies.
 	 * @param array    $subtypes Subtypes asked for (`include`) and left out (`exclude`).
@@ -466,7 +438,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Published posts of every public post type but attachments, as `/wp/v2/search` lists them.
+	 * Published posts of public post types, except attachments.
 	 *
 	 * @param array    $subtypes Subtypes asked for (`include`) and left out (`exclude`).
 	 * @param array    $terms    Search terms, from `get_search_terms()`.
@@ -494,7 +466,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 		$post_types = array_values( $post_types );
 		$found      = $this->get_terms_found_sql( array( 'p.post_title', 'p.post_excerpt', 'p.post_content' ), $terms );
 
-		// Pages rank above other content that matches as well: a link is more often to a page.
+		// Links are more often to pages, so pages outrank other content that matches as well.
 		$sql = $wpdb->prepare(
 			"SELECT 'post-type' AS kind, CASE WHEN p.post_type = 'page' THEN %d + 0.5 ELSE %d END AS base_rank,
 				p.post_type AS subtype, p.ID AS object_id, p.post_title AS title, p.post_date AS sort_date, '' AS sort_name
@@ -507,7 +479,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Terms of every public taxonomy, as `/wp/v2/search` lists them.
+	 * Terms of public taxonomies.
 	 *
 	 * @param array    $subtypes Subtypes asked for (`include`) and left out (`exclude`).
 	 * @param array    $terms    Search terms, from `get_search_terms()`.
@@ -545,9 +517,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Post formats that have an archive, as `/wp/v2/search` lists them.
-	 *
-	 * There is no table of post formats to search, so each one is written into the query.
+	 * Post formats with an archive. There is no table for them, so each is a row of literals.
 	 *
 	 * @param array $terms Search terms, from `get_search_terms()`.
 	 * @return string|null SQL.
@@ -585,10 +555,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Media the current user can see, as `/wp/v2/media` lists it.
-	 *
-	 * Media shares the visibility of the post it is attached to, so the parent is checked in the
-	 * query. Checking each result afterwards would leave pages short and the total wrong.
+	 * Media the user can see. Visibility follows the parent post, checked in SQL so pages and
+	 * totals stay right.
 	 *
 	 * @param array $terms Search terms, from `get_search_terms()`.
 	 * @return string SQL.
@@ -614,11 +582,9 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether the current user can read the post an attachment belongs to.
-	 *
-	 * Mirrors `WP_REST_Posts_Controller::check_read_permission()` and the `read_post` capability:
-	 * anyone can read a published post, the author can read their own, and others need to be able
-	 * to read private posts, or edit others' posts for any other status.
+	 * Whether the user can read an attachment's parent, as `check_read_permission()` decides:
+	 * published, their own, private with `read_private_posts`, or other statuses with
+	 * `edit_others_posts`.
 	 *
 	 * @return string SQL condition.
 	 */
@@ -657,7 +623,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * The types a request asks to rank first, most wanted first.
+	 * The `prefer_types` entries that name a known type.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return array[] Each with a search `type`, and a `subtype` when it names one.
@@ -682,7 +648,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Matches a row against a preferred type.
+	 * SQL condition for rows of a preferred type.
 	 *
 	 * @param array $entry A preferred type.
 	 * @return string SQL condition.
@@ -700,8 +666,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * How highly a row's type ranks. Preferred types rank above every other, in the order given,
-	 * as `preferTypes` does in core-data.
+	 * A row's type rank. Preferred types rank above all others, in the order given.
 	 *
 	 * @param array[] $preferred Types to rank first, most wanted first.
 	 * @return string SQL expression.
@@ -723,9 +688,9 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether beginning with what was typed can lift a row above others on its page. Media titles
-	 * are often file names, which begin with the word they are about, so media is only lifted when
-	 * it is preferred. It still shares pages with other results beginning with what was typed.
+	 * Whether beginning with the search lifts a row within its page. Not for media unless
+	 * preferred, since file-name titles often begin with the search. Media still shares pages
+	 * by it.
 	 *
 	 * @param array[] $preferred Types to rank first.
 	 * @return string SQL condition.
@@ -741,7 +706,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * A title lowercased with its curly quotes made straight, to compare with what was typed.
+	 * A title lowercased with straight quotes, to compare with the search.
 	 *
 	 * @param string $column Column holding the title.
 	 * @return string SQL expression.
@@ -757,16 +722,14 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * A title lowercased with its punctuation made spaces and a space either side, so every word
-	 * in it sits between two spaces.
+	 * A title lowercased, split into words by spaces, with a space at each end.
 	 *
 	 * @param string $column Column holding the title.
 	 * @return string SQL expression.
 	 */
 	private function get_title_words_sql( $column ) {
 		if ( $this->supports_window_functions() ) {
-			// The same databases can split at anything but letters and numbers, as `tokenize()`
-			// in core-data does.
+			// Splits at anything but letters and numbers, as `tokenize()` in core-data did.
 			$sql = "REGEXP_REPLACE( LOWER( $column ), '[^\\\\p{L}\\\\p{N}]+', ' ' )";
 		} else {
 			global $wpdb;
@@ -781,7 +744,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Builds the query that scores how well each candidate matches.
+	 * Adds the ranking scores to each candidate.
 	 *
 	 * @param string   $candidates SQL listing the candidates.
 	 * @param string   $search     What was typed.
@@ -823,8 +786,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * How much of the word it was found in a word typed accounts for: all of it when it is the
-	 * whole word, and otherwise its share of the letters of the first word holding it.
+	 * How much of the title word a word typed covers: 1 for a whole word, otherwise its share of
+	 * the first title word holding it.
 	 *
 	 * @param string $word A word typed.
 	 * @return string SQL expression between 0 and 1.
@@ -845,12 +808,11 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Builds the query for one page of suggestions.
+	 * Builds the query for one page.
 	 *
-	 * Where the database has window functions, the results of each post type and taxonomy are
-	 * numbered within each group of equally good matches, and the list takes the first of every
-	 * one, then the second, and so on. That order is the same for every page, so paging through it never repeats or
-	 * skips a result. Each page is then shown in rank order.
+	 * With window functions, results of equal quality are numbered within each subtype, and pages
+	 * take the first of each subtype, then the second, and so on. The order is fixed, so paging
+	 * never repeats or skips a result. Each page is then sorted by rank.
 	 *
 	 * @param string   $ranked   SQL scoring each candidate.
 	 * @param string[] $words    Words typed.
@@ -869,7 +831,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			return "SELECT * FROM ( $ranked ) AS ranked ORDER BY $rank $limit";
 		}
 
-		// Every row carries how many there are across every page, so no second query counts them.
+		// Each row carries the total, so there is no separate count query.
 		if ( ! $words ) {
 			return "SELECT ranked.*, COUNT(*) OVER () AS total_count FROM ( $ranked ) AS ranked ORDER BY $rank $limit";
 		}
@@ -889,9 +851,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Whether the database can number rows within groups and split text with a regular
-	 * expression, which MySQL 8.0 and MariaDB 10.2 have. Older databases rank results by how
-	 * well they match alone, and split titles at common punctuation.
+	 * Whether the database has window functions and `REGEXP_REPLACE` (MySQL 8.0+, MariaDB 10.2+).
+	 * Without them, pages are not shared between subtypes, and titles split at common punctuation.
 	 *
 	 * @return bool
 	 */
@@ -904,7 +865,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * The order suggestions rank in.
+	 * The rank order.
 	 *
 	 * @param string[] $words Words typed.
 	 * @return string SQL.
@@ -918,7 +879,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Formats a row as a suggestion, with the fields and `self` link `/wp/v2/search` gives.
+	 * Formats a row with the fields and `self` link `/wp/v2/search` returns.
 	 *
 	 * @param object          $item    Row from the query.
 	 * @param WP_REST_Request $request Full details about the request.
@@ -982,7 +943,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		return array(
 			'search'          => array(
-				'description' => __( 'Text to find in titles.', 'gutenberg' ),
+				'description' => __( 'Text to search for.', 'gutenberg' ),
 				'type'        => 'string',
 				'default'     => '',
 			),
@@ -1026,7 +987,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 				'items'       => array( 'type' => 'string' ),
 			),
 			'prefer_types'    => array(
-				'description' => __( 'Types to rank first, most wanted first: a type, or a type and a post type or taxonomy.', 'gutenberg' ),
+				'description' => __( 'Types to rank first, in order: a type, or a type and subtype.', 'gutenberg' ),
 				'type'        => 'array',
 				'items'       => array(
 					'type'       => array( 'string', 'object' ),
