@@ -1,84 +1,65 @@
-import colorTokens from '../../tokens/color.json';
-import borderTokens from '../../tokens/border.json';
-import dimensionTokens from '../../tokens/dimension.json';
+import { tokens, groups } from '../../prebuilt/js/design-tokens.mjs';
 
 export type TokenEntry = {
 	/** CSS custom property, e.g. `--wpds-color-background-surface-neutral`. */
 	name: string;
 	description: string;
+	/** Resolved default value as a CSS string, when it has a stable one. */
+	css?: string;
 };
 
 export type TokenGroup = {
-	/** Path segments below the token root, e.g. `[ 'background', 'surface' ]`. */
+	/** Path segments below the token group, e.g. `[ 'background', 'surface' ]`. */
 	path: string[];
 	tokens: TokenEntry[];
 };
 
-type TokenNode = { $description?: string; [ key: string ]: unknown };
-
-function isNode( value: unknown ): value is TokenNode {
-	return typeof value === 'object' && value !== null;
-}
-
 /**
- * Flattens a token tree into groups of leaf tokens, one group per parent node.
- * Metadata keys (`$…`) are skipped, as are `skip`ped top-level branches such as
- * `primitive`, which are not public.
+ * Splits the token export's flat list for one group (e.g. `color`) into
+ * sub-groups, keyed by the segments of the name between the group prefix and
+ * the variable tail (the part that varies within a sub-group).
  *
- * @param root     Token tree root (e.g. the `wpds-color` node).
- * @param rootName Root key, used as the CSS variable prefix.
- * @param skip     Top-level keys to leave out.
+ * @param group   Group name from the `groups` export.
+ * @param getPath Derives the sub-group path from the name segments that follow
+ *                `--wpds-<group>-`.
  */
 function collect(
-	root: TokenNode,
-	rootName: string,
-	skip: string[] = []
+	group: string,
+	getPath: ( segments: string[] ) => string[]
 ): TokenGroup[] {
-	const groups: TokenGroup[] = [];
+	const result: TokenGroup[] = [];
+	const prefix = `--wpds-${ group }-`;
 
-	const walk = ( node: TokenNode, path: string[] ) => {
-		const tokens: TokenEntry[] = [];
-		for ( const [ key, child ] of Object.entries( node ) ) {
-			if ( key.startsWith( '$' ) || ! isNode( child ) ) {
-				continue;
-			}
-			if ( path.length === 0 && skip.includes( key ) ) {
-				continue;
-			}
-			if ( '$value' in child ) {
-				tokens.push( {
-					name: `--${ [ rootName, ...path, key ].join( '-' ) }`,
-					description: child.$description ?? '',
-				} );
-			} else {
-				walk( child, [ ...path, key ] );
-			}
+	for ( const name of ( groups as Record< string, string[] > )[ group ] ) {
+		const path = getPath( name.slice( prefix.length ).split( '-' ) );
+		const key = path.join( '/' );
+		let entry = result.find( ( item ) => item.path.join( '/' ) === key );
+		if ( ! entry ) {
+			entry = { path, tokens: [] };
+			result.push( entry );
 		}
-		if ( tokens.length ) {
-			groups.push( { path, tokens } );
-		}
-	};
+		const token = tokens[ name as keyof typeof tokens ];
+		entry.tokens.push( {
+			name,
+			description: token.$description,
+			css: 'modes' in token ? token.modes.default.css : undefined,
+		} );
+	}
 
-	walk( root, [] );
-	return groups;
+	return result;
 }
 
-export const colorGroups = collect(
-	colorTokens[ 'wpds-color' ] as TokenNode,
-	'wpds-color',
-	[ 'primitive' ]
+// Color names are `<property>-<target>-<tone…>`; `stroke-focus` has no target.
+export const colorGroups = collect( 'color', ( segments ) =>
+	segments.length > 2 ? segments.slice( 0, 2 ) : segments.slice( 0, 1 )
 );
 
-export const borderGroups = collect(
-	borderTokens[ 'wpds-border' ] as TokenNode,
-	'wpds-border'
-);
+// Border and dimension names end with a single scale step (`md`, `2xl`).
+const dropScaleStep = ( segments: string[] ) => segments.slice( 0, -1 );
 
-export const dimensionGroups = collect(
-	dimensionTokens[ 'wpds-dimension' ] as TokenNode,
-	'wpds-dimension',
-	[ 'primitive' ]
-);
+export const borderGroups = collect( 'border', dropScaleStep );
+
+export const dimensionGroups = collect( 'dimension', dropScaleStep );
 
 /**
  * Turns a path such as `[ 'background', 'surface' ]` into a title.
