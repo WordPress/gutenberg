@@ -34,6 +34,8 @@ import type { Attachment } from './types';
 declare global {
 	interface Window {
 		__clientSideMediaProcessing?: boolean;
+		/** Set by core's media-frame-upload script once it handles these uploads. */
+		__wpMediaFrameUpload?: boolean;
 		plupload?: { FAILED: number };
 	}
 }
@@ -840,11 +842,21 @@ function handleFilesAdded(
  * Safe to call repeatedly: the patch is applied once, and it decides per batch
  * of files whether the pipeline can take them, so an uploader created before
  * the block editor configured the pipeline still works.
+ *
+ * Does nothing where core's own media frame integration has already bound
+ * its handler: both would bind at the same priority and the first to return
+ * `false` would silence the other, with load order deciding which.
  */
 export function installClientSideModalUploads(): void {
 	const { wp, plupload } = window as any;
 
-	if ( isInstalled || ! wp?.Uploader || ! wp?.media || ! plupload ) {
+	if (
+		isInstalled ||
+		window.__wpMediaFrameUpload ||
+		! wp?.Uploader ||
+		! wp?.media ||
+		! plupload
+	) {
 		return;
 	}
 

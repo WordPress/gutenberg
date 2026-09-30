@@ -180,6 +180,7 @@ describe( 'installClientSideModalUploads', () => {
 		delete ( window as any ).wp;
 		delete ( window as any ).plupload;
 		delete ( window as any ).__clientSideMediaProcessing;
+		delete ( window as any ).__wpMediaFrameUpload;
 	} );
 
 	it( 'binds FilesAdded ahead of the built-in handler', async () => {
@@ -200,6 +201,20 @@ describe( 'installClientSideModalUploads', () => {
 		const { installClientSideModalUploads } = await loadModule();
 
 		expect( () => installClientSideModalUploads() ).not.toThrow();
+	} );
+
+	it( 'leaves the uploader alone when core already handles media frame uploads', async () => {
+		// Core's media-frame-upload script sets this flag once it has bound
+		// its own handler, so a second one here would only race it.
+		( window as any ).__wpMediaFrameUpload = true;
+		const { Uploader } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+
+		expect( bindings ).toEqual( [] );
+		expect( up.bind ).not.toHaveBeenCalled();
 	} );
 
 	it( 'routes a file through the pipeline instead of plupload', async () => {
