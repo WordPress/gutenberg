@@ -10,6 +10,7 @@
  * @covers ::_gutenberg_is_field_id_list_or_true
  * @covers ::gutenberg_register_field_collection
  * @covers ::gutenberg_register_core_post_supports_fields
+ * @covers ::gutenberg_exclude_core_post_type_support_fields
  * @covers ::gutenberg_register_core_field_collections
  * @covers Gutenberg_Fields_Registry::initialize
  * @covers Gutenberg_Fields_Registry::register
@@ -521,12 +522,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'gutenberg_register_core_post_supports_fields( $registry );', $built );
 		$this->assertStringContainsString( "gutenberg_register_field_collection( \$registry, __DIR__ . '/wp_template' );", $built );
 		$this->assertStringContainsString( "add_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );", $built );
+		$this->assertStringContainsString( "add_filter( 'fields_api_post_type_support_exclusions', 'gutenberg_exclude_core_post_type_support_fields', 10, 3 );", $built );
 		$this->assertStringNotContainsString( 'wp_register_field_collection', $built );
 		$this->assertStringNotContainsString( 'wp_get_field_collection_fields', $built );
 		$this->assertSame(
 			str_replace(
-				array( 'wp_register_field_collection', 'wp_get_field_collection_fields', 'register_core_post_supports_fields', 'register_core_field_collections' ),
-				array( 'gutenberg_register_field_collection', 'gutenberg_get_field_collection_fields', 'gutenberg_register_core_post_supports_fields', 'gutenberg_register_core_field_collections' ),
+				array( 'wp_register_field_collection', 'wp_get_field_collection_fields', 'register_core_post_supports_fields', 'exclude_core_post_type_support_fields', 'register_core_field_collections' ),
+				array( 'gutenberg_register_field_collection', 'gutenberg_get_field_collection_fields', 'gutenberg_register_core_post_supports_fields', 'gutenberg_exclude_core_post_type_support_fields', 'gutenberg_register_core_field_collections' ),
 				$source
 			),
 			$built,
@@ -577,12 +579,27 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The defaults make no exception for any post type: on their own, they
-	 * register the author field on templates, template parts, and
-	 * attachments, which support authors. Their collections unregister it,
-	 * as a plugin would.
+	 * The core post types exclude the defaults they do not get on the
+	 * filter, like a plugin: templates and template parts the author field,
+	 * attachments every default field.
+	 */
+	public function test_the_core_post_types_exclude_defaults_on_the_filter() {
+		$this->assertSame( 10, has_filter( 'fields_api_post_type_support_exclusions', 'gutenberg_exclude_core_post_type_support_fields' ) );
+
+		$ids = array( 'author', 'comment_status', 'notesCount' );
+		$this->assertSame( array( 'plugin_field', 'author' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
+		$this->assertSame( array( 'author' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array( 'plugin_field', 'author', 'comment_status', 'notesCount' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'attachment', $ids ) );
+		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ), 'It leaves the other post types alone.' );
+	}
+
+	/**
+	 * The defaults make no exception for any post type: without the core
+	 * callback of the filter, they register the author field on templates,
+	 * template parts, and attachments, which support authors.
 	 */
 	public function test_the_defaults_make_no_exception() {
+		remove_filter( 'fields_api_post_type_support_exclusions', 'gutenberg_exclude_core_post_type_support_fields' );
 		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
 		$this->core_collections_unhooked = true;
 		$this->on_fields_api_init( 'gutenberg_register_core_post_supports_fields', 0 );
@@ -592,6 +609,62 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$this->assertArrayHasKey( 'author', $fields, "The defaults register the author field on $post_type." );
 			$this->assertSame( 'integer', $fields['author']['type'] );
 		}
+	}
+
+	/**
+	 * A plugin excludes a default field from its post type on the filter,
+	 * before it is registered, keeping the others. The filter receives the
+	 * post type and the ids of the defaults it supports.
+	 */
+	public function test_a_plugin_can_exclude_a_default_field_from_a_post_type() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book'  => array( 'title', 'author', 'comments' ),
+				'gutenberg_note'  => array( 'title', 'author', 'comments' ),
+				'gutenberg_plain' => array( 'title' ),
+			)
+		);
+		$calls = array();
+		add_filter(
+			'fields_api_post_type_support_exclusions',
+			static function ( $excluded, $post_type, $ids ) use ( &$calls ) {
+				$calls[ $post_type ] = $ids;
+				if ( 'gutenberg_book' === $post_type ) {
+					$excluded[] = 'comment_status';
+				}
+				return $excluded;
+			},
+			10,
+			3
+		);
+
+		self::reset_registry();
+		$this->assertSame( array( 'author' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'comment_status' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
+		$this->assertSame( array( 'author', 'comment_status', 'notesCount' ), $calls['post'] );
+		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
+	}
+
+	/**
+	 * A value of the filter other than a list is reported, and excludes
+	 * nothing.
+	 */
+	public function test_an_invalid_exclusion_is_reported_and_excludes_nothing() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'author', 'comments' ) ) );
+		add_filter(
+			'fields_api_post_type_support_exclusions',
+			static function ( $excluded, $post_type ) {
+				return 'gutenberg_book' === $post_type ? 'author' : $excluded;
+			},
+			10,
+			2
+		);
+
+		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_supports_fields' );
+		self::reset_registry();
+
+		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 	}
 
 	/**
