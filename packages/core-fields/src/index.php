@@ -146,7 +146,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
  *   a site rather than publish content.
  * - Pages, templates, template parts, and patterns: `title`. They have
- *   their own title fields, declared client-side.
+ *   their own title fields: the `page` collection has the one of pages, and
+ *   the client declares the others.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -203,6 +204,7 @@ add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_
  */
 function register_core_field_collections( $registry ) {
 	register_core_post_type_supports_fields( $registry );
+	wp_register_field_collection( $registry, __DIR__ . '/page' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
 	wp_register_field_collection( $registry, __DIR__ . '/attachment' );

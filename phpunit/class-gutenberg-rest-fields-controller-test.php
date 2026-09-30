@@ -418,11 +418,15 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			array(
 				array(
 					'id'     => '@wordpress/core-fields/post_type_supports',
-					'fields' => $ids,
+					'fields' => array_values( array_diff( $ids, array( 'title' ) ) ),
+				),
+				array(
+					'id'     => '@wordpress/core-fields/page',
+					'fields' => array( 'title' ),
 				),
 			),
 			$data['script_modules'],
-			'The default fields are registered with the module of their collection.'
+			'The fields are registered with the module of their collection.'
 		);
 	}
 
