@@ -251,6 +251,10 @@ export default function SuggestionAutoSave() {
 		[ syncOnce ]
 	);
 
+	// Entries as of the last scheduling pass. The reducer replaces only the
+	// entry it touches, so comparing identities finds the blocks that changed.
+	const scheduledEntriesRef = useRef< Record< string, unknown > >( {} );
+
 	useEffect( () => {
 		const timers = timersRef.current;
 
@@ -270,10 +274,24 @@ export default function SuggestionAutoSave() {
 				enqueueSync( clientId );
 			}
 			timers.clear();
+			// Re-entering Suggest mode reconsiders every entry.
+			scheduledEntriesRef.current = {};
 			return undefined;
 		}
 
+		/*
+		 * Only a changed entry is re-fingerprinted and has its debounce
+		 * restarted. Restarting every block's timer on each change let steady
+		 * typing in one block postpone another block's save indefinitely, and
+		 * fingerprinting every entry cost a JSON.stringify of each payload per
+		 * keystroke.
+		 */
+		const previous = scheduledEntriesRef.current;
+		scheduledEntriesRef.current = entries;
 		for ( const [ clientId, entry ] of Object.entries( entries ) ) {
+			if ( previous[ clientId ] === entry ) {
+				continue;
+			}
 			const operations = operationsForEntry( entry );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === entry.syncedOpsKey ) {
@@ -293,12 +311,18 @@ export default function SuggestionAutoSave() {
 		return undefined;
 	}, [ isSuggestMode, entries, enqueueSync ] );
 
-	// Clear all pending timers on unmount.
+	// Save anything still waiting out its debounce on unmount (the
+	// experiment toggled off, the editor closed) rather than dropping it.
+	const enqueueSyncRef = useRef( enqueueSync );
+	useEffect( () => {
+		enqueueSyncRef.current = enqueueSync;
+	}, [ enqueueSync ] );
 	useEffect( () => {
 		const timers = timersRef.current;
 		return () => {
-			for ( const timer of timers.values() ) {
+			for ( const [ clientId, timer ] of timers ) {
 				clearTimeout( timer );
+				enqueueSyncRef.current( clientId );
 			}
 			timers.clear();
 		};
