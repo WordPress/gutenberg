@@ -44,17 +44,14 @@ concurrency:
 permissions: {}
 
 jobs:
-    # Collects a list of contributor props for the PR meta comment to post.
-    props-bot:
-        name: Generate a list of props
+    pull-request:
+        name: Resolve the pull request target
         runs-on: 'ubuntu-24.04'
         permissions:
-            # Read is enough: the action posts nothing, see `post-comment`.
             pull-requests: read
-            contents: read
-        timeout-minutes: 20
+        timeout-minutes: 5
         outputs:
-            comment-body: ${{ steps.props.outputs.comment-body }}
+            base-ref: ${{ steps.pull-request.outputs.result }}
         # The job will run when pull requests are open, ready for review and:
         #
         # - A comment is added to the pull request.
@@ -73,6 +70,34 @@ jobs:
             ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
+            # issue_comment does not carry the target branch. Read the current
+            # target for every event so both writers use the same decision.
+            - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              id: pull-request
+              with:
+                  result-encoding: string
+                  script: |
+                      const { data } = await github.rest.pulls.get( {
+                        ...context.repo,
+                        pull_number: context.issue.number,
+                      } );
+                      return data.base.ref;
+
+    # Collects a list of contributor props for the PR meta comment to post.
+    props-bot:
+        name: Generate a list of props
+        needs: pull-request
+        if: ${{ needs.pull-request.outputs.base-ref == github.event.repository.default_branch }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            # Read is enough: the action posts nothing, see `post-comment`.
+            pull-requests: read
+            contents: read
+        timeout-minutes: 20
+        outputs:
+            comment-body: ${{ steps.props.outputs.comment-body }}
+
+        steps:
             - name: Gather a list of contributors
               id: props
               uses: WordPress/props-bot-action@trunk
@@ -80,6 +105,23 @@ jobs:
                   # The PR meta comment carries the list, so the action renders
                   # it to an output and posts nothing itself.
                   post-comment: false
+
+    # Other branches retain standalone props until their shared writers have
+    # been updated. Otherwise the base gate would discard every fresh list.
+    standalone-props:
+        name: Update the standalone props comment
+        needs: pull-request
+        if: ${{ needs.pull-request.outputs.base-ref != github.event.repository.default_branch }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: write
+            contents: read
+        timeout-minutes: 20
+
+        steps:
+            - uses: WordPress/props-bot-action@trunk
+              with:
+                  post-comment: true
 
     pr-meta:
         name: Update PR meta comment
