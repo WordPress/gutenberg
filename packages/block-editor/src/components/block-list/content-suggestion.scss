@@ -1,11 +1,12 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // Visual treatment for blocks and RichText runs tagged with a pending
 // suggestion. Lives in `block-editor` because the canvas iframe loads
 // `wp-block-editor-content` (compiled from this package) but does NOT load
 // the editor-package chrome stylesheets — keeping these rules here is what
-// makes them apply inside the iframe.
+// makes them apply inside the iframe. The `--wpds-*` design tokens are
+// available there too: `wp-theme` is the first dependency of the iframe's
+// `wp-edit-blocks` bundle.
 //
 // - Block-level classes (`is-suggestion-pending*`) are set by the editor
 //   suggestion system via `metadata.suggestion`.
@@ -16,31 +17,36 @@
 // from the suggester's avatar color — so individual suggestions tint to their
 // author the same way live cursors do.
 
-// Default suggestion colors, used when the suggester's avatar color
-// can't be resolved (e.g., anonymous edits or pre-collab sessions).
-$suggestion-color: #188038;
-$suggestion-deletion-color: #cc1818;
-$suggestion-addition-color: #007017;
-$suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
+// Author color with the tone default that applies when the suggester's avatar
+// color can't be resolved (e.g., anonymous edits or pre-collab sessions):
+// the strong success stroke for anything proposed, the strong error stroke for
+// a proposed deletion.
+$suggestion-color: var(--suggestion-author-color, var(--wpds-color-stroke-surface-success-strong));
+$suggestion-deletion-color: var(--suggestion-author-color, var(--wpds-color-stroke-surface-error-strong));
 
 // Text-safe variants: the author palette (AVATAR_BORDER_COLORS) is chosen for
-// 3:1 borders, and several entries sit near 2.7-3.3:1 on white — a WCAG AA
-// fail for TEXT. Mixing 40% black brings every palette entry above the 4.5:1
-// text threshold on light backgrounds. Use these wherever the author color
-// paints text or a line-through (which crosses text); keep the raw color for
-// non-text uses (borders, outlines, underline decoration, backgrounds).
-$suggestion-author-text-color: color-mix(in srgb, #{$suggestion-author-color} 60%, #000);
-$suggestion-deletion-text-color: color-mix(in srgb, var(--suggestion-author-color, #{$suggestion-deletion-color}) 60%, #000);
-$suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-color, #{$suggestion-addition-color}) 60%, #000);
+// borders, and several entries fall short of the 4.5:1 WCAG AA text threshold
+// on their own. Mixing the color with the inherited text color pulls it
+// toward whatever the theme already contrasts against its background: darker
+// on light themes, lighter on dark ones, and per block, so a Cover with light
+// text over a dark image gets a light tint. At this share every palette entry
+// and both defaults clear 4.5:1 against white and against dark backgrounds
+// down to #333, and the move tab's label below clears it on the tab's own
+// fill (see the contrast table in PR #80429). Use these wherever the author
+// color paints text or a line-through (which crosses text); keep the raw
+// color for borders, outlines, underlines and backgrounds.
+$suggestion-mix: 45%;
+$suggestion-text-color: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, currentColor);
+$suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color} $suggestion-mix, currentColor);
 
 // Green "bracket" applied to any block with a pending attribute overlay
 // while the suggester is editing. Drawn with an outline so it layers above
 // block content without affecting layout.
 .block-editor-block-list__block.is-suggestion-pending {
 	position: relative;
-	outline: 2px solid $suggestion-author-color;
-	outline-offset: 2px;
-	border-radius: $radius-small;
+	outline: var(--wpds-border-width-sm) solid $suggestion-color;
+	outline-offset: var(--wpds-border-width-sm);
+	border-radius: var(--wpds-border-radius-sm);
 
 	&::before,
 	&::after {
@@ -48,7 +54,7 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 		position: absolute;
 		width: $grid-unit-10;
 		height: $grid-unit-10;
-		border: 2px solid $suggestion-author-color;
+		border: var(--wpds-border-width-sm) solid $suggestion-color;
 		pointer-events: none;
 	}
 
@@ -69,35 +75,34 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 
 // Pending-remove: the block is still real (selection, focus, and toolbar
 // keep working) but the visual treatment communicates "proposed for
-// deletion". Strikethrough + suggestion-green text on every line so
+// deletion". Strikethrough + suggestion-tinted text on every line so
 // multi-line paragraphs read clearly as "delete me", matching Google
 // Docs' suggesting-mode strike-through. The decoration is applied to
 // the wrapper and propagates to inline rich-text descendants.
 .block-editor-block-list__block.is-suggestion-pending-remove {
-	color: $suggestion-author-text-color;
+	color: $suggestion-text-color;
 	text-decoration: line-through;
-	text-decoration-color: $suggestion-author-text-color;
-	text-decoration-thickness: 2px;
+	text-decoration-thickness: var(--wpds-border-width-sm);
 }
 
 // Pending-insert: the block was inserted in Suggest mode but isn't yet
-// "real". A dashed green outline distinguishes it from the solid bracket
+// "real". A dashed outline distinguishes it from the solid bracket
 // used by pending attribute edits, and the suggester's typed content
-// is rendered in suggestion green so the reviewer sees a green preview
+// is rendered in the suggestion tint so the reviewer sees a preview
 // of what's being added (matching Google Docs' suggesting-mode insert
 // treatment). Edits to a pending-insert block bypass the suggestion
 // overlay (see `with-suggestion-overlay.js`) so the content syncs and
 // shows up here.
 .block-editor-block-list__block.is-suggestion-pending-insert {
 	position: relative;
-	color: $suggestion-author-text-color;
-	outline: 2px dashed $suggestion-author-color;
-	outline-offset: 2px;
-	border-radius: $radius-small;
+	color: $suggestion-text-color;
+	outline: var(--wpds-border-width-sm) dashed $suggestion-color;
+	outline-offset: var(--wpds-border-width-sm);
+	border-radius: var(--wpds-border-radius-sm);
 }
 
 // Pending-move: the block has been dragged to a new position but the move
-// isn't yet committed. A dotted green outline distinguishes it from the
+// isn't yet committed. A dotted outline distinguishes it from the
 // dashed pending-insert (the block existed before — only its position is
 // suggested). The "Suggested move" tab pinned to the top corner makes the
 // preview state unambiguous. The tab text comes from the
@@ -106,24 +111,37 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 .block-editor-block-list__block.is-suggestion-pending-move {
 	position: relative;
 	opacity: 0.7;
-	outline: 2px dotted $suggestion-author-color;
-	outline-offset: 2px;
-	border-radius: $radius-small;
+	outline: var(--wpds-border-width-sm) dotted $suggestion-color;
+	outline-offset: var(--wpds-border-width-sm);
+	border-radius: var(--wpds-border-radius-sm);
 
+	// The tab's label sits on the tab's own fill rather than on the canvas,
+	// so it cannot lean on the inherited-color mix above (in `background`,
+	// `currentColor` is the pseudo-element's own text color). Mix the author
+	// color toward the neutral foreground token instead, which always comes
+	// out dark, and pair it with the light "on strong" foreground. Under
+	// `.is-dark-theme` (set on the canvas body by `EditorStyles` from the
+	// theme's background luminance) invert both so the tab still stands out
+	// from a dark canvas.
 	&::before {
 		content: attr(data-suggestion-move-label);
 		position: absolute;
-		top: -$grid-unit-20;
+		top: calc(-1 * var(--wpds-typography-line-height-xs));
 		left: -$grid-unit-05;
-		padding: 0 $grid-unit-10;
-		background: $suggestion-author-color;
-		color: $white;
-		font-size: 11px;
-		font-weight: 500;
-		line-height: $grid-unit-20;
-		border-radius: $radius-small $radius-small 0 0;
+		padding: 0 var(--wpds-dimension-padding-sm);
+		background: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, var(--wpds-color-foreground-content-neutral));
+		color: var(--wpds-color-foreground-interactive-neutral-strong);
+		font-size: var(--wpds-typography-font-size-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: var(--wpds-typography-line-height-xs);
+		border-radius: var(--wpds-border-radius-sm) var(--wpds-border-radius-sm) 0 0;
 		pointer-events: none;
 		z-index: 1;
+	}
+
+	.is-dark-theme &::before {
+		background: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, var(--wpds-color-background-surface-neutral-strong));
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 }
 
@@ -135,31 +153,35 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 // Per-author tinting (via `data-author`) and alignment with the Revisions diff
 // UI land with the Phase 5 visual work.
 .wp-suggestion {
+	// The marker is a `<mark>`, which browsers paint black on yellow by
+	// default. Inherit the text color so the run follows the theme (and the
+	// mixes below start from it) instead of going black on a dark canvas.
 	background: transparent;
+	color: inherit;
 
 	// The runtime annotation decoration nests a `<mark class="annotation-text">`
 	// inside the suggestion marker. Suggestion threads are `note`-type comments,
 	// so `NoteHighlightStyles` tints that inner mark with the author's color by
-	// id (and the browser otherwise paints `<mark>` yellow). Here the marker's
-	// own strikethrough/underline is the visual, so the highlight box — whose
-	// rounded edges read as stray vertical bars around the run and any trailing
-	// space — is redundant. Neutralize it; `!important` overrides the
+	// id (and the browser otherwise paints `<mark>` black on yellow). Here the
+	// marker's own strikethrough/underline is the visual, so the highlight box
+	// — whose rounded edges read as stray vertical bars around the run and any
+	// trailing space — is redundant. Neutralize it; `!important` overrides the
 	// id-specificity rule `NoteHighlightStyles` injects per thread. Per-author
 	// tinting returns on the marker itself in the Phase 5 visual work.
 	mark.annotation-text {
 		background-color: transparent !important;
+		color: inherit;
 	}
 
 	&[data-suggestion-type="del"] {
 		color: $suggestion-deletion-text-color;
 		text-decoration: line-through;
-		text-decoration-color: $suggestion-deletion-text-color;
 	}
 
 	&[data-suggestion-type="add"] {
-		color: $suggestion-addition-text-color;
+		color: $suggestion-text-color;
 		text-decoration: underline;
-		text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
+		text-decoration-color: $suggestion-color;
 	}
 
 	// A pending formatting change (bold/italic/link toggled over a run): the
@@ -171,8 +193,8 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 	// Phase 5 visual work.
 	&[data-suggestion-type="format"] {
 		text-decoration: underline dotted;
-		text-decoration-color: var(--suggestion-author-color, #{$suggestion-color});
-		text-decoration-thickness: 2px;
+		text-decoration-color: $suggestion-color;
+		text-decoration-thickness: var(--wpds-border-width-sm);
 		text-underline-offset: 2px;
 	}
 
@@ -221,29 +243,28 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 .is-suggestion-move-ghost {
 	display: block;
 	position: relative;
-	margin: $grid-unit-15 0;
-	padding: $grid-unit-15;
+	margin: var(--wpds-dimension-gap-md) 0;
+	padding: var(--wpds-dimension-padding-md);
 	opacity: 0.6;
-	color: $suggestion-author-text-color;
-	border: 1px dotted $suggestion-author-color;
-	border-radius: $radius-small;
+	color: $suggestion-text-color;
+	border: var(--wpds-border-width-xs) dotted $suggestion-color;
+	border-radius: var(--wpds-border-radius-sm);
 	text-decoration: line-through;
-	text-decoration-color: $suggestion-author-text-color;
 	pointer-events: none;
 	user-select: none;
 
 	.is-suggestion-move-ghost__label {
 		display: inline-flex;
 		align-items: center;
-		gap: $grid-unit-05;
-		font-size: 11px;
-		font-weight: 500;
+		gap: var(--wpds-dimension-gap-xs);
+		font-size: var(--wpds-typography-font-size-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		text-decoration: none;
 	}
 
 	.is-suggestion-move-ghost__excerpt {
 		display: block;
-		margin-top: $grid-unit-05;
-		font-size: 13px;
+		margin-top: var(--wpds-dimension-gap-xs);
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
