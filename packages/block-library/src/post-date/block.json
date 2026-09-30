@@ -4,7 +4,7 @@
 	"name": "core/post-date",
 	"title": "Date",
 	"category": "theme",
-	"description": "Display a custom date.",
+	"description": "Displays the publish date for an entry such as a post or page.",
 	"textdomain": "default",
 	"attributes": {
 		"datetime": {

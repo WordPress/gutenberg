@@ -4,7 +4,7 @@
 	"name": "core/table",
 	"title": "Table",
 	"category": "text",
-	"description": "Create structured content in rows and columns to display information.",
+	"description": "Creates structured content in rows and columns to display information.",
 	"textdomain": "default",
 	"attributes": {
 		"hasFixedLayout": {

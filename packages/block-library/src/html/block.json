@@ -4,7 +4,7 @@
 	"name": "core/html",
 	"title": "Custom HTML",
 	"category": "widgets",
-	"description": "Add custom HTML code and preview it as you edit.",
+	"description": "Adds custom HTML code and preview it as you edit.",
 	"keywords": [ "embed" ],
 	"textdomain": "default",
 	"attributes": {

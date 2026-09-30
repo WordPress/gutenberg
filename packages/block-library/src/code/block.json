@@ -4,7 +4,7 @@
 	"name": "core/code",
 	"title": "Code",
 	"category": "text",
-	"description": "Display code snippets that respect your spacing and tabs.",
+	"description": "Displays code snippets that respects the spacing and tabs.",
 	"textdomain": "default",
 	"attributes": {
 		"content": {
