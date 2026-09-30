@@ -50,15 +50,38 @@ test.describe( 'Dropdown Menu', () => {
 		} );
 
 		await test.step( 'ignores arrow key navigation that is orthogonal to the orientation of the menu, but stays open', async () => {
-			// Expect the first menu item to be focused.
-			await expect( menuItems.first() ).toBeFocused();
+			// The first item opens a submenu with the right arrow, so test
+			// on the last item, which is a plain one.
+			await page.keyboard.press( 'ArrowUp' );
+			await expect( menuItems.last() ).toBeFocused();
 
 			// Press left and right keys an arbitrary (but > 1) number of times.
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 5 } );
 
-			// Expect the first menu item to still be focused.
-			await expect( menuItems.first() ).toBeFocused();
+			// Expect the last menu item to still be focused.
+			await expect( menuItems.last() ).toBeFocused();
+		} );
+
+		await test.step( 'opens a submenu with the right arrow and closes it with the left arrow', async () => {
+			const appearance = menu.getByRole( 'menuitem', {
+				name: 'Appearance',
+				exact: true,
+			} );
+			const submenu = page.getByRole( 'menu', { name: 'Appearance' } );
+
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( appearance ).toBeFocused();
+
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( submenu ).toBeVisible();
+			await expect(
+				submenu.getByRole( 'menuitemcheckbox' ).first()
+			).toBeFocused();
+
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( submenu ).toBeHidden();
+			await expect( appearance ).toBeFocused();
 		} );
 	} );
 } );

@@ -25,7 +25,10 @@ function createHost( onNavigate?: ( path: string ) => void ) {
 	const HostLink = forwardRef<
 		HTMLAnchorElement,
 		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
-	>( function HostLink( { path, onClick, children, ...props }, ref ) {
+	>( function UnforwardedHostLink(
+		{ path, onClick, children, ...props },
+		ref
+	) {
 		receivedRef.push( ref !== null );
 
 		return (

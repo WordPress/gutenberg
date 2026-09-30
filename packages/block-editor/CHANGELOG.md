@@ -2,9 +2,22 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
+-   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
 ### Bug Fixes
 
+-   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
+-   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
+-   Fix style edits applied to a multi-block selection overwriting each block's other styles. Only the changed values are now applied to every selected block, so distinct styles are preserved and resets propagate to the whole selection ([#80070](https://github.com/WordPress/gutenberg/pull/80070)).
+
+### Internal
+
+-   Apply the disabled state to block binding menu triggers instead of their roots ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ### Internal
 
@@ -37,6 +50,7 @@
 -   `BlockAlignmentControl`: Hide the control again when none of a block's alignments are available. Paragraph, Heading, List and other blocks that support only wide and full were showing a menu of unavailable options that could not change anything ([#83265](https://github.com/WordPress/gutenberg/pull/83265)).
 -   Inline images in rich text are selected by clicking them again. A block captures a drag that starts on its own image through the `dragstart` target instead of the `pointer-events: none` rule that also kept the image from any click ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
 -   `RichText`: The edit UI of a format follows the active object when the selection moves from one object straight to another, for example from one inline image to the next, so the popover shows the attributes of that object at its position ([#83370](https://github.com/WordPress/gutenberg/pull/83370)).
+-   `FontAppearanceControl`: List only the weights inside a variable font's range, reading both ends of the range as whole numbers or as the keywords `normal` and `bold` ([#83128](https://github.com/WordPress/gutenberg/pull/83128)).
 -   `LinkControl`: Only label pages as the front page or blog home. Posts, terms and media are separate tables and can share an id, so an unscoped search could label a term "Front page" ([#83082](https://github.com/WordPress/gutenberg/pull/83082)).
 -   `InnerBlocks`: Resolve a container's legacy layout markup (`inherit: true`, or a bare `contentSize` / `wideSize` with no `type`) to a constrained layout for its inner blocks, so they are offered the wide and full alignments. Previously only the container's styles honoured the legacy form, and the inner blocks resolved to the flow layout ([#82637](https://github.com/WordPress/gutenberg/pull/82637)).
 -   Block Patterns, Block Visibility, and Block Lock: Preserve the intended colors of icons converted to strokes. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
 ## 6.56.0 (2026-09-23)
 
 ### Bug Fixes
