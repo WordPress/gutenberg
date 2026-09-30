@@ -362,11 +362,13 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const dragScale = cardScale( anchorRect );
 				const grabX = event.clientX;
 				const grabY = event.clientY;
-				// The visual hangs just below and right of the pointer,
-				// wherever the press landed in the block.
+				// The pointer holds the block by its top left corner,
+				// wherever the press landed in the block: the corner sits
+				// just inside the grabbing hand.
+				const grabOffset = 4;
 				const anchorVisual = {
-					left: grabX + 8,
-					top: grabY + 10,
+					left: grabX - grabOffset,
+					top: grabY - grabOffset,
 					width: anchorRect.width * dragScale,
 					height: anchorRect.height * dragScale,
 				};
@@ -539,10 +541,12 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					// On the stack's top right corner, clear of the
 					// pointer at its top left.
 					countBadge.style.left = `${
-						( lastClientX + 8 + anchorVisual.width ) * inverted - 12
+						( lastClientX - grabOffset + anchorVisual.width ) *
+							inverted -
+						12
 					}px`;
 					countBadge.style.top = `${
-						( lastClientY + 10 ) * inverted - 12
+						( lastClientY - grabOffset ) * inverted - 12
 					}px`;
 				}
 				positionCountBadge();
