@@ -386,12 +386,30 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			array(
 				array(
 					'id'     => '@wordpress/core-fields/post_supports',
-					'fields' => array( 'author' ),
+					'fields' => array( 'author', 'comment_status', 'notesCount' ),
 				),
 			),
 			$data['script_modules'],
-			'The author field ships its JavaScript parts in the default fields module.'
+			'The default fields are registered with the module of their collection.'
 		);
+	}
+
+	/**
+	 * The default fields are exposed with the origin of their collection and
+	 * without their `supports`, which only decides where they apply.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_the_default_fields_without_their_supports() {
+		wp_set_current_user( self::$editor_id );
+
+		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
+
+		$this->assertNotEmpty( $data['fields'] );
+		foreach ( $data['fields'] as $field ) {
+			$this->assertArrayNotHasKey( 'supports', $field );
+			$this->assertSame( 'core', $field['origin']['registeredBy'] );
+		}
 	}
 
 	/**

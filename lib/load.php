@@ -169,14 +169,6 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
 }
 
-// The collections of the fields core registers: each one hooks its
-// registration to `fields_api_init`, see lib/compat/wordpress-7.2/fields-api.php.
-if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
-	foreach ( glob( __DIR__ . '/../build/scripts/core-fields/*/index.php' ) as $core_fields_collection ) {
-		require_once $core_fields_collection;
-	}
-}
-
 // Block supports overrides.
 require __DIR__ . '/block-supports/settings.php';
 require __DIR__ . '/block-supports/elements.php';
