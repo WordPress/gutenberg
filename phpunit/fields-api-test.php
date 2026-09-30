@@ -792,17 +792,22 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	/**
 	 * Attachments support authors and comments but the media editor has its
 	 * own fields, so they opt out of every default field and their
-	 * collection has the media fields, plain data without a script module.
+	 * collection has the media fields, with its script module.
 	 */
 	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
 		$this->assertTrue( post_type_supports( 'attachment', 'author' ), 'The post type supports authors.' );
 		$this->assertTrue( post_type_supports( 'attachment', 'comments' ), 'The post type supports comments.' );
 
-		$fields = gutenberg_get_registered_fields( 'postType', 'attachment' );
-		$this->assertSame( array( 'date' ), array_column( $fields, 'id' ), 'Only the media fields are registered.' );
-		$this->assertSame( 'datetime', $fields[0]['type'], 'The media fields come from the attachment collection.' );
-		$this->assertSame( 'core', $fields[0]['origin']['registeredBy'] );
-		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'attachment' ), 'The media fields registered so far are plain data: no script module.' );
+		$ids    = array( 'date', 'mime_type' );
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), null, 'id' );
+		$this->assertSame( $ids, array_keys( $fields ), 'Only the media fields are registered.' );
+		$this->assertSame( 'datetime', $fields['date']['type'], 'The media fields come from the attachment collection.' );
+		$this->assertSame( 'core', $fields['date']['origin']['registeredBy'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/attachment' => $ids ),
+			gutenberg_get_registered_field_modules( 'postType', 'attachment' ),
+			'Every media field is registered with the module of the collection.'
+		);
 	}
 
 	/**
@@ -812,7 +817,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_attachments_keep_the_fields_plugins_register() {
 		$this->register_fields( 'postType', 'attachment', array( $this->field( 'credit' ) ) );
 
-		$this->assertSame( array( 'date', 'credit' ), array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' ) );
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertContains( 'date', $ids, 'The media fields are kept.' );
+		$this->assertSame( 'credit', end( $ids ), 'The plugin field follows the media fields.' );
 	}
 
 	/**

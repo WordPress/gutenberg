@@ -30,6 +30,10 @@
 	],
 	"module": "build-module/post_type_supports/index.mjs",
 	"exports": {
+		"./attachment": {
+			"types": "./build-types/attachment/index.d.ts",
+			"import": "./build-module/attachment/index.mjs"
+		},
 		"./post_type_supports": {
 			"types": "./build-types/post_type_supports/index.d.ts",
 			"import": "./build-module/post_type_supports/index.mjs"
@@ -41,6 +45,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
+		"./attachment": "./build-module/attachment/index.mjs",
 		"./post_type_supports": "./build-module/post_type_supports/index.mjs",
 		"./wp_template": "./build-module/wp_template/index.mjs"
 	},
