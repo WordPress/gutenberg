@@ -25,9 +25,7 @@ const avatarStyle: CSSProperties = {
 	width: 16,
 };
 
-const avatarLabelLayout = (
-	<Stack direction="row" gap="sm" align="center" render={ <span /> } />
-);
+const avatarLabelLayout = <Stack direction="row" gap="sm" align="center" />;
 
 const comboboxItems = [
 	'Apple',
