@@ -15,6 +15,10 @@
 -   Point the apt sources of the buster-based WordPress images (PHP 7.2) at `archive.debian.org`, so building them no longer fails now that Debian 10 has reached end-of-life and left the regular mirrors.
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
 
+### Bug Fixes
+
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations ([#75046](https://github.com/WordPress/gutenberg/pull/75046)).
+
 ## 10.0.0 (2024-05-31)
 
 ### Breaking Changes
