@@ -22,9 +22,6 @@ import {
 	featuredImageField,
 	templateField,
 	formatField,
-	postsPerPageField,
-	siteDiscussionField,
-	postsPageTitleField,
 } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -192,17 +189,17 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
+				// The template field uses private core-data selectors via
+				// @wordpress/fields' unlock, which needs resolving before it can
+				// move to @wordpress/core-fields.
 				! isDesignPostType && templateField,
+				// Its availability depends on the editor-only `disablePostFormats`
+				// setting, so the editor registers it here.
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&
 					formatField,
-				// The `home`/`index` template summary exposes a few fields that
-				// target other entities (`root/site` and the posts page).
-				// `DataFormPostSummary` overrides them to read/write the right
-				// entity and to control their visibility.
-				postTypeSlug === 'wp_template' && postsPageTitleField,
-				postTypeSlug === 'wp_template' && postsPerPageField,
-				postTypeSlug === 'wp_template' && siteDiscussionField,
+				// The preview needs editor context, block-editor components, and
+				// private core-data selectors, so it stays in the editor package.
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,

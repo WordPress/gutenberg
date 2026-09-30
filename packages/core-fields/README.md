@@ -8,43 +8,43 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
--   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `title`). They are registered in code, see below.
--   `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
--   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`).
--   `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
--   `wp_block`: the fields patterns have instead of the defaults (`excerpt`, their description, `sync-status`, and `title`).
--   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
+- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `title`). They are registered in code, see below.
+- `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
+- `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`), plus the reading settings shown for `home` and `index` templates (`posts_page_title`, `posts_per_page`, and `default_comment_status`).
+- `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
+- `wp_block`: the fields patterns have instead of the defaults (`excerpt`, their description, `sync-status`, and `title`).
+- `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
 
 Each field has a folder:
 
--   `<field>/field.php` returns the serializable part of the field: `type`, `label`, `elements`, `filterBy`, and so on. The id of the field is the name of its folder, unless the file sets an `id`.
--   `<field>/field.tsx`, when the field has JavaScript parts, exports them as `fieldExtensions`.
+- `<field>/field.php` returns the serializable part of the field: `type`, `label`, `elements`, `filterBy`, and so on. The id of the field is the name of its folder, unless the file sets an `id`.
+- `<field>/field.tsx`, when the field has JavaScript parts, exports them as `fieldExtensions`.
 
 And each folder of fields may have:
 
--   `index.ts`, when some of its fields have JavaScript parts: its script module, whose default export maps the id of each of those fields to its `fieldExtensions`.
--   `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_type_supports` has none.
+- `index.ts`, when some of its fields have JavaScript parts: its script module, whose default export maps the id of each of those fields to its `fieldExtensions`.
+- `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_type_supports` has none.
 
 ### The default fields of every post type
 
 `register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports, or whatever it supports:
 
--   `author`, for the post types supporting `author`.
--   `comment_status`, for the post types supporting `comments`.
--   `date`, for every post type but the design ones.
--   `discussion`, for the post types supporting `comments` or `trackbacks`.
--   `excerpt`, for the post types supporting `excerpt`.
--   `last_edited_date`, for every post type.
--   `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
--   `parent`, for the post types supporting `page-attributes`.
--   `password`, for every post type but the design ones.
--   `ping_status`, for the post types supporting `trackbacks`.
--   `post-content-info`, for the post types supporting `editor`.
--   `scheduled_date`, for every post type but the design ones.
--   `slug`, for the viewable post types but the design ones.
--   `status`, for every post type but the design ones.
--   `sticky`, for posts, the only post type with sticky posts.
--   `title`, for the post types supporting `title`.
+- `author`, for the post types supporting `author`.
+- `comment_status`, for the post types supporting `comments`.
+- `date`, for every post type but the design ones.
+- `discussion`, for the post types supporting `comments` or `trackbacks`.
+- `excerpt`, for the post types supporting `excerpt`.
+- `last_edited_date`, for every post type.
+- `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
+- `parent`, for the post types supporting `page-attributes`.
+- `password`, for every post type but the design ones.
+- `ping_status`, for the post types supporting `trackbacks`.
+- `post-content-info`, for the post types supporting `editor`.
+- `scheduled_date`, for every post type but the design ones.
+- `slug`, for the viewable post types but the design ones.
+- `status`, for every post type but the design ones.
+- `sticky`, for posts, the only post type with sticky posts.
+- `title`, for the post types supporting `title`.
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
 
@@ -58,21 +58,21 @@ The value is the list of the ids of the default fields the post type does not ge
 
 Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`:
 
--   Templates and template parts exclude `author`, which the `wp_template` and `wp_template_part` collections define for them.
--   Templates, template parts, and patterns exclude `excerpt`, which is their description. The template and pattern collections define their own description fields.
--   Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
--   The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`), since they lay out a site rather than publish content.
--   Pages, templates, template parts, and patterns exclude `title`, since their collections define their own title fields.
--   Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
+- Templates and template parts exclude `author`, which the `wp_template` and `wp_template_part` collections define for them.
+- Templates, template parts, and patterns exclude `excerpt`, which is their description. The template and pattern collections define their own description fields.
+- Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
+- The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`), since they lay out a site rather than publish content.
+- Pages, templates, template parts, and patterns exclude `title`, since their collections define their own title fields.
+- Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
 ### Collection configuration
 
 The array the `index.php` of a collection returns has these keys:
 
--   `origin` (required): who registers the fields, `'core'` for every collection of this package. It becomes the `origin.registeredBy` of each field.
--   `kind` (required): the entity kind, e.g. `'postType'`.
--   `name` (required): the entity name, e.g. `'wp_template'`.
--   `module` (optional): the id of the script module of the collection, written out (`'@wordpress/core-fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
+- `origin` (required): who registers the fields, `'core'` for every collection of this package. It becomes the `origin.registeredBy` of each field.
+- `kind` (required): the entity kind, e.g. `'postType'`.
+- `name` (required): the entity name, e.g. `'wp_template'`.
+- `module` (optional): the id of the script module of the collection, written out (`'@wordpress/core-fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
 
 An invalid configuration is reported with `_doing_it_wrong()` and skipped. For example, `wp_template/index.php`:
 
