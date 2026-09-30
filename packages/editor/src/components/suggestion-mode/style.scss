@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-
 // Sidebar/chrome styles for the suggestion-mode UI. The canvas-targeted
 // visual treatments for `.block-editor-block-list__block.is-suggestion-*`
 // live in `block-editor/src/components/block-list/content-suggestion.scss`
@@ -11,7 +9,7 @@
 .editor-collab-sidebar-panel__suggestion-summary {
 	em {
 		font-style: italic;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 		// Proposed text is quoted verbatim, so the runs of spaces a
 		// suggestion adds or removes have to survive rendering; the default
 		// HTML collapse makes one space and three look identical. Wrapping
