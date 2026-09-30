@@ -91,12 +91,12 @@ Format a number according to the current locale.
 
 _Parameters_
 
--   _number_ `number`: The number to format.
--   _decimals_ The number of decimal places to include.
+- _number_ `number`: The number to format.
+- _decimals_ The number of decimal places to include.
 
 _Returns_
 
--   The formatted number as a string.
+- The formatted number as a string.
 
 ### resetLocaleData
 
