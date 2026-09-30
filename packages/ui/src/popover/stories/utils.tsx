@@ -2,11 +2,10 @@ import {
 	createPortal,
 	forwardRef,
 	useCallback,
-	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
 import type { RefCallback } from 'react';
 
 /**
@@ -23,7 +22,7 @@ export function useMeasure< TRef extends HTMLElement >() {
 		height: 0,
 	} );
 
-	useLayoutEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		if ( ! element ) {
 			return;
 		}
@@ -61,7 +60,7 @@ export function useMeasure< TRef extends HTMLElement >() {
 export const GenericIframe = forwardRef<
 	HTMLIFrameElement,
 	GenericIframeProps
->( function GenericIframe( { children, ...props }, ref ) {
+>( function UnforwardedGenericIframe( { children, ...props }, ref ) {
 	const [ containerNode, setContainerNode ] = useState< HTMLElement | null >(
 		null
 	);

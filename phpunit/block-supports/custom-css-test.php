@@ -29,8 +29,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $block_name Name for the test block.
 	 * @param array  $supports   Array defining block support configuration.
-	 *
-	 * @return WP_Block_Type The block type for the newly registered test block.
 	 */
 	private function register_custom_css_block_with_support( $block_name, $supports = array() ) {
 		$this->test_block_name = $block_name;
@@ -337,6 +335,44 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
 
 		$this->assertStringContainsString( 'wp-custom-css-mixed123', $result, 'Custom CSS class should be extracted and added.' );
+	}
+
+	/**
+	 * Tests that custom CSS class surrounded by ASCII whitespace (other than space) is extracted.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_extracts_class_between_whitespace() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => "\twp-custom-css-123abc\t",
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertStringContainsString( 'wp-custom-css-123abc', $result, 'Custom CSS class should be extracted from between whitespace.' );
+	}
+
+	/**
+	 * Tests that a class merely prefixed with wp-custom-css- (e.g. via a hyphen) is not treated as the custom CSS class.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_returns_unchanged_for_prefixed_class() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => 'my-wp-custom-css-456def',
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when wp-custom-css- only appears as a substring of another class.' );
 	}
 
 	/**

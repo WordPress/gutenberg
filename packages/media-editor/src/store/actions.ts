@@ -15,16 +15,19 @@ export interface MediaEditorModalUpdate {
 interface OpenMediaEditorModalArgs {
 	id: number;
 	onUpdate?: ( updated: MediaEditorModalUpdate ) => void;
+	onClose?: () => void;
 }
 
 export function openMediaEditorModal( {
 	id,
 	onUpdate,
+	onClose,
 }: OpenMediaEditorModalArgs ) {
 	return {
 		type: 'OPEN_MEDIA_EDITOR_MODAL' as const,
 		id,
 		onUpdate: onUpdate ?? null,
+		onClose: onClose ?? null,
 	};
 }
 

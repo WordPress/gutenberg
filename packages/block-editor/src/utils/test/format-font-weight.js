@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { formatFontWeight } from '../format-font-weight';
 
 describe( 'formatFontWeight', () => {

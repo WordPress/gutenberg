@@ -1,18 +1,13 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
+import type { StoryFn } from '@storybook/react-vite';
 import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';
 
 const meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},
@@ -38,4 +33,29 @@ export const Default = (): ReactElement => {
 			</div>
 		</>
 	);
+};
+
+/**
+ *
+ */
+export const CurrentColor: StoryFn< typeof Icon > = ( args ) => {
+	return (
+		<div
+			style={ {
+				display: 'flex',
+				alignItems: 'center',
+				padding: '4px',
+				gap: '4px',
+				color: 'blue',
+				border: '1px solid blue',
+			} }
+		>
+			<Icon { ...args } />
+			This div has a blue <code>color</code>, and the icon will be
+			rendered in the same color.
+		</div>
+	);
+};
+CurrentColor.args = {
+	icon: icons.wordpress,
 };

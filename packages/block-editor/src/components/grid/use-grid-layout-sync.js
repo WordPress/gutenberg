@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 import { setImmutably } from '../../utils/object';

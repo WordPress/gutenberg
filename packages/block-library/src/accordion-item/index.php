@@ -7,7 +7,7 @@
  * @since 6.9.0
  *
  * @param array{ openByDefault: bool } $attributes The block attributes.
- * @param string                        $content   The block content.
+ * @param string                       $content    The block content.
  * @return string Returns the updated markup.
  */
 function block_core_accordion_item_render( array $attributes, string $content ): string {
@@ -46,7 +46,8 @@ function block_core_accordion_item_render( array $attributes, string $content ):
 			if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-panel' ) ) ) {
 				$p->set_attribute( 'id', $unique_id . '-panel' );
 				$p->set_attribute( 'aria-labelledby', $unique_id );
-				$p->set_attribute( 'data-wp-bind--inert', '!state.isOpen' );
+				$p->set_attribute( 'data-wp-bind--hidden', 'state.isHidden' );
+				$p->set_attribute( 'data-wp-on--beforematch', 'actions.handleBeforeMatch' );
 
 				// Only modify content if all directives have been set.
 				$content = $p->get_updated_html();

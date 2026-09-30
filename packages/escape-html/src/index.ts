@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import __unstableEscapeGreaterThan from './escape-greater';
 
 /**

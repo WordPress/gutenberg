@@ -1,12 +1,9 @@
-/**
- * External dependencies
+/*
+ * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
+ * stopped treating whitespace as a token in `diffWords`, which coalesces
+ * adjacent word changes into a single removed/added pair.
  */
-import { diffArrays } from 'diff/lib/diff/array';
-import { diffWords } from 'diff/lib/diff/word';
-
-/**
- * WordPress dependencies
- */
+import { diffArrays, diffWordsWithSpace } from 'diff';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import {
 	privateApis as blocksPrivateApis,
@@ -20,13 +17,30 @@ import {
 	applyFormat,
 } from '@wordpress/rich-text';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
+import { DIFF_DESCRIPTION_IDS } from './diff-format-types';
 
 const { parseRawBlock } = unlock( blocksPrivateApis );
+
+/**
+ * Whether a grammar-parsed raw block is a whitespace-only freeform pseudo-block
+ * (the `\n\n` between block markers, etc). These are stripped from both arrays
+ * before LCS to keep the matching pivot stable: under `diff` v6's tie-breaker,
+ * a whitespace block could otherwise be selected as the LCS anchor in
+ * `[paragraph, whitespace, paragraph]` swaps, mis-pairing the surrounding
+ * paragraphs in `pairSimilarBlocks`. Whitespace pseudo-blocks don't render
+ * anyway (`parseRawBlock` returns undefined for them), so dropping them
+ * before the diff has no user-visible effect.
+ *
+ * @param {Object} rawBlock A raw block from `@wordpress/block-serialization-default-parser`.
+ * @return {boolean} True if the block should be excluded from LCS matching.
+ */
+function isWhitespaceRawBlock( rawBlock ) {
+	return (
+		rawBlock.blockName === null &&
+		( ! rawBlock.innerHTML || ! rawBlock.innerHTML.trim() )
+	);
+}
 
 /**
  * Safely stringifies a value for display and comparison.
@@ -233,27 +247,34 @@ function pairSimilarBlocks( blocks ) {
 			};
 
 			// Decide where to place the modified block by checking
-			// what's between the removed and added positions.
-			// If there are unpaired added blocks between them,
-			// placing at the removed position would put the modified
-			// block before content that comes before it in the
-			// current revision — so use the added position.
-			// Otherwise, use the removed position to keep the
-			// previous revision's order intact.
+			// what's between the removed and added positions. If any
+			// block between them is in the current revision (an
+			// unchanged block, or an unpaired added block), placing
+			// the modification at the removed position would put it
+			// before content that already comes before it in the
+			// current revision — so use the added position instead.
+			// Otherwise, use the removed position to keep the previous
+			// revision's reading order intact.
+			//
+			// 'removed' blocks (and added blocks already absorbed via
+			// `pairedAdded`) aren't checked because they aren't in the
+			// current revision and so don't count as crossing it.
 			const lo = Math.min( rem.index, bestMatch.index );
 			const hi = Math.max( rem.index, bestMatch.index );
-			let hasAddedBetween = false;
+			let crossesCurrentContent = false;
 			for ( let i = lo + 1; i < hi; i++ ) {
-				if (
-					blocks[ i ].__revisionDiffStatus?.status === 'added' &&
-					! pairedAdded.has( i )
-				) {
-					hasAddedBetween = true;
+				const status = blocks[ i ].__revisionDiffStatus?.status;
+				if ( status === undefined ) {
+					crossesCurrentContent = true;
+					break;
+				}
+				if ( status === 'added' && ! pairedAdded.has( i ) ) {
+					crossesCurrentContent = true;
 					break;
 				}
 			}
 
-			if ( hasAddedBetween ) {
+			if ( crossesCurrentContent ) {
 				// Use the added position — don't jump before
 				// current-revision content.
 				modifications.set( bestMatch.index, modifiedBlock );
@@ -287,11 +308,21 @@ function pairSimilarBlocks( blocks ) {
  * Detects modifications when exactly 1 block is removed and 1 is added
  * with the same blockName (1:1 replacement = modification).
  *
+ * Whitespace-only freeform pseudo-blocks are filtered at every recursive
+ * level so this function is safe to call directly with raw output from
+ * `@wordpress/block-serialization-default-parser`. The duplicate work for
+ * inner-block recursion is negligible and keeps the contract self-contained.
+ *
  * @param {Array} currentRaw  Current revision's raw blocks.
  * @param {Array} previousRaw Previous revision's raw blocks.
  * @return {Array} Merged raw blocks with diff status injected.
  */
 function diffRawBlocks( currentRaw, previousRaw ) {
+	// Strip whitespace-only freeform pseudo-blocks before LCS — see
+	// `isWhitespaceRawBlock` for why.
+	currentRaw = currentRaw.filter( ( b ) => ! isWhitespaceRawBlock( b ) );
+	previousRaw = previousRaw.filter( ( b ) => ! isWhitespaceRawBlock( b ) );
+
 	const createBlockSignature = ( rawBlock ) =>
 		JSON.stringify( {
 			name: rawBlock.blockName,
@@ -490,6 +521,67 @@ function describeFormatChange(
 }
 
 /**
+ * Merge adjacent removed/added diff parts into fewer del/ins pairs.
+ *
+ * `diffWordsWithSpace` can emit alternating removed/added tokens for a run of
+ * changed words, which produces one del/ins pair per word, making the output
+ * more verbose for screen readers. This merges such runs into a single removed part and a
+ * single added part.
+ *
+ * @param {Array<{ added?: boolean, removed?: boolean, value: string }>} parts Output from `diffWordsWithSpace`.
+ * @return {Array<{ added?: boolean, removed?: boolean, value: string }>} Merged parts.
+ */
+function mergeTextDiffParts( parts ) {
+	const result = [];
+	let index = 0;
+
+	while ( index < parts.length ) {
+		const part = parts[ index ];
+
+		if ( ! part.removed && ! part.added ) {
+			result.push( part );
+			index++;
+			continue;
+		}
+
+		let removed = '';
+		let added = '';
+
+		while ( index < parts.length ) {
+			const current = parts[ index ];
+
+			if ( current.removed ) {
+				removed += current.value;
+				index++;
+			} else if ( current.added ) {
+				added += current.value;
+				index++;
+			} else if (
+				current.value.trim() === '' &&
+				index + 1 < parts.length &&
+				( parts[ index + 1 ].removed || parts[ index + 1 ].added )
+			) {
+				// Whitespace between changed tokens — include in both sides.
+				removed += current.value;
+				added += current.value;
+				index++;
+			} else {
+				break;
+			}
+		}
+
+		if ( removed ) {
+			result.push( { removed: true, value: removed } );
+		}
+		if ( added ) {
+			result.push( { added: true, value: added } );
+		}
+	}
+
+	return result;
+}
+
+/**
  * Apply inline diff formatting comparing two RichTextData values.
  * - Text changes: apply revision/diff-removed and revision/diff-added formats
  * - Format-only changes (text unchanged): apply revision/diff-format-changed format
@@ -502,8 +594,10 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 	const currentText = currentRichText.toPlainText();
 	const previousText = previousRichText.toPlainText();
 
-	// Diff the plain text (words for cleaner output)
-	const textDiff = diffWords( previousText, currentText );
+	// Diff the plain text (words for cleaner output).
+	const textDiff = mergeTextDiffParts(
+		diffWordsWithSpace( previousText, currentText )
+	);
 
 	let result = create( { text: '' } );
 	let currentIdx = 0;
@@ -521,7 +615,9 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				removedSlice,
 				{
 					type: 'revision/diff-removed',
-					attributes: { title: __( 'Removed' ) },
+					attributes: {
+						'aria-describedby': DIFF_DESCRIPTION_IDS.removed,
+					},
 				},
 				0,
 				part.value.length
@@ -539,7 +635,9 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				addedSlice,
 				{
 					type: 'revision/diff-added',
-					attributes: { title: __( 'Added' ) },
+					attributes: {
+						'aria-describedby': DIFF_DESCRIPTION_IDS.added,
+					},
 				},
 				0,
 				part.value.length
@@ -578,26 +676,40 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 					);
 
 					if ( rangeFormatChanged ) {
-						// Get type and description of what changed
-						const { type, description } = describeFormatChange(
+						// Get type of what changed. `description` (e.g. "2
+						// formats changed") is no longer used for the
+						// accessible name: aria-describedby must point to a
+						// static element already in the document, so we
+						// reference one of a fixed set of shared hidden
+						// descriptions instead of building one per instance.
+						const { type } = describeFormatChange(
 							currentFormats,
 							previousFormats,
 							currentIdx + rangeStart,
 							previousIdx + rangeStart
 						);
 
-						// Map change type to format type for styling
+						// Map change type to format type for styling, and
+						// the id of its shared hidden description element.
 						const formatType = {
 							added: 'revision/diff-format-added',
 							removed: 'revision/diff-format-removed',
 							changed: 'revision/diff-format-changed',
 						}[ type ];
 
+						const descriptionId = {
+							added: DIFF_DESCRIPTION_IDS.formatAdded,
+							removed: DIFF_DESCRIPTION_IDS.formatRemoved,
+							changed: DIFF_DESCRIPTION_IDS.formatChanged,
+						}[ type ];
+
 						const marked = applyFormat(
 							rangeSlice,
 							{
 								type: formatType,
-								attributes: { title: description },
+								attributes: {
+									'aria-describedby': descriptionId,
+								},
 							},
 							0,
 							i - rangeStart
@@ -618,6 +730,21 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 	}
 
 	return new RichTextData( result );
+}
+
+/**
+ * Apply inline diff formatting to two HTML strings, for fields that are
+ * stored as HTML rather than as blocks, such as the post title.
+ *
+ * @param {string} currentHTML  Current revision's HTML.
+ * @param {string} previousHTML Previous revision's HTML.
+ * @return {RichTextData} Rich text with the diff marks applied.
+ */
+export function diffRevisionHTML( currentHTML, previousHTML ) {
+	return applyRichTextDiff(
+		RichTextData.fromHTMLString( currentHTML || '' ),
+		RichTextData.fromHTMLString( previousHTML || '' )
+	);
 }
 
 /**
@@ -660,7 +787,10 @@ function applyDiffToBlock( currentBlock, previousBlock, diffStatus ) {
 				previousBlock.attributes[ attrName ]
 			);
 			if ( currStr !== prevStr ) {
-				changedAttributes[ attrName ] = diffWords( prevStr, currStr );
+				changedAttributes[ attrName ] = diffWordsWithSpace(
+					prevStr,
+					currStr
+				);
 			}
 		}
 	}

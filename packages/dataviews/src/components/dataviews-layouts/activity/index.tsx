@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ViewActivityProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import ActivityGroup from './activity-group';
@@ -63,7 +52,7 @@ export default function ViewActivity< Item >(
 				direction="column"
 				gap="sm"
 				className={ wrapperClassName }
-				// @ts-ignore
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ isInert ? 'true' : undefined }
 			>
 				{ groupedEntries.map(
@@ -92,7 +81,7 @@ export default function ViewActivity< Item >(
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
-				// @ts-ignore
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ isInert ? 'true' : undefined }
 			>
 				<ActivityItems< Item > { ...props } />

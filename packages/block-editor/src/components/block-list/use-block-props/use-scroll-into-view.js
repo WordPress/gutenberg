@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 
 export function useScrollIntoView( { isSelected } ) {

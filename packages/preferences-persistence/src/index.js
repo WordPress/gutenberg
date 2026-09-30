@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
 import convertPreferencesPackageData from './migrations/preferences-package-data';

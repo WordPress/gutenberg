@@ -31,7 +31,7 @@
 	border-radius: $radius-round;
 	box-sizing: border-box;
 	display: block;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Geometric centering */
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Geometric centering */
 	left: 50%;
 	top: 4px;
 	transform: translateX(-50%);

@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 import type { CustomSelectItemProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import * as Styled from './styles';

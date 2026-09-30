@@ -1,0 +1,64 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as AnnouncementStories from './announcements.story';
+
+<Meta of={ AnnouncementStories } />
+
+# Notice announcements
+
+`Notice` does not announce its content automatically. Its `intent` controls appearance. The application decides whether, when, and how urgently to announce an update.
+
+## Static information
+
+Leave static notices without an announcement. Users can read the message and reach its actions through normal navigation.
+
+<Canvas of={ AnnouncementStories.StaticNotice } />
+
+## Announce from the application
+
+For dynamic notices, use `speak()` from `@wordpress/a11y` in the event handler or lifecycle callback that handles the update. Pass an explicit message containing the relevant title and description. Exclude action labels and technical error details. Do not also add a live-region role to the visible notice, which could cause duplicate announcements.
+
+Import `@wordpress/a11y` during application startup, before announcements are needed. Its main entrypoint creates shared live regions when the document is ready; `speak()` updates those regions. In a standalone app, wait until the document is ready before sending the first announcement. The WordPress script entrypoint uses the same setup. The script-module entrypoint requires the host to provide the live regions.
+
+### Urgent errors
+
+Use `speak( message, 'assertive' )` when an error needs immediate attention, such as a failed save or an editor crash. Keep keyboard focus where it is. Select **Save changes** to simulate a failed save. **Try again** clears the simulated error.
+
+<Canvas of={ AnnouncementStories.UrgentError } />
+
+### Non-urgent updates
+
+Use `speak( message, 'polite' )` for updates that can wait until the screen reader finishes speaking. An error in one dashboard widget, while the rest of the dashboard remains usable, can also use a polite announcement.
+
+Select **Save draft** to show and announce a new notice. **Dismiss** removes the visible notice. Neither action label is included in the announcement.
+
+<Canvas of={ AnnouncementStories.PoliteStatus } />
+
+## Using a live region directly
+
+An application can instead manage its own live region. Mount an empty region before the update, then populate it. Use `role="status"` for non-urgent updates and `role="alert"` for important, time-sensitive messages. Include the relevant title and description, and keep actions outside the region.
+
+```jsx
+// Keep this region mounted before the save completes.
+<div role="status">
+	{ isSaved ? 'Draft saved. Your draft has been saved.' : '' }
+</div>
+```
+
+The [WAI-ARIA alert pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) notes that most screen readers announce dynamically inserted alerts. This special behavior does not apply to every live-region role. Do not rely on inserting a populated `role="status"` element to announce its contents. Keeping the region mounted first is the more reliable pattern for both roles.
+
+Use one announcement mechanism for each update. Do not combine this live region with a `speak()` call for the same message.
+
+## Migrating existing notices
+
+Remove `spokenMessage` and `politeness` from `Notice.Root`. These props are no longer supported.
+
+-   If the notice is static, no replacement is needed.
+-   If it needs an announcement, call `speak()` where the application handles the update, as shown above, or update an existing live region.
+-   If the previous `spokenMessage` differed from the visible text, pass that message to `speak()`.
+-   Choose `polite` or `assertive` based on urgency, independently of the notice's visual intent.
+
+This change applies to `@wordpress/ui` `Notice`. The `@wordpress/components` `Notice` API is unchanged.
+
+Test dynamic announcements with the browsers and screen readers your application supports. Automated tests can check the message and politeness passed to `speak()`, but cannot verify speech output.
+
+See the [`@wordpress/a11y` API](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#api) and the [WAI-ARIA status role](https://www.w3.org/TR/wai-aria-1.2/#status).

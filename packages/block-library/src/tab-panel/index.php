@@ -8,7 +8,7 @@
 /**
  * Render callback for core/tab-panel.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
@@ -22,10 +22,10 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	static $tab_counters = array();
 
 	if ( ! isset( $tab_counters[ $tabs_id ] ) ) {
-		$tab_counters[ $tabs_id ] = 0;
+		$tab_counters[ $tabs_id ] = 1;
 	}
 
-	$tab_index = $tab_counters[ $tabs_id ];
+	$tab_number = $tab_counters[ $tabs_id ];
 	++$tab_counters[ $tabs_id ];
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
@@ -36,36 +36,22 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	$tab_id = (string) $tag_processor->get_attribute( 'id' );
 	if ( empty( $tab_id ) ) {
 		$tab_id = ! empty( $tabs_id )
-			? $tabs_id . '-tab-' . $tab_index
-			: 'tab-' . $tab_index;
+			? $tabs_id . '-tab-' . $tab_number
+			: 'tab-' . $tab_number;
 		$tag_processor->set_attribute( 'id', $tab_id );
 	}
 
-	/**
-	 * Add interactivity to the tab element.
-	 */
-	$tag_processor->set_attribute(
-		'data-wp-interactive',
-		'core/tabs/private'
-	);
-	$tag_processor->set_attribute(
-		'data-wp-context',
-		wp_json_encode(
-			array(
-				'tab' => array(
-					'id' => $tab_id,
-				),
-			)
-		)
-	);
-
-	/**
-	 * Process accessibility and interactivity attributes.
-	 */
-	$tag_processor->set_attribute( 'role', 'tabpanel' );
 	$tag_processor->set_attribute( 'aria-labelledby', 'tab__' . $tab_id );
-	$tag_processor->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
-	$tag_processor->set_attribute( 'tabindex', 0 );
+
+	/*
+	 * Hiding a panel is left to the client, which is why `hidden` is bound to a
+	 * state getter the server cannot resolve rather than set here: a visitor
+	 * whose browser never runs the block's script is then given the content of
+	 * every panel instead of none of it. `core/accordion` works the same way.
+	 */
+	$tag_processor->set_attribute( 'data-wp-bind--hidden', 'state.isHidden' );
+	$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
+	$tag_processor->set_attribute( 'data-wp-on--beforematch', 'actions.handleBeforeMatch' );
 
 	return (string) $tag_processor->get_updated_html();
 }
@@ -75,7 +61,7 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
  *
  * @hook init
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_tab_panel() {
 	register_block_type_from_metadata(

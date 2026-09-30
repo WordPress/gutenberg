@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import AspectRatioTool from '../aspect-ratio-tool';
 
 export default {
-	title: 'BlockEditor/DimensionsTool/AspectRatioTool',
+	id: 'blockeditor-dimensionstool-aspectratiotool',
+	title: 'Editor/Block Editor/DimensionsTool/AspectRatioTool',
 	component: AspectRatioTool,
 	tags: [ 'status-private' ],
 	argTypes: {

@@ -4,12 +4,7 @@
  * Projects using `wp-scripts lint-js` that do not provide their own
  * eslint.config.* will use this config automatically.
  */
-
-/**
- * Internal dependencies
- */
 const { hasBabelConfig } = require( '../utils' );
-
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
 const config = [
@@ -18,13 +13,22 @@ const config = [
 		ignores: [ '**/build/**', '**/node_modules/**', '**/vendor/**' ],
 	},
 
+	/*
+	 * ESLint's default file discovery covers only `.js`, `.mjs` and `.cjs`.
+	 * Every other extension has to be named before any config below applies.
+	 */
+	{ files: [ '**/*.jsx', '**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts' ] },
+
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
 
 	// Unit test overrides.
 	...wpPlugin.configs[ 'test-unit' ].map( ( c ) => ( {
 		...c,
-		files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
+		files: [
+			'**/@(test|__tests__)/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}',
+			'**/*.@(test|spec).{js,jsx,ts,tsx,mjs,cjs,mts,cts}',
+		],
 	} ) ),
 ];
 

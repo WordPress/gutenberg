@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { ToggleControl } from '@wordpress/components';
-/**
- * Internal dependencies
- */
 import type { BaseOptionProps } from './types';
 
 function BaseOption( {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, Size } from './types';
 import {
 	DEFAULT_KEYBOARD_STEP,
@@ -62,7 +59,11 @@ export interface InteractionStatus {
 export interface CropperInteractionActions {
 	/** Set the image pan offset in normalized coordinates. */
 	setPan: ( pan: NormalizedPoint ) => void;
-	/** Set the zoom level. */
+	/**
+	 * Set the zoom level. Cursorless surfaces (slider, keyboard `+`/`-`)
+	 * rely on this anchoring at the crop center; pointer-driven zoom
+	 * paths use `setZoomAtPoint` with an explicit focal point instead.
+	 */
 	setZoom: ( zoom: number ) => void;
 	/** Set zoom and pan together for focal-point zoom. */
 	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
@@ -282,6 +283,11 @@ export class InteractionController {
 		if ( e.button !== 0 ) {
 			return;
 		}
+		// Touch gestures are handled by touchstart/touchmove. Starting the
+		// pointer drag path too can briefly toggle drag UI before pinch begins.
+		if ( e.pointerType === 'touch' ) {
+			return;
+		}
 		e.preventDefault();
 
 		// Blur any focused handle so its focus ring doesn't linger,
@@ -298,6 +304,14 @@ export class InteractionController {
 
 		// Capture pointer so drag works across iframe boundaries.
 		el.setPointerCapture( e.pointerId );
+
+		// End a pending wheel gesture now, so its debounce timer cannot
+		// fire mid-drag and end the drag's gesture along with it.
+		if ( this.wheelGestureActive ) {
+			clearTimeout( this.wheelGestureTimer );
+			this.wheelGestureActive = false;
+			this.options.onGestureEnd?.();
+		}
 
 		this.setStatus( { isDragging: true } );
 		this.options.onGestureStart?.();
@@ -564,6 +578,7 @@ export class InteractionController {
 		if ( ! touch ) {
 			return;
 		}
+		moveEvent.preventDefault();
 
 		cancelAnimationFrame( this.rafId );
 		this.rafId = requestAnimationFrame( () => {
@@ -637,20 +652,28 @@ export class InteractionController {
 							? ( my - startMy ) / visSize.height
 							: 0;
 
-					// Focal-point zoom correction.
-					const zoomRatio = s.zoom !== 0 ? 1 - newZoom / s.zoom : 0;
-					const focalNormX = mx / visSize.width;
-					const focalNormY = my / visSize.height;
-					const zoomCropX =
-						s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
-					const zoomCropY =
-						s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
+					// Focal-point zoom correction. Keep this based on the
+					// pinch-start state; using the current reducer state here
+					// compounds prior touchmove frames and makes a fixed pinch
+					// center drift after the image is already zoomed or panned.
+					const zoomRatio =
+						touch.startZoom !== 0
+							? 1 - newZoom / touch.startZoom
+							: 0;
+					const startFocalNormX = startMx / visSize.width;
+					const startFocalNormY = startMy / visSize.height;
 
-					// Combined: pan drift + zoom correction.
+					// Combined: midpoint drift + zoom around the pinch-start
+					// midpoint, so moving both fingers together pans while
+					// symmetric pinches keep the start center stationary.
 					const newCropX =
-						touch.startPanX + panDx + ( zoomCropX - s.pan.x );
+						touch.startPanX +
+						panDx +
+						( startFocalNormX - touch.startPanX ) * zoomRatio;
 					const newCropY =
-						touch.startPanY + panDy + ( zoomCropY - s.pan.y );
+						touch.startPanY +
+						panDy +
+						( startFocalNormY - touch.startPanY ) * zoomRatio;
 
 					const { pan: clampedCrop } = restrictPanZoom(
 						{
@@ -681,13 +704,13 @@ export class InteractionController {
 					panSize.width > 0
 						? ( moveEvent.touches[ 0 ].clientX -
 								touch.lastTouchX ) /
-						  panSize.width
+							panSize.width
 						: 0;
 				const deltaY =
 					panSize.height > 0
 						? ( moveEvent.touches[ 0 ].clientY -
 								touch.lastTouchY ) /
-						  panSize.height
+							panSize.height
 						: 0;
 
 				const { pan: newCrop } = restrictPanZoom(
@@ -941,5 +964,13 @@ export class InteractionController {
 		this.drag = null;
 		this.touch = null;
 		this.lastTap = null;
+		// Reset the gesture bookkeeping too. The timers above are cancelled
+		// rather than run, so these flags would otherwise stay set: a stale
+		// `wheelGestureActive` suppresses the next wheel gesture's start,
+		// and `setStatus` dedupes against `isDragging` / `isZooming`, so a
+		// stale value swallows the next real change.
+		this.wheelGestureActive = false;
+		this.isDragging = false;
+		this.isZooming = false;
 	}
 }

@@ -1,1 +1,0 @@
-export { Widget } from './widget';

@@ -2,21 +2,41 @@
 	"wpds-border": {
 		"$type": "dimension",
 		"radius": {
+			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
-				"$description": "Extra small radius"
+				"$description": "Buttons and other elements nested inside controls.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
 			},
 			"sm": {
 				"$value": { "value": 2, "unit": "px" },
-				"$description": "Small radius"
+				"$description": "Standalone buttons, inputs, and compact controls.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
 			},
 			"md": {
 				"$value": { "value": 4, "unit": "px" },
-				"$description": "Medium radius"
+				"$description": "Menus, popovers, and other small portaled overlays.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
 			},
 			"lg": {
 				"$value": { "value": 8, "unit": "px" },
-				"$description": "Large radius"
+				"$description": "Cards, dialogs, notices, and other larger content containers.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"xl": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Page and app shell surfaces.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]
@@ -55,9 +75,6 @@
 				"$value": { "value": 2, "unit": "px" },
 				"$description": "Border width for focus ring",
 				"$extensions": {
-					"mode": {
-						"high-dpi": { "value": 1.5, "unit": "px" }
-					},
 					"com.figma.scopes": [ "STROKE_FLOAT" ]
 				}
 			}

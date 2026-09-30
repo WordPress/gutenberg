@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
-
-/**
- * Internal dependencies
- */
 const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );

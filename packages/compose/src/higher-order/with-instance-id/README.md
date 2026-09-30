@@ -6,9 +6,6 @@ Wrapping a component with `withInstanceId` provides a unique `instanceId` to ser
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { withInstanceId } from '@wordpress/compose';
 
 function MyCustomElement( { instanceId } ) {

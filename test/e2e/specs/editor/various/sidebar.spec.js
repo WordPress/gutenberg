@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Sidebar', () => {
@@ -100,6 +97,37 @@ test.describe( 'Sidebar', () => {
 
 		// The Block tab should be focused and selected.
 		await expect( activeTab ).toHaveText( 'Block' );
+		await expect( activeTab ).toBeFocused();
+	} );
+
+	test( 'should focus the selected tab when tabbing into the sidebar', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const content of [ '0', '1' ] ) {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( content );
+		}
+
+		const activeTab = page
+			.getByRole( 'region', {
+				name: 'Editor settings',
+			} )
+			.getByRole( 'tab', { selected: true } );
+
+		// A selected block puts the sidebar on the "Block" tab.
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Tab' );
+		await expect( activeTab ).toHaveText( 'Block' );
+		await expect( activeTab ).toBeFocused();
+
+		// Moving to the title clears the block selection, which switches the
+		// sidebar back to the "Post" tab.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await page.keyboard.press( 'Tab' );
+		await expect( activeTab ).toHaveText( 'Post' );
 		await expect( activeTab ).toBeFocused();
 	} );
 

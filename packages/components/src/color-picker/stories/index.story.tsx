@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import { ColorPicker } from '../component';
 
 const meta: Meta< typeof ColorPicker > = {
 	tags: [ 'manifest' ],
 	component: ColorPicker,
-	title: 'Components/Selection & Input/Color/ColorPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/ColorPicker',
 	id: 'components-colorpicker',
 	argTypes: {
 		as: { control: false },
@@ -27,7 +20,7 @@ const meta: Meta< typeof ColorPicker > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

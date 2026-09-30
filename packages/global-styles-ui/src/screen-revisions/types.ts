@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 export interface User {

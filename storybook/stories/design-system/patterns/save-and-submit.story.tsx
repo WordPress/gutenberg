@@ -41,6 +41,7 @@ const LayoutCardSaveExample = () => {
 						variant="primary"
 						isBusy
 						style={ { marginTop: '16px' } }
+						__next40pxDefaultSize
 					>
 						Save
 					</Button>
@@ -56,7 +57,7 @@ const meta: Meta< typeof LayoutCardSaveExample > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
+	tags: [ 'docs-only' ],
 };
 
 export default meta;

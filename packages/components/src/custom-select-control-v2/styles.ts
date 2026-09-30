@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
@@ -132,9 +126,11 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	&[data-open] {
 		@media not ( prefers-reduced-motion ) {
 			animation-name: ${ slideDown }, ${ fadeIn };
-			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			animation-duration:
+				${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
 				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			animation-timing-function:
+				${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
 				${ DROPDOWN_MOTION_CSS.FADE_EASING };
 			will-change: transform, opacity;
 		}
