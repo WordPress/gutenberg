@@ -158,6 +158,13 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
+	it( 'returns nothing for a plain string the appliers cannot mark', () => {
+		expect( planEditMarkers( 'Hello world', 'Hello' ) ).toEqual( {
+			kind: 'none',
+			actions: [],
+		} );
+	} );
+
 	it( 'returns nothing when the text is unchanged', () => {
 		expect( planEditMarkers( rtd( 'Hello' ), rtd( 'Hello' ) ) ).toEqual( {
 			kind: 'none',

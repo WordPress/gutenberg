@@ -358,6 +358,11 @@ export function planEditMarkers(
 	nextValue: any,
 	{ authorId }: { authorId?: number | string } = {}
 ): { kind: string; actions: MarkerAction[] } {
+	// The appliers only mark `RichTextData`; planning a plain string would open
+	// a note that never gets a marker.
+	if ( ! ( prevValue instanceof RichTextData ) ) {
+		return { kind: 'none', actions: [] };
+	}
 	const record = toRecord( prevValue );
 	if ( ! record ) {
 		return { kind: 'none', actions: [] };
