@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import {
 	archive,
@@ -86,169 +87,144 @@ const SHORTCUTS = {
 	},
 };
 
+function DefaultExample( {
+	variant,
+}: Pick< ComponentProps< typeof Menu.Popup >, 'variant' > ) {
+	const [ bookmarks, setBookmarks ] = useState( true );
+	const [ downloads, setDownloads ] = useState( false );
+	const [ view, setView ] = useState( 'list' );
+
+	return (
+		<Menu.Root>
+			<Menu.Trigger>Open menu</Menu.Trigger>
+			<Menu.Popup variant={ variant }>
+				<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+					<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+					<Menu.ItemLabel>Archive</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Item
+					prefix={ <Menu.PrefixIcon icon={ archive } /> }
+					shortcut={ SHORTCUTS.save }
+					suffix="Draft"
+				>
+					<Menu.ItemLabel>Save</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Separator />
+				<Menu.Group>
+					<Menu.GroupLabel>Links</Menu.GroupLabel>
+					<Menu.LinkItem href="#menu-default-example">
+						<Menu.ItemLabel>View details</Menu.ItemLabel>
+					</Menu.LinkItem>
+					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Group>
+				<Menu.Separator />
+				<Menu.Group>
+					<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
+					<Menu.CheckboxItem
+						checked={ bookmarks }
+						onCheckedChange={ setBookmarks }
+					>
+						<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Show saved pages in the table.
+						</Menu.ItemDescription>
+					</Menu.CheckboxItem>
+					<Menu.CheckboxItem
+						checked={ downloads }
+						onCheckedChange={ setDownloads }
+						shortcut={ SHORTCUTS.downloads }
+					>
+						<Menu.ItemLabel>Downloads</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Show downloaded files in the table.
+						</Menu.ItemDescription>
+					</Menu.CheckboxItem>
+				</Menu.Group>
+				<Menu.Separator />
+				<Menu.RadioGroup value={ view } onValueChange={ setView }>
+					<Menu.GroupLabel>View</Menu.GroupLabel>
+					<Menu.RadioItem
+						value="list"
+						prefix={ <Menu.PrefixIcon icon={ archive } /> }
+					>
+						<Menu.ItemLabel>List</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Show compact rows.
+						</Menu.ItemDescription>
+					</Menu.RadioItem>
+					<Menu.RadioItem
+						value="grid"
+						prefix={ <Menu.PrefixIcon icon={ archive } /> }
+					>
+						<Menu.ItemLabel>Grid</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Show larger preview tiles.
+						</Menu.ItemDescription>
+					</Menu.RadioItem>
+				</Menu.RadioGroup>
+				<Menu.Separator />
+				<Menu.Group aria-label="More actions">
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger
+							shortcut={ SHORTCUTS.move }
+							suffix="3"
+						>
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Choose another collection.
+							</Menu.ItemDescription>
+						</Menu.SubmenuTrigger>
+						<Menu.Popup variant={ variant }>
+							<Menu.Item>
+								<Menu.ItemLabel>Favorites</Menu.ItemLabel>
+							</Menu.Item>
+							<Menu.Item
+								prefix={ <Menu.PrefixIcon icon={ archive } /> }
+							>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
+							<Menu.SubmenuRoot>
+								<Menu.SubmenuTrigger>
+									<Menu.ItemLabel>
+										More destinations
+									</Menu.ItemLabel>
+								</Menu.SubmenuTrigger>
+								<Menu.Popup variant={ variant }>
+									<Menu.Item>
+										<Menu.ItemLabel>
+											Reviewed
+										</Menu.ItemLabel>
+									</Menu.Item>
+									<Menu.Item>
+										<Menu.ItemLabel>Shared</Menu.ItemLabel>
+									</Menu.Item>
+								</Menu.Popup>
+							</Menu.SubmenuRoot>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+					<Menu.Item disabled>
+						<Menu.ItemLabel>Unavailable action</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	);
+}
+
+export const Default: Story = {
+	render: () => <DefaultExample />,
+};
+
 /**
  * Set `variant="high-contrast"` on each popup, including submenu popups, to use
  * a strong border, small radius, and no shadow.
  */
 export const HighContrast: Story = {
-	render: () => (
-		<Menu.Root>
-			<Menu.Trigger>Open menu</Menu.Trigger>
-			<Menu.Popup variant="high-contrast">
-				<Menu.Item>
-					<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-				</Menu.Item>
-				<Menu.SubmenuRoot>
-					<Menu.SubmenuTrigger>
-						<Menu.ItemLabel>Move to</Menu.ItemLabel>
-					</Menu.SubmenuTrigger>
-					<Menu.Popup variant="high-contrast">
-						<Menu.Item>
-							<Menu.ItemLabel>Sidebar</Menu.ItemLabel>
-						</Menu.Item>
-						<Menu.Item>
-							<Menu.ItemLabel>Footer</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.SubmenuRoot>
-			</Menu.Popup>
-		</Menu.Root>
-	),
-};
-
-export const Default: Story = {
-	render: function Render() {
-		const [ bookmarks, setBookmarks ] = useState( true );
-		const [ downloads, setDownloads ] = useState( false );
-		const [ view, setView ] = useState( 'list' );
-
-		return (
-			<Menu.Root>
-				<Menu.Trigger>Open menu</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
-						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
-						<Menu.ItemLabel>Archive</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.Item
-						prefix={ <Menu.PrefixIcon icon={ archive } /> }
-						shortcut={ SHORTCUTS.save }
-						suffix="Draft"
-					>
-						<Menu.ItemLabel>Save</Menu.ItemLabel>
-					</Menu.Item>
-					<Menu.Separator />
-					<Menu.Group>
-						<Menu.GroupLabel>Links</Menu.GroupLabel>
-						<Menu.LinkItem href="#menu-default-example">
-							<Menu.ItemLabel>View details</Menu.ItemLabel>
-						</Menu.LinkItem>
-						<Menu.LinkItem
-							href="https://wordpress.org"
-							openInNewTab
-						>
-							<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
-						</Menu.LinkItem>
-					</Menu.Group>
-					<Menu.Separator />
-					<Menu.Group>
-						<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
-						<Menu.CheckboxItem
-							checked={ bookmarks }
-							onCheckedChange={ setBookmarks }
-						>
-							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show saved pages in the table.
-							</Menu.ItemDescription>
-						</Menu.CheckboxItem>
-						<Menu.CheckboxItem
-							checked={ downloads }
-							onCheckedChange={ setDownloads }
-							shortcut={ SHORTCUTS.downloads }
-						>
-							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show downloaded files in the table.
-							</Menu.ItemDescription>
-						</Menu.CheckboxItem>
-					</Menu.Group>
-					<Menu.Separator />
-					<Menu.RadioGroup value={ view } onValueChange={ setView }>
-						<Menu.GroupLabel>View</Menu.GroupLabel>
-						<Menu.RadioItem
-							value="list"
-							prefix={ <Menu.PrefixIcon icon={ archive } /> }
-						>
-							<Menu.ItemLabel>List</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show compact rows.
-							</Menu.ItemDescription>
-						</Menu.RadioItem>
-						<Menu.RadioItem
-							value="grid"
-							prefix={ <Menu.PrefixIcon icon={ archive } /> }
-						>
-							<Menu.ItemLabel>Grid</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show larger preview tiles.
-							</Menu.ItemDescription>
-						</Menu.RadioItem>
-					</Menu.RadioGroup>
-					<Menu.Separator />
-					<Menu.Group aria-label="More actions">
-						<Menu.SubmenuRoot>
-							<Menu.SubmenuTrigger
-								shortcut={ SHORTCUTS.move }
-								suffix="3"
-							>
-								<Menu.ItemLabel>Move to</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Choose another collection.
-								</Menu.ItemDescription>
-							</Menu.SubmenuTrigger>
-							<Menu.Popup>
-								<Menu.Item>
-									<Menu.ItemLabel>Favorites</Menu.ItemLabel>
-								</Menu.Item>
-								<Menu.Item
-									prefix={
-										<Menu.PrefixIcon icon={ archive } />
-									}
-								>
-									<Menu.ItemLabel>Archive</Menu.ItemLabel>
-								</Menu.Item>
-								<Menu.SubmenuRoot>
-									<Menu.SubmenuTrigger>
-										<Menu.ItemLabel>
-											More destinations
-										</Menu.ItemLabel>
-									</Menu.SubmenuTrigger>
-									<Menu.Popup>
-										<Menu.Item>
-											<Menu.ItemLabel>
-												Reviewed
-											</Menu.ItemLabel>
-										</Menu.Item>
-										<Menu.Item>
-											<Menu.ItemLabel>
-												Shared
-											</Menu.ItemLabel>
-										</Menu.Item>
-									</Menu.Popup>
-								</Menu.SubmenuRoot>
-							</Menu.Popup>
-						</Menu.SubmenuRoot>
-						<Menu.Item disabled>
-							<Menu.ItemLabel>Unavailable action</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Group>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-	},
+	render: () => <DefaultExample variant="high-contrast" />,
 };
 
 export const LinkItem: Story = {
