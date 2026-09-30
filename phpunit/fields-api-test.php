@@ -12,10 +12,8 @@
  * @covers ::_gutenberg_is_field_id_list_or_true
  * @covers ::_gutenberg_get_excluded_post_type_supports
  * @covers ::gutenberg_register_field_collection
+ * @covers ::gutenberg_register_core_post_supports_fields
  * @covers ::gutenberg_register_core_field_collections
- * @covers ::gutenberg_exclude_post_type_supports_attachment
- * @covers ::gutenberg_exclude_post_type_supports_wp_template
- * @covers ::gutenberg_exclude_post_type_supports_wp_template_part
  * @covers Gutenberg_Fields_Registry::initialize
  * @covers Gutenberg_Fields_Registry::register
  * @covers Gutenberg_Fields_Registry::unregister
@@ -430,8 +428,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	/**
 	 * Any post type supporting authors, comments, or notes, including a
 	 * custom one, gets the default fields: the defaults derive from the post
-	 * types registered when the action fires. The `supports` of the fields
-	 * only decides where they apply: it is not registered.
+	 * types registered when the action fires.
 	 */
 	public function test_a_custom_post_type_gets_the_default_fields_of_its_supports() {
 		register_post_type(
@@ -457,13 +454,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertSame( array( 'author', 'comment_status', 'notesCount' ), array_column( $fields, 'id' ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
-		foreach ( $fields as $field ) {
-			$this->assertArrayNotHasKey( 'supports', $field, 'The `supports` of a field is not registered.' );
-		}
 		$this->assertSame(
 			array( '@wordpress/core-fields/post_supports' => array( 'author', 'comment_status', 'notesCount' ) ),
 			$modules,
-			'Every field of the collection is registered with its module.'
+			'Every default field is registered with the module of its folder.'
 		);
 	}
 
@@ -517,32 +511,37 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The build prefixes the functions the core-fields loader and opt-outs
-	 * define, and the public function they call, and nothing else.
+	 * The build prefixes the functions the core-fields loader defines, and
+	 * the public functions it calls, and nothing else.
 	 */
 	public function test_the_build_prefixes_the_functions_of_the_core_fields_loader() {
 		$source = file_get_contents( __DIR__ . '/../packages/core-fields/src/index.php' );
 		$built  = file_get_contents( __DIR__ . '/../build/scripts/core-fields/index.php' );
 
+		$this->assertStringContainsString( 'function gutenberg_register_core_post_supports_fields( $registry )', $built );
 		$this->assertStringContainsString( 'function gutenberg_register_core_field_collections( $registry )', $built );
-		$this->assertStringContainsString( "gutenberg_register_field_collection( \$registry, __DIR__ . '/post_supports' );", $built );
+		$this->assertStringContainsString( "gutenberg_get_field_collection_fields( __DIR__ . '/post_supports' );", $built );
+		$this->assertStringContainsString( 'gutenberg_register_core_post_supports_fields( $registry );', $built );
+		$this->assertStringContainsString( "gutenberg_register_field_collection( \$registry, __DIR__ . '/wp_template' );", $built );
 		$this->assertStringContainsString( "add_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );", $built );
 		$this->assertStringNotContainsString( 'wp_register_field_collection', $built );
+		$this->assertStringNotContainsString( 'wp_get_field_collection_fields', $built );
 		$this->assertSame(
-			str_replace( array( 'wp_register_field_collection', 'register_core_field_collections' ), array( 'gutenberg_register_field_collection', 'gutenberg_register_core_field_collections' ), $source ),
+			str_replace(
+				array( 'wp_register_field_collection', 'wp_get_field_collection_fields', 'register_core_post_supports_fields', 'register_core_field_collections' ),
+				array( 'gutenberg_register_field_collection', 'gutenberg_get_field_collection_fields', 'gutenberg_register_core_post_supports_fields', 'gutenberg_register_core_field_collections' ),
+				$source
+			),
 			$built,
 			'Only the function names change.'
 		);
-
-		$built = file_get_contents( __DIR__ . '/../build/scripts/core-fields/wp_template/exclude-post-type-supports.php' );
-		$this->assertStringContainsString( 'function gutenberg_exclude_post_type_supports_wp_template( $excluded, $post_type )', $built );
-		$this->assertStringContainsString( "add_filter( 'fields_api_exclude_post_type_supports', 'gutenberg_exclude_post_type_supports_wp_template', 10, 2 );", $built );
 	}
 
 	/**
-	 * The default fields come from the `post_supports` collection.
+	 * The default fields come from the `field.php` files of the
+	 * `post_supports` folder.
 	 */
-	public function test_the_default_fields_come_from_the_post_supports_collection() {
+	public function test_the_default_fields_come_from_the_post_supports_folder() {
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'post' ), null, 'id' );
 		$this->assertSame( 'integer', $fields['author']['type'] );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
@@ -571,35 +570,31 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The core collections are registered through the public function, on
-	 * `fields_api_init` at priority 0, before the plugins hooking the action
-	 * at the default priority. Each post type opting out of default fields
-	 * does it on the filter.
+	 * The core fields are registered on `fields_api_init` at priority 0,
+	 * before the plugins hooking the action at the default priority.
 	 */
 	public function test_the_core_collections_are_registered_at_priority_zero() {
 		$this->assertSame( 0, has_action( 'fields_api_init', 'gutenberg_register_core_field_collections' ) );
 		$this->assertFalse( function_exists( 'register_core_field_collections' ), 'The Gutenberg build prefixes the function.' );
-		foreach ( array( 'attachment', 'wp_template', 'wp_template_part' ) as $post_type ) {
-			$this->assertSame( 10, has_filter( 'fields_api_exclude_post_type_supports', 'gutenberg_exclude_post_type_supports_' . $post_type ), "The $post_type collection opts out on the filter." );
-		}
+		$this->assertFalse( function_exists( 'register_core_post_supports_fields' ), 'The Gutenberg build prefixes the function.' );
 	}
 
 	/**
-	 * The opt-outs of the core collections compose with the other
-	 * callbacks of the filter: they add to the incoming list, keep `true`,
-	 * and leave the other post types alone.
+	 * The defaults make no exception for any post type: on their own, they
+	 * register the author field on templates, template parts, and
+	 * attachments, which support authors. Their collections unregister it,
+	 * as a plugin would.
 	 */
-	public function test_the_core_opt_outs_compose_with_other_callbacks() {
-		$this->assertSame( array( 'plugin_field', 'author' ), gutenberg_exclude_post_type_supports_wp_template( array( 'plugin_field' ), 'wp_template' ) );
-		$this->assertTrue( gutenberg_exclude_post_type_supports_wp_template( true, 'wp_template' ) );
-		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_post_type_supports_wp_template( array( 'plugin_field' ), 'page' ) );
+	public function test_the_defaults_make_no_exception() {
+		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
+		$this->core_collections_unhooked = true;
+		$this->on_fields_api_init( 'gutenberg_register_core_post_supports_fields', 0 );
 
-		$this->assertSame( array( 'plugin_field', 'author' ), gutenberg_exclude_post_type_supports_wp_template_part( array( 'plugin_field' ), 'wp_template_part' ) );
-		$this->assertTrue( gutenberg_exclude_post_type_supports_wp_template_part( true, 'wp_template_part' ) );
-		$this->assertSame( array(), gutenberg_exclude_post_type_supports_wp_template_part( array(), 'wp_template' ) );
-
-		$this->assertTrue( gutenberg_exclude_post_type_supports_attachment( array( 'plugin_field' ), 'attachment' ) );
-		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_post_type_supports_attachment( array( 'plugin_field' ), 'page' ) );
+		foreach ( array( 'wp_template', 'wp_template_part', 'attachment' ) as $post_type ) {
+			$fields = array_column( gutenberg_get_registered_fields( 'postType', $post_type ), null, 'id' );
+			$this->assertArrayHasKey( 'author', $fields, "The defaults register the author field on $post_type." );
+			$this->assertSame( 'integer', $fields['author']['type'] );
+		}
 	}
 
 	/**
@@ -684,30 +679,22 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A plugin can opt a post type out of a default field on the filter,
-	 * keeping the others.
+	 * A plugin drops a default field from its post type by unregistering
+	 * it at the default priority, keeping the others.
 	 */
-	public function test_a_plugin_can_exclude_a_default_field_from_a_post_type() {
+	public function test_a_plugin_can_drop_a_default_field_from_a_post_type() {
 		$this->register_post_types(
 			array(
 				'gutenberg_book' => array( 'title', 'author', 'comments' ),
 				'gutenberg_note' => array( 'title', 'author', 'comments' ),
 			)
 		);
-		add_filter(
-			'fields_api_exclude_post_type_supports',
-			static function ( $excluded, $post_type ) {
-				if ( 'gutenberg_book' !== $post_type || true === $excluded ) {
-					return $excluded;
-				}
-				$excluded[] = 'comment_status';
-				return $excluded;
-			},
-			10,
-			2
+		$this->on_fields_api_init(
+			static function ( $registry ) {
+				$registry->unregister( 'postType', 'gutenberg_book', array( 'comment_status' ) );
+			}
 		);
 
-		self::reset_registry();
 		$this->assertSame( array( 'author' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
 	}
@@ -728,16 +715,15 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			3
 		);
 
-		self::reset_registry();
-		gutenberg_get_registered_fields( 'postType', 'post' );
+		$this->register_fixture_collections( 'valid', array( 'everywhere' ) );
 
 		$this->assertSame( array_values( get_post_types( array( 'show_in_rest' => true ) ) ), array_keys( $calls ), 'The filter runs for every post type exposed in the REST API.' );
 		$this->assertSame(
 			array(
-				'origin' => 'core',
+				'origin' => 'fixture',
 				'kind'   => 'postType',
 				'name'   => null,
-				'module' => '@wordpress/core-fields/post_supports',
+				'module' => 'fixture/everywhere',
 			),
 			$calls['post']
 		);
