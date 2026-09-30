@@ -13,9 +13,11 @@
  */
 
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
+import { fieldExtensions as caption } from './caption/field';
 import { fieldExtensions as mimeType } from './mime_type/field';
 
 const fields: FieldsScriptParts = {
+	caption,
 	mime_type: mimeType,
 };
 

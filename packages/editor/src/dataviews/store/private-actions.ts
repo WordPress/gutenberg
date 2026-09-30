@@ -47,7 +47,6 @@ import {
 	altTextField,
 	attachedToField,
 	authorField as mediaAuthorField,
-	captionField,
 	descriptionField as mediaDescriptionField,
 	filenameField,
 	filesizeField,
@@ -132,7 +131,6 @@ const MEDIA_FIELDS = [
 	attachedToField,
 	titleField,
 	altTextField,
-	captionField,
 	mediaDescriptionField,
 ];
 
