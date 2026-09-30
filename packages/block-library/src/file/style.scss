@@ -3,6 +3,10 @@
 .wp-block-file {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75em;
 
 	&:not(.wp-element-button) {
 		font-size: 0.8em;
@@ -15,10 +19,6 @@
 	&.alignright {
 		/*rtl:ignore*/
 		text-align: right;
-	}
-
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
 	}
 }
 
