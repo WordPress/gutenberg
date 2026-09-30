@@ -1,0 +1,26 @@
+# Base PHPStan configuration for Gutenberg
+#
+# This is kept separate from the main PHPStan configuration file to allow for easy overloading while baseline errors are being fixed.
+#
+# https://phpstan.org/config-reference
+
+parameters:
+  # What directories and files should be scanned.
+  paths:
+    - ../../gutenberg.php
+    - ../../post-content.php
+    - ../../lib
+  bootstrapFiles:
+    - bootstrap.php
+    - ../../gutenberg.php
+  scanFiles:
+    - ../../gutenberg.php
+    - ../../post-content.php
+  scanDirectories:
+    - ../../lib
+    - ../../packages
+  excludePaths:
+    analyse:
+      # Exclude files maintained in WordPress Core and backported to Gutenberg.
+      - ../../lib/compat/wordpress-*/html-api/*
+      - ../../packages/block-serialization-spec-parser/parser
