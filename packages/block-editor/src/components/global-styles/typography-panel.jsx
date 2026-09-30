@@ -8,9 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
-import { store as noticesStore } from '@wordpress/notices';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -282,7 +280,6 @@ export default function TypographyPanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
-	const { createWarningNotice } = useDispatch( noticesStore );
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
@@ -380,6 +377,13 @@ export default function TypographyPanel( {
 			inheritedValue?.background?.backgroundClip ) === 'text';
 	const hasBlockBackground =
 		! clipsToText && !! ( backgroundGradient || backgroundColor );
+	// Said before the gradient is chosen rather than after, because this is
+	// the state the control used to be disabled in.
+	const backgroundOverrideNotice = backgroundGradient
+		? __( 'Setting a text gradient replaces the background gradient.' )
+		: __(
+				'Setting a text gradient clips the background color to the text.'
+			);
 	const textGradient = inheritedIsTextGradient
 		? decodeValue( inheritedValue?.background?.gradient )
 		: undefined;
@@ -388,20 +392,6 @@ export default function TypographyPanel( {
 		: undefined;
 	const hasTextGradientValue = () => userTextGradient !== undefined;
 	const setTextGradient = ( newGradient, newSlug ) => {
-		// The gradient the block already had is written over by the one
-		// clipped to the text, and a background color it keeps is painted
-		// inside the text from here on. Both are worth saying once, at the
-		// moment they happen, rather than standing in the panel afterwards.
-		if ( newGradient && hasBlockBackground ) {
-			createWarningNotice(
-				backgroundGradient
-					? __(
-							'The text gradient replaced the background gradient.'
-						)
-					: __( 'The background color now paints inside the text.' ),
-				{ type: 'snackbar' }
-			);
-		}
 		let changedObject = setImmutably(
 			value,
 			[ 'background', 'gradient' ],
@@ -1061,6 +1051,24 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				/>
 			) }
+			{ hasTextColorEnabled && clipsToTextHere && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-typography-panel__text-gradient-notice"
+				>
+					{ textGradientNotice }
+				</Notice>
+			) }
+			{ hasTextGradientEnabled && hasBlockBackground && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-typography-panel__text-gradient-notice"
+				>
+					{ backgroundOverrideNotice }
+				</Notice>
+			) }
 			{ hasFontFamilyEnabled && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
@@ -1373,15 +1381,6 @@ export default function TypographyPanel( {
 						</div>
 					) }
 				</InheritanceToolsPanelItem>
-			) }
-			{ hasTextColorEnabled && clipsToTextHere && (
-				<Notice
-					status="info"
-					isDismissible={ false }
-					className="block-editor-typography-panel__text-gradient-notice"
-				>
-					{ textGradientNotice }
-				</Notice>
 			) }
 		</Wrapper>
 	);
