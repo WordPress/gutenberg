@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Allow passing a custom output path to the `--blocks-manifest` flag of the `build` and `start` commands, e.g. `--blocks-manifest=dist/blocks-manifest.php` ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
 ### Bug Fixes
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

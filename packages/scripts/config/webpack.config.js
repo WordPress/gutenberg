@@ -281,10 +281,15 @@ class BlocksManifestPlugin {
 	 */
 	apply( compiler ) {
 		compiler.hooks.afterEmit.tap( 'BlocksManifest', () => {
+			const outputArg = process.env.WP_BLOCKS_MANIFEST_OUTPUT
+				? ` --output="${ resolve(
+						process.env.WP_BLOCKS_MANIFEST_OUTPUT
+					) }"`
+				: '';
 			exec(
 				`node "${ fromScriptsRoot(
 					'build-blocks-manifest'
-				) }" --input="${ compiler.options.output.path }"`
+				) }" --input="${ compiler.options.output.path }"${ outputArg }`
 			);
 		} );
 	}
