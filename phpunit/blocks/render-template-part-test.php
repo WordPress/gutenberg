@@ -103,7 +103,7 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		$this->assertSame( 1, $post_action->get_call_count(), 'The post action should fire once.' );
 	}
 
-	public function test_falls_back_to_theme_file_when_theme_term_cache_is_empty() {
+	public function test_handles_error_when_theme_term_cache_is_empty() {
 		$template_part_id = $this->create_template_part( 'test-empty-cache' );
 
 		// The post has a `wp_theme` term in the database, but the cache says it has none.
@@ -116,30 +116,27 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-empty-cache"} /-->' );
 
-		$this->assertStringContainsString( 'Theme file template part', $output );
-		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assert_error_output( 'test-empty-cache', $output );
 		$this->assertSame( 0, $post_action->get_call_count(), 'The post action should not fire.' );
-		$this->assertSame( 1, $file_action->get_call_count(), 'The file action should fire once.' );
+		$this->assertSame( $this->is_debug() ? 0 : 1, $file_action->get_call_count(), 'The file action should only fire outside debug mode.' );
 	}
 
-	public function test_falls_back_to_theme_file_when_theme_terms_are_filtered_out() {
+	public function test_handles_error_when_theme_terms_are_filtered_out() {
 		$this->create_template_part( 'test-filtered-terms' );
 		$this->filter_wp_theme_terms( false );
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-filtered-terms"} /-->' );
 
-		$this->assertStringContainsString( 'Theme file template part', $output );
-		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assert_error_output( 'test-filtered-terms', $output );
 	}
 
-	public function test_falls_back_to_theme_file_when_theme_terms_are_an_error() {
+	public function test_handles_error_when_theme_terms_are_an_error() {
 		$this->create_template_part( 'test-terms-error' );
 		$this->filter_wp_theme_terms( new WP_Error( 'test_error', 'Test error' ) );
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-terms-error"} /-->' );
 
-		$this->assertStringContainsString( 'Theme file template part', $output );
-		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assert_error_output( 'test-terms-error', $output );
 	}
 
 	public function test_renders_nothing_when_post_fails_to_load_and_there_is_no_theme_file() {
@@ -151,12 +148,44 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"' . self::NO_FILE_SLUG . '"} /-->' );
 
-		// Matches the output of the block when the template part can't be found.
-		$expected = WP_DEBUG && WP_DEBUG_DISPLAY
-			? sprintf( 'Template part has been deleted or is unavailable: %s', self::NO_FILE_SLUG )
-			: '';
+		$expected = $this->is_debug() ? $this->get_unavailable_message( self::NO_FILE_SLUG ) : '';
 
 		$this->assertSame( $expected, $output );
-		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
+		$this->assertSame( $this->is_debug() ? 0 : 1, $none_action->get_call_count(), 'The none action should only fire outside debug mode.' );
+	}
+
+	/**
+	 * Whether the block shows debug messages, matching the check in the block.
+	 *
+	 * @return bool
+	 */
+	private function is_debug() {
+		return WP_DEBUG && WP_DEBUG_DISPLAY;
+	}
+
+	/**
+	 * Gets the message the block shows in debug mode when a template part is unavailable.
+	 *
+	 * @param string $slug The template part slug.
+	 * @return string
+	 */
+	private function get_unavailable_message( $slug ) {
+		return sprintf( 'Template part has been deleted or is unavailable: %s', $slug );
+	}
+
+	/**
+	 * Asserts the output when the customized template part fails to load: the unavailable
+	 * message in debug mode, and the theme file otherwise.
+	 *
+	 * @param string $slug   The template part slug.
+	 * @param string $output The rendered block.
+	 */
+	private function assert_error_output( $slug, $output ) {
+		if ( $this->is_debug() ) {
+			$this->assertSame( $this->get_unavailable_message( $slug ), $output );
+		} else {
+			$this->assertStringContainsString( 'Theme file template part', $output );
+		}
+		$this->assertStringNotContainsString( 'Customized template part', $output );
 	}
 }
