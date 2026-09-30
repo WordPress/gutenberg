@@ -89,7 +89,7 @@ const hosted = useWidgetActions( actions );
 Three rules hold the two sources together:
 
 -   **Conditioned by not declaring.** The list replaces the previous one; an action that does not apply right now is left out, and the host withdraws it.
--   **The manifest is the baseline, the runtime upgrades it.** A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out. The declared "Details" shows while loading; once the counts arrive, "Review 3 items" with the filtered target replaces it.
+-   **The manifest is the baseline, the runtime upgrades it.** A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out. The declared "Details" shows while loading; once the counts arrive, "Review 3 items" with the filtered target replaces it. A declared action is never withdrawn: the manifest holds what every instance offers, and an action that only applies sometimes is declared at runtime alone.
 -   **Placement stays the host's.** Runtime actions ride the same `relevance` scale; the widget still never names a surface.
 
 `useWidgetActions` returns whether the host took the actions. Under a host without the `actions` capability it returns `false`, and the widget keeps rendering its own affordance, the same fallback a link keeps without `links`.
