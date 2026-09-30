@@ -26,7 +26,7 @@ type Attributes = {
 };
 
 const onExport = vi.fn< () => void | Promise< void > >();
-const onRefresh = vi.fn< () => void >();
+const onRefresh = vi.fn< () => void | Promise< void > >();
 
 /*
  * Declares from its attributes: while `count` is positive, a link taking the
@@ -325,10 +325,53 @@ describe( 'runtime actions', () => {
 		await waitFor( () =>
 			expect( button ).toHaveAttribute( 'aria-disabled', 'true' )
 		);
+		expect( button ).toHaveFocus();
+
+		await user.click( button );
+		expect( onExport ).toHaveBeenCalledTimes( 1 );
 
 		settle();
 		await waitFor( () =>
 			expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' )
+		);
+	} );
+
+	it( 'keeps a menu action pending after its menu closes', async () => {
+		const user = userEvent.setup();
+		let settle = () => {};
+		onRefresh.mockImplementation(
+			() =>
+				new Promise< void >( ( resolve ) => {
+					settle = resolve;
+				} )
+		);
+		render(
+			<Harness
+				layout={ instance( 'test/plain', { refreshable: true } ) }
+			/>
+		);
+
+		const more = await screen.findByRole( 'button', { name: 'More' } );
+		await user.click( more );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Refresh' } )
+		);
+		await waitFor( () =>
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+		);
+
+		await user.click( more );
+		const item = await screen.findByRole( 'menuitem', { name: 'Refresh' } );
+		expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.click( item );
+		expect( onRefresh ).toHaveBeenCalledTimes( 1 );
+
+		settle();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Refresh' } )
+			).not.toHaveAttribute( 'aria-disabled', 'true' )
 		);
 	} );
 

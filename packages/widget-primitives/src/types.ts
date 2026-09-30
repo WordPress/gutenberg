@@ -138,7 +138,8 @@ export interface WidgetAction extends WidgetActionEnvelope {
 export interface WidgetCallbackAction extends WidgetActionEnvelope {
 	/**
 	 * Callback fulfillment: what triggering the action runs. A returned
-	 * promise keeps the affordance pending until it settles.
+	 * promise keeps the affordance pending until it settles, fulfilled or
+	 * rejected. Reporting the outcome stays the callback's.
 	 */
 	callback: () => void | Promise< void >;
 }

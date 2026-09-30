@@ -16,6 +16,7 @@ import type {
 } from '@wordpress/widget-primitives';
 import { isCallbackAction } from '../../utils/action-fulfillment';
 import { CallbackAction } from '../widget-actions/callback-action';
+import { useRunActions } from '../widget-actions/use-run-actions';
 import styles from './widget-footer.module.css';
 
 type IconActionProps = {
@@ -89,7 +90,8 @@ type WidgetFooterProps = {
  * Persistent strip under the widget body. `'high'` actions mount as leading
  * text affordances, a declared icon riding as prefix; `'medium'` actions as
  * trailing compact affordances, icon-only when they declare an icon. Every
- * link is a real anchor; a callback action mounts a button.
+ * link is a real anchor; a callback action mounts a button, disabled while
+ * its promise settles.
  *
  * A target the host recognizes as one of its own routes mounts the host
  * router's link through `HostLink`, so it navigates client-side.
@@ -100,6 +102,8 @@ export function WidgetFooter( {
 	actions,
 	editMode = false,
 }: WidgetFooterProps ): React.ReactNode {
+	const { run, pendingIds } = useRunActions();
+
 	if ( actions.length === 0 ) {
 		return null;
 	}
@@ -127,6 +131,8 @@ export function WidgetFooter( {
 							<CallbackAction
 								key={ action.id }
 								action={ action }
+								isPending={ pendingIds.has( action.id ) }
+								onRun={ run }
 							/>
 						) : (
 							<Link
@@ -162,6 +168,10 @@ export function WidgetFooter( {
 									<CallbackAction
 										key={ action.id }
 										action={ action }
+										isPending={ pendingIds.has(
+											action.id
+										) }
+										onRun={ run }
 										compact
 									/>
 								);

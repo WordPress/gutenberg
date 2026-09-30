@@ -1,10 +1,19 @@
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, IconButton } from '@wordpress/ui';
 import type { WidgetCallbackAction } from '@wordpress/widget-primitives';
-import { useRunAction } from './use-run-action';
 
 interface CallbackActionProps {
 	action: WidgetCallbackAction;
+
+	/**
+	 * Whether a promise the callback returned is still settling.
+	 */
+	isPending: boolean;
+
+	/**
+	 * Runs the action.
+	 */
+	onRun: ( action: WidgetCallbackAction ) => void;
 
 	/**
 	 * The footer's trailing form: icon-only when the action declares an
@@ -21,10 +30,10 @@ interface CallbackActionProps {
  */
 export function CallbackAction( {
 	action,
+	isPending,
+	onRun,
 	compact = false,
 }: CallbackActionProps ): React.ReactNode {
-	const { run, isPending } = useRunAction( action );
-
 	if ( compact && action.icon ) {
 		return (
 			<IconButton
@@ -34,7 +43,7 @@ export function CallbackAction( {
 				tone="neutral"
 				size="compact"
 				disabled={ isPending }
-				onClick={ run }
+				onClick={ () => onRun( action ) }
 			/>
 		);
 	}
@@ -45,7 +54,7 @@ export function CallbackAction( {
 			tone={ compact ? 'neutral' : 'brand' }
 			size="compact"
 			disabled={ isPending }
-			onClick={ run }
+			onClick={ () => onRun( action ) }
 		>
 			{ action.icon && <Button.Icon icon={ action.icon } /> }
 			{ action.label }
