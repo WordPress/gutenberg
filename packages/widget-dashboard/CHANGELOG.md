@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 0.8.0 (2026-09-23)
+
 ### Enhancements
 
 -   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
@@ -17,6 +23,7 @@
 
 ### Internal
 
+-   Disable `custom-property-pattern` for this package so private `--_wp-*` tokens remain allowed ([#83075](https://github.com/WordPress/gutenberg/pull/83075)).
 -   Route link actions through `HostLink` from `@wordpress/widget-primitives`,
     replacing the per-surface host link gating and `getActionRoute`
     ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).

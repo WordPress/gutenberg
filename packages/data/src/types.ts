@@ -299,6 +299,11 @@ export interface NormalizedResolver {
 	 * Optional function to check if the resolver should be invalidated.
 	 */
 	shouldInvalidate?: ( action: any, ...args: any[] ) => boolean;
+	/**
+	 * Optional. Derives the cache key from the selector arguments, so several
+	 * selector calls can share a single resolver run.
+	 */
+	getResolutionArgs?: ( ...args: any[] ) => any[];
 }
 
 /**
@@ -313,7 +318,7 @@ export interface BoundSelector {
 	/**
 	 * Optional function to normalize the arguments.
 	 */
-	__unstableNormalizeArgs?: ( args: any[] ) => any[];
+	normalizeArgs?: ( args: any[] ) => any[];
 	/**
 	 * Whether this selector is a registry selector.
 	 */

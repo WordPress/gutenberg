@@ -13,8 +13,10 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
@@ -30,7 +32,6 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation } from './variations';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -43,8 +44,19 @@ function VideoEdit( {
 	onReplace,
 } ) {
 	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks, width, height } = attributes;
-	const isGif = isGifVariation( attributes );
+	const {
+		id,
+		controls,
+		poster,
+		src,
+		tracks,
+		width,
+		height,
+		autoplay,
+		loop,
+		muted,
+		playsInline,
+	} = attributes;
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -54,10 +66,15 @@ function VideoEdit( {
 	// swap. A non-`auto` ratio governs the box height throughout the load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const videoStyle = {
+		...( aspectRatio && { aspectRatio } ),
+		...getShadowClassesAndStyles( attributes ).style,
+	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	const prefersReducedMotion = useReducedMotion();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -73,17 +90,13 @@ function VideoEdit( {
 		}
 	}, [ poster ] );
 
-	// The GIF variation plays like an animated GIF in the editor (the playback
-	// attributes are applied to the preview <video> below). Regular videos do
-	// not autoplay in the editor, so only nudge GIFs into playing after a
-	// source change in case the muted autoplay did not start on its own.
+	// `autoPlay` only applies when the video loads, so pause a video that is
+	// already playing when the user turns on reduced motion.
 	useEffect( () => {
-		if ( isGif ) {
-			// Browsers allow muted videos to be played programmatically.
-			videoPlayer.current?.play().catch( () => {} );
+		if ( prefersReducedMotion ) {
+			videoPlayer.current?.pause();
 		}
-	}, [ isGif, src, poster ] );
-
+	}, [ prefersReducedMotion ] );
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -214,38 +227,36 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					/>
+					<PosterImage
+						poster={ poster }
+						onChange={ ( posterImage ) =>
 							setAttributes( {
-								autoplay: false,
-								controls: true,
-								loop: false,
-								muted: false,
-								playsInline: false,
-								preload: 'metadata',
-								poster: undefined,
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<PosterImage
-							poster={ poster }
-							onChange={ ( posterImage ) =>
-								setAttributes( {
-									poster: posterImage?.url,
-								} )
-							}
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+								poster: posterImage?.url,
+							} )
+						}
+					/>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
@@ -253,13 +264,17 @@ function VideoEdit( {
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ isGif }
-					loop={ isGif }
-					muted={ isGif }
-					playsInline={ isGif }
+					autoPlay={ autoplay && ! prefersReducedMotion }
+					loop={ loop }
+					muted={ muted }
+					playsInline={ playsInline }
 					width={ width }
 					height={ height }
-					style={ aspectRatio ? { aspectRatio } : undefined }
+					style={
+						Object.keys( videoStyle ).length
+							? videoStyle
+							: undefined
+					}
 				>
 					<Tracks tracks={ tracks } />
 				</video>

@@ -92,6 +92,18 @@
             - render
             - style
             - value
+      - name: Autocomplete.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.List
         props:
             - children
@@ -142,6 +154,11 @@
       - name: Autocomplete.Row
         props:
             - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Separator
+        props:
             - className
             - render
             - style
@@ -1038,6 +1055,7 @@
       - defaultSize
       - enable
       - grid
+      - gridGap
       - handleClasses
       - handleComponent
       - handleStyles
@@ -1119,7 +1137,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1164,6 +1181,23 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelect.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1212,7 +1246,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1257,6 +1290,123 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
+- name: SearchableSelectControl
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - className
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - label
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - placeholder
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - statusContent
+      - triggerContent
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableSelectControl.Collection
+        props:
+            - children
+      - name: SearchableSelectControl.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableSelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
+      - name: SearchableSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchControl
   props:
       - __next40pxDefaultSize
@@ -1272,26 +1422,192 @@
       - placeholder
       - size
       - value
+- name: Select.Root
+  props:
+      - actionsRef
+      - autoComplete
+      - children
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - form
+      - highlightItemOnHover
+      - id
+      - inputRef
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - modal
+      - name
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - readOnly
+      - required
+      - value
+  subcomponents:
+      - name: Select.Group
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.Item
+        props:
+            - children
+            - className
+            - disabled
+            - label
+            - nativeButton
+            - render
+            - size
+            - style
+            - value
+      - name: Select.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Select.Popup
+        props:
+            - children
+            - className
+            - finalFocus
+            - portal
+            - positioner
+            - render
+            - style
+            - width
+      - name: Select.Portal
+        props:
+            - className
+            - container
+            - render
+            - style
+      - name: Select.Positioner
+        props:
+            - align
+            - alignItemWithTrigger
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
+      - name: Select.Separator
+        props:
+            - className
+            - render
+            - style
+      - name: Select.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
+            - style
+            - variant
 - name: SelectControl
   props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __nextHasNoMarginBottom
+      - actionsRef
+      - autoComplete
       - children
+      - className
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
       - disabled
-      - help
+      - form
       - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
       - label
-      - labelPosition
-      - multiple
-      - onChange
-      - options
-      - prefix
+      - modal
+      - name
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - placeholder
+      - popupWidth
+      - readOnly
       - ref
+      - required
       - size
-      - suffix
+      - triggerContent
       - value
-      - variant
+  subcomponents:
+      - name: SelectControl.Group
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - label
+            - nativeButton
+            - render
+            - style
+            - value
+      - name: SelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: Shortcut
   props:
       - className

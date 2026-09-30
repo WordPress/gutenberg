@@ -345,7 +345,8 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground',
+	id: 'widget-dashboard-playground',
+	title: 'Widgets/Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -484,7 +485,10 @@ const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 const DemoRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedDemoRouteLink(
+	{ path, onClick, children, ...props },
+	ref
+) {
 	return (
 		<a
 			ref={ ref }

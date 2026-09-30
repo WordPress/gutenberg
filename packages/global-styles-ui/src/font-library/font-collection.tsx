@@ -16,11 +16,12 @@ import {
 	SelectControl as WCSelectControl,
 	Flex,
 	Button,
-	DropdownMenu,
 	SearchControl,
 	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Select } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import {
@@ -31,8 +32,6 @@ import {
 	chevronRight,
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Select, pending WordPress/gutenberg#76135.
-import { Select } from '@wordpress/ui';
 import type {
 	FontCollection as FontCollectionType,
 	FontFace,
@@ -284,21 +283,33 @@ function FontCollection( { slug }: { slug: string } ) {
 									</WCText>
 								</VStack>
 								{ showActions && (
-									<DropdownMenu
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										popoverProps={ {
-											position: 'bottom left',
-										} }
-										controls={ [
-											{
-												title: __(
-													'Revoke access to Google Fonts'
-												),
-												onClick: revokeAccess,
-											},
-										] }
-									/>
+									<Menu.Root>
+										<Menu.Trigger
+											render={
+												<Button
+													size="small"
+													icon={ moreVertical }
+													label={ __( 'Actions' ) }
+												/>
+											}
+										/>
+										<Menu.Popup
+											positioner={
+												<Menu.Positioner
+													side="bottom"
+													align="end"
+												/>
+											}
+										>
+											<Menu.Item onClick={ revokeAccess }>
+												<Menu.ItemLabel>
+													{ __(
+														'Revoke access to Google Fonts'
+													) }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popup>
+									</Menu.Root>
 								) }
 							</HStack>
 							<Spacer margin={ 4 } />
@@ -420,7 +431,7 @@ function FontCollection( { slug }: { slug: string } ) {
 								{ __( 'Select font variants to install.' ) }
 							</WCText>
 							<Spacer margin={ 4 } />
-							<CheckboxControl
+							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
 								checked={ isSelectAllChecked }
@@ -517,11 +528,13 @@ function FontCollection( { slug }: { slug: string } ) {
 										CurrentPage: (
 											<Select.Root
 												value={ page.toString() }
-												onValueChange={ ( newPage ) =>
-													setPage(
-														parseInt( newPage )
-													)
-												}
+												onValueChange={ ( newPage ) => {
+													if ( newPage !== null ) {
+														setPage(
+															parseInt( newPage )
+														);
+													}
+												} }
 											>
 												<Select.Trigger
 													size="small"

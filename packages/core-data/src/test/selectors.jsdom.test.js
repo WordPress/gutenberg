@@ -21,15 +21,15 @@ import {
 	hasUndo,
 	hasRedo,
 } from '../selectors';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 
-vi.mock( '../sync', () => ( {
-	getSyncManager: vi.fn(),
+vi.mock( '../entity-sync', () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'hasUndo/hasRedo', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
@@ -37,7 +37,7 @@ describe( 'hasUndo/hasRedo', () => {
 			hasUndo: vi.fn( () => false ),
 			hasRedo: vi.fn( () => false ),
 		};
-		getSyncManager.mockReturnValue( { undoManager } );
+		getEntitySyncManager.mockReturnValue( { undoManager } );
 
 		const state = deepFreeze( {
 			syncUndoManagerState: {
@@ -57,7 +57,7 @@ describe( 'hasUndo/hasRedo', () => {
 			hasUndo: vi.fn( () => true ),
 			hasRedo: vi.fn( () => false ),
 		};
-		getSyncManager.mockReturnValue( undefined );
+		getEntitySyncManager.mockReturnValue( undefined );
 
 		const state = { undoManager };
 
@@ -70,8 +70,8 @@ describe( 'hasUndo/hasRedo', () => {
 
 describe( 'getEntityRecord', () => {
 	describe( 'normalizing Post ID passed as recordKey', () => {
-		it( 'normalizes any Post ID recordKey argument to a Number via `__unstableNormalizeArgs` method', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+		it( 'normalizes any Post ID recordKey argument to a Number via `normalizeArgs` method', async () => {
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'123',
@@ -80,7 +80,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'i-am-a-slug-with-a-number-123',

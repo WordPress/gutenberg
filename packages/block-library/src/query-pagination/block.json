@@ -32,6 +32,9 @@
 		"align": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -40,6 +43,11 @@
 				"text": true,
 				"link": true
 			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"blockGap": true
 		},
 		"layout": {
 			"allowSwitching": false,

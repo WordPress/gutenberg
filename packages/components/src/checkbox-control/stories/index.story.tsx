@@ -9,7 +9,7 @@ import { HStack } from '../../h-stack';
 const meta: Meta< typeof CheckboxControl > = {
 	tags: [ 'manifest' ],
 	component: CheckboxControl,
-	title: 'Components/Selection & Input/Common/CheckboxControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/CheckboxControl',
 	id: 'components-checkboxcontrol',
 	argTypes: {
 		onChange: {
@@ -140,8 +140,6 @@ export const WithCustomLabel: Story = {
 						setChecked( v );
 						onChange( v );
 					} }
-					// Disable reason: For simplicity of the code snippet.
-					// eslint-disable-next-line no-restricted-syntax
 					id="my-checkbox-with-custom-label"
 					aria-describedby="my-custom-description"
 				/>
@@ -149,7 +147,6 @@ export const WithCustomLabel: Story = {
 					<label htmlFor="my-checkbox-with-custom-label">
 						My custom label
 					</label>
-					{ /* eslint-disable-next-line no-restricted-syntax */ }
 					<div id="my-custom-description" style={ { fontSize: 13 } }>
 						A custom description.
 					</div>

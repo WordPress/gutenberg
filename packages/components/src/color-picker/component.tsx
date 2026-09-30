@@ -212,9 +212,11 @@ const UnconnectedColorPicker = (
 					<ColorFormatSelect>
 						<Select.Root
 							value={ colorType }
-							onValueChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
-							}
+							onValueChange={ ( nextColorType ) => {
+								if ( nextColorType !== null ) {
+									setColorType( nextColorType as ColorType );
+								}
+							} }
 						>
 							<Select.Trigger
 								size="compact"

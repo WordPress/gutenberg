@@ -106,7 +106,16 @@ export function getWidgetMetadata( rootDir, widgetName ) {
  * Supported source extensions for widget entry files, in priority order.
  * Must stay aligned with SOURCE_EXTENSIONS in build.mjs.
  */
-const WIDGET_EXTENSIONS = [ 'tsx', 'ts', 'jsx', 'js', 'mjs' ];
+const WIDGET_EXTENSIONS = [
+	'tsx',
+	'ts',
+	'mts',
+	'cts',
+	'jsx',
+	'js',
+	'mjs',
+	'cjs',
+];
 
 /**
  * @typedef {Object} WidgetFiles

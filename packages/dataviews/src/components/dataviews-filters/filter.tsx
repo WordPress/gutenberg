@@ -4,7 +4,6 @@ import { Dropdown, FlexItem, Icon as WCIcon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Select, pending WordPress/gutenberg#76135.
 import { Select, Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
@@ -90,6 +89,9 @@ function OperatorSelector( {
 				<Select.Root
 					value={ value }
 					onValueChange={ ( newValue ) => {
+						if ( newValue === null ) {
+							return;
+						}
 						const newOperator = newValue as Operator;
 						const currentOperator = currentFilter?.operator;
 						const newFilters = currentFilter
