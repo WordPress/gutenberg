@@ -132,7 +132,7 @@ jobs:
 
                   cat >> pr-meta/body.md <<'EOF'
 
-                  _Updated as activity occurs. Add the `props-bot` label to refresh._
+                  _Updated as activity occurs, without notifying anyone named here. Add the `props-bot` label to refresh._
                   EOF
 
             - uses: ./tools/pr-meta
