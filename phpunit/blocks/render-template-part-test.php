@@ -15,11 +15,29 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	// Slug that has no theme file.
 	const NO_FILE_SLUG = 'test-no-file';
 
+	/**
+	 * The `get_the_terms` filter added by a test, if any.
+	 *
+	 * @var callable|null
+	 */
+	private $get_the_terms_filter = null;
+
 	public function set_up() {
 		parent::set_up();
 
 		// Stand in for the theme's `parts/` files so the tests don't depend on the active theme.
 		add_filter( 'pre_get_block_file_template', array( $this, 'filter_pre_get_block_file_template' ), 10, 3 );
+	}
+
+	public function tear_down() {
+		remove_filter( 'pre_get_block_file_template', array( $this, 'filter_pre_get_block_file_template' ), 10 );
+
+		if ( $this->get_the_terms_filter ) {
+			remove_filter( 'get_the_terms', $this->get_the_terms_filter, 10 );
+			$this->get_the_terms_filter = null;
+		}
+
+		parent::tear_down();
 	}
 
 	public function filter_pre_get_block_file_template( $block_template, $id, $template_type ) {
@@ -67,14 +85,10 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	 * @param mixed $value The value to return.
 	 */
 	private function filter_wp_theme_terms( $value ) {
-		add_filter(
-			'get_the_terms',
-			static function ( $terms, $post_id, $taxonomy ) use ( $value ) {
-				return 'wp_theme' === $taxonomy ? $value : $terms;
-			},
-			10,
-			3
-		);
+		$this->get_the_terms_filter = static function ( $terms, $post_id, $taxonomy ) use ( $value ) {
+			return 'wp_theme' === $taxonomy ? $value : $terms;
+		};
+		add_filter( 'get_the_terms', $this->get_the_terms_filter, 10, 3 );
 	}
 
 	public function test_renders_customized_template_part_from_post() {
