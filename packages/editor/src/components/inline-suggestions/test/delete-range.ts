@@ -37,6 +37,22 @@ describe( 'computeDeleteRange', () => {
 		} );
 	} );
 
+	describe( 'surrogate pairs', () => {
+		const emoji = 'a\u{1F600}b';
+
+		it( 'marks a whole emoji before the caret (backward)', () => {
+			expect(
+				computeDeleteRange( emoji, 3, 'deleteContentBackward' )
+			).toEqual( { start: 1, end: 3 } );
+		} );
+
+		it( 'marks a whole emoji after the caret (forward)', () => {
+			expect(
+				computeDeleteRange( emoji, 1, 'deleteContentForward' )
+			).toEqual( { start: 1, end: 3 } );
+		} );
+	} );
+
 	describe( 'word', () => {
 		it( 'marks the word before the caret', () => {
 			// caret after "Hello world" (11) -> back over "world" (the word,
