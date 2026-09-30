@@ -6,6 +6,10 @@
 
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 
+### Bug Fixes
+
+-   Undo and redo stopped working for entities that real-time collaboration does not sync, such as a post type excluded from collaboration, while a synced entity is loaded in the same editor. core-data's undo manager now stays in charge for every entity and delegates to the sync manager only for synced entities ([#80722](https://github.com/WordPress/gutenberg/issues/80722)).
+
 ### Internal
 
 -   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).

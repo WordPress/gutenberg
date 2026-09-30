@@ -4,7 +4,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '..';
-import { editMediaEntity, setCollaborationSupported } from '../private-actions';
+import {
+	editMediaEntity,
+	setCollaborationSupported,
+	recordSyncUndoLevel,
+} from '../private-actions';
 import { getEntitySyncManager } from '../entity-sync';
 import { unlock } from '../lock-unlock';
 
@@ -225,9 +229,7 @@ describe( 'setCollaborationSupported', () => {
 		const syncManager = {
 			unloadAll: vi.fn(),
 		};
-		const dispatch = Object.assign( vi.fn(), {
-			__unstableNotifySyncUndoManagerChange: vi.fn(),
-		} );
+		const dispatch = vi.fn();
 		getEntitySyncManager.mockReturnValue( syncManager );
 
 		setCollaborationSupported( false )( { dispatch } );
@@ -237,11 +239,23 @@ describe( 'setCollaborationSupported', () => {
 			supported: false,
 		} );
 		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).toHaveBeenCalledWith( {
-			hasUndo: false,
-			hasRedo: false,
+	} );
+} );
+
+describe( 'recordSyncUndoLevel', () => {
+	it( 'adds a level to the undo manager and changes state', () => {
+		const undoManager = { addRecord: vi.fn() };
+		const select = { getUndoManager: () => undoManager };
+		const dispatch = vi.fn();
+
+		recordSyncUndoLevel()( { select, dispatch } );
+
+		expect( undoManager.addRecord ).toHaveBeenCalledTimes( 1 );
+		const [ record ] = undoManager.addRecord.mock.calls[ 0 ];
+		expect( record ).toHaveLength( 1 );
+		expect( record[ 0 ].id ).toEqual( expect.any( String ) );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'RECORD_SYNC_UNDO_LEVEL',
 		} );
 	} );
 } );

@@ -10,6 +10,7 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 			getEntitySnapshot: vi.fn(),
 			createPersistedCRDTDoc: vi.fn(),
 			undoManager: undefined,
+			isLoaded: vi.fn(),
 		};
 		return {
 			mockSyncManager: manager,
@@ -208,7 +209,7 @@ describe( 'the default entity sync manager', () => {
 				editRecord: vi.fn(),
 				getEditedRecord: vi.fn(),
 				refetchRecord: vi.fn(),
-				onUndoStackChange: vi.fn(),
+				onUndoLevelOpened: vi.fn(),
 			};
 
 			manager.load( 'postType', 'post', 1, record, handlers );
@@ -223,7 +224,7 @@ describe( 'the default entity sync manager', () => {
 					editRecord: handlers.editRecord,
 					getEditedRecord: handlers.getEditedRecord,
 					onStatusChange: expect.any( Function ),
-					onUndoStackChange: handlers.onUndoStackChange,
+					onUndoLevelOpened: handlers.onUndoLevelOpened,
 					persistCRDTDoc: expect.any( Function ),
 					refetchRecord: handlers.refetchRecord,
 					restoreUndoMeta: expect.any( Function ),
@@ -278,7 +279,7 @@ describe( 'the default entity sync manager', () => {
 						editRecord: vi.fn(),
 						getEditedRecord: vi.fn(),
 						refetchRecord: vi.fn(),
-						onUndoStackChange: vi.fn(),
+						onUndoLevelOpened: vi.fn(),
 					}
 				);
 				await mockSyncManager.load.mock.calls[ 0 ][ 4 ].persistCRDTDoc();
@@ -768,12 +769,35 @@ describe( 'the default entity sync manager', () => {
 			expect( mockSyncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'exposes the sync undo manager', () => {
-			expect( manager.undoManager ).toBeUndefined();
-
+		it( 'exposes the sync undo history only once a sync manager exists', async () => {
+			const { getSyncManager } = await import( '../sync' );
 			mockSyncManager.undoManager = { undo: vi.fn() };
 
-			expect( manager.undoManager ).toBe( mockSyncManager.undoManager );
+			expect( manager.undoHistory ).toBeUndefined();
+
+			getSyncManager();
+
+			expect( manager.undoHistory ).toBe( mockSyncManager.undoManager );
+		} );
+
+		it( 'reports a record as synced when the sync manager has it loaded', async () => {
+			const { getSyncManager } = await import( '../sync' );
+			mockSyncManager.isLoaded.mockReturnValue( true );
+
+			// Nothing is synced before a sync manager exists.
+			expect( manager.isSynced( 'postType', 'post', 1 ) ).toBe( false );
+			expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+
+			getSyncManager();
+
+			expect( manager.isSynced( 'postType', 'post', 1 ) ).toBe( true );
+			expect( mockSyncManager.isLoaded ).toHaveBeenCalledWith(
+				'postType/post',
+				1
+			);
+
+			mockSyncManager.isLoaded.mockReturnValue( false );
+			expect( manager.isSynced( 'postType', 'post', 2 ) ).toBe( false );
 		} );
 	} );
 } );

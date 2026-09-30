@@ -5,6 +5,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
+import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -171,13 +172,8 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-		const syncManager = getEntitySyncManager();
-		if ( ! supported && syncManager ) {
-			syncManager.unloadAll();
-			dispatch.__unstableNotifySyncUndoManagerChange( {
-				hasUndo: false,
-				hasRedo: false,
-			} );
+		if ( ! supported ) {
+			getEntitySyncManager()?.unloadAll();
 		}
 	};
 
@@ -200,22 +196,21 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
- * Returns an action object used to notify core-data that the sync undo manager
- * state changed outside of the core-data reducer, e.g. The Yjs UndoManager
- * captured an undo level.
- *
- * @param {Object}  state         The sync undo stack state.
- * @param {boolean} state.hasRedo Whether there are changes to redo.
- * @param {boolean} state.hasUndo Whether there are changes to undo.
- *
- * @return {Object} Action object.
+ * Records that the entity sync manager opened a new undo level for a record
+ * it syncs, so the level takes its place in core-data's undo history next to
+ * the edits core-data records itself. See `utils/sync-undo-levels.js`.
  */
-export function __unstableNotifySyncUndoManagerChange( state ) {
-	return {
-		type: 'SYNC_UNDO_MANAGER_CHANGE',
-		...state,
+export const recordSyncUndoLevel =
+	() =>
+	( { select, dispatch } ) => {
+		select.getUndoManager().addRecord( createSyncUndoLevelRecord() );
+
+		// The undo manager is a mutable object held in state, so change
+		// state for `hasUndo` and `hasRedo` to be read again. The sync
+		// manager reports levels outside of entity edits, for example after
+		// a deferred document update.
+		dispatch( { type: 'RECORD_SYNC_UNDO_LEVEL' } );
 	};
-}
 
 /**
  * Returns an action object used to set the sync connection status for an entity or collection.
