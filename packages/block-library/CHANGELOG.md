@@ -17,6 +17,7 @@
 -   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
+-   Latest Posts: Take the post title link's text decoration from its list item, so the decoration the block paints is the only one on the title. The link's own underline was drawn on top of it, which made "None" look like it did nothing and showed a strikethrough and an underline together ([#83350](https://github.com/WordPress/gutenberg/pull/83350)).
 
 ## 11.1.0 (2026-09-23)
 
