@@ -46,6 +46,20 @@
 	// The canvas draws the divider.
 	.editor-collab-sidebar-panel {
 		border-left: 0;
+		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
+		// No anchoring, so a thread that grows doesn't move the panel.
+		overflow-y: auto;
+		overflow-anchor: none;
+		scrollbar-width: none;
+
+		// Gives the panel the canvas's scroll range, whatever their heights.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			width: 1px;
+			height: calc(100% + var(--canvas-scroll-range, 0px));
+		}
 	}
 
 	// The margin spans the canvas scrollbar; shift the panel off it.
@@ -94,13 +108,12 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
-		// Inherits `--canvas-offset` and `--canvas-scroll` from the panel (set
-		// by `useFloatingBoard`) so each thread tracks the canvas frame and its
-		// scroll.
-		transform: translateY(calc(var(--canvas-offset, 0px) + var(--canvas-scroll, 0px)));
-		will-change: transform;
-		// Keep the reply input reachable when a thread is taller than the viewport
-		// (e.g. many replies on short content where the canvas can't scroll).
+		// Inherits `--canvas-offset` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas frame. The panel's scroll tracks the
+		// canvas scroll.
+		transform: translateY(var(--canvas-offset, 0px));
+		// Keep the reply input reachable when a thread is taller than the
+		// viewport (e.g. many replies).
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
 		overflow-y: auto;
 
