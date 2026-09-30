@@ -840,14 +840,10 @@ export function useSuggestionsProvider() {
 						clearOverlay( targetClientId );
 					}
 
-					createNotice(
-						'snackbar' as any,
-						__( 'Suggestion applied.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
+					createNotice( 'success', __( 'Suggestion applied.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
 				} catch ( error: any ) {
 					createNotice(
 						'error',
@@ -910,7 +906,7 @@ export function useSuggestionsProvider() {
 					{ throwOnError: true }
 				);
 
-				createNotice( 'snackbar' as any, __( 'Suggestion applied.' ), {
+				createNotice( 'success', __( 'Suggestion applied.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
@@ -1082,7 +1078,7 @@ export function useSuggestionsProvider() {
 					clearOverlayForComment( clientId, commentId );
 				}
 
-				createNotice( 'snackbar' as any, __( 'Suggestion rejected.' ), {
+				createNotice( 'success', __( 'Suggestion rejected.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
