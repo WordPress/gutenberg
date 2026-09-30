@@ -1051,24 +1051,6 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				/>
 			) }
-			{ hasTextColorEnabled && clipsToTextHere && (
-				<Notice
-					status="info"
-					isDismissible={ false }
-					className="block-editor-typography-panel__text-gradient-notice"
-				>
-					{ textGradientNotice }
-				</Notice>
-			) }
-			{ hasTextGradientEnabled && hasBlockBackground && (
-				<Notice
-					status="info"
-					isDismissible={ false }
-					className="block-editor-typography-panel__text-gradient-notice"
-				>
-					{ backgroundOverrideNotice }
-				</Notice>
-			) }
 			{ hasFontFamilyEnabled && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
@@ -1381,6 +1363,24 @@ export default function TypographyPanel( {
 						</div>
 					) }
 				</InheritanceToolsPanelItem>
+			) }
+			{ hasTextColorEnabled && clipsToTextHere && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-typography-panel__text-gradient-notice"
+				>
+					{ textGradientNotice }
+				</Notice>
+			) }
+			{ hasTextGradientEnabled && hasBlockBackground && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="block-editor-typography-panel__text-gradient-notice"
+				>
+					{ backgroundOverrideNotice }
+				</Notice>
 			) }
 		</Wrapper>
 	);
