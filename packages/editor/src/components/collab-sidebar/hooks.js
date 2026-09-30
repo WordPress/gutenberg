@@ -211,6 +211,11 @@ function applyReactionDelta( note, emoji, addedReactionId ) {
 	const entry = summary[ emoji ];
 
 	if ( addedReactionId ) {
+		// Concurrent adds converge server-side on one surviving row, so a
+		// repeated ID is already counted.
+		if ( entry?.my_reaction_id === addedReactionId ) {
+			return note;
+		}
 		summary[ emoji ] = {
 			count: ( entry?.count || 0 ) + 1,
 			reacted: true,

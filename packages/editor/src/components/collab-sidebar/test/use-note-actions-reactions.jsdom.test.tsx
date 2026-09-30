@@ -69,6 +69,49 @@ describe( 'useNoteActions onToggleReaction', () => {
 		mockApiFetch.mockReset();
 	} );
 
+	it( 'counts concurrent adds that converge on one reaction once', async () => {
+		// The server dedupes concurrent inserts and returns the surviving
+		// row's ID to every request; the refreshes that would correct the
+		// count all fail.
+		actions.saveEntityRecord.mockResolvedValue( { id: 100 } );
+		mockApiFetch.mockRejectedValue( new Error( 'offline' ) );
+
+		const { result } = renderHook( () => useNoteActions( {} ) );
+
+		await act( async () => {
+			await Promise.all( [
+				result.current.onToggleReaction( {
+					commentId: 7,
+					emoji: 'heart',
+				} ),
+				result.current.onToggleReaction( {
+					commentId: 7,
+					emoji: 'heart',
+				} ),
+			] );
+		} );
+
+		expect( records.get( 7 )?.reaction_summary ).toEqual( {
+			heart: { count: 1, reacted: true, my_reaction_id: 100 },
+		} );
+
+		// Removing the one surviving reaction leaves no phantom count.
+		const { result: after } = renderHook( () =>
+			useNoteActions( { 7: records.get( 7 )!.reaction_summary } )
+		);
+		await act( async () => {
+			await after.current.onToggleReaction( {
+				commentId: 7,
+				emoji: 'heart',
+			} );
+		} );
+
+		expect( records.get( 7 )?.reaction_summary ).toEqual( {} );
+		actions.saveEntityRecord.mockImplementation( async () => ( {
+			id: nextReactionId++,
+		} ) );
+	} );
+
 	it( 'ignores a refresh that a newer reaction has overtaken', async () => {
 		const heartRefresh = deferred< unknown >();
 		const rocketRefresh = deferred< unknown >();
