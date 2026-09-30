@@ -272,17 +272,20 @@ function StyleBook(
 	);
 	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
 
-	const settings = useMemo(
-		() => ( {
+	const settings = useMemo( () => {
+		const nonGlobalStyles = ( originalSettings.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
+		return {
 			...originalSettings,
 			styles:
 				! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
-					? globalStyles
+					? [ ...nonGlobalStyles, ...globalStyles ]
 					: originalSettings.styles,
 			isPreviewMode: true,
-		} ),
-		[ globalStyles, originalSettings, userConfig ]
-	);
+		};
+	}, [ globalStyles, originalSettings, userConfig ] );
 
 	return (
 		<div
