@@ -939,6 +939,20 @@ describe( 'marker attributes', () => {
 		expect( result.rejected ).toMatch( /needs both/ );
 	} );
 
+	/* Enterprise Server serves Actions over http when TLS is off. */
+	it( 'keeps a run link from an enterprise host without TLS', () => {
+		const runUrl = 'http://ghes.example/actions/runs/1';
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
+	} );
+
 	it.each( [
 		[ 'a space', 'https://example.com/a b' ],
 		[ 'a closing bracket', 'https://example.com/a>b' ],

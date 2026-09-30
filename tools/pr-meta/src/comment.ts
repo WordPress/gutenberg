@@ -221,7 +221,8 @@ const MAX_RUN_URL = 256;
  * previous revision wrote.
  */
 const SHA = /^[0-9a-f]{7,40}$/;
-const RUN_URL = /^https:\/\/[^\s>]+$/;
+/* `http` too: Enterprise Server serves Actions over it when TLS is off. */
+const RUN_URL = /^https?:\/\/[^\s>]+$/;
 
 function safeSha( value?: string ): string | undefined {
 	return value && SHA.test( value ) ? value : undefined;
