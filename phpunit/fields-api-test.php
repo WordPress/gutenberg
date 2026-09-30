@@ -23,7 +23,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'scheduled_date', 'status' );
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status' );
 
 	/**
 	 * The ids of the default fields about publishing a post, which the
@@ -31,7 +31,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const PUBLISHING_FIELDS = array( 'date', 'scheduled_date', 'status' );
+	const PUBLISHING_FIELDS = array( 'date', 'password', 'scheduled_date', 'status' );
 
 	/**
 	 * The callbacks a test hooked to `fields_api_init`, as callback and
@@ -555,6 +555,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		return array(
 			'date'             => array( 'date', true ),
 			'last_edited_date' => array( 'last_edited_date', false ),
+			'password'         => array( 'password', true ),
 			'scheduled_date'   => array( 'scheduled_date', true ),
 			'status'           => array( 'status', true ),
 		);
