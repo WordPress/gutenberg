@@ -16,16 +16,13 @@ const headingStyle: CSSProperties = {
 	marginBlock: '0 12px',
 };
 
-const detailStyle: CSSProperties = {
-	color: 'var(--wpds-color-foreground-content-neutral-weak)',
-	whiteSpace: 'nowrap',
-};
-
 const avatarStyle: CSSProperties = {
 	background: 'var(--wpds-color-background-interactive-brand-strong)',
 	borderRadius: '50%',
-	flexShrink: 0,
+	display: 'inline-block',
 	height: 16,
+	marginInlineEnd: 8,
+	verticalAlign: 'middle',
 	width: 16,
 };
 
@@ -60,30 +57,42 @@ function RichItemLayouts() {
 					<Combobox.Input aria-label="Filter Combobox items" />
 					<Combobox.List>
 						<Combobox.ListBody>
-							<Combobox.Item value="Apple">Apple</Combobox.Item>
-							<Combobox.Item value="Banana">Banana</Combobox.Item>
+							<Combobox.Item value="Apple">
+								<Combobox.ItemLabel>Apple</Combobox.ItemLabel>
+							</Combobox.Item>
+							<Combobox.Item value="Banana">
+								<Combobox.ItemLabel>Banana</Combobox.ItemLabel>
+							</Combobox.Item>
 							<Combobox.Item value="Blackberry">
-								<span>Blackberry</span>
-								<span style={ detailStyle }>99 in stock</span>
+								<Combobox.ItemLabel>
+									Blackberry
+								</Combobox.ItemLabel>
+								<Combobox.ItemDescription>
+									99 in stock
+								</Combobox.ItemDescription>
 							</Combobox.Item>
 							<Combobox.Item value="Blueberry">
-								<span
-									style={ avatarStyle }
-									aria-hidden="true"
-								/>
-								<span>Blueberry with a leading avatar</span>
+								<Combobox.ItemLabel>
+									<span
+										style={ avatarStyle }
+										aria-hidden="true"
+									/>
+									Blueberry with a leading avatar
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 							<Combobox.Item value="Pineapple">
-								<span>
+								<Combobox.ItemLabel>
 									Pineapple with a long label that wraps onto
 									a second line in a narrow popup
-								</span>
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 							<Combobox.Item
 								value="Create fruit"
 								variant="creatable"
 							>
-								Create fruit
+								<Combobox.ItemLabel>
+									Create fruit
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						</Combobox.ListBody>
 					</Combobox.List>
@@ -96,26 +105,38 @@ function RichItemLayouts() {
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
 							<Autocomplete.Item value="Apple">
-								Apple
+								<Autocomplete.ItemLabel>
+									Apple
+								</Autocomplete.ItemLabel>
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Apricot">
-								<span>Apricot</span>
-								<span style={ detailStyle }>12 in stock</span>
+								<Autocomplete.ItemLabel>
+									Apricot
+								</Autocomplete.ItemLabel>
+								<Autocomplete.ItemDescription>
+									12 in stock
+								</Autocomplete.ItemDescription>
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Avocado">
-								<span
-									style={ avatarStyle }
-									aria-hidden="true"
-								/>
-								<span>Avocado with a leading avatar</span>
+								<Autocomplete.ItemLabel>
+									<span
+										style={ avatarStyle }
+										aria-hidden="true"
+									/>
+									Avocado with a leading avatar
+								</Autocomplete.ItemLabel>
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Blackberry">
-								<strong>Black</strong>
-								<span>berry</span>
+								<Autocomplete.ItemLabel>
+									<strong>Black</strong>
+									<span>berry</span>
+								</Autocomplete.ItemLabel>
 							</Autocomplete.Item>
 							<Autocomplete.Item value="Pineapple">
-								Pineapple with a long label that wraps onto a
-								second line in a narrow popup
+								<Autocomplete.ItemLabel>
+									Pineapple with a long label that wraps onto
+									a second line in a narrow popup
+								</Autocomplete.ItemLabel>
 							</Autocomplete.Item>
 						</Autocomplete.ListBody>
 					</Autocomplete.List>
