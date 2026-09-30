@@ -106,7 +106,6 @@ describe( 'Meter', () => {
 					<Meter.Indicator
 						ref={ indicatorRef }
 						tone="brand"
-						color="red"
 						render={ <div data-custom="indicator" /> }
 					/>
 				</Meter.Track>
@@ -132,6 +131,5 @@ describe( 'Meter', () => {
 			expect( ref.current ).toHaveAttribute( 'data-custom', name );
 		}
 		expect( indicatorRef.current ).not.toHaveAttribute( 'tone' );
-		expect( indicatorRef.current ).not.toHaveAttribute( 'color' );
 	} );
 } );

@@ -182,51 +182,6 @@ describe( 'Meter', () => {
 		);
 	} );
 
-	it( 'applies tone and custom color to the bar', async () => {
-		const Example = ( { color }: { color?: string } ) => (
-			<Meter.Root value={ 60 } style={ { color: 'rgb(0, 128, 0)' } }>
-				<Meter.Label>Storage used</Meter.Label>
-				<Meter.Value />
-				<Meter.Track data-testid="track">
-					<Meter.Indicator
-						tone="brand"
-						color={ color }
-						style={ { opacity: 0.8 } }
-						data-testid="indicator"
-					/>
-				</Meter.Track>
-			</Meter.Root>
-		);
-		const { rerender } = await render( <Example /> );
-		const track = screen.getByTestId( 'track' );
-		const indicator = screen.getByTestId( 'indicator' );
-		const label = screen.getByText( 'Storage used' );
-		const value = screen.getByText( '60%' );
-		const trackColor = getComputedStyle( track ).backgroundColor;
-		const labelColor = getComputedStyle( label ).color;
-		const valueColor = getComputedStyle( value ).color;
-		const brandColor = getComputedStyle( indicator ).backgroundColor;
-		expect( getComputedStyle( track ).height ).toBe( '8px' );
-
-		await rerender( <Example color="rgb(139, 47, 201)" /> );
-		expect( getComputedStyle( indicator ).backgroundColor ).toBe(
-			'rgb(139, 47, 201)'
-		);
-		expect( getComputedStyle( indicator ).opacity ).toBe( '0.8' );
-		expect( getComputedStyle( track ).backgroundColor ).toBe( trackColor );
-		expect( getComputedStyle( label ).color ).toBe( labelColor );
-		expect( getComputedStyle( value ).color ).toBe( valueColor );
-
-		await rerender( <Example color="currentColor" /> );
-		expect( getComputedStyle( indicator ).backgroundColor ).toBe(
-			'rgb(0, 128, 0)'
-		);
-
-		await rerender( <Example /> );
-		expect( getComputedStyle( indicator ).backgroundColor ).toBe(
-			brandColor
-		);
-	} );
 	it( 'fills from the inline start in RTL', async () => {
 		await render(
 			<Meter.Root value={ 25 } aria-label="Storage used" dir="rtl">

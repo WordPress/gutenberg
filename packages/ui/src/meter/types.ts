@@ -20,18 +20,11 @@ export type IndicatorProps = Omit<
 	'color'
 > & {
 	/**
-	 * The color intent of the filled indicator. Overridden by `color`.
+	 * The color tone of the filled indicator.
 	 *
 	 * @default "neutral"
 	 */
 	tone?: 'neutral' | 'brand';
-
-	/**
-	 * The filled indicator color, overriding `tone`. Accepts any CSS color value,
-	 * including `currentColor` to inherit the surrounding text color.
-	 * The track, label, and value keep their own colors.
-	 */
-	color?: string;
 };
 
 export type LabelProps = ComponentProps< typeof _Meter.Label > & {
