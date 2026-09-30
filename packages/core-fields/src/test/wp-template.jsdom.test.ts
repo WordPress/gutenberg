@@ -7,6 +7,9 @@ describe( 'wp_template', () => {
 			'author',
 			'description',
 			'description_readonly',
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
 			'title',
 		] );
 	} );
