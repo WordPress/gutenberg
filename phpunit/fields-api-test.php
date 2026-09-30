@@ -31,7 +31,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const PUBLISHING_FIELDS = array( 'date', 'password', 'scheduled_date', 'status' );
+	const PUBLISHING_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status' );
 
 	/**
 	 * The callbacks a test hooked to `fields_api_init`, as callback and
@@ -769,7 +769,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'discussion' ), self::get_support_field_ids( 'gutenberg_book' ) );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), self::without_every_post_type_fields( $calls['gutenberg_book'] ), 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'sticky' ), self::without_every_post_type_fields( $calls['post'] ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'slug', 'sticky' ), self::without_every_post_type_fields( $calls['post'] ) );
 		$this->assertSame( self::EVERY_POST_TYPE_FIELDS, $calls['gutenberg_plain'], 'A post type supporting nothing gets the defaults of every post type.' );
 	}
 
@@ -801,6 +801,35 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_template_parts_do_not_get_the_default_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
 		$this->assertSame( array(), self::get_support_field_ids( 'wp_template_part' ) );
+	}
+
+	/**
+	 * The slug field is registered on the viewable post types, which have a
+	 * permalink, but for the design ones.
+	 */
+	public function test_the_viewable_post_types_get_the_slug_field() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'public'       => true,
+				'show_in_rest' => true,
+			)
+		);
+		register_post_type(
+			'gutenberg_note',
+			array(
+				'public'       => false,
+				'show_in_rest' => true,
+			)
+		);
+		$this->post_types[] = 'gutenberg_book';
+		$this->post_types[] = 'gutenberg_note';
+		self::reset_registry();
+
+		$this->assertContains( 'slug', array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertNotContains( 'slug', array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'A post type that is not viewable has no permalink.' );
+		$this->assertContains( 'slug', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'slug', array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), 'id' ) );
 	}
 
 	/**
