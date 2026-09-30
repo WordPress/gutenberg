@@ -1,0 +1,16 @@
+/*
+ * The image and the placeholder of the view, laid out by the grid cell they
+ * fill.
+ */
+.image,
+.placeholder {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: var(--wpds-border-radius-md);
+}
+
+.placeholder {
+	box-shadow: none;
+	background: var(--wpds-color-background-surface-neutral-weak);
+}

@@ -18,6 +18,7 @@ import { fieldExtensions as author } from './author/field';
 import { fieldExtensions as date } from './date/field';
 import { fieldExtensions as discussion } from './discussion/field';
 import { fieldExtensions as excerpt } from './excerpt/field';
+import { fieldExtensions as featuredMedia } from './featured_media/field';
 import { fieldExtensions as lastEditedDate } from './last_edited_date/field';
 import { fieldExtensions as parent } from './parent/field';
 import { fieldExtensions as password } from './password/field';
@@ -35,6 +36,7 @@ const fields: FieldsScriptParts = {
 	date,
 	discussion,
 	excerpt,
+	featured_media: featuredMedia,
 	last_edited_date: lastEditedDate,
 	parent,
 	password,

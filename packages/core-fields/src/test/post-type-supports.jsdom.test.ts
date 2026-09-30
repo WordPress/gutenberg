@@ -8,6 +8,7 @@ describe( 'post_type_supports', () => {
 			'date',
 			'discussion',
 			'excerpt',
+			'featured_media',
 			'last_edited_date',
 			'parent',
 			'password',
@@ -152,6 +153,16 @@ describe( 'post_type_supports', () => {
 		expect( postTypeSupports.parent ).toEqual( {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
+		} );
+	} );
+
+	it( 'stores the removal of the featured image as no media', () => {
+		const { setValue } = postTypeSupports.featured_media;
+		expect( setValue?.( { item: {}, value: 7 } ) ).toEqual( {
+			featured_media: 7,
+		} );
+		expect( setValue?.( { item: {}, value: undefined } ) ).toEqual( {
+			featured_media: 0,
 		} );
 	} );
 

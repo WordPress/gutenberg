@@ -26,6 +26,8 @@
  * - `date`, for every post type but the design ones.
  * - `discussion`, for the post types supporting `comments` or `trackbacks`.
  * - `excerpt`, for the post types supporting `excerpt`.
+ * - `featured_media`, for the post types supporting `thumbnail` when the
+ *   theme supports post thumbnails for them.
  * - `format`, for the post types supporting `post-formats` when the theme
  *   supports post formats.
  * - `last_edited_date`, for every post type.
@@ -68,6 +70,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'date'              => true,
 			'discussion'        => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
 			'excerpt'           => post_type_supports( $post_type, 'excerpt' ),
+			'featured_media'    => post_type_supports( $post_type, 'thumbnail' ) && current_theme_supports( 'post-thumbnails', $post_type ),
 			'format'            => post_type_supports( $post_type, 'post-formats' ) && current_theme_supports( 'post-formats' ),
 			'last_edited_date'  => true,
 			'notesCount'        => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
