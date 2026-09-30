@@ -8,10 +8,10 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
-	findSuggestionRange,
 } from './format';
 import {
 	buildSuggestionMarkerAttributes,
+	findAdditionRange,
 	formatsAdditionRunToExtend,
 	insertInlineAddition,
 	growInlineAddition,
@@ -568,7 +568,7 @@ export function applyEditPlan(
 				break;
 			}
 			case 'grow-add': {
-				const range = findSuggestionRange( result, action.id! );
+				const range = findAdditionRange( result, action.id! );
 				if ( ! range ) {
 					break;
 				}

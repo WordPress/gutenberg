@@ -16,7 +16,12 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
-import { findSuggestionText } from '../inline-suggestions';
+import {
+	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_DELETION,
+	SUGGESTION_TYPE_REPLACEMENT,
+	findSuggestionText,
+} from '../inline-suggestions';
 
 const EMPTY_ARRAY: Array< string | null > = [];
 
@@ -263,24 +268,53 @@ function ResolvedSuggestionSummary( {
 			if ( ! attributes ) {
 				return EMPTY_ARRAY;
 			}
-			return operations.map( ( op: any ) =>
-				op.type !== 'inline-suggestion' || ! op.attribute || op.text
-					? null
-					: findSuggestionText(
-							attributes[ op.attribute ],
-							thread.id
-						)
-			);
+			/*
+			 * Two entries per op, kept flat so the comparison stays per
+			 * string: the text the op proposes, then (for a replacement,
+			 * whose one id also marks the replaced run) the replaced text.
+			 */
+			return operations.flatMap( ( op: any ) => {
+				if (
+					op.type !== 'inline-suggestion' ||
+					! op.attribute ||
+					op.text
+				) {
+					return [ null, null ];
+				}
+				const value = attributes[ op.attribute ];
+				if ( op.suggestionType === SUGGESTION_TYPE_REPLACEMENT ) {
+					return [
+						findSuggestionText(
+							value,
+							thread.id,
+							SUGGESTION_TYPE_ADDITION
+						),
+						findSuggestionText(
+							value,
+							thread.id,
+							SUGGESTION_TYPE_DELETION
+						),
+					];
+				}
+				return [ findSuggestionText( value, thread.id ), null ];
+			} );
 		},
 		[ operations, thread?.blockClientId, thread?.id ]
 	);
 	const resolvedOperations = useMemo(
 		() =>
-			operations.map( ( op: any, index: number ) =>
-				markerTexts[ index ]
-					? { ...op, text: markerTexts[ index ] }
-					: op
-			),
+			operations.map( ( op: any, index: number ) => {
+				const text = markerTexts[ index * 2 ];
+				const deletedText = markerTexts[ index * 2 + 1 ];
+				if ( ! text && ! deletedText ) {
+					return op;
+				}
+				return {
+					...op,
+					...( text && { text } ),
+					...( deletedText && { deletedText } ),
+				};
+			} ),
 		[ operations, markerTexts ]
 	);
 

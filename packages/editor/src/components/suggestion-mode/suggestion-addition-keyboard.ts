@@ -15,6 +15,7 @@ import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
+	SUGGESTION_TYPE_REPLACEMENT,
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
@@ -148,9 +149,9 @@ function readInlinePasteHTML(
  *   back inside a pending addition of the author's own grows that marker the
  *   same way, wherever the caret sits in it, so one proposal stays one marker
  *   and one note.
- * - Type-over (entering text with a non-collapsed selection) proposes deleting
- *   the selected text (a `del` marker) and adds the replacement (an `add` run
- *   at the selection end), as two independent notes.
+ * - Type-over (entering text with a non-collapsed selection) is one
+ *   replacement note: an `add` run for the new text at the selection start,
+ *   then a `del` run over the selected text, both keyed to the same note.
  * - A simple single-line paste is handled on the `paste` event (capture phase,
  *   ahead of the editor's own paste pipeline) and inserted exactly like typed
  *   text; over a selection it is a type-over. Multi-line / block-level paste is
@@ -247,11 +248,11 @@ export default function SuggestionAdditionKeyboard() {
 		[ createSuggestion, getBlockName ]
 	);
 
-	// Start a fresh addition run: open the note(s), write the marker(s), and
+	// Start a fresh addition run: open the note, write the marker(s), and
 	// flush any characters buffered while the request was in flight. A
-	// non-collapsed range is a type-over (propose deleting the selected text,
-	// then add the replacement at the selection end); a collapsed range is a
-	// plain insertion. The run stays open so contiguous typing can grow it.
+	// non-collapsed range is a type-over (the replacement at the selection
+	// start, the selected text marked for deletion after it); a collapsed range
+	// is a plain insertion. The run stays open so contiguous typing can grow it.
 	const beginInsertion = useCallback(
 		async (
 			clientId: string,
@@ -261,14 +262,19 @@ export default function SuggestionAdditionKeyboard() {
 			segment: RunSegment
 		) => {
 			const isTypeOver = start !== end;
-			const markerStart = isTypeOver ? end : start;
+			/*
+			 * The proposed text goes at the selection start, ahead of the
+			 * replaced text, as Google Docs places it: the caret then sits
+			 * right after the new text, so Backspace corrects it rather than
+			 * reaching the struck-through run.
+			 */
 			const run: AdditionRun = {
 				clientId,
 				attributeKey,
 				id: null,
-				start: markerStart,
-				end: markerStart,
-				caret: markerStart,
+				start,
+				end: start,
+				caret: start,
 				pending: [ segment ],
 			};
 			runRef.current = run;
@@ -315,60 +321,45 @@ export default function SuggestionAdditionKeyboard() {
 				}
 				cleanupAbandonedNotes( clientId, ids );
 			};
-			let delId: any = null;
-			let addId: any = null;
+			let id: any = null;
 			try {
-				if ( isTypeOver ) {
-					delId = await openInlineNote(
-						clientId,
-						attributeKey,
-						SUGGESTION_TYPE_DELETION
-					);
-					if ( runRef.current !== run ) {
-						abandon( delId );
-						return;
-					}
-					if ( ! delId || ! caretStillAnchored() ) {
-						abandon( delId );
-						return;
-					}
-				}
-
-				addId = await openInlineNote(
+				/*
+				 * A type-over is ONE suggestion: its `add` and `del` runs
+				 * carry the same note id, so the sidebar shows a single
+				 * "Replace" note and accept/reject resolve both halves.
+				 */
+				id = await openInlineNote(
 					clientId,
 					attributeKey,
-					SUGGESTION_TYPE_ADDITION
+					isTypeOver
+						? SUGGESTION_TYPE_REPLACEMENT
+						: SUGGESTION_TYPE_ADDITION
 				);
 				// The run may have been abandoned (mode change) or the caret
 				// may have relocated while the request was in flight.
 				if ( runRef.current !== run ) {
-					abandon( delId, addId );
+					abandon( id );
 					return;
 				}
-				if ( ! addId || ! caretStillAnchored() ) {
-					abandon( delId, addId );
+				if ( ! id || ! caretStillAnchored() ) {
+					abandon( id );
 					return;
 				}
 				const buffered = mergeRunSegments( run.pending );
-				run.id = addId;
+				run.id = id;
 				run.pending = [];
 				/*
 				 * Compose the whole gesture into ONE content value — the `del`
 				 * marker over the replaced range plus the addition run — and
 				 * write it once. A type-over is a single user gesture, so it
-				 * must occupy a single undo level: written separately, Ctrl+Z
-				 * would peel off the addition but leave the deletion marker
-				 * behind.
+				 * must occupy a single undo level.
 				 */
 				let value = getBlockAttributes( clientId )?.[ attributeKey ];
 				if ( isTypeOver ) {
-					// Wrapping the selection in the `del` marker doesn't
-					// change the text length, so `markerStart` (the selection
-					// end) is still the insertion point for the replacement.
 					const deleted = wrapInlineMarker( value, {
 						formatType: SUGGESTION_FORMAT_NAME,
 						attributes: buildSuggestionMarkerAttributes( {
-							id: delId,
+							id,
 							type: SUGGESTION_TYPE_DELETION,
 							authorId,
 						} ),
@@ -383,7 +374,7 @@ export default function SuggestionAdditionKeyboard() {
 					text: buffered.text,
 					html: buffered.html,
 					attributes: buildSuggestionMarkerAttributes( {
-						id: addId,
+						id,
 						type: SUGGESTION_TYPE_ADDITION,
 						authorId,
 					} ),
@@ -395,9 +386,8 @@ export default function SuggestionAdditionKeyboard() {
 				commit( clientId, attributeKey, inserted, run.caret );
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure; drop
-				// the run so the next edit starts clean, and trash whichever
-				// half of a type-over did get its note.
-				abandon( delId, addId );
+				// the run so the next edit starts clean.
+				abandon( id );
 			}
 		},
 		[

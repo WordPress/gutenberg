@@ -461,14 +461,15 @@ function ellipsize( text: string, max: number = SUMMARY_MAX_CHARS ): string {
  * inline suggestion that adds or removes literal spaces (e.g. a single typed
  * space) is shown as-is rather than reduced to an empty quote.
  *
- * @param text Literal marker text.
+ * @param text  Literal marker text.
+ * @param [max] Length cap; defaults to `SUMMARY_MAX_CHARS`.
  * @return The text, truncated with an ellipsis when too long.
  */
-function clampText( text: string ): string {
-	if ( text.length <= SUMMARY_MAX_CHARS ) {
+function clampText( text: string, max: number = SUMMARY_MAX_CHARS ): string {
+	if ( text.length <= max ) {
 		return text;
 	}
-	return `${ text.slice( 0, SUMMARY_MAX_CHARS - 1 ) }…`;
+	return `${ text.slice( 0, max - 1 ) }…`;
 }
 
 /**
@@ -658,6 +659,42 @@ export function summarizeOperations(
 					} else {
 						attributeLabels.push( op.attribute );
 					}
+				}
+				continue;
+			}
+			/*
+			 * A type-over is one note owning both runs: quote the replaced
+			 * text and its replacement on one line, the way the word-diff
+			 * path reports a rewrite. Either side can be empty once the
+			 * author backspaced their new text away (or on a marker edited
+			 * away), which leaves a plain Add:/Delete:.
+			 */
+			if ( op.suggestionType === 'replace' ) {
+				const added = isTextLike( op.text ) ? op.text : '';
+				const removed = isTextLike( op.deletedText )
+					? op.deletedText
+					: '';
+				if ( added && removed ) {
+					lines.push( {
+						label: __( 'Replace:' ),
+						value: sprintf(
+							/* translators: 1: text being replaced. 2: proposed replacement text. */
+							__( '%1$s → %2$s' ),
+							presentText(
+								clampText( removed, REPLACE_SIDE_MAX_CHARS )
+							),
+							presentText(
+								clampText( added, REPLACE_SIDE_MAX_CHARS )
+							)
+						),
+					} );
+				} else if ( added || removed ) {
+					lines.push( {
+						label: added ? __( 'Add:' ) : __( 'Delete:' ),
+						value: presentText( clampText( added || removed ) ),
+					} );
+				} else {
+					attributeLabels.push( op.attribute );
 				}
 				continue;
 			}

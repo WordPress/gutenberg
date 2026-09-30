@@ -62,6 +62,37 @@ function carriesId(
 }
 
 /**
+ * Whether the marker with the given id in a character's format stack also
+ * carries every attribute value in `match`.
+ *
+ * @param stack       Formats applied to one character.
+ * @param formatType  Rich-text format type to match.
+ * @param idAttribute Marker attribute holding the id.
+ * @param target      Marker id, as a string.
+ * @param match       Attribute values to require; none means any marker.
+ * @return True when the marker matches.
+ */
+function matchesAttributes(
+	stack: any[] | undefined,
+	formatType: string,
+	idAttribute: string,
+	target: string,
+	match?: Record< string, string >
+): boolean {
+	if ( ! match ) {
+		return true;
+	}
+	return !! stack?.some(
+		( f: any ) =>
+			f.type === formatType &&
+			f.attributes?.[ idAttribute ] === target &&
+			Object.entries( match ).every(
+				( [ key, expected ] ) => f.attributes[ key ] === expected
+			)
+	);
+}
+
+/**
  * Find the character range of the marker matching `id` within an already-parsed
  * rich-text record.
  *
@@ -155,6 +186,9 @@ export function findMarkerRange(
  * @param options.idAttribute Marker attribute holding the id.
  * @param options.id          Marker id to search for.
  * @param options.quickReject Optional substring used to skip parsing when absent.
+ * @param options.match       Optional extra attribute values the marker must
+ *                            carry; quotes only the runs that match when one id
+ *                            spans markers of different kinds.
  * @return The marked text, or '' when no marker is found.
  */
 export function findMarkerText(
@@ -164,11 +198,13 @@ export function findMarkerText(
 		idAttribute = 'data-id',
 		id,
 		quickReject,
+		match,
 	}: {
 		formatType: string;
 		idAttribute?: string;
 		id: number | string | null | undefined;
 		quickReject?: string;
+		match?: Record< string, string >;
 	}
 ): string {
 	const record = parseMarkerValue( value, { id, quickReject } );
@@ -186,7 +222,14 @@ export function findMarkerText(
 	let text = '';
 	for ( let i = range.start; i < range.end; i++ ) {
 		if (
-			carriesId( record.formats[ i ], formatType, idAttribute, target )
+			carriesId( record.formats[ i ], formatType, idAttribute, target ) &&
+			matchesAttributes(
+				record.formats[ i ],
+				formatType,
+				idAttribute,
+				target,
+				match
+			)
 		) {
 			text += record.text[ i ];
 		}
