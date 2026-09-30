@@ -481,7 +481,7 @@
 @mixin link-reset {
 	&:focus {
 		color: var(--wp-admin-theme-color--rgb);
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
 		border-radius: variables.$radius-small;
 	}
 }
@@ -572,6 +572,10 @@
 }
 
 @mixin wordpress-admin-schemes() {
+	body.admin-color-fresh {
+		@include admin-scheme(#007cba);
+	}
+
 	body.admin-color-light {
 		@include admin-scheme(#007cba);
 	}
