@@ -10,13 +10,17 @@
 add_action(
 	'init',
 	static function () {
-		foreach ( array( 'current', 'alternative' ) as $name ) {
+		$templates = array(
+			'standard-page' => 'Standard page',
+			'landing-page'  => 'Landing page',
+		);
+		foreach ( $templates as $slug => $title ) {
 			register_block_template(
-				'gutenberg-test//filtered-' . $name,
+				'gutenberg-test//' . $slug,
 				array(
-					'title'      => 'Filtered ' . $name,
-					'content'    => '<!-- wp:paragraph --><p>Rendering filtered ' . $name . '</p><!-- /wp:paragraph --><!-- wp:post-content /-->',
-					'post_types' => array( 'post', 'page' ),
+					'title'      => $title,
+					'content'    => '<!-- wp:post-content /-->',
+					'post_types' => array( 'page' ),
 				)
 			);
 		}
@@ -26,34 +30,14 @@ add_action(
 add_filter(
 	'get_block_templates',
 	static function ( $templates, $query, $template_type ) {
-		if ( 'wp_template' !== $template_type || ! isset( $query['slug'], $query['post_type'] ) ) {
+		if (
+			'wp_template' !== $template_type ||
+			'page' !== ( $query['post_type'] ?? null ) ||
+			'landing-page' !== ( $query['slug'] ?? null )
+		) {
 			return $templates;
 		}
-		if ( 'filtered-empty' === $query['slug'] ) {
-			return array();
-		}
-		if ( 'filtered-choices' === $query['slug'] ) {
-			return array_values(
-				array_filter(
-					$templates,
-					static function ( $template ) {
-						return 'filtered-alternative' === $template->slug;
-					}
-				)
-			);
-		}
-		return $templates;
-	},
-	10,
-	3
-);
-
-add_action(
-	'wp_after_insert_post',
-	static function ( $post_id, $post, $update ) {
-		if ( ! $update && 'auto-draft' === $post->post_status && 'post' === $post->post_type && ! metadata_exists( 'post', $post_id, '_wp_page_template' ) ) {
-			update_post_meta( $post_id, '_wp_page_template', 'filtered-current' );
-		}
+		return wp_filter_object_list( $templates, array( 'slug' => 'landing-page' ) );
 	},
 	10,
 	3

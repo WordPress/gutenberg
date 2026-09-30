@@ -201,55 +201,78 @@ test.describe( 'Filtered template choices (DataForm inspector)', () => {
 	} );
 
 	for ( const context of EDITOR_CONTEXTS ) {
-		test( `preserves the active template and saves an alternative in the ${ context.name }`, async ( {
+		test( `shows only the extension template for the restricted page slug in the ${ context.name }`, async ( {
 			admin,
 			editor,
 			page,
 			requestUtils,
 		} ) => {
 			const post = await requestUtils.createPage( {
-				title: 'Filtered page',
-				slug: 'filtered-choices',
+				title: 'Landing page',
+				slug: 'landing-page',
 				status: 'publish',
-				template: 'filtered-current',
 			} );
 			await context.open(
 				{ admin },
 				{ postId: post.id, postType: 'page' }
 			);
 			const summary = await openPostSummary( { editor, page } );
-			await expect(
-				summary.getByText( 'Filtered current', { exact: true } )
-			).toBeVisible();
-			await summary
-				.getByRole( 'button', { name: 'Edit Template' } )
-				.click();
+			const control = summary.getByRole( 'button', {
+				name: 'Edit Template',
+			} );
+			await expect( control ).toHaveAccessibleDescription(
+				'Landing page'
+			);
+			await control.click();
 			const select = page.getByRole( 'combobox', { name: 'Template' } );
-			await expect( select ).toHaveValue( 'filtered-current' );
-			await expect(
-				select.getByRole( 'option', { name: 'Filtered current' } )
-			).toBeDisabled();
-			await select.selectOption( { label: 'Filtered alternative' } );
-			await page.keyboard.press( 'Escape' );
-			await context.save( { page, editor } );
+			await expect( select ).toHaveValue( 'landing-page' );
+			await expect( select.getByRole( 'option' ) ).toHaveText( [
+				'Landing page',
+			] );
+			await expect( select ).toBeDisabled();
+		} );
+
+		test( `switches from the assigned template when the page slug becomes restricted in the ${ context.name }`, async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPage( {
+				title: 'Regular page',
+				slug: 'regular-page',
+				status: 'publish',
+				template: 'standard-page',
+			} );
 			await context.open(
 				{ admin },
 				{ postId: post.id, postType: 'page' }
 			);
-			const reopened = await openPostSummary( { editor, page } );
-			await expect(
-				reopened.getByText( 'Filtered alternative', { exact: true } )
-			).toBeVisible();
-			const saved = await requestUtils.rest( {
-				path: `/wp/v2/pages/${ post.id }`,
+			const summary = await openPostSummary( { editor, page } );
+			const control = summary.getByRole( 'button', {
+				name: 'Edit Template',
 			} );
-			expect( saved.template ).toBe( 'filtered-alternative' );
-			await page.goto( `?page_id=${ post.id }` );
-			await expect(
-				page.getByText( 'Rendering filtered alternative', {
-					exact: true,
-				} )
-			).toBeVisible();
+			await expect( control ).toHaveAccessibleDescription(
+				'Standard page'
+			);
+
+			await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'Link', exact: true } )
+				.fill( 'landing-page' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Escape' );
+
+			await expect( control ).toHaveAccessibleDescription(
+				'Landing page'
+			);
+			await control.click();
+			const select = page.getByRole( 'combobox', { name: 'Template' } );
+			await expect( select ).toHaveValue( 'landing-page' );
+			await expect( select.getByRole( 'option' ) ).toHaveText( [
+				'Landing page',
+			] );
+			await expect( select ).toBeDisabled();
 		} );
 	}
 } );
