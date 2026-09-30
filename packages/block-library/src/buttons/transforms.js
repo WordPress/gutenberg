@@ -44,9 +44,10 @@ const transforms = {
 							...getTransformedAttributes(
 								attributes,
 								'core/button',
-								( { content: contentBinding } ) => ( {
-									text: contentBinding,
-								} )
+								( { content: contentBinding } ) =>
+									contentBinding
+										? { text: contentBinding }
+										: undefined
 							),
 							text,
 							url,

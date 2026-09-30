@@ -81,10 +81,14 @@ export function hasPatternOverridesDefaultBinding(
  */
 export function replacePatternOverridesDefaultBinding(
 	bindings: Bindings | undefined | null,
-	supportedAttributes: string[]
+	supportedAttributes: string[] | undefined | null
 ) {
 	// The `__default` binding currently only works for pattern overrides.
 	if ( ! hasPatternOverridesDefaultBinding( bindings ) ) {
+		return bindings;
+	}
+
+	if ( ! supportedAttributes || ! Array.isArray( supportedAttributes ) ) {
 		return bindings;
 	}
 
