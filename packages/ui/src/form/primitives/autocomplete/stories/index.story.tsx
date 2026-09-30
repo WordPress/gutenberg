@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
@@ -39,6 +39,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.ItemLabel': Autocomplete.ItemLabel,
 		'Autocomplete.ItemDescription': Autocomplete.ItemDescription,
 		'Autocomplete.Row': Autocomplete.Row,
+		'Autocomplete.Separator': Autocomplete.Separator,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
 		'Autocomplete.Status': Autocomplete.Status,
@@ -609,6 +610,43 @@ export const Grouped: Story = {
 										) }
 									</Autocomplete.Collection>
 								</Autocomplete.Group>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Autocomplete.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...COMMANDS.slice( 0, 3 ), { id: 'help', value: 'Get help' } ],
+		openOnInputClick: true,
+		children: [
+			<Autocomplete.Input
+				aria-label="Command"
+				placeholder="Type a command"
+				key="input"
+			/>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.id }>
+									{ item.id === 'help' && index > 0 && (
+										<Autocomplete.Separator />
+									) }
+									<Autocomplete.Item value={ item }>
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
+									</Autocomplete.Item>
+								</Fragment>
 							) }
 						</Autocomplete.Collection>
 					</Autocomplete.ListBody>

@@ -447,6 +447,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		 */
 		let mayClaimEmptySlot = getActiveComplementaryArea( 'core' ) !== null;
 
+		// Hiding the complementary area only changes the preferences store.
 		const unsubscribe = registry.subscribe( () => {
 			// Returns `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) !== null ) {
