@@ -14,6 +14,10 @@
 -   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
 -   Fix style edits applied to a multi-block selection overwriting each block's other styles. Only the changed values are now applied to every selected block, so distinct styles are preserved and resets propagate to the whole selection ([#80070](https://github.com/WordPress/gutenberg/pull/80070)).
 
+### Internal
+
+-   Apply the disabled state to block binding menu triggers instead of their roots ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+
 ## 18.0.0 (2026-09-23)
 
 ### Breaking Changes
