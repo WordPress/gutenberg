@@ -1,0 +1,36 @@
+name: PR Playground Preview - Build
+
+# Use pull_request for untrusted code with read-only permissions
+# No access to secrets, no write permissions
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  build-plugin-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Explicitly disable credential persistence for security
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Build Gutenberg plugin zip
+        env:
+          NO_CHECKS: 1
+        run: npm run build:plugin-zip
+
+      - name: Upload Gutenberg plugin zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: gutenberg-plugin-zip-pr${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: gutenberg.zip
+          if-no-files-found: error
