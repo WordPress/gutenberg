@@ -18,7 +18,6 @@
 		{ "path": "../../packages/editor/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/fields/tsconfig.build.json" },
-		{ "path": "../../packages/fields-loader/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/route" },

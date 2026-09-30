@@ -2,7 +2,6 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { loadFields } from '@wordpress/fields-loader';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
@@ -20,13 +19,6 @@ export const route = {
 		) {
 			throw notFound();
 		}
-	},
-	loader: async () => {
-		// Warm up the fields the stage renders. A failure is reported by the stage.
-		await loadFields( {
-			kind: 'postType',
-			name: 'wp_template_part',
-		} ).catch( () => {} );
 	},
 	title: () => __( 'Template Parts' ),
 	async canvas( context: {
