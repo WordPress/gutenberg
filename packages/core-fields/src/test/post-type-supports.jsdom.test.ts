@@ -17,6 +17,7 @@ describe( 'post_type_supports', () => {
 			'slug',
 			'status',
 			'sticky',
+			'template',
 			'title',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
@@ -149,6 +150,13 @@ describe( 'post_type_supports', () => {
 
 	it( 'provides the control and the render of the parent', () => {
 		expect( postTypeSupports.parent ).toEqual( {
+			Edit: expect.any( Function ),
+			render: expect.any( Function ),
+		} );
+	} );
+
+	it( 'provides the control and the render of the template', () => {
+		expect( postTypeSupports.template ).toEqual( {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
 		} );

@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
-- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `format`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `title`). They are registered in code, see below.
+- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `format`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `template`, `title`). They are registered in code, see below.
 - `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
 - `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`), plus the reading settings shown for `home` and `index` templates (`posts_page_title`, `posts_per_page`, and `default_comment_status`).
 - `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
@@ -45,6 +45,7 @@ And each folder of fields may have:
 - `slug`, for the viewable post types but the design ones.
 - `status`, for every post type but the design ones.
 - `sticky`, for posts, the only post type with sticky posts.
+- `template`, for every post type but the design ones.
 - `title`, for the post types supporting `title`.
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
@@ -62,7 +63,7 @@ Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()
 - Templates and template parts exclude `author`, which the `wp_template` and `wp_template_part` collections define for them.
 - Templates, template parts, and patterns exclude `excerpt`, which is their description. The template and pattern collections define their own description fields.
 - Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
-- The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`), since they lay out a site rather than publish content.
+- The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`) and the `template` that renders a post, since they lay out a site rather than publish content.
 - Pages, templates, template parts, and patterns exclude `title`, since their collections define their own title fields.
 - Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
