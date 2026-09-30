@@ -28,6 +28,7 @@ const meta: Meta< typeof SearchableSelectControl > = {
 		'SearchableSelectControl.Group': SearchableSelectControl.Group,
 		'SearchableSelectControl.GroupLabel':
 			SearchableSelectControl.GroupLabel,
+		'SearchableSelectControl.Separator': SearchableSelectControl.Separator,
 		'SearchableSelectControl.Item': SearchableSelectControl.Item,
 		'SearchableSelectControl.ItemLabel': SearchableSelectControl.ItemLabel,
 		'SearchableSelectControl.ItemDescription':
@@ -278,6 +279,19 @@ export const Grouped: Story = {
 	args: {
 		...SearchableSelectStories.Grouped.args,
 		defaultValue: GROUPED_ITEMS[ 0 ].items[ 0 ],
+		label: 'Fruit',
+		description: 'Choose your favorite fruit.',
+	},
+};
+
+/**
+ * Use `SearchableSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableSelectStories.WithSeparator,
+	args: {
+		...SearchableSelectStories.WithSeparator.args,
+		defaultValue: ITEMS[ 0 ],
 		label: 'Fruit',
 		description: 'Choose your favorite fruit.',
 	},
