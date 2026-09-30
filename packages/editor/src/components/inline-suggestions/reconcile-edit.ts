@@ -1,9 +1,5 @@
-import {
-	RichTextData,
-	create,
-	slice,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { RichTextData, slice, toHTMLString } from '@wordpress/rich-text';
+import { toRichTextRecord } from './rich-text-record';
 import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -217,23 +213,6 @@ export function widenReplaceToWords(
 }
 
 /**
- * Parse a block attribute value into a rich-text record, tolerating plain
- * strings and other non-rich values.
- *
- * @param value Block attribute value.
- * @return Rich-text record, or null when the value isn't rich text.
- */
-function toRecord( value: any ) {
-	if ( value instanceof RichTextData ) {
-		return create( { html: value.toHTMLString() } );
-	}
-	if ( typeof value === 'string' ) {
-		return create( { html: value } );
-	}
-	return null;
-}
-
-/**
  * The `core/suggestion` format active at a character, or null.
  *
  * @param record Rich-text record.
@@ -363,12 +342,12 @@ export function planEditMarkers(
 	if ( ! ( prevValue instanceof RichTextData ) ) {
 		return { kind: 'none', actions: [] };
 	}
-	const record = toRecord( prevValue );
+	const record = toRichTextRecord( prevValue );
 	if ( ! record ) {
 		return { kind: 'none', actions: [] };
 	}
 
-	const nextRecord = toRecord( nextValue );
+	const nextRecord = toRichTextRecord( nextValue );
 	const edit = analyzeTextEdit(
 		record.text,
 		nextRecord ? nextRecord.text : ''
