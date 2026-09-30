@@ -129,8 +129,9 @@ export default async function fetchLinkSuggestions(
 
 	// Naming a number is asking for no more than that; naming none is taking whatever a page
 	// holds, which an unscoped search may exceed.
-	const limit = searchOptionsToUse.perPage;
-	const perPage = limit ?? ( searchOptions.isInitialSuggestions ? 3 : 20 );
+	const perPage =
+		searchOptionsToUse.perPage ??
+		( searchOptions.isInitialSuggestions ? 3 : 20 );
 
 	const { disablePostFormats = false } = editorSettings;
 
@@ -257,17 +258,16 @@ export default async function fetchLinkSuggestions(
 
 	const sortedResults = rankResults( results, search );
 
-	// Determine how many results to return
+	// Return everything the endpoints gave us, ranked.
 	//
-	// If a search is unscoped (any type), we don't want to limit it to the perPage as it might discard
-	// valid results from a lower tier (i.e. attachments). So, unscoped default searches return
-	// every title matching a word typed even if they exceed 20. Titles matching no word typed are
-	// left out: `/wp/v2/search` matches post content and excerpts too, with no way to narrow it.
-	// Explicitly passed perPage unscoped searches respect the perPage value.
-	const matches = sortedResults.filter( ( { found } ) => found > 0 );
-
-	const bounded = type || limit !== undefined;
-	const kept = bounded ? matches.slice( 0, perPage ) : matches;
+	// `perPage` and `page` are the page size and page number for each endpoint, so an unscoped
+	// search asks four of them and can return up to four times the `perPage`. Cutting that back
+	// is what used to break paging: `page` asks each endpoint for its own next page, never for
+	// what the merge threw away, so anything cut here was on no page at all. Keeping it all means
+	// consecutive pages reach every result.
+	//
+	// A search narrowed to one type is a single request, so there `perPage` is the page boundary.
+	const kept = type ? sortedResults.slice( 0, perPage ) : sortedResults;
 
 	return kept.map( ( { result } ) => result );
 }
