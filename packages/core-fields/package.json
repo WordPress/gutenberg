@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/core-fields",
 	"version": "0.1.0-prerelease",
-	"description": "JavaScript parts of the fields WordPress core registers on the server for the Fields API.",
+	"description": "The fields WordPress core registers on the server for the Fields API: their PHP declarations and their JavaScript parts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
