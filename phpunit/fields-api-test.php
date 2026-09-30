@@ -698,9 +698,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * A collection registers its fields on its entity, after the fields
-	 * registered on it before, with its origin and its module. A
-	 * collection for a post type not exposed in the REST API registers
-	 * nothing, and is still valid.
+	 * registered on it before, with its origin and its module. Like the
+	 * registry, it does not check that the entity exists or is exposed in
+	 * the REST API.
 	 */
 	public function test_a_collection_places_its_fields() {
 		$this->register_post_types(
@@ -720,8 +720,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 				'magazine' => true,
 				'hidden'   => true,
 			),
-			$results,
-			'A valid collection returns true, even when its post type is not exposed in the REST API.'
+			$results
 		);
 
 		$book = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
@@ -731,7 +730,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertSame( array( 'issue' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ) );
 		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_magazine' ), 'A collection without module registers none.' );
-		$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'A post type not exposed in the REST API gets no fields.' );
+		$this->assertSame( array( 'secret' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'id' ), 'A post type not exposed in the REST API gets its fields too.' );
 	}
 
 	/**

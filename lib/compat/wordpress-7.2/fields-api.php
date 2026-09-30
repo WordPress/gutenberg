@@ -353,9 +353,9 @@ function _gutenberg_is_field_id_list_or_true( $value ) {
  *
  * The collection unregisters the fields of its `unregister`, then registers
  * its fields on the entity, after the fields registered on it before. The
- * fields keep the alphabetical order of their folders. A collection for a
- * post type that does not exist or is not exposed in the REST API
- * registers and unregisters nothing.
+ * fields keep the alphabetical order of their folders. Like the registry,
+ * it does not check that the entity exists: the `/wp/v2/fields` route only
+ * serves the fields of the entities the REST API exposes.
  *
  * Fields that apply to several entities, such as the defaults every post
  * type derives from its supports, are registered in code: a
@@ -374,8 +374,7 @@ function _gutenberg_is_field_id_list_or_true( $value ) {
  * @param string                    $directory The directory of the
  *                                             collection.
  * @return bool Whether the collection is valid and the registry accepted
- *              all of its fields. True as well when it has no fields, or
- *              its post type is not exposed in the REST API.
+ *              all of its fields. True as well when it has no fields.
  */
 function gutenberg_register_field_collection( $registry, $directory ) {
 	if ( ! $registry instanceof Gutenberg_Fields_Registry ) {
@@ -390,10 +389,6 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 	$collection = _gutenberg_get_field_collection( $directory );
 	if ( null === $collection ) {
 		return false;
-	}
-
-	if ( 'postType' === $collection['kind'] && ! in_array( $collection['name'], get_post_types( array( 'show_in_rest' => true ) ), true ) ) {
-		return true;
 	}
 
 	// Before registering, so a collection can replace a field registered

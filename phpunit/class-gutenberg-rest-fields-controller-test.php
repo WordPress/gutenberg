@@ -259,6 +259,38 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The fields registered on a post type not exposed in the REST API are
+	 * not served: the registry accepts them, the route does not.
+	 *
+	 * @covers ::get_items_permissions_check
+	 * @covers ::get_required_capability
+	 */
+	public function test_get_items_post_type_hidden_from_rest_is_not_found() {
+		register_post_type( 'gutenberg_hidden', array( 'show_in_rest' => false ) );
+		wp_set_current_user( self::$admin_id );
+
+		try {
+			$registered = $this->register_fields(
+				'postType',
+				'gutenberg_hidden',
+				array(
+					array(
+						'id'    => 'secret',
+						'type'  => 'text',
+						'label' => 'Secret',
+					),
+				)
+			);
+			$response   = $this->dispatch_request( 'postType', 'gutenberg_hidden' );
+		} finally {
+			unregister_post_type( 'gutenberg_hidden' );
+		}
+
+		$this->assertTrue( $registered, 'The registry accepts the fields.' );
+		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+	}
+
+	/**
 	 * Taxonomy fields are gated by the taxonomy's `manage_terms` capability.
 	 *
 	 * @covers ::get_items_permissions_check
