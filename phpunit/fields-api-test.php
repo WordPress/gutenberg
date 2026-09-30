@@ -848,6 +848,21 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Pages support titles but their title shows the page's role on the
+	 * site: they opt out of the default title field and their collection has
+	 * its own, with its own script module.
+	 */
+	public function test_pages_get_their_own_title_field() {
+		$fields  = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$modules = gutenberg_get_registered_field_modules( 'postType', 'page' );
+
+		$this->assertFalse( $fields['title']['enableHiding'], 'The page title is the one of the collection.' );
+		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
+		$this->assertSame( array( 'title' ), $modules['@wordpress/core-fields/page'] );
+		$this->assertNotContains( 'title', $modules['@wordpress/core-fields/post_type_supports'], 'The default title field is not registered.' );
+	}
+
+	/**
 	 * Patterns support excerpts but their excerpt is their description,
 	 * which the client edits with its own field of the same id, so they opt
 	 * out of the default excerpt field.
