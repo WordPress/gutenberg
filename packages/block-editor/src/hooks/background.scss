@@ -14,8 +14,10 @@
 			margin-top: $grid-unit-20;
 		}
 
-		/* Same for the notice, which is not a panel item at all. */
+		/* Same for the notice, which is not a panel item at all. It speaks
+		   for the whole panel, so it spans both columns of the grid. */
 		.block-editor-background-panel__clips-to-text-notice {
+			grid-column: 1 / -1;
 			margin-top: $grid-unit-20;
 		}
 	}
