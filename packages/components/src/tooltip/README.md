@@ -51,7 +51,7 @@ Option to hide the tooltip when the anchor is clicked.
 Used to specify the tooltip's placement with respect to its anchor.
 
 -   Required: No
--   Default: `'bottom'`
+-   Default: `'top'`
 
 #### `position`: `string`
 
@@ -60,7 +60,7 @@ _Note: use the `placement` prop instead when possible._
 Legacy way to specify the popover's position with respect to its anchor. Specify y- and x-axis as a space-separated string. Supports `'top'`, `'middle'`, `'bottom'` y axis, and `'left'`, `'center'`, `'right'` x axis.
 
 -   Required: No
--   Default: `'bottom'`
+-   Default: `'top'`
 
 #### `shortcut`: `string` | `object`
 

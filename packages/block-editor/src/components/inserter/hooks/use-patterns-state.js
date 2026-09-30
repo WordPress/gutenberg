@@ -1,19 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import {
+	isNavigationOverlayContextKey,
+	userPatternCategoriesSelectKey,
+} from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
+
+// Shared so the selector cache survives the inserter closing and reopening.
+const FILTERED_OPTIONS = { [ isFiltered ]: true };
+const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
 
 /**
  * Retrieves the block patterns inserter state.
@@ -31,30 +32,53 @@ const usePatternsState = (
 	selectedCategory,
 	isQuick
 ) => {
-	const options = useMemo(
-		() => ( { [ isFiltered ]: !! isQuick } ),
-		[ isQuick ]
-	);
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
+
+	// Check if we're editing a navigation-overlay template part.
+	// This information is passed through block editor settings to avoid
+	// cross-package dependencies.
+	const isWithinNavigationOverlayContext = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( blockEditorStore ) );
+		const settings = getSettings();
+		return settings[ isNavigationOverlayContextKey ] ?? false;
+	}, [] );
+
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
 			const { getSettings, __experimentalGetAllowedPatterns } = unlock(
 				select( blockEditorStore )
 			);
-			const {
-				__experimentalUserPatternCategories,
-				__experimentalBlockPatternCategories,
-			} = getSettings();
+			const settings = getSettings();
+			const userPatternCategoriesSelect =
+				settings[ userPatternCategoriesSelectKey ];
 			return {
 				patterns: __experimentalGetAllowedPatterns(
 					rootClientId,
 					options
 				),
-				userPatternCategories: __experimentalUserPatternCategories,
-				patternCategories: __experimentalBlockPatternCategories,
+				userPatternCategories: userPatternCategoriesSelect
+					? userPatternCategoriesSelect( select )
+					: settings.__experimentalUserPatternCategories,
+				patternCategories:
+					settings.__experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId, options ]
 	);
+
+	// Filter out patterns with "navigation" category unless we're in
+	// navigation-overlay template part context.
+	// TO DO: create an api for patterns to decide in which context they should be shown.
+	const filteredPatterns = useMemo( () => {
+		return patterns.filter( ( pattern ) => {
+			const hasNavigationCategory =
+				pattern.categories?.includes( 'navigation' );
+			if ( hasNavigationCategory && ! isWithinNavigationOverlayContext ) {
+				return false;
+			}
+			return true;
+		} );
+	}, [ patterns, isWithinNavigationOverlayContext ] );
 	const { getClosestAllowedInsertionPointForPattern } = unlock(
 		useSelect( blockEditorStore )
 	);
@@ -82,7 +106,7 @@ const usePatternsState = (
 				: getClosestAllowedInsertionPointForPattern(
 						pattern,
 						rootClientId
-				  );
+					);
 			if ( destinationRootClientId === null ) {
 				return;
 			}
@@ -112,7 +136,7 @@ const usePatternsState = (
 			createSuccessNotice(
 				sprintf(
 					/* translators: %s: block pattern title. */
-					__( 'Block pattern "%s" inserted.' ),
+					__( 'Pattern "%s" inserted.' ),
 					pattern.title
 				),
 				{
@@ -131,7 +155,7 @@ const usePatternsState = (
 		]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ filteredPatterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

@@ -23,14 +23,10 @@ const MyComponentWithConstrainedTabbing = () => {
 	let form = (
 		<form>
 			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label="Input 1"
 				onChange={ () => {} }
 			/>
 			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label="Input 2"
 				onChange={ () => {} }
 			/>

@@ -89,4 +89,14 @@
 			Toggle context
 		</button>
 	</div>
+
+	<div data-wp-style----var="state.color">
+		<span style="color: var(--var);" data-testid="can use CSS variables">
+			Uses CSS variables
+		</span>
+	</div>
+
+	<div data-wp-style--color---unique-id="state.color" data-testid="ignores unique-ids">
+		Ignores unique-ids
+	</div>
 </div>

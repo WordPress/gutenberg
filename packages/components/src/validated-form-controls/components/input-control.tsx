@@ -1,55 +1,37 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import deprecated from '@wordpress/deprecated';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import InputControl from '../../input-control';
-import type { InputControlProps } from '../../input-control/types';
-
-type Value = InputControlProps[ 'value' ];
 
 const UnforwardedValidatedInputControl = (
 	{
 		required,
-		customValidator,
-		onChange,
+		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof InputControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps< InputControlProps[ 'value' ] >,
+	}: React.ComponentProps< typeof InputControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
+	deprecated( 'wp.components.privateApis.ValidatedInputControl', {
+		since: '7.2',
+		alternative: 'ValidatedInputControl from @wordpress/ui',
+		hint: 'This private API will be completely removed within a few Gutenberg plugin releases.',
+	} );
+
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
-	const valueRef = useRef< Value >( restProps.value );
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
-			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<InputControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				onChange={ ( value, ...args ) => {
-					valueRef.current = value;
-					onChange?.( value, ...args );
-				} }
-				{ ...restProps }
-			/>
+			<InputControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -57,3 +39,4 @@ const UnforwardedValidatedInputControl = (
 export const ValidatedInputControl = forwardRef(
 	UnforwardedValidatedInputControl
 );
+ValidatedInputControl.displayName = 'ValidatedInputControl';

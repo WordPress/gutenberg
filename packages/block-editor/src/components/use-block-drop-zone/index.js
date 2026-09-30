@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -9,13 +6,10 @@ import {
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
+	hasBlockSupport,
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
@@ -148,12 +142,16 @@ export function getDropTargetPosition(
 		} ) => {
 			const rect = getBoundingClientRect();
 
+			if ( ! rect ) {
+				return;
+			}
+
 			let [ distance, edge ] = getDistanceToNearestEdge(
 				position,
 				rect,
 				allowedEdges
 			);
-			// If the the point is close to a side, prioritize that side.
+			// If the point is close to a side, prioritize that side.
 			const [ sideDistance, sideEdge ] = getDistanceToNearestEdge(
 				position,
 				rect,
@@ -325,6 +323,7 @@ export default function useBlockDropZone( {
 		getBlockListSettings,
 		getBlocks,
 		getBlockIndex,
+		getBlockName,
 		getDraggedBlockClientIds,
 		getBlockNamesByClientId,
 		getAllowedBlocks,
@@ -376,9 +375,7 @@ export default function useBlockDropZone( {
 				}
 
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
-				const targetBlockName = getBlockNamesByClientId( [
-					targetRootClientId,
-				] )[ 0 ];
+				const targetBlockName = getBlockName( targetRootClientId );
 
 				const draggedBlockNames = getBlockNamesByClientId(
 					draggedBlockClientIds
@@ -390,7 +387,18 @@ export default function useBlockDropZone( {
 					targetBlockName
 				);
 
-				if ( ! isBlockDroppingAllowed ) {
+				// The before/after operations insert into the parent block
+				// list, not the target's own.
+				const isParentDropTargetValid =
+					!! dropZoneElement &&
+					isDropTargetValid(
+						getBlockType,
+						getAllowedBlocks( parentBlockClientId ),
+						draggedBlockNames,
+						getBlockName( parentBlockClientId )
+					);
+
+				if ( ! isBlockDroppingAllowed && ! isParentDropTargetValid ) {
 					return;
 				}
 
@@ -406,10 +414,18 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const blocks = getBlocks( targetRootClientId );
+				const blocks = getBlocks( targetRootClientId )
+					// Filter out blocks that are hidden
+					.filter( ( block ) => {
+						return ! (
+							hasBlockSupport( block.name, 'visibility', true ) &&
+							block.attributes?.metadata?.blockVisibility ===
+								false
+						);
+					} );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
-				if ( blocks.length === 0 ) {
+				if ( blocks.length === 0 && isBlockDroppingAllowed ) {
 					registry.batch( () => {
 						setDropTarget( {
 							index: 0,
@@ -428,10 +444,14 @@ export default function useBlockDropZone( {
 					return {
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
-						getBoundingClientRect: () =>
-							ownerDocument
-								.getElementById( `block-${ clientId }` )
-								.getBoundingClientRect(),
+						getBoundingClientRect: () => {
+							const blockElement = ownerDocument.getElementById(
+								`block-${ clientId }`
+							);
+							return blockElement
+								? blockElement.getBoundingClientRect()
+								: null;
+						},
 						blockIndex: getBlockIndex( clientId ),
 						blockOrientation:
 							getBlockListSettings( clientId )?.orientation,
@@ -443,7 +463,9 @@ export default function useBlockDropZone( {
 					{ x: event.clientX, y: event.clientY },
 					getBlockListSettings( targetRootClientId )?.orientation,
 					{
-						dropZoneElement,
+						dropZoneElement: isParentDropTargetValid
+							? dropZoneElement
+							: undefined,
 						parentBlockClientId,
 						parentBlockOrientation: parentBlockClientId
 							? getBlockListSettings( parentBlockClientId )
@@ -455,6 +477,14 @@ export default function useBlockDropZone( {
 
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
+
+				// Any other operation would drop into the target itself.
+				if (
+					! isBlockDroppingAllowed &&
+					! [ 'before', 'after' ].includes( operation )
+				) {
+					return;
+				}
 
 				const isTargetIndexEmptyDefaultBlock =
 					blocksData[ targetIndex ]?.isUnmodifiedDefaultBlock;
@@ -532,17 +562,19 @@ export default function useBlockDropZone( {
 			},
 			[
 				isDragging,
-				getAllowedBlocks,
-				targetRootClientId,
-				getBlockNamesByClientId,
 				getDraggedBlockClientIds,
+				targetRootClientId,
+				getBlockParents,
+				getAllowedBlocks,
+				getBlockName,
+				getBlockNamesByClientId,
 				getBlockType,
+				dropZoneElement,
+				parentBlockClientId,
 				getSectionRootClientId,
 				isZoomOut,
 				getBlocks,
 				getBlockListSettings,
-				dropZoneElement,
-				parentBlockClientId,
 				getBlockIndex,
 				registry,
 				startDragging,
@@ -562,7 +594,7 @@ export default function useBlockDropZone( {
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
+			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget.ownerDocument );
 		},

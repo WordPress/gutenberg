@@ -94,7 +94,7 @@ class Test_Render_Block_Core_Post_Date extends WP_UnitTestCase {
 		);
 
 		// Now verify that a fallback value is overridden by Block Bindings.
-		$block->attributes['datetime'] = '2025-01-01 00:00:00';
+		$block->parsed_block['attrs']['datetime'] = '2025-01-01 00:00:00';
 
 		$output = $block->render();
 		$this->assertStringContainsString(

@@ -13,14 +13,6 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
-// Set up metadata prior to rendering any blocks.
-if ( class_exists( 'WP_Duotone' ) ) {
-	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ) );
-	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_style_block_names' ) );
-}
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
-
 // Add classnames to blocks using duotone support.
 if ( function_exists( 'wp_render_duotone_support' ) ) {
 	// Deprecated render function.
@@ -30,7 +22,7 @@ if ( class_exists( 'WP_Duotone' ) ) {
 	remove_filter( 'render_block', array( 'WP_Duotone', 'render_duotone_support' ) );
 	remove_filter( 'render_block_core/image', array( 'WP_Duotone', 'restore_image_outer_container' ) );
 }
-add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 3 );
 add_filter( 'render_block_core/image', array( 'WP_Duotone_Gutenberg', 'restore_image_outer_container' ), 10, 1 );
 
 // Enqueue styles.
@@ -73,9 +65,9 @@ add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migr
  *
  * @deprecated 6.3.0
  *
- * @param  mixed $n   Number of unknown type.
- * @param  int   $max Upper value of the range to bound to.
- * @return float      Value in the range [0,1].
+ * @param mixed $n   Number of unknown type.
+ * @param int   $max Upper value of the range to bound to.
+ * @return float Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -108,8 +100,8 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
  *
  * @deprecated 6.3.0
  *
- * @param  mixed $n   Number of unknown type.
- * @return float      Value in the range [0,1].
+ * @param mixed $n Number of unknown type.
+ * @return float Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound_alpha( $n ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -130,8 +122,8 @@ function gutenberg_tinycolor_bound_alpha( $n ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $rgb_color RGB object.
- * @return array            Rounded and converted RGB object.
+ * @param array $rgb_color RGB object.
+ * @return array Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -150,10 +142,10 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  *
  * @deprecated 6.3.0
  *
- * @param  float $p first component.
- * @param  float $q second component.
- * @param  float $t third component.
- * @return float    R, G, or B component.
+ * @param float $p first component.
+ * @param float $q second component.
+ * @param float $t third component.
+ * @return float R, G, or B component.
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -183,8 +175,8 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $hsl_color HSL object.
- * @return array            Rounded and converted RGB object.
+ * @param array $hsl_color HSL object.
+ * @return array Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -222,8 +214,8 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  *
  * @deprecated 6.3.0
  *
- * @param  string $color_str CSS color string.
- * @return array             RGB object.
+ * @param string $color_str CSS color string.
+ * @return array RGB object.
  */
 function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -379,8 +371,8 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone filter CSS id.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone filter CSS id.
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -392,8 +384,8 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone CSS filter property url value.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -405,8 +397,8 @@ function gutenberg_get_duotone_filter_property( $preset ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone SVG filter.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone SVG filter.
  */
 function gutenberg_get_duotone_filter_svg( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -430,9 +422,9 @@ function gutenberg_register_duotone_support( $block_type ) {
  *
  * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::render_duotone_support() instead.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );

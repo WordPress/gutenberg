@@ -1,0 +1,13 @@
+# Interactive Block — Client-Side Navigation
+
+> **Note**
+> Check the [Interactivity API Reference docs in the Block Editor handbook](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/) to learn more about the Interactivity API.
+
+This block has been created with the `create-block-interactive-template` (`client-side-navigation` variant) and demonstrates client-side navigation powered by `@wordpress/interactivity-router`.
+
+## How it works
+
+- **Server-rendered content** — `render.php` reads a `?quote=` query param and picks a quote from a hardcoded array, rendered inside a router region.
+- **Client-side navigation** — Prev/next links change the query param and trigger navigation via `@wordpress/interactivity-router` instead of a full page reload.
+- **State persistence proof** — A client-side stopwatch runs outside the navigated region, demonstrating that client state is preserved across navigations.
+- **Loading indicator** — Visual feedback is shown while navigation is in progress.

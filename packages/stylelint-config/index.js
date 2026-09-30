@@ -1,8 +1,15 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
+export default {
+	extends: [ 'stylelint-config-recommended' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
+	),
+	plugins: [
+		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
+		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
+		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+	],
 	rules: {
 		'at-rule-empty-line-before': [
 			'always',
@@ -30,12 +37,7 @@ module.exports = {
 			'line-height': [ 'px' ],
 		},
 		'font-family-name-quotes': 'always-where-recommended',
-		'font-weight-notation': [
-			'numeric',
-			{
-				ignore: [ 'relative' ],
-			},
-		],
+		'font-weight-notation': 'numeric',
 		'function-name-case': [
 			'lower',
 			{
@@ -43,7 +45,10 @@ module.exports = {
 			},
 		],
 		'function-url-quotes': 'never',
-		'length-zero-no-unit': true,
+		'length-zero-no-unit': [
+			true,
+			{ ignore: [ 'custom-properties' ], ignoreFunctions: [ 'var' ] },
+		],
 		'rule-empty-line-before': [
 			'always',
 			{
@@ -68,6 +73,19 @@ module.exports = {
 		'selector-pseudo-element-colon-notation': 'double',
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
+		/*
+		 * Ban private prefixes (--_gcd-*, --_wp-*). The pattern is matched against the name without the leading `--`. Projects that already set custom-property-pattern will override this entirely and must merge `(?!_(?:gcd|wp)-)` into their own pattern if they want to keep the ban.
+		 */
+		'custom-property-pattern': [
+			'^(?!_(?:gcd|wp)-).+',
+			{
+				message: ( name ) =>
+					`Do not use "${ name }". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time.`,
+			},
+		],
+		'plugin-wpds/no-setting-wpds-custom-properties': true,
+		'plugin-wpds/no-token-fallback-values': true,
+		'plugin-wpds/no-unknown-ds-tokens': true,
 
 		/* Disable new rules from stylelint-config-recommended 7 > 14 */
 		'function-no-unknown': null,

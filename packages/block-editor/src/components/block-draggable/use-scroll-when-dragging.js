@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 

@@ -29,10 +29,19 @@ function render_block_core_media_text( $attributes, $content ) {
 		return $content;
 	}
 
-	$has_media_on_right = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
-	$image_fill         = isset( $attributes['imageFill'] ) && $attributes['imageFill'];
-	$focal_point        = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
-	$unique_id          = 'wp-block-media-text__media-' . wp_unique_id();
+	$has_media_on_right = 'right' === ( $attributes['mediaPosition'] ?? null );
+	$image_fill         = (bool) ( $attributes['imageFill'] ?? false );
+	$focal_point_attr   = $attributes['focalPoint'] ?? null;
+	$focal_point_x      = null;
+	$focal_point_y      = null;
+	if ( is_array( $focal_point_attr ) ) {
+		$focal_point_x = isset( $focal_point_attr['x'] ) && is_numeric( $focal_point_attr['x'] ) ? $focal_point_attr['x'] : null;
+		$focal_point_y = isset( $focal_point_attr['y'] ) && is_numeric( $focal_point_attr['y'] ) ? $focal_point_attr['y'] : null;
+	}
+	$focal_point = null !== $focal_point_x && null !== $focal_point_y
+		? round( $focal_point_x * 100 ) . '% ' . round( $focal_point_y * 100 ) . '%'
+		: '50% 50%';
+	$unique_id   = 'wp-block-media-text__media-' . wp_unique_id();
 
 	$block_tag_processor = new WP_HTML_Tag_Processor( $content );
 	$block_query         = array(
@@ -77,7 +86,7 @@ function render_block_core_media_text( $attributes, $content ) {
 
 	// Add the image tag inside the figure tag, and update the image attributes
 	// in order to display the featured image.
-	$media_size_slug = isset( $attributes['mediaSizeSlug'] ) ? $attributes['mediaSizeSlug'] : 'full';
+	$media_size_slug = $attributes['mediaSizeSlug'] ?? 'full';
 	$image_tag       = '<img class="wp-block-media-text__featured_image">';
 	$content         = preg_replace(
 		'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',

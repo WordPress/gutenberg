@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
-	title: 'Components/Feedback/Tip',
+	title: 'Components/@wordpress-components/Feedback/Tip',
 	id: 'components-tip',
 	argTypes: {
 		children: { control: { type: 'text' } },
@@ -20,6 +13,10 @@ const meta: Meta< typeof Tip > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'unaudited',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

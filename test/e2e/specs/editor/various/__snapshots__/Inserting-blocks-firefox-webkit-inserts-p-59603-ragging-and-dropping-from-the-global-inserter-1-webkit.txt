@@ -14,6 +14,6 @@
 <hr class="wp-block-separator has-css-opacity"/>
 <!-- /wp:separator -->
 
-<!-- wp:post-date {"metadata":{"bindings":{"datetime":{"source":"core/post-data","args":{"key":"date"}}}}} /-->
+<!-- wp:post-date {"metadata":{"bindings":{"datetime":{"source":"core/post-data","args":{"field":"date"}}}}} /-->
 <!-- /wp:post-template --></div>
 <!-- /wp:query -->

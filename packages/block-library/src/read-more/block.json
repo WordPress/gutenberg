@@ -18,7 +18,13 @@
 	},
 	"usesContext": [ "postId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"text": true
@@ -47,11 +53,13 @@
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
+			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"width": true
 			}
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

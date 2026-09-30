@@ -1,0 +1,25 @@
+.dataforms-layouts-card__field {
+	width: 100%;
+}
+
+.dataforms-layouts-card__field-header-content {
+	min-height: 24px; // TODO: use size / height DS token when available
+}
+
+.dataforms-layouts-card__field-header-content-description {
+	display: contents;
+}
+
+.dataforms-layouts-card__field-description {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	display: block;
+	font-size: var(--wpds-typography-font-size-md);
+	margin-bottom: var(--wpds-dimension-gap-lg);
+}
+
+.dataforms-layouts-card__field-summary {
+	display: flex;
+	flex-direction: row;
+	gap: var(--wpds-dimension-gap-lg);
+	align-items: center;
+}

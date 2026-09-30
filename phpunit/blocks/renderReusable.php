@@ -63,6 +63,6 @@ class Test_Blocks_RenderReusable extends WP_UnitTestCase {
 		);
 
 		$output = $synced_pattern_block_instance->render();
-		$this->assertSame( '<p>Custom content set from block context</p>', $output );
+		$this->assertSame( '<p class="wp-block-paragraph">Custom content set from block context</p>', $output );
 	}
 }
