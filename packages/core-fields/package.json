@@ -24,29 +24,40 @@
 	},
 	"files": [
 		"src",
-		"build",
 		"build-module",
 		"build-types",
 		"*.md"
 	],
-	"main": "build/index.cjs",
-	"module": "build-module/index.mjs",
+	"module": "build-module/post_supports/index.mjs",
 	"exports": {
-		".": {
-			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs",
-			"require": "./build/index.cjs"
+		"./post_supports": {
+			"types": "./build-types/post_supports/index.d.ts",
+			"import": "./build-module/post_supports/index.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
-		".": "./build-module/index.mjs"
+		"./post_supports": "./build-module/post_supports/index.mjs"
+	},
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php"
+		]
 	},
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/fields": "file:../fields",
-		"@wordpress/fields-loader": "file:../fields-loader"
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/fields-loader": "file:../fields-loader",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

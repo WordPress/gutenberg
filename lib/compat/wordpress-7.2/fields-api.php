@@ -214,14 +214,68 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
 
 /**
+ * Registers a collection of the fields WordPress core registers, from
+ * packages/core-fields/src/<collection>, copied to
+ * build/scripts/core-fields/<collection> by the build.
+ *
+ * A collection holds a folder per field and an `index.php`:
+ *
+ * - `<field>/field.php` returns the serializable part of the field. Its id is
+ *   the name of the folder, unless the file sets an `id`. The fields are in
+ *   the alphabetical order of their folders.
+ * - `index.php` returns the function placing the fields: it receives the
+ *   registry, the fields of the collection, and the id of the script module
+ *   of the collection, and registers each field for the entities it applies
+ *   to.
+ *
+ * The JavaScript parts of the fields, if any, are in `<field>/field.tsx`, and
+ * the `index.ts` of the collection gathers them in the
+ * `@wordpress/core-fields/<collection>` script module. Only the collections
+ * that have one pass `$has_script_module`.
+ *
+ * @param Gutenberg_Fields_Registry $registry          The registry being read.
+ * @param string                    $collection        The name of the collection, e.g. `post_supports`.
+ * @param bool                      $has_script_module Whether the collection has a script module.
+ * @param string|null               $directory         The directory of the collections. Defaults to
+ *                                                     the build output of the package.
+ * @return bool Whether the collection was found.
+ */
+function _gutenberg_register_core_fields_collection( Gutenberg_Fields_Registry $registry, $collection, $has_script_module, $directory = null ) {
+	$directory = ( $directory ?? __DIR__ . '/../../../build/scripts/core-fields' ) . '/' . $collection;
+	if ( ! is_dir( $directory ) || ! is_file( $directory . '/index.php' ) ) {
+		return false;
+	}
+
+	$files = glob( $directory . '/*/field.php' );
+	sort( $files, SORT_STRING );
+
+	$fields = array();
+	foreach ( $files as $file ) {
+		$field = require $file;
+		if ( ! is_array( $field ) ) {
+			continue;
+		}
+		// The id comes first, like in the fields registered directly.
+		$fields[] = array_merge( array( 'id' => basename( dirname( $file ) ) ), $field );
+	}
+
+	$place = require $directory . '/index.php';
+	$place( $registry, $fields, $has_script_module ? '@wordpress/core-fields/' . $collection : null );
+
+	return true;
+}
+
+/**
  * Registers the default fields of every post type exposed in the REST API.
  *
  * These are the fields ported to the server so far; the editor still derives
  * the rest client-side in packages/editor/src/dataviews/store/private-actions.ts
- * and merges these into them. The JavaScript parts of the fields that have
- * any (the author field: its render component, elements, value setter, and
- * visibility) ship in the `@wordpress/core-fields` script module,
- * see packages/core-fields/src/index.ts, registered along with the field.
+ * and merges these into them. They are the `post_supports` collection, see
+ * packages/core-fields/src/post_supports: which post type gets which field
+ * depends on its supports. The JavaScript parts of the fields that have any
+ * (the author field: its render component, elements, value setter, and
+ * visibility) ship in the `@wordpress/core-fields/post_supports` script
+ * module, registered along with the field.
  *
  * The fields depend on the supports of the post type, which are not final
  * until `init` completes: core registers its post types on `init` at
@@ -242,80 +296,7 @@ add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fi
  * @param Gutenberg_Fields_Registry $registry The registry being read.
  */
 function _gutenberg_register_posttype_supports_fields( Gutenberg_Fields_Registry $registry ) {
-	$post_types = get_post_types( array( 'show_in_rest' => true ) );
-	foreach ( $post_types as $post_type ) {
-		if ( post_type_supports( $post_type, 'author' ) ) {
-			// packages/fields/src/fields/author/index.tsx: `render`,
-			// `getElements`, `setValue`, and `isVisible` come from the script
-			// module.
-			$registry->register(
-				'core',
-				'postType',
-				$post_type,
-				array(
-					array(
-						'id'       => 'author',
-						'type'     => 'integer',
-						'label'    => __( 'Author', 'gutenberg' ),
-						'filterBy' => array(
-							'operators' => array( 'isAny', 'isNone' ),
-						),
-					),
-				),
-				'@wordpress/core-fields'
-			);
-		}
-
-		// The remaining default fields are plain data: no script module.
-		$fields = array();
-
-		if ( post_type_supports( $post_type, 'comments' ) ) {
-			// packages/fields/src/fields/comment-status/index.tsx
-			$fields[] = array(
-				'id'            => 'comment_status',
-				'type'          => 'text',
-				'label'         => __( 'Comments', 'gutenberg' ),
-				'Edit'          => 'radio',
-				'enableSorting' => false,
-				'enableHiding'  => false,
-				'filterBy'      => false,
-				'elements'      => array(
-					array(
-						'value'       => 'open',
-						'label'       => __( 'Open', 'gutenberg' ),
-						'description' => __( 'Visitors can add new comments and replies.', 'gutenberg' ),
-					),
-					array(
-						'value'       => 'closed',
-						'label'       => __( 'Closed', 'gutenberg' ),
-						'description' => __( 'Visitors cannot add new comments or replies. Existing comments remain visible.', 'gutenberg' ),
-					),
-				),
-			);
-		}
-
-		// Notes are declared as an argument of the `editor` support, e.g.
-		// `'supports' => array( 'editor' => array( 'notes' => true ) )`, which
-		// WordPress stores as a list of argument arrays. A bare `editor`
-		// support is stored as `true`, hence the array check.
-		$editor_args = get_all_post_type_supports( $post_type )['editor'] ?? null;
-		if ( is_array( $editor_args ) && array_filter( array_column( $editor_args, 'notes' ) ) ) {
-			// packages/fields/src/fields/notes/index.tsx
-			$fields[] = array(
-				'id'            => 'notesCount',
-				'type'          => 'integer',
-				'label'         => __( 'Notes', 'gutenberg' ),
-				'enableSorting' => false,
-				'filterBy'      => false,
-			);
-		}
-
-		if ( empty( $fields ) ) {
-			continue;
-		}
-
-		$registry->register( 'core', 'postType', $post_type, $fields );
-	}
+	_gutenberg_register_core_fields_collection( $registry, 'post_supports', true );
 }
 add_action( 'fields_api_init', '_gutenberg_register_posttype_supports_fields', 0 );
 
