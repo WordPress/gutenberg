@@ -10,6 +10,7 @@
 -   Media & Text: Lower the specificity of the content area's default padding so themes can override it, including through the block's custom CSS in `theme.json` ([#83563](https://github.com/WordPress/gutenberg/pull/83563)).
 -   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
 
 ### Bug Fixes
 
