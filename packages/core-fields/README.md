@@ -2,120 +2,99 @@
 
 The fields WordPress core registers on the server for the Fields API: their PHP declarations and their JavaScript parts, side by side.
 
-The Fields API declares fields in PHP. What PHP cannot serialize, such as a field's `render` component or its `getElements` callback, ships in a script module registered along with the fields. This package holds both halves of the fields WordPress core registers, grouped in field collections.
+The Fields API declares fields in PHP. What PHP cannot serialize, such as a field's `render` component or its `getElements` callback, ships in a script module registered along with the fields. This package holds both halves of the fields WordPress core registers, grouped in folders.
 
-## Field collections
+## Default fields and field collections
 
-A collection is a folder of `src` holding the fields registered together, for one entity or for every post type:
+The fields of this package live in folders of `src`:
 
--   `post_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `notesCount`).
+-   `post_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `notesCount`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
--   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: it opts out of the default author field, since template parts declare their own client-side.
+-   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: it drops the default author field, since template parts declare their own client-side.
 -   `attachment`: the fields of the media editor ported to the server so far (`date`), instead of all the defaults.
 
-Each field has a folder in its collection:
+Each field has a folder:
 
 -   `<field>/field.php` returns the serializable part of the field: `type`, `label`, `elements`, `filterBy`, and so on. The id of the field is the name of its folder, unless the file sets an `id`.
 -   `<field>/field.tsx`, when the field has JavaScript parts, exports them as `fieldExtensions`.
 
-And each collection has:
+And each folder of fields may have:
 
--   `index.php`, which returns the configuration of the collection as a plain array, described below. It defines no function and hooks nothing.
--   `index.ts`, when some of its fields have JavaScript parts: the script module of the collection, whose default export maps the id of each of those fields to its `fieldExtensions`.
--   `exclude-post-type-supports.php`, when its post type opts out of fields of the `post_supports` collection: a function hooked to the `fields_api_exclude_post_type_supports` filter, described below.
+-   `index.ts`, when some of its fields have JavaScript parts: its script module, whose default export maps the id of each of those fields to its `fieldExtensions`.
+-   `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_supports` has none.
+
+### The default fields of every post type
+
+`register_core_post_supports_fields()`, in `src/index.php`, registers the fields of `post_supports` on every post type exposed in the REST API, from what each supports:
+
+-   `author`, for the post types supporting `author`.
+-   `comment_status`, for the post types supporting `comments`.
+-   `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
+
+It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_supports` module.
+
+It makes no exception for any post type. A post type whose fields differ from the defaults drops the ones it does not want, like a plugin does: core's own collections do it with their `unregister` key.
 
 ### Collection configuration
 
-The array `index.php` returns has these keys:
+The array the `index.php` of a collection returns has these keys:
 
 -   `origin` (required): who registers the fields, `'core'` for every collection of this package. It becomes the `origin.registeredBy` of each field.
 -   `kind` (required): the entity kind, e.g. `'postType'`.
--   `name` (required): the entity name, e.g. `'wp_template'`, or `null` for every entity of the kind. Only the `postType` kind supports `null`, for every post type exposed in the REST API; a collection for every entity of another kind is reported with `_doing_it_wrong()` and skipped.
+-   `name` (required): the entity name, e.g. `'wp_template'`.
 -   `module` (optional): the id of the script module of the collection, written out (`'@wordpress/core-fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
+-   `unregister` (optional): the ids of the fields registered on the entity before the collection that it removes, or `true` for all of them. Ids that are not registered are ignored.
 
-Each field of a collection whose `name` is `null` sets `supports` in its `field.php`, the condition a post type must meet to get it:
-
--   A support name, e.g. `'supports' => 'author'`: the post type supports it (`post_type_supports()`).
--   A support and argument pair, e.g. `'supports' => array( 'editor', 'notes' )`: the arguments of the support have a truthy value for the argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`. A support without arguments meets no pair.
-
-The `supports` of a field only decides where it applies: it is not registered, so it is not part of the `/wp/v2/fields` response. The fields of a collection for a single entity do not set it. An invalid configuration or field is reported with `_doing_it_wrong()` and skipped.
-
-For example, `post_supports/index.php`, whose fields set `supports` (`author` → `'author'`, `comment_status` → `'comments'`, `notesCount` → `array( 'editor', 'notes' )`), and `wp_template/index.php`:
+An invalid configuration is reported with `_doing_it_wrong()` and skipped. For example, `wp_template/index.php` replaces the default author field with its own, and `attachment/index.php` drops every default:
 
 ```php
 return array(
-	'origin' => 'core',
-	'kind'   => 'postType',
-	'name'   => null,
-	'module' => '@wordpress/core-fields/post_supports',
+	'origin'     => 'core',
+	'kind'       => 'postType',
+	'name'       => 'wp_template',
+	'module'     => '@wordpress/core-fields/wp_template',
+	'unregister' => array( 'author' ),
 );
 
 return array(
-	'origin' => 'core',
-	'kind'   => 'postType',
-	'name'   => 'wp_template',
-	'module' => '@wordpress/core-fields/wp_template',
+	'origin'     => 'core',
+	'kind'       => 'postType',
+	'name'       => 'attachment',
+	'unregister' => true,
 );
 ```
 
-### Opting out of the fields derived from supports
-
-A post type whose fields differ from the defaults opts out of some or all of them on the `fields_api_exclude_post_type_supports` filter:
-
-```php
-apply_filters( 'fields_api_exclude_post_type_supports', array $excluded, string $post_type, array $collection );
-```
-
-The value is what the post type does not get from the collections for every post type: a list of field ids, or `true` for all of them. It starts as an empty array. `$collection` is the configuration of the collection being registered (`origin`, `kind`, `name`, `module`), for a callback that only targets one collection. A value other than `true` or a list of strings is reported with `_doing_it_wrong()` and excludes nothing. Callbacks compose: add to the incoming list rather than replacing it, and return `true` unchanged. The filter runs when the registry fires `fields_api_init`, on its first read after `init`, so add callbacks on plugin load or on `init`.
-
-Each core collection that opts out does it in its own `exclude-post-type-supports.php`: `wp_template` and `wp_template_part` exclude `author`, `attachment` excludes everything (`true`). For instance `wp_template/exclude-post-type-supports.php`:
-
-```php
-function exclude_post_type_supports_wp_template( $excluded, $post_type ) {
-	if ( 'wp_template' !== $post_type || true === $excluded ) {
-		return $excluded;
-	}
-
-	$excluded   = is_array( $excluded ) ? $excluded : array();
-	$excluded[] = 'author';
-	return $excluded;
-}
-add_filter( 'fields_api_exclude_post_type_supports', 'exclude_post_type_supports_wp_template', 10, 2 );
-```
-
-There is no precedence between collections: a collection redefining a field of a collection for every post type needs its post type to exclude that field, or the registry refuses its fields, reporting the duplicate with `_doing_it_wrong()`, as it would for a plugin registering a field twice.
+There is no precedence between collections: the registry refuses a field registered twice for the same entity, reporting the duplicate with `_doing_it_wrong()`. A collection redefining a field registered before it lists it in `unregister`.
 
 ### Loading
 
-`src/index.php` registers the core collections through the public Fields API, exactly as a plugin registers its own: it requires the `exclude-post-type-supports.php` files, and `register_core_field_collections()` calls `wp_register_field_collection()` for each collection, listed explicitly, on the `fields_api_init` action at priority 0. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered.
+`src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `fields_api_init` action at priority 0: it registers the defaults first, then calls `wp_register_field_collection()` for each collection, listed explicitly, so the `unregister` of a collection finds the defaults registered. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
-`wp_register_field_collection( $registry, $directory )` reads one collection and registers its fields on the registry the action passes. A collection for every post type registers, on each post type exposed in the REST API, the fields whose `supports` it meets minus those the filter excludes. A collection for a single post type registers its fields after them, or nothing when the post type does not exist or is not exposed in the REST API. The fields of a collection follow the alphabetical order of their folders. It returns whether the collection is valid and the registry accepted all of its fields.
+`wp_register_field_collection( $registry, $directory )` reads one collection and registers its fields on the registry the action passes: it unregisters the fields of its `unregister`, then registers its own after the fields registered on the entity before, in the alphabetical order of their folders. A collection for a post type that does not exist or is not exposed in the REST API registers and unregisters nothing. It returns whether the collection is valid and the registry accepted all of its fields.
 
-A plugin does the same with its own collections. With the Gutenberg plugin, the function is `gutenberg_register_field_collection()`:
+A plugin does the same with its own collections. With the Gutenberg plugin, the functions are `gutenberg_register_field_collection()` and `gutenberg_get_field_collection_fields()`:
 
 ```php
 add_action(
 	'fields_api_init',
 	function ( $registry ) {
+		// Books do not get the default comment status.
 		wp_register_field_collection( $registry, __DIR__ . '/fields/book' );
 	}
 );
 
-// Books keep their author field, but not the default comment status.
-add_filter(
-	'fields_api_exclude_post_type_supports',
-	function ( $excluded, $post_type ) {
-		if ( 'book' === $post_type && true !== $excluded ) {
-			$excluded[] = 'comment_status';
-		}
-		return $excluded;
-	},
-	10,
-	2
+// fields/book/index.php
+return array(
+	'origin'     => 'my-plugin',
+	'kind'       => 'postType',
+	'name'       => 'book',
+	'unregister' => array( 'comment_status' ),
 );
 ```
 
-The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them and `wp_register_field_collection()` with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
+Or, in code, `$registry->unregister( 'postType', 'book', array( 'comment_status' ) )` followed by `$registry->register()`.
+
+The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them, `wp_register_field_collection()`, and `wp_get_field_collection_fields()` with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
 
 The client never imports this package directly. `loadFields` and `useFields` from [`@wordpress/fields-loader`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields-loader/README.md) import the script module of a collection on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id among the fields registered with that module. That is why each collection with JavaScript parts has a module of its own: `post_supports` and `wp_template` both have an `author` field.
 
