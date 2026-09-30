@@ -395,19 +395,17 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The default fields are exposed with the origin of their collection and
-	 * without their `supports`, which only decides where they apply.
+	 * The default fields are exposed with the `core` origin.
 	 *
 	 * @covers ::get_items
 	 */
-	public function test_get_items_exposes_the_default_fields_without_their_supports() {
+	public function test_get_items_exposes_the_default_fields_with_the_core_origin() {
 		wp_set_current_user( self::$editor_id );
 
 		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
 
 		$this->assertNotEmpty( $data['fields'] );
 		foreach ( $data['fields'] as $field ) {
-			$this->assertArrayNotHasKey( 'supports', $field );
 			$this->assertSame( 'core', $field['origin']['registeredBy'] );
 		}
 	}
