@@ -99,7 +99,7 @@ const NO_SORT_STRATEGY = () => null;
  * @param ref   Forwarded to the grid's root `<div>`.
  */
 export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
-	function DashboardGrid( props, ref ) {
+	function UnforwardedDashboardGrid( props, ref ) {
 		const {
 			layout,
 			columns,

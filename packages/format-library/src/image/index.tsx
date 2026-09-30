@@ -9,13 +9,32 @@ import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-import type { EditImageProps, InlineImageUIProps } from '../types';
+import type { FormatEditProps } from '../types';
+
+/**
+ * The attributes the `core/image` format registers.
+ */
+interface ImageFormatAttributes {
+	className?: string;
+	style?: string;
+	url?: string;
+	alt?: string;
+}
+
+interface InlineImageUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeObjectAttributes: ImageFormatAttributes;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -28,9 +47,9 @@ const title = __( 'Inline image' );
  * @return The extracted image ID or undefined if not found.
  */
 function getCurrentImageId(
-	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
+	activeObjectAttributes: ImageFormatAttributes
 ): number | undefined {
-	if ( ! activeObjectAttributes?.className ) {
+	if ( ! activeObjectAttributes.className ) {
 		return undefined;
 	}
 
@@ -62,8 +81,8 @@ function InlineUI( {
 	activeObjectAttributes,
 	contentRef,
 }: InlineImageUIProps ) {
-	const style = activeObjectAttributes?.style;
-	const alt = activeObjectAttributes?.alt;
+	const style = activeObjectAttributes.style;
+	const alt = activeObjectAttributes.alt;
 
 	const width = style?.replace( /\D/g, '' );
 	const [ editedWidth, setEditedWidth ] = useState( width );
@@ -164,7 +183,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditImageProps ) {
+}: FormatEditProps ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
