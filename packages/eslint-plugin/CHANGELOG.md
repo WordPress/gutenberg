@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Recommend `Radio`, `RadioGroup`, and `RadioGroupControl` from `@wordpress/ui`, and flag `RadioControl` from `@wordpress/components` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `use-recommended-components`: Update the "Use with caution" entry from `LinkButton` to `ButtonLink` to match the renamed `@wordpress/ui` component ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   Update `use-recommended-components` rule to prefer `Badge` from `@wordpress/ui` over the private `@wordpress/components` `Badge`. ([#82379](https://github.com/WordPress/gutenberg/pull/82379))
 
