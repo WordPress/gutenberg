@@ -3,8 +3,6 @@ import { userEvent } from 'vitest/browser';
 import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { dispatch, select } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the
@@ -17,7 +15,6 @@ beforeEach( () => {
 
 afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
-	dispatch( noticesStore ).removeAllNotices( 'snackbar' );
 } );
 
 /**
@@ -45,26 +42,10 @@ async function renderPanel( props ) {
 const textGradientNotice = ( container ) =>
 	within( container ).queryByText( /replaces the text color/ );
 
-/**
- * Picks the first gradient in the Typography panel's Gradient control.
- */
-async function chooseFirstGradient() {
-	await userEvent.click( screen.getByRole( 'button', { name: /Gradient/ } ) );
-	const swatches = await screen.findAllByRole( 'option' );
-	await userEvent.click( swatches[ 0 ] );
-}
-
-/**
- * Contents of the snackbars raised since the test began.
- *
- * @return {string[]} Snackbar notice contents.
- */
-function snackbarContents() {
-	return select( noticesStore )
-		.getNotices()
-		.filter( ( notice ) => notice.type === 'snackbar' )
-		.map( ( notice ) => notice.content );
-}
+// The notice shown before a text gradient is chosen, while the block still
+// paints a background of its own.
+const backgroundOverrideNotice = ( container ) =>
+	within( container ).queryByText( /^Setting a text gradient/ );
 
 /**
  * Activates an item in a ToolsPanel options menu.
@@ -1089,11 +1070,11 @@ describe( 'TypographyPanel text gradient', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'reports replacing a gradient stored the legacy way', async () => {
+	it( 'warns before replacing a gradient stored the legacy way', async () => {
 		// A preset gradient lives in the `gradient` attribute and a custom one
-		// in `color.gradient`. Either is a background the text gradient writes
-		// over, so the hook folds them in and the replacement is reported.
-		await renderPanel( {
+		// in `color.gradient`. Either is a background the text gradient would
+		// write over, so the hook folds them in and the panel says so first.
+		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
 			defaultControls: shownControls,
@@ -1104,11 +1085,9 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		} );
 
-		await chooseFirstGradient();
-
-		expect( snackbarContents() ).toEqual( [
-			'The text gradient replaced the background gradient.',
-		] );
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient replaces the background gradient.'
+		);
 	} );
 
 	it( 'hides the gradient control when the theme turns the clip off', async () => {
@@ -1219,38 +1198,34 @@ describe( 'TypographyPanel text gradient', () => {
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'reports that a background color now paints inside the text', async () => {
-		await renderPanel( {
+	it( 'warns that a background color will be clipped to the text', async () => {
+		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
 			defaultControls: shownControls,
 			value: { color: { background: '#000000' } },
 		} );
 
-		await chooseFirstGradient();
-
-		expect( snackbarContents() ).toEqual( [
-			'The background color now paints inside the text.',
-		] );
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient clips the background color to the text.'
+		);
 	} );
 
-	it( 'reports a preset background color the same way', async () => {
-		await renderPanel( {
+	it( 'warns about a preset background color the same way', async () => {
+		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
 			defaultControls: shownControls,
 			value: { color: { background: 'var:preset|color|black' } },
 		} );
 
-		await chooseFirstGradient();
-
-		expect( snackbarContents() ).toEqual( [
-			'The background color now paints inside the text.',
-		] );
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient clips the background color to the text.'
+		);
 	} );
 
-	it( 'reports nothing for an inherited background', async () => {
-		await renderPanel( {
+	it( 'says nothing for an inherited background', async () => {
+		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
 			defaultControls: shownControls,
@@ -1259,10 +1234,24 @@ describe( 'TypographyPanel text gradient', () => {
 			},
 		} );
 
-		await chooseFirstGradient();
-
 		// Clipping away an inherited background is an override, not a loss.
-		expect( snackbarContents() ).toEqual( [] );
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'says nothing once the block already clips to the text', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'leaves the gradient control enabled for a gradient clipped to the text', async () => {
