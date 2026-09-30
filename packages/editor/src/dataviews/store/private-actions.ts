@@ -187,6 +187,8 @@ export const registerPostTypeSchema =
 				: !! postThumbnails;
 
 			fields = [
+				// This field uses the editor's featured image and media picker
+				// hooks, which depend on editor context.
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
