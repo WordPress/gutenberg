@@ -20,7 +20,10 @@ function setup(
 }
 
 function CurrentState() {
-	const { state, cropOptions } = useMediaEditor();
+	const {
+		cropper: { state },
+		cropOptions,
+	} = useMediaEditor();
 
 	return (
 		<>
