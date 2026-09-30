@@ -25,8 +25,10 @@ if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
  * block snapshot carried inside a suggestion operation (`op.block` on
  * `block-remove` / `block-insert-after` ops), recursing into `innerBlocks`.
  *
- * Only `innerHTML` and `originalContent` are filtered: they are the fields a
- * consumer turns back into markup when the block is re-inserted on accept.
+ * `innerHTML` and `originalContent` are the fields a consumer turns back
+ * into markup when the block is re-inserted. `attributes` get the same
+ * string-leaf walk core applies to parsed blocks, so no nested value
+ * escapes the filter.
  *
  * @param array $block Serialized block snapshot (decoded from JSON).
  * @return array Snapshot with HTML-bearing fields filtered.
@@ -36,6 +38,9 @@ function gutenberg_kses_suggestion_block_snapshot( $block ) {
 		if ( isset( $block[ $key ] ) && is_string( $block[ $key ] ) ) {
 			$block[ $key ] = wp_kses_post( $block[ $key ] );
 		}
+	}
+	if ( isset( $block['attributes'] ) && is_array( $block['attributes'] ) ) {
+		$block['attributes'] = filter_block_kses_value( $block['attributes'], 'post' );
 	}
 	if ( isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
 		foreach ( $block['innerBlocks'] as $index => $inner_block ) {
@@ -59,9 +64,9 @@ function gutenberg_kses_suggestion_block_snapshot( $block ) {
  *
  *   - Users with `unfiltered_html` store the payload as-is — the same
  *     freedom they already have in post content.
- *   - Everyone else has `wp_kses_post()` applied to the string values that
- *     get APPLIED to content on accept/reject: `after`, `afterHTML`,
- *     `beforeHTML`, and the serialized block snapshot in `block`.
+ *   - Everyone else has `wp_kses_post()` applied to every string leaf of
+ *     the values that get APPLIED to content on accept/reject: `after`,
+ *     `afterHTML`, `beforeHTML`, and the serialized block snapshot in `block`.
  *
  * `before` is intentionally NOT filtered: it is only compared against live
  * content for conflict detection, never applied. Filtering it would produce
@@ -92,9 +97,11 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
 			if ( ! is_array( $operation ) ) {
 				continue;
 			}
+			// `after` can be structured (a table's `body` rows, a gallery's
+			// `images`), so every string leaf is filtered, not only strings.
 			foreach ( array( 'after', 'afterHTML', 'beforeHTML' ) as $key ) {
-				if ( isset( $operation[ $key ] ) && is_string( $operation[ $key ] ) ) {
-					$operation[ $key ] = wp_kses_post( $operation[ $key ] );
+				if ( isset( $operation[ $key ] ) ) {
+					$operation[ $key ] = filter_block_kses_value( $operation[ $key ], 'post' );
 				}
 			}
 			if ( isset( $operation['block'] ) && is_array( $operation['block'] ) ) {
