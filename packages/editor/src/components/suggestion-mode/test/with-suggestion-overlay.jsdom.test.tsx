@@ -24,7 +24,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { unregisterFormatType } from '@wordpress/rich-text';
+import { RichTextData, unregisterFormatType } from '@wordpress/rich-text';
 import withSuggestionOverlay, {
 	mergeOverlayAttributes,
 	structuralMarkerClass,
@@ -112,7 +112,9 @@ function renderWithProviders(
 function FakeBlock( { attributes, setAttributes }: any ) {
 	return (
 		<>
-			<div data-testid="content">{ attributes?.content ?? '' }</div>
+			<div data-testid="content">
+				{ String( attributes?.content ?? '' ) }
+			</div>
 			<div data-testid="level">{ attributes?.level ?? '' }</div>
 			<button
 				type="button"
@@ -195,7 +197,11 @@ describe( 'withSuggestionOverlay', () => {
 				<Wrapped
 					clientId="a"
 					name="core/paragraph"
-					attributes={ { content: 'Hello' } }
+					// Paragraph content is always `RichTextData` in the
+					// editor; the planner declines plain strings.
+					attributes={ {
+						content: RichTextData.fromHTMLString( 'Hello' ),
+					} }
 					setAttributes={ setAttributes }
 				/>
 			</>,
@@ -212,9 +218,9 @@ describe( 'withSuggestionOverlay', () => {
 			expect.objectContaining( {
 				clientId: 'a',
 				blockName: 'core/paragraph',
-				prevContent: 'Hello',
 			} )
 		);
+		expect( String( request.prevContent ) ).toBe( 'Hello' );
 		expect( request.plan.actions.length ).toBeGreaterThan( 0 );
 		expect(
 			request.plan.actions.every( ( action: any ) => action.newNote )
