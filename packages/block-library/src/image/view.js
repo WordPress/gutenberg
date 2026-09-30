@@ -73,29 +73,47 @@ function getImageSrcset( { lightboxSrcset } ) {
  *
  * @param {HTMLImageElement} imageRef Original image.
  * @param {number}           scale    Scale applied to the lightbox container.
- * @return {string} The radii, e.g. `8px 8px 8px 8px / 8px 8px 8px 8px`.
+ * @return {string} The radii, e.g. `8px 8px 8px 8px / 8px 8px 8px 8px`, or an
+ *                  empty string when the image has square corners.
  */
 function getScaledBorderRadius( imageRef, scale ) {
 	const style = window.getComputedStyle( imageRef );
+	const width = imageRef.offsetWidth;
+	const height = imageRef.offsetHeight;
 	const toPx = ( value, size ) => {
 		const length = parseFloat( value ) || 0;
-		return (
-			( value.endsWith( '%' ) ? ( length * size ) / 100 : length ) / scale
-		);
+		return value.endsWith( '%' ) ? ( length * size ) / 100 : length;
 	};
+	// Horizontal and vertical radii of each corner, clockwise from top left.
 	const radii = [ 'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft' ].map(
 		( corner ) => {
 			// The computed value is either `<x>` or `<x> <y>`, in px or %.
 			const [ x, y = x ] =
 				style[ `border${ corner }Radius` ].split( ' ' );
-			return [
-				toPx( x, imageRef.offsetWidth ),
-				toPx( y, imageRef.offsetHeight ),
-			];
+			return [ toPx( x, width ), toPx( y, height ) ];
 		}
 	);
-	return `${ radii.map( ( [ x ] ) => `${ x }px` ).join( ' ' ) } / ${ radii
-		.map( ( [ , y ] ) => `${ y }px` )
+	if ( radii.every( ( [ x, y ] ) => ! x && ! y ) ) {
+		return '';
+	}
+
+	// Shrink radii that don't fit the image, as browsers do when rendering
+	// them (e.g. `9999px` for pill shapes).
+	const [ topLeft, topRight, bottomRight, bottomLeft ] = radii;
+	const fit = ( size, sum ) => ( sum > 0 ? size / sum : 1 );
+	const factor =
+		Math.min(
+			1,
+			fit( width, topLeft[ 0 ] + topRight[ 0 ] ),
+			fit( width, bottomLeft[ 0 ] + bottomRight[ 0 ] ),
+			fit( height, topLeft[ 1 ] + bottomLeft[ 1 ] ),
+			fit( height, topRight[ 1 ] + bottomRight[ 1 ] )
+		) / scale;
+	const toCss = ( value ) =>
+		`${ Math.round( value * factor * 100 ) / 100 }px`;
+
+	return `${ radii.map( ( [ x ] ) => toCss( x ) ).join( ' ' ) } / ${ radii
+		.map( ( [ , y ] ) => toCss( y ) )
 		.join( ' ' ) }`;
 }
 
@@ -578,6 +596,10 @@ const { state, actions, callbacks } = store(
 				const cropY = ( containerHeight - thumbnailHeight ) / 2;
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
+				const initialClipRadius = getScaledBorderRadius(
+					state.selectedImage.imageRef,
+					containerScale
+				);
 
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
@@ -592,10 +614,9 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
 					--wp--lightbox-image-width: ${ containerWidth }px;
 					--wp--lightbox-image-height: ${ containerHeight }px;
-					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px round ${ getScaledBorderRadius(
-						state.selectedImage.imageRef,
-						containerScale
-					) });
+					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px${
+						initialClipRadius ? ` round ${ initialClipRadius }` : ''
+					});
 					--wp--lightbox-thumbnail-width: ${
 						hasCroppedSource ? thumbnailWidth : containerWidth
 					}px;

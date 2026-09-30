@@ -1081,28 +1081,64 @@ test.describe( 'Image - lightbox', () => {
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 
-			// Round the corners from theme CSS, and show the 10x10 image at
-			// half size so the zoom animation starts at a scale of 0.5.
-			await page.addStyleTag( {
-				content: `.wp-lightbox-container img {
-					width: 5px !important;
-					height: 5px !important;
-					border-radius: 1px 40%;
-				}`,
-			} );
-
 			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeVisible();
-			await lightboxImage.click();
-
 			const overlay = page.locator( '.wp-lightbox-overlay' );
-			await expect( overlay ).toHaveClass( /active/ );
+			await expect( lightboxImage ).toBeVisible();
 
-			// 1px and 40% of 5px, divided by the 0.5 scale.
-			await expect( overlay ).toHaveAttribute(
-				'style',
-				/--wp--lightbox-initial-clip:\s*inset\(0px 0px round 2px 4px 2px 4px \/ 2px 4px 2px 4px\)/
-			);
+			// The 10x10 image is shown at 5x5, so the zoom starts at a scale
+			// of 0.5 and the radii are doubled in the lightbox container.
+			const cases = [
+				{
+					borderRadius: '1px 40%',
+					// 1px and 40% of 5px, divided by the scale.
+					expected:
+						'inset(0px 0px round 2px 4px 2px 4px / 2px 4px 2px 4px)',
+				},
+				{
+					borderRadius: '9999px',
+					// Shrunk to fit the 5px image like the browser does.
+					expected:
+						'inset(0px 0px round 5px 5px 5px 5px / 5px 5px 5px 5px)',
+				},
+				{
+					borderRadius: '0',
+					expected: 'inset(0px 0px)',
+				},
+			];
+
+			for ( const { borderRadius, expected } of cases ) {
+				await page.evaluate( ( radius ) => {
+					let style = document.getElementById( 'test-image-radius' );
+					if ( ! style ) {
+						style = document.createElement( 'style' );
+						style.id = 'test-image-radius';
+						document.head.appendChild( style );
+					}
+					style.textContent = `.wp-lightbox-container img {
+						width: 5px !important;
+						height: 5px !important;
+						border-radius: ${ radius };
+					}`;
+				}, borderRadius );
+
+				await lightboxImage.click();
+				await expect( overlay ).toHaveClass( /active/ );
+				await expect
+					.poll( () =>
+						overlay.evaluate( ( element ) =>
+							window
+								.getComputedStyle( element )
+								.getPropertyValue(
+									'--wp--lightbox-initial-clip'
+								)
+								.trim()
+						)
+					)
+					.toBe( expected );
+
+				await overlay.getByRole( 'button', { name: 'Close' } ).click();
+				await expect( overlay ).not.toHaveClass( /active/ );
+			}
 		} );
 
 		test.describe( 'Overlay not a direct child of body', () => {
