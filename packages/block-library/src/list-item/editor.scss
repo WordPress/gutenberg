@@ -1,0 +1,4 @@
+// Prevent the RichText wrapper from behaving as a block element.
+.wp-block-list-item > .block-editor-rich-text__editable.rich-text {
+	display: inline;
+}
