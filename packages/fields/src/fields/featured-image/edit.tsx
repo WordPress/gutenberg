@@ -8,7 +8,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { MediaEditControl } from '../../components/media-edit';
+import { MediaEditControl } from '@wordpress/media-utils';
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 type Item = BasePostWithEmbeddedFeaturedMedia;

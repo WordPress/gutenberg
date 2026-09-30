@@ -7214,22 +7214,6 @@
 			"count": 4
 		}
 	},
-	"packages/fields/src/components/media-edit/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
-		"no-restricted-imports": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 7
-		}
-	},
-	"packages/fields/src/components/media-edit/use-moving-animation.ts": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/fields/src/fields/author/author-view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7680,6 +7664,19 @@
 	"packages/media-fields/src/media_thumbnail/view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		}
+	},
+	"packages/media-utils/src/components/media-edit/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 4
+		},
+		"react-hooks/refs": {
+			"count": 7
+		}
+	},
+	"packages/media-utils/src/components/media-edit/use-moving-animation.ts": {
+		"react-hooks/refs": {
+			"count": 3
 		}
 	},
 	"packages/media-utils/src/components/media-upload-modal/upload-status-popover.tsx": {

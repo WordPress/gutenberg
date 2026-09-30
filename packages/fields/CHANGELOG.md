@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `MediaEdit` and its `MediaEditProps` type moved to `@wordpress/media-utils`, which this package re-exports them from. Both exports and their behavior are unchanged.
+
 ### Bug Fixes
 
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))

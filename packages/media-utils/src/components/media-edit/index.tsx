@@ -41,17 +41,12 @@ import {
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
-import {
-	MediaUpload,
-	uploadMedia,
-	privateApis as mediaUtilsPrivateApis,
-} from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-import { unlock } from '../../lock-unlock';
-import type { MediaEditProps } from '../../types';
+import MediaUpload from '../media-upload';
+import { MediaUploadModal } from '../media-upload-modal';
+import { uploadMedia } from '../../utils/upload-media';
+import type { MediaEditProps } from './types';
 import useMovingAnimation from './use-moving-animation';
-
-const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
 function AnimatedMediaItem( {
 	children,
@@ -581,7 +576,7 @@ function CompactMediaEditAttachments( {
  *
  * @example
  * ```tsx
- * import { MediaEdit } from '@wordpress/fields';
+ * import { MediaEdit } from '@wordpress/media-utils';
  * import type { DataFormControlProps } from '@wordpress/dataviews';
  *
  * const featuredImageField = {
