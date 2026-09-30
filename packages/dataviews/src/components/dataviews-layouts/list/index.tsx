@@ -219,12 +219,9 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					{ /* The `disabled` prop on `Menu.Root` (rather than on
-					     the trigger) keeps the menu from opening while
-					     letting the trigger button stay focusable via its
-					     own `accessibleWhenDisabled`. */ }
-					<Menu.Root disabled={ ! actions.length }>
+					<Menu.Root>
 						<Menu.Trigger
+							disabled={ ! actions.length }
 							render={
 								<Composite.Item
 									id={ generateDropdownTriggerCompositeId(
@@ -237,7 +234,6 @@ function ListItem< Item >( {
 											icon={ moreVertical }
 											label={ __( 'Actions' ) }
 											accessibleWhenDisabled
-											disabled={ ! actions.length }
 											onKeyDownCapture={
 												onDropdownTriggerKeyDown
 											}
