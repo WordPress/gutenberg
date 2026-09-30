@@ -37,6 +37,7 @@
  * - `slug`, for the viewable post types but the design ones.
  * - `status`, for every post type but the design ones.
  * - `sticky`, for posts, the only post type with sticky posts.
+ * - `title`, for the post types supporting `title`.
  *
  * It makes no exception for any post type: the fields a post type does not
  * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
@@ -74,6 +75,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'slug'              => is_post_type_viewable( $post_type ),
 			'status'            => true,
 			'sticky'            => 'post' === $post_type,
+			'title'             => post_type_supports( $post_type, 'title' ),
 		);
 		$all_fields = array_keys( array_filter( $applies ) );
 		if ( ! $all_fields ) {
@@ -143,6 +145,8 @@ function register_core_post_type_supports_fields( $registry ) {
  *   navigation menus): the fields about publishing a post
  *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
  *   a site rather than publish content.
+ * - Pages, templates, template parts, and patterns: `title`. They have
+ *   their own title fields, declared client-side.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -162,9 +166,14 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 			$excluded_fields[] = 'author';
 			$excluded_fields[] = 'excerpt';
 			$excluded_fields[] = 'post-content-info';
+			$excluded_fields[] = 'title';
 			break;
 		case 'wp_block':
 			$excluded_fields[] = 'excerpt';
+			$excluded_fields[] = 'title';
+			break;
+		case 'page':
+			$excluded_fields[] = 'title';
 			break;
 		case 'wp_navigation':
 			$excluded_fields[] = 'post-content-info';

@@ -21,7 +21,6 @@ import {
 	duplicateTemplatePart,
 	featuredImageField,
 	templatePartAuthorField,
-	titleField,
 	templateField,
 	templateTitleField,
 	pageTitleField,
@@ -229,6 +228,8 @@ export const registerPostTypeSchema =
 					postPreviewField,
 				isPattern && patternSyncStatusField,
 			].filter( Boolean ) as Field< any >[];
+			// The server registers the title of the other post types
+			// supporting titles.
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
 				if ( postType === 'page' ) {
@@ -239,10 +240,10 @@ export const registerPostTypeSchema =
 					[ 'wp_block', 'wp_template_part' ].includes( postType )
 				) {
 					_titleField = patternTitleField;
-				} else {
-					_titleField = titleField;
 				}
-				fields.push( _titleField );
+				if ( _titleField ) {
+					fields.push( _titleField );
+				}
 			}
 		}
 

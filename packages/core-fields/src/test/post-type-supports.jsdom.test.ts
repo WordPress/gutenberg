@@ -17,6 +17,7 @@ describe( 'post_type_supports', () => {
 			'slug',
 			'status',
 			'sticky',
+			'title',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
 			getElements: expect.any( Function ),
@@ -151,5 +152,13 @@ describe( 'post_type_supports', () => {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
 		} );
+	} );
+
+	it( 'reads the decoded title', () => {
+		expect(
+			postTypeSupports.title.getValue?.( {
+				item: { title: { rendered: 'Tom &amp; Jerry' } },
+			} )
+		).toBe( 'Tom & Jerry' );
 	} );
 } );
