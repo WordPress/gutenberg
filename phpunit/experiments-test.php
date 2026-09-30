@@ -14,11 +14,11 @@ class Experiments_Test extends WP_UnitTestCase {
 	private $original_experiments;
 
 	/**
-	 * Plugin files written by `activate_fake_plugin()`, to remove afterwards.
+	 * Plugin files written by `activate_mock_plugin()`, to remove afterwards.
 	 *
 	 * @var string[]
 	 */
-	private $fake_plugins = array();
+	private $mock_plugins = array();
 
 	public function set_up() {
 		parent::set_up();
@@ -30,7 +30,7 @@ class Experiments_Test extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		foreach ( $this->fake_plugins as $basename ) {
+		foreach ( $this->mock_plugins as $basename ) {
 			$path = WP_PLUGIN_DIR . '/' . $basename;
 
 			if ( file_exists( $path ) ) {
@@ -38,7 +38,7 @@ class Experiments_Test extends WP_UnitTestCase {
 				rmdir( dirname( $path ) );
 			}
 		}
-		$this->fake_plugins = array();
+		$this->mock_plugins = array();
 
 		if ( false === $this->original_experiments ) {
 			delete_option( 'gutenberg-experiments' );
@@ -56,14 +56,14 @@ class Experiments_Test extends WP_UnitTestCase {
 	 * @param string      $basename Plugin basename, e.g. `foo/foo.php`.
 	 * @param string|null $version  Version header, or null to leave the file out.
 	 */
-	private function activate_fake_plugin( $basename, $version = null ) {
+	private function activate_mock_plugin( $basename, $version = null ) {
 		if ( null !== $version ) {
 			$path = WP_PLUGIN_DIR . '/' . $basename;
 
 			wp_mkdir_p( dirname( $path ) );
-			file_put_contents( $path, "<?php\n/*\nPlugin Name: Fake\nVersion: $version\n*/\n" );
+			file_put_contents( $path, "<?php\n/*\nPlugin Name: Mock\nVersion: $version\n*/\n" );
 
-			$this->fake_plugins[] = $basename;
+			$this->mock_plugins[] = $basename;
 		}
 
 		add_filter(
@@ -110,37 +110,37 @@ class Experiments_Test extends WP_UnitTestCase {
 	}
 
 	public function test_an_active_plugin_with_no_fix_released_is_detected() {
-		$this->activate_fake_plugin( 'meetinghub/meetinghub.php', '1.2.3' );
+		$this->activate_mock_plugin( 'meetinghub/meetinghub.php', '1.2.3' );
 
 		$this->assertTrue( gutenberg_has_react_19_incompatible_extension() );
 	}
 
 	public function test_an_active_plugin_older_than_its_fix_is_detected() {
-		$this->activate_fake_plugin( 'ultimate-blocks/ultimate-blocks.php', '3.5.9' );
+		$this->activate_mock_plugin( 'ultimate-blocks/ultimate-blocks.php', '3.5.9' );
 
 		$this->assertTrue( gutenberg_has_react_19_incompatible_extension() );
 	}
 
 	public function test_an_active_plugin_that_shipped_its_fix_is_not_detected() {
-		$this->activate_fake_plugin( 'ultimate-blocks/ultimate-blocks.php', '3.6.0' );
+		$this->activate_mock_plugin( 'ultimate-blocks/ultimate-blocks.php', '3.6.0' );
 
 		$this->assertFalse( gutenberg_has_react_19_incompatible_extension() );
 	}
 
 	public function test_an_active_plugin_without_a_version_header_is_detected() {
-		$this->activate_fake_plugin( 'ultimate-blocks/ultimate-blocks.php', '' );
+		$this->activate_mock_plugin( 'ultimate-blocks/ultimate-blocks.php', '' );
 
 		$this->assertTrue( gutenberg_has_react_19_incompatible_extension() );
 	}
 
 	public function test_an_active_plugin_missing_from_disk_is_not_detected() {
-		$this->activate_fake_plugin( 'meetinghub/meetinghub.php' );
+		$this->activate_mock_plugin( 'meetinghub/meetinghub.php' );
 
 		$this->assertFalse( gutenberg_has_react_19_incompatible_extension() );
 	}
 
 	public function test_an_unrelated_active_plugin_is_not_detected() {
-		$this->activate_fake_plugin( 'akismet/akismet.php', '1.0.0' );
+		$this->activate_mock_plugin( 'akismet/akismet.php', '1.0.0' );
 
 		$this->assertFalse( gutenberg_has_react_19_incompatible_extension() );
 	}
