@@ -1,4 +1,5 @@
 import {
+	__experimentalToolsPanelContext as ToolsPanelContext,
 	FontSizePicker,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -7,7 +8,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
@@ -209,6 +210,24 @@ export function TypographyToolsPanel( {
 			{ children }
 		</ToolsPanel>
 	);
+}
+
+/**
+ * Renders a notice only while the control it describes is on screen. The panel
+ * itself knows whether a block supports a control, not whether the user has
+ * turned it on, which the ToolsPanel holds.
+ *
+ * @param {Object}  props
+ * @param {string}  props.label            Label the control registers under.
+ * @param {boolean} props.isShownByDefault Whether the control needs no opt in.
+ * @param {Element} props.children         The notice.
+ */
+function NoticeForControl( { label, isShownByDefault, children } ) {
+	const { menuItems } = useContext( ToolsPanelContext );
+	// Mirrors `ToolsPanelItem`: a default control is always there, an optional
+	// one arrives once it is checked in the panel menu.
+	const isShown = isShownByDefault || !! menuItems?.optional?.[ label ];
+	return isShown ? children : null;
 }
 
 const DEFAULT_CONTROLS = {
@@ -1365,22 +1384,32 @@ export default function TypographyPanel( {
 				</InheritanceToolsPanelItem>
 			) }
 			{ hasTextColorEnabled && clipsToTextHere && (
-				<Notice
-					status="info"
-					isDismissible={ false }
-					className="block-editor-typography-panel__text-gradient-notice"
+				<NoticeForControl
+					label={ __( 'Color' ) }
+					isShownByDefault={ defaultControls.textColor }
 				>
-					{ textGradientNotice }
-				</Notice>
+					<Notice
+						status="info"
+						isDismissible={ false }
+						className="block-editor-typography-panel__text-gradient-notice"
+					>
+						{ textGradientNotice }
+					</Notice>
+				</NoticeForControl>
 			) }
 			{ hasTextGradientEnabled && hasBlockBackground && (
-				<Notice
-					status="info"
-					isDismissible={ false }
-					className="block-editor-typography-panel__text-gradient-notice"
+				<NoticeForControl
+					label={ __( 'Gradient' ) }
+					isShownByDefault={ defaultControls.textGradient }
 				>
-					{ backgroundOverrideNotice }
-				</Notice>
+					<Notice
+						status="info"
+						isDismissible={ false }
+						className="block-editor-typography-panel__text-gradient-notice"
+					>
+						{ backgroundOverrideNotice }
+					</Notice>
+				</NoticeForControl>
 			) }
 		</Wrapper>
 	);

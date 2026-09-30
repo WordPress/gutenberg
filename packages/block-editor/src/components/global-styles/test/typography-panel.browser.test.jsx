@@ -1238,6 +1238,18 @@ describe( 'TypographyPanel text gradient', () => {
 		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
 	} );
 
+	it( 'says nothing while the Gradient control is off the panel', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			// Gradient not shown, so there is nothing on screen to warn about.
+			defaultControls: { textColor: true },
+			value: { color: { background: '#000000' } },
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'says nothing once the block already clips to the text', async () => {
 		const { container } = await renderPanel( {
 			settings: gradientSettings,
