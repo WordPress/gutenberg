@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
+import { inertValue } from '@wordpress/ui';
 import { useMergeRefs } from '@wordpress/compose';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
@@ -157,7 +158,8 @@ export function GridItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
 					</div>
