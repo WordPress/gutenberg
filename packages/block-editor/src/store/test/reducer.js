@@ -4254,7 +4254,7 @@ describe( 'state', () => {
 
 		describe( 'edit mode', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -4308,7 +4308,7 @@ describe( 'state', () => {
 
 		describe( 'synced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the pattern is inserted with no inner blocks.
 				// - next the pattern is marked as a controlled block.
@@ -4873,7 +4873,7 @@ describe( 'state', () => {
 
 		describe( 'contentOnly template locking', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5131,7 +5131,7 @@ describe( 'state', () => {
 		describe( 'zoom out mode', () => {
 			let initialState;
 
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5322,7 +5322,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5484,7 +5484,7 @@ describe( 'state', () => {
 
 		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
@@ -5592,7 +5592,7 @@ describe( 'state', () => {
 
 		describe( 'isIsolatedEditor setting', () => {
 			let stateWithUnsyncedPatternAndTemplatePart;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Set up a state with both an unsynced pattern and a template part.
 				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
 					[
@@ -5762,7 +5762,7 @@ describe( 'state', () => {
 
 		describe( 'template parts', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the template part is inserted with no inner blocks.
 				// - next the template part is marked as a controlled block.
@@ -5876,7 +5876,7 @@ describe( 'state', () => {
 
 		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
 			let initialState;
-			beforeAll( () => {
+			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{

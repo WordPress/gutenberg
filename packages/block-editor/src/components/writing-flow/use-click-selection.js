@@ -3,6 +3,7 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -11,7 +12,8 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
-	} = useSelect( blockEditorStore );
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
@@ -84,6 +86,31 @@ export default function useClickSelection() {
 					// multiselection (focus moved to first block's multi-
 					// controls).
 					selectBlock( clickedClientId );
+				} else if (
+					clickedClientId &&
+					clickedClientId !== startClientId &&
+					canHostEditableRoot( clickedClientId )
+				) {
+					// Selecting the block makes its field inert under the
+					// engaged wrapper. Left to the re-render, that lands
+					// mid-click, after the browser placed the caret and focus
+					// in the field, and drops both. Do it now, so the default
+					// action places the caret through the host instead.
+					const editable = event.target.closest(
+						'[contenteditable="true"]'
+					);
+
+					if (
+						editable &&
+						getBlockClientId( editable ) === clickedClientId
+					) {
+						setContentEditableWrapper( node, true );
+						// Remove the attribute rather than set "inherit":
+						// Gecko does not map the invalid value to the inherit
+						// state and treats the element as non-editable.
+						editable.removeAttribute( 'contenteditable' );
+						selectBlock( clickedClientId, null );
+					}
 				}
 			}
 

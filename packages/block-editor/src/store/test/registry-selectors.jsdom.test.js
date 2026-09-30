@@ -7,9 +7,15 @@ import {
 	expect,
 	it,
 } from 'vitest';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	registerBlockVariation,
+	unregisterBlockType,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
 import { store } from '../';
+import { isFiltered } from '../utils';
 
 describe( 'selectors', () => {
 	beforeEach( () => {
@@ -430,6 +436,27 @@ describe( 'selectors', () => {
 					} )
 				);
 			} );
+		} );
+	} );
+
+	describe( 'getInserterItems', () => {
+		const options = { [ isFiltered ]: false };
+		const getItemIds = () =>
+			select( store )
+				.getInserterItems( null, options )
+				.map( ( { id } ) => id );
+
+		it( 'should reflect registered and unregistered variations', () => {
+			expect( getItemIds() ).not.toContain( 'core/test-block-a/foo' );
+
+			registerBlockVariation( 'core/test-block-a', {
+				name: 'foo',
+				title: 'Foo',
+			} );
+			expect( getItemIds() ).toContain( 'core/test-block-a/foo' );
+
+			unregisterBlockVariation( 'core/test-block-a', 'foo' );
+			expect( getItemIds() ).not.toContain( 'core/test-block-a/foo' );
 		} );
 	} );
 } );
