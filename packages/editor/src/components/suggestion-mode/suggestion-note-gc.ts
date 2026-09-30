@@ -48,6 +48,7 @@ import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionOverlay } from './overlay-context';
+import { getBlockTreeVersion } from './block-tree-version';
 import {
 	findInlineOp,
 	findStructuralOp,
@@ -199,9 +200,10 @@ function buildAnchorIndex(
 type AnchorIndex = ReturnType< typeof buildAnchorIndex >;
 
 /*
- * Index cache keyed by the `getBlocks()` tree, which the block-editor store
- * replaces on any attribute or structure change. Store updates that leave the
- * tree alone (selection, notices, entity records) reuse the last index.
+ * Index cache keyed by the block tree version, which changes on any block
+ * attribute or structure change, controlled inner blocks included. Store
+ * updates that leave every block alone (selection, notices, entity records)
+ * reuse the last index.
  */
 const anchorIndexCache = new WeakMap<
 	object,
@@ -219,15 +221,15 @@ function getAnchorIndex(
 	blockEditor: any,
 	inlineAttributes: Set< string >
 ): AnchorIndex {
-	const blocks = blockEditor.getBlocks?.();
+	const version = getBlockTreeVersion( blockEditor );
 	const key = [ ...inlineAttributes ].sort().join( '|' );
-	const cached = blocks ? anchorIndexCache.get( blocks ) : undefined;
+	const cached = version ? anchorIndexCache.get( version ) : undefined;
 	if ( cached && cached.key === key ) {
 		return cached.index;
 	}
 	const index = buildAnchorIndex( blockEditor, inlineAttributes );
-	if ( blocks ) {
-		anchorIndexCache.set( blocks, { key, index } );
+	if ( version ) {
+		anchorIndexCache.set( version, { key, index } );
 	}
 	return index;
 }
