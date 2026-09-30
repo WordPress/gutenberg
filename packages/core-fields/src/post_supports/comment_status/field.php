@@ -7,6 +7,7 @@
  */
 
 return array(
+	'supports'      => 'comments',
 	'type'          => 'text',
 	'label'         => __( 'Comments', 'gutenberg' ),
 	'Edit'          => 'radio',

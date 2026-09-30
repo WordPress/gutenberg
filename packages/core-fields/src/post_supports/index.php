@@ -1,64 +1,28 @@
 <?php
 /**
- * Registers the fields of the `post_supports` collection: the default fields
- * of every post type exposed in the REST API, each derived from a support of
- * the post type.
+ * The `post_supports` collection: the default fields of every post type
+ * exposed in the REST API, each derived from a support of the post type.
  *
  * - `author`, for the post types supporting `author`.
  * - `comment_status`, for the post types supporting `comments`.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  *
- * Only the author field has JavaScript parts, so it is the only one
- * registered with the script module of the collection: a post type without
- * authors does not load the module.
+ * The `supports` of each `field.php` declares the support it derives from.
+ * A post type whose own collection redefines or drops some of these fields
+ * excludes their supports with `exclude_supports`, see the `wp_template`,
+ * `wp_template_part`, and `attachment` collections.
+ *
+ * Only the author field has JavaScript parts, but every field of the
+ * collection is registered with its script module: a post type supporting
+ * only comments or notes lists the module too, which is small.
  *
  * @package WordPress
  */
 
-/**
- * Registers the fields of the `post_supports` collection for the post types
- * they apply to.
- *
- * The fields depend on the supports of the post type, which are not final
- * until `init` completes: core registers its post types on `init` at
- * priority 0, custom post types are usually registered at the default
- * priority, and plugins add or remove supports on `init` too. Hence it runs
- * on `fields_api_init`, which the registry fires on its first read, after
- * `init`. At priority 0, so a plugin altering the defaults on the registry
- * at the default priority sees them registered. The post types whose fields
- * differ from these defaults adjust them in their own collection, at
- * priority 9.
- *
- * @param WP_Fields_Registry $registry The registry being read.
- */
-function register_core_fields_post_supports( $registry ) {
-	$fields = wp_get_field_collection_fields( __DIR__ );
-
-	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
-		if ( isset( $fields['author'] ) && post_type_supports( $post_type, 'author' ) ) {
-			$registry->register( 'core', 'postType', $post_type, array( $fields['author'] ), '@wordpress/core-fields/post_supports' );
-		}
-
-		// The remaining fields are plain data: no script module.
-		$data_fields = array();
-
-		if ( isset( $fields['comment_status'] ) && post_type_supports( $post_type, 'comments' ) ) {
-			$data_fields[] = $fields['comment_status'];
-		}
-
-		// Notes are declared as an argument of the `editor` support, e.g.
-		// `'supports' => array( 'editor' => array( 'notes' => true ) )`, which
-		// WordPress stores as a list of argument arrays. A bare `editor`
-		// support is stored as `true`, hence the array check.
-		$editor_args = get_all_post_type_supports( $post_type )['editor'] ?? null;
-		if ( isset( $fields['notesCount'] ) && is_array( $editor_args ) && array_filter( array_column( $editor_args, 'notes' ) ) ) {
-			$data_fields[] = $fields['notesCount'];
-		}
-
-		if ( ! empty( $data_fields ) ) {
-			$registry->register( 'core', 'postType', $post_type, $data_fields );
-		}
-	}
-}
-add_action( 'fields_api_init', 'register_core_fields_post_supports', 0 );
+return array(
+	'origin' => 'core',
+	'kind'   => 'postType',
+	'name'   => null,
+	'module' => '@wordpress/core-fields/post_supports',
+);

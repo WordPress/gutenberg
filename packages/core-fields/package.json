@@ -47,15 +47,7 @@
 	"wpCopyFiles": {
 		"files": [
 			"src/**/*.php"
-		],
-		"transforms": {
-			"php": {
-				"functionPrefix": "gutenberg_",
-				"prefixFunctions": [
-					"wp_get_field_collection_fields"
-				]
-			}
-		}
+		]
 	},
 	"types": "build-types",
 	"sideEffects": false,
