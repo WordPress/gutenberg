@@ -3,7 +3,11 @@ import wpTemplate from '../wp_template';
 
 describe( 'wp_template', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
-		expect( Object.keys( wpTemplate ) ).toEqual( [ 'author', 'title' ] );
+		expect( Object.keys( wpTemplate ) ).toEqual( [
+			'author',
+			'description',
+			'title',
+		] );
 	} );
 
 	it( 'provides the JavaScript parts of the template author field', () => {
@@ -20,5 +24,22 @@ describe( 'wp_template', () => {
 				item: { author: 1, author_text: 'Twenty Twenty-Five' },
 			} )
 		).toBe( 'Twenty Twenty-Five' );
+	} );
+
+	it( 'edits the description of custom templates only', () => {
+		const { getValue, isVisible } = wpTemplate.description;
+		expect(
+			getValue?.( { item: { description: 'Tom &amp; Jerry' } } )
+		).toBe( 'Tom & Jerry' );
+		expect(
+			isVisible?.( {
+				source: 'custom',
+				has_theme_file: false,
+				is_custom: true,
+			} )
+		).toBe( true );
+		expect( isVisible?.( { source: 'theme', has_theme_file: true } ) ).toBe(
+			false
+		);
 	} );
 } );

@@ -892,12 +892,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template' ), null, 'id' );
-		$this->assertSame( array( 'author', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The default author and title fields are not registered.' );
+		$this->assertSame( array( 'author', 'description', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The default author and title fields are not registered.' );
 		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( 'author', 'title' ),
+			array( 'author', 'description', 'title' ),
 			gutenberg_get_registered_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
 			'The fields of templates ship their JavaScript parts in the module of the collection.'
 		);
