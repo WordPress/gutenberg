@@ -1,4 +1,4 @@
-import tokenFallbacks from '@wordpress/theme/design-token-fallbacks.js';
+import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 import {
 	addFallbackToVar as _addFallbackToVar,
 	getTokenFallback as _getTokenFallback,
@@ -16,6 +16,8 @@ import {
  * `./add-fallback-to-var.mjs`, prebound to the package's token fallback
  * map. Update the regex/replacement logic in that file, not here.
  *
+ * Returns the value unchanged when `@wordpress/theme` is not installed.
+ *
  * @param {string}  cssValue               A CSS declaration value.
  * @param {Object}  [options]              Options.
  * @param {boolean} [options.escapeQuotes] When true, escape `"` and `'` in
@@ -28,8 +30,17 @@ import {
  * @return {string}                        The value with fallbacks injected.
  */
 export function addFallbackToVar( cssValue, options ) {
+	if ( ! tokenFallbacks ) {
+		return cssValue;
+	}
 	return _addFallbackToVar( cssValue, tokenFallbacks, options );
 }
+
+/**
+ * Whether design token fallbacks are available, i.e. whether
+ * `@wordpress/theme` is installed. The plugins do nothing without them.
+ */
+export const hasTokenFallbacks = tokenFallbacks !== undefined;
 
 /**
  * Get the generated fallback for a design token.
@@ -38,5 +49,5 @@ export function addFallbackToVar( cssValue, options ) {
  * @return {string} The token fallback.
  */
 export function getTokenFallback( tokenName ) {
-	return _getTokenFallback( tokenName, tokenFallbacks );
+	return _getTokenFallback( tokenName, tokenFallbacks ?? {} );
 }

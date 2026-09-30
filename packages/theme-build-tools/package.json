@@ -30,6 +30,7 @@
 	"files": [
 		"build-types",
 		"*-plugins/**",
+		"lib/**",
 		"*.md",
 		"!build-types/**/*.d.mts.map",
 		"!build-types/**/*.d.ts.map",
@@ -74,11 +75,11 @@
 		"@babel/types": "^7.29.7",
 		"@jridgewell/remapping": "^2.3.5",
 		"@jridgewell/trace-mapping": "^0.3.31",
-		"@wordpress/theme": "file:../theme",
 		"magic-string": "^0.30.21"
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"lightningcss": "^1.33.0",
@@ -89,6 +90,7 @@
 		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
+		"@wordpress/theme": ">=2.2.0 <4.0.0",
 		"esbuild": ">=0.27.2 <1.0.0",
 		"lightningcss": ">=1.33.0 <2.0.0",
 		"postcss": "^8.0.0",
@@ -96,6 +98,9 @@
 		"vite": "^7 || ^8"
 	},
 	"peerDependenciesMeta": {
+		"@wordpress/theme": {
+			"optional": true
+		},
 		"esbuild": {
 			"optional": true
 		},

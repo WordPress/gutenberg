@@ -7,7 +7,7 @@
 		"rootDir": ".",
 		"types": [ "node" ]
 	},
-	"include": [ "*-plugins/*.mjs" ],
+	"include": [ "*-plugins/*.mjs", "lib/*.mjs" ],
 	"exclude": [
 		"**/test/**",
 		"**/tests/**",

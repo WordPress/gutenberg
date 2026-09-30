@@ -1,5 +1,5 @@
 import stylelint from 'stylelint';
-import tokenList from '@wordpress/theme/design-tokens.js';
+import { tokenList } from '../lib/theme-tokens.mjs';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
@@ -36,7 +36,7 @@ function extractCSSVariables( value, prefix = '' ) {
 	return variables;
 }
 
-const knownTokens = new Set( Object.keys( tokens ) );
+const knownTokens = new Set( tokenList ?? [] );
 const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
 
 const {
@@ -59,7 +59,8 @@ const ruleFunction = ( primary ) => {
 			possible: [ true ],
 		} );
 
-		if ( ! validOptions ) {
+		// Without `@wordpress/theme` there is no token list to validate against.
+		if ( ! validOptions || ! tokenList ) {
 			return;
 		}
 
