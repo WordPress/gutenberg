@@ -27,7 +27,6 @@ interface HeaderMenuProps< Item > {
 	canMove?: boolean;
 	canInsertLeft?: boolean;
 	canInsertRight?: boolean;
-	disabled?: boolean;
 }
 
 function WithMenuSeparators( { children }: { children: ReactNode } ) {
@@ -52,7 +51,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		canMove = true,
 		canInsertLeft = true,
 		canInsertRight = true,
-		disabled = false,
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
@@ -106,7 +104,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	const isRtl = isRTL();
 
 	return (
-		<Menu.Root disabled={ disabled }>
+		<Menu.Root>
 			<Menu.Trigger
 				render={
 					<Button
@@ -114,8 +112,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						className="dataviews-view-table-header-button"
 						ref={ ref }
 						variant="tertiary"
-						disabled={ disabled }
-						accessibleWhenDisabled={ false }
 					/>
 				}
 			>

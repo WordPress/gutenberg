@@ -1,9 +1,8 @@
 import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-import DataViewsContext from '../../dataviews-context';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
@@ -30,7 +29,7 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
-	const { isDefaultUI } = useContext( DataViewsContext );
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -55,7 +54,7 @@ function ViewGrid< Item >( {
 		shouldSelectOnClick: false,
 	} );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
-	if ( ! hasData ) {
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -85,13 +84,15 @@ function ViewGrid< Item >( {
 	};
 	return (
 		<>
-			{ isDefaultUI && hasBulkActions && (
+			{ ( hasBulkActions || isActionInProgress ) && (
 				<div
 					className="dataviews-view-grid__bulk-actions-header"
 					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 					inert={ isLoading ? 'true' : undefined }
 				>
-					<BulkActionToolbar />
+					<BulkActionToolbar
+						onActionInProgressChange={ setIsActionInProgress }
+					/>
 				</div>
 			) }
 			{

@@ -175,7 +175,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
-	it( 'preserves an explicit bulk toolbar in a custom table composition', () => {
+	it( 'renders header bulk actions once in a custom table composition', () => {
 		render(
 			<DataViewWrapper
 				view={ { type: LAYOUT_TABLE } }
@@ -188,13 +188,16 @@ describe( 'DataViews component', () => {
 				<DataViews.Pagination />
 			</DataViewWrapper>
 		);
+		expect( console ).toHaveWarnedWith(
+			'DataViews.BulkActionToolbar is deprecated. Please use DataViews.Layout instead.'
+		);
 		expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: 'Delete' } )
-		).not.toHaveClass( 'is-secondary' );
+		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
+			'is-secondary'
+		);
 	} );
 
-	it( 'preserves footer bulk actions in a custom grid composition', async () => {
+	it( 'renders header bulk actions in a custom grid composition', async () => {
 		render(
 			<DataViewWrapper view={ { type: LAYOUT_GRID } } actions={ actions }>
 				<DataViews.Layout />
@@ -206,9 +209,73 @@ describe( 'DataViews component', () => {
 			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
 		);
 		expect( screen.getByText( '3 Items selected' ) ).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: 'Delete' } )
-		).not.toHaveClass( 'is-secondary' );
+		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
+			'is-secondary'
+		);
+	} );
+
+	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+		'keeps %s bulk actions visible until a callback that clears selection finishes',
+		async ( type ) => {
+			let finishAction: () => void;
+			const pending = new Promise< void >( ( resolve ) => {
+				finishAction = resolve;
+			} );
+			function PendingActionView() {
+				const [ selection, setSelection ] = useState( [ '1' ] );
+				const [ items, setItems ] = useState( data );
+				return (
+					<DataViewWrapper
+						view={ { type } }
+						data={ items }
+						selection={ selection }
+						onChangeSelection={ setSelection }
+						actions={ [
+							{
+								id: 'process',
+								label: 'Process',
+								supportsBulk: true,
+								callback: async () => {
+									setSelection( [] );
+									setItems( [] );
+									await pending;
+								},
+							},
+						] }
+					/>
+				);
+			}
+			render( <PendingActionView /> );
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Process' } )
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Process' } )
+			).toHaveClass( 'is-busy' );
+			expect( screen.getByText( '1 Item selected' ) ).toBeVisible();
+			finishAction!();
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'button', { name: 'Process' } )
+				).not.toBeInTheDocument()
+			);
+			expect( screen.getByText( 'No results' ) ).toBeVisible();
+		}
+	);
+
+	it( 'restores column controls when bulk actions become unavailable', () => {
+		const props = { selection: [ '1' ], onChangeSelection: vi.fn() };
+		const { rerender } = render(
+			<DataViewWrapper { ...props } actions={ actions } />
+		);
+		rerender( <DataViewWrapper { ...props } actions={ [] } /> );
+		const titleHeader = screen.getByRole( 'columnheader', {
+			name: 'Title',
+		} );
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( titleHeader.closest( 'tr' ) ).not.toHaveAttribute( 'inert' );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 	} );
 
 	it( 'disabled desktop bulk action cannot run', async () => {
@@ -257,7 +324,9 @@ describe( 'DataViews component', () => {
 			name: 'Title',
 		} );
 		expect( tableHeader ).not.toHaveAttribute( 'inert' );
-		expect( within( titleHeader ).getByRole( 'button' ) ).toBeDisabled();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( titleHeader.closest( 'tr' ) ).toHaveAttribute( 'inert' );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 		expect(
 			within( toolbarCell ).getByRole( 'checkbox', {
 				name: 'Deselect all',
@@ -1010,14 +1079,14 @@ describe( 'DataViews component', () => {
 			const firstCheckbox = screen.getByRole( 'checkbox', {
 				name: data[ 0 ].title,
 			} );
-			const thirdCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 2 ].title,
-			} );
 			const user = userEvent.setup();
 			await user.click( firstCheckbox );
 
 			// First item should be selected.
 			expect( firstCheckbox ).toBeChecked();
+			const thirdCheckbox = screen.getByRole( 'checkbox', {
+				name: data[ 2 ].title,
+			} );
 			await user.click( thirdCheckbox );
 
 			// Both items should be selected (checkboxes toggle independently).
@@ -1434,7 +1503,7 @@ describe( 'DataViews component', () => {
 			);
 			await user.click( bulkActions );
 
-			const disabledAction = screen.getByRole( 'menuitem', {
+			const disabledAction = await screen.findByRole( 'menuitem', {
 				name: 'Edit',
 			} );
 			expect( disabledAction ).toHaveAttribute( 'aria-disabled', 'true' );

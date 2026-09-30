@@ -1,11 +1,11 @@
-import { Button, DropdownMenu, MenuItem } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox, pending WordPress/gutenberg#76135.
-import { Checkbox, Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox and Menu, pending WordPress/gutenberg#76135.
+import { Checkbox, Menu, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
@@ -118,7 +118,7 @@ interface ActionButtonProps< Item > {
 	selectedItems: Item[];
 	actionInProgress: string | null;
 	onAction: ( action: Action< Item >, items: Item[] ) => void;
-	onClose?: () => void;
+	isMenuItem?: boolean;
 }
 
 interface ToolbarContentProps< Item > {
@@ -129,6 +129,7 @@ interface ToolbarContentProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isInfiniteScroll: boolean;
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
+	onActionInProgressChange?: ( inProgress: boolean ) => void;
 }
 
 function ActionTrigger< Item >( {
@@ -137,17 +138,14 @@ function ActionTrigger< Item >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
-	const { isDefaultUI } = useContext( DataViewsContext );
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
 		<Button
-			variant={ isDefaultUI ? 'secondary' : undefined }
-			className={
-				isDefaultUI ? 'dataviews-bulk-actions__action' : undefined
-			}
+			variant="secondary"
+			className="dataviews-bulk-actions__action"
 			disabled={ !! action.disabled || isBusy }
 			accessibleWhenDisabled
 			label={ isMobile ? label : undefined }
@@ -168,7 +166,7 @@ function ActionButton< Item >( {
 	selectedItems,
 	actionInProgress,
 	onAction,
-	onClose,
+	isMenuItem,
 }: ActionButtonProps< Item > ) {
 	const selectedEligibleItems = useMemo(
 		() =>
@@ -178,20 +176,21 @@ function ActionButton< Item >( {
 		[ action, selectedItems ]
 	);
 	const onClick = () => {
-		onClose?.();
 		onAction( action, selectedEligibleItems );
 	};
 	const isBusy = actionInProgress === action.id;
-	if ( onClose ) {
+	if ( isMenuItem ) {
 		return (
-			<MenuItem
+			<Menu.Item
 				onClick={ onClick }
 				disabled={ !! action.disabled || isBusy }
 			>
-				{ typeof action.label === 'string'
-					? action.label
-					: action.label( selectedEligibleItems ) }
-			</MenuItem>
+				<Menu.ItemLabel>
+					{ typeof action.label === 'string'
+						? action.label
+						: action.label( selectedEligibleItems ) }
+				</Menu.ItemLabel>
+			</Menu.Item>
 		);
 	}
 	return (
@@ -215,16 +214,13 @@ function renderBulkActionsContent< Item >(
 	actionInProgress: string | null,
 	onAction: ( action: Action< Item >, items: Item[] ) => void,
 	onChangeSelection: SetSelection,
-	isDefaultUI: boolean,
 	totalItems: number,
 	isMobile: boolean,
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
-			className={
-				isDefaultUI ? 'dataviews-bulk-actions__clear' : undefined
-			}
+			className="dataviews-bulk-actions__clear"
 			icon={ closeSmall }
 			showTooltip
 			tooltipPosition="top"
@@ -235,7 +231,7 @@ function renderBulkActionsContent< Item >(
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
 		/>
 	);
-	const renderActions = ( onClose?: () => void ) =>
+	const renderActions = ( isMenuItem = false ) =>
 		actionsToShow.map( ( action ) => (
 			<ActionButton
 				key={ action.id }
@@ -243,17 +239,13 @@ function renderBulkActionsContent< Item >(
 				selectedItems={ selectedItems }
 				actionInProgress={ actionInProgress }
 				onAction={ onAction }
-				onClose={ onClose }
+				isMenuItem={ isMenuItem }
 			/>
 		) );
 	return (
 		<Stack
 			direction="row"
-			className={
-				isDefaultUI
-					? 'dataviews-bulk-actions'
-					: 'dataviews-bulk-actions-footer__container'
-			}
+			className="dataviews-bulk-actions"
 			gap="md"
 			align="center"
 			justify="start"
@@ -267,7 +259,7 @@ function renderBulkActionsContent< Item >(
 				getItemId={ getItemId }
 				disableSelectAll={ isInfiniteScroll }
 			/>
-			{ ( ! isDefaultUI || !! selection.length ) && (
+			{ !! selection.length && (
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ getFooterMessage(
 						selection.length,
@@ -277,40 +269,41 @@ function renderBulkActionsContent< Item >(
 					) }
 				</span>
 			) }
-			{ isDefaultUI && ! selection.length && <BulkActionsLabel /> }
 			<Stack
 				direction="row"
-				className={
-					isDefaultUI
-						? 'dataviews-bulk-actions__buttons'
-						: 'dataviews-bulk-actions-footer__action-buttons'
-				}
-				gap={ isDefaultUI ? 'md' : 'xs' }
+				className="dataviews-bulk-actions__buttons"
+				gap="md"
 				justify="start"
 			>
-				{ isDefaultUI && isMobile
+				{ isMobile
 					? actionsToShow.length > 0 && (
-							<DropdownMenu
-								label={ __( 'Actions' ) }
-								text={ __( 'Actions' ) }
-								icon={ chevronDown }
-								toggleProps={ {
-									variant: 'secondary',
-									size: 'compact',
-									iconPosition: 'right',
-									className: 'dataviews-bulk-actions__action',
-									disabled: !! actionInProgress,
-									isBusy: !! actionInProgress,
-									accessibleWhenDisabled: true,
-								} }
-							>
-								{ ( { onClose } ) => renderActions( onClose ) }
-							</DropdownMenu>
+							<Menu.Root>
+								<Menu.Trigger
+									disabled={ !! actionInProgress }
+									render={
+										<Button
+											variant="secondary"
+											size="compact"
+											icon={ chevronDown }
+											iconPosition="right"
+											className="dataviews-bulk-actions__action"
+											isBusy={ !! actionInProgress }
+											accessibleWhenDisabled
+										>
+											{ __( 'Actions' ) }
+										</Button>
+									}
+								/>
+								<Menu.Popup>
+									<Menu.Group>
+										{ renderActions( true ) }
+									</Menu.Group>
+								</Menu.Popup>
+							</Menu.Root>
 						)
 					: renderActions() }
-				{ ! isDefaultUI && clearSelection }
 			</Stack>
-			{ isDefaultUI && clearSelection }
+			{ clearSelection }
 		</Stack>
 	);
 }
@@ -323,9 +316,9 @@ function BulkActionsContent< Item >( {
 	getItemId,
 	isInfiniteScroll,
 	selectionCheckboxRef,
+	onActionInProgressChange,
 }: ToolbarContentProps< Item > ) {
-	const { isDefaultUI = false, paginationInfo } =
-		useContext( DataViewsContext );
+	const { paginationInfo } = useContext( DataViewsContext );
 	const [ pendingContent, setPendingContent ] =
 		useState< React.JSX.Element >();
 	const registry = useRegistry();
@@ -339,10 +332,12 @@ function BulkActionsContent< Item >( {
 			return;
 		}
 		setPendingContent( renderContent( action.id ) );
+		onActionInProgressChange?.( true );
 		try {
 			await action.callback( items, { registry } );
 		} finally {
 			setPendingContent( undefined );
+			onActionInProgressChange?.( false );
 		}
 	};
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -372,14 +367,13 @@ function BulkActionsContent< Item >( {
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
-					( ! isMobile || isDefaultUI || action.icon ) &&
 					selectedItems.some(
 						( item ) =>
 							! action.isEligible || action.isEligible( item )
 					)
 				);
 			} ),
-		[ actions, selectedItems, isMobile, isDefaultUI ]
+		[ actions, selectedItems ]
 	);
 	const renderContent = ( actionInProgress: string | null ) =>
 		renderBulkActionsContent(
@@ -393,7 +387,6 @@ function BulkActionsContent< Item >( {
 			actionInProgress,
 			onAction,
 			onChangeSelection,
-			isDefaultUI,
 			paginationInfo.totalItems,
 			isMobile,
 			selectionCheckboxRef
@@ -414,10 +407,12 @@ function BulkActionsContent< Item >( {
 
 interface BulkActionToolbarProps {
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
+	onActionInProgressChange?: ( inProgress: boolean ) => void;
 }
 
 export function BulkActionToolbar( {
 	selectionCheckboxRef,
+	onActionInProgressChange,
 }: BulkActionToolbarProps = {} ) {
 	const {
 		data,
@@ -430,6 +425,7 @@ export function BulkActionToolbar( {
 	return (
 		<BulkActionsContent
 			selectionCheckboxRef={ selectionCheckboxRef }
+			onActionInProgressChange={ onActionInProgressChange }
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }
@@ -437,15 +433,5 @@ export function BulkActionToolbar( {
 			getItemId={ getItemId }
 			isInfiniteScroll={ !! view.infiniteScrollEnabled }
 		/>
-	);
-}
-
-function BulkActionsLabel() {
-	const { fields, view } = useContext( DataViewsContext );
-	return (
-		<span>
-			{ fields.find( ( field ) => field.id === view.titleField )?.label ??
-				__( 'Items' ) }
-		</span>
 	);
 }

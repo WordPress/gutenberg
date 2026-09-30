@@ -147,8 +147,17 @@
 
 		tr {
 			border: 0;
+
+			&[inert] {
+				visibility: hidden;
+			}
 		}
 		th {
+			vertical-align: middle;
+
+			[role="checkbox"] {
+				display: flex;
+			}
 			background-color: inherit;
 			padding-top: var(--wpds-dimension-padding-sm);
 			padding-bottom: var(--wpds-dimension-padding-sm);

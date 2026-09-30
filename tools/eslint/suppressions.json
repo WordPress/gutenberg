@@ -5121,11 +5121,6 @@
 			"count": 1
 		}
 	},
-	"packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/components/dataviews-view-config/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
