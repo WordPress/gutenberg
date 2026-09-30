@@ -27,15 +27,16 @@ afterAll( () => {
 
 const SENTENCE = 'The quick brown fox jumps over the lazy dog.';
 const HEAD = 'The quick brown fox ';
+const rtd = ( html: string ) => RichTextData.fromHTMLString( html );
 
 describe( 'planStoreContentEdit', () => {
 	it( 'plans a deletion marker for the head half of a block split', () => {
 		// What `__unstableSplitSelection` dispatches: the head block keeps its
 		// client id and loses everything after the caret.
 		const plan = planStoreContentEdit(
-			{ content: SENTENCE },
-			{ content: HEAD },
-			{ content: HEAD },
+			{ content: rtd( SENTENCE ) },
+			{ content: rtd( HEAD ) },
+			{ content: rtd( HEAD ) },
 			1
 		);
 		expect( plan ).toEqual( {
@@ -51,29 +52,30 @@ describe( 'planStoreContentEdit', () => {
 		} );
 	} );
 
-	it( 'accepts RichTextData values on either side', () => {
-		const plan = planStoreContentEdit(
-			{ content: RichTextData.fromHTMLString( SENTENCE ) },
-			{ content: RichTextData.fromHTMLString( HEAD ) },
-			{ content: RichTextData.fromHTMLString( HEAD ) },
-			1
-		);
-		expect( plan?.actions?.[ 0 ]?.type ).toBe( 'wrap-del' );
+	it( 'declines plain-string content, which the appliers cannot mark', () => {
+		expect(
+			planStoreContentEdit(
+				{ content: SENTENCE },
+				{ content: HEAD },
+				{ content: HEAD },
+				1
+			)
+		).toBeNull();
 	} );
 
 	it( 'declines a change that touches any attribute besides content', () => {
 		expect(
 			planStoreContentEdit(
-				{ content: SENTENCE, level: 2 },
-				{ content: HEAD, level: 3 },
-				{ content: HEAD, level: 3 },
+				{ content: rtd( SENTENCE ), level: 2 },
+				{ content: rtd( HEAD ), level: 3 },
+				{ content: rtd( HEAD ), level: 3 },
 				1
 			)
 		).toBeNull();
 		expect(
 			planStoreContentEdit(
-				{ content: SENTENCE, level: 2 },
-				{ content: SENTENCE, level: 3 },
+				{ content: rtd( SENTENCE ), level: 2 },
+				{ content: rtd( SENTENCE ), level: 3 },
 				{ level: 3 },
 				1
 			)
@@ -83,7 +85,7 @@ describe( 'planStoreContentEdit', () => {
 	it( 'declines a non-string-like content value', () => {
 		expect(
 			planStoreContentEdit(
-				{ content: SENTENCE },
+				{ content: rtd( SENTENCE ) },
 				{ content: undefined },
 				{ content: undefined },
 				1
@@ -94,9 +96,9 @@ describe( 'planStoreContentEdit', () => {
 	it( 'declines when the planner has no action to propose', () => {
 		expect(
 			planStoreContentEdit(
-				{ content: SENTENCE },
-				{ content: SENTENCE },
-				{ content: SENTENCE },
+				{ content: rtd( SENTENCE ) },
+				{ content: rtd( SENTENCE ) },
+				{ content: rtd( SENTENCE ) },
 				1
 			)
 		).toBeNull();
@@ -108,9 +110,9 @@ describe( 'planStoreContentEdit', () => {
 		// rescue and it keeps the capture it has today.
 		expect(
 			planStoreContentEdit(
-				{ content: 'Start' },
-				{ content: 'Start one two' },
-				{ content: 'Start one two' },
+				{ content: rtd( 'Start' ) },
+				{ content: rtd( 'Start one two' ) },
+				{ content: rtd( 'Start one two' ) },
 				1
 			)
 		).toBeNull();
@@ -119,9 +121,9 @@ describe( 'planStoreContentEdit', () => {
 	it( 'declines a type-over, whose plan is a deletion plus an addition', () => {
 		expect(
 			planStoreContentEdit(
-				{ content: SENTENCE },
-				{ content: HEAD + 'sleeps.' },
-				{ content: HEAD + 'sleeps.' },
+				{ content: rtd( SENTENCE ) },
+				{ content: rtd( HEAD + 'sleeps.' ) },
+				{ content: rtd( HEAD + 'sleeps.' ) },
 				1
 			)
 		).toBeNull();
@@ -135,9 +137,9 @@ describe( 'planStoreContentEdit', () => {
 			'Hello <mark data-suggestion-id="7" data-suggestion-type="add" data-author="1" class="wp-suggestion">NEW</mark>';
 		expect(
 			planStoreContentEdit(
-				{ content: withAddition },
-				{ content: withAddition.replace( 'NEW', 'NEWER' ) },
-				{ content: withAddition.replace( 'NEW', 'NEWER' ) },
+				{ content: rtd( withAddition ) },
+				{ content: rtd( withAddition.replace( 'NEW', 'NEWER' ) ) },
+				{ content: rtd( withAddition.replace( 'NEW', 'NEWER' ) ) },
 				1
 			)
 		).toBeNull();
