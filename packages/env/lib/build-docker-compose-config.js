@@ -174,6 +174,19 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.tests.mysqlPort ?? ''
 	}}:3306`;
 
+	// MySQL healthcheck using MariaDB's official healthcheck.sh script.
+	// --connect: verifies TCP connection and that entrypoint has finished
+	// --innodb_initialized: ensures InnoDB storage engine is fully initialized
+	// MARIADB_AUTO_UPGRADE env var ensures healthcheck user exists for existing installations.
+	// Timing is generous to support slow CI environments.
+	const mysqlHealthcheck = {
+		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
+		interval: '5s',
+		timeout: '10s',
+		retries: 12,
+		start_period: '60s',
+	};
+
 	return {
 		services: {
 			mysql: {
@@ -186,8 +199,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
+					// Ensures healthcheck user is created for existing installations.
+					MARIADB_AUTO_UPGRADE: '1',
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
+				healthcheck: mysqlHealthcheck,
 			},
 			'tests-mysql': {
 				image: `mariadb:${ config.env.tests.mariadbVersion ?? 'lts' }`,
@@ -197,11 +213,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
+					// Ensures healthcheck user is created for existing installations.
+					MARIADB_AUTO_UPGRADE: '1',
 				},
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
+				healthcheck: mysqlHealthcheck,
 			},
 			wordpress: {
-				depends_on: [ 'mysql' ],
+				depends_on: {
+					mysql: {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -219,7 +242,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [ 'tests-mysql' ],
+				depends_on: {
+					'tests-mysql': {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',
