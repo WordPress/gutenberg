@@ -449,10 +449,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			unregister_post_type( 'gutenberg_book' );
 		}
 
-		$this->assertSame( array( 'author', 'comment_status', 'notesCount' ), array_column( $fields, 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount' ), array_column( $fields, 'id' ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
-			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'notesCount' ) ),
+			array( '@wordpress/core-fields/post_type_supports' => array( 'author', 'comment_status', 'discussion', 'notesCount' ) ),
 			$modules,
 			'Every default field is registered with the module of its folder.'
 		);
@@ -500,6 +500,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function data_default_fields_and_their_supports() {
 		return array(
+			'discussion'  => array( 'discussion', array( 'comments', 'trackbacks' ) ),
 			'ping_status' => array( 'ping_status', array( 'trackbacks' ) ),
 		);
 	}
@@ -581,6 +582,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame( 'radio', $fields['comment_status']['Edit'] );
 		$this->assertSame( 'boolean', $fields['ping_status']['type'] );
+		$this->assertSame( 'Discussion', $fields['discussion']['label'] );
 	}
 
 	/**
@@ -675,10 +677,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		self::reset_registry();
-		$this->assertSame( array( 'author' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
-		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
-		$this->assertSame( array( 'author', 'comment_status' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'notesCount', 'ping_status' ), $calls['post'] );
+		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'ping_status' ), $calls['post'] );
 		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
 	}
 
@@ -700,7 +702,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'gutenberg_register_core_post_type_supports_fields' );
 		self::reset_registry();
 
-		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 	}
 
 	/**
@@ -801,8 +803,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertSame( array( 'author' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
-		$this->assertSame( array( 'author', 'comment_status' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
+		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
 	}
 
 	/**

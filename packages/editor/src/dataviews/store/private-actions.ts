@@ -24,7 +24,6 @@ import {
 	dateField,
 	parentField,
 	passwordField,
-	discussionField,
 	slugField,
 	statusField,
 	templatePartAuthorField,
@@ -273,9 +272,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				'comment_status',
 				'ping_status',
-				( postTypeConfig.supports?.comments ||
-					postTypeConfig.supports?.trackbacks ) &&
-					discussionField,
+				'discussion',
 				! isDesignPostType && templateField,
 				postTypeConfig.supports?.[ 'post-formats' ] &&
 					! disablePostFormats &&

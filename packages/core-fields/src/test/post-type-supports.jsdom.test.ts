@@ -5,6 +5,7 @@ describe( 'post_type_supports', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
 		expect( Object.keys( postTypeSupports ) ).toEqual( [
 			'author',
+			'discussion',
 			'ping_status',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
@@ -45,5 +46,25 @@ describe( 'post_type_supports', () => {
 		expect( setValue?.( { item: {}, value: true } ) ).toEqual( {
 			ping_status: 'open',
 		} );
+	} );
+
+	it( 'summarizes the comment and ping statuses', () => {
+		const render = postTypeSupports.discussion.render as ( props: {
+			item: Record< string, string >;
+		} ) => string;
+		expect(
+			render( { item: { comment_status: 'open', ping_status: 'open' } } )
+		).toBe( 'Open' );
+		expect(
+			render( {
+				item: { comment_status: 'open', ping_status: 'closed' },
+			} )
+		).toBe( 'Comments only' );
+		expect(
+			render( {
+				item: { comment_status: 'closed', ping_status: 'open' },
+			} )
+		).toBe( 'Pings only' );
+		expect( render( { item: {} } ) ).toBe( 'Closed' );
 	} );
 } );
