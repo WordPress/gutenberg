@@ -266,7 +266,12 @@ function truncate(
 	}
 
 	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
-	const note = `<sub>Truncated.${ link }</sub>`;
+	const linked = `<sub>Truncated.${ link }</sub>`;
+	/* A link with no room left to sit in is worth less than the body it cost. */
+	const note =
+		linked.length > definition.budget / 2
+			? '<sub>Truncated.</sub>'
+			: linked;
 	const shorten = ( room: number ) =>
 		definition.keep === 'end'
 			? ( keepEnd( body, room, note ) ?? keepStart( body, room, note ) )
@@ -287,7 +292,8 @@ function truncate(
 		room -= candidate.length - definition.budget;
 	}
 
-	return note;
+	/* Nothing of the body fits, so say only that, and within the budget. */
+	return note.slice( 0, definition.budget );
 }
 
 /**

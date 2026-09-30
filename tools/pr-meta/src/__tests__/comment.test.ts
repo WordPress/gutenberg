@@ -847,7 +847,10 @@ describe( 'truncation repairs both edges', () => {
 		const shapes = [
 			'x'.repeat( 40000 ),
 			`\`\`\`\n${ 'y\n'.repeat( 20000 ) }`,
+			// Longer than any fixed allowance a repair might have reserved.
+			`${ '`'.repeat( 24 ) }\n${ 'y\n'.repeat( 20000 ) }`,
 			`<details>\n<summary>s</summary>\n\n${ 'z\n'.repeat( 20000 ) }`,
+			`${ '<details>\n'.repeat( 50 ) }${ 'z\n'.repeat( 20000 ) }`,
 			'a\r\n'.repeat( 20000 ),
 		];
 
@@ -871,7 +874,27 @@ describe( 'truncation repairs both edges', () => {
 					definition.budget
 				);
 				expect( comment.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
+				/* A budget met by keeping nothing would be no use. */
+				expect( section.length ).toBeGreaterThan(
+					definition.budget / 2
+				);
 			}
 		}
+	} );
+
+	/* The note is built from the run URL, which is not bounded either. */
+	it( 'stays within budget when the run link cannot fit', () => {
+		const definition = getSection( 'labels' )!;
+		const merged = bodyOf(
+			mergeSection( undefined, {
+				id: 'labels',
+				body: 'Warning.\n'.repeat( 5000 ),
+				runUrl: `https://example.com/${ 'u'.repeat( 70000 ) }`,
+			} )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+		expect( merged.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
 	} );
 } );
