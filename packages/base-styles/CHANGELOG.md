@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `radio-control`: Use the design system color tokens ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+
 ## 13.2.0 (2026-09-23)
 
 ### Enhancements
