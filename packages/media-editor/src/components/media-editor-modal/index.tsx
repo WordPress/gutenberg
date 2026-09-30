@@ -3,22 +3,13 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
-import type { Field } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import MediaEditor from '../media-editor';
-import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 interface MediaEditorModalProps {
-	/**
-	 * Attachment fields to render in the Details tab.
-	 *
-	 * Passed from the editor layer (which owns the `usePostFields` hook),
-	 * since `@wordpress/media-editor` cannot depend on `@wordpress/editor`.
-	 */
-	fields?: Field< Media >[];
 	/**
 	 * Fixed aspect-ratio presets for image cropping. Free and Original are
 	 * always provided by the media editor.
@@ -46,7 +37,6 @@ function ModalFooter() {
 }
 
 export function MediaEditorModal( {
-	fields = [],
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
 	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
@@ -88,7 +78,6 @@ export function MediaEditorModal( {
 	return (
 		<MediaEditor
 			id={ id }
-			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
