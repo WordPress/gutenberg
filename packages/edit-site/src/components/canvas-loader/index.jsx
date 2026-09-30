@@ -8,7 +8,7 @@ import { unlock } from '../../lock-unlock';
 const { useStyle } = unlock( editorPrivateApis );
 
 export default function CanvasLoader( { id } ) {
-	const textColor = useStyle( 'color.text' );
+	const backgroundColor = useStyle( 'color.background' );
 	const { elapsed, total } = useSelect( ( select ) => {
 		const selectorsByStatus = select( coreStore ).countSelectorsByStatus();
 		const resolving = selectorsByStatus.resolving ?? 0;
@@ -21,7 +21,9 @@ export default function CanvasLoader( { id } ) {
 
 	return (
 		<div className="edit-site-canvas-loader">
-			<ThemeProvider color={ textColor ? { primary: textColor } : {} }>
+			<ThemeProvider
+				color={ backgroundColor ? { background: backgroundColor } : {} }
+			>
 				<ProgressBar id={ id } max={ total } value={ elapsed } />
 			</ThemeProvider>
 		</div>

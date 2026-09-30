@@ -8,7 +8,7 @@
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
--   `ProgressBar`: Use the WordPress Design System track and thumb color tokens. Overriding `--wp-components-color-foreground` (including through `Theme`) no longer recolors it; use `ThemeProvider` from `@wordpress/theme` instead ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
+-   `ProgressBar`: Use the WordPress Design System neutral track and thumb color tokens. Overriding `--wp-components-color-foreground` (including through `Theme`) no longer recolors it; use `ThemeProvider` from `@wordpress/theme` instead ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ### Enhancements
 
