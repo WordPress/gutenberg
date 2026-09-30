@@ -66,6 +66,39 @@ function getImageSrcset( { lightboxSrcset } ) {
 	return lightboxSrcset || '';
 }
 
+/**
+ * Returns the border radius of the original image as `inset()` radii in the
+ * coordinate space of the scaled lightbox container, so the zoom animation
+ * starts and ends with the same corners as the original image.
+ *
+ * @param {HTMLImageElement} imageRef Original image.
+ * @param {number}           scale    Scale applied to the lightbox container.
+ * @return {string} The radii, e.g. `8px 8px 8px 8px / 8px 8px 8px 8px`.
+ */
+function getScaledBorderRadius( imageRef, scale ) {
+	const style = window.getComputedStyle( imageRef );
+	const toPx = ( value, size ) => {
+		const length = parseFloat( value ) || 0;
+		return (
+			( value.endsWith( '%' ) ? ( length * size ) / 100 : length ) / scale
+		);
+	};
+	const radii = [ 'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft' ].map(
+		( corner ) => {
+			// The computed value is either `<x>` or `<x> <y>`, in px or %.
+			const [ x, y = x ] =
+				style[ `border${ corner }Radius` ].split( ' ' );
+			return [
+				toPx( x, imageRef.offsetWidth ),
+				toPx( y, imageRef.offsetHeight ),
+			];
+		}
+	);
+	return `${ radii.map( ( [ x ] ) => `${ x }px` ).join( ' ' ) } / ${ radii
+		.map( ( [ , y ] ) => `${ y }px` )
+		.join( ' ' ) }`;
+}
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -559,7 +592,10 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
 					--wp--lightbox-image-width: ${ containerWidth }px;
 					--wp--lightbox-image-height: ${ containerHeight }px;
-					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);
+					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px round ${ getScaledBorderRadius(
+						state.selectedImage.imageRef,
+						containerScale
+					) });
 					--wp--lightbox-thumbnail-width: ${
 						hasCroppedSource ? thumbnailWidth : containerWidth
 					}px;
