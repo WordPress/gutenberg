@@ -29,6 +29,7 @@
  *   argument.
  * - `ping_status`, for the post types supporting `trackbacks`.
  * - `post-content-info`, for the post types supporting `editor`.
+ * - `sticky`, for posts, the only post type with sticky posts.
  *
  * It makes no exception for any post type: the fields a post type does not
  * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
@@ -58,6 +59,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'notesCount'        => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 			'ping_status'       => post_type_supports( $post_type, 'trackbacks' ),
 			'post-content-info' => post_type_supports( $post_type, 'editor' ),
+			'sticky'            => 'post' === $post_type,
 		);
 		$all_fields = array_keys( array_filter( $applies ) );
 		if ( ! $all_fields ) {

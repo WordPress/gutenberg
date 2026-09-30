@@ -9,6 +9,7 @@ describe( 'post_type_supports', () => {
 			'excerpt',
 			'ping_status',
 			'post-content-info',
+			'sticky',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
 			getElements: expect.any( Function ),
@@ -68,5 +69,14 @@ describe( 'post_type_supports', () => {
 			} )
 		).toBe( 'Pings only' );
 		expect( render( { item: {} } ) ).toBe( 'Closed' );
+	} );
+
+	it( 'shows the sticky field when the post can be made sticky', () => {
+		const { isVisible } = postTypeSupports.sticky;
+		expect( isVisible?.( { _links: { 'wp:action-sticky': [] } } ) ).toBe(
+			true
+		);
+		expect( isVisible?.( { _links: {} } ) ).toBe( false );
+		expect( isVisible?.( {} ) ).toBe( true );
 	} );
 } );

@@ -688,7 +688,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info' ), $calls['post'] );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status', 'post-content-info', 'sticky' ), $calls['post'] );
 		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
 	}
 
@@ -720,6 +720,18 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_template_parts_do_not_get_the_default_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
 		$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'wp_template_part' ) );
+	}
+
+	/**
+	 * Only posts have sticky posts, so only they get the sticky field.
+	 */
+	public function test_only_posts_get_the_sticky_field() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'editor' ) ) );
+		self::reset_registry();
+
+		$this->assertContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'post' ), 'id' ) );
+		$this->assertNotContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'sticky', array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 	}
 
 	/**
