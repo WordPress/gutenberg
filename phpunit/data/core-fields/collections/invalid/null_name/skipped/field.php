@@ -1,11 +1,11 @@
 <?php
 /**
- * A field without `supports`.
+ * A field skipped with its collection.
  *
  * @package gutenberg
  */
 
 return array(
 	'type'  => 'text',
-	'label' => 'Unconditional',
+	'label' => 'Skipped',
 );

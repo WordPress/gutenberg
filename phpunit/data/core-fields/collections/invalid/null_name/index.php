@@ -1,6 +1,6 @@
 <?php
 /**
- * A collection for every post type.
+ * A collection with a null `name`: a collection is for a single entity.
  *
  * @package gutenberg
  */
@@ -9,5 +9,4 @@ return array(
 	'origin' => 'fixture',
 	'kind'   => 'postType',
 	'name'   => null,
-	'module' => 'fixture/everywhere',
 );

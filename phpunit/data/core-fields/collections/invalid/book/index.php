@@ -1,6 +1,6 @@
 <?php
 /**
- * A valid collection for books, with an invalid field.
+ * A valid collection for books, registered along the invalid ones.
  *
  * @package gutenberg
  */

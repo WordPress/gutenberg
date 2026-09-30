@@ -1,6 +1,6 @@
 <?php
 /**
- * The field of books redefining the one of every post type.
+ * The field of books redefining one registered before it.
  *
  * @package gutenberg
  */
