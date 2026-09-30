@@ -7,6 +7,7 @@ describe( 'attachment', () => {
 			'alt_text',
 			'caption',
 			'description',
+			'media_dimensions',
 			'mime_type',
 		] );
 	} );
@@ -45,5 +46,16 @@ describe( 'attachment', () => {
 		const { isVisible } = attachment.alt_text;
 		expect( isVisible?.( { media_type: 'image' } ) ).toBe( true );
 		expect( isVisible?.( { media_type: 'file' } ) ).toBe( false );
+	} );
+
+	it( 'shows the dimensions of the media that have some', () => {
+		const { getValue, isVisible } = attachment.media_dimensions;
+		const item = { media_details: { width: 640, height: 480 } };
+		expect( getValue?.( { item } ) ).toBe( '640 × 480' );
+		expect( isVisible?.( item ) ).toBe( true );
+		expect( getValue?.( { item: {} } ) ).toBe( '' );
+		expect( isVisible?.( { media_details: { width: 640 } } ) ).toBe(
+			false
+		);
 	} );
 } );
