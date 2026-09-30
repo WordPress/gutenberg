@@ -185,21 +185,17 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						handleDevicePreviewChange( value )
 					}
 				>
-					<Menu.Group>
-						{ choices.map( ( choice ) => (
-							<Menu.RadioItem
-								key={ choice.value }
-								value={ choice.value }
-							>
-								<Menu.ItemLabel>
-									{ choice.label }
-								</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									{ choice.info }
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-						) ) }
-					</Menu.Group>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ choice.info }
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+					) ) }
 				</Menu.RadioGroup>
 				{ isResponsiveEditingEnabled && (
 					<>

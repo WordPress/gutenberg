@@ -444,6 +444,149 @@ describe( 'Menu', () => {
 		} );
 	} );
 
+	describe( 'group composition', () => {
+		const nestingCases = [
+			{
+				Parent: Menu.Group,
+				Child: Menu.RadioGroup,
+				description: 'RadioGroup inside Group',
+				message: 'Menu.RadioGroup: Cannot be nested inside Menu.Group.',
+			},
+			{
+				Parent: Menu.RadioGroup,
+				Child: Menu.Group,
+				description: 'Group inside RadioGroup',
+				message: 'Menu.Group: Cannot be nested inside Menu.RadioGroup.',
+			},
+		];
+
+		it.each( nestingCases )(
+			'rejects $description through a wrapper component',
+			( { Parent, Child, message } ) => {
+				function WrappedGroup() {
+					return (
+						<div>
+							<Child />
+						</div>
+					);
+				}
+
+				expect( () =>
+					render(
+						<Parent>
+							<WrappedGroup />
+						</Parent>
+					)
+				).toThrow( message );
+				expect( console ).toHaveErrored();
+			}
+		);
+
+		it( 'labels sibling groups independently', () => {
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Options</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Group>
+							<Menu.GroupLabel>Actions</Menu.GroupLabel>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Group>
+						<Menu.RadioGroup defaultValue="compact">
+							<Menu.GroupLabel>Density</Menu.GroupLabel>
+							<Menu.RadioItem value="compact">
+								<Menu.ItemLabel>Compact</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			expect( screen.getAllByRole( 'group' ) ).toHaveLength( 2 );
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Actions' } )
+				).getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeInTheDocument();
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Density' } )
+				).getByRole( 'menuitemradio', { name: 'Compact' } )
+			).toBeChecked();
+		} );
+
+		it.each( nestingCases )(
+			'allows $description across a separate root menu',
+			( { Parent, Child } ) => {
+				render(
+					<Parent>
+						<Menu.Root defaultOpen>
+							<Menu.Trigger>Options</Menu.Trigger>
+							<Menu.Popup>
+								<Child>
+									<Menu.GroupLabel>
+										Inner group
+									</Menu.GroupLabel>
+								</Child>
+							</Menu.Popup>
+						</Menu.Root>
+					</Parent>
+				);
+				expect(
+					screen.getByRole( 'group', { name: 'Inner group' } )
+				).toBeInTheDocument();
+			}
+		);
+
+		it.each( nestingCases )(
+			'allows $description across a submenu',
+			( { Parent, Child } ) => {
+				render(
+					<Menu.Root defaultOpen>
+						<Menu.Trigger>Options</Menu.Trigger>
+						<Menu.Popup>
+							<Parent>
+								<Menu.SubmenuRoot defaultOpen>
+									<Menu.SubmenuTrigger>
+										<Menu.ItemLabel>More</Menu.ItemLabel>
+									</Menu.SubmenuTrigger>
+									<Menu.Popup>
+										<Child>
+											<Menu.GroupLabel>
+												Inner group
+											</Menu.GroupLabel>
+										</Child>
+									</Menu.Popup>
+								</Menu.SubmenuRoot>
+							</Parent>
+						</Menu.Popup>
+					</Menu.Root>
+				);
+				expect(
+					screen.getByRole( 'group', { name: 'Inner group' } )
+				).toBeInTheDocument();
+			}
+		);
+
+		it.each( nestingCases )(
+			'preserves production rendering of $description',
+			( { Parent, Child } ) => {
+				vi.stubEnv( 'NODE_ENV', 'production' );
+				try {
+					render(
+						<Parent>
+							<Child />
+						</Parent>
+					);
+					expect( screen.getAllByRole( 'group' ) ).toHaveLength( 2 );
+				} finally {
+					vi.unstubAllEnvs();
+				}
+			}
+		);
+	} );
+
 	it( 'throws when ItemDescription is outside a menu item', () => {
 		expect( () =>
 			render( <Menu.ItemDescription>Description</Menu.ItemDescription> )
