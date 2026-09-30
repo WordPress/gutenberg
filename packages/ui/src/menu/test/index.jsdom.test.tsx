@@ -124,6 +124,16 @@ describe( 'Menu', () => {
 		expect( trigger.tagName ).toBe( 'DIV' );
 	} );
 
+	it( 'does not expose disabled on menu roots', () => {
+		// @ts-expect-error Disable Menu.Trigger or individual items instead.
+		const root = <Menu.Root disabled />;
+		// @ts-expect-error Disable Menu.SubmenuTrigger or individual items instead.
+		const submenuRoot = <Menu.SubmenuRoot disabled />;
+
+		expect( root ).toBeDefined();
+		expect( submenuRoot ).toBeDefined();
+	} );
+
 	it( 'does not expose detached trigger props', () => {
 		const triggerWithHandle = (
 			// @ts-expect-error Menu does not expose Base UI's handle utility.
@@ -205,21 +215,20 @@ describe( 'Menu', () => {
 		}
 	} );
 
-	it( 'does not close a disabled non-modal menu on iframe pointerdown', async () => {
+	it( 'closes a non-modal menu on iframe pointerdown after its trigger becomes disabled', async () => {
 		const user = userEvent.setup();
 
-		function MenuDisabledWhileOpen() {
+		function MenuTriggerDisabledWhileOpen() {
 			const [ open, setOpen ] = useState( false );
 
 			return (
 				<>
 					<Menu.Root
-						disabled={ open }
 						modal={ false }
 						onOpenChange={ setOpen }
 						open={ open }
 					>
-						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Trigger disabled={ open }>Actions</Menu.Trigger>
 						<Menu.Popup>
 							<Menu.Item>
 								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
@@ -231,7 +240,7 @@ describe( 'Menu', () => {
 			);
 		}
 
-		render( <MenuDisabledWhileOpen /> );
+		render( <MenuTriggerDisabledWhileOpen /> );
 		const iframe = screen.getByTitle( 'Editor canvas' );
 		const iframeDocument = document.implementation.createHTMLDocument();
 		Object.defineProperty( iframe, 'contentDocument', {
@@ -247,7 +256,9 @@ describe( 'Menu', () => {
 				new MouseEvent( 'pointerdown', { bubbles: true } )
 			);
 		} );
-		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
 	} );
 
 	it( 'reattaches the iframe listener after reload and removes it when closed', async () => {
