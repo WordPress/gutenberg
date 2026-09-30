@@ -5,10 +5,12 @@
 ### Enhancements
 
 -   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+-   Filters: a filter chip now grows to at most the width of the filters row and truncates its values with an ellipsis, instead of wrapping onto several lines ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
 
 ### Bug Fixes
 
+-   Filters: show the filter name in a chip in the emphasis font weight ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
 -   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ### Documentation
