@@ -1,6 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
+import {
+	Icon,
+	Link,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	LinkButton,
+	Stack,
+	Tooltip,
+	inertValue,
+} from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
 import styles from './widget-footer.module.css';
@@ -104,7 +111,8 @@ export function WidgetFooter( {
 			align="center"
 			gap="lg"
 			className={ styles[ 'widget-footer' ] }
-			{ ...( editMode ? { inert: 'true' } : {} ) }
+			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+			inert={ inertValue( editMode ) }
 		>
 			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">

@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
+import { Menu, Stack, VisuallyHidden, inertValue } from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -554,7 +554,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		render: <div />,
 		activeId: activeCompositeId,
 		setActiveId: setActiveCompositeId,
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: inertValue( ! isInfiniteScroll && isLoading ),
 	};
 	if ( ! hasData ) {
 		return (

@@ -28,6 +28,7 @@ export {
 	KeyboardShortcutDisplay,
 	useKeyboardShortcutProps,
 } from './utils/keyboard-shortcut';
+export { inertValue } from './utils/inert-value';
 export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
 export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
 export * from './visually-hidden';
