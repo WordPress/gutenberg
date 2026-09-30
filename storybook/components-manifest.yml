@@ -157,6 +157,11 @@
             - className
             - render
             - style
+      - name: Autocomplete.Separator
+        props:
+            - className
+            - render
+            - style
       - name: Autocomplete.Status
         props:
             - children
@@ -1188,6 +1193,11 @@
             - className
             - render
             - style
+      - name: SearchableChipSelect.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1292,6 +1302,11 @@
             - className
             - render
             - style
+      - name: SearchableChipSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableSelectControl
   props:
       - actionsRef
@@ -1384,6 +1399,11 @@
       - name: SearchableSelectControl.ItemLabel
         props:
             - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Separator
+        props:
             - className
             - render
             - style
@@ -1497,6 +1517,11 @@
             - sideOffset
             - sticky
             - style
+      - name: Select.Separator
+        props:
+            - className
+            - render
+            - style
       - name: Select.Trigger
         props:
             - children
@@ -1575,6 +1600,11 @@
       - name: SelectControl.ItemLabel
         props:
             - children
+            - className
+            - render
+            - style
+      - name: SelectControl.Separator
+        props:
             - className
             - render
             - style
