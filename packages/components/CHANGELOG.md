@@ -8,7 +8,6 @@
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
--   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ### Enhancements
 
@@ -42,6 +41,7 @@
 ### Internal
 
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ## 41.0.0 (2026-09-23)
 
