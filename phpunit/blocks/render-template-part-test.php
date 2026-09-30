@@ -1,0 +1,148 @@
+<?php
+/**
+ * Tests for the Template Part block rendering.
+ *
+ * @package WordPress
+ * @subpackage Blocks
+ *
+ * @group blocks
+ */
+class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
+
+	const POST_CONTENT = '<!-- wp:paragraph --><p>Customized template part</p><!-- /wp:paragraph -->';
+	const FILE_CONTENT = '<!-- wp:paragraph --><p>Theme file template part</p><!-- /wp:paragraph -->';
+
+	// Slug that has no theme file.
+	const NO_FILE_SLUG = 'test-no-file';
+
+	public function set_up() {
+		parent::set_up();
+
+		// Stand in for the theme's `parts/` files so the tests don't depend on the active theme.
+		add_filter( 'pre_get_block_file_template', array( $this, 'filter_pre_get_block_file_template' ), 10, 3 );
+	}
+
+	public function filter_pre_get_block_file_template( $block_template, $id, $template_type ) {
+		if ( 'wp_template_part' !== $template_type || get_stylesheet() . '//' . self::NO_FILE_SLUG === $id ) {
+			return $block_template;
+		}
+
+		$template          = new WP_Block_Template();
+		$template->id      = $id;
+		$template->theme   = get_stylesheet();
+		$template->type    = 'wp_template_part';
+		$template->content = self::FILE_CONTENT;
+		$template->area    = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+
+		return $template;
+	}
+
+	/**
+	 * Creates a customized template part post for the active theme.
+	 *
+	 * @param string $slug The template part slug.
+	 * @return int The template part post ID.
+	 */
+	private function create_template_part( $slug ) {
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Template Part',
+				'post_name'    => $slug,
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( get_stylesheet() ), 'wp_theme' );
+
+		return $template_part_id;
+	}
+
+	/**
+	 * Makes `get_the_terms()` return the given value for the `wp_theme` taxonomy.
+	 *
+	 * @param mixed $value The value to return.
+	 */
+	private function filter_wp_theme_terms( $value ) {
+		add_filter(
+			'get_the_terms',
+			static function ( $terms, $post_id, $taxonomy ) use ( $value ) {
+				return 'wp_theme' === $taxonomy ? $value : $terms;
+			},
+			10,
+			3
+		);
+	}
+
+	public function test_renders_customized_template_part_from_post() {
+		$this->create_template_part( 'test-customized' );
+
+		$post_action = new MockAction();
+		add_action( 'render_block_core_template_part_post', array( $post_action, 'action' ) );
+
+		$output = do_blocks( '<!-- wp:template-part {"slug":"test-customized"} /-->' );
+
+		$this->assertStringContainsString( 'Customized template part', $output );
+		$this->assertSame( 1, $post_action->get_call_count(), 'The post action should fire once.' );
+	}
+
+	public function test_falls_back_to_theme_file_when_theme_term_cache_is_empty() {
+		$template_part_id = $this->create_template_part( 'test-empty-cache' );
+
+		// The post has a `wp_theme` term in the database, but the cache says it has none.
+		wp_cache_set( $template_part_id, array(), 'wp_theme_relationships' );
+
+		$post_action = new MockAction();
+		$file_action = new MockAction();
+		add_action( 'render_block_core_template_part_post', array( $post_action, 'action' ) );
+		add_action( 'render_block_core_template_part_file', array( $file_action, 'action' ) );
+
+		$output = do_blocks( '<!-- wp:template-part {"slug":"test-empty-cache"} /-->' );
+
+		$this->assertStringContainsString( 'Theme file template part', $output );
+		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assertSame( 0, $post_action->get_call_count(), 'The post action should not fire.' );
+		$this->assertSame( 1, $file_action->get_call_count(), 'The file action should fire once.' );
+	}
+
+	public function test_falls_back_to_theme_file_when_theme_terms_are_filtered_out() {
+		$this->create_template_part( 'test-filtered-terms' );
+		$this->filter_wp_theme_terms( false );
+
+		$output = do_blocks( '<!-- wp:template-part {"slug":"test-filtered-terms"} /-->' );
+
+		$this->assertStringContainsString( 'Theme file template part', $output );
+		$this->assertStringNotContainsString( 'Customized template part', $output );
+	}
+
+	public function test_falls_back_to_theme_file_when_theme_terms_are_an_error() {
+		$this->create_template_part( 'test-terms-error' );
+		$this->filter_wp_theme_terms( new WP_Error( 'test_error', 'Test error' ) );
+
+		$output = do_blocks( '<!-- wp:template-part {"slug":"test-terms-error"} /-->' );
+
+		$this->assertStringContainsString( 'Theme file template part', $output );
+		$this->assertStringNotContainsString( 'Customized template part', $output );
+	}
+
+	public function test_renders_nothing_when_post_fails_to_load_and_there_is_no_theme_file() {
+		$this->create_template_part( self::NO_FILE_SLUG );
+		$this->filter_wp_theme_terms( false );
+
+		$none_action = new MockAction();
+		add_action( 'render_block_core_template_part_none', array( $none_action, 'action' ) );
+
+		$output = do_blocks( '<!-- wp:template-part {"slug":"' . self::NO_FILE_SLUG . '"} /-->' );
+
+		// Matches the output of the block when the template part can't be found.
+		$expected = WP_DEBUG && WP_DEBUG_DISPLAY
+			? sprintf( 'Template part has been deleted or is unavailable: %s', self::NO_FILE_SLUG )
+			: '';
+
+		$this->assertSame( $expected, $output );
+		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
+	}
+}

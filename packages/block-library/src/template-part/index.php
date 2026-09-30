@@ -44,11 +44,14 @@ function render_block_core_template_part( $attributes ) {
 			)
 		);
 		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-		if ( $template_part_post ) {
+		// `_build_block_template_result_from_post()` can return a WP_Error, for example when
+		// `get_the_terms()` returns no `wp_theme` terms for the post. Fall back to the theme
+		// file in that case, as `get_block_template()` does.
+		$block_template = $template_part_post ? _build_block_template_result_from_post( $template_part_post ) : null;
+		if ( $block_template && ! is_wp_error( $block_template ) ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
-			$block_template = _build_block_template_result_from_post( $template_part_post );
-			$content        = $block_template->content;
+			$content = $block_template->content;
 			if ( isset( $block_template->area ) ) {
 				$area = $block_template->area;
 			}
