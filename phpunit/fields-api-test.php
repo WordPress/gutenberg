@@ -7,7 +7,6 @@
  * @covers ::_gutenberg_add_field_modules_to_editor_script
  * @covers ::gutenberg_get_field_collection_fields
  * @covers ::_gutenberg_get_field_collection
- * @covers ::_gutenberg_is_field_id_list_or_true
  * @covers ::gutenberg_register_field_collection
  * @covers ::gutenberg_register_core_post_supports_fields
  * @covers ::gutenberg_exclude_core_post_type_support_fields
@@ -808,10 +807,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * There is no precedence between collections: a collection redefining a
-	 * field registered before it without unregistering it is refused by the
-	 * registry, like a plugin registering it twice.
+	 * field registered before it is refused by the registry, like a plugin
+	 * registering it twice.
 	 */
-	public function test_a_collection_redefining_a_field_it_does_not_unregister_is_refused() {
+	public function test_a_collection_redefining_a_registered_field_is_refused() {
 		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
 		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
 		$this->core_collections_unhooked = true;
@@ -842,79 +841,6 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertFalse( $result, 'The refused collection returns false.' );
 		$this->assertSame( array( 'authorship' ), array_column( $fields, 'id' ) );
 		$this->assertSame( 'Authorship', $fields[0]['label'], 'The field registered first is kept.' );
-	}
-
-	/**
-	 * A collection for a single entity unregisters the fields of its
-	 * `unregister` before registering its own, so it can replace or drop
-	 * fields registered before it: a list of ids, which may name fields
-	 * that are not registered, or true for all of them. A collection
-	 * without fields of its own still unregisters.
-	 */
-	public function test_a_collection_unregisters_the_fields_it_replaces() {
-		$this->register_post_types(
-			array(
-				'gutenberg_book'     => array( 'title' ),
-				'gutenberg_novel'    => array( 'title' ),
-				'gutenberg_magazine' => array( 'title' ),
-			)
-		);
-		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
-		$this->core_collections_unhooked = true;
-
-		$directory = __DIR__ . '/data/core-fields/collections/replacing';
-		$results   = array();
-		$this->on_fields_api_init(
-			function ( $registry ) use ( $directory, &$results ) {
-				foreach ( array( 'gutenberg_book', 'gutenberg_novel', 'gutenberg_magazine' ) as $post_type ) {
-					$registry->register( 'defaults', 'postType', $post_type, array( $this->field( 'authorship' ), $this->field( 'discussion' ) ), 'defaults/module' );
-				}
-				foreach ( array( 'book', 'novel', 'magazine' ) as $collection ) {
-					$results[ $collection ] = gutenberg_register_field_collection( $registry, $directory . '/' . $collection );
-				}
-			},
-			0
-		);
-
-		$this->assertSame(
-			array(
-				'book'     => true,
-				'novel'    => true,
-				'magazine' => true,
-			),
-			$results
-		);
-
-		$book = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
-		$this->assertSame( array( 'discussion', 'authorship' ), array_column( $book, 'id' ), 'The replacing field follows the fields kept.' );
-		$this->assertSame( 'Book authorship', $book[1]['label'] );
-		$this->assertSame( 'fixture', $book[1]['origin']['registeredBy'] );
-		$this->assertSame(
-			array(
-				'defaults/module' => array( 'discussion' ),
-				'fixture/book'    => array( 'authorship' ),
-			),
-			gutenberg_get_registered_field_modules( 'postType', 'gutenberg_book' ),
-			'The replaced field leaves the module it was registered with.'
-		);
-
-		$this->assertSame( array( 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_novel' ), 'id' ), 'A collection without fields drops the fields it lists.' );
-		$this->assertSame( array( 'issue' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ), 'True drops every field registered before.' );
-		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_magazine' ) );
-	}
-
-	/**
-	 * An `unregister` other than true or a list of field ids is reported,
-	 * and the collection skipped.
-	 */
-	public function test_an_invalid_unregister_skips_the_collection() {
-		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
-
-		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
-		$results = $this->register_fixture_collections( 'invalid', array( 'unregister_string' ) );
-
-		$this->assertSame( array( 'unregister_string' => false ), $results );
-		$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ) );
 	}
 
 	/**
