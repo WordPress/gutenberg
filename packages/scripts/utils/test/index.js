@@ -126,6 +126,7 @@ describe( 'utils', () => {
 
 			afterEach( () => {
 				process.argv = originalArgv;
+				getArgsFromCLIMock.mockReset();
 				delete process.env.WP_BLOCKS_MANIFEST;
 				delete process.env.WP_BLOCKS_MANIFEST_OUTPUT;
 			} );
