@@ -232,6 +232,45 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		} );
 	} );
 
+	test( 'TypographyPanel replaces a preset gradient with a text gradient', () => {
+		mockUseSelectImpl.fn = () => ( {
+			style: undefined,
+			fontFamily: undefined,
+			fontSize: undefined,
+			fitText: undefined,
+			className: undefined,
+			gradient: 'vivid',
+		} );
+		const setAttributes = vi.fn();
+
+		render(
+			<TypographyPanel
+				clientId="block-1"
+				name="core/paragraph"
+				setAttributes={ setAttributes }
+				settings={ { typography: { fontSize: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls[ 0 ];
+		// Shaped as `attributesToStyle` hands it to the panel, which always
+		// builds the `typography` and `color` objects.
+		props.onChange( {
+			typography: {},
+			color: {},
+			background: {
+				gradient: 'var:preset|gradient|purple-blue',
+				backgroundClip: 'text',
+			},
+		} );
+
+		// The preset attribute paints the whole block through the `background`
+		// shorthand, which resets the clip the text gradient depends on.
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( { gradient: undefined } )
+		);
+	} );
+
 	// After relocation, block-scoped element/link colors are owned by the
 	// Elements panel (`hooks/elements.js`), which renders the shared Color
 	// panel. The former `ColorEdit` wrapper no longer exists; top-level text

@@ -286,6 +286,11 @@ export function TypographyPanel( {
 							gradient: style?.color?.gradient,
 						},
 					} );
+				} else if ( gradient ) {
+					// A preset gradient paints the whole block through the
+					// `background` shorthand, which resets the clip the text
+					// gradient depends on. The text gradient replaces it.
+					newAttributes.gradient = undefined;
 				}
 
 				// If setting a font size and fitText is currently enabled, disable it.
@@ -303,6 +308,7 @@ export function TypographyPanel( {
 	// link color selection.
 	const enableContrastChecking =
 		! value?.color?.gradient &&
+		'text' !== value?.background?.backgroundClip &&
 		!! value?.color?.text &&
 		settings?.color?.text &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
