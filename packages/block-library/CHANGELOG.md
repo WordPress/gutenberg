@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
 -   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
 -   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
