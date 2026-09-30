@@ -1,6 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
+import { ButtonLink, Icon, Link, Stack, Tooltip } from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
 import styles from './widget-footer.module.css';
@@ -32,7 +32,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
-					<LinkButton
+					<ButtonLink
 						variant="minimal"
 						tone="neutral"
 						size="compact"
@@ -53,7 +53,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 					/>
 				}
 			>
-				<LinkButton.Icon icon={ action.icon } />
+				<ButtonLink.Icon icon={ action.icon } />
 			</Tooltip.Trigger>
 			<Tooltip.Popup>{ action.label }</Tooltip.Popup>
 		</Tooltip.Root>
