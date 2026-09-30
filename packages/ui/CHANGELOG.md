@@ -4,16 +4,20 @@
 
 ### Breaking Changes
 
+-   `Menu.Root`, `Menu.SubmenuRoot`: Remove the `disabled` prop. Disable `Menu.Trigger`, `Menu.SubmenuTrigger`, or individual items instead ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   `Autocomplete.Item`, `Combobox.Item`, `SearchableSelect.Item`, `SearchableChipSelect.Item`, `SearchableSelectControl.Item`, and `SearchableChipSelectControl.Item` now require an `ItemLabel` as their first direct child, followed only by optional `ItemDescription` components. Wrap existing text children in `ItemLabel` ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 -   `Notice`: Remove built-in screen reader announcements and the `spokenMessage` and `politeness` props. Consumers now announce dynamic updates explicitly, for example with `speak()` from `@wordpress/a11y` ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 
 ### New Features
 
+-   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
 ### Enhancements
 
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
+-   Native text inputs and textareas use at least 16px below 600px to avoid iOS Safari zoom. Prefix and suffix text on `Input` match that size. Select and combobox trigger text stay at the `md` font size. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
+-   `Menu`: Add development-only checks against nesting `Group` and `RadioGroup` within each other, and document how to label radio groups ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
@@ -25,6 +29,10 @@
 ### Internal
 
 -   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+
+### Documentation
+
+-   `Menu`: Explain when to disable triggers and items ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ## 0.23.0 (2026-09-23)
 
