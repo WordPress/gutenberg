@@ -1010,6 +1010,93 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		}
 	}
 
+	/**
+	 * `gutenberg_note_reaction_emoji_rules` controls which hex-key reactions
+	 * (full picker picks outside the named list) the controller accepts.
+	 *
+	 * @dataProvider data_reaction_emoji_rules
+	 *
+	 * @param mixed  $rules   The filtered rules.
+	 * @param string $content The reaction storage key to submit.
+	 * @param int    $status  Expected response status.
+	 */
+	public function test_reaction_emoji_rules_affect_validation( $rules, $content, $status ) {
+		$filter = function () use ( $rules ) {
+			return $rules;
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+
+		try {
+			wp_set_current_user( self::$editor_id );
+			$post_id = self::factory()->post->create();
+			$note_id = $this->create_note( $post_id, self::$editor_id );
+
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body(
+				wp_json_encode(
+					array(
+						'post'    => $post_id,
+						'type'    => 'reaction',
+						'parent'  => $note_id,
+						'content' => $content,
+					)
+				)
+			);
+			$response = rest_get_server()->dispatch( $request );
+
+			if ( 201 === $status ) {
+				$this->assertSame( 201, $response->get_status() );
+			} else {
+				$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, $status );
+			}
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+		}
+	}
+
+	public function data_reaction_emoji_rules() {
+		$exclude_thumbs = array( 'exclude' => array( '1F44D' ) );
+		$named_only     = array( 'allow_unlisted' => false );
+
+		return array(
+			'excluded emoji'                     => array( $exclude_thumbs, '1f44d', 400 ),
+			'skin-tone variant of excluded'      => array( $exclude_thumbs, '1f44d-1f3fd', 400 ),
+			'emoji that is not excluded'         => array( $exclude_thumbs, '1f389', 201 ),
+			'exclusion written with VS-16'       => array( array( 'exclude' => array( '2763-FE0F' ) ), '2763', 400 ),
+			'legacy unpadded key'                => array( array( 'exclude' => array( '00A9' ) ), 'a9', 400 ),
+			'named-only rejects unlisted'        => array( $named_only, '1f44d', 400 ),
+			'named-only accepts named slug'      => array( $named_only, 'heart', 201 ),
+			'named-only accepts named as hex'    => array( $named_only, '2764', 201 ),
+			'named emoji wins over an exclusion' => array( array( 'exclude' => array( '2764' ) ), '2764', 201 ),
+			'malformed rules fall back'          => array( 'not-an-array', '1f389', 201 ),
+		);
+	}
+
+	public function test_reaction_emoji_rules_reach_editor_settings() {
+		$filter = function () {
+			return array(
+				'allow_unlisted' => false,
+				'exclude'        => array( '1F595', 'not hex', 42 ),
+			);
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+
+		try {
+			$settings = gutenberg_add_note_reaction_emojis_setting( array() );
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+		}
+
+		$this->assertSame(
+			array(
+				'allowUnlisted' => false,
+				'exclude'       => array( '1f595' ),
+			),
+			$settings['noteReactionEmojiRules']
+		);
+	}
+
 	public function test_schema_includes_reaction_summary() {
 		$controller = new Gutenberg_REST_Comment_Controller_7_2();
 		$schema     = $controller->get_item_schema();

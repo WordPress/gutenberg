@@ -258,10 +258,123 @@ function gutenberg_get_note_reaction_emojis() {
  * @return array Updated block editor settings.
  */
 function gutenberg_add_note_reaction_emojis_setting( $settings ) {
-	$settings['noteReactionEmojis'] = gutenberg_get_note_reaction_emojis();
+	$rules = gutenberg_get_note_reaction_emoji_rules();
+
+	$settings['noteReactionEmojis']     = gutenberg_get_note_reaction_emojis();
+	$settings['noteReactionEmojiRules'] = array(
+		'allowUnlisted' => $rules['allow_unlisted'],
+		'exclude'       => $rules['exclude'],
+	);
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_setting' );
+
+/**
+ * Normalizes an emoji hex key to the reaction storage form: lowercase,
+ * each code point padded to four digits, U+FE0F and skin-tone modifiers
+ * stripped. Accepts Emojibase hexcodes (`1F44D-1F3FB`) and stored keys.
+ *
+ * @since 7.2.0
+ *
+ * @param string $hex_key Hex code points joined by `-`.
+ * @return string The base emoji's hex key, or empty string when invalid.
+ */
+function gutenberg_normalize_note_reaction_hex_key( $hex_key ) {
+	if ( ! is_string( $hex_key ) || ! preg_match( '/^[0-9a-f]{1,6}(-[0-9a-f]{1,6})*$/i', $hex_key ) ) {
+		return '';
+	}
+	$parts = array();
+	foreach ( explode( '-', strtolower( $hex_key ) ) as $part ) {
+		$value = hexdec( $part );
+		// Variation Selector-16 and the five Fitzpatrick skin-tone modifiers.
+		if ( 0xFE0F === $value || ( $value >= 0x1F3FB && $value <= 0x1F3FF ) ) {
+			continue;
+		}
+		$parts[] = str_pad( $part, 4, '0', STR_PAD_LEFT );
+	}
+	return implode( '-', $parts );
+}
+
+/**
+ * Returns the rules for reactions picked outside the named emoji list,
+ * which the full picker stores as hex keys.
+ *
+ * @since 7.2.0
+ *
+ * @return array {
+ *     @type bool     $allow_unlisted Whether emoji outside the named list are accepted.
+ *     @type string[] $exclude        Normalized hex keys that are never accepted.
+ * }
+ */
+function gutenberg_get_note_reaction_emoji_rules() {
+	/**
+	 * Filters which emoji note reactions accept beyond the named list from
+	 * `gutenberg_note_reaction_emojis`. Named emoji are always accepted.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $rules {
+	 *     @type bool     $allow_unlisted Whether any emoji from the full picker is
+	 *                                    accepted. False limits reactions to the
+	 *                                    named list. Default true.
+	 *     @type string[] $exclude        Emojibase hexcodes to reject, such as
+	 *                                    `1F595`. Excluding an emoji also excludes
+	 *                                    its skin-tone variants. Default empty.
+	 * }
+	 */
+	$rules = apply_filters(
+		'gutenberg_note_reaction_emoji_rules',
+		array(
+			'allow_unlisted' => true,
+			'exclude'        => array(),
+		)
+	);
+	$rules = is_array( $rules ) ? $rules : array();
+
+	$exclude = array();
+	if ( isset( $rules['exclude'] ) && is_array( $rules['exclude'] ) ) {
+		foreach ( $rules['exclude'] as $hexcode ) {
+			$hex_key = gutenberg_normalize_note_reaction_hex_key( $hexcode );
+			if ( '' !== $hex_key ) {
+				$exclude[] = $hex_key;
+			}
+		}
+	}
+
+	return array(
+		'allow_unlisted' => ! isset( $rules['allow_unlisted'] ) || (bool) $rules['allow_unlisted'],
+		'exclude'        => array_values( array_unique( $exclude ) ),
+	);
+}
+
+/**
+ * Whether a hex-key reaction is accepted under the emoji rules. An emoji
+ * from the named list is always accepted, including its skin-tone variants.
+ *
+ * @since 7.2.0
+ *
+ * @param string $hex_key The submitted hex key.
+ * @return bool Whether the reaction is allowed.
+ */
+function gutenberg_is_note_reaction_hex_key_allowed( $hex_key ) {
+	$base = gutenberg_normalize_note_reaction_hex_key( $hex_key );
+	if ( '' === $base ) {
+		return false;
+	}
+
+	foreach ( gutenberg_get_note_reaction_emojis() as $entry ) {
+		if (
+			is_array( $entry ) &&
+			! empty( $entry['emoji'] ) &&
+			gutenberg_normalize_note_reaction_hex_key( gutenberg_emoji_to_hexcode( $entry['emoji'] ) ) === $base
+		) {
+			return true;
+		}
+	}
+
+	$rules = gutenberg_get_note_reaction_emoji_rules();
+	return $rules['allow_unlisted'] && ! in_array( $base, $rules['exclude'], true );
+}
 
 /**
  * Returns the reaction children of a note.
