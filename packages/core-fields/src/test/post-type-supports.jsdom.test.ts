@@ -8,6 +8,7 @@ describe( 'post_type_supports', () => {
 			'discussion',
 			'excerpt',
 			'ping_status',
+			'post-content-info',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
 			getElements: expect.any( Function ),

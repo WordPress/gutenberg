@@ -18,12 +18,14 @@ import { fieldExtensions as author } from './author/field';
 import { fieldExtensions as discussion } from './discussion/field';
 import { fieldExtensions as excerpt } from './excerpt/field';
 import { fieldExtensions as pingStatus } from './ping_status/field';
+import { fieldExtensions as postContentInfo } from './post_content_info/field';
 
 const fields: FieldsScriptParts = {
 	author,
 	discussion,
 	excerpt,
 	ping_status: pingStatus,
+	'post-content-info': postContentInfo,
 };
 
 export default fields;

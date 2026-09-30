@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
--   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `discussion`, `excerpt`, `notesCount`, `ping_status`). They are registered in code, see below.
+-   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `discussion`, `excerpt`, `notesCount`, `ping_status`, `post-content-info`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: template parts exclude the default author field, since they declare their own client-side.
 -   `attachment`: the fields of the media editor ported to the server so far (`date`), instead of all the defaults.
@@ -33,6 +33,7 @@ And each folder of fields may have:
 -   `excerpt`, for the post types supporting `excerpt`.
 -   `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
 -   `ping_status`, for the post types supporting `trackbacks`.
+-   `post-content-info`, for the post types supporting `editor`.
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
 
@@ -44,7 +45,7 @@ apply_filters( 'fields_api_post_type_supports_exclusions', string[] $excluded_fi
 
 The value is the list of the ids of the default fields the post type does not get, empty by default. `$all_fields` lists the defaults the post type supports, the ones it would get; the filter does not run for a post type supporting none. Callbacks compose: add to the incoming list rather than replacing it. A value other than a list is reported with `_doing_it_wrong()` and excludes nothing. The filter runs when the registry fires `fields_api_init`, on its first read after `init`, so add callbacks on plugin load or on `init`.
 
-Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`: templates and template parts exclude `author`, which the `wp_template` collection and the client define for them, templates, template parts, and patterns exclude `excerpt`, which is their description, and attachments exclude every default (`$all_fields`), since the media editor has its own fields.
+Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`: templates and template parts exclude `author`, which the `wp_template` collection and the client define for them, templates, template parts, and patterns exclude `excerpt`, which is their description, templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read, and attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
 ### Collection configuration
 
