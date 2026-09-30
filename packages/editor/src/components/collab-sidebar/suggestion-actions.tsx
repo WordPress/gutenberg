@@ -180,7 +180,6 @@ export function SuggestionActionButtons( {
 		<Stack
 			direction="row"
 			justify="flex-end"
-			gap={ '0' as any }
 			className="editor-collab-sidebar-panel__suggestion-header-actions"
 			onClick={ ( event ) => {
 				// Keep the click from bubbling into the thread's expand/
