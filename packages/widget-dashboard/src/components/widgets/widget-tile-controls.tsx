@@ -24,11 +24,9 @@ interface WidgetTileControlsProps {
 }
 
 /**
- * One tile's normal-mode toolbar: the attribute controls (high-relevance
- * fields on the prominent surface, plus a settings entry point when needed)
- * and the menu actions, declared by the type or by the mounted instance.
- * Nothing to hold, no toolbar. Subscribes to the instance's runtime actions
- * here, so a declaration re-renders this toolbar and nothing else.
+ * One tile's normal-mode toolbar: the attribute controls and the menu
+ * actions. Subscribes to the instance's runtime actions here, so a
+ * declaration re-renders this toolbar alone.
  *
  * @param {WidgetTileControlsProps} props Component props.
  */

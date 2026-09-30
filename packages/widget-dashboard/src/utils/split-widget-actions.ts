@@ -7,11 +7,10 @@ import { mergeWidgetActions } from './merge-widget-actions';
 /**
  * Splits a widget's actions across the chrome surfaces: the footer takes
  * `relevance: 'high'` and `'medium'`, the More menu the rest. Full-bleed
- * widgets have no footer, so every action stays in the menu. The instance's
- * runtime actions join the type's declared ones first.
+ * widgets have no footer, so every action stays in the menu.
  *
- * @param {WidgetType | undefined} widgetType     The widget type whose actions are routed.
- * @param {WidgetRuntimeAction[]}  runtimeActions The actions its mounted instance declares.
+ * @param {WidgetType | undefined} widgetType     The widget type.
+ * @param {WidgetRuntimeAction[]}  runtimeActions The instance's actions.
  */
 export function splitWidgetActions(
 	widgetType?: WidgetType,

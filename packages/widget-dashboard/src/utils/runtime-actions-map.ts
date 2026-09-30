@@ -3,9 +3,7 @@ import type { ObservableMap } from '@wordpress/compose';
 import type { WidgetRuntimeAction } from '@wordpress/widget-primitives';
 
 /**
- * The actions each mounted instance declares at runtime, keyed by instance
- * uuid. Surfaces subscribe per instance, so a declaration re-renders the
- * chrome of that tile and nothing else.
+ * The runtime actions of each mounted instance, keyed by uuid.
  */
 export type RuntimeActionsMap = ObservableMap< string, WidgetRuntimeAction[] >;
 

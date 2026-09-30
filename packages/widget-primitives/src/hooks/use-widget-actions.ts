@@ -5,8 +5,7 @@ import type { WidgetRuntimeAction } from '../types';
 const NO_ACTIONS: WidgetRuntimeAction[] = [];
 
 /*
- * Two actions declare the same thing when every field matches. A callback
- * matches any other callback: the host always runs the latest one.
+ * Callbacks always match: the host runs the latest one.
  */
 function isSameAction(
 	a: WidgetRuntimeAction,
@@ -38,21 +37,13 @@ function isSameList(
 }
 
 /**
- * Declares the actions a mounted widget wants placed by its host, computed
- * from what the render knows: loaded data, the instance's attributes, a
- * feature gate. The list is the instance's whole set: leave out the entries
- * that do not apply right now, since an action is conditioned by not
- * declaring it. A runtime action with a declared action's `id` takes its
- * place, keeping the declared `icon` and `relevance` it leaves out.
- *
- * The list is compared by value, so it can be written inline, and a
- * callback always runs its latest version.
- *
- * Returns whether the host took the actions. `false` means the host has no
- * `actions` capability and the widget keeps rendering its own affordances.
+ * Declares the actions a mounted widget wants its host to place. The list
+ * is the instance's whole set: leave out what does not apply. It is
+ * compared by value, so it can be written inline, and a callback always
+ * runs its latest version.
  *
  * @param {WidgetRuntimeAction[]} actions The actions to place.
- * @return {boolean} Whether a host places them.
+ * @return {boolean} Whether the host places them.
  */
 export function useWidgetActions( actions: WidgetRuntimeAction[] ): boolean {
 	const declare = useWidgetHost().actions?.declare;

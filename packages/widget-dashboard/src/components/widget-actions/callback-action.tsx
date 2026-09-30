@@ -6,25 +6,20 @@ interface CallbackActionProps {
 	action: WidgetCallbackAction;
 
 	/**
-	 * Whether a promise the callback returned is still settling.
+	 * Whether its promise is still settling.
 	 */
 	isPending: boolean;
 
-	/**
-	 * Runs the action.
-	 */
 	onRun: ( action: WidgetCallbackAction ) => void;
 
 	/**
-	 * The footer's trailing form: icon-only when the action declares an
-	 * icon, a compact neutral button otherwise.
+	 * The footer's trailing form: icon-only when the action has an icon.
 	 */
 	compact?: boolean;
 }
 
 /**
- * Materializes a callback action as a button, disabled while its promise
- * settles. Text with the icon as prefix by default.
+ * A callback action as a button, disabled while its promise settles.
  *
  * @param {CallbackActionProps} props Component props.
  */

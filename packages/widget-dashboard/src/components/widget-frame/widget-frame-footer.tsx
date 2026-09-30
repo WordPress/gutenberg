@@ -11,9 +11,8 @@ interface WidgetFrameFooterProps {
 }
 
 /**
- * The frame's footer: the promoted actions, declared by the type or by the
- * mounted instance. Subscribes to the instance's runtime actions here,
- * beside the body, so a declaration never re-renders the body above it.
+ * The frame's footer. Subscribes to the instance's runtime actions here,
+ * so a declaration never re-renders the body.
  *
  * @param {WidgetFrameFooterProps} props Component props.
  */

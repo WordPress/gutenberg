@@ -3,13 +3,8 @@ import type {
 	WidgetRuntimeAction,
 } from '@wordpress/widget-primitives';
 
-/**
- * Upgrades a declared action with the runtime one carrying its `id`. The
- * runtime action keeps the declared `icon` and `relevance` it leaves out;
- * the label and the fulfillment are always its own.
- *
- * @param {WidgetAction}        declared The declared action.
- * @param {WidgetRuntimeAction} runtime  The runtime action taking its place.
+/*
+ * The runtime action keeps the declared `icon` and `relevance` it leaves out.
  */
 function upgradeDeclaredAction(
 	declared: WidgetAction,
@@ -25,10 +20,9 @@ function upgradeDeclaredAction(
 }
 
 /**
- * Joins a type's declared actions with the ones its mounted instance
- * declares. A runtime action carrying a declared `id` takes that action's
- * position; the rest follow in their own order. An `id` the runtime list
- * repeats keeps its first entry.
+ * Joins the type's declared actions with the instance's runtime ones. A
+ * runtime action carrying a declared `id` takes that action's position;
+ * the rest follow in their own order.
  *
  * @param {WidgetAction[]}        declared The type's declared actions.
  * @param {WidgetRuntimeAction[]} runtime  The instance's runtime actions.

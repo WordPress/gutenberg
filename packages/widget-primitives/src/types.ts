@@ -70,8 +70,7 @@ export interface WidgetHelp {
 export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
- * What every action carries, whatever fulfills it: the identity a host
- * places and labels.
+ * The identity every action shares, whatever fulfills it.
  */
 export interface WidgetActionEnvelope {
 	/**
@@ -99,15 +98,12 @@ export interface WidgetActionEnvelope {
 }
 
 /**
- * A user-triggerable verb a widget type declares. The declaration is
- * serializable data: an envelope (`id`, `label`, optional `icon` and
- * `relevance`) plus exactly one fulfillment, named by the key carrying it.
- * Today the only key is `href`, so the only fulfillment is a link.
+ * A verb a widget type declares: serializable data with an envelope and one
+ * fulfillment, named by the key carrying it. Today the only key is `href`,
+ * a link.
  *
- * The host owns what follows: which primitive materializes the fulfillment,
- * and where the affordance is placed. For a link that means mounting a real
- * link primitive wherever the surface allows one, so middle-click, copy
- * address, and the anchor role survive.
+ * The host picks the primitive and the placement. A link mounts a real
+ * anchor wherever the surface allows one.
  */
 export interface WidgetAction extends WidgetActionEnvelope {
 	/**
@@ -130,23 +126,16 @@ export interface WidgetAction extends WidgetActionEnvelope {
 }
 
 /**
- * An action fulfilled by a function: triggering it runs `callback`. A
- * function does not serialize, so this form never appears in a widget
- * type; a mounted widget declares it for its own instance through
- * `useWidgetActions`, closing over the state only the render has.
+ * An action fulfilled by a function. It does not serialize, so only a
+ * mounted widget declares it, through `useWidgetActions`. A returned
+ * promise keeps the affordance pending until it settles.
  */
 export interface WidgetCallbackAction extends WidgetActionEnvelope {
-	/**
-	 * Callback fulfillment: what triggering the action runs. A returned
-	 * promise keeps the affordance pending until it settles, fulfilled or
-	 * rejected. Reporting the outcome stays the callback's.
-	 */
 	callback: () => void | Promise< void >;
 }
 
 /**
- * An action as a host materializes it: the type's declared link, or one
- * of either fulfillment a mounted widget declares at runtime.
+ * An action as hosts materialize it: a link or a callback.
  */
 export type WidgetRuntimeAction = WidgetAction | WidgetCallbackAction;
 

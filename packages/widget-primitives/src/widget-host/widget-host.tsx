@@ -35,17 +35,14 @@ export interface WidgetHostLinks {
 }
 
 /**
- * Host actions capability: takes the actions a mounted widget declares for
- * its own instance, so the host can place and materialize them beside the
- * type's declared ones. The host binds it to the instance it renders; the
- * widget never names which instance it is.
+ * Host actions capability: takes the actions a mounted widget declares.
+ * The host binds it to the instance it renders.
  */
 export interface WidgetHostActions {
 	/**
-	 * Replaces the instance's runtime actions with `actions`. An empty
-	 * list withdraws them. A runtime action carrying a declared action's
-	 * `id` takes its place, keeping the declared `icon` and `relevance` it
-	 * leaves out.
+	 * Replaces the instance's runtime actions. One carrying a declared
+	 * action's `id` takes its place, keeping the declared `icon` and
+	 * `relevance` it leaves out.
 	 */
 	declare: ( actions: WidgetRuntimeAction[] ) => void;
 }
@@ -61,8 +58,7 @@ export interface WidgetHost {
 	links?: WidgetHostLinks;
 
 	/**
-	 * Runtime action placement. Absent: the widget keeps rendering its
-	 * own affordances.
+	 * Runtime action placement. Absent: widgets keep their own affordances.
 	 */
 	actions?: WidgetHostActions;
 }

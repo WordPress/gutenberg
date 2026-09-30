@@ -113,9 +113,7 @@ export default function SiteHealth() {
 	);
 	const href = counts ? reviewHref( counts ) : '';
 
-	// Once the counts are in and there is something to review, the declared
-	// Details action gives way to the same target filtered to the statuses
-	// with items, under a label carrying the count.
+	// With items to review, this takes the declared Details action's place.
 	const hosted = useWidgetActions(
 		issuesTotal > 0
 			? [

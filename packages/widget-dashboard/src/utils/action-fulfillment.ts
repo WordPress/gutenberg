@@ -4,8 +4,7 @@ import type {
 } from '@wordpress/widget-primitives';
 
 /**
- * Whether a callback fulfills the action. The key carrying the fulfillment
- * names it.
+ * Whether a callback fulfills the action.
  *
  * @param {WidgetRuntimeAction} action The action to test.
  */

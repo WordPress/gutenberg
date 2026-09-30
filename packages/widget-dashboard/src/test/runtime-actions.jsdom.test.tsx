@@ -29,10 +29,9 @@ const onExport = vi.fn< () => void | Promise< void > >();
 const onRefresh = vi.fn< () => void | Promise< void > >();
 
 /*
- * Declares from its attributes: while `count` is positive, a link taking the
- * declared Details action's place; while `period` is set, a link whose target
- * carries it; while `exportable`, a promoted callback; while `refreshable`, a
- * callback for the menu.
+ * Declares one action per attribute: `count` takes the declared Details
+ * action's place, `period` sets a link target, `exportable` adds a promoted
+ * callback and `refreshable` a menu callback.
  */
 function TestWidget( {
 	attributes,

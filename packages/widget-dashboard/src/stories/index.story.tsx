@@ -311,10 +311,9 @@ const goalProgressWidgetType: WidgetType = {
 };
 
 /*
- * A widget that learns something after mounting: which checks need
- * attention. Its declared "Details" action is the baseline; once the check
- * settles it declares, in its place, a link carrying the count and a
- * filtered target, plus a CSV download of the checks on screen.
+ * A widget whose actions depend on what it loads: once the check settles,
+ * a counted link takes the declared "Details" action's place, beside a CSV
+ * download.
  */
 interface SiteCheck {
 	id: number;

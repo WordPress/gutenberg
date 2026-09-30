@@ -10,10 +10,9 @@ function isThenable( value: unknown ): value is PromiseLike< unknown > {
 }
 
 /**
- * Runs the callback actions of one surface and tracks, by `id`, the ones
- * whose returned promise has not settled. The state sits with the surface,
- * so it outlives the controls the surface mounts and unmounts. The host only
- * tracks the pending state; the outcome stays the callback's.
+ * Runs a surface's callback actions and tracks, by `id`, the ones whose
+ * promise has not settled. The state outlives the controls the surface
+ * mounts and unmounts.
  */
 export function useRunActions(): {
 	run: ( action: WidgetCallbackAction ) => Promise< void >;

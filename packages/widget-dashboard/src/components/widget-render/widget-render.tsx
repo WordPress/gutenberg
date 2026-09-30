@@ -20,8 +20,7 @@ interface WidgetRenderProps {
  * callback the render contract expects. When the policy denies `edit`,
  * the widget renders read-only: it receives no `setAttributes`.
  *
- * Lends the widget the `actions` capability bound to this instance, so
- * what it declares at runtime lands in the tile's chrome.
+ * Lends the widget the `actions` capability, bound to this instance.
  *
  * @param {WidgetRenderProps} props Component props.
  */

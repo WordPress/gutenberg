@@ -28,7 +28,7 @@ type WidgetActionsProps = {
  * router's link through `HostLink`, so it navigates client-side.
  *
  * A callback action mounts a menu item, disabled while its promise settles.
- * The pending state is held here, so it survives the popup closing.
+ * That state is held here, so it survives the popup closing.
  *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.
