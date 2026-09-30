@@ -24,7 +24,6 @@ import {
 	dateField,
 	parentField,
 	passwordField,
-	pingStatusField,
 	discussionField,
 	slugField,
 	statusField,
@@ -273,7 +272,7 @@ export const registerPostTypeSchema =
 					patternDescriptionField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				'comment_status',
-				postTypeConfig.supports?.trackbacks && pingStatusField,
+				'ping_status',
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
 					discussionField,

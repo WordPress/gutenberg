@@ -25,12 +25,13 @@
  * - `comment_status`, for the post types supporting `comments`.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
+ * - `ping_status`, for the post types supporting `trackbacks`.
  *
  * It makes no exception for any post type: the fields a post type does not
  * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
  * before they are registered.
  *
- * Only the author field has JavaScript parts, but every field is registered
+ * Only some fields have JavaScript parts, but every field is registered
  * with the script module of the folder: a post type supporting only
  * comments or notes lists the module too, which is small.
  *
@@ -50,6 +51,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'author'         => post_type_supports( $post_type, 'author' ),
 			'comment_status' => post_type_supports( $post_type, 'comments' ),
 			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
+			'ping_status'    => post_type_supports( $post_type, 'trackbacks' ),
 		);
 		$all_fields = array_keys( array_filter( $applies ) );
 		if ( ! $all_fields ) {
