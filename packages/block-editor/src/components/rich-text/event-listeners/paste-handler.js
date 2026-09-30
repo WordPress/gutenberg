@@ -29,6 +29,7 @@ export default ( props ) => ( element ) => {
 			__unstableEmbedURLOnPaste,
 			preserveWhiteSpace,
 			pastePlainText,
+			disableLineBreaks,
 			registry,
 		} = props.current;
 
@@ -97,7 +98,12 @@ export default ( props ) => ( element ) => {
 			if ( transformed !== value ) {
 				onChange( transformed );
 			} else {
-				const valueToInsert = create( { html: content } );
+				let valueToInsert = create( { html: content } );
+
+				if ( disableLineBreaks ) {
+					valueToInsert = replace( valueToInsert, /\r?\n/g, ' ' );
+				}
+
 				addActiveFormats( valueToInsert, value.activeFormats );
 				onChange( insert( value, valueToInsert ) );
 			}
