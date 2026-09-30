@@ -86,6 +86,36 @@ const SHORTCUTS = {
 	},
 };
 
+/**
+ * Set `variant="high-contrast"` on each popup, including submenu popups, to use
+ * a strong border, small radius, and no shadow.
+ */
+export const HighContrast: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Open menu</Menu.Trigger>
+			<Menu.Popup variant="high-contrast">
+				<Menu.Item>
+					<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.SubmenuRoot>
+					<Menu.SubmenuTrigger>
+						<Menu.ItemLabel>Move to</Menu.ItemLabel>
+					</Menu.SubmenuTrigger>
+					<Menu.Popup variant="high-contrast">
+						<Menu.Item>
+							<Menu.ItemLabel>Sidebar</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item>
+							<Menu.ItemLabel>Footer</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.SubmenuRoot>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
 export const Default: Story = {
 	render: function Render() {
 		const [ bookmarks, setBookmarks ] = useState( true );

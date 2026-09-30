@@ -71,12 +71,13 @@ export interface PopupProps
 	 *
 	 * - `'default'` — standard surface styling with background, padding,
 	 *    border radius, and shadow.
+	 * - `'high-contrast'`: strong border, small radius, and no shadow.
 	 * - `'unstyled'` — no visual treatment; useful as a blank positioning
 	 *    container for fully custom content.
 	 *
 	 * @default 'default'
 	 */
-	variant?: 'default' | 'unstyled';
+	variant?: 'default' | 'high-contrast' | 'unstyled';
 }
 
 export interface ArrowProps extends ComponentProps< 'div' > {

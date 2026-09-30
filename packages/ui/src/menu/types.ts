@@ -89,6 +89,18 @@ export type SeparatorProps = ComponentProps< typeof _Menu.Separator >;
 
 export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 	/**
+	 * The visual style of the popup.
+	 *
+	 * - `'default'`: standard border, radius, and shadow.
+	 * - `'high-contrast'`: strong border, small radius, and no shadow.
+	 *
+	 * Set the variant on each popup, including submenu popups.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'high-contrast';
+
+	/**
 	 * The content to be rendered inside the menu popup.
 	 */
 	children?: ReactNode;

@@ -1,3 +1,6 @@
+// Browser style assertions require the public theme stylesheet.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/theme/design-tokens.css';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
@@ -399,6 +402,52 @@ describe( 'Popover', () => {
 	} );
 
 	describe( 'variant', () => {
+		it.each( [ 'default', 'high-contrast' ] as const )(
+			'uses the %s surface appearance with a matching arrow',
+			async ( variant ) => {
+				const arrowRef = createRef< HTMLDivElement >();
+
+				await render(
+					<Popover.Root defaultOpen>
+						<Popover.Trigger>Open</Popover.Trigger>
+						<Popover.Popup variant={ variant }>
+							<Popover.Title>Details</Popover.Title>
+							<Popover.Arrow ref={ arrowRef } />
+						</Popover.Popup>
+					</Popover.Root>
+				);
+
+				const title = await screen.findByRole( 'heading', {
+					name: 'Details',
+				} );
+				await expect.element( title ).toBeVisible();
+				// The visual surface has no semantic role. Inspect it for computed styles.
+				// eslint-disable-next-line testing-library/no-node-access
+				const surface = title.parentElement!;
+				const style = getComputedStyle( surface );
+				expect( style.borderTopWidth ).toBe( '1px' );
+				expect( style.borderTopColor ).toBe(
+					variant === 'high-contrast'
+						? 'rgb(30, 30, 30)'
+						: 'rgb(219, 219, 219)'
+				);
+				expect( style.borderRadius ).toBe(
+					variant === 'high-contrast' ? '2px' : '4px'
+				);
+				const shadowMatcher = expect.not.stringMatching( /^none$/ );
+				expect( style.boxShadow ).toEqual(
+					variant === 'high-contrast' ? 'none' : shadowMatcher
+				);
+				// SVG stroke paths have no semantic query.
+				const arrowStroke =
+					// eslint-disable-next-line testing-library/no-node-access
+					arrowRef.current!.querySelector( 'path:last-child' )!;
+				expect( getComputedStyle( arrowStroke ).fill ).toBe(
+					style.borderTopColor
+				);
+			}
+		);
+
 		it( 'should not apply popup styles when variant is unstyled', async () => {
 			const user = userEvent;
 			const unstyledRef = createRef< HTMLDivElement >();

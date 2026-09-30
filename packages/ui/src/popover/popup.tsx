@@ -8,6 +8,7 @@ import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import styles from './style.module.css';
+import highContrastStyles from '../utils/css/high-contrast-popup.module.css';
 import type { PopupProps } from './types';
 
 const CLOSE_ATTR = 'data-wp-ui-popover-close';
@@ -50,7 +51,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	// inner surface so the arrow's containing block stays borderless. See
 	// `style.module.css` for the full rationale.
 	const popupChildren = useDefaultSurface ? (
-		<div className={ styles.surface }>{ validatedChildren }</div>
+		<div
+			className={ clsx(
+				styles.surface,
+				variant === 'high-contrast' &&
+					highContrastStyles[ 'high-contrast' ]
+			) }
+		>
+			{ validatedChildren }
+		</div>
 	) : (
 		validatedChildren
 	);

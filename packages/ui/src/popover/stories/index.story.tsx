@@ -5,6 +5,8 @@ import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
+import { Button } from '../../button';
+import { Stack } from '../../stack';
 import { Link } from '../../link';
 import { GenericIframe, useMeasure } from './utils';
 
@@ -886,36 +888,22 @@ export const Anchor: Story = {
 };
 
 /**
- * Use `variant="unstyled"` and custom inline styles to replicate a toolbar-like
- * appearance: high-contrast border, no shadow, and a smaller border radius.
- *
- * A first-class `variant="toolbar"` may be added in the future if this pattern
- * becomes widespread.
+ * The `high-contrast` variant uses a strong border, small radius, and no shadow.
+ * Use it for popups that need a more distinct boundary, such as block toolbars.
  */
-export const ToolbarVariant: Story = {
+export const HighContrast: Story = {
 	args: {
 		children: [
-			<Popover.Trigger key="trigger">Open Toolbar</Popover.Trigger>,
-			<Popover.Popup
-				variant="unstyled"
-				style={ {
-					display: 'flex',
-					gap: 'var(--wpds-dimension-gap-xs)',
-					padding: '4px 8px',
-					border: '1px solid #1e1e1e',
-					borderRadius: 2,
-					background: '#fff',
-					fontSize: 13,
-				} }
-				key="popup"
-			>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					Formatting
-				</VisuallyHidden>
-				<button type="button">B</button>
-				<button type="button">I</button>
-				<button type="button">U</button>
-				<button type="button">Link</button>
+			<Popover.Trigger key="trigger">Open popover</Popover.Trigger>,
+			<Popover.Popup variant="high-contrast" key="popup">
+				<Popover.Arrow />
+				<Popover.Title>Formatting</Popover.Title>
+				<Stack direction="row" gap="xs">
+					<Button variant="minimal">Bold</Button>
+					<Button variant="minimal">Italic</Button>
+					<Button variant="minimal">Underline</Button>
+					<Button variant="minimal">Link</Button>
+				</Stack>
 			</Popover.Popup>,
 		],
 	},

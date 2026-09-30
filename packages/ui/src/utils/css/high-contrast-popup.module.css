@@ -1,0 +1,17 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		.high-contrast {
+			--_wp-ui-popup-border-color: var(--wpds-color-foreground-content-neutral);
+
+			border-color: var(--_wp-ui-popup-border-color);
+			border-radius: var(--wpds-border-radius-sm);
+			box-shadow: none;
+
+			@media (forced-colors: active) {
+				--_wp-ui-popup-border-color: CanvasText;
+			}
+		}
+	}
+}

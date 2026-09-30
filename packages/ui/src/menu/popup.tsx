@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import styles from './style.module.css';
+import highContrastStyles from '../utils/css/high-contrast-popup.module.css';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { useMenuContext } from './context';
@@ -12,7 +13,7 @@ import type { PopupProps } from './types';
  * Renders the floating menu popup.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
-	{ children, className, portal, positioner, ...props },
+	{ children, className, portal, positioner, variant = 'default', ...props },
 	ref
 ) {
 	const { isSubmenu } = useMenuContext();
@@ -22,6 +23,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 			ref={ ref }
 			className={ clsx(
 				styles.popup,
+				variant === 'high-contrast' &&
+					highContrastStyles[ 'high-contrast' ],
 				isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
 				className
 			) }
