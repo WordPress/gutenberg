@@ -1392,6 +1392,25 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The cascade flag only ever sits on reactions, so restoring any other
+	 * comment must leave its meta alone.
+	 */
+	public function test_untrashing_regular_comment_keeps_its_meta() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
+		add_comment_meta( $comment_id, '_wp_trash_meta_with_note', '1', true );
+
+		wp_trash_comment( $comment_id );
+		wp_untrash_comment( $comment_id );
+
+		$this->assertSame( '1', get_comment_meta( $comment_id, '_wp_trash_meta_with_note', true ) );
+	}
+
+	/**
 	 * Trashing a note trashes its reactions, so permanently deleting it
 	 * afterwards must still find and delete them.
 	 */

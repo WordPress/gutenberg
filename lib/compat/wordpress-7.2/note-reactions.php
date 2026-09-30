@@ -365,9 +365,14 @@ add_action( 'untrashed_comment', 'gutenberg_untrash_note_reactions', 10, 2 );
  *
  * @since 7.2.0
  *
- * @param string $comment_id The comment ID as a numeric string.
+ * @param string     $comment_id The comment ID as a numeric string.
+ * @param WP_Comment $comment    The untrashed comment.
  */
-function gutenberg_clear_note_reaction_trash_flag( $comment_id ) {
+function gutenberg_clear_note_reaction_trash_flag( $comment_id, $comment ) {
+	if ( ! $comment instanceof WP_Comment || 'reaction' !== $comment->comment_type ) {
+		return;
+	}
+
 	delete_comment_meta( $comment_id, '_wp_trash_meta_with_note' );
 }
-add_action( 'untrashed_comment', 'gutenberg_clear_note_reaction_trash_flag', 5 );
+add_action( 'untrashed_comment', 'gutenberg_clear_note_reaction_trash_flag', 5, 2 );
