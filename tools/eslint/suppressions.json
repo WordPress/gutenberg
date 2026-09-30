@@ -7490,9 +7490,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/screen-element.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"no-restricted-imports": {
 			"count": 1
 		}
