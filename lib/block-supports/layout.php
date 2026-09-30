@@ -53,17 +53,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
@@ -104,17 +104,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
