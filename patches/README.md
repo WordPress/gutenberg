@@ -8,7 +8,4 @@ Existing patches should be described and justified here.
 
 ## Patches
 
-### `patches/@arraypress+waveform-player+1.26.0.patch`
-
-This patch requires initialization to be requested explicitly and removes passing custom SVG icons
-through HTML data attributes.
+There are currently no patches.
