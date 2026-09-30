@@ -40,17 +40,20 @@ function Root( { className, ...settings } ) {
 		isOutlineMode,
 		isFocusMode,
 		isPreviewMode,
+		showBlockBoundaries,
 		editedContentOnlySection,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
 			isTyping,
 			hasBlockSpotlight,
+			isZoomOut,
 			getEditedContentOnlySection,
 		} = unlock( select( blockEditorStore ) );
 		const {
 			outlineMode,
 			focusMode,
+			showBlockBoundaries: _showBlockBoundaries,
 			isPreviewMode: _isPreviewMode,
 		} = getSettings();
 		return {
@@ -63,6 +66,8 @@ function Root( { className, ...settings } ) {
 			isFocusMode:
 				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
 			isPreviewMode: _isPreviewMode,
+			showBlockBoundaries:
+				! _isPreviewMode && ! isZoomOut() && _showBlockBoundaries,
 			editedContentOnlySection: getEditedContentOnlySection(),
 		};
 	}, [] );
@@ -112,6 +117,7 @@ function Root( { className, ...settings } ) {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
 				'is-preview-mode': isPreviewMode,
+				'show-block-boundaries': showBlockBoundaries,
 			} ),
 		},
 		settings
