@@ -1,14 +1,13 @@
 <?php
 /**
- * A collection for books, excluding the fields of the `editor` support: not those of its `notes` argument.
+ * A collection for books, with a script module.
  *
  * @package gutenberg
  */
 
 return array(
-	'origin'           => 'fixture',
-	'kind'             => 'postType',
-	'name'             => 'gutenberg_book',
-	'module'           => 'fixture/book',
-	'exclude_supports' => array( 'editor' ),
+	'origin' => 'fixture',
+	'kind'   => 'postType',
+	'name'   => 'gutenberg_book',
+	'module' => 'fixture/book',
 );

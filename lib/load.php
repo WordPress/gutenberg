@@ -168,6 +168,9 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
 }
+if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
+	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/settings.php';

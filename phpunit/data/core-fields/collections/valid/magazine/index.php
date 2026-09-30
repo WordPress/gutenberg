@@ -1,13 +1,12 @@
 <?php
 /**
- * A collection for magazines, excluding every field of the collections for every post type.
+ * A collection for magazines, without a script module.
  *
  * @package gutenberg
  */
 
 return array(
-	'origin'           => 'fixture',
-	'kind'             => 'postType',
-	'name'             => 'gutenberg_magazine',
-	'exclude_supports' => true,
+	'origin' => 'fixture',
+	'kind'   => 'postType',
+	'name'   => 'gutenberg_magazine',
 );
