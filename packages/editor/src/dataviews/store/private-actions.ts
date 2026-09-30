@@ -48,7 +48,6 @@ import {
 	authorField as mediaAuthorField,
 	filenameField,
 	filesizeField,
-	mediaDimensionsField,
 } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -125,7 +124,6 @@ const MEDIA_FIELDS = [
 	mediaAuthorField,
 	filenameField,
 	filesizeField,
-	mediaDimensionsField,
 	attachedToField,
 	titleField,
 ];
