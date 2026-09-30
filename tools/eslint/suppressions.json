@@ -412,7 +412,7 @@
 	},
 	"packages/block-editor/src/components/block-lock/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -427,18 +427,24 @@
 		}
 	},
 	"packages/block-editor/src/components/block-manager/category.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-manager/checklist.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-manager/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -550,7 +556,7 @@
 	},
 	"packages/block-editor/src/components/block-removal-warning-modal/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -788,7 +794,7 @@
 	},
 	"packages/block-editor/src/components/block-visibility/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1652,6 +1658,9 @@
 		}
 	},
 	"packages/block-editor/src/components/link-control/settings.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2462,7 +2471,7 @@
 	},
 	"packages/block-library/src/breadcrumbs/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react-hooks/refs": {
 			"count": 2
@@ -2909,7 +2918,7 @@
 	},
 	"packages/block-library/src/home-link/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2976,7 +2985,7 @@
 	},
 	"packages/block-library/src/image/image.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3147,7 +3156,7 @@
 	},
 	"packages/block-library/src/navigation-link/link-ui/page-creator.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3160,7 +3169,7 @@
 	},
 	"packages/block-library/src/navigation-link/shared/controls.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -4160,6 +4169,9 @@
 		}
 	},
 	"packages/block-library/src/tab-panel/controls.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4866,6 +4878,9 @@
 		}
 	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -5072,6 +5087,9 @@
 		}
 	},
 	"packages/dataviews/src/components/dataviews-bulk-actions/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react-hooks/refs": {
 			"count": 4
 		}
@@ -5106,12 +5124,27 @@
 			"count": 1
 		}
 	},
+	"packages/dataviews/src/components/dataviews-picker-footer/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/dataviews/src/components/dataviews-view-config/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/dataviews-view-config/properties-section.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/checkbox-control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -6410,6 +6443,9 @@
 		}
 	},
 	"packages/editor/src/components/post-pending-status/index.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6421,7 +6457,7 @@
 	},
 	"packages/editor/src/components/post-pingbacks/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -6458,6 +6494,9 @@
 		}
 	},
 	"packages/editor/src/components/post-publish-panel/index.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6572,13 +6611,16 @@
 	},
 	"packages/editor/src/components/post-status/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-sticky/index.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6609,6 +6651,9 @@
 		}
 	},
 	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6864,7 +6909,7 @@
 	},
 	"packages/editor/src/components/start-page-options/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7179,7 +7224,7 @@
 	},
 	"packages/fields/src/fields/password/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		}
 	},
 	"packages/fields/src/fields/pattern-sync-status/index.tsx": {
@@ -7252,7 +7297,7 @@
 	},
 	"packages/format-library/src/link/css-classes-setting.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/format-library/src/link/test/css-classes-setting.jsdom.test.jsx": {
@@ -7310,7 +7355,7 @@
 	},
 	"packages/global-styles-ui/src/font-library/collection-font-variant.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/global-styles-ui/src/font-library/font-card.tsx": {
@@ -7320,7 +7365,7 @@
 	},
 	"packages/global-styles-ui/src/font-library/font-collection.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 6
+			"count": 7
 		}
 	},
 	"packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx": {
@@ -7330,7 +7375,7 @@
 	},
 	"packages/global-styles-ui/src/font-library/installed-fonts.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 6
+			"count": 7
 		}
 	},
 	"packages/global-styles-ui/src/font-library/library-font-details.tsx": {
@@ -7340,7 +7385,7 @@
 	},
 	"packages/global-styles-ui/src/font-library/library-font-variant.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/global-styles-ui/src/font-library/modal.tsx": {

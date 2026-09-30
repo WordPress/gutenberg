@@ -1,14 +1,14 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
-import { LinkButton } from '../index';
+import { ButtonLink } from '../index';
 
-const meta: Meta< typeof LinkButton > = {
-	title: 'Components/@wordpress-ui/LinkButton',
-	id: 'design-system-components-linkbutton',
-	component: LinkButton,
+const meta: Meta< typeof ButtonLink > = {
+	title: 'Components/@wordpress-ui/ButtonLink',
+	id: 'design-system-components-buttonlink',
+	component: ButtonLink,
 	subcomponents: {
-		'LinkButton.Icon': LinkButton.Icon,
+		'ButtonLink.Icon': ButtonLink.Icon,
 	},
 	parameters: {
 		componentStatus: {
@@ -20,7 +20,7 @@ const meta: Meta< typeof LinkButton > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof LinkButton >;
+type Story = StoryObj< typeof ButtonLink >;
 
 export const Default: Story = {
 	args: {
@@ -120,7 +120,7 @@ export const AllTonesAndVariants: Story = {
 									alignItems: 'center',
 								} }
 							>
-								<LinkButton
+								<ButtonLink
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
@@ -139,7 +139,7 @@ export const WithIcon: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<LinkButton.Icon icon={ wordpress } key="icon" />,
+			<ButtonLink.Icon icon={ wordpress } key="icon" />,
 			'Link button',
 		],
 	},
