@@ -19,6 +19,7 @@
 -   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
 -   `ItemGroup`: Use design system's outline focus ring instead of previous box-shadow implementation ([#83764](https://github.com/WordPress/gutenberg/pull/83764)).
 -   `ColorPalette`: Show the custom color button's focus ring with the design system's outline instead of a legacy inset box-shadow ([#83841](https://github.com/WordPress/gutenberg/pull/83841)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 
 ### Deprecations
 

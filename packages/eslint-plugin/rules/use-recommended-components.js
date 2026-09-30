@@ -56,6 +56,7 @@ const ALLOWLIST = {
 			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
+			'inertValue',
 			'useKeyboardShortcutProps',
 		],
 		caution: [
