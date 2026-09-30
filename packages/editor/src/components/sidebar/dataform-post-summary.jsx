@@ -12,8 +12,8 @@ import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
-import revisionsField from '../../dataviews/fields/revisions';
-import readingSettingsField from '../../dataviews/fields/reading-settings';
+import revisionsField from './fields/revisions';
+import readingSettingsField from './fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
@@ -321,8 +321,18 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					return field;
 				} )
 				.filter( Boolean )
-				// Editor-only fields, injected here rather than registered
-				// so they never leak into the site editor list / quick-edit fields.
+				// Editor-only fields, injected here rather than registered on
+				// the server: `revisions` switches the editor to its revisions
+				// view and `reading_settings` shares its component with the
+				// legacy summary panel, so both read the editor store, which the
+				// script modules of `@wordpress/core-fields` cannot import.
+				//
+				// Their ids are already in the form configurations the server
+				// builds (`revisions` in the default post type form and in the
+				// `wp_block`, `wp_template_part`, and `wp_template` ones,
+				// `reading_settings` in the `wp_template` one), yet nothing
+				// registers a field for them: every other consumer of those forms
+				// drops the ids for want of a field.
 				.concat( revisionsField, readingSettingsField ),
 		[
 			_fields,
