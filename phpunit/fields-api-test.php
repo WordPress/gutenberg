@@ -23,15 +23,15 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status' );
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status', 'template' );
 
 	/**
-	 * The ids of the default fields about publishing a post, which the
-	 * design post types exclude.
+	 * The ids of the default fields the design post types exclude: those
+	 * about publishing a post, and the template that renders it.
 	 *
 	 * @var string[]
 	 */
-	const PUBLISHING_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status' );
+	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' );
 
 	/**
 	 * The callbacks a test hooked to `fields_api_init`, as callback and
@@ -560,6 +560,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'password'         => array( 'password', true ),
 			'scheduled_date'   => array( 'scheduled_date', true ),
 			'status'           => array( 'status', true ),
+			'template'         => array( 'template', true ),
 		);
 	}
 
@@ -712,12 +713,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_the_core_post_types_exclude_defaults_on_the_filter() {
 		$this->assertSame( 10, has_filter( 'fields_api_post_type_supports_exclusions', 'gutenberg_exclude_core_post_type_support_fields' ) );
 
-		$ids        = array( 'author', 'comment_status', 'notesCount' );
-		$publishing = self::PUBLISHING_FIELDS;
-		$this->assertSame( array_merge( array( 'plugin_field', 'author', 'excerpt', 'post-content-info', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
-		$this->assertSame( array_merge( array( 'author', 'excerpt', 'post-content-info', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
-		$this->assertSame( array_merge( array( 'excerpt', 'title' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
-		$this->assertSame( array_merge( array( 'post-content-info' ), $publishing ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_navigation', $ids ) );
+		$ids      = array( 'author', 'comment_status', 'notesCount' );
+		$excluded = self::DESIGN_EXCLUDED_FIELDS;
+		$this->assertSame( array_merge( array( 'plugin_field', 'author', 'excerpt', 'post-content-info', 'title' ), $excluded ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
+		$this->assertSame( array_merge( array( 'author', 'excerpt', 'post-content-info', 'title' ), $excluded ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array_merge( array( 'excerpt', 'title' ), $excluded ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
+		$this->assertSame( array_merge( array( 'post-content-info' ), $excluded ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_navigation', $ids ) );
 		$this->assertSame( array( 'plugin_field', 'author', 'comment_status', 'notesCount' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'attachment', $ids ) );
 		$this->assertSame( array( 'plugin_field', 'title' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ) );
 		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'post', $ids ), 'It leaves the other post types alone.' );

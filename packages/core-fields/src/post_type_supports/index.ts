@@ -27,6 +27,7 @@ import { fieldExtensions as scheduledDate } from './scheduled_date/field';
 import { fieldExtensions as slug } from './slug/field';
 import { fieldExtensions as status } from './status/field';
 import { fieldExtensions as sticky } from './sticky/field';
+import { fieldExtensions as template } from './template/field';
 import { fieldExtensions as title } from './title/field';
 
 const fields: FieldsScriptParts = {
@@ -43,6 +44,7 @@ const fields: FieldsScriptParts = {
 	slug,
 	status,
 	sticky,
+	template,
 	title,
 };
 

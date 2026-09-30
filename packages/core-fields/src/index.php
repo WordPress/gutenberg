@@ -39,6 +39,7 @@
  * - `slug`, for the viewable post types but the design ones.
  * - `status`, for every post type but the design ones.
  * - `sticky`, for posts, the only post type with sticky posts.
+ * - `template`, for every post type but the design ones.
  * - `title`, for the post types supporting `title`.
  *
  * It makes no exception for any post type: the fields a post type does not
@@ -78,6 +79,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'slug'              => is_post_type_viewable( $post_type ),
 			'status'            => true,
 			'sticky'            => 'post' === $post_type,
+			'template'          => true,
 			'title'             => post_type_supports( $post_type, 'title' ),
 		);
 		$all_fields = array_keys( array_filter( $applies ) );
@@ -146,8 +148,9 @@ function register_core_post_type_supports_fields( $registry ) {
  *   Their content is blocks laying out a site, not text to read.
  * - The design post types (templates, template parts, patterns, and
  *   navigation menus): the fields about publishing a post
- *   (`date`, `password`, `scheduled_date`, `slug`, `status`). They lay out
- *   a site rather than publish content.
+ *   (`date`, `password`, `scheduled_date`, `slug`, `status`) and the
+ *   `template` that renders a post. They lay out a site rather than
+ *   publish content.
  * - Pages, templates, template parts, and patterns: `title`. They have
  *   their own title fields in their collections.
  * - Attachments: every default field. The media editor has its own fields,
@@ -186,7 +189,7 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 			break;
 	}
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ), true ) ) {
-		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'password', 'scheduled_date', 'slug', 'status' ) );
+		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' ) );
 	}
 	return $excluded_fields;
 }

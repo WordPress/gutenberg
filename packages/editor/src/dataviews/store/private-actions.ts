@@ -20,10 +20,9 @@ import {
 	deletePost,
 	duplicateTemplatePart,
 	featuredImageField,
-	templateField,
 } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 export function registerEntityAction< Item >(
@@ -169,7 +168,6 @@ export const registerPostTypeSchema =
 
 		if ( postType !== ATTACHMENT_POST_TYPE ) {
 			const postTypeSlug = postTypeConfig.slug;
-			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
 			// `post-thumbnails` is `true` or the list of post types the theme
 			// opted in.
 			const postThumbnails =
@@ -184,10 +182,6 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.thumbnail &&
 					themeSupportsThumbnails &&
 					featuredImageField,
-				// The template field uses private core-data selectors via
-				// @wordpress/fields' unlock, which needs resolving before it can
-				// move to @wordpress/core-fields.
-				! isDesignPostType && templateField,
 			].filter( Boolean ) as Field< any >[];
 		}
 
