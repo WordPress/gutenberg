@@ -33,6 +33,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minHeight`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`

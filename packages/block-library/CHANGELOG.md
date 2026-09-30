@@ -2,14 +2,51 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+-   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
+-   Media & Text: Lower the specificity of the content area's default padding so themes can override it, including through the block's custom CSS in `theme.json` ([#83563](https://github.com/WordPress/gutenberg/pull/83563)).
+-   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
 ### Bug Fixes
 
+-   Tag Cloud: Space the tags of the Outline style evenly. The base link margin outranked the style's own reset, so each tag carried that margin on top of the container's gap and the horizontal spacing did not match the spacing between rows ([#70224](https://github.com/WordPress/gutenberg/pull/70224)).
+-   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
+-   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+-   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
+-   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
+
+### Internal
+
+-   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
+
+## 11.1.0 (2026-09-23)
+
+### Enhancements
+
+-   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
+-   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
+-   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
+-   Icon: Don't render icons from non-public icon collections on the front end, since they aren't available in the editor anyway ([#82774](https://github.com/WordPress/gutenberg/pull/82774)).
+
+### Bug Fixes
+
+-   Image: The resize box no longer takes the pointer from the image while the block is selected, so the image has its context menu and is the source of a drag by it; the resize handles are unaffected ([#72983](https://github.com/WordPress/gutenberg/pull/72983)).
+-   Navigation: Stop the flyout `min-width` from applying to always-open submenus. Hovering, focusing or selecting an item in a vertical menu with submenus set to always show forced its inline submenu to at least 200px and made the menu re-wrap ([#83142](https://github.com/WordPress/gutenberg/pull/83142)).
 -   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
 -   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
 -   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
 -   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
+-   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
 
 ### Internal
 

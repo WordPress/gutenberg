@@ -139,6 +139,44 @@ describe( 'BorderControl', () => {
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
 
+		it( 'should not offer a percentage unit for the width', () => {
+			const props = createProps();
+			render( <TestBorderControl { ...props } /> );
+
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			expect(
+				within( unitSelect ).queryByRole( 'option', { name: '%' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should keep the unit of a percentage width until it is changed', async () => {
+			const user = userEvent.setup();
+			const props = createProps( {
+				value: { ...defaultBorder, width: '10%' },
+			} );
+			const { rerender } = render( <TestBorderControl { ...props } /> );
+
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			expect( unitSelect ).toHaveValue( '%' );
+
+			await user.selectOptions( unitSelect, 'px' );
+
+			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+				...defaultBorder,
+				width: '10px',
+			} );
+
+			rerender( <TestBorderControl { ...props } /> );
+
+			expect(
+				within( unitSelect ).queryByRole( 'option', { name: '%' } )
+			).not.toBeInTheDocument();
+		} );
+
 		describe( 'color indicator inline styles', () => {
 			const getIndicatorWrapper = ( border: Border ) => {
 				render(

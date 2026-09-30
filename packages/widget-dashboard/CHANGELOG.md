@@ -4,6 +4,20 @@
 
 ### Enhancements
 
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Bug Fixes
+
+-   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+### Internal
+
+-   Update consumers to the renamed `ButtonLink`, `Dialog.CloseIconButton`, and `Drawer.CloseIconButton` components from `@wordpress/ui` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
+
+## 0.8.0 (2026-09-23)
+
+### Enhancements
+
 -   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
     Card's `--wpds-dimension-padding-2xl`, and the header/body gap follows it;
     `--wp-widget-dashboard-tile-padding` still overrides both

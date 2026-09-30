@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-runtime",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"description": "Runtime helpers for injecting WordPress package styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"files": [
 		"src",
