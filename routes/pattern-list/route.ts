@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { loadEntityFields } from '@wordpress/entity-fields';
+import { loadFields } from '@wordpress/fields-loader';
 
 /**
  * Route configuration for pattern list.
@@ -17,7 +17,7 @@ export const route = {
 				'wp_block'
 			),
 			// Warm up the fields the stage renders. A failure is reported by the stage.
-			loadEntityFields( { kind: 'postType', name: 'wp_block' } ).catch(
+			loadFields( { kind: 'postType', name: 'wp_block' } ).catch(
 				() => {}
 			),
 		] );

@@ -1,4 +1,4 @@
-# Entity Fields
+# Fields Loader
 
 Load the fields WordPress entities register on the server, ready to pass to DataViews and DataForm.
 
@@ -9,14 +9,14 @@ The Fields API lets WordPress core and plugins register the fields of an entity 
 Install the module:
 
 ```bash
-npm install @wordpress/entity-fields --save
+npm install @wordpress/fields-loader --save
 ```
 
 _This package assumes that your code will run in an ES2015+ environment. If you're using an environment that has limited or no support for such language features and/or APIs, you should include the polyfill shipped in `@wordpress/babel-preset-default` in your code._
 
 ## Prerequisites
 
-- The `/wp/v2/fields` REST API route and the `getFieldsConfig` selector of the `core` data store, which requests and caches the fields. The Gutenberg plugin provides both. On a WordPress version without them, `useEntityFields` returns an error and `loadEntityFields` rejects with one, so a plugin bundling this package can fall back to fields of its own.
+- The `/wp/v2/fields` REST API route and the `getFieldsConfig` selector of the `core` data store, which requests and caches the fields. The Gutenberg plugin provides both. On a WordPress version without them, `useFields` returns an error and `loadFields` rejects with one, so a plugin bundling this package can fall back to fields of its own.
 - The script modules registered along with the fields must be on the page's import map. On the editor screens WordPress adds them for you.
 
 ## Usage
@@ -25,10 +25,10 @@ Read the fields of an entity in a React component:
 
 ```jsx
 import { DataViews } from '@wordpress/dataviews';
-import { useEntityFields } from '@wordpress/entity-fields';
+import { useFields } from '@wordpress/fields-loader';
 
 function ProductList( { data, view, onChangeView } ) {
-	const { fields, isLoading, error } = useEntityFields( {
+	const { fields, isLoading, error } = useFields( {
 		kind: 'postType',
 		name: 'product',
 	} );
@@ -49,7 +49,7 @@ function ProductList( { data, view, onChangeView } ) {
 }
 ```
 
-Load them ahead of time, in a route loader or any other code outside React, with `loadEntityFields`. Both share the request and the resolved fields, so the component renders what the loader loaded.
+Load them ahead of time, in a route loader or any other code outside React, with `loadFields`. Both share the request and the resolved fields, so the component renders what the loader loaded.
 
 ### Providing the JavaScript parts of a field
 
@@ -73,7 +73,7 @@ A module only contributes to the fields the server lists for it: parts for any o
 
 The JavaScript parts of the fields a script module provides, keyed by field id: what PHP cannot serialize, such as `render`, `Edit`, or `getElements`. It is the shape of the default export of a script module registered along with fields on the server.
 
-### loadEntityFields
+### loadFields
 
 Loads the fields registered on the server for an entity, in route loaders and other code outside React.
 
@@ -89,11 +89,11 @@ _Returns_
 
 - `Promise< Field< Item >[] >`: Promise resolving to the fields, in the server order. It rejects with an `Error` when the fields cannot be requested, or when WordPress does not provide them.
 
-### useEntityFields
+### useFields
 
 Returns the fields registered on the server for an entity.
 
-The React counterpart of `loadEntityFields`: both share the request and the module imports, so a route loader warms up what the hook renders.
+The React counterpart of `loadFields`: both share the request and the module imports, so a route loader warms up what the hook renders.
 
 _Parameters_
 

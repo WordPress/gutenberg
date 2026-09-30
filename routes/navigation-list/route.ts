@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { loadEntityFields } from '@wordpress/entity-fields';
+import { loadFields } from '@wordpress/fields-loader';
 import { loadNavigationViewConfig } from './view-utils';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -72,7 +72,7 @@ export const route = {
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
 			// Warm up the fields the stage renders. A failure is reported by
 			// the stage.
-			loadEntityFields( {
+			loadFields( {
 				kind: 'postType',
 				name: NAVIGATION_POST_TYPE,
 			} ).catch( () => {} ),

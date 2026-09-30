@@ -128,7 +128,7 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
           - any-glob-to-any-file: 'packages/core-fields/**'
-          - any-glob-to-any-file: 'packages/entity-fields/**'
+          - any-glob-to-any-file: 'packages/fields-loader/**'
 
 '[Package] Format library':
     - changed-files:

@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { loadEntityFields } from '@wordpress/entity-fields';
+import { loadFields } from '@wordpress/fields-loader';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
@@ -23,7 +23,7 @@ export const route = {
 	},
 	loader: async () => {
 		// Warm up the fields the stage renders. A failure is reported by the stage.
-		await loadEntityFields( {
+		await loadFields( {
 			kind: 'postType',
 			name: 'wp_template_part',
 		} ).catch( () => {} );

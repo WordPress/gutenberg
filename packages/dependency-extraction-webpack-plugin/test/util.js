@@ -67,7 +67,7 @@ describe( 'defaultRequestToExternal', () => {
 			defaultRequestToExternal( '@wordpress/global-styles-ui' )
 		).toBeUndefined();
 		expect(
-			defaultRequestToExternal( '@wordpress/entity-fields' )
+			defaultRequestToExternal( '@wordpress/fields-loader' )
 		).toBeUndefined();
 	} );
 } );

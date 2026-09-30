@@ -12,7 +12,7 @@
  * Only the fields with JavaScript parts need an entry. The comment status and
  * notes fields are plain data and have none.
  */
-import type { FieldsScriptParts } from '@wordpress/entity-fields';
+import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { authorField } from '@wordpress/fields';
 
 const coreFields: FieldsScriptParts = {
