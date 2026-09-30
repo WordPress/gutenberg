@@ -592,6 +592,31 @@ class Gutenberg_REST_Link_Suggestions_Controller_Test extends WP_Test_REST_TestC
 		);
 	}
 
+	public function test_matches_percent_signs_and_underscores_literally() {
+		$this->create_post( '100% Arabica', 'page', 1 );
+		$this->create_post( '1000 Arabica', 'page', 2 );
+		$this->create_post( 'cold_brew notes', 'page', 3 );
+		$this->create_post( 'coldXbrew notes', 'page', 4 );
+
+		$this->assertSame( array( '100% Arabica' ), $this->get_titles( array( 'search' => '100%' ) ) );
+		$this->assertSame( array( 'cold_brew notes' ), $this->get_titles( array( 'search' => 'cold_brew' ) ) );
+	}
+
+	public function test_searches_text_holding_quotes_and_backslashes_without_database_errors() {
+		global $wpdb;
+
+		$this->create_post( "Barista's Pick", 'page' );
+
+		foreach ( array( "barista's", 'barista\\', "barista' OR 1=1 -- ", 'barista\\\'s' ) as $search ) {
+			$response = $this->get_suggestions( array( 'search' => $search ) );
+
+			$this->assertSame( 200, $response->get_status(), $search );
+			$this->assertSame( '', $wpdb->last_error, $search );
+		}
+
+		$this->assertSame( array( "Barista\u{2019}s Pick" ), array_map( 'html_entity_decode', $this->get_titles( array( 'search' => "barista's" ) ) ) );
+	}
+
 	public function test_leaves_out_drafts_and_private_posts() {
 		$this->create_post( 'Latte Draft', 'page', 1, array( 'post_status' => 'draft' ) );
 		$this->create_post( 'Latte Private', 'page', 2, array( 'post_status' => 'private' ) );

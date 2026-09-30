@@ -228,13 +228,15 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 
 		// The SQL holds everything the results depend on, down to what the current user can see,
 		// so it keys the cache. Adding or changing a post or term changes the last changed times.
-		$cache_key = 'link-suggestions:' . md5( $count_sql . $page_sql ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' );
+		// The placeholder `prepare()` puts in place of each `%` differs between requests, so it
+		// is taken out first.
+		$cache_key = 'link-suggestions:' . md5( $wpdb->remove_placeholder_escape( $count_sql . $page_sql ) ) . ':' . wp_cache_get_last_changed( 'posts' ) . ':' . wp_cache_get_last_changed( 'terms' );
 		$cached    = wp_cache_get( $cache_key, 'post-queries' );
 
 		if ( false !== $cached ) {
 			list( $total, $rows ) = $cached;
 		} else {
-			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Every value is escaped where the SQL is built, and the results are cached.
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Built from pieces made with `$wpdb->prepare()`, and cached.
 			$rows = $wpdb->get_results( $page_sql );
 
 			if ( $rows && isset( $rows[0]->total_count ) ) {
@@ -245,7 +247,7 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 				// Without window functions, or past the last page, nothing carries the total.
 				$total = (int) $wpdb->get_var( $count_sql );
 			}
-			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:enable
 
 			wp_cache_set( $cache_key, array( $total, $rows ), 'post-queries' );
 		}
@@ -346,16 +348,6 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Quotes a value as an SQL string.
-	 *
-	 * @param string $value Value.
-	 * @return string
-	 */
-	private function quote( $value ) {
-		return "'" . esc_sql( $value ) . "'";
-	}
-
-	/**
 	 * Requires every term to be found in one of the columns, and no term left out to be found in
 	 * any, as `WP_Query` searches do.
 	 *
@@ -366,22 +358,25 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	private function get_terms_found_sql( $columns, $terms ) {
 		global $wpdb;
 
+		// `$column` is always one of the columns this class names, never a value from the request.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$conditions = array();
 		foreach ( $terms['include'] as $term ) {
-			$like  = $this->quote( '%' . $wpdb->esc_like( $term ) . '%' );
+			$like  = '%' . $wpdb->esc_like( $term ) . '%';
 			$found = array();
 			foreach ( $columns as $column ) {
-				$found[] = "$column LIKE $like";
+				$found[] = $wpdb->prepare( "$column LIKE %s", $like );
 			}
-			$conditions[] = '(' . implode( ' OR ', $found ) . ')';
+			$conditions[] = '( ' . implode( ' OR ', $found ) . ' )';
 		}
 
 		foreach ( $terms['exclude'] as $term ) {
-			$like = $this->quote( '%' . $wpdb->esc_like( $term ) . '%' );
+			$like = '%' . $wpdb->esc_like( $term ) . '%';
 			foreach ( $columns as $column ) {
-				$conditions[] = "COALESCE( $column, '' ) NOT LIKE $like";
+				$conditions[] = $wpdb->prepare( "COALESCE( $column, '' ) NOT LIKE %s", $like );
 			}
 		}
+		// phpcs:enable
 
 		return $conditions ? implode( ' AND ', $conditions ) : '1=1';
 	}
@@ -496,15 +491,19 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			return null;
 		}
 
-		$post_types = implode( ', ', array_map( array( $this, 'quote' ), $post_types ) );
+		$post_types = array_values( $post_types );
 		$found      = $this->get_terms_found_sql( array( 'p.post_title', 'p.post_excerpt', 'p.post_content' ), $terms );
-		$rank       = self::TYPE_RANKS['post'];
 
 		// Pages rank above other content that matches as well: a link is more often to a page.
-		return "SELECT 'post-type' AS kind, CASE WHEN p.post_type = 'page' THEN $rank + 0.5 ELSE $rank END AS base_rank, p.post_type AS subtype, p.ID AS object_id,
-				p.post_title AS title, p.post_date AS sort_date, '' AS sort_name
+		$sql = $wpdb->prepare(
+			"SELECT 'post-type' AS kind, CASE WHEN p.post_type = 'page' THEN %d + 0.5 ELSE %d END AS base_rank,
+				p.post_type AS subtype, p.ID AS object_id, p.post_title AS title, p.post_date AS sort_date, '' AS sort_name
 			FROM {$wpdb->posts} AS p
-			WHERE p.post_type IN ( $post_types ) AND p.post_status = 'publish' AND $found";
+			WHERE p.post_status = 'publish' AND p.post_type IN ( " . implode( ', ', array_fill( 0, count( $post_types ), '%s' ) ) . ' )',
+			array_merge( array( self::TYPE_RANKS['post'], self::TYPE_RANKS['post'] ), $post_types )
+		);
+
+		return "$sql AND $found";
 	}
 
 	/**
@@ -530,15 +529,19 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			return null;
 		}
 
-		$taxonomies = implode( ', ', array_map( array( $this, 'quote' ), $taxonomies ) );
+		$taxonomies = array_values( $taxonomies );
 		$found      = $this->get_terms_found_sql( array( 't.name', 't.slug' ), $terms );
-		$rank       = self::TYPE_RANKS['term'];
 
-		return "SELECT 'taxonomy' AS kind, $rank AS base_rank, tt.taxonomy AS subtype, t.term_id AS object_id,
+		$sql = $wpdb->prepare(
+			"SELECT 'taxonomy' AS kind, %d AS base_rank, tt.taxonomy AS subtype, t.term_id AS object_id,
 				t.name AS title, NULL AS sort_date, t.name AS sort_name
 			FROM {$wpdb->terms} AS t
 			INNER JOIN {$wpdb->term_taxonomy} AS tt ON tt.term_id = t.term_id
-			WHERE tt.taxonomy IN ( $taxonomies ) AND $found";
+			WHERE tt.taxonomy IN ( " . implode( ', ', array_fill( 0, count( $taxonomies ), '%s' ) ) . ' )',
+			array_merge( array( self::TYPE_RANKS['term'] ), $taxonomies )
+		);
+
+		return "$sql AND $found";
 	}
 
 	/**
@@ -550,6 +553,8 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string|null SQL.
 	 */
 	private function get_post_formats_sql( $terms ) {
+		global $wpdb;
+
 		$rows  = array();
 		$index = 0;
 		$rank  = self::TYPE_RANKS['post-format'];
@@ -561,12 +566,12 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 				continue;
 			}
 
-			$rows[] = sprintf(
+			$rows[] = $wpdb->prepare(
 				"SELECT 'post-format' AS kind, %d AS base_rank, 'post-format' AS subtype, %s AS object_id, %s AS title, NULL AS sort_date, %s AS sort_name",
 				$rank,
-				$this->quote( $slug ),
-				$this->quote( $label ),
-				$this->quote( sprintf( '%02d', $index ) )
+				$slug,
+				$label,
+				sprintf( '%02d', $index )
 			);
 		}
 
@@ -595,14 +600,17 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			array( 'a.post_title', 'a.post_excerpt', 'a.post_content' ),
 			$terms
 		);
-		$rank  = self::TYPE_RANKS['attachment'];
 
-		return "SELECT 'media' AS kind, $rank AS base_rank, 'attachment' AS subtype, a.ID AS object_id,
+		$sql = $wpdb->prepare(
+			"SELECT 'media' AS kind, %d AS base_rank, 'attachment' AS subtype, a.ID AS object_id,
 				a.post_title AS title, a.post_date AS sort_date, '' AS sort_name
 			FROM {$wpdb->posts} AS a
 			LEFT JOIN {$wpdb->posts} AS parent ON parent.ID = a.post_parent
-			WHERE a.post_type = 'attachment' AND a.post_status = 'inherit'
-				AND ( {$this->get_readable_parent_sql()} ) AND $found";
+			WHERE a.post_type = 'attachment' AND a.post_status = 'inherit'",
+			self::TYPE_RANKS['attachment']
+		);
+
+		return "$sql AND ( {$this->get_readable_parent_sql()} ) AND $found";
 	}
 
 	/**
@@ -615,32 +623,34 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL condition.
 	 */
 	private function get_readable_parent_sql() {
-		$public_statuses = array_map( array( $this, 'quote' ), get_post_stati( array( 'public' => true ) ) );
+		global $wpdb;
+
+		$public_statuses = array_values( get_post_stati( array( 'public' => true ) ) );
 		$private_types   = array();
 		$others_types    = array();
 
 		foreach ( get_post_types( array(), 'objects' ) as $post_type ) {
 			if ( current_user_can( $post_type->cap->read_private_posts ) ) {
-				$private_types[] = $this->quote( $post_type->name );
+				$private_types[] = $post_type->name;
 			}
 			if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
-				$others_types[] = $this->quote( $post_type->name );
+				$others_types[] = $post_type->name;
 			}
 		}
 
 		$conditions = array(
 			'a.post_parent = 0',
 			'parent.ID IS NULL',
-			'parent.post_status IN ( ' . implode( ', ', $public_statuses ) . ' )',
-			'parent.post_author = ' . get_current_user_id(),
+			$wpdb->prepare( 'parent.post_status IN ( ' . implode( ', ', array_fill( 0, count( $public_statuses ), '%s' ) ) . ' )', $public_statuses ),
+			$wpdb->prepare( 'parent.post_author = %d', get_current_user_id() ),
 		);
 
 		if ( $private_types ) {
-			$conditions[] = "( parent.post_status = 'private' AND parent.post_type IN ( " . implode( ', ', $private_types ) . ' ) )';
+			$conditions[] = $wpdb->prepare( "( parent.post_status = 'private' AND parent.post_type IN ( " . implode( ', ', array_fill( 0, count( $private_types ), '%s' ) ) . ' ) )', $private_types );
 		}
 
 		if ( $others_types ) {
-			$conditions[] = "( parent.post_status <> 'private' AND parent.post_type IN ( " . implode( ', ', $others_types ) . ' ) )';
+			$conditions[] = $wpdb->prepare( "( parent.post_status <> 'private' AND parent.post_type IN ( " . implode( ', ', array_fill( 0, count( $others_types ), '%s' ) ) . ' ) )', $others_types );
 		}
 
 		return implode( ' OR ', $conditions );
@@ -678,10 +688,12 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL condition.
 	 */
 	private function get_preferred_type_sql( $entry ) {
-		$sql = 'kind = ' . $this->quote( self::KINDS[ $entry['type'] ] );
+		global $wpdb;
+
+		$sql = $wpdb->prepare( 'kind = %s', self::KINDS[ $entry['type'] ] );
 
 		if ( $entry['subtype'] ) {
-			$sql .= ' AND subtype = ' . $this->quote( $entry['subtype'] );
+			$sql .= $wpdb->prepare( ' AND subtype = %s', $entry['subtype'] );
 		}
 
 		return "( $sql )";
@@ -699,10 +711,12 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			return 'c.base_rank';
 		}
 
+		global $wpdb;
+
 		$cases = array();
 		foreach ( $preferred as $index => $entry ) {
 			$rank    = count( self::TYPE_RANKS ) + count( $preferred ) - $index;
-			$cases[] = "WHEN {$this->get_preferred_type_sql( $entry )} THEN $rank";
+			$cases[] = "WHEN {$this->get_preferred_type_sql( $entry )} THEN " . $wpdb->prepare( '%d', $rank );
 		}
 
 		return 'CASE ' . implode( ' ', $cases ) . ' ELSE c.base_rank END';
@@ -733,9 +747,11 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL expression.
 	 */
 	private function get_plain_title_sql( $column ) {
+		global $wpdb;
+
 		$sql = "LOWER( TRIM( $column ) )";
 		foreach ( self::CURLY_QUOTES as $curly => $straight ) {
-			$sql = "REPLACE( $sql, {$this->quote( $curly )}, {$this->quote( $straight )} )";
+			$sql = "REPLACE( $sql, " . $wpdb->prepare( '%s, %s', $curly, $straight ) . ' )';
 		}
 		return $sql;
 	}
@@ -753,9 +769,11 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			// in core-data does.
 			$sql = "REGEXP_REPLACE( LOWER( $column ), '[^\\\\p{L}\\\\p{N}]+', ' ' )";
 		} else {
+			global $wpdb;
+
 			$sql = "LOWER( $column )";
 			foreach ( self::WORD_SEPARATORS as $separator ) {
-				$sql = "REPLACE( $sql, {$this->quote( $separator )}, ' ' )";
+				$sql = "REPLACE( $sql, " . $wpdb->prepare( '%s', $separator ) . ", ' ' )";
 			}
 		}
 
@@ -772,19 +790,21 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL.
 	 */
 	private function get_ranked_sql( $candidates, $search, $words, $preferred ) {
+		global $wpdb;
+
 		$titled = "SELECT c.*, {$this->get_type_rank_sql( $preferred )} AS type_rank FROM ( $candidates ) AS c";
 
 		if ( ! $words ) {
 			return "SELECT * FROM ( $titled ) AS scored";
 		}
 
-		$needle = mb_strtolower( trim( $search ) );
-		$needle = $this->quote( strtr( $needle, self::CURLY_QUOTES ) );
+		$needle = strtr( mb_strtolower( trim( $search ) ), self::CURLY_QUOTES );
+		$begins = $wpdb->prepare( 'LEFT( plain, CHAR_LENGTH( %s ) ) = %s', $needle, $needle );
 
 		$found    = array();
 		$coverage = array();
 		foreach ( $words as $word ) {
-			$found[]    = "( LOCATE( {$this->quote( $word )}, title_words ) > 0 )";
+			$found[]    = $wpdb->prepare( '( LOCATE( %s, title_words ) > 0 )', $word );
 			$coverage[] = $this->get_word_coverage_sql( $word );
 		}
 
@@ -792,9 +812,9 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 			', ',
 			array(
 				'( ' . implode( ' + ', $found ) . ' ) AS found',
-				"( LOCATE( $needle, plain ) > 0 ) AS contains_search",
-				"( LEFT( plain, CHAR_LENGTH( $needle ) ) = $needle ) AS begins",
-				"( LEFT( plain, CHAR_LENGTH( $needle ) ) = $needle AND {$this->get_can_begin_sql( $preferred )} ) AS lifted",
+				$wpdb->prepare( '( LOCATE( %s, plain ) > 0 ) AS contains_search', $needle ),
+				"( $begins ) AS begins",
+				"( $begins AND {$this->get_can_begin_sql( $preferred )} ) AS lifted",
 				'( ( ' . implode( ' + ', $coverage ) . ' ) / ' . count( $words ) . ' * 10 ) AS coverage',
 			)
 		);
@@ -810,15 +830,16 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL expression between 0 and 1.
 	 */
 	private function get_word_coverage_sql( $word ) {
-		$quoted   = $this->quote( $word );
-		$whole    = $this->quote( ' ' . $word . ' ' );
+		global $wpdb;
+
 		$length   = mb_strlen( $word );
-		$position = "LOCATE( $quoted, title_words )";
+		$whole    = $wpdb->prepare( 'LOCATE( %s, title_words )', ' ' . $word . ' ' );
+		$position = $wpdb->prepare( 'LOCATE( %s, title_words )', $word );
 		$before   = "CHAR_LENGTH( SUBSTRING_INDEX( LEFT( title_words, $position - 1 ), ' ', -1 ) )";
 		$after    = "CHAR_LENGTH( SUBSTRING_INDEX( SUBSTRING( title_words, $position + $length ), ' ', 1 ) )";
 
 		return "( CASE
-			WHEN LOCATE( $whole, title_words ) > 0 THEN 1
+			WHEN $whole > 0 THEN 1
 			WHEN $position > 0 THEN $length / ( $before + $length + $after )
 			ELSE 0 END )";
 	}
@@ -838,7 +859,9 @@ class Gutenberg_REST_Link_Suggestions_Controller extends WP_REST_Controller {
 	 * @return string SQL.
 	 */
 	private function get_page_sql( $ranked, $words, $page, $per_page ) {
-		$limit     = "LIMIT $per_page OFFSET " . ( ( $page - 1 ) * $per_page );
+		global $wpdb;
+
+		$limit     = $wpdb->prepare( 'LIMIT %d OFFSET %d', $per_page, ( $page - 1 ) * $per_page );
 		$rank      = $this->get_order_by( $words );
 		$tie_break = implode( ', ', self::TIE_BREAK );
 
