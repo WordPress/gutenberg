@@ -1,4 +1,5 @@
 import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { SUGGESTION_CLASS, SUGGESTION_FORMAT_NAME } from './format';
 
 /**
@@ -18,7 +19,9 @@ export function hasSuggestionMarkers( value: any ): boolean {
 		return value.includes( SUGGESTION_CLASS );
 	}
 	if ( value instanceof RichTextData ) {
-		return value.formats.some( ( stack ) =>
+		// `RichTextData` types its `formats` as `never[]`.
+		const formats: RichTextValue[ 'formats' ] = value.formats;
+		return formats.some( ( stack ) =>
 			stack?.some( ( format ) => format.type === SUGGESTION_FORMAT_NAME )
 		);
 	}
