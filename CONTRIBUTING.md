@@ -22,7 +22,7 @@ To learn all about contributing to the Gutenberg project, see the [Contributor G
 
 -   Accessibility should be top of mind and thoroughly tested by following the [accessibility testing instructions](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md).
 
--   Verify that any changes in your PR that affect function/class/variable names are mirrored in the corresponding `.native.js` versions of the files to avoid introducing breaking changes in the [React Native Mobile Editor](https://github.com/WordPress/gutenberg/tree/trunk/docs/contributors/code/react-native).
+-   The React Native Mobile Editor has been removed from `trunk`. The previous integration was unmaintained and known to be broken following the upgrade to React 19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)). Fixes for the existing Gutenberg Mobile build should be made by branching from the most recent React Native release — tag [`rnmobile/1.121.0`](https://github.com/WordPress/gutenberg/releases/tag/rnmobile%2F1.121.0) at commit [`e63b8b8`](https://github.com/WordPress/gutenberg/commit/e63b8b8be7bdc5e9dd2781c597e918a7be212fe5) (see [#63744](https://github.com/WordPress/gutenberg/pull/63744)) — and cutting a minor release from there.
 
 -   You maintain copyright over any contribution you make. By submitting a pull request you agree to release that code under [Gutenberg's License](/LICENSE.md).
 

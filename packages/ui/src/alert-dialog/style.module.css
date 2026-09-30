@@ -1,0 +1,41 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.error-message {
+			align-self: flex-end;
+			color: var(--wpds-color-foreground-content-error);
+		}
+	}
+
+	@layer compositions {
+		/*
+		 * AlertDialog stacks an actions row and an optional error message in
+		 * its footer. `composes` the shared `.footer` so the chrome padding +
+		 * separator are inherited, then overrides the row layout to a column.
+		 *
+		 * The override lives in `wp-ui.compositions` (a higher layer than the
+		 * composed `.footer`, which sits in `wp-ui-components`) so it always
+		 * wins regardless of stylesheet injection order. `composes` keeps the
+		 * two classes bound together so the base styles can never be applied
+		 * without this override.
+		 */
+		.footer-column {
+			composes: footer from "../utils/css/overlay-chrome.module.css";
+
+			flex-direction: column;
+			align-items: stretch;
+			justify-content: flex-start;
+			gap: var(--wpds-dimension-gap-md);
+		}
+
+		.irreversible-action {
+			--wp-ui-button-background-color: var(--wpds-color-background-interactive-error-strong);
+			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-error-strong-active);
+			--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
+			--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-error-strong);
+			--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-error-strong-active);
+			--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
+		}
+	}
+}

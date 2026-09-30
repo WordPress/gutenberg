@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -115,12 +112,13 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/buttons' ],
-			transform: ( { label, url, rel, opensInNewTab } ) => {
+			transform: ( { label, url, rel, title, opensInNewTab } ) => {
 				return createBlock( 'core/buttons', {}, [
 					createBlock( 'core/button', {
 						text: label,
 						url,
 						rel,
+						title,
 						linkTarget: opensInNewTab ? '_blank' : undefined,
 					} ),
 				] );

@@ -70,7 +70,7 @@ Besides the two mandatory properties, the styles properties array should also in
 -   `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
 -   `style_data`: Contains a theme.json-like notation in an array of style properties.
 
-It is also possible to set the `is_default` property to `true` to mark one of the block styles as the default one, should one be mising.
+It is also possible to set the `is_default` property to `true` to mark one of the block styles as the default one, should one be missing.
 
 The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
 

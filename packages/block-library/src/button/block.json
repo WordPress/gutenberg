@@ -18,9 +18,6 @@
 			"type": "string",
 			"default": "button"
 		},
-		"textAlign": {
-			"type": "string"
-		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
@@ -66,9 +63,6 @@
 		},
 		"gradient": {
 			"type": "string"
-		},
-		"width": {
-			"type": "number"
 		}
 	},
 	"supports": {
@@ -84,10 +78,18 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"width": true,
+			"__experimentalSkipSerialization": [ "width" ],
+			"__experimentalDefaultControls": {
+				"width": true
+			}
+		},
 		"typography": {
 			"__experimentalSkipSerialization": [
 				"fontSize",
 				"lineHeight",
+				"textAlign",
 				"fontFamily",
 				"fontWeight",
 				"fontStyle",
@@ -97,6 +99,7 @@
 			],
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -146,6 +149,10 @@
 		"root": ".wp-block-button .wp-block-button__link",
 		"typography": {
 			"writingMode": ".wp-block-button"
+		},
+		"dimensions": {
+			"root": ".wp-block-button",
+			"width": ".wp-block-button"
 		}
 	}
 }

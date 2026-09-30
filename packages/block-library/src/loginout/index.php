@@ -23,19 +23,34 @@ function render_block_core_loginout( $attributes ) {
 	 */
 	$current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$classes  = is_user_logged_in() ? 'logged-in' : 'logged-out';
+	$user_logged_in = is_user_logged_in();
+
+	$classes  = $user_logged_in ? 'logged-in' : 'logged-out';
 	$contents = wp_loginout(
 		isset( $attributes['redirectToCurrent'] ) && $attributes['redirectToCurrent'] ? $current_url : '',
 		false
 	);
 
 	// If logged-out and displayLoginAsForm is true, show the login form.
-	if ( ! is_user_logged_in() && ! empty( $attributes['displayLoginAsForm'] ) ) {
+	if ( ! $user_logged_in && ! empty( $attributes['displayLoginAsForm'] ) ) {
 		// Add a class.
 		$classes .= ' has-login-form';
 
 		// Get the form.
 		$contents = wp_login_form( array( 'echo' => false ) );
+
+		if ( wp_is_block_theme() ) {
+			$processor = new WP_HTML_Tag_Processor( $contents );
+
+			while ( $processor->next_tag( 'input' ) ) {
+				if ( 'submit' === $processor->get_attribute( 'type' ) && 'wp-submit' === $processor->get_attribute( 'name' ) ) {
+					$processor->add_class( 'wp-block-button__link' );
+					$processor->add_class( wp_theme_get_element_class_name( 'button' ) );
+					$contents = $processor->get_updated_html();
+					break;
+				}
+			}
+		}
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );

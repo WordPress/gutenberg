@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 export const visuallyHidden: CSSProperties = {
@@ -15,4 +12,5 @@ export const visuallyHidden: CSSProperties = {
 	position: 'absolute',
 	width: '1px',
 	wordWrap: 'normal',
+	wordBreak: 'normal',
 };

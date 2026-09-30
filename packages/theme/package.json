@@ -1,0 +1,159 @@
+{
+	"name": "@wordpress/theme",
+	"version": "2.2.0",
+	"description": "Theme and context provider for the WordPress Design System.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"design-system",
+		"design-tokens",
+		"theme"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/theme"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": "^20.19.0 || >=22.13.0"
+	},
+	"files": [
+		"build-module",
+		"build-types",
+		"*-plugins/**",
+		"prebuilt",
+		"*.md",
+		"!build-types/**/*.d.mts.map",
+		"!build-types/**/*.d.ts.map",
+		"!**/stories/**",
+		"!**/test/**"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./build-module/index.mjs"
+		},
+		"./design-tokens.css": "./prebuilt/css/design-tokens.css",
+		"./design-tokens.js": {
+			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
+			"default": "./prebuilt/js/design-tokens.mjs"
+		},
+		"./postcss-plugins/postcss-ds-token-fallbacks": {
+			"types": "./build-types/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
+			"default": "./postcss-plugins/postcss-ds-token-fallbacks.mjs"
+		},
+		"./lightningcss-plugins/lightningcss-ds-token-fallbacks": {
+			"types": "./build-types/lightningcss-plugins/lightningcss-ds-token-fallbacks.d.mts",
+			"default": "./lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs"
+		},
+		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
+			"types": "./build-types/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
+			"default": "./esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
+		},
+		"./vite-plugins/vite-ds-token-fallbacks": {
+			"types": "./build-types/vite-plugins/vite-ds-token-fallbacks.d.mts",
+			"default": "./vite-plugins/vite-ds-token-fallbacks.mjs"
+		},
+		"./stylelint-plugins/no-unknown-ds-tokens": {
+			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+			"default": "./stylelint-plugins/no-unknown-ds-tokens.mjs"
+		},
+		"./stylelint-plugins/no-setting-wpds-custom-properties": {
+			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+			"default": "./stylelint-plugins/no-setting-wpds-custom-properties.mjs"
+		},
+		"./stylelint-plugins/no-token-fallback-values": {
+			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+			"default": "./stylelint-plugins/no-token-fallback-values.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"sideEffects": [
+		"prebuilt/css/design-tokens.css"
+	],
+	"dependencies": {
+		"@babel/parser": "^7.28.6",
+		"@babel/types": "^7.29.7",
+		"@jridgewell/remapping": "^2.3.5",
+		"@jridgewell/trace-mapping": "^0.3.31",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
+		"colorjs.io": "^0.7.1",
+		"magic-string": "^0.30.21",
+		"memize": "^2.1.1"
+	},
+	"devDependencies": {
+		"@storybook/addon-docs": "^10.5.3",
+		"@storybook/react-vite": "^10.5.3",
+		"@terrazzo/parser": "^2.7.1",
+		"@terrazzo/plugin-css": "^2.7.1",
+		"@terrazzo/token-tools": "^2.7.1",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/node": "^24.13.3",
+		"@wordpress/validation-tools": "file:../../tools/validation",
+		"esbuild": "^0.27.2",
+		"lightningcss": "^1.33.0",
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"source-map": "^0.6.1",
+		"storybook": "^10.5.3",
+		"stylelint": "^17.14.1",
+		"vite": "^8.2.2",
+		"vitest": "^5.0.0",
+		"vitest-browser-react": "^2.3.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"esbuild": ">=0.27.2 <1.0.0",
+		"lightningcss": ">=1.33.0 <2.0.0",
+		"postcss": "^8.0.0",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19",
+		"stylelint": "^16 || ^17",
+		"vite": "^7 || ^8"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"esbuild": {
+			"optional": true
+		},
+		"lightningcss": {
+			"optional": true
+		},
+		"postcss": {
+			"optional": true
+		},
+		"stylelint": {
+			"optional": true
+		},
+		"vite": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build:default-ramps": "node bin/generate-default-ramps/index.ts",
+		"build:tokens": "node bin/generate-primitive-tokens/index.ts && node bin/build-design-tokens/index.ts",
+		"build": "npm run build:default-ramps && npm run build:tokens",
+		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
+		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
+	}
+}

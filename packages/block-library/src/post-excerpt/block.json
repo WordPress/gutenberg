@@ -7,9 +7,6 @@
 	"description": "Display the excerpt.",
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"moreText": {
 			"type": "string",
 			"role": "content"
@@ -28,7 +25,13 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -38,6 +41,7 @@
 				"link": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -45,6 +49,8 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
+			"textColumns": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

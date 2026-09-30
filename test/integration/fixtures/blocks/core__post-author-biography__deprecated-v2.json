@@ -1,0 +1,38 @@
+[
+	{
+		"name": "core/post-author-biography",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-author-biography",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-author-biography",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
+import { getPaddingBySize } from '../get-padding-by-size';
 import type { HeaderProps } from '../types';
 
 export function useCardHeader(
@@ -23,22 +16,16 @@ export function useCardHeader(
 		...otherProps
 	} = useContextSystem( props, 'CardHeader' );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.Header,
-				styles.borderRadius,
-				styles.borderColor,
-				styles.cardPaddings[ size ],
-				isBorderless && styles.borderless,
-				isShady && styles.shady,
-				// This classname is added for legacy compatibility reasons.
-				'components-card__header',
-				className
-			),
-		[ className, cx, isBorderless, isShady, size ]
+	const classes = clsx(
+		styles.header,
+		getPaddingBySize( size ),
+		{
+			[ styles[ 'section-borderless' ] ]: isBorderless,
+			[ styles[ 'is-shady' ] ]: isShady,
+		},
+		// This classname is added for legacy compatibility reasons.
+		'components-card__header',
+		className
 	);
 
 	return {

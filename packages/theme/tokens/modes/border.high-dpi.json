@@ -1,0 +1,13 @@
+{
+	"wpds-border": {
+		"width": {
+			"focus": {
+				"$type": "dimension",
+				"$value": {
+					"value": 1.5,
+					"unit": "px"
+				}
+			}
+		}
+	}
+}

@@ -21,8 +21,13 @@
 			<p data-wp-text="state.counter" data-testid="counter">0</p>
 		</div>
 	</div>
-	<div data-wp-on-window--resize="actions.resizeHandler" data-wp-on-window--resize--second="actions.resizeSecondHandler">
+	<div
+		data-wp-on-window--resize="actions.resizeHandler"
+		data-wp-on-window--resize--second="actions.resizeSecondHandler"
+		data-wp-on-window--resize---third="actions.resizeThirdHandler"
+	>
 		<p data-wp-text="state.resizeHandler" data-testid="resizeHandler">no</p>
 		<p data-wp-text="state.resizeSecondHandler" data-testid="resizeSecondHandler">no</p>
+		<p data-wp-text="state.resizeThirdHandler" data-testid="resizeThirdHandler">no</p>
 	</div>
 </div>

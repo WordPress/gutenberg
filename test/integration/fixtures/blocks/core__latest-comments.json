@@ -6,7 +6,7 @@
 			"commentsToShow": 5,
 			"displayAvatar": true,
 			"displayDate": true,
-			"displayExcerpt": true
+			"displayContent": "excerpt"
 		},
 		"innerBlocks": []
 	}

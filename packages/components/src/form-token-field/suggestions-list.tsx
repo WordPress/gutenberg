@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { MouseEventHandler, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { SuggestionsListProps } from './types';
 
 const handleMouseDown: MouseEventHandler = ( e ) => {
@@ -65,7 +54,9 @@ export function SuggestionsList<
 	};
 
 	const computeSuggestionMatch = ( suggestion: T ) => {
-		const matchText = displayTransform( match ).toLocaleLowerCase();
+		const matchText = displayTransform( match )
+			.normalize( 'NFKC' )
+			.toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}

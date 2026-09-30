@@ -131,6 +131,7 @@ registerBlockType( 'my-plugin/record-title', {
 ```js
 import { TextControl } from '@wordpress/components';
 import { InnerBlocks } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 export default function Edit( props ) {
 	const MY_TEMPLATE = [ [ 'my-plugin/record-title', {} ] ];
@@ -141,8 +142,6 @@ export default function Edit( props ) {
 	return (
 		<div>
 			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label={ __( 'Record ID' ) }
 				value={ recordId }
 				onChange={ ( val ) =>

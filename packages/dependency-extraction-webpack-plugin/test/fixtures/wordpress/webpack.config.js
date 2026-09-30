@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '../../..' );
 
 module.exports = {

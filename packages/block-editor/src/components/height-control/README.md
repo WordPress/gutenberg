@@ -1,5 +1,7 @@
 # Height Control
 
+**⚠️ DEPRECATED:** This component is deprecated. Please use `DimensionControl` instead for new implementations.
+
 The `HeightControl` component adds a linked unit control and slider component for controlling the height of a block within the block editor. It supports passing a label, and is used for controlling the minimum height dimensions of Group blocks.
 
 _Note:_ It is worth noting that the minimum height option is an opt-in feature. Themes need to declare support for it before it'll be available, and a convenient way to do that is via opting in to the [appearanceTools](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls) UI controls.
@@ -7,6 +9,26 @@ _Note:_ It is worth noting that the minimum height option is an opt-in feature. 
 ## Development guidelines
 
 ### Usage
+
+**For new implementations, use `DimensionControl` instead:**
+
+```jsx
+import { useState } from 'react';
+import { DimensionControl } from '@wordpress/block-editor';
+
+const MyDimensionControl = () => {
+	const [ value, setValue ] = useState();
+	return (
+		<DimensionControl
+			label={ 'Height' }
+			onChange={ setValue }
+			value={ value }
+		/>
+	);
+};
+```
+
+**Legacy usage (deprecated):**
 
 Renders the markup for height control component, to be used in the block inspector.
 
@@ -16,12 +38,14 @@ import { HeightControl } from '@wordpress/block-editor';
 
 const MyLineHeightControl = () => (
 	const [ value, setValue ] = useState();
-	<HeightControl
-		label={ 'My Height Control' }
-		onChange={ setValue }
-		value={ value }
-	/>
-);
+	return (
+		<HeightControl
+			label={ 'My Height Control' }
+			onChange={ setValue }
+			value={ value }
+		/>
+	);
+};
 ```
 
 ### Props

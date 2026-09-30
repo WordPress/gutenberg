@@ -50,6 +50,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"interactivity": {
@@ -68,6 +69,12 @@
 				"padding": false,
 				"margin": false
 			}
+		},
+		"shadow": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
 		},
 		"color": {
 			"background": true,
