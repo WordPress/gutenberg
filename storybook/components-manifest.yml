@@ -157,6 +157,11 @@
             - className
             - render
             - style
+      - name: Autocomplete.Separator
+        props:
+            - className
+            - render
+            - style
       - name: Autocomplete.Status
         props:
             - children
@@ -274,16 +279,73 @@
             - className
             - render
             - style
+- name: Checkbox
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - indeterminate
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: CheckboxControl
   props:
-      - __nextHasNoMarginBottom
       - checked
+      - className
+      - defaultChecked
+      - description
+      - details
       - disabled
-      - heading
-      - help
+      - form
+      - hideLabelFromVision
+      - id
       - indeterminate
+      - inputRef
       - label
-      - onChange
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: CheckboxGroup
+  props:
+      - allValues
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: CheckboxGroup.NestedItems
+        props:
+            - align
+            - children
+            - className
+            - direction
+            - gap
+            - justify
+            - render
+            - style
+            - wrap
 - name: Collapsible.Root
   props:
       - children
@@ -1188,6 +1250,11 @@
             - className
             - render
             - style
+      - name: SearchableChipSelect.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1292,6 +1359,11 @@
             - className
             - render
             - style
+      - name: SearchableChipSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableSelectControl
   props:
       - actionsRef
@@ -1384,6 +1456,11 @@
       - name: SearchableSelectControl.ItemLabel
         props:
             - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Separator
+        props:
             - className
             - render
             - style
@@ -1497,6 +1574,11 @@
             - sideOffset
             - sticky
             - style
+      - name: Select.Separator
+        props:
+            - className
+            - render
+            - style
       - name: Select.Trigger
         props:
             - children
@@ -1578,6 +1660,11 @@
             - className
             - render
             - style
+      - name: SelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: Shortcut
   props:
       - className
@@ -1619,7 +1706,8 @@
       - politeness
       - spokenMessage
 - name: Spinner
-  props: []
+  props:
+      - color
 - name: Stack
   props:
       - align
