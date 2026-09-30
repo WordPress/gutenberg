@@ -4,6 +4,8 @@ import type { WpTemplate } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';
 
+const EMPTY_TEMPLATES: WpTemplate[] = [];
+
 /**
  * Hook that determines the template field rendering mode for a post.
  *
@@ -71,7 +73,7 @@ function getTemplateSlugToCheck(
  * @param postId   The post ID.
  * @param slug     The post slug.
  */
-export function useDefaultTemplate(
+function useDefaultTemplate(
 	postType: string | undefined,
 	postId: string | number | undefined,
 	slug: string | undefined
@@ -109,26 +111,10 @@ export function useDefaultTemplate(
 
 			// Check if the current page is the posts page.
 			const postsPageId = unlock( select( coreStore ) ).getPostsPageId();
-			if ( postType === 'page' && postsPageId === postIdStr ) {
-				const templateId = select( coreStore ).getDefaultTemplateId( {
-					slug: 'home',
-				} );
-				if ( ! templateId ) {
-					return undefined;
-				}
-
-				const template = select(
-					coreStore
-				).getEntityRecord< WpTemplate >(
-					'postType',
-					'wp_template',
-					templateId
-				);
-				return template;
-			}
-
-			// Check any other case.
-			const slugToCheck = getTemplateSlugToCheck( postType, slug );
+			const slugToCheck =
+				postType === 'page' && postsPageId === postIdStr
+					? 'home'
+					: getTemplateSlugToCheck( postType, slug );
 			const templateId = select( coreStore ).getDefaultTemplateId( {
 				slug: slugToCheck,
 			} );
@@ -136,12 +122,11 @@ export function useDefaultTemplate(
 				return undefined;
 			}
 
-			const template = select( coreStore ).getEntityRecord< WpTemplate >(
+			return select( coreStore ).getEntityRecord< WpTemplate >(
 				'postType',
 				'wp_template',
 				templateId
 			);
-			return template;
 		},
 		[ postType, postId, slug ]
 	);
@@ -174,17 +159,17 @@ export function usePostTemplate(
 				getHomePage()?.postId === singlePostId &&
 				defaultTemplate?.slug === 'front-page';
 			const canSwitchTemplate = ! isPostsPage && ! hasFrontPageTemplate;
+			const templates = core.getEntityRecords< WpTemplate >(
+				'postType',
+				'wp_template',
+				{
+					per_page: -1,
+					post_type: postType,
+					slug: slug || undefined,
+				}
+			);
 			let currentTemplate = defaultTemplate;
 			if ( canSwitchTemplate ) {
-				const templates = core.getEntityRecords< WpTemplate >(
-					'postType',
-					'wp_template',
-					{
-						per_page: -1,
-						post_type: postType,
-						slug: slug || undefined,
-					}
-				);
 				// Wait for the choices before falling back from the assignment.
 				currentTemplate = templates
 					? ( templates.find(
@@ -194,7 +179,12 @@ export function usePostTemplate(
 						defaultTemplate )
 					: undefined;
 			}
-			return { currentTemplate, defaultTemplate, canSwitchTemplate };
+			return {
+				currentTemplate,
+				defaultTemplate,
+				canSwitchTemplate,
+				templates: templates ?? EMPTY_TEMPLATES,
+			};
 		},
 		[ postId, postType, slug, assignedSlug, defaultTemplate ]
 	);

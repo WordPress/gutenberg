@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from '@wordpress/element';
-import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { SelectControl as WCSelectControl } from '@wordpress/components';
@@ -16,8 +15,6 @@ type TemplateEditComponentProps = Omit<
 > & {
 	onChange: ( value: string ) => void;
 };
-
-const EMPTY_ARRAY: [] = [];
 
 function ClassicTemplateEdit( {
 	data,
@@ -74,17 +71,12 @@ function BlockThemeTemplateEdit( {
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
 	const assignedSlug = field.getValue( { item: data } );
-	const { currentTemplate, defaultTemplate, canSwitchTemplate } =
+	const { currentTemplate, defaultTemplate, canSwitchTemplate, templates } =
 		usePostTemplate( postType, postId, slug, assignedSlug );
-	const templates = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< WpTemplate >(
-				'postType',
-				'wp_template',
-				{ per_page: -1, post_type: postType, slug: slug || undefined }
-			) ?? EMPTY_ARRAY,
-		[ postType, slug ]
-	);
+	const value =
+		currentTemplate && currentTemplate.id !== defaultTemplate?.id
+			? currentTemplate.slug
+			: '';
 	const options = useMemo( () => {
 		const templateOptions = templates
 			.filter( ( template ) => !! template.content.raw )
@@ -95,39 +87,27 @@ function BlockThemeTemplateEdit( {
 			} ) );
 		if (
 			currentTemplate &&
-			! templates.some(
-				( template ) =>
-					template.id === currentTemplate.id &&
-					!! template.content.raw
-			)
+			! templateOptions.some( ( option ) => option.value === value )
 		) {
 			templateOptions.unshift( {
 				label: getItemTitle( currentTemplate ),
-				value:
-					currentTemplate.id === defaultTemplate?.id
-						? ''
-						: currentTemplate.slug,
+				value,
 				disabled: true,
 			} );
 		}
 		return templateOptions;
-	}, [ templates, currentTemplate, defaultTemplate ] );
+	}, [ templates, currentTemplate, defaultTemplate, value ] );
 	if ( ! currentTemplate ) {
 		return null;
 	}
-	const hasAlternative = templates.some(
-		( template ) =>
-			template.id !== currentTemplate.id && !! template.content.raw
+	const hasAlternative = options.some(
+		( option ) => ! option.disabled && option.value !== value
 	);
 	return (
 		<WCSelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={
-				currentTemplate.id === defaultTemplate?.id
-					? ''
-					: currentTemplate.slug
-			}
+			value={ value }
 			options={ options }
 			onChange={ onChange }
 			disabled={

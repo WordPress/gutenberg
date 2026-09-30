@@ -249,7 +249,7 @@ export const getTemplateId = createRegistrySelector(
 			{
 				per_page: -1,
 				post_type: postType,
-				slug: editedEntity.slug,
+				slug: editedEntity.slug || undefined,
 			}
 		);
 		if ( ! templates ) {

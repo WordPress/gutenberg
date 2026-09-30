@@ -28,7 +28,7 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 				'description'       => __( 'Slug of the post to get available templates for.', 'gutenberg' ),
 				'type'              => 'string',
 				'sanitize_callback' => static function ( $value ) {
-					return is_string( $value ) ? sanitize_title( $value ) : $value;
+					return sanitize_title( $value );
 				},
 				'validate_callback' => static function ( $value, $request, $param ) {
 					$valid = rest_validate_request_arg( $value, $request, $param );
@@ -46,7 +46,7 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 	}
 
 	/**
-	 * Retrieves filtered choices, independently of the active template.
+	 * Retrieves template choices for a post type and edited slug.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 * @return WP_REST_Response Response object.
@@ -67,7 +67,11 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 		$items     = get_block_templates( $query, $this->post_type );
 		$templates = array();
 		foreach ( is_array( $items ) ? $items : array() as $template ) {
-			if ( ! $template instanceof WP_Block_Template || ! is_string( $template->id ) || '' === $template->id || ( isset( $query['wp_id'] ) && (int) $template->wp_id !== $query['wp_id'] ) ) {
+			if (
+				! $template instanceof WP_Block_Template ||
+				! is_string( $template->id ) ||
+				'' === $template->id
+			) {
 				continue;
 			}
 			$data                       = $this->prepare_item_for_response( $template, $request );

@@ -8,8 +8,8 @@
 /**
  * Includes the hierarchy default before plugins filter the available choices.
  *
- * Runs before the usual filter priority. Neither the order nor membership of
- * the returned choices determines the active template or changes an assignment.
+ * Runs before the usual filter priority. The editor uses the first choice when
+ * the assigned template is unavailable, without changing the saved assignment.
  * When merged to Core, this preparation belongs in get_block_templates().
  *
  * @param WP_Block_Template[] $templates     Available templates.
@@ -18,7 +18,13 @@
  * @return WP_Block_Template[] Available choices.
  */
 function gutenberg_prepare_post_template_choices( $templates, $query, $template_type ) {
-	if ( 'wp_template' !== $template_type || ! isset( $query['slug'], $query['post_type'] ) || ! is_string( $query['slug'] ) || ! is_string( $query['post_type'] ) || ! is_array( $templates ) ) {
+	if (
+		'wp_template' !== $template_type ||
+		! isset( $query['slug'], $query['post_type'] ) ||
+		! is_string( $query['slug'] ) ||
+		! is_string( $query['post_type'] ) ||
+		! is_array( $templates )
+	) {
 		return $templates;
 	}
 

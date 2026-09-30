@@ -52,14 +52,14 @@ function useTemplates( postType, postSlug ) {
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 				post_type: postType,
-				...( postSlug !== undefined && { slug: postSlug } ),
+				slug: postSlug || undefined,
 			} ),
 		[ postType, postSlug ]
 	);
 }
 
 /**
- * @return {import('@wordpress/core-data').WpTemplate[] | null} Templates.
+ * @return {Array<import('@wordpress/core-data').WpTemplate & { isDefault: boolean }>} Templates.
  */
 export function useAvailableTemplates() {
 	const { postType, postId } = useEditedPostContext();
@@ -77,7 +77,7 @@ export function useAvailableTemplates() {
 	);
 
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates( postType, postSlug || undefined );
+	const templates = useTemplates( postType, postSlug );
 	// The filtered order does not define the hierarchy default.
 	const defaultTemplateId = useSelect(
 		( select ) => {
