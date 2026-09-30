@@ -1,11 +1,10 @@
 const { dirname, join } = require( 'path' );
-const { writeFile } = require( 'fs' ).promises;
-const makeDir = require( 'make-dir' );
+const { writeFile, mkdir } = require( 'fs' ).promises;
 const { render } = require( 'mustache' );
 
 const writeOutputAsset = async ( inputFile, outputFile, view ) => {
 	const outputFilePath = join( view.rootDirectory, 'assets', outputFile );
-	await makeDir( dirname( outputFilePath ) );
+	await mkdir( dirname( outputFilePath ), { recursive: true } );
 	writeFile( outputFilePath, inputFile );
 };
 
@@ -14,7 +13,7 @@ const writeOutputTemplate = async ( inputFile, outputFile, view ) => {
 	const renderedFile = render( inputFile, view );
 	if ( renderedFile.trim().length ) {
 		const outputFilePath = join( view.rootDirectory, outputFile );
-		await makeDir( dirname( outputFilePath ) );
+		await mkdir( dirname( outputFilePath ), { recursive: true } );
 		writeFile(
 			outputFilePath.replace( /\$slug/g, view.slug ),
 			renderedFile
