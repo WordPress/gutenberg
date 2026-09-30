@@ -1,0 +1,18 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		.icon-only {
+			composes: icon-button from "../icon-button/style.module.css";
+		}
+
+		.icon {
+			pointer-events: none;
+		}
+
+		.icon-only-icon {
+			composes: icon from "../icon-button/style.module.css";
+			pointer-events: none;
+		}
+	}
+}
