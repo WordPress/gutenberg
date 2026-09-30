@@ -47,7 +47,6 @@ import {
 	attachedToField,
 	authorField as mediaAuthorField,
 	filenameField,
-	filesizeField,
 } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -123,7 +122,6 @@ export function setIsReady( kind: string, name: string ) {
 const MEDIA_FIELDS = [
 	mediaAuthorField,
 	filenameField,
-	filesizeField,
 	attachedToField,
 	titleField,
 ];
