@@ -107,6 +107,21 @@ describe( 'props', () => {
 		expect( style.justifyContent ).toBe( 'space-between' );
 	} );
 
+	test( 'should render alignment bottomLeft', async () => {
+		await render(
+			<Grid alignment="bottomLeft" data-testid="grid">
+				<View />
+				<View />
+				<View />
+			</Grid>
+		);
+
+		const style = readStyle();
+		expect( style.display ).toBe( 'grid' );
+		expect( style.alignItems ).toBe( 'flex-end' );
+		expect( style.justifyContent ).toBe( 'flex-start' );
+	} );
+
 	test( 'should ignore unsupported runtime alignment values', async () => {
 		await render(
 			<Grid
