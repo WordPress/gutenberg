@@ -122,7 +122,8 @@ export function WidgetFrame( {
 					styles.content,
 					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
-				{ ...( editMode ? { inert: 'true' } : {} ) }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ editMode ? 'true' : undefined }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>

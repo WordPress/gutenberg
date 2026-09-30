@@ -214,7 +214,8 @@ export function LanesItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ dragging ? 'true' : undefined }
 					>
 						{ actionableArea }
 					</div>
