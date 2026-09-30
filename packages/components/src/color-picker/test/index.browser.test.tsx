@@ -3,6 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import { resetLocaleData, setLocaleData } from '@wordpress/i18n';
 import { ColorPicker } from '..';
 
 const hslaMatcher = expect.objectContaining( {
@@ -190,6 +191,27 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( expected );
 		} );
+	} );
+
+	it( 'should translate the RGB channel labels', async () => {
+		const user = userEvent.setup();
+		setLocaleData( {
+			Red: [ 'Rot' ],
+			'red color channel abbreviation\u0004R': [ 'Rt' ],
+		} );
+
+		try {
+			await render( <ColorPicker color="#fff" enableAlpha={ false } /> );
+
+			await user.selectOptions( screen.getByRole( 'combobox' ), 'rgb' );
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Rot' } )
+			).toBeVisible();
+			expect( screen.getByText( 'Rt' ) ).toBeVisible();
+		} finally {
+			resetLocaleData();
+		}
 	} );
 
 	describe( 'HSL inputs', () => {
