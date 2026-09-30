@@ -89,6 +89,44 @@ export function recordEntityEdit(
 }
 
 /**
+ * Takes the next level off the history and applies its sync manager part.
+ *
+ * @param {Object}        undoManager   core-data's undo manager.
+ * @param {Object}        [syncManager] The registered entity sync manager.
+ * @param {'undo'|'redo'} type          Which direction to move in.
+ *
+ * @return {Object|undefined} The level: `changes` for the store, and whether
+ *                            it `didApply` anything. Undefined when the history
+ *                            is exhausted.
+ */
+function popUndoLevel( undoManager, syncManager, type ) {
+	const undoHistory = syncManager?.undoHistory;
+	const record = 'undo' === type ? undoManager.undo() : undoManager.redo();
+
+	if ( ! record ) {
+		return undefined;
+	}
+
+	const changes = record.filter(
+		( entry ) =>
+			! isSyncUndoLevel( entry ) &&
+			! isSyncedRecord( syncManager, entry.id )
+	);
+
+	let didApplySyncLevel = false;
+
+	if ( undoHistory && record.some( isSyncUndoLevel ) ) {
+		didApplySyncLevel =
+			'undo' === type ? undoHistory.undo() : undoHistory.redo();
+	}
+
+	return {
+		changes,
+		didApply: changes.length > 0 || didApplySyncLevel,
+	};
+}
+
+/**
  * Undoes or redoes the next level of the history.
  *
  * A level whose entities are no longer reachable is skipped: a sync manager
@@ -106,37 +144,20 @@ export function recordEntityEdit(
  *                           is left to move.
  */
 export function applyUndoLevel( undoManager, syncManager, type ) {
-	const undoHistory = syncManager?.undoHistory;
+	let level = popUndoLevel( undoManager, syncManager, type );
 
-	for (;;) {
-		const record =
-			'undo' === type ? undoManager.undo() : undoManager.redo();
-
-		if ( ! record ) {
-			return undefined;
-		}
-
-		const changes = record.filter(
-			( entry ) =>
-				! isSyncUndoLevel( entry ) &&
-				! isSyncedRecord( syncManager, entry.id )
-		);
-
-		let didApplySyncLevel = false;
-
-		if ( undoHistory && record.some( isSyncUndoLevel ) ) {
-			didApplySyncLevel =
-				'undo' === type ? undoHistory.undo() : undoHistory.redo();
-		}
-
-		if ( ! changes.length && ! didApplySyncLevel ) {
-			continue;
-		}
-
-		// The next change must open a new level rather than merge into the
-		// one just moved.
-		undoHistory?.stopCapturing();
-
-		return changes;
+	// A level that applied nothing is stale. Move past it to the next one.
+	while ( level && ! level.didApply ) {
+		level = popUndoLevel( undoManager, syncManager, type );
 	}
+
+	if ( ! level ) {
+		return undefined;
+	}
+
+	// The next change must open a new level rather than merge into the one
+	// just moved.
+	syncManager?.undoHistory?.stopCapturing();
+
+	return level.changes;
 }
