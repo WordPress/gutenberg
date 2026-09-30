@@ -30,7 +30,10 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
-import { isPartOfPendingInsertion } from './store-interceptor';
+import {
+	isPartOfPendingInsertion,
+	isPartOfPendingInsertionCached,
+} from './store-interceptor';
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -208,20 +211,25 @@ const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
 			const { clientId } = props;
-			const isSuggestMode = useSelect(
-				( select ) =>
+			const { isSuggestMode, isPendingInsert } = useSelect(
+				( select ) => {
 					// `getEditorIntent` is private while Suggest mode is
 					// experimental.
-					unlock( select( STORE_NAME ) ).getEditorIntent() ===
-					EDITOR_INTENT_SUGGEST,
-				[]
-			);
-			const isPendingInsert = useSelect(
-				( select ) =>
-					isPartOfPendingInsertion(
-						select( blockEditorStore ),
-						clientId
-					),
+					const suggesting =
+						unlock( select( STORE_NAME ) ).getEditorIntent() ===
+						EDITOR_INTENT_SUGGEST;
+					return {
+						isSuggestMode: suggesting,
+						// Only Suggest intent acts on it; skip the lookup
+						// for every block in the other intents.
+						isPendingInsert:
+							suggesting &&
+							isPartOfPendingInsertionCached(
+								select( blockEditorStore ),
+								clientId
+							),
+					};
+				},
 				[ clientId ]
 			);
 
