@@ -255,22 +255,3 @@ function gutenberg_get_field_collection_fields( $directory ) {
 
 	return $fields;
 }
-
-/**
- * Adjusts the default fields of template parts.
- *
- * Template parts support authors, so they get the default author field like
- * any other post type. Yet they have their own author field, declared
- * client-side in packages/fields/src/fields/template-author/index.tsx, which
- * reads the theme or plugin that provides them instead of the post author.
- *
- * It runs right after the default fields are registered, on
- * `fields_api_init` at priority 9, so a plugin hooking the action at
- * the default priority sees the final defaults.
- *
- * @param Gutenberg_Fields_Registry $registry The registry being read.
- */
-function _gutenberg_register_posttype_wp_template_part_fields( Gutenberg_Fields_Registry $registry ) {
-	$registry->unregister( 'postType', 'wp_template_part', array( 'author' ) );
-}
-add_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields', 9 );

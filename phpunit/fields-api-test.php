@@ -8,7 +8,7 @@
  * @covers ::gutenberg_get_field_collection_fields
  * @covers ::gutenberg_register_core_fields_post_supports
  * @covers ::gutenberg_register_core_fields_wp_template
- * @covers ::_gutenberg_register_posttype_wp_template_part_fields
+ * @covers ::gutenberg_register_core_fields_wp_template_part
  * @covers ::gutenberg_register_core_fields_attachment
  * @covers Gutenberg_Fields_Registry::initialize
  * @covers Gutenberg_Fields_Registry::register
@@ -464,6 +464,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 0, has_action( 'fields_api_init', 'gutenberg_register_core_fields_post_supports' ) );
 		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_wp_template' ) );
 		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_attachment' ) );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_wp_template_part' ) );
 	}
 
 	/**
@@ -476,7 +477,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_template_parts_do_not_get_the_default_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
-		$this->assertSame( 9, has_action( 'fields_api_init', '_gutenberg_register_posttype_wp_template_part_fields' ), 'The adjustment runs right after the defaults.' );
+		$this->assertSame( 9, has_action( 'fields_api_init', 'gutenberg_register_core_fields_wp_template_part' ), 'The adjustment runs right after the defaults.' );
 
 		$before = null;
 		$this->on_fields_api_init(

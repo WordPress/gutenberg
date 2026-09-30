@@ -11,6 +11,7 @@ A collection is a folder of `src` holding the fields registered together, usuall
 -   `post_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `notesCount`).
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `attachment`: the fields of the media editor ported to the server so far (`date`).
+-   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: it removes the default author field, since template parts declare their own client-side.
 
 Each field has a folder in its collection:
 
