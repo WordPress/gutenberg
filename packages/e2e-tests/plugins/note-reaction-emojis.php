@@ -9,14 +9,14 @@
 
 /**
  * Extends the note reaction emoji list with many extra entries to
- * exercise the `gutenberg_note_reaction_emojis` filter end-to-end:
+ * exercise the `gutenberg_note_reaction_emoji_settings` filter end-to-end:
  * the picker must offer the extended set, the REST API must accept
  * the custom slugs, and the picker UI must stay usable at this size.
  *
- * @param array[] $emojis Default emoji definitions.
- * @return array[] Extended emoji definitions.
+ * @param array $settings Default emoji settings.
+ * @return array Settings with an extended named emoji list.
  */
-function gutenberg_test_note_reaction_emojis( $emojis ) {
+function gutenberg_test_note_reaction_emojis( $settings ) {
 	$extra = array(
 		array(
 			'emoji' => '👍',
@@ -120,6 +120,7 @@ function gutenberg_test_note_reaction_emojis( $emojis ) {
 		),
 	);
 
-	return array_merge( $emojis, $extra );
+	$settings['emojis'] = array_merge( $settings['emojis'], $extra );
+	return $settings;
 }
-add_filter( 'gutenberg_note_reaction_emojis', 'gutenberg_test_note_reaction_emojis' );
+add_filter( 'gutenberg_note_reaction_emoji_settings', 'gutenberg_test_note_reaction_emojis' );

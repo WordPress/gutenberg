@@ -125,7 +125,7 @@ export function useFrequentEmojis(): {
 	const registry = useRegistry();
 	/*
 	 * Seed from the filtered list, not the shipped defaults, so a site
-	 * using `gutenberg_note_reaction_emojis` sees its own set.
+	 * using `gutenberg_note_reaction_emoji_settings` sees its own set.
 	 */
 	const emojis = useReactionEmojis();
 	const frequentKeys = useSelect(

@@ -972,10 +972,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			),
 		);
 
-		$filter = function () use ( $custom_emoji ) {
-			return $custom_emoji;
+		$filter = function ( $settings ) use ( $custom_emoji ) {
+			$settings['emojis'] = $custom_emoji;
+			return $settings;
 		};
-		add_filter( 'gutenberg_note_reaction_emojis', $filter );
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 
 		try {
 			wp_set_current_user( self::$editor_id );
@@ -1006,25 +1007,25 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		} finally {
 			// Always remove the filter so a failed assertion above does not
 			// leak it into the rest of the suite.
-			remove_filter( 'gutenberg_note_reaction_emojis', $filter );
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 		}
 	}
 
 	/**
-	 * `gutenberg_note_reaction_emoji_rules` controls which hex-key reactions
+	 * `gutenberg_note_reaction_emoji_settings` controls which hex-key reactions
 	 * (full picker picks outside the named list) the controller accepts.
 	 *
 	 * @dataProvider data_reaction_emoji_rules
 	 *
-	 * @param mixed  $rules   The filtered rules.
+	 * @param mixed  $rules   The filtered settings.
 	 * @param string $content The reaction storage key to submit.
 	 * @param int    $status  Expected response status.
 	 */
 	public function test_reaction_emoji_rules_affect_validation( $rules, $content, $status ) {
-		$filter = function () use ( $rules ) {
-			return $rules;
+		$filter = function ( $settings ) use ( $rules ) {
+			return is_array( $rules ) ? array_merge( $settings, $rules ) : $rules;
 		};
-		add_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 
 		try {
 			wp_set_current_user( self::$editor_id );
@@ -1051,7 +1052,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, $status );
 			}
 		} finally {
-			remove_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 		}
 	}
 
@@ -1073,19 +1074,47 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
-	public function test_reaction_emoji_rules_reach_editor_settings() {
-		$filter = function () {
-			return array(
-				'allow_unlisted' => false,
-				'exclude'        => array( '1F595', 'not hex', 42 ),
-			);
+	/**
+	 * A callback that returns only some keys keeps the defaults for the rest,
+	 * and a non-array return falls back to the defaults entirely.
+	 */
+	public function test_reaction_emoji_settings_fill_missing_keys_from_defaults() {
+		$defaults = gutenberg_get_note_reaction_emoji_settings();
+
+		$partial = function () {
+			return array( 'allow_unlisted' => false );
 		};
-		add_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $partial );
+		try {
+			$settings = gutenberg_get_note_reaction_emoji_settings();
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $partial );
+		}
+		$this->assertFalse( $settings['allow_unlisted'] );
+		$this->assertSame( $defaults['emojis'], $settings['emojis'] );
+		$this->assertSame( array(), $settings['exclude'] );
+
+		add_filter( 'gutenberg_note_reaction_emoji_settings', '__return_false' );
+		try {
+			$settings = gutenberg_get_note_reaction_emoji_settings();
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', '__return_false' );
+		}
+		$this->assertSame( $defaults, $settings );
+	}
+
+	public function test_reaction_emoji_rules_reach_editor_settings() {
+		$filter = function ( $settings ) {
+			$settings['allow_unlisted'] = false;
+			$settings['exclude']        = array( '1F595', 'not hex', 42 );
+			return $settings;
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 
 		try {
 			$settings = gutenberg_add_note_reaction_emojis_setting( array() );
 		} finally {
-			remove_filter( 'gutenberg_note_reaction_emoji_rules', $filter );
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
 		}
 
 		$this->assertSame(
