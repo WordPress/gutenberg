@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Template choices: Support filtering by the edited post slug while preserving the active template and its assignment ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+-   Template choices: Resolve the active template from the choices for the edited post slug and post type, keeping the assignment when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
 
 ### Bug Fixes
 

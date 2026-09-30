@@ -148,7 +148,7 @@ export function useDefaultTemplate(
 }
 
 /**
- * Resolves the active template independently of the filtered choices.
+ * Resolves the active template from the choices for the edited post slug.
  *
  * @param postType     The post type.
  * @param postId       The post ID.
@@ -175,21 +175,27 @@ export function usePostTemplate(
 				defaultTemplate?.slug === 'front-page';
 			const canSwitchTemplate = ! isPostsPage && ! hasFrontPageTemplate;
 			let currentTemplate = defaultTemplate;
-			if ( canSwitchTemplate && assignedSlug ) {
-				const allTemplates = core.getEntityRecords< WpTemplate >(
+			if ( canSwitchTemplate ) {
+				const templates = core.getEntityRecords< WpTemplate >(
 					'postType',
 					'wp_template',
-					{ per_page: -1 }
+					{
+						per_page: -1,
+						post_type: postType,
+						slug: slug || undefined,
+					}
 				);
-				// Loading is not evidence that the assigned template is missing.
-				currentTemplate = allTemplates
-					? ( allTemplates.find(
+				// Wait for the choices before falling back from the assignment.
+				currentTemplate = templates
+					? ( templates.find(
 							( template ) => template.slug === assignedSlug
-						) ?? defaultTemplate )
+						) ??
+						templates[ 0 ] ??
+						defaultTemplate )
 					: undefined;
 			}
 			return { currentTemplate, defaultTemplate, canSwitchTemplate };
 		},
-		[ postId, postType, assignedSlug, defaultTemplate ]
+		[ postId, postType, slug, assignedSlug, defaultTemplate ]
 	);
 }

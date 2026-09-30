@@ -86,15 +86,19 @@ function BlockThemeTemplateEdit( {
 		[ postType, slug ]
 	);
 	const options = useMemo( () => {
-		const templateOptions = templates.map( ( template ) => ( {
-			label: getItemTitle( template ),
-			value: template.id === defaultTemplate?.id ? '' : template.slug,
-			disabled: false,
-		} ) );
+		const templateOptions = templates
+			.filter( ( template ) => !! template.content.raw )
+			.map( ( template ) => ( {
+				label: getItemTitle( template ),
+				value: template.id === defaultTemplate?.id ? '' : template.slug,
+				disabled: false,
+			} ) );
 		if (
 			currentTemplate &&
 			! templates.some(
-				( template ) => template.id === currentTemplate.id
+				( template ) =>
+					template.id === currentTemplate.id &&
+					!! template.content.raw
 			)
 		) {
 			templateOptions.unshift( {
@@ -112,7 +116,8 @@ function BlockThemeTemplateEdit( {
 		return null;
 	}
 	const hasAlternative = templates.some(
-		( template ) => template.id !== currentTemplate.id
+		( template ) =>
+			template.id !== currentTemplate.id && !! template.content.raw
 	);
 	return (
 		<WCSelectControl
