@@ -4,8 +4,8 @@
  * plugin registers its own.
  *
  * The default fields every post type derives from its supports are
- * registered in code, see register_core_post_supports_fields(). Their
- * definitions are the `field.php` files of the `post_supports` folder. The
+ * registered in code, see register_core_post_type_supports_fields(). Their
+ * definitions are the `field.php` files of the `post_type_supports` folder. The
  * post types whose fields differ from the defaults exclude the ones they do
  * not get on the `fields_api_post_type_supports_exclusions` filter, as a
  * plugin would, see exclude_core_post_type_support_fields().
@@ -38,8 +38,8 @@
  *
  * @param WP_Fields_Registry $registry The registry being read.
  */
-function register_core_post_supports_fields( $registry ) {
-	$definitions = wp_get_field_collection_fields( __DIR__ . '/post_supports' );
+function register_core_post_type_supports_fields( $registry ) {
+	$definitions = wp_get_field_collection_fields( __DIR__ . '/post_type_supports' );
 
 	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
 		// WordPress stores the arguments of a support as a list of argument
@@ -96,7 +96,7 @@ function register_core_post_supports_fields( $registry ) {
 		// Keeps the alphabetical order of the folders.
 		$fields = array_values( array_intersect_key( $definitions, array_flip( array_diff( $all_fields, $excluded_fields ) ) ) );
 		if ( $fields ) {
-			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_supports' );
+			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_type_supports' );
 		}
 	}
 }
@@ -148,7 +148,7 @@ add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_
  * @param WP_Fields_Registry $registry The registry being read.
  */
 function register_core_field_collections( $registry ) {
-	register_core_post_supports_fields( $registry );
+	register_core_post_type_supports_fields( $registry );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
 	wp_register_field_collection( $registry, __DIR__ . '/attachment' );
