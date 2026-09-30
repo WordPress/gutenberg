@@ -1,18 +1,18 @@
-import { Dialog as _Dialog } from '@base-ui/react/dialog';
+import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 import { IconButton } from '../icon-button';
-import type { CloseIconProps } from './types';
+import type { CloseIconButtonProps } from './types';
 
 /**
- * Renders an icon button that closes the dialog when clicked.
+ * Renders an icon button that closes the drawer when clicked.
  * Provides a default close icon and accessible label.
  */
-const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
-	function DialogCloseIcon( { icon, label, ...props }, ref ) {
+const CloseIconButton = forwardRef< HTMLButtonElement, CloseIconButtonProps >(
+	function DrawerCloseIconButton( { icon, label, ...props }, ref ) {
 		return (
-			<_Dialog.Close
+			<_Drawer.Close
 				ref={ ref }
 				render={
 					<IconButton
@@ -22,7 +22,7 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 						{ ...props }
 						icon={ icon ?? close }
 						label={ label ?? __( 'Close' ) }
-						data-wp-ui-dialog-close-icon=""
+						data-wp-ui-drawer-close-icon=""
 					/>
 				}
 			/>
@@ -30,4 +30,4 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 	}
 );
 
-export { CloseIcon };
+export { CloseIconButton };
