@@ -10,6 +10,9 @@ import ReactionEmojiPicker, {
 	hexKeyToEmoji,
 	REACTION_EMOJIS,
 	buildEmojiBySlugMap,
+	getNamedHexKeys,
+	isReactionEmojiAllowed,
+	parseReactionEmojiRules,
 } from '../reaction-emoji-picker';
 
 describe( 'buildEmojiBySlugMap', () => {
@@ -213,5 +216,46 @@ describe( 'emojiToStorageKey', () => {
 	it( 'falls back to the padded hex key for other emoji', () => {
 		expect( emojiToStorageKey( '👍' ) ).toBe( '1f44d' );
 		expect( emojiToStorageKey( '©️' ) ).toBe( '00a9' );
+	} );
+} );
+
+describe( 'parseReactionEmojiRules', () => {
+	it( 'allows any emoji when the setting is absent or malformed', () => {
+		const any = { allowUnlisted: true, exclude: [] };
+		expect( parseReactionEmojiRules( undefined ) ).toEqual( any );
+		expect( parseReactionEmojiRules( 'strict' ) ).toEqual( any );
+	} );
+
+	it( 'keeps string exclusions, lowercased', () => {
+		expect(
+			parseReactionEmojiRules( {
+				allowUnlisted: false,
+				exclude: [ '1F595', 42, null ],
+			} )
+		).toEqual( { allowUnlisted: false, exclude: [ '1f595' ] } );
+	} );
+} );
+
+describe( 'isReactionEmojiAllowed', () => {
+	const named = getNamedHexKeys( REACTION_EMOJIS );
+
+	it( 'rejects an excluded emoji and its skin-tone variants', () => {
+		const rules = { allowUnlisted: true, exclude: [ '1f44d' ] };
+		expect( isReactionEmojiAllowed( '1f44d', rules, named ) ).toBe( false );
+		expect( isReactionEmojiAllowed( '1f44d-1f3fd', rules, named ) ).toBe(
+			false
+		);
+		expect( isReactionEmojiAllowed( '1f600', rules, named ) ).toBe( true );
+	} );
+
+	it( 'accepts only named emoji when unlisted emoji are not allowed', () => {
+		const rules = { allowUnlisted: false, exclude: [] };
+		expect( isReactionEmojiAllowed( '2764', rules, named ) ).toBe( true );
+		expect( isReactionEmojiAllowed( '1f600', rules, named ) ).toBe( false );
+	} );
+
+	it( 'accepts a named emoji even when it is excluded', () => {
+		const rules = { allowUnlisted: true, exclude: [ '2764' ] };
+		expect( isReactionEmojiAllowed( '2764', rules, named ) ).toBe( true );
 	} );
 } );

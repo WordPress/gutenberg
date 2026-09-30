@@ -424,6 +424,98 @@ describe( 'EmojiPicker search announcements', () => {
 	} );
 } );
 
+describe( 'EmojiPicker emoji rules', () => {
+	const originalFetch = global.fetch;
+
+	beforeEach( () => {
+		dispatch( preferencesStore ).set(
+			'core',
+			FREQUENT_EMOJIS_PREFERENCE_KEY,
+			[]
+		);
+		global.fetch = vi.fn( ( url: RequestInfo | URL ) =>
+			Promise.resolve( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F600',
+										emoji: '😀',
+										label: 'grinning face',
+										group: 0,
+									},
+									{
+										hexcode: '1F389',
+										emoji: '🎉',
+										label: 'party popper',
+										group: 6,
+									},
+									{
+										hexcode: '1F595',
+										emoji: '🖕',
+										label: 'middle finger',
+										group: 1,
+									},
+								]
+							: {}
+					),
+			} as unknown as Response )
+		);
+	} );
+
+	afterEach( () => {
+		global.fetch = originalFetch;
+		act( () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteEmojibaseUrl: undefined,
+				noteReactionEmojiRules: undefined,
+			} );
+		} );
+	} );
+
+	it( 'drops excluded emoji from the grid', async () => {
+		dispatch( blockEditorStore ).updateSettings( {
+			// A distinct URL keeps the module-level dataset cache apart.
+			noteEmojibaseUrl: 'https://example.test/rules-exclude',
+			noteReactionEmojiRules: {
+				allowUnlisted: true,
+				exclude: [ '1f595' ],
+			},
+		} );
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		expect(
+			await screen.findByRole( 'gridcell', { name: 'grinning face' } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'gridcell', { name: 'middle finger' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'offers only the named list when unlisted emoji are not allowed', async () => {
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/rules-named-only',
+			noteReactionEmojiRules: { allowUnlisted: false, exclude: [] },
+		} );
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		// 🎉 is in the default named list; it also seeds "Frequently used".
+		expect(
+			( await screen.findAllByRole( 'gridcell' ) ).map( ( cell ) =>
+				cell.getAttribute( 'aria-label' )
+			)
+		).not.toContain( 'grinning face' );
+		expect(
+			screen.getAllByRole( 'gridcell', { name: 'party popper' } ).length
+		).toBeGreaterThan( 0 );
+		expect(
+			screen.queryByRole( 'gridcell', { name: 'middle finger' } )
+		).not.toBeInTheDocument();
+	} );
+} );
+
 describe( 'EMOJIBASE_LOCALES drift detection', () => {
 	// `tools/build-scripts/copy-emojibase-data.mjs` hardcodes a parallel `LOCALES`
 	// array — when the build runs it copies exactly those locale

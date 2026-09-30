@@ -21,6 +21,12 @@ import {
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
+import {
+	getNamedHexKeys,
+	isReactionEmojiAllowed,
+	useReactionEmojiRules,
+	useReactionEmojis,
+} from './reaction-emoji-picker';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -211,7 +217,27 @@ export function searchEmojis(
 export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
-	const { data, isLoading, error } = useEmojibaseData( baseUrl, locale );
+	const {
+		data: dataset,
+		isLoading,
+		error,
+	} = useEmojibaseData( baseUrl, locale );
+	const namedEmojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
+	// Offer only what the REST API accepts under the site's emoji rules.
+	const data = useMemo( () => {
+		if ( ! dataset ) {
+			return dataset;
+		}
+		const namedKeys = getNamedHexKeys( namedEmojis );
+		return dataset.filter( ( entry ) =>
+			isReactionEmojiAllowed(
+				normalizeHexcode( entry.hexcode ),
+				rules,
+				namedKeys
+			)
+		);
+	}, [ dataset, namedEmojis, rules ] );
 	const [ query, setQuery ] = useState( '' );
 	const searchRef = useRef< HTMLInputElement >( null );
 

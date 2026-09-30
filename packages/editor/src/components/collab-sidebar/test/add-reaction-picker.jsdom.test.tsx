@@ -107,6 +107,36 @@ describe( 'AddReactionButton', () => {
 		}
 	} );
 
+	it( 'renders nothing when the full picker is limited to an empty list', () => {
+		act( () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteEmojibaseUrl: 'https://example.test/empty-named-only',
+				noteReactionEmojis: [],
+				noteReactionEmojiRules: { allowUnlisted: false, exclude: [] },
+			} );
+		} );
+		try {
+			render(
+				<AddReactionButton
+					noteId={ uniqueNoteId }
+					onToggleReaction={ vi.fn() }
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Add reaction' } )
+			).not.toBeInTheDocument();
+		} finally {
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+					noteReactionEmojis: undefined,
+					noteReactionEmojiRules: undefined,
+				} );
+			} );
+		}
+	} );
+
 	it( 'opens the full picker directly and stores a filter-provided emoji under its slug', async () => {
 		// With an Emojibase URL configured, "Add reaction" opens the full
 		// searchable picker straight away (no intermediate quick row).

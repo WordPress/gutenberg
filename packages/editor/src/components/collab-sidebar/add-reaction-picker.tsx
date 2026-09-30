@@ -22,6 +22,7 @@ import ReactionEmojiPicker, {
 	emojiToHexKey,
 	emojiToStorageKey,
 	buildEmojiBySlugMap,
+	useReactionEmojiRules,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
 import {
@@ -182,6 +183,7 @@ export function AddReactionButton( {
 }: AddReactionButtonProps ) {
 	const { recordUse } = useFrequentEmojis();
 	const emojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
 	const emojiBySlug = useMemo(
 		() => buildEmojiBySlugMap( emojis ),
 		[ emojis ]
@@ -216,8 +218,9 @@ export function AddReactionButton( {
 
 	const showFullPicker = hasFullPicker && ! pickerFailed;
 
-	// With no Emojibase data and an emptied list there is nothing to pick.
-	if ( ! hasFullPicker && ! emojis.length ) {
+	// With an emptied list and no full picker, or a full picker limited to
+	// that list, there is nothing to pick.
+	if ( ! emojis.length && ( ! hasFullPicker || ! rules.allowUnlisted ) ) {
 		return null;
 	}
 
