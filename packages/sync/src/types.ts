@@ -1,4 +1,3 @@
-import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 import type { ConnectionError } from './errors';
@@ -122,11 +121,6 @@ export interface SyncManagerUpdateOptions {
 	isNewUndoLevel?: boolean;
 }
 
-export interface SyncUndoStackState {
-	hasRedo: boolean;
-	hasUndo: boolean;
-}
-
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
@@ -138,7 +132,8 @@ export interface RecordHandlers {
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	onUndoStackChange?: ( state: SyncUndoStackState ) => void;
+	// Called when a local change to the record opened a new undo level.
+	onUndoLevelOpened?: () => void;
 }
 
 export interface SyncConfig {
@@ -180,6 +175,8 @@ export interface SyncManager {
 		objectId: ObjectID,
 		encodedSnapshot: string
 	) => boolean;
+	// Whether the entity was loaded for syncing and has not been unloaded.
+	isLoaded: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -192,8 +189,8 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
-	// undoManager is undefined until the first entity is loaded.
-	undoManager: SyncUndoManager | undefined;
+	// The undo history of the loaded entities. See `SyncUndoManager`.
+	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
 	update: (
@@ -205,13 +202,25 @@ export interface SyncManager {
 	) => void;
 }
 
-export interface SyncUndoManager extends WPUndoManager< ObjectData > {
+/**
+ * The undo history of the entities a sync manager has loaded. Yjs tracks
+ * their changes, one level per stack item, and reports each new level through
+ * the record's `onUndoLevelOpened` handler. It is not an undo manager for the
+ * editor: the consumer keeps its own and delegates a level here when that
+ * level is the one to undo or redo.
+ */
+export interface SyncUndoManager {
 	addToScope: (
 		ymap: Y.Map< any >,
 		handlers: Pick<
 			RecordHandlers,
-			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
+			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoLevelOpened'
 		>
 	) => void;
+	clearRedo: () => void;
+	hasRedo: () => boolean;
+	hasUndo: () => boolean;
+	redo: () => boolean;
 	stopCapturing: () => void;
+	undo: () => boolean;
 }

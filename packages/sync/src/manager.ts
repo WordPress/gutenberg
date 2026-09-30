@@ -77,35 +77,16 @@ export function createSyncManager( debug = false ): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
-	 * A "sync-aware" undo manager for all synced entities. It is lazily created
-	 * when the first entity is loaded.
-	 *
-	 * IMPORTANT: In Gutenberg, the undo manager is effectively global and manages
-	 * undo/redo state for all entities. If the default WPUndoManager is used,
-	 * changes to entities are recorded in the `editEntityRecord` action:
-	 *
-	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/core-data/src/actions.js#L428-L442
-	 *
-	 * In contrast, the `SyncUndoManager` only manages undo/redo for entities that
-	 * **are being synced by this sync manager**. The `addRecord` method is still
-	 * called in the code linked above, but it is a no-op. Yjs automatically tracks
-	 * changes to entities via the associated CRDT doc:
-	 *
-	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/sync/src/undo-manager.ts#L42-L48
-	 *
-	 * This means that if at least one entity is being synced, then undo/redo
-	 * operations will be **restricted to synced entities only.**
-	 *
-	 * We could improve the `SyncUndoManager` to also track non-synced entities by
-	 * delegating to a secondary `WPUndoManager`, but this would add complexity
-	 * since we would need to maintain two separate undo/redo stacks and ensure
-	 * that they retain ordering and integrity.
-	 *
-	 * However, we also anticipate that most entities being edited in Gutenberg
-	 * will be synced entities (e.g. posts, pages, templates, template parts,
-	 * etc.), so this limitation may be temporary.
+	 * The undo history of the loaded entities. Yjs tracks their changes
+	 * through the documents loaded below, so core-data does not record them
+	 * itself. It learns about each level Yjs opens through the record's
+	 * `onUndoLevelOpened` handler, keeps that level in its own undo manager
+	 * next to the records of entities that are not synced, and delegates it
+	 * back here when it is the one to undo or redo.
 	 */
-	let undoManager: SyncUndoManager | undefined;
+	const undoManager: SyncUndoManager = createUndoManager( {
+		flushPendingUpdates: flushPendingCRDTDocUpdates,
+	} );
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -177,8 +158,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
 
-			onUndoStackChange: handlers.onUndoStackChange
-				? debugWrap( handlers.onUndoStackChange )
+			onUndoLevelOpened: handlers.onUndoLevelOpened
+				? debugWrap( handlers.onUndoLevelOpened )
 				: undefined,
 		};
 
@@ -251,16 +232,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			} );
 		};
 
-		// Lazily create the undo manager when the first entity is loaded.
-		if ( ! undoManager ) {
-			undoManager = createUndoManager();
-		}
-
-		const { addUndoMeta, onUndoStackChange, restoreUndoMeta } = handlers;
+		const { addUndoMeta, onUndoLevelOpened, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
-			onUndoStackChange,
+			onUndoLevelOpened,
 		} );
 
 		// Declare with let before using it in unload closure.
@@ -460,6 +436,16 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	/**
+	 * Whether an entity was loaded for syncing and has not been unloaded.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	function isLoaded( objectType: ObjectType, objectId: ObjectID ): boolean {
+		return entityStates.has( getEntityId( objectType, objectId ) );
+	}
+
+	/**
 	 * Unload an entity, stop syncing, destroy its in-memory state, and trigger an
 	 * update of the collection.
 	 *
@@ -485,7 +471,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			entityState.unload();
 		}
 		entityStates.clear();
-		undoManager = undefined;
 
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();
@@ -650,8 +635,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			// We can't do this in the undo manager itself, because addRecord() is
 			// called after the CRDT changes have been applied, and we want to
 			// ensure that the undo set is created before the changes are applied.
-			if ( isNewUndoLevel && undoManager ) {
-				undoManager.stopCapturing?.();
+			if ( isNewUndoLevel ) {
+				undoManager.stopCapturing();
 			}
 
 			ydoc.transact( () => {
@@ -681,14 +666,28 @@ export function createSyncManager( debug = false ): SyncManager {
 	 */
 	const pendingCRDTDocUpdates: Array< Parameters< typeof updateCRDTDoc > > =
 		[];
+	let isFlushingCRDTDocUpdates = false;
 
 	function flushPendingCRDTDocUpdates(): void {
-		while ( pendingCRDTDocUpdates.length > 0 ) {
-			const args = pendingCRDTDocUpdates.shift();
+		// Applying an update can ask for a flush itself (closing an undo
+		// level flushes first). The updates already queued keep their order
+		// by letting the outer flush finish them.
+		if ( isFlushingCRDTDocUpdates ) {
+			return;
+		}
 
-			if ( args ) {
-				updateCRDTDoc( ...args );
+		isFlushingCRDTDocUpdates = true;
+
+		try {
+			while ( pendingCRDTDocUpdates.length > 0 ) {
+				const args = pendingCRDTDocUpdates.shift();
+
+				if ( args ) {
+					updateCRDTDoc( ...args );
+				}
 			}
+		} finally {
+			isFlushingCRDTDocUpdates = false;
 		}
 	}
 
@@ -863,12 +862,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		entityContainsSnapshot: debugWrap( entityContainsSnapshot ),
 		getAwareness,
 		getEntitySnapshot: debugWrap( getEntitySnapshot ),
+		isLoaded,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
-		// Use getter to ensure we always return the current value of `undoManager`.
-		get undoManager(): SyncUndoManager | undefined {
-			return undoManager;
-		},
+		undoManager,
 		unload: debugWrap( unloadEntity ),
 		unloadAll: debugWrap( unloadAll ),
 		update: debugWrap( updateOrDefer ),

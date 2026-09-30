@@ -93,7 +93,7 @@ describe( 'SyncManager', () => {
 			editRecord: vi.fn(),
 			getEditedRecord: vi.fn( async () => Promise.resolve( mockRecord ) ),
 			onStatusChange: vi.fn(),
-			onUndoStackChange: undefined,
+			onUndoLevelOpened: undefined,
 			persistCRDTDoc: vi.fn(),
 			refetchRecord: vi.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: vi.fn(),
@@ -506,8 +506,11 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
-		it( 'clears the undo manager after unloading all entities', async () => {
+		it( 'keeps the same undo manager before, during, and after entities are loaded', async () => {
 			const manager = createSyncManager();
+			const { undoManager } = manager;
+
+			expect( undoManager ).toBeDefined();
 
 			await manager.load(
 				mockSyncConfig,
@@ -524,11 +527,32 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			expect( manager.undoManager ).toBeDefined();
+			expect( manager.undoManager ).toBe( undoManager );
 
 			manager.unloadAll();
 
-			expect( manager.undoManager ).toBeUndefined();
+			expect( manager.undoManager ).toBe( undoManager );
+		} );
+
+		it( 'reports which entities are loaded', async () => {
+			const manager = createSyncManager();
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( true );
+			expect( manager.isLoaded( 'post', '456' ) ).toBe( false );
+
+			manager.unload( 'post', '123' );
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
 		} );
 
 		it( 'destroys providers and skips initialization when unload runs during load', async () => {

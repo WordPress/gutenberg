@@ -38,7 +38,8 @@ The sync manager (`src/manager.ts`) orchestrates the lifecycle of synced entitie
 -   **`unload(objectType, objectId)`**: Disconnect providers, remove observers, and destroy the `Y.Doc`.
 -   **`getAwareness(objectType, objectId)`**: Return the awareness instance for the entity, if one exists.
 -   **`createPersistedCRDTDoc(objectType, objectId)`**: Serialize the entity's CRDT document for persistence (see "Persistence" below).
--   **`undoManager`**: The sync-aware undo manager, lazily created when the first entity is loaded (see "Undo / redo" below).
+-   **`undoManager`**: The undo history of the loaded entities, created with the sync manager (see "Undo / redo" below).
+-   **`isLoaded(objectType, objectId)`**: Whether an entity was loaded for syncing and not unloaded since. `core-data` uses it to leave the undo history of such records to this manager.
 
 ### Data flow
 
@@ -119,9 +120,9 @@ Awareness provides ephemeral presence information (cursor positions, user identi
 
 ## Undo / redo
 
-The `SyncUndoManager` (`src/undo-manager.ts`) replaces the default WordPress undo manager when synced entities are in use. It wraps Yjs's built-in undo functionality.
+The `SyncUndoManager` (`src/undo-manager.ts`) is the undo history of the loaded entities, backed by Yjs's built-in undo functionality. It is not the editor's undo manager: `core-data` keeps its own undo manager for every entity and delegates to this one only for the levels that belong here.
 
--   **Lazy creation**: The undo manager is created when the first entity is loaded. If no entities are synced, the default WordPress undo manager is used.
--   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked.
--   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks.
--   **Limitation**: Once created, the `SyncUndoManager` only tracks synced entities. Edits to non-synced entities are not included in the undo stack.
+-   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked. `core-data` does not record edits to loaded entities itself (it asks `isLoaded`).
+-   **Reporting levels**: Each time Yjs opens a new undo level for a record, the record's `onUndoLevelOpened` handler runs. `core-data` records a placeholder for the level in its own undo manager, next to the records of entities that are not synced, so both are undone in the order they were made. When that placeholder is undone or redone, `core-data` calls `undo()` or `redo()` here.
+-   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks. `stopCapturing()` closes the current level; `core-data` calls it when it records an edit itself, so a later synced change cannot merge into a level that is no longer on top. `clearRedo()` drops the redo levels when another edit ends the redo history.
+-   **Deferred changes**: Local changes to a document are deferred when editing alone (see `update`). Reading or moving the history flushes them first, so their levels keep their place in the order.
