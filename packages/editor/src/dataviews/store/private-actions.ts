@@ -23,7 +23,6 @@ import {
 	parentField,
 	passwordField,
 	slugField,
-	statusField,
 	templatePartAuthorField,
 	titleField,
 	templateField,
@@ -210,7 +209,6 @@ export const registerPostTypeSchema =
 				// types supporting authors, and its own on templates. Template
 				// parts exclude it there and keep this one.
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
-				! isDesignPostType && statusField,
 				// There is no post type support flag for permalinks, and
 				// `viewable` alone is not the full condition (the type must
 				// also be public), so the field also checks each post.

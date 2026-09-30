@@ -8,7 +8,7 @@ The Fields API declares fields in PHP. What PHP cannot serialize, such as a fiel
 
 The fields of this package live in folders of `src`:
 
--   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `ping_status`, `post-content-info`, `scheduled_date`, `sticky`). They are registered in code, see below.
+-   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `last_edited_date`, `notesCount`, `ping_status`, `post-content-info`, `scheduled_date`, `status`, `sticky`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: template parts exclude the default author field, since they declare their own client-side.
 -   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
@@ -37,6 +37,7 @@ And each folder of fields may have:
 -   `ping_status`, for the post types supporting `trackbacks`.
 -   `post-content-info`, for the post types supporting `editor`.
 -   `scheduled_date`, for every post type but the design ones.
+-   `status`, for every post type but the design ones.
 -   `sticky`, for posts, the only post type with sticky posts.
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
@@ -54,7 +55,7 @@ Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()
 -   Templates and template parts exclude `author`, which the `wp_template` collection and the client define for them.
 -   Templates, template parts, and patterns exclude `excerpt`, which is their description.
 -   Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
--   The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `scheduled_date`), since they lay out a site rather than publish content.
+-   The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `scheduled_date`, `status`), since they lay out a site rather than publish content.
 -   Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
 
 ### Collection configuration

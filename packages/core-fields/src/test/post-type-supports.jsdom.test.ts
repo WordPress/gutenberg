@@ -12,6 +12,7 @@ describe( 'post_type_supports', () => {
 			'ping_status',
 			'post-content-info',
 			'scheduled_date',
+			'status',
 			'sticky',
 		] );
 		expect( postTypeSupports.author ).toEqual( {
@@ -109,5 +110,15 @@ describe( 'post_type_supports', () => {
 			true
 		);
 		expect( isVisible?.( { _links: {} } ) ).toBe( false );
+	} );
+
+	it( 'treats an auto-draft as a draft', () => {
+		const { getValue } = postTypeSupports.status;
+		expect( getValue?.( { item: { status: 'auto-draft' } } ) ).toBe(
+			'draft'
+		);
+		expect( getValue?.( { item: { status: 'publish' } } ) ).toBe(
+			'publish'
+		);
 	} );
 } );
