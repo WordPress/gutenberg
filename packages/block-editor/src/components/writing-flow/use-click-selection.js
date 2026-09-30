@@ -3,7 +3,6 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
-import { unlock } from '../../lock-unlock';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
 // synthesizes from it. Other engines place it in the mousedown's default
@@ -19,7 +18,7 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
-	} = unlock( useSelect( blockEditorStore ) );
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			let pointerType;
