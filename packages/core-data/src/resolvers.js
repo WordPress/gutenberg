@@ -227,7 +227,7 @@ export const getEntityRecord =
 						);
 					},
 					onUndoLevelOpened: () => {
-						dispatch.recordSyncUndoLevel();
+						dispatch.recordSyncUndoLevel( kind, name, key );
 					},
 				} );
 			}

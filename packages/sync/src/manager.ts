@@ -28,6 +28,7 @@ import { docContainsSnapshot, encodeDocSnapshot } from './crdt-snapshot';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
+	getEntityId,
 	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
@@ -49,19 +50,6 @@ interface EntityState {
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
-}
-
-/**
- * Get the entity ID for the given object type and object ID.
- *
- * @param {ObjectType}    objectType Object type.
- * @param {ObjectID|null} objectId   Object ID.
- */
-function getEntityId(
-	objectType: ObjectType,
-	objectId: ObjectID | null
-): EntityID {
-	return `${ objectType }_${ objectId }`;
 }
 
 /**
@@ -233,7 +221,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const { addUndoMeta, onUndoLevelOpened, restoreUndoMeta } = handlers;
-		undoManager.addToScope( recordMap, {
+		undoManager.addToScope( objectType, objectId, recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
 			onUndoLevelOpened,

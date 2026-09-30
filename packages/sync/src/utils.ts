@@ -8,7 +8,20 @@ import {
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
 } from './config';
-import type { CRDTDoc } from './types';
+import type { CRDTDoc, EntityID, ObjectID, ObjectType } from './types';
+
+/**
+ * Get the entity ID for the given object type and object ID.
+ *
+ * @param {ObjectType}    objectType Object type.
+ * @param {ObjectID|null} objectId   Object ID.
+ */
+export function getEntityId(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): EntityID {
+	return `${ objectType }_${ objectId }`;
+}
 
 // An object representation of CRDT document metadata.
 type DocumentMeta = Record< string, DocumentMetaValue >;

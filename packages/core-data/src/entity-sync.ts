@@ -95,29 +95,39 @@ export interface EntitySyncAfterSaveContext {
 }
 
 /**
- * The undo history a sync manager keeps for the records it syncs. core-data's
- * own undo manager stays in charge: it holds one placeholder per level
- * reported through `onUndoLevelOpened`, in order with the edits it records
- * itself, and calls back here when a placeholder is the level to move.
+ * The undo history a sync manager keeps for the records it syncs, one per
+ * record. core-data's own undo manager stays in charge: it holds one
+ * placeholder per level reported through `onUndoLevelOpened`, naming the
+ * record that opened it, in order with the edits it records itself. It calls
+ * back here for that record when a placeholder is the level to move.
  */
 export interface EntitySyncUndoHistory {
 	/**
-	 * Undoes the most recent level. Returns false when there is none left,
-	 * for example because its record was unloaded.
+	 * Undoes the most recent level of a record. Returns false when there is
+	 * none left, for example because the record was unloaded.
 	 */
-	undo: () => boolean;
+	undo: (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => boolean;
 
-	/** Redoes the most recently undone level. */
-	redo: () => boolean;
+	/** Redoes the most recently undone level of a record. */
+	redo: (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => boolean;
 
 	/**
-	 * Closes the current level so the next change opens a new one. core-data
-	 * calls it when it records an edit itself, so a later synced change
-	 * cannot merge into a level that is no longer the most recent one.
+	 * Closes the current level of every record so the next change opens a
+	 * new one. core-data calls it when it records an edit itself, so a later
+	 * synced change cannot merge into a level that is no longer the most
+	 * recent one.
 	 */
 	stopCapturing: () => void;
 
-	/** Drops the redo levels. core-data calls it when another edit ends the redo history. */
+	/** Drops the redo levels of every record. core-data calls it when another edit ends the redo history. */
 	clearRedo: () => void;
 }
 

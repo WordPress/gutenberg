@@ -199,11 +199,17 @@ export function receiveViewConfig( kind, name, config ) {
  * Records that the entity sync manager opened a new undo level for a record
  * it syncs, so the level takes its place in core-data's undo history next to
  * the edits core-data records itself. See `utils/sync-undo-levels.js`.
+ *
+ * @param {string}        kind     Kind of the record.
+ * @param {string}        name     Name of the record.
+ * @param {number|string} recordId Id of the record.
  */
 export const recordSyncUndoLevel =
-	() =>
+	( kind, name, recordId ) =>
 	( { select, dispatch } ) => {
-		select.getUndoManager().addRecord( createSyncUndoLevelRecord() );
+		select
+			.getUndoManager()
+			.addRecord( createSyncUndoLevelRecord( kind, name, recordId ) );
 
 		// The undo manager is a mutable object held in state, so change
 		// state for `hasUndo` and `hasRedo` to be read again. The sync

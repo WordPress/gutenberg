@@ -771,13 +771,41 @@ describe( 'the default entity sync manager', () => {
 
 		it( 'exposes the sync undo history only once a sync manager exists', async () => {
 			const { getSyncManager } = await import( '../sync' );
-			mockSyncManager.undoManager = { undo: vi.fn() };
+			mockSyncManager.undoManager = {
+				undo: vi.fn( () => true ),
+				redo: vi.fn( () => false ),
+				stopCapturing: vi.fn(),
+				clearRedo: vi.fn(),
+			};
 
 			expect( manager.undoHistory ).toBeUndefined();
 
 			getSyncManager();
 
-			expect( manager.undoHistory ).toBe( mockSyncManager.undoManager );
+			// Levels are moved for the record that opened them.
+			expect( manager.undoHistory.undo( 'postType', 'post', 1 ) ).toBe(
+				true
+			);
+			expect( mockSyncManager.undoManager.undo ).toHaveBeenCalledWith(
+				'postType/post',
+				1
+			);
+			expect( manager.undoHistory.redo( 'postType', 'post', 1 ) ).toBe(
+				false
+			);
+			expect( mockSyncManager.undoManager.redo ).toHaveBeenCalledWith(
+				'postType/post',
+				1
+			);
+
+			manager.undoHistory.stopCapturing();
+			manager.undoHistory.clearRedo();
+			expect(
+				mockSyncManager.undoManager.stopCapturing
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				mockSyncManager.undoManager.clearRedo
+			).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'reports a record as synced when the sync manager has it loaded', async () => {

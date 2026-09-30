@@ -373,7 +373,25 @@ export function createDefaultEntitySyncManager(
 				return undefined;
 			}
 
-			return getSyncManager()?.undoManager;
+			const undoManager = getSyncManager()?.undoManager;
+			if ( ! undoManager ) {
+				return undefined;
+			}
+
+			return {
+				undo: ( kind, name, recordId ) =>
+					undoManager.undo(
+						`${ kind }/${ name }`,
+						toObjectId( recordId )
+					),
+				redo: ( kind, name, recordId ) =>
+					undoManager.redo(
+						`${ kind }/${ name }`,
+						toObjectId( recordId )
+					),
+				stopCapturing: () => undoManager.stopCapturing(),
+				clearRedo: () => undoManager.clearRedo(),
+			};
 		},
 	};
 }
