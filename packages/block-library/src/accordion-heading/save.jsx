@@ -8,7 +8,7 @@ import {
 
 export default function save( { attributes } ) {
 	const { level, title, iconPosition, showIcon } = attributes;
-	const TagName = 'h' + ( level || 3 );
+	const TagName = 'h' + level;
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 
 	const blockProps = useBlockProps.save( {
