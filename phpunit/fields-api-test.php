@@ -501,6 +501,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function data_default_fields_and_their_supports() {
 		return array(
 			'discussion'  => array( 'discussion', array( 'comments', 'trackbacks' ) ),
+			'excerpt'     => array( 'excerpt', array( 'excerpt' ) ),
 			'ping_status' => array( 'ping_status', array( 'trackbacks' ) ),
 		);
 	}
@@ -583,6 +584,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'radio', $fields['comment_status']['Edit'] );
 		$this->assertSame( 'boolean', $fields['ping_status']['type'] );
 		$this->assertSame( 'Discussion', $fields['discussion']['label'] );
+		$this->assertSame( 'textarea', $fields['excerpt']['Edit']['control'] );
 	}
 
 	/**
@@ -619,14 +621,16 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	/**
 	 * The core post types exclude the defaults they do not get on the
 	 * filter, like a plugin: templates and template parts the author field,
+	 * templates, template parts, and patterns the excerpt field,
 	 * attachments every default field.
 	 */
 	public function test_the_core_post_types_exclude_defaults_on_the_filter() {
 		$this->assertSame( 10, has_filter( 'fields_api_post_type_supports_exclusions', 'gutenberg_exclude_core_post_type_support_fields' ) );
 
 		$ids = array( 'author', 'comment_status', 'notesCount' );
-		$this->assertSame( array( 'plugin_field', 'author' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
-		$this->assertSame( array( 'author' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array( 'plugin_field', 'author', 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'wp_template', $ids ), 'It adds to the incoming list.' );
+		$this->assertSame( array( 'author', 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_template_part', $ids ) );
+		$this->assertSame( array( 'excerpt' ), gutenberg_exclude_core_post_type_support_fields( array(), 'wp_block', $ids ) );
 		$this->assertSame( array( 'plugin_field', 'author', 'comment_status', 'notesCount' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'attachment', $ids ) );
 		$this->assertSame( array( 'plugin_field' ), gutenberg_exclude_core_post_type_support_fields( array( 'plugin_field' ), 'page', $ids ), 'It leaves the other post types alone.' );
 	}
@@ -680,7 +684,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'The other post types keep the field.' );
 		$this->assertSame( array( 'author', 'comment_status', 'discussion' ), $calls['gutenberg_book'], 'The filter receives the ids of the defaults the post type supports.' );
-		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'ping_status' ), $calls['post'] );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'excerpt', 'notesCount', 'ping_status' ), $calls['post'] );
 		$this->assertArrayNotHasKey( 'gutenberg_plain', $calls, 'The filter does not run for a post type without defaults.' );
 	}
 
@@ -712,6 +716,16 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_template_parts_do_not_get_the_default_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
 		$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'wp_template_part' ) );
+	}
+
+	/**
+	 * Patterns support excerpts but their excerpt is their description,
+	 * which the client edits with its own field of the same id, so they opt
+	 * out of the default excerpt field.
+	 */
+	public function test_patterns_do_not_get_the_default_excerpt_field() {
+		$this->assertTrue( post_type_supports( 'wp_block', 'excerpt' ), 'The post type supports excerpts.' );
+		$this->assertNotContains( 'excerpt', array_column( gutenberg_get_registered_fields( 'postType', 'wp_block' ), 'id' ) );
 	}
 
 	/**
