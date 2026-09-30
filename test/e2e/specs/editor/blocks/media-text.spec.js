@@ -2,6 +2,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // 50 characters with no spaces — long enough to wrap if overflow-wrap is anywhere.
 const LONG_BUTTON_LABEL = 'A'.repeat( 50 );
+// Long enough to inflate the Media & Text content column without mid-word wrapping.
+const LONG_UNBROKEN_TEXT = 'A'.repeat( 200 );
 
 test.describe( 'Media & Text', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -63,5 +65,47 @@ test.describe( 'Media & Text', () => {
 				} );
 			} )
 			.toBeLessThan( 1.35 );
+	} );
+
+	test( 'should keep nested Quote wrapping so the page does not scroll horizontally', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/media-text',
+			attributes: {
+				mediaType: 'image',
+				mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+			},
+			innerBlocks: [
+				{
+					name: 'core/quote',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: LONG_UNBROKEN_TEXT },
+						},
+					],
+				},
+			],
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const quote = page.locator(
+			'.wp-block-media-text__content .wp-block-quote'
+		);
+		await expect( quote ).toBeVisible();
+		await expect( quote ).toHaveCSS( 'overflow-wrap', 'anywhere' );
+
+		await expect
+			.poll( async () => {
+				return page.evaluate( () => {
+					const root = document.documentElement;
+					return root.scrollWidth - root.clientWidth;
+				} );
+			} )
+			.toBeLessThanOrEqual( 1 );
 	} );
 } );
