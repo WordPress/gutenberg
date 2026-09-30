@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useMemo,
 	forwardRef,
 	useCallback,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
 import * as Styled from './styles';
@@ -24,8 +13,8 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover(
-	{ gutter, children, shift, modal = true, ...otherProps },
+>( function UnforwardedPopover(
+	{ gutter, shift, modal = true, ...otherProps },
 	ref
 ) {
 	const menuContext = useContext( Context );
@@ -70,6 +59,18 @@ export const Popover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
 		<Styled.Menu
 			{ ...otherProps }
@@ -88,9 +89,7 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			variant={ menuContext.variant }
-		>
-			{ children }
-		</Styled.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );

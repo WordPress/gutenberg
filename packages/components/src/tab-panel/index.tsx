@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	forwardRef,
 	useEffect,
@@ -16,11 +9,6 @@ import {
 } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-
 import Button from '../button';
 import type { TabPanelProps } from './types';
 import type { WordPressComponentProps } from '../context';

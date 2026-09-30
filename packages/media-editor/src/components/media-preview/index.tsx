@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 
@@ -74,10 +67,11 @@ function MediaPreviewContent( {
 					<p className="media-editor-preview__mime-type">
 						{ mimeType }
 					</p>
+					{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
 					<a
 						href={ mediaUrl }
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener"
 						className="media-editor-preview__download-link"
 					>
 						{ __( 'View file' ) }

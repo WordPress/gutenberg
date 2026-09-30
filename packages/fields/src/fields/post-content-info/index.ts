@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import type { BasePost } from '../../types';
+import type { BasePostWithEditedEntity } from '../../types';
 import PostContentInfoView from './post-content-info-view';
 
-const postContentInfoField: Field< BasePost > = {
+const postContentInfoField: Field< BasePostWithEditedEntity > = {
 	label: __( 'Post content information' ),
 	id: 'post-content-info',
 	type: 'text',

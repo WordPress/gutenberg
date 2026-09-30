@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
-
 import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -15,14 +12,19 @@ const POPOVER_PROPS = {
 };
 
 export default function LeafMoreMenu( {
-	block,
+	clientId,
 	...props
 }: {
-	block: { clientId: string };
+	clientId: string;
 } ) {
-	const { clientId } = block;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		duplicateBlocks,
+		insertBeforeBlock,
+		insertAfterBlock,
+	} = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -30,14 +32,45 @@ export default function LeafMoreMenu( {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const rootClientId = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getBlockName,
+					canInsertBlockType,
+					getDirectInsertBlock,
+					getBlockIndex,
+					getBlockCount,
+				} = select( blockEditorStore );
+				const { getDefaultBlockName } = select( blocksStore );
 
-			return getBlockRootClientId( clientId );
-		},
-		[ clientId ]
-	);
+				const _rootClientId = getBlockRootClientId( clientId );
+				const _blockName = getBlockName( clientId );
+				const canInsertDefaultBlock = canInsertBlockType(
+					getDefaultBlockName(),
+					_rootClientId
+				);
+				const directInsertBlock = _rootClientId
+					? getDirectInsertBlock( _rootClientId )
+					: null;
+
+				return {
+					rootClientId: _rootClientId,
+					canDuplicate:
+						hasBlockSupport( _blockName, 'multiple', true ) &&
+						canInsertBlockType( _blockName, _rootClientId ),
+					canInsertBlock:
+						( canInsertDefaultBlock || !! directInsertBlock ) &&
+						canInsertBlockType( _blockName, _rootClientId ),
+					isFirst: getBlockIndex( clientId ) === 0,
+					isLast:
+						getBlockIndex( clientId ) ===
+						getBlockCount( _rootClientId ) - 1,
+				};
+			},
+			[ clientId ]
+		);
 
 	return (
 		<DropdownMenu
@@ -53,6 +86,7 @@ export default function LeafMoreMenu( {
 					<MenuGroup>
 						<MenuItem
 							icon={ chevronUp }
+							disabled={ isFirst }
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -62,6 +96,7 @@ export default function LeafMoreMenu( {
 						</MenuItem>
 						<MenuItem
 							icon={ chevronDown }
+							disabled={ isLast }
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();
@@ -69,6 +104,36 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
+						{ canDuplicate && (
+							<MenuItem
+								onClick={ () => {
+									duplicateBlocks( [ clientId ] );
+									onClose();
+								} }
+							>
+								{ __( 'Duplicate' ) }
+							</MenuItem>
+						) }
+						{ canInsertBlock && (
+							<>
+								<MenuItem
+									onClick={ () => {
+										insertBeforeBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add before' ) }
+								</MenuItem>
+								<MenuItem
+									onClick={ () => {
+										insertAfterBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add after' ) }
+								</MenuItem>
+							</>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

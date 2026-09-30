@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/paragraph",
+		"attrs": {
+			"align": "left",
+			"textColor": "accent-1"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<p class=\"has-text-align-left has-accent-1-color has-text-color\">test</p>\n",
+		"innerContent": [
+			"\n<p class=\"has-text-align-left has-accent-1-color has-text-color\">test</p>\n"
+		]
+	}
+]

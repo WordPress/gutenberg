@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import documentHasTextSelection from './document-has-text-selection';
 import inputFieldHasUncollapsedSelection from './input-field-has-uncollapsed-selection';
 

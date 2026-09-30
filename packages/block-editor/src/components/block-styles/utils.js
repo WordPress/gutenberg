@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import TokenList from '@wordpress/token-list';
 import { _x } from '@wordpress/i18n';
 
@@ -75,7 +72,7 @@ export function getRenderedStyles( styles ) {
 					isDefault: true,
 				},
 				...styles,
-		  ];
+			];
 }
 
 /**

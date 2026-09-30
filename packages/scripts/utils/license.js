@@ -270,7 +270,7 @@ function checkDepLicense( depPath, licenses ) {
 	 * or the type was invalid, try reading it from the files defined in
 	 * license files, instead.
 	 */
-	const detectedLicenseType = detectTypeFromLicenseFiles( path );
+	const detectedLicenseType = detectTypeFromLicenseFiles( depPath );
 	if ( ! licenseType && ! detectedLicenseType ) {
 		return;
 	}

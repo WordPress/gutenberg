@@ -4,7 +4,7 @@
 .global-styles-ui-variations_item {
 	box-sizing: border-box;
 	// To round the outline in Windows 10 high contrast mode.
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	.global-styles-ui-variations_item-preview {
 		border-radius: $radius-small;

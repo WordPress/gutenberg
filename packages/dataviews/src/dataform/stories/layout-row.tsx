@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 
@@ -37,12 +30,15 @@ const LayoutRowComponent = ( {
 		tax: number;
 		quantity: number;
 		total: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 	};
 
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -57,37 +53,37 @@ const LayoutRowComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'shippingCity',
-			label: 'Shipping City',
+			label: 'Shipping city',
 			type: 'text',
 		},
 		{
 			id: 'shippingPostalCode',
-			label: 'Shipping Postal Code',
+			label: 'Shipping postal code',
 			type: 'text',
 		},
 		{
 			id: 'shippingCountry',
-			label: 'Shipping Country',
+			label: 'Shipping country',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'billingCity',
-			label: 'Billing City',
+			label: 'Billing city',
 			type: 'text',
 		},
 		{
 			id: 'billingPostalCode',
-			label: 'Billing Postal Code',
+			label: 'Billing postal code',
 			type: 'text',
 		},
 		{
@@ -102,7 +98,7 @@ const LayoutRowComponent = ( {
 		},
 		{
 			id: 'hasDiscount',
-			label: 'Has Discount?',
+			label: 'Has discount?',
 			type: 'boolean',
 		},
 		{
@@ -163,6 +159,24 @@ const LayoutRowComponent = ( {
 			type: 'integer',
 			readOnly: true,
 		},
+		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -188,6 +202,9 @@ const LayoutRowComponent = ( {
 		tax: 20,
 		quantity: 5,
 		total: 600,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 	} );
 
 	const getRowLayoutFromStoryArgs = ( {
@@ -249,6 +266,15 @@ const LayoutRowComponent = ( {
 					],
 				},
 
+				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getRowLayoutFromStoryArgs( {
+						alignment:
+							alignment === 'default' ? 'start' : alignment,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
+				},
 				{
 					id: 'planRow',
 					label: 'Subscription',

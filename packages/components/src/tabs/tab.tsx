@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
-
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import type { TabProps } from './types';
 import warning from '@wordpress/warning';
+import { chevronRight } from '@wordpress/icons';
+import type { TabProps } from './types';
 import { useTabsContext } from './context';
 import {
 	Tab as StyledTab,
@@ -16,12 +9,14 @@ import {
 	TabChevron as StyledTabChevron,
 } from './styles';
 import type { WordPressComponentProps } from '../context';
-import { chevronRight } from '@wordpress/icons';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
 	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
->( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
+>( function UnforwardedTab(
+	{ children, tabId, disabled, render, ...otherProps },
+	ref
+) {
 	const { store, instanceId } = useTabsContext() ?? {};
 
 	if ( ! store ) {

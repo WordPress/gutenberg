@@ -9,6 +9,10 @@ The Interactivity API supports two navigation modes:
 -   **Region-based client-side navigation** — The recommended approach for implementing client-side navigation in WordPress.
 -   **Full-page client-side navigation** _(experimental)_ — Treats the entire `<body>` element as a single region, effectively updating the whole page content without a traditional reload. Covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
+<div class="callout callout-info">
+To learn how to ensure your blocks and interactive elements are compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility</a> guide.
+</div>
+
 ## How client-side navigation works
 
 When a user triggers a navigation, for example, by clicking a link that has a `data-wp-on--click` directive that calls `actions.navigate()`, the Interactivity Router:
@@ -29,7 +33,13 @@ This approach offers several benefits:
 
 ## Getting started with the Interactivity Router
 
-The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool, which creates a block with the Interactivity API already configured:
+The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool. It offers a dedicated `client-side-navigation` variant that scaffolds a fully working block with client-side navigation already wired up — including router regions, prev/next navigation, a loading indicator, and a stopwatch that persists across navigations to demonstrate state persistence:
+
+```bash
+npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template --variant client-side-navigation
+```
+
+You can also scaffold the default variant and add client-side navigation yourself:
 
 ```bash
 npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template
@@ -101,13 +111,17 @@ For **blocks**, this attribute is added automatically when the block declares in
 
 If your block's `block.json` already includes one of these, no additional setup is needed — WordPress handles the rest.
 
-For **classic themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
+For **classic PHP themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
 
 ```php
 wp_interactivity()->add_client_navigation_support_to_script_module(
     'my-theme/navigation'
 );
 ```
+
+<div class="callout callout-info">
+To understand what makes a block (or interactive elements in a classic PHP theme) compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility</a> guide.
+</div>
 
 Without this, the router will not load your script module when navigating to a page that needs it.
 
@@ -701,7 +715,7 @@ When `clientNavigationDisabled` is `true`:
 
 The Interactivity API router includes built-in feedback during navigation:
 
--   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet. This 400ms delay is introduced to avoid showing the animation if the page has been sucessfully prefetched or in very fast connections.
+-   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet. This 400ms delay is introduced to avoid showing the animation if the page has been successfully prefetched or in very fast connections.
 -   **Screen reader announcements**: Accessibility announcements for navigation progress.
 
 In some cases, you may want to disable these:
@@ -792,7 +806,12 @@ const { actions } = store( 'myPlugin', {
 			} );
 			// Navigate to the same page, bypassing the cache
 			// to reflect the updated content.
-			yield navigate( window.location.href, { force: true } );
+			const { actions: routerActions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield routerActions.navigate( window.location.href, {
+				force: true,
+			} );
 		},
 	},
 } );
@@ -975,11 +994,11 @@ This approach ensures that:
 
 When `navigate()` actually renders the new page, the router toggles style sheets on and off:
 
--   **Activating styles**: For each style sheet that belongs to the target page, the router removes the `media="preload"` override (or restores the original `media` attribute if one was specified). This causes the browser to apply those styles.
+-   **Activating styles**: For each style sheet that belongs to the target page, the router restores the original `media` attribute (reverting the `media="preload"` override set during prefetching) and sets `sheet.disabled = false`. This causes the browser to apply those styles.
 
--   **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `media="preload"`. This disables the styles without removing the element from the DOM.
+-   **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `sheet.disabled = true`. This disables the styles without removing the element from the DOM.
 
-By keeping deactivated style elements in the DOM (rather than removing them), the router can quickly reactivate them if the user navigates back. The styles are already loaded and parsed; they just need to be enabled.
+By keeping deactivated style elements in the DOM (rather than removing them), the router can quickly reactivate them if the user navigates back. The styles are already loaded and parsed; they just need to be re-enabled.
 
 ### Script module handling
 
@@ -1070,9 +1089,9 @@ When WordPress renders a page with interactive elements, it embeds server-provid
 	{
 		"state": {
 			"myPlugin": {
-				"cartItemCount": 3,
+				"cartItemCount": 3
 			}
-		}
+		},
 		"config": {
 			"myPlugin": {
 				"userLoggedIn": true
@@ -1097,11 +1116,11 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 
 When the router fetches a new page, it extracts these types of server data:
 
-1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `state` property. This state comes from `wp_interactivity_state` is stored in the internal in-memory page cache entry.
+1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extract its `state` property. This state comes from `wp_interactivity_state` is stored in the internal in-memory page cache entry.
 
 2. **Local context**: Context values are embedded in the virtual DOM representation of each router region. When a region's HTML is converted to vDOM, the `data-wp-context` attributes are preserved and will be processed during rendering.
 
-3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extrat its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
+3. **Config**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content to extract its `config` property. This configuration comes from `wp_interactivity_config` and is stored in the internal in-memory page cache entry.
 
 **Merging server data during navigation**
 
@@ -1186,12 +1205,13 @@ When `navigate()` is called (for example, on link click):
 2. If not already prefetched, the fetch process from Phase 1 runs now.
 3. The router waits for the page to be ready (fetch complete, styles loaded).
 4. A loading indicator may appear if the wait exceeds a threshold (400ms).
-5. The rendering phase begins (wrapped in a batch for efficiency):
-    - Script modules for the new page are executed.
-    - Server state is merged with client state.
-    - Each router region is updated with its new virtual DOM.
-    - Regions with `attachTo` that don't exist are created and appended.
+5. The rendering phase begins:
     - Styles are activated/deactivated as needed.
+    - Script modules for the new page are executed.
+    - In a batch for efficiency:
+        - Server state is merged with client state.
+        - Each router region is updated with its new virtual DOM.
+        - Regions with `attachTo` that don't exist are created and appended.
     - The document title is updated.
 6. Browser history is updated (pushState or replaceState).
 7. Screen reader announcement is made for accessibility.
@@ -1210,7 +1230,7 @@ This ensures that rapid clicking through multiple links doesn't cause visual gli
 
 Full-page client-side navigation is an experimental feature that extends the region-based approach described throughout this guide. Instead of requiring you to define individual router regions, full-page navigation treats the entire `<body>` element as a single region — effectively replacing all page content during navigation.
 
-This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **WP Admin > Gutenberg > Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
+This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **WP Admin > Settings > Gutenberg Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
 
 Once enabled, this mode automatically intercepts all link clicks and hover events on the page, triggering client-side navigation and prefetching without you needing to write any custom action handlers. It is available through a separate entry point in the router package:
 

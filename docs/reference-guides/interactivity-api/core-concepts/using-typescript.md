@@ -166,8 +166,8 @@ const { state } = store( 'myCounterPlugin', {
 		product: 2,
 	} as State, // Casts the entire state manually.
 	actions: {
-		increment() {
-			state.counter * state.product;
+		multiply() {
+			state.counter *= state.product;
 		},
 	},
 } );
@@ -452,7 +452,7 @@ This also means that you can use your async actions in external functions, and T
 ```ts
 const someAsyncFunction = async () => {
 	// This works fine and it's correctly typed.
-	await actions.delayedIncrement( 2000 );
+	await actions.delayedIncrement();
 };
 ```
 

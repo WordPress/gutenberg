@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	PluginErrorBoundaryProps as Props,
 	PluginErrorBoundaryState as State,

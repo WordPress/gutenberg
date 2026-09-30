@@ -1,3 +1,4 @@
 {
-	"extends": "packages/scripts/config/.markdownlint.json"
+	"extends": "packages/scripts/config/.markdownlint.json",
+	"MD033": false
 }

@@ -47,7 +47,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // override existing route defined by core, if it exists
 		);
 	}
 
@@ -57,11 +58,21 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check(
-		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$request
-	) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
+	public function get_items_permissions_check( $request ) {
+		$kind = $request->get_param( 'kind' );
+		$name = $request->get_param( 'name' );
+
+		$capability = $this->get_required_capability( $kind, $name );
+
+		if ( null === $capability ) {
+			return new WP_Error(
+				'rest_view_config_invalid_entity',
+				__( 'Invalid entity kind or name.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( ! current_user_can( $capability ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to read view config.', 'gutenberg' ),
@@ -70,6 +81,48 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Resolves the capability required to read the view config for an entity.
+	 *
+	 * Known kinds map to the capability that gates managing that entity's list:
+	 * post types use their own `edit_posts` capability (which honors custom
+	 * `capability_type` registrations), taxonomies use `manage_terms`, and
+	 * root-level entities use `manage_options`. A post type or taxonomy that is
+	 * not registered, or not exposed to the REST API, resolves to `null` so the
+	 * request is treated as referencing an unknown entity.
+	 *
+	 * Any other kind falls back to `edit_posts`. This keeps entities registered
+	 * through the `get_entity_view_config_{$kind}_{$name}` filter readable behind
+	 * a baseline capability.
+	 *
+	 * @param string $kind The entity kind (e.g. `postType`).
+	 * @param string $name The entity name (e.g. `page`).
+	 * @return string|null Capability required to read the config, or null if the
+	 *                     entity is not registered.
+	 */
+	protected function get_required_capability( $kind, $name ) {
+		switch ( $kind ) {
+			case 'postType':
+				$post_type = get_post_type_object( $name );
+				if ( $post_type && $post_type->show_in_rest ) {
+					return $post_type->cap->edit_posts;
+				}
+				return null;
+
+			case 'taxonomy':
+				$taxonomy = get_taxonomy( $name );
+				if ( $taxonomy && $taxonomy->show_in_rest ) {
+					return $taxonomy->cap->manage_terms;
+				}
+				return null;
+
+			case 'root':
+				return 'manage_options';
+		}
+
+		return 'edit_posts';
 	}
 
 	/**
@@ -82,166 +135,93 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$kind = $request->get_param( 'kind' );
 		$name = $request->get_param( 'name' );
 
-		// TODO: this data will come from a registry of view configs per entity.
-		$default_view    = array(
-			'type'       => 'table',
-			'filters'    => array(),
-			'perPage'    => 20,
-			'sort'       => array(
-				'field'     => 'title',
-				'direction' => 'asc',
-			),
-			'titleField' => 'title',
-			'fields'     => array( 'author', 'status' ),
-		);
-		$default_layouts = array(
-			'table' => array(),
-			'grid'  => array(),
-			'list'  => array(),
-		);
-		$all_items_title = __( 'All items', 'gutenberg' );
-		if ( 'postType' === $kind ) {
-			$post_type_object = get_post_type_object( $name );
-			if ( $post_type_object && ! empty( $post_type_object->labels->all_items ) ) {
-				$all_items_title = $post_type_object->labels->all_items;
-			}
-		}
-		$view_list = array(
-			array(
-				'title' => $all_items_title,
-				'slug'  => 'all',
-			),
-		);
-		if ( 'postType' === $kind && 'page' === $name ) {
-			$default_view    = array(
-				'type'       => 'list',
-				'filters'    => array(),
-				'perPage'    => 20,
-				'sort'       => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				),
-				'showLevels' => true,
-				'titleField' => 'title',
-				'mediaField' => 'featured_media',
-				'fields'     => array( 'author', 'status' ),
-			);
-			$default_layouts = array(
-				'table' => array(
-					'layout' => array(
-						'styles' => array(
-							'author' => array(
-								'align' => 'start',
-							),
-						),
-					),
-				),
-				'grid'  => array(),
-				'list'  => array(),
-			);
-			$view_list       = array(
-				array(
-					'title' => $all_items_title,
-					'slug'  => 'all',
-				),
-				array(
-					'title' => __( 'Published', 'gutenberg' ),
-					'slug'  => 'published',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'publish',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Scheduled', 'gutenberg' ),
-					'slug'  => 'future',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'future',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Drafts', 'gutenberg' ),
-					'slug'  => 'drafts',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'draft',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Pending', 'gutenberg' ),
-					'slug'  => 'pending',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'pending',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Private', 'gutenberg' ),
-					'slug'  => 'private',
-					'view'  => array(
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'private',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-				array(
-					'title' => __( 'Trash', 'gutenberg' ),
-					'slug'  => 'trash',
-					'view'  => array(
-						'type'    => 'table',
-						'layout'  => isset( $default_layouts['table']['layout'] ) ? $default_layouts['table']['layout'] : array(),
-						'filters' => array(
-							array(
-								'field'    => 'status',
-								'operator' => 'isAny',
-								'value'    => 'trash',
-								'isLocked' => true,
-							),
-						),
-					),
-				),
-			);
-		}
+		$config = gutenberg_get_entity_view_config( $kind, $name );
+		$schema = $this->get_item_schema();
 
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
-			'default_view'    => $default_view,
-			'default_layouts' => $default_layouts,
-			'view_list'       => $view_list,
+			'version'         => Gutenberg_View_Config_Data::LATEST_VERSION,
+			'default_view'    => $this->cast_empty_objects( $config['default_view'], $schema['properties']['default_view'] ),
+			'default_layouts' => $this->cast_empty_objects( $config['default_layouts'], $schema['properties']['default_layouts'] ),
+			'view_list'       => $this->cast_empty_objects( $config['view_list'], $schema['properties']['view_list'] ),
+			'form'            => $this->cast_empty_objects( $config['form'], $schema['properties']['form'] ),
 		);
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Recursively casts empty arrays to objects where the schema types them as
+	 * objects.
+	 *
+	 * PHP cannot distinguish an empty associative array from an empty list, so
+	 * `json_encode()` always serializes `array()` as a JSON array (`[]`). The
+	 * REST schema, however, types several values as objects, which must encode
+	 * as `{}`. This walks the value against its schema and casts any empty,
+	 * object-typed array to an object. Non-empty associative arrays already
+	 * encode as objects, so they are left as arrays and only recursed into to
+	 * fix any nested empty objects.
+	 *
+	 * Union schemas (`oneOf`/`anyOf`) are handled only for the empty-array case:
+	 * an empty value is cast to an object when any branch allows an object. Such
+	 * values are not recursed into, which is sufficient for the form schema
+	 * where they never contain empty nested objects.
+	 *
+	 * @param mixed $value  The value to normalize.
+	 * @param array $schema The schema node describing the value.
+	 * @return mixed The normalized value, with empty object-typed arrays cast to objects.
+	 */
+	protected function cast_empty_objects( $value, $schema ) {
+		if ( ! is_array( $value ) || ! is_array( $schema ) ) {
+			return $value;
+		}
+
+		if ( isset( $schema['oneOf'] ) || isset( $schema['anyOf'] ) ) {
+			$branches = isset( $schema['oneOf'] ) ? $schema['oneOf'] : $schema['anyOf'];
+			if ( array() === $value ) {
+				foreach ( $branches as $branch ) {
+					if ( is_array( $branch ) && in_array( 'object', (array) ( isset( $branch['type'] ) ? $branch['type'] : array() ), true ) ) {
+						return (object) array();
+					}
+				}
+			}
+			return $value;
+		}
+
+		$types = (array) ( isset( $schema['type'] ) ? $schema['type'] : array() );
+
+		if ( in_array( 'array', $types, true ) && isset( $schema['items'] ) ) {
+			foreach ( $value as $index => $item ) {
+				$value[ $index ] = $this->cast_empty_objects( $item, $schema['items'] );
+			}
+			return $value;
+		}
+
+		if ( in_array( 'object', $types, true ) ) {
+			if ( isset( $schema['properties'] ) ) {
+				foreach ( $schema['properties'] as $property => $property_schema ) {
+					if ( array_key_exists( $property, $value ) ) {
+						$value[ $property ] = $this->cast_empty_objects( $value[ $property ], $property_schema );
+					}
+				}
+			}
+			if ( isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
+				foreach ( $value as $key => $item ) {
+					if ( isset( $schema['properties'][ $key ] ) ) {
+						continue;
+					}
+					$value[ $key ] = $this->cast_empty_objects( $item, $schema['additionalProperties'] );
+				}
+			}
+
+			// Empty object-typed arrays must serialize as {} to match the schema.
+			if ( array() === $value ) {
+				return (object) array();
+			}
+		}
+
+		return $value;
 	}
 
 	/**
@@ -271,15 +251,21 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'type'        => 'string',
 					'readonly'    => true,
 				),
+				'version'         => array(
+					'description' => __( 'The schema version of the configuration.', 'gutenberg' ),
+					'type'        => 'integer',
+					'readonly'    => true,
+				),
 				'default_view'    => array(
 					'description' => __( 'Default view configuration.', 'gutenberg' ),
 					'type'        => 'object',
 					'readonly'    => true,
 					'properties'  => array_merge(
 						array(
-							'type' => array(
+							'type'   => array(
 								'type' => 'string',
 							),
+							'layout' => $this->get_combined_layout_schema(),
 						),
 						$view_base_properties
 					),
@@ -373,6 +359,12 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						),
 					),
 				),
+				'form'            => array(
+					'description' => __( 'Default form configuration.', 'gutenberg' ),
+					'type'        => 'object',
+					'readonly'    => true,
+					'properties'  => $this->get_form_schema(),
+				),
 			),
 		);
 
@@ -382,13 +374,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	/**
 	 * Returns the schema properties shared by all view types (ViewBase), excluding 'type'.
 	 *
+	 * Note that `search` and `page` are not part of the schema: they are managed
+	 * via the URL, which is their only source of truth.
+	 *
 	 * @return array Schema properties for the base view configuration.
 	 */
-	private function get_view_base_schema() {
+	protected function get_view_base_schema() {
 		return array(
-			'search'                => array(
-				'type' => 'string',
-			),
 			'filters'               => array(
 				'type'  => 'array',
 				'items' => array(
@@ -432,9 +424,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'enum' => array( 'asc', 'desc' ),
 					),
 				),
-			),
-			'page'                  => array(
-				'type' => 'integer',
 			),
 			'perPage'               => array(
 				'type' => 'integer',
@@ -493,7 +482,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a column style object.
 	 */
-	private function get_column_style_schema() {
+	protected function get_column_style_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -519,7 +508,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a table layout object.
 	 */
-	private function get_table_layout_schema() {
+	protected function get_table_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -543,7 +532,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a list layout object.
 	 */
-	private function get_list_layout_schema() {
+	protected function get_list_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -564,12 +553,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a combined layout object.
 	 */
-	private function get_combined_layout_schema() {
+	protected function get_combined_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array_merge(
 				$this->get_table_layout_schema()['properties'],
-				$this->get_grid_layout_schema()['properties']
+				$this->get_grid_layout_schema()['properties'],
+				$this->get_list_layout_schema()['properties']
 			),
 		);
 	}
@@ -579,7 +569,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a grid layout object.
 	 */
-	private function get_grid_layout_schema() {
+	protected function get_grid_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -596,6 +586,225 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'type' => 'string',
 					'enum' => array( 'compact', 'balanced', 'comfortable' ),
 				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for a form layout object as a discriminated union.
+	 *
+	 * Each variant is discriminated by a single-value enum on its `type` property,
+	 * matching the TypeScript Layout union in dataviews/src/types/dataform.ts.
+	 *
+	 * @return array Schema for a form layout object.
+	 */
+	protected function get_form_layout_schema() {
+		return array(
+			'oneOf' => array(
+				// RegularLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'regular' ),
+						),
+						'labelPosition' => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+					),
+				),
+				// PanelLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'           => array(
+							'type' => 'string',
+							'enum' => array( 'panel' ),
+						),
+						'labelPosition'  => array(
+							'type' => 'string',
+							'enum' => array( 'top', 'side', 'none' ),
+						),
+						'openAs'         => array(
+							'oneOf' => array(
+								array(
+									'type' => 'string',
+									'enum' => array( 'dropdown', 'modal' ),
+								),
+								array(
+									'type'       => 'object',
+									'properties' => array(
+										'type'        => array(
+											'type' => 'string',
+											'enum' => array( 'dropdown', 'modal' ),
+										),
+										'applyLabel'  => array(
+											'type' => 'string',
+										),
+										'cancelLabel' => array(
+											'type' => 'string',
+										),
+									),
+								),
+							),
+						),
+						'summary'        => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'type' => 'string',
+									),
+								),
+							),
+						),
+						'editVisibility' => array(
+							'type' => 'string',
+							'enum' => array( 'always', 'on-hover' ),
+						),
+					),
+				),
+				// CardLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'          => array(
+							'type' => 'string',
+							'enum' => array( 'card' ),
+						),
+						'withHeader'    => array(
+							'type' => 'boolean',
+						),
+						'isOpened'      => array(
+							'type' => 'boolean',
+						),
+						'isCollapsible' => array(
+							'type' => 'boolean',
+						),
+						'summary'       => array(
+							'oneOf' => array(
+								array( 'type' => 'string' ),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'oneOf' => array(
+											array( 'type' => 'string' ),
+											array(
+												'type' => 'object',
+												'properties' => array(
+													'id' => array(
+														'type' => 'string',
+													),
+													'visibility' => array(
+														'type' => 'string',
+														'enum' => array( 'always', 'when-collapsed' ),
+													),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+				// RowLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'      => array(
+							'type' => 'string',
+							'enum' => array( 'row' ),
+						),
+						'alignment' => array(
+							'type' => 'string',
+							'enum' => array( 'start', 'center', 'end' ),
+						),
+						'styles'    => array(
+							'type'                 => 'object',
+							'additionalProperties' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'flex' => array(
+										'type' => array( 'string', 'number' ),
+									),
+								),
+							),
+						),
+					),
+				),
+				// DetailsLayout.
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'type'    => array(
+							'type' => 'string',
+							'enum' => array( 'details' ),
+						),
+						'summary' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for a form field item (string or object).
+	 *
+	 * @return array Schema for a form field.
+	 */
+	protected function get_form_field_schema() {
+		return array(
+			'oneOf' => array(
+				array( 'type' => 'string' ),
+				array(
+					'type'       => 'object',
+					'properties' => array(
+						'id'          => array(
+							'type' => 'string',
+						),
+						'label'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'layout'      => $this->get_form_layout_schema(),
+						'children'    => array(
+							'type'  => 'array',
+							'items' => array(
+								'oneOf' => array(
+									array( 'type' => 'string' ),
+									// This object can have the shape of a form field itself,
+									// allowing for recursive nesting of form fields.
+									// There's no easy way to codify this recursion via the JSON Schema draft-04
+									// supported by the REST API.
+									array( 'type' => 'object' ),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Returns the schema for the form configuration object.
+	 *
+	 * @return array Schema properties for the form configuration.
+	 */
+	protected function get_form_schema() {
+		return array(
+			'layout' => $this->get_form_layout_schema(),
+			'fields' => array(
+				'type'  => 'array',
+				'items' => $this->get_form_field_schema(),
 			),
 		);
 	}

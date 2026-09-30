@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { __experimentalText as Text } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { __experimentalText as WCText } from '@wordpress/components';
 import BackgroundPanel from './background-panel';
 import { ScreenHeader } from './screen-header';
 import { useSetting } from './hooks';
@@ -24,9 +17,9 @@ function ScreenBackground() {
 			<ScreenHeader
 				title={ __( 'Background' ) }
 				description={
-					<Text>
+					<WCText>
 						{ __( "Set styles for the site's background." ) }
-					</Text>
+					</WCText>
 				}
 			/>
 			{ hasBackgroundPanel && <BackgroundPanel /> }

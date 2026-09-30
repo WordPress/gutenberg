@@ -1,13 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ReactElement } from 'react';
-import { useArgs } from 'storybook/preview-api';
-
-/**
- * WordPress dependencies
- */
+import { useState, type Element as ReactElement } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -15,12 +7,7 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ToggleControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
@@ -43,17 +30,21 @@ const keywords: Partial< Record< string, string[] > > = {
 	pencil: [ 'edit' ],
 	thumbsDown: [ 'dislike' ],
 	thumbsUp: [ 'like' ],
-	timeToRead: [ 'clock' ],
+	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
 	trash: [ 'delete' ],
 	unseen: [ 'hide' ],
 };
 
 const ALL_ICONS_MANIFEST = new Map(
-	manifest.map( ( entry: { slug: string; public?: boolean } ) => [
+	manifest.map( ( entry: { slug: string; collections?: string[] } ) => [
 		entry.slug,
-		{ slug: entry.slug, public: !! entry.public },
+		{ slug: entry.slug, collections: entry.collections ?? [] },
 	] )
 );
+
+const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
+
+type Collection = ( typeof COLLECTIONS )[ number ];
 
 function nameToSlug( name: string ): string {
 	return (
@@ -71,7 +62,8 @@ function nameToSlug( name: string ): string {
 
 const meta: Meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
@@ -79,7 +71,7 @@ const meta: Meta = {
 	argTypes: {
 		filter: { control: false },
 		size: { control: false },
-		highlightPublicIcons: { control: false },
+		collection: { control: false },
 	},
 };
 export default meta;
@@ -87,34 +79,39 @@ export default meta;
 type LibraryArgs = {
 	filter: string;
 	size: string | number;
-	highlightPublicIcons: boolean;
-};
-
-type LibraryExampleProps = LibraryArgs & {
-	updateArgs: ( newArgs: Partial< LibraryArgs > ) => void;
+	collection: Collection;
 };
 
 const LibraryExample = ( {
-	filter,
-	size,
-	highlightPublicIcons,
-	updateArgs,
-}: LibraryExampleProps ): ReactElement => {
-	const filteredIcons = filter.length
-		? Object.fromEntries(
-				Object.entries( availableIcons ).filter( ( [ name ] ) => {
-					const normalizedName = name.toLowerCase();
-					const normalizedFilter = filter.toLowerCase();
+	filter: initialFilter,
+	size: initialSize,
+	collection: initialCollection,
+}: LibraryArgs ): ReactElement => {
+	const [ filter, setFilter ] = useState( initialFilter );
+	const [ size, setSize ] = useState( initialSize );
+	const [ collection, setCollection ] = useState( initialCollection );
+	const normalizedFilter = filter.toLowerCase();
+	const filteredIcons = Object.fromEntries(
+		Object.entries( availableIcons ).filter( ( [ name ] ) => {
+			if ( collection !== 'all' ) {
+				const iconInfo = ALL_ICONS_MANIFEST.get( nameToSlug( name ) );
+				if ( ! iconInfo?.collections.includes( collection ) ) {
+					return false;
+				}
+			}
 
-					return (
-						normalizedName.includes( normalizedFilter ) ||
-						keywords[ name ]?.some( ( keyword: string ) =>
-							keyword.toLowerCase().includes( normalizedFilter )
-						)
-					);
-				} )
-		  )
-		: availableIcons;
+			if ( ! normalizedFilter.length ) {
+				return true;
+			}
+
+			return (
+				name.toLowerCase().includes( normalizedFilter ) ||
+				keywords[ name ]?.some( ( keyword: string ) =>
+					keyword.toLowerCase().includes( normalizedFilter )
+				)
+			);
+		} )
+	);
 
 	const hasResults = Object.keys( filteredIcons ).length > 0;
 
@@ -123,12 +120,11 @@ const LibraryExample = ( {
 			<VStack spacing={ 8 }>
 				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
 					<SearchControl
-						__next40pxDefaultSize
 						label="Icon name"
 						hideLabelFromVision={ false }
 						value={ filter }
 						onChange={ ( value: string | undefined ) =>
-							updateArgs( { filter: value } )
+							setFilter( value ?? '' )
 						}
 					/>
 					<ToggleGroupControl
@@ -136,9 +132,8 @@ const LibraryExample = ( {
 						isBlock
 						value={ size }
 						onChange={ ( value: string | number | undefined ) =>
-							updateArgs( { size: value } )
+							setSize( value ?? '24' )
 						}
-						__next40pxDefaultSize
 					>
 						{ [ '16', '24', '32' ].map( ( option ) => (
 							<ToggleGroupControlOption
@@ -148,22 +143,29 @@ const LibraryExample = ( {
 							/>
 						) ) }
 					</ToggleGroupControl>
-					<ToggleControl
-						label="Highlight public icons"
-						checked={ highlightPublicIcons }
-						onChange={ ( value: boolean ) =>
-							updateArgs( { highlightPublicIcons: value } )
+					<ToggleGroupControl
+						label="Collection"
+						isBlock
+						value={ collection }
+						onChange={ ( value: string | number | undefined ) =>
+							setCollection( ( value ?? 'all' ) as Collection )
 						}
-						help="Emphasize icons available in the SVG icon registry."
-					/>
+					>
+						{ COLLECTIONS.map( ( option ) => (
+							<ToggleGroupControlOption
+								key={ option }
+								value={ option }
+								label={ option === 'all' ? 'All' : option }
+							/>
+						) ) }
+					</ToggleGroupControl>
 				</HStack>
 				{ hasResults ? (
 					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
 						{ Object.entries( filteredIcons ).map(
 							( [ name, icon ] ) => {
 								const slug = nameToSlug( name );
-								const iconInfo = ALL_ICONS_MANIFEST.get( slug );
-								if ( ! iconInfo ) {
+								if ( ! ALL_ICONS_MANIFEST.has( slug ) ) {
 									throw new Error(
 										`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
 									);
@@ -176,11 +178,6 @@ const LibraryExample = ( {
 											flexDirection: 'column',
 											alignItems: 'center',
 											gap: 8,
-											opacity:
-												highlightPublicIcons &&
-												! iconInfo.public
-													? 0.2
-													: 1,
 										} }
 									>
 										<Icon
@@ -209,14 +206,11 @@ const LibraryExample = ( {
 	);
 };
 
-export const Library: StoryObj< typeof meta > = {
+export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
 		size: '24',
-		highlightPublicIcons: false,
+		collection: 'all',
 	},
-	render: function Library() {
-		const [ args, updateArgs ] = useArgs< LibraryArgs >();
-		return <LibraryExample { ...args } updateArgs={ updateArgs } />;
-	},
+	render: ( args ) => <LibraryExample { ...args } />,
 };

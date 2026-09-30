@@ -1,21 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import type { User } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
@@ -32,12 +25,18 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 			if ( ! shouldFetch ) {
 				return null;
 			}
-			const { getEntityRecord } = select( coreStore );
-			// This doesn't make extra REST requests because the records are
-			// already in the store from the field's getElements function.
-			return authorId
-				? getEntityRecord( 'root', 'user', authorId )
-				: null;
+			const { getEntityRecords } = select( coreStore );
+			// Query the collection with `who: 'authors'` instead of calling
+			// `getEntityRecord`, because the single user endpoint denies
+			// access to authors without published posts for users who can't
+			// list users. See https://core.trac.wordpress.org/ticket/56429.
+			return (
+				getEntityRecords< User >( 'root', 'user', {
+					include: [ authorId ],
+					who: 'authors',
+					context: 'view',
+				} )?.[ 0 ] ?? null
+			);
 		},
 		[ authorId, shouldFetch ]
 	);
@@ -64,7 +63,7 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 			) }
 			{ ! imageUrl && (
 				<div className="fields-controls__author-icon">
-					<Icon icon={ authorIcon } />
+					<WCIcon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="fields-controls__author-name">{ text }</span>

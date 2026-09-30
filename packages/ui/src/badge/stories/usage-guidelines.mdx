@@ -1,0 +1,131 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Badge usage guidelines
+
+## Choosing intent
+
+<Canvas of={ UsageGuidelinesStories.AllIntents } />
+
+It can be difficult to determine which badge intent to use because the component's properties are not tied to any specific product view. Those properties should be balanced against the requirements of the view in which the badge appears, all while keeping an eye on high-level consistency (global statuses that appear across multiple views).
+
+Here is a decision tree to help identify which badge to use.
+
+### 1. Ask first: should this draw the eye?
+
+If the user scans this screen, should their attention be drawn to this badge?
+
+-   If **no** → use `none` (or even just plain text; no badge), even if the state is positive or "stable".
+-   If **yes** → pick an intent based on how important the action or awareness is.
+
+### 2. High / Medium / Low = action priority
+
+Use when there's something for the user to act on.
+
+#### `high` – Critical / top priority
+
+-   Needs attention as soon as possible
+-   _E.g. "Payment declined", "Security issue"_
+
+<Canvas of={ UsageGuidelinesStories.High } />
+
+#### `medium` – Important / blocks progress
+
+-   Blocks a key task, should be handled soon
+-   _E.g. "Approval required", "Review needed"_
+
+<Canvas of={ UsageGuidelinesStories.Medium } />
+
+#### `low` – Worth noticing / non‑urgent
+
+-   Good to be aware of; action may be optional or later
+-   _E.g. "Pending", "Queued", "Minor issues", "Optional setup"_
+
+<Canvas of={ UsageGuidelinesStories.Low } />
+
+### 3. Informational / draft = special non-final states
+
+#### `informational` – Notable, no action / fix needed
+
+-   Context only; no clear action
+-   _E.g. "Scheduled", "Beta", "Internal only"_
+
+<Canvas of={ UsageGuidelinesStories.Informational } />
+
+#### `draft` – Not final / work in progress
+
+-   _E.g. "Draft", "Unpublished", "Work in progress"_
+
+<Canvas of={ UsageGuidelinesStories.Draft } />
+
+### 4. Stable / none = normal states
+
+#### `stable` – Positive / "healthy" state
+
+-   Use when confirming success or "all good" is important in that view
+-   _E.g. "Healthy", "Active", "Live"_
+
+<Canvas of={ UsageGuidelinesStories.Stable } />
+
+#### `none` – Default for normal / background states
+
+-   Especially in dense lists where too much color creates visual noise
+-   _E.g. "Inactive", "Expired"_
+
+<Canvas of={ UsageGuidelinesStories.None } />
+
+### Examples
+
+#### Comment status
+
+-   "Approved" → `none`
+-   "Approval required" → `medium`
+
+<Canvas of={ UsageGuidelinesStories.CommentStatus } />
+
+#### Page status
+
+-   "Published" → `none`
+-   "Pending" → `low`
+-   "Draft" → `draft`
+-   "Scheduled" → `informational`
+-   "Private" → `informational`
+
+<Canvas of={ UsageGuidelinesStories.PageStatus } />
+
+#### Plugin status
+
+-   "Active" → `stable`
+-   "Inactive" → `none`
+
+<Canvas of={ UsageGuidelinesStories.PluginStatus } />
+
+### 5. When in doubt…
+
+Use the least attention‑grabbing intent that still:
+
+-   Makes it clear what needs attention,
+-   Marks what isn't final, or
+-   Confirms a key success state in that context.
+
+## Using with icons
+
+`Badge` is text-only. Intent is communicated through color and label — not through icons inside the badge.
+
+### ❌ Don't
+
+-   **Put icons inside badges.** A status icon duplicates what the intent color and label already convey.
+
+<Canvas of={ UsageGuidelinesStories.IncorrectBadgeWithIcon } />
+
+### ✅ Do
+
+-   **Use text-only badges.** In most cases, the intent color and label are enough. Adding a status icon inside the badge duplicates information and adds visual noise, especially in dense lists.
+
+<Canvas of={ UsageGuidelinesStories.TextOnlyBadges } />
+
+-   **Keep nearby icons separate.** When a row already includes a content icon (e.g. post type, plugin), use that icon for identity and let the badge communicate status on its own.
+
+<Canvas of={ UsageGuidelinesStories.WithAdjacentContentIcon } />

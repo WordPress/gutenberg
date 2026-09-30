@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
@@ -38,11 +35,11 @@ export default function pluginKnownWpdsCssVariables( {
 					continue;
 				}
 
+				// Resolver tokens share the resolver's source location, so group by
+				// the stable token namespace. This matches the documentation plugin.
 				const group =
-					token.token.source.loc
-						?.split( '/' )
-						.at( -1 )
-						?.split( '.json' )[ 0 ] ?? 'unknown';
+					token.token.id.split( '.' )[ 0 ]?.replace( /^wpds-/, '' ) ||
+					'unknown';
 
 				const isBrandToken = token.localID.includes( 'brand' );
 
@@ -56,7 +53,10 @@ export default function pluginKnownWpdsCssVariables( {
 					tokenEntry.modes = {
 						default: {
 							$value: token.token.$value,
-							css: token.value as string,
+							css:
+								typeof token.value === 'string'
+									? token.value
+									: '',
 						},
 					};
 				}

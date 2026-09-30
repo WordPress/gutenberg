@@ -1,14 +1,81 @@
+const {
+	createPrivateApisState,
+	trackPrivateApisSpecifier,
+	getPropertyName,
+	getUnlockDestructuring,
+} = require( '../utils/private-apis' );
+
 /**
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
  *
+ * Components in `caution` are marked "Use with caution". They are flagged
+ * unless the `allowUseWithCaution` option is enabled.
+ *
  * `message` supports `{{ name }}` and `{{ source }}` placeholders.
  *
- * @type {Record<string, { allowed: string[], message?: string }>}
+ * @type {Record<string, { allowed: string[], caution?: string[], message?: string }>}
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
-		allowed: [ 'Badge', 'Stack' ],
+		allowed: [
+			'Autocomplete',
+			'Badge',
+			'Calendar',
+			'Card',
+			'Collapsible',
+			'CollapsibleCard',
+			'ControlWithError',
+			'EmptyState',
+			'Field',
+			'Fieldset',
+			'Icon',
+			'Input',
+			'InputControl',
+			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
+			'Link',
+			'RangeCalendar',
+			'SearchableChipSelect',
+			'SearchableChipSelectControl',
+			'Select',
+			'SelectControl',
+			'Skeleton',
+			'Spinner',
+			'Stack',
+			'Tabs',
+			'Text',
+			'Textarea',
+			'TextareaControl',
+			'Tooltip',
+			'ValidatedInputControl',
+			'ValidatedTextareaControl',
+			'ValidityIndicator',
+			'VisuallyHidden',
+			'useKeyboardShortcutProps',
+		],
+		caution: [
+			'AlertDialog',
+			'Breadcrumb',
+			'Button',
+			'Checkbox',
+			'CheckboxGroup',
+			'Combobox',
+			'Dialog',
+			'Drawer',
+			'IconButton',
+			'LinkButton',
+			'Menu',
+			'Notice',
+			'Popover',
+			'Radio',
+			'RadioGroup',
+			'SearchableSelect',
+			'SearchableSelectControl',
+			'Switch',
+			'SwitchControl',
+		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
@@ -24,8 +91,53 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
-		__experimentalZStack:
+		ExternalLink:
+			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
+		__experimentalDivider:
+			'Use a Separator subcomponent such as `Menu.Separator` from `@wordpress/ui` when one exists. Otherwise write your own CSS, preferably using the design tokens available in `@wordpress/theme`.',
+		__experimentalElevation:
+			'Use elevation tokens from `@wordpress/base-styles` instead.',
+		__experimentalGrid:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
+		__experimentalScrollable: 'Write your own CSS instead.',
+		__experimentalSpacer: '{{ name }} is planned for deprecation.',
+		__experimentalSurface:
+			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
+		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalView: '{{ name }} is planned for deprecation.',
+		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
+		__experimentalZStack: 'Write your own CSS instead.',
+		Animate:
+			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
+		BaseControl:
+			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
+		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
+		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
+		CardDivider: 'A divider is no longer a standard pattern for cards.',
+		CardFooter: 'A footer is no longer a standard pattern for cards.',
+		CardHeader:
+			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
+		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FlexBlock:
+			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FlexItem:
+			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		__experimentalInputControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
+		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TabbableContainer: '{{ name }} is planned for deprecation.',
+		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TextControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
+		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };
 
@@ -38,9 +150,22 @@ const rule = {
 				'Encourage the use of recommended UI components in a WordPress environment.',
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
 		},
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					allowUseWithCaution: {
+						type: 'boolean',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const { allowUseWithCaution = false } = context.options[ 0 ] ?? {};
+		const privateApisState = createPrivateApisState();
+
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
 			ImportDeclaration( node ) {
@@ -53,20 +178,30 @@ const rule = {
 				const allowlistEntry = ALLOWLIST[ source ];
 				const denylistEntry = DENYLIST[ source ];
 
-				if ( ! allowlistEntry && ! denylistEntry ) {
-					return;
-				}
-
 				node.specifiers.forEach( ( specifier ) => {
 					if ( specifier.type !== 'ImportSpecifier' ) {
 						return;
 					}
 
 					const name = specifier.imported.name;
+					trackPrivateApisSpecifier(
+						privateApisState,
+						specifier,
+						source,
+						!! denylistEntry
+					);
+
+					if ( ! allowlistEntry && ! denylistEntry ) {
+						return;
+					}
 
 					if (
 						allowlistEntry &&
-						! allowlistEntry.allowed.includes( name )
+						! allowlistEntry.allowed.includes( name ) &&
+						! (
+							allowUseWithCaution &&
+							allowlistEntry.caution?.includes( name )
+						)
 					) {
 						context.report( {
 							node: specifier,
@@ -88,6 +223,39 @@ const rule = {
 							),
 						} );
 					}
+				} );
+			},
+			/** @param {import('estree').VariableDeclarator} node */
+			VariableDeclarator( node ) {
+				const unlockDestructuring = getUnlockDestructuring(
+					node,
+					context.sourceCode,
+					privateApisState
+				);
+				if ( ! unlockDestructuring ) {
+					return;
+				}
+
+				const { source, properties } = unlockDestructuring;
+				const denylistEntry = DENYLIST[ source ];
+				if ( ! denylistEntry ) {
+					return;
+				}
+
+				properties.forEach( ( property ) => {
+					const name = getPropertyName( property.key );
+					if ( ! name || ! denylistEntry.hasOwnProperty( name ) ) {
+						return;
+					}
+
+					context.report( {
+						node: property.key,
+						message: resolveMessage(
+							denylistEntry[ name ],
+							name,
+							source
+						),
+					} );
 				} );
 			},
 		};

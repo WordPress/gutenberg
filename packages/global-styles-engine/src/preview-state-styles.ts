@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { generateGlobalStyles } from './core/render';
 import type { GlobalStylesConfig } from './types';
 
@@ -36,7 +33,7 @@ export function generatePreviewStateStyles(
 		const [ generatedStyles ] = generateGlobalStyles( previewConfig, [] );
 
 		return generatedStyles.map( ( style ) => style.css ).join( '\n' );
-	} catch ( error ) {
+	} catch {
 		// If generation fails, return empty string to avoid breaking previews
 		return '';
 	}

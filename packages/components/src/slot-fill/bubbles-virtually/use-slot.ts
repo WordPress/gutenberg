@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { useObservableValue } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import SlotFillContext from '../context';
 import type { SlotKey, SlotRef } from '../types';
 

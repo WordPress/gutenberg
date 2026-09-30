@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-import { Card, CardHeader, CardBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { Card } from '@wordpress/ui';
 import DataViews from '../index';
 import {
 	LAYOUT_GRID,
@@ -39,28 +32,32 @@ const WithCardComponent = ( {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 	return (
-		<Card>
-			<CardHeader>Header</CardHeader>
-			<CardBody style={ { height: containerHeight, minHeight: 0 } }>
-				<DataViews
-					getItemId={ ( item ) => item.id.toString() }
-					paginationInfo={ paginationInfo }
-					data={ shownData }
-					view={ view }
-					fields={ fields }
-					onChangeView={ setView }
-					actions={ actions.filter(
-						( action ) => ! action.supportsBulk
-					) }
-					defaultLayouts={ {
-						[ LAYOUT_TABLE ]: {},
-						[ LAYOUT_GRID ]: {},
-						[ LAYOUT_LIST ]: {},
-						[ LAYOUT_ACTIVITY ]: {},
-					} }
-				/>
-			</CardBody>
-		</Card>
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Header</Card.Title>
+			</Card.Header>
+			<Card.Content style={ { height: containerHeight, minHeight: 0 } }>
+				<Card.FullBleed>
+					<DataViews
+						getItemId={ ( item ) => item.id.toString() }
+						paginationInfo={ paginationInfo }
+						data={ shownData }
+						view={ view }
+						fields={ fields }
+						onChangeView={ setView }
+						actions={ actions.filter(
+							( action ) => ! action.supportsBulk
+						) }
+						defaultLayouts={ {
+							[ LAYOUT_TABLE ]: true,
+							[ LAYOUT_GRID ]: true,
+							[ LAYOUT_LIST ]: true,
+							[ LAYOUT_ACTIVITY ]: true,
+						} }
+					/>
+				</Card.FullBleed>
+			</Card.Content>
+		</Card.Root>
 	);
 };
 
