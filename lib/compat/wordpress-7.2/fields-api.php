@@ -19,6 +19,13 @@
  * {@see Gutenberg_Fields_Registry::unregister()}. The functions below read the
  * registry.
  *
+ * Fields can also be declared as files, grouped in a field collection, which
+ * a `fields_api_init` callback registers with
+ * {@see gutenberg_register_field_collection()}. The fields a collection for
+ * every post type derives from the supports of each post type can be
+ * excluded per post type with the `fields_api_exclude_post_type_supports`
+ * filter.
+ *
  * @package gutenberg
  */
 
@@ -213,13 +220,12 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 }
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
 
-
 /**
- * Returns the fields of a collection of the fields WordPress core registers.
+ * Returns the fields of a field collection.
  *
  * A collection holds a folder per field, whose `field.php` returns the
  * serializable part of the field, see
- * {@see _gutenberg_get_field_collections()}.
+ * {@see gutenberg_register_field_collection()}.
  *
  * @param string $directory The directory of the collection.
  * @return array<string, array> The fields of the collection, keyed by id, in
@@ -289,6 +295,251 @@ function _gutenberg_post_type_meets_field_support( $post_type, $condition ) {
 
 	$arguments = get_all_post_type_supports( $post_type )[ $condition[0] ] ?? null;
 	return is_array( $arguments ) && (bool) array_filter( array_column( $arguments, $condition[1] ) );
+}
+
+/**
+ * Reads and validates a field collection, see
+ * {@see gutenberg_register_field_collection()} for its format.
+ *
+ * An invalid configuration or field is reported with _doing_it_wrong(): the
+ * collection or the field is skipped.
+ *
+ * @param string $directory The directory of the collection.
+ * @return array|null The configuration of the collection, with the `module`
+ *                    key set and its valid `fields` as a list, or null when
+ *                    the configuration is invalid.
+ */
+function _gutenberg_get_field_collection( $directory ) {
+	$slug   = basename( $directory );
+	$file   = $directory . '/index.php';
+	$config = is_file( $file ) ? require $file : null;
+	$error  = null;
+
+	if ( ! is_array( $config ) ) {
+		$error = __( 'The `index.php` of a field collection must return an array.', 'gutenberg' );
+	} elseif ( ! isset( $config['origin'] ) || ! is_string( $config['origin'] ) || '' === $config['origin'] ) {
+		$error = __( 'The `origin` of a field collection must be a non-empty string.', 'gutenberg' );
+	} elseif ( ! isset( $config['kind'] ) || ! is_string( $config['kind'] ) || '' === $config['kind'] ) {
+		$error = __( 'The `kind` of a field collection must be a non-empty string.', 'gutenberg' );
+	} elseif ( ! array_key_exists( 'name', $config ) || ( null !== $config['name'] && ( ! is_string( $config['name'] ) || '' === $config['name'] ) ) ) {
+		$error = __( 'The `name` of a field collection must be a non-empty string, or null for every entity of the kind.', 'gutenberg' );
+	} elseif ( null === $config['name'] && 'postType' !== $config['kind'] ) {
+		$error = __( 'Only the `postType` kind supports field collections for every entity of the kind: the `name` must be a string.', 'gutenberg' );
+	} elseif ( isset( $config['module'] ) && ( ! is_string( $config['module'] ) || '' === $config['module'] ) ) {
+		$error = __( 'The `module` of a field collection must be the id of a script module.', 'gutenberg' );
+	}
+
+	if ( null !== $error ) {
+		_doing_it_wrong(
+			'gutenberg_register_field_collection',
+			/* translators: 1: The name of a field collection. 2: The error. */
+			sprintf( __( 'The field collection "%1$s" is skipped. %2$s', 'gutenberg' ), $slug, $error ),
+			'7.2.0'
+		);
+		return null;
+	}
+
+	$universal = null === $config['name'];
+	$fields    = array();
+	foreach ( gutenberg_get_field_collection_fields( $directory ) as $id => $field ) {
+		if ( $universal && ! _gutenberg_is_field_support_condition( $field['supports'] ?? null ) ) {
+			$error = __( 'A field of a collection for every entity of the kind must set `supports` to a support name, or a support and argument pair.', 'gutenberg' );
+		} elseif ( ! $universal && array_key_exists( 'supports', $field ) ) {
+			$error = __( 'Only the fields of a collection for every entity of the kind can set `supports`.', 'gutenberg' );
+		} else {
+			$fields[] = $field;
+			continue;
+		}
+
+		_doing_it_wrong(
+			'gutenberg_register_field_collection',
+			/* translators: 1: The id of a field. 2: The name of a field collection. 3: The error. */
+			sprintf( __( 'The field "%1$s" of the collection "%2$s" is skipped. %3$s', 'gutenberg' ), $id, $slug, $error ),
+			'7.2.0'
+		);
+	}
+
+	return array_merge(
+		$config,
+		array(
+			'module' => $config['module'] ?? null,
+			'fields' => $fields,
+		)
+	);
+}
+
+/**
+ * Returns the ids of the fields a post type does not get from a collection
+ * for every post type, from the `fields_api_exclude_post_type_supports`
+ * filter.
+ *
+ * @param string $post_type  The post type.
+ * @param array  $collection The configuration of the collection, as
+ *                           returned by {@see _gutenberg_get_field_collection()}.
+ * @return true|string[] The ids of the excluded fields, or true for all of
+ *                       them.
+ */
+function _gutenberg_get_excluded_post_type_supports( $post_type, $collection ) {
+	unset( $collection['fields'] );
+
+	/**
+	 * Filters the fields a post type does not get from the field collections
+	 * for every post type, whose fields derive from the supports of each post
+	 * type (like the default `author`, `comment_status`, and `notesCount`
+	 * fields).
+	 *
+	 * A post type whose fields differ from the defaults opts out of some or
+	 * all of them here, and registers its own if needed: the registry
+	 * refuses a field registered twice for the same entity. Callbacks
+	 * compose: add to the incoming list rather than replacing it, and keep
+	 * `true` when it comes in.
+	 *
+	 * The filter runs when the registry fires `fields_api_init`, on its first
+	 * read after `init`: add callbacks on plugin load or on `init`, not
+	 * later.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param true|string[] $excluded   The ids of the fields the post type does
+	 *                                  not get from the collection, or true
+	 *                                  for all of them. Default empty array.
+	 * @param string        $post_type  The post type.
+	 * @param array         $collection {
+	 *     The configuration of the collection, as its `index.php` returns it.
+	 *
+	 *     @type string      $origin Who registers the fields of the collection.
+	 *     @type string      $kind   The entity kind, `postType`.
+	 *     @type null        $name   The entity name, null for every post type.
+	 *     @type string|null $module The id of the script module of the
+	 *                               collection, if any.
+	 * }
+	 */
+	$excluded = apply_filters( 'fields_api_exclude_post_type_supports', array(), $post_type, $collection );
+
+	if ( true === $excluded || ( is_array( $excluded ) && array_is_list( $excluded ) && count( array_filter( $excluded, 'is_string' ) ) === count( $excluded ) ) ) {
+		return $excluded;
+	}
+
+	_doing_it_wrong(
+		'gutenberg_register_field_collection',
+		sprintf(
+			/* translators: 1: The name of a filter. 2: A post type. */
+			__( 'The %1$s filter must return true, or a list of field ids. Nothing is excluded for the post type "%2$s".', 'gutenberg' ),
+			'<code>fields_api_exclude_post_type_supports</code>',
+			$post_type
+		),
+		'7.2.0'
+	);
+	return array();
+}
+
+/**
+ * Registers the fields of a field collection.
+ *
+ * A collection is a folder whose `index.php` returns its configuration, with
+ * a folder per field whose `field.php` returns the serializable part of the
+ * field (see {@see gutenberg_get_field_collection_fields()}). The
+ * JavaScript parts of the fields, if any, ship in the script module of the
+ * collection. The configuration is an array with these keys:
+ *
+ * - `origin` (required): who registers the fields: `core`, or the slug of
+ *   the plugin or theme. See {@see Gutenberg_Fields_Registry::register()}.
+ * - `kind` (required): the entity kind, e.g. `postType`.
+ * - `name` (required, may be null): the entity name, e.g. `wp_template`.
+ *   Null makes the collection apply to every entity of the kind, which only
+ *   the `postType` kind supports: every post type exposed in the REST API.
+ *   Each field of such a collection declares, as its `supports`, the
+ *   support condition a post type must meet to get it: a support name
+ *   (`'author'`), or a support and one of its arguments
+ *   (`array( 'editor', 'notes' )`). The fields of a collection for a single
+ *   entity do not set it.
+ * - `module` (optional): the id of the script module providing the
+ *   JavaScript parts of the fields. Every field of the collection is
+ *   registered with it.
+ *
+ * A collection for a single entity registers its fields on it. A
+ * collection for a post type that does not exist or is not exposed in the
+ * REST API registers nothing.
+ *
+ * A collection for every post type registers, on each post type exposed in
+ * the REST API, the fields whose `supports` condition the post type meets,
+ * minus those the `fields_api_exclude_post_type_supports` filter excludes
+ * for it. The `supports` of a field only decides where it applies: it is
+ * not registered.
+ *
+ * The fields keep the alphabetical order of their folders, and follow the
+ * fields registered on the entity before. There is no precedence between
+ * collections: the registry refuses a field registered twice for an entity,
+ * so a collection redefining a field of a collection for every post type
+ * needs the post type to exclude it with the filter.
+ *
+ * It must be called on the `fields_api_init` action, with the registry its
+ * callbacks receive. The fields of the post types depend on their supports,
+ * which are final once `init` has completed, when the action fires.
+ *
+ * An invalid configuration or field, and an invalid value of the filter,
+ * are reported with _doing_it_wrong() and skipped.
+ *
+ * @since 7.2.0
+ *
+ * @param Gutenberg_Fields_Registry $registry  The registry, as received by
+ *                                             the `fields_api_init` action.
+ * @param string                    $directory The directory of the
+ *                                             collection.
+ * @return bool Whether the collection is valid and the registry accepted
+ *              all of its fields. True as well when no fields applied.
+ */
+function gutenberg_register_field_collection( $registry, $directory ) {
+	if ( ! $registry instanceof Gutenberg_Fields_Registry ) {
+		_doing_it_wrong(
+			__FUNCTION__,
+			__( 'Field collections are registered on the registry the `fields_api_init` action passes to its callbacks.', 'gutenberg' ),
+			'7.2.0'
+		);
+		return false;
+	}
+
+	$collection = _gutenberg_get_field_collection( $directory );
+	if ( null === $collection ) {
+		return false;
+	}
+	if ( empty( $collection['fields'] ) ) {
+		return true;
+	}
+
+	$post_types = get_post_types( array( 'show_in_rest' => true ) );
+
+	if ( null !== $collection['name'] ) {
+		// Like the collections for every post type, only the post types
+		// exposed in the REST API.
+		if ( 'postType' === $collection['kind'] && ! in_array( $collection['name'], $post_types, true ) ) {
+			return true;
+		}
+		return $registry->register( $collection['origin'], $collection['kind'], $collection['name'], $collection['fields'], $collection['module'] );
+	}
+
+	$registered = true;
+	foreach ( $post_types as $post_type ) {
+		$excluded = _gutenberg_get_excluded_post_type_supports( $post_type, $collection );
+		if ( true === $excluded ) {
+			continue;
+		}
+
+		$fields = array();
+		foreach ( $collection['fields'] as $field ) {
+			if ( in_array( $field['id'], $excluded, true ) || ! _gutenberg_post_type_meets_field_support( $post_type, $field['supports'] ) ) {
+				continue;
+			}
+			unset( $field['supports'] );
+			$fields[] = $field;
+		}
+
+		if ( ! empty( $fields ) ) {
+			$registered = $registry->register( $collection['origin'], 'postType', $post_type, $fields, $collection['module'] ) && $registered;
+		}
+	}
+
+	return $registered;
 }
 
 /**

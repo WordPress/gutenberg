@@ -8,6 +8,9 @@
  * @covers ::gutenberg_get_field_collection_fields
  * @covers ::_gutenberg_is_field_support_condition
  * @covers ::_gutenberg_post_type_meets_field_support
+ * @covers ::_gutenberg_get_field_collection
+ * @covers ::_gutenberg_get_excluded_post_type_supports
+ * @covers ::gutenberg_register_field_collection
  * @covers ::_gutenberg_get_field_collections
  * @covers ::_gutenberg_register_core_field_collections
  * @covers Gutenberg_Fields_Registry::initialize
@@ -33,6 +36,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	private $core_collections_unhooked = false;
 
 	/**
+	 * The post types a test registered, unregistered on tear down.
+	 *
+	 * @var string[]
+	 */
+	private $post_types = array();
+
+	/**
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
@@ -48,6 +58,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			add_action( 'fields_api_init', '_gutenberg_register_core_field_collections', 0 );
 			$this->core_collections_unhooked = false;
 		}
+		foreach ( $this->post_types as $post_type ) {
+			unregister_post_type( $post_type );
+		}
+		$this->post_types = array();
 		self::reset_registry();
 
 		parent::tear_down();
@@ -161,6 +175,55 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			},
 			0
 		);
+	}
+
+	/**
+	 * Registers the fields of fixture collections instead of the core
+	 * collections, for the duration of the test: the loader of the core
+	 * collections is unhooked, then hooked back on tear down.
+	 *
+	 * @param string   $fixture     The folder of the collections, in
+	 *                              data/core-fields/collections.
+	 * @param string[] $collections The collections to register, in order.
+	 * @return bool[] What gutenberg_register_field_collection() returned for
+	 *                each collection, keyed by collection.
+	 */
+	private function register_fixture_collections( $fixture, $collections ) {
+		remove_action( 'fields_api_init', '_gutenberg_register_core_field_collections', 0 );
+		$this->core_collections_unhooked = true;
+
+		$directory = __DIR__ . '/data/core-fields/collections/' . $fixture;
+		$results   = array();
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( $directory, $collections, &$results ) {
+				foreach ( $collections as $collection ) {
+					$results[ $collection ] = gutenberg_register_field_collection( $registry, $directory . '/' . $collection );
+				}
+			},
+			0
+		);
+		return $results;
+	}
+
+	/**
+	 * Registers the fixture post types a test uses, exposed in the REST API
+	 * unless hidden. They are unregistered on tear down.
+	 *
+	 * @param array<string, array> $post_types The supports, keyed by post type.
+	 * @param string[]             $hidden     The post types not exposed in
+	 *                                         the REST API.
+	 */
+	private function register_post_types( $post_types, $hidden = array() ) {
+		foreach ( $post_types as $post_type => $supports ) {
+			$this->post_types[] = $post_type;
+			register_post_type(
+				$post_type,
+				array(
+					'show_in_rest' => ! in_array( $post_type, $hidden, true ),
+					'supports'     => $supports,
+				)
+			);
+		}
 	}
 
 	/**
@@ -724,6 +787,209 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$reported,
 			'Each invalid collection and field is reported: no origin, no name, a kind other than `postType` for every entity, exclusions for every entity, an invalid exclusion, a field of every entity without `supports`, and a field of an entity with one.'
 		);
+	}
+
+	/**
+	 * The public function registers a collection for every post type on the
+	 * post types meeting the `supports` of each field, a support name or a
+	 * support and argument pair, minus the fields the filter excludes: a
+	 * list of ids, or all of them. A collection for a single post type
+	 * registers its fields after them. Each field carries the origin and
+	 * the module of its collection, and not its `supports`.
+	 */
+	public function test_a_collection_places_its_fields() {
+		$supports = array(
+			'title',
+			'author',
+			'comments',
+			'editor' => array( 'notes' => true ),
+		);
+		$this->register_post_types(
+			array(
+				'gutenberg_book'     => $supports,
+				'gutenberg_novel'    => $supports,
+				'gutenberg_magazine' => $supports,
+				'gutenberg_plain'    => array( 'title', 'editor' ),
+				'gutenberg_hidden'   => $supports,
+			),
+			array( 'gutenberg_hidden' )
+		);
+		add_filter(
+			'fields_api_exclude_post_type_supports',
+			static function ( $excluded, $post_type ) {
+				if ( 'gutenberg_novel' === $post_type ) {
+					return array_merge( $excluded, array( 'authorship', 'margin_notes' ) );
+				}
+				return 'gutenberg_magazine' === $post_type ? true : $excluded;
+			},
+			10,
+			2
+		);
+
+		$results = $this->register_fixture_collections( 'valid', array( 'everywhere', 'book', 'magazine', 'hidden' ) );
+
+		$fields  = array();
+		$modules = array();
+		foreach ( array( 'gutenberg_book', 'gutenberg_novel', 'gutenberg_magazine', 'gutenberg_plain', 'gutenberg_hidden' ) as $post_type ) {
+			$fields[ $post_type ]  = gutenberg_get_registered_fields( 'postType', $post_type );
+			$modules[ $post_type ] = gutenberg_get_registered_field_modules( 'postType', $post_type );
+		}
+
+		$this->assertSame(
+			array(
+				'everywhere' => true,
+				'book'       => true,
+				'magazine'   => true,
+				'hidden'     => true,
+			),
+			$results,
+			'A valid collection returns true, even when its post type is not exposed in the REST API.'
+		);
+		$this->assertSame(
+			array( 'authorship', 'discussion', 'margin_notes', 'subtitle' ),
+			array_column( $fields['gutenberg_book'], 'id' ),
+			'The fields of the collection registered first come first.'
+		);
+		$this->assertSame(
+			array(
+				'fixture/everywhere' => array( 'authorship', 'discussion', 'margin_notes' ),
+				'fixture/book'       => array( 'subtitle' ),
+			),
+			$modules['gutenberg_book'],
+			'Each field is registered with the module of its collection.'
+		);
+		$this->assertSame( array( 'fixture' ), array_unique( array_column( array_column( $fields['gutenberg_book'], 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
+		foreach ( $fields['gutenberg_book'] as $field ) {
+			$this->assertArrayNotHasKey( 'supports', $field, 'The `supports` of a field is not registered.' );
+		}
+
+		$this->assertSame( array( 'discussion' ), array_column( $fields['gutenberg_novel'], 'id' ), 'A list of ids excludes those fields.' );
+		$this->assertSame( array( 'issue' ), array_column( $fields['gutenberg_magazine'], 'id' ), 'Excluding `true` excludes every field of the collection.' );
+		$this->assertSame( array(), $modules['gutenberg_magazine'], 'A collection without module registers none.' );
+		$this->assertSame( array(), $fields['gutenberg_plain'], 'A bare `editor` support meets no support and argument pair.' );
+		$this->assertSame( array(), $fields['gutenberg_hidden'], 'A post type not exposed in the REST API gets no fields.' );
+	}
+
+	/**
+	 * Callbacks of the filter compose: the exclusions of each apply.
+	 */
+	public function test_the_exclusions_of_the_callbacks_compose() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array(
+					'title',
+					'author',
+					'comments',
+					'editor' => array( 'notes' => true ),
+				),
+			)
+		);
+		foreach ( array( 'authorship', 'discussion' ) as $id ) {
+			add_filter(
+				'fields_api_exclude_post_type_supports',
+				static function ( $excluded ) use ( $id ) {
+					if ( true !== $excluded ) {
+						$excluded[] = $id;
+					}
+					return $excluded;
+				}
+			);
+		}
+
+		$this->register_fixture_collections( 'valid', array( 'everywhere' ) );
+
+		$this->assertSame( array( 'margin_notes' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+	}
+
+	/**
+	 * A value of the filter other than `true` or a list of field ids is
+	 * reported, and excludes nothing.
+	 */
+	public function test_an_invalid_exclusion_is_reported_and_excludes_nothing() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'author', 'comments' ) ) );
+		add_filter(
+			'fields_api_exclude_post_type_supports',
+			static function ( $excluded, $post_type ) {
+				return 'gutenberg_book' === $post_type ? 'authorship' : $excluded;
+			},
+			10,
+			2
+		);
+
+		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
+		$this->register_fixture_collections( 'valid', array( 'everywhere' ) );
+
+		$this->assertSame( array( 'authorship', 'discussion' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+	}
+
+	/**
+	 * There is no precedence between collections: a collection redefining a
+	 * field of a collection for every post type the post type does not
+	 * exclude is refused by the registry, like a plugin registering it.
+	 */
+	public function test_a_collection_redefining_a_field_not_excluded_is_refused() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'author' ) ) );
+
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$results = $this->register_fixture_collections( 'duplicate', array( 'everywhere', 'book' ) );
+		$fields  = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
+
+		$this->assertSame(
+			array(
+				'everywhere' => true,
+				'book'       => false,
+			),
+			$results,
+			'The refused collection returns false.'
+		);
+		$this->assertSame( array( 'authorship' ), array_column( $fields, 'id' ) );
+		$this->assertSame( 'Authorship', $fields[0]['label'], 'The field of every post type is kept.' );
+	}
+
+	/**
+	 * An invalid collection or field is reported and skipped; the valid
+	 * fields are registered.
+	 */
+	public function test_an_invalid_collection_or_field_is_skipped() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'author', 'comments' ) ) );
+
+		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
+		$reported = array();
+		$report   = static function ( $function_name, $message ) use ( &$reported ) {
+			if ( 'gutenberg_register_field_collection' === $function_name ) {
+				$reported[] = $message;
+			}
+		};
+		add_action( 'doing_it_wrong_run', $report, 10, 2 );
+		$results = $this->register_fixture_collections( 'invalid', array( 'everywhere', 'book', 'no_name', 'no_origin', 'taxonomies', 'missing' ) );
+		$ids     = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
+
+		$this->assertSame( array( 'authorship', 'subtitle' ), $ids );
+		$this->assertSame(
+			array(
+				'everywhere' => true,
+				'book'       => true,
+				'no_name'    => false,
+				'no_origin'  => false,
+				'taxonomies' => false,
+				'missing'    => false,
+			),
+			$results,
+			'An invalid configuration returns false; skipping an invalid field does not.'
+		);
+		$this->assertCount(
+			6,
+			$reported,
+			'Each invalid collection and field is reported: a field of every entity without `supports`, a field of an entity with one, no name, no origin, a kind other than `postType` for every entity, and a missing `index.php`.'
+		);
+	}
+
+	/**
+	 * A collection is registered on the registry `fields_api_init` passes.
+	 */
+	public function test_a_collection_needs_the_registry() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
+		$this->assertFalse( gutenberg_register_field_collection( null, __DIR__ . '/data/core-fields/collections/valid/book' ) );
 	}
 
 	/**
