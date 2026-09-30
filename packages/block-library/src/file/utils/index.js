@@ -5,6 +5,11 @@
  * @return {boolean} Whether or not the browser supports inline PDFs.
  */
 export const browserSupportsPdfs = () => {
+	// Use native feature detection if available.
+	if ( window.navigator.pdfViewerEnabled ) {
+		return true;
+	}
+
 	// Most mobile devices include "Mobi" in their UA.
 	if ( window.navigator.userAgent.indexOf( 'Mobi' ) > -1 ) {
 		return false;
@@ -49,7 +54,7 @@ const createActiveXObject = ( type ) => {
 	let ax;
 	try {
 		ax = new window.ActiveXObject( type );
-	} catch ( e ) {
+	} catch {
 		ax = undefined;
 	}
 	return ax;

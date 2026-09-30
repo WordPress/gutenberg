@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { orderEntityRecordsBySearch } from '../order-entity-records-by-search';
 
 const mockData = [

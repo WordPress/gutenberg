@@ -5,6 +5,7 @@
 ## Example
 
 See the `PreferencesModal` readme for usage info.
+
 ## Props
 ### sections
 

@@ -41,7 +41,6 @@ function MyCustomSelectControl() {
 	const [ , setFontSize ] = useState();
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -53,7 +52,6 @@ function MyControlledCustomSelectControl() {
 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -143,13 +141,6 @@ A handler for `focus` events on the trigger button.
 A handler for `blur` events on the trigger button.
 
 -   Required: No
-
-#### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Required: No
-- Default: `false`
 
 ## Related components
 

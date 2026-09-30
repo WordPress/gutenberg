@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../i18n-translator-comments';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
@@ -86,6 +82,22 @@ _x( '"%1$s"/ %2$s', 'caption' );
 // translators: %1$s: Title of a media work from Openverse; %2$s: Work's licence e.g: "CC0 1.0".
 _x( '"%1$s"/ %2$s', 'caption' );
 			`,
+		},
+		{
+			code: ` // translators: %s: Hello at 6:00 AM
+		i18n.sprintf( i18n.__( 'Hello at %s' ), '6:00 AM' );`,
+		},
+		{
+			code: `// translators: %.2f: Percentage
+		i18n.sprintf( i18n.__( 'Percentage: %.2f' ), 1.00 );`,
+		},
+		{
+			code: `// translators: %.*f: Percentage
+		i18n.sprintf( i18n.__( 'Percentage: %.*f' ), 2, 1.00 );`,
+		},
+		{
+			code: `// translators: %(named).2s: truncated name
+		i18n.sprintf( i18n.__( 'Truncated name: %(named).2s' ), { named: 'Long Name' } );`,
 		},
 	],
 	invalid: [

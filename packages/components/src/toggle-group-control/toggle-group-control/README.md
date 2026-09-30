@@ -1,12 +1,10 @@
 # `ToggleGroupControl`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
 
-This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
+This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use [`Tabs` from `@wordpress/ui`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tabs--docs) instead.
 
 Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
 
@@ -20,13 +18,7 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl
-			label="my label"
-			value="vertical"
-			isBlock
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		>
+		<ToggleGroupControl label="my label" value="vertical" isBlock>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
@@ -89,16 +81,9 @@ The value of the `ToggleGroupControl`.
 
 -   Required: No
 
-### `__next40pxDefaultSize`: `boolean`
+### `disabled`: `boolean`
 
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`
-
-### `__nextHasNoMarginBottom`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version.
+If true, every option is unselectable. The selected value is left as-is.
 
 -   Required: No
 -   Default: `false`

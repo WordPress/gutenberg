@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test,
 	expect,
@@ -74,9 +71,10 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeVisible();
 
 		// Click on the inline appender.
-		await page.click(
-			'css=.editor-styles-wrapper >> role=button[name="Add block"i]'
-		);
+		await page
+			.locator( '.editor-styles-wrapper' )
+			.getByRole( 'button', { name: 'Add block' } )
+			.click();
 
 		const inlineInserterSearchBox = page.locator(
 			'role=searchbox[name="Search"i]'
@@ -86,7 +84,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.keyboard.type( 'Search' );
 
-		await page.click( 'role=option[name="Search"i]' );
+		await page.getByRole( 'option', { name: 'Search' } ).click();
 
 		await page
 			.locator(
@@ -131,7 +129,7 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		await page.focus( 'text=First Paragraph' );
+		await page.getByText( 'First Paragraph' ).focus();
 		await editor.clickBlockToolbarButton( 'Options' );
 
 		await showMoreSettingsButton.click();
@@ -202,7 +200,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( inserterHeading ).toBeVisible();
 
 		// Open the Publish Settings.
-		await page.click( 'role=button[name="Publish Settings"i]' );
+		await page.getByRole( 'button', { name: 'Publish Settings' } ).click();
 
 		// Expect the Publish Settings outer section to be found.
 		const publishSettings = page.locator(
@@ -215,7 +213,9 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
-		await page.focus( 'role=document[name="Block: Paragraph"i]' );
+		await page
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
 		await page.keyboard.type( ' ' );
 
 		// Open the inserter outer section.
@@ -227,7 +227,10 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( publishSettings ).toBeHidden();
 
 		// Back to the widget areas panel.
-		await page.click( 'role=button[name=/Back$/] >> visible=true' );
+		await page
+			.getByRole( 'button', { name: /Back$/ } )
+			.filter( { visible: true } )
+			.click();
 
 		// Expect the inserter outer section to be closed.
 		await expect( inserterHeading ).toBeHidden();
@@ -235,6 +238,7 @@ test.describe( 'Widgets Customizer', () => {
 
 	test( 'should move focus to the block', async ( {
 		page,
+		editor,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -251,7 +255,10 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		// Navigate back to the parent panel.
-		await page.click( 'role=button[name=/Back$/] >> visible=true' );
+		await page
+			.getByRole( 'button', { name: /Back$/ } )
+			.filter( { visible: true } )
+			.click();
 
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 
@@ -267,12 +274,16 @@ test.describe( 'Widgets Customizer', () => {
 		const firstParagraphBlock = page.locator(
 			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		// Expect to focus on a already focused widget.
 		await paragraphWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editParagraphWidget.click();
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		const headingWidget = previewFrame.locator(
 			'.widget:has-text("First Heading")'
@@ -286,7 +297,7 @@ test.describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = page.locator(
-			'role=document[name="Block: Heading"i] >> text="First Heading"'
+			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
 	} );
@@ -315,9 +326,12 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Expect clicking on the section title should clear the selection.
 		{
-			await page.click(
-				'role=heading[name="Customizing ▸ Widgets Footer #1"i][level=3]'
-			);
+			await page
+				.getByRole( 'heading', {
+					name: 'Customizing ▸ Widgets Footer #1',
+					level: 3,
+				} )
+				.click();
 			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
@@ -326,7 +340,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Expect clicking on the preview iframe should clear the selection.
 		{
-			await page.click( '#customize-preview' );
+			await page.locator( '#customize-preview' ).click();
 			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
@@ -398,7 +412,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		// Testing removing the block.
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name=/Delete/]' );
+		await page.getByRole( 'menuitem', { name: /Delete/ } ).click();
 
 		// Add it back again using the variant.
 		const testWidgetBlock =
@@ -420,7 +434,9 @@ test.describe( 'Widgets Customizer', () => {
 		// Wait for publishing to finish.
 		await Promise.all( [
 			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
-			page.click( 'role=button[name="Publish"i]' ),
+			page
+				.getByRole( 'button', { name: 'Publish', exact: true } )
+				.click(),
 		] );
 		await expect(
 			page.locator( 'role=button[name="Published"i]' )
@@ -481,17 +497,20 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		await page.focus( 'text="First Paragraph"' );
+		await page.getByText( 'First Paragraph', { exact: true } ).focus();
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Group"i]' );
+		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		// Refocus the paragraph block.
-		await page.focus(
-			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
-		);
+		await page
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( {
+				has: page.getByText( 'First Paragraph', { exact: true } ),
+			} )
+			.focus();
 		await editor.clickBlockToolbarButton( 'Move to widget area' );
 
-		await page.click( 'role=menuitemradio[name="Footer #2"i]' );
+		await page.getByRole( 'menuitemradio', { name: 'Footer #2' } ).click();
 
 		// Should switch to and expand Footer #2.
 		await expect(
@@ -505,7 +524,9 @@ test.describe( 'Widgets Customizer', () => {
 			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
-		await expect( movedParagraphBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( movedParagraphBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should not render Block Settings sections', async ( {
@@ -537,7 +558,9 @@ test.describe( 'Widgets Customizer', () => {
 		// Click Publish
 		await Promise.all( [
 			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
-			page.click( 'role=button[name="Publish"i]' ),
+			page
+				.getByRole( 'button', { name: 'Publish', exact: true } )
+				.click(),
 		] );
 		// Wait for publishing to finish.
 		await expect(
@@ -545,17 +568,25 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeDisabled();
 
 		// Select the paragraph block
-		await page.focus( 'role=document[name="Block: Paragraph"i]' );
+		await page
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
 
 		// Click the three dots button, then click "Show More Settings".
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Show more settings"i]' );
+		await page
+			.getByRole( 'menuitem', { name: 'Show more settings' } )
+			.click();
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
-		await page.click( 'role=button[name="Typography options"i]' );
-		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
+		await page
+			.getByRole( 'button', { name: 'Typography options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.click();
 
-		await page.click( 'role=checkbox[name="Drop cap"i]' );
+		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).click();
 
 		// Now that we've made a change:
 		// (1) Publish button should be active
@@ -582,22 +613,178 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = page.locator(
-			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
-		);
-		await HTMLBlockTextarea.type( 'hello' );
+		await page.getByRole( 'button', { name: 'Edit HTML' } ).click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
+		await page.keyboard.type( 'hello' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		// Click Publish
 		await Promise.all( [
 			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
-			page.click( 'role=button[name="Publish"i]' ),
+			page
+				.getByRole( 'button', { name: 'Publish', exact: true } )
+				.click(),
 		] );
 
 		// reload
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+		await page
+			.locator( 'role=document[name="Block: Custom HTML"i]' )
+			.click();
+		await page.getByRole( 'button', { name: 'Edit code' } ).click();
+		await expect(
+			page.getByRole( 'dialog' ).getByRole( 'textbox' )
+		).toHaveText( 'hello' );
+	} );
 
-		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const welcomeGuideHeading = page.getByRole( 'heading', {
+			name: 'Welcome to block Widgets',
+			level: 1,
+		} );
+		await expect( welcomeGuideHeading ).toBeHidden();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+		// The welcome guide is not a preference, so the item is a plain menu
+		// item rather than a `menuitemcheckbox`.
+		await page.getByRole( 'menuitem', { name: 'Welcome Guide' } ).click();
+
+		await expect( welcomeGuideHeading ).toBeVisible();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/57678.
+	test( 'should keep the undo and redo buttons focusable when there is nothing to undo or redo', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+
+		// The buttons are announced as disabled, but they must not be
+		// natively disabled, otherwise they could not receive focus.
+		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( redoButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( undoButton ).toHaveJSProperty( 'disabled', false );
+		await expect( redoButton ).toHaveJSProperty( 'disabled', false );
+
+		await undoButton.focus();
+		await expect( undoButton ).toBeFocused();
+		await redoButton.focus();
+		await expect( redoButton ).toBeFocused();
+	} );
+
+	test( 'should navigate the document tools with the arrow keys', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+		const inserterToggle = documentTools.getByRole( 'button', {
+			name: 'Add block',
+		} );
+		const optionsToggle = documentTools.getByRole( 'button', {
+			name: 'Options',
+		} );
+
+		await undoButton.focus();
+		await expect( undoButton ).toBeFocused();
+
+		// The disabled undo and redo buttons are part of the arrow keys
+		// navigation, like in the other editors.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( redoButton ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( inserterToggle ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( optionsToggle ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( undoButton ).toBeFocused();
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect( optionsToggle ).toBeFocused();
+		await page.keyboard.press( 'Home' );
+		await expect( undoButton ).toBeFocused();
+		await page.keyboard.press( 'End' );
+		await expect( optionsToggle ).toBeFocused();
+
+		// The toolbar is a single tab stop.
+		await page.keyboard.press( 'Tab' );
+		await expect( documentTools.locator( ':focus' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'should undo and redo changes from the document tools', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+		const paragraphBlock = page.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		await widgetsCustomizerPage.addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+		await expect( paragraphBlock ).toHaveText( 'First Paragraph' );
+		await expect( undoButton ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		await undoButton.click();
+		await expect(
+			paragraphBlock.filter( { hasText: 'First Paragraph' } )
+		).toHaveCount( 0 );
+		await expect( redoButton ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		await redoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'First Paragraph' );
+		await expect( redoButton ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );
 
@@ -636,20 +823,23 @@ class WidgetsCustomizerPage {
 	 * @param {string} widgetAreaName The Widget Area's name to expand on.
 	 */
 	async expandWidgetArea( widgetAreaName ) {
-		await this.page.click( 'role=heading[name=/Widgets/i][level=3]' );
+		await this.page
+			.getByRole( 'heading', { name: /Widgets/i, level: 3 } )
+			.click();
 
-		await this.page.click(
-			`role=heading[name=/${ widgetAreaName }/i][level=3]`
-		);
+		await this.page
+			.getByRole( 'heading', { name: widgetAreaName, level: 3 } )
+			.click();
 	}
 
 	/**
 	 * @param {string} blockName The block to be added.
 	 */
 	async addBlock( blockName ) {
-		await this.page.click(
-			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
-		);
+		await this.page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Add block' } )
+			.click();
 
 		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
 
@@ -662,7 +852,9 @@ class WidgetsCustomizerPage {
 
 		await searchBox.type( blockName );
 
-		await this.page.click( `role=option[name="${ blockName }"]` );
+		await this.page
+			.getByRole( 'option', { name: blockName, exact: true } )
+			.click();
 
 		const addedBlock = this.page.locator(
 			'role=document >> css=.is-selected[data-block]'

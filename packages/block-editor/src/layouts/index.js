@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import flex from './flex';
 import flow from './flow';
 import constrained from './constrained';

@@ -1,12 +1,8 @@
 # RadioGroup
 
-<div class="callout callout-alert">
-This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.</p>
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 Use a RadioGroup component when you want users to select one option from a small set of options.
 
@@ -57,10 +53,10 @@ const MyControlledRadioRadioGroup = () => {
 	const [ checked, setChecked ] = useState( '25' );
 	return (
 		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
-			<Radio __next40pxDefaultSize value="25">25%</Radio>
-			<Radio __next40pxDefaultSize value="50">50%</Radio>
-			<Radio __next40pxDefaultSize value="75">75%</Radio>
-			<Radio __next40pxDefaultSize value="100">100%</Radio>
+			<Radio value="25">25%</Radio>
+			<Radio value="50">50%</Radio>
+			<Radio value="75">75%</Radio>
+			<Radio value="100">100%</Radio>
 		</RadioGroup>
 	);
 };
@@ -80,10 +76,10 @@ import {
 const MyUncontrolledRadioRadioGroup = () => {
 	return (
 		<RadioGroup label="Width" defaultChecked="25">
-			<Radio __next40pxDefaultSize value="25">25%</Radio>
-			<Radio __next40pxDefaultSize value="50">50%</Radio>
-			<Radio __next40pxDefaultSize value="75">75%</Radio>
-			<Radio __next40pxDefaultSize value="100">100%</Radio>
+			<Radio value="25">25%</Radio>
+			<Radio value="50">50%</Radio>
+			<Radio value="75">75%</Radio>
+			<Radio value="100">100%</Radio>
 		</RadioGroup>
 	);
 };

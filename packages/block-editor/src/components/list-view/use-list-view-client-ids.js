@@ -1,12 +1,4 @@
-/**
- * WordPress dependencies
- */
-
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -16,14 +8,14 @@ export default function useListViewClientIds( { blocks, rootClientId } ) {
 			const {
 				getDraggedBlockClientIds,
 				getSelectedBlockClientIds,
-				getEnabledClientIdsTree,
+				getListViewClientIdsTree,
 			} = unlock( select( blockEditorStore ) );
 
 			return {
 				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
 				clientIdsTree:
-					blocks ?? getEnabledClientIdsTree( rootClientId ),
+					blocks ?? getListViewClientIdsTree( rootClientId ),
 			};
 		},
 		[ blocks, rootClientId ]

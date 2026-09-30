@@ -2,7 +2,7 @@
 /**
  * Test `gutenberg_override_script`.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class Override_Script_Test extends WP_UnitTestCase {
@@ -40,7 +40,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
-		$this->assertEquals( array( 'dependency' ), $script->deps );
+		$this->assertSame( array( 'dependency' ), $script->deps );
 	}
 
 	/**
@@ -59,9 +59,9 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
-		$this->assertEquals( 'https://example.com/updated', $script->src );
-		$this->assertEquals( array( 'updated-dependency' ), $script->deps );
-		$this->assertEquals( 'updated-version', $script->ver );
+		$this->assertSame( 'https://example.com/updated', $script->src );
+		$this->assertSame( array( 'updated-dependency' ), $script->deps );
+		$this->assertSame( 'updated-version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}
 
@@ -81,9 +81,9 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-second-dummy-script', 'registered' );
-		$this->assertEquals( 'https://example.com/', $script->src );
-		$this->assertEquals( array( 'dependency' ), $script->deps );
-		$this->assertEquals( 'version', $script->ver );
+		$this->assertSame( 'https://example.com/', $script->src );
+		$this->assertSame( array( 'dependency' ), $script->deps );
+		$this->assertSame( 'version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}
 }

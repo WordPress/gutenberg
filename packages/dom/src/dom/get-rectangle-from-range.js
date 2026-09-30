@@ -1,11 +1,9 @@
-/**
- * Internal dependencies
- */
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
- * can be found.
+ * can be found. Use instead of `Range.getBoundingClientRect()`, which is often
+ * broken, especially for collapsed ranges.
  *
  * @param {Range} range The range.
  *
@@ -65,21 +63,72 @@ export default function getRectangleFromRange( range ) {
 		);
 	}
 
-	const { startContainer } = range;
+	const { startContainer, startOffset } = range;
 	const { ownerDocument } = startContainer;
+	assertIsDefined( ownerDocument, 'ownerDocument' );
 
-	// Correct invalid "BR" ranges. The cannot contain any children.
-	if ( startContainer.nodeName === 'BR' ) {
-		const { parentNode } = startContainer;
-		assertIsDefined( parentNode, 'parentNode' );
-		const index = /** @type {Node[]} */ (
-			Array.from( parentNode.childNodes )
-		).indexOf( startContainer );
-
-		assertIsDefined( ownerDocument, 'ownerDocument' );
+	// A range inside an element with no children, like a line break or the
+	// placeholder, is the same spot as the position before that element.
+	if (
+		startContainer.nodeType !== startContainer.TEXT_NODE &&
+		! startContainer.childNodes.length &&
+		startContainer.parentNode
+	) {
 		range = ownerDocument.createRange();
-		range.setStart( parentNode, index );
-		range.setEnd( parentNode, index );
+		range.setStartBefore( startContainer );
+		range.collapse( true );
+		return getRectangleFromRange( range );
+	}
+
+	// A collapsed range at an element offset has no rectangle. Translate it
+	// to the text offset next to it: the end of the text before or the start
+	// of the text after. When those sit on different lines the caret could
+	// be on either, so return null.
+	if ( startContainer.nodeType !== startContainer.TEXT_NODE ) {
+		let before = startContainer.childNodes[ startOffset - 1 ];
+		while ( before?.lastChild ) {
+			before = before.lastChild;
+		}
+		let after = startContainer.childNodes[ startOffset ];
+		while ( after?.firstChild ) {
+			after = after.firstChild;
+		}
+
+		let beforeRange;
+		if ( before && before.nodeType === before.TEXT_NODE ) {
+			beforeRange = ownerDocument.createRange();
+			beforeRange.setStart(
+				before,
+				/** @type {Text} */ ( before ).length
+			);
+			beforeRange.collapse( true );
+		}
+		let afterRange;
+		if ( after && after.nodeType === after.TEXT_NODE ) {
+			afterRange = ownerDocument.createRange();
+			afterRange.setStart( after, 0 );
+			afterRange.collapse( true );
+		}
+
+		if ( beforeRange && afterRange ) {
+			const beforeRect = beforeRange.getClientRects()[ 0 ];
+			const afterRect = afterRange.getClientRects()[ 0 ];
+			if (
+				beforeRect &&
+				afterRect &&
+				beforeRect.bottom <= afterRect.top
+			) {
+				return null;
+			}
+		}
+
+		if ( afterRange ) {
+			range = afterRange;
+		} else if ( beforeRange ) {
+			range = beforeRange;
+		} else {
+			return null;
+		}
 	}
 
 	const rects = range.getClientRects();
@@ -90,23 +139,35 @@ export default function getRectangleFromRange( range ) {
 		return null;
 	}
 
-	let rect = rects[ 0 ];
-
-	// If the collapsed range starts (and therefore ends) at an element node,
-	// `getClientRects` can be empty in some browsers. This can be resolved
-	// by adding a temporary text node with zero-width space to the range.
-	//
-	// See: https://stackoverflow.com/a/6847328/995445
-	if ( ! rect || rect.height === 0 ) {
+	// A collapsed range at a soft line wrap is equally ambiguous: the same
+	// position ends one line and starts the next. Some browsers (Gecko)
+	// return a single rectangle for it, on the upper line, regardless of
+	// where the caret is. Detect the boundary by measuring the characters
+	// around the position: when they sit on different lines, there is no
+	// way to know which line the caret is on, so don't return anything.
+	if (
+		rects.length === 1 &&
+		startContainer.nodeType === startContainer.TEXT_NODE &&
+		range.startOffset > 0 &&
+		range.startOffset < /** @type {Text} */ ( startContainer ).length
+	) {
 		assertIsDefined( ownerDocument, 'ownerDocument' );
-		const padNode = ownerDocument.createTextNode( '\u200b' );
-		// Do not modify the live range.
-		range = range.cloneRange();
-		range.insertNode( padNode );
-		rect = range.getClientRects()[ 0 ];
-		assertIsDefined( padNode.parentNode, 'padNode.parentNode' );
-		padNode.parentNode.removeChild( padNode );
+		const measure = (
+			/** @type {number} */ start,
+			/** @type {number} */ end
+		) => {
+			const charRange = ownerDocument.createRange();
+			charRange.setStart( startContainer, start );
+			charRange.setEnd( startContainer, end );
+			return charRange.getBoundingClientRect();
+		};
+		const before = measure( range.startOffset - 1, range.startOffset );
+		const after = measure( range.startOffset, range.startOffset + 1 );
+
+		if ( before.bottom <= after.top ) {
+			return null;
+		}
 	}
 
-	return rect;
+	return rects[ 0 ] ?? null;
 }

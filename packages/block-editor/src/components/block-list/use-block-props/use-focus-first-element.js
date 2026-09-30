@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	focus,
@@ -9,10 +6,6 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -29,9 +22,8 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
+		unlock( useSelect( blockEditorStore ) );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -55,6 +47,11 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		// Do not focus the block if it already contains the active element.
 		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+			return;
+		}
+
+		if ( initialPosition === true ) {
+			ref.current.focus();
 			return;
 		}
 
@@ -87,6 +84,47 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
+		// Do not place a caret when the target already contains one:
+		// while an editing host contains the target (the block supports
+		// `editableRoot`), the caret can be inside it without the target
+		// holding focus. Only a caret the rich text synchronized to the
+		// store (offsets present) is deliberate; a leftover one yields to
+		// an explicitly requested edge position (initialPosition -1).
+		const selection = ownerDocument.defaultView.getSelection();
+		const { clientId: selectionClientId, offset } = getSelectionStart();
+		const hasCaret =
+			!! selection.anchorNode && target.contains( selection.anchorNode );
+		const isDeliberate =
+			initialPosition === 0 ||
+			( offset !== undefined && selectionClientId === clientId );
+
+		if ( hasCaret && isDeliberate ) {
+			// The field applies the store selection when focused, so only
+			// move focus, unless an editing host containing the target has
+			// it.
+			const { activeElement } = ownerDocument;
+			const isHosted =
+				activeElement?.isContentEditable &&
+				activeElement.contains( target );
+			if ( ! isHosted ) {
+				target.focus();
+			}
+			return;
+		}
+
+		// Under the editing host the target is editable through the host
+		// and not a focus target of its own (no contenteditable attribute):
+		// place the caret at its edge directly. Focusing it then focuses
+		// the host (see RichText), which adopts the caret.
+		if ( target.isContentEditable && target.contentEditable !== 'true' ) {
+			selection.collapse(
+				target,
+				isReverse ? target.childNodes.length : 0
+			);
+			target.focus();
+			return;
+		}
+
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 

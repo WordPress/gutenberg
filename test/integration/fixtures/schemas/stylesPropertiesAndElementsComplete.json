@@ -3,7 +3,7 @@
 	"version": 3,
 	"styles": {
 		"blocks": {
-			"core/button": {
+			"core/paragraph": {
 				"invalidAdditionalProperty": true
 			}
 		}

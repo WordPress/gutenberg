@@ -15,7 +15,7 @@
  * consumer code might still be referencing them. In order to not break the Site Editor
  * flows, we don't fully remove the old routes, but redirect them to the core's one.
  *
- * @see https://github.com/WordPress/gutenberg/pull/41306
+ * @link https://github.com/WordPress/gutenberg/pull/41306
  *
  * @package gutenberg
  */
