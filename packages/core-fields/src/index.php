@@ -133,8 +133,9 @@ function register_core_post_type_supports_fields( $registry ) {
  * - Templates: `author`. Their author is the theme, plugin, site, or user
  *   that provides them rather than their post author, so the `wp_template`
  *   collection has its own author field.
- * - Template parts: `author`. They declare their own author field
- *   client-side.
+ * - Template parts: `author`. Their author is the theme, plugin, site, or
+ *   user that provides them too, so the `wp_template_part` collection has
+ *   its own author field.
  * - Templates, template parts, and patterns: `excerpt`. Their excerpt is
  *   their description: templates and patterns edit it with their own
  *   description fields, declared client-side (the one of patterns has the

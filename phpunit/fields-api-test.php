@@ -798,12 +798,20 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Template parts support authors but have their own client-side author
-	 * field, so they opt out of the default one.
+	 * Template parts support authors but their author is the theme, plugin,
+	 * site, or user that provides them: they opt out of the default author
+	 * field and their collection has its own, with its own script module.
 	 */
-	public function test_template_parts_do_not_get_the_default_author_field() {
+	public function test_template_parts_get_their_own_author_field() {
 		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
-		$this->assertSame( array(), self::get_support_field_ids( 'wp_template_part' ) );
+
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'wp_template_part' ), null, 'id' );
+		$this->assertSame( array( 'author' ), self::get_support_field_ids( 'wp_template_part' ), 'The default author field is not registered.' );
+		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template part author is not the integer post author.' );
+		$this->assertSame(
+			array( 'author' ),
+			gutenberg_get_registered_field_modules( 'postType', 'wp_template_part' )['@wordpress/core-fields/wp_template_part']
+		);
 	}
 
 	/**
