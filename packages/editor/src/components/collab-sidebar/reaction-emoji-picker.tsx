@@ -148,8 +148,10 @@ export function emojiToStorageKey(
 
 /**
  * The reaction emoji list from editor settings, falling back to the curated
- * defaults. The server injects it via `gutenberg_note_reaction_emojis`, so
- * the picker offers the set the REST API accepts. Malformed entries drop.
+ * defaults only when the setting is absent. The server injects it via
+ * `gutenberg_note_reaction_emojis`, so the picker offers the set the REST API
+ * accepts. Malformed entries drop, and an empty result stays empty: the
+ * server rejects the defaults' slugs once a filter removes them.
  *
  * @return The emoji list to offer in the picker.
  */
@@ -168,7 +170,7 @@ export function useReactionEmojis(): CuratedEmoji[] {
 				typeof entry.label === 'string' &&
 				typeof entry.value === 'string'
 		);
-		return valid.length ? valid : REACTION_EMOJIS;
+		return valid;
 	}, [] );
 }
 

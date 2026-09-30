@@ -92,7 +92,7 @@ describe( 'ReactionEmojiPicker', () => {
 			).toBeVisible();
 		} );
 
-		it( 'drops malformed entries and falls back to defaults when none survive', async () => {
+		it( 'drops malformed entries without restoring the defaults', async () => {
 			dispatch( blockEditorStore ).updateSettings( {
 				noteReactionEmojis: [
 					null,
@@ -100,11 +100,40 @@ describe( 'ReactionEmojiPicker', () => {
 					{ label: 'No emoji', value: 'no-emoji' },
 				],
 			} );
-			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
-
-			expect( await screen.findAllByRole( 'button' ) ).toHaveLength(
-				REACTION_EMOJIS.length
+			const { unmount } = render(
+				<ReactionEmojiPicker onSelect={ () => {} } />
 			);
+
+			expect(
+				screen.getByRole( 'group', {
+					name: 'Add an emoji reaction',
+				} )
+			).toBeInTheDocument();
+			expect( screen.queryAllByRole( 'button' ) ).toHaveLength( 0 );
+			// Unmount before `afterEach` restores the defaults, which would
+			// otherwise mount items whose Composite updates escape act().
+			unmount();
+		} );
+
+		it( 'keeps an explicitly empty filtered list empty', async () => {
+			// The server validates against the filtered list, so offering
+			// the defaults here would produce slugs it rejects.
+			dispatch( blockEditorStore ).updateSettings( {
+				noteReactionEmojis: [],
+			} );
+			const { unmount } = render(
+				<ReactionEmojiPicker onSelect={ () => {} } />
+			);
+
+			expect(
+				screen.getByRole( 'group', {
+					name: 'Add an emoji reaction',
+				} )
+			).toBeInTheDocument();
+			expect( screen.queryAllByRole( 'button' ) ).toHaveLength( 0 );
+			// Unmount before `afterEach` restores the defaults, which would
+			// otherwise mount items whose Composite updates escape act().
+			unmount();
 		} );
 	} );
 } );
@@ -175,6 +204,10 @@ describe( 'emojiToStorageKey', () => {
 	it( 'collapses a curated emoji to its slug', () => {
 		expect( emojiToStorageKey( '❤️' ) ).toBe( 'heart' );
 		expect( emojiToStorageKey( '❤' ) ).toBe( 'heart' );
+	} );
+
+	it( 'uses the hex key for a default emoji missing from the list', () => {
+		expect( emojiToStorageKey( '🎉', [] ) ).toBe( '1f389' );
 	} );
 
 	it( 'falls back to the padded hex key for other emoji', () => {

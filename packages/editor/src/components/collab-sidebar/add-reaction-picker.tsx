@@ -216,6 +216,11 @@ export function AddReactionButton( {
 
 	const showFullPicker = hasFullPicker && ! pickerFailed;
 
+	// With no Emojibase data and an emptied list there is nothing to pick.
+	if ( ! hasFullPicker && ! emojis.length ) {
+		return null;
+	}
+
 	return (
 		<Dropdown
 			className="editor-collab-sidebar-panel__add-reaction"

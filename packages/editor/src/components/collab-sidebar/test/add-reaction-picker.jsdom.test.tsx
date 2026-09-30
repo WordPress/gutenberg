@@ -81,6 +81,32 @@ describe( 'AddReactionButton', () => {
 		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
 	} );
 
+	it( 'renders nothing when the filtered list is empty and no Emojibase URL is set', () => {
+		act( () => {
+			dispatch( blockEditorStore ).updateSettings( {
+				noteReactionEmojis: [],
+			} );
+		} );
+		try {
+			render(
+				<AddReactionButton
+					noteId={ uniqueNoteId }
+					onToggleReaction={ vi.fn() }
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Add reaction' } )
+			).not.toBeInTheDocument();
+		} finally {
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteReactionEmojis: undefined,
+				} );
+			} );
+		}
+	} );
+
 	it( 'opens the full picker directly and stores a filter-provided emoji under its slug', async () => {
 		// With an Emojibase URL configured, "Add reaction" opens the full
 		// searchable picker straight away (no intermediate quick row).
