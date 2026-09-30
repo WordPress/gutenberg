@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockTreeVersion } from '../block-tree-version';
 
@@ -21,6 +22,7 @@ beforeAll( () => {
 		apiVersion: 3,
 		title: 'Container',
 		category: 'design',
+		attributes: {},
 		edit: () => null,
 		save: () => null,
 	} );

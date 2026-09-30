@@ -904,14 +904,10 @@ export function useSuggestionsProvider() {
 					);
 
 					if ( ! silent ) {
-						createNotice(
-							'snackbar' as any,
-							__( 'Suggestion applied.' ),
-							{
-								type: 'snackbar',
-								isDismissible: true,
-							}
-						);
+						createNotice( 'success', __( 'Suggestion applied.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
 					}
 				} catch ( error: any ) {
 					// Roll the attribute back so the block isn't left
@@ -1018,14 +1014,10 @@ export function useSuggestionsProvider() {
 					}
 
 					if ( ! silent ) {
-						createNotice(
-							'snackbar' as any,
-							__( 'Suggestion applied.' ),
-							{
-								type: 'snackbar',
-								isDismissible: true,
-							}
-						);
+						createNotice( 'success', __( 'Suggestion applied.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
 					}
 				} catch ( error: any ) {
 					createNotice(
@@ -1091,14 +1083,10 @@ export function useSuggestionsProvider() {
 				);
 
 				if ( ! silent ) {
-					createNotice(
-						'snackbar' as any,
-						__( 'Suggestion applied.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
+					createNotice( 'success', __( 'Suggestion applied.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
 				}
 			} catch ( error: any ) {
 				// Roll back the block change so the UI isn't left in a
@@ -1242,7 +1230,7 @@ export function useSuggestionsProvider() {
 
 						if ( ! silent ) {
 							createNotice(
-								'snackbar' as any,
+								'success',
 								__( 'Suggestion rejected.' ),
 								{ type: 'snackbar', isDismissible: true }
 							);
@@ -1388,14 +1376,10 @@ export function useSuggestionsProvider() {
 				}
 
 				if ( ! silent ) {
-					createNotice(
-						'snackbar' as any,
-						__( 'Suggestion rejected.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
+					createNotice( 'success', __( 'Suggestion rejected.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
 				}
 			} catch ( error: any ) {
 				createNotice(

@@ -2,11 +2,11 @@ import { createContext, useContext } from '@wordpress/element';
 import type { CropperState } from '../image-editor';
 import {
 	useMediaEditorState,
-	type MediaEditorController,
+	type MediaEditorSession,
 } from './use-media-editor-state';
 import type { CropOptionsSlice } from './types';
 
-const MediaEditorStateContext = createContext< MediaEditorController | null >(
+const MediaEditorStateContext = createContext< MediaEditorSession | null >(
 	null
 );
 
@@ -20,9 +20,9 @@ interface MediaEditorStateProviderProps {
 }
 
 /**
- * Provider that vends the composite media-editor controller via
- * context. Wrap the media editor in this so every consumer
- * (canvas, toolbar, sidebar) reads from the same store.
+ * Provider that vends the media editor session via context. Wrap
+ * the media editor in this so every consumer (canvas, toolbar,
+ * sidebar) reads from the same store.
  *
  * @param props
  * @param props.initialCropperState
@@ -47,12 +47,12 @@ export function MediaEditorStateProvider( {
 }
 
 /**
- * Consume the composite media-editor controller. Throws if used
+ * Consume the media editor session. Throws if used
  * outside a `<MediaEditorStateProvider>`.
  *
- * @return The composite controller.
+ * @return The media editor session.
  */
-export function useMediaEditor(): MediaEditorController {
+export function useMediaEditor(): MediaEditorSession {
 	const context = useContext( MediaEditorStateContext );
 	if ( ! context ) {
 		throw new Error(
