@@ -7,6 +7,7 @@ describe( 'attachment', () => {
 			'alt_text',
 			'caption',
 			'description',
+			'filesize',
 			'media_dimensions',
 			'mime_type',
 		] );
@@ -57,5 +58,25 @@ describe( 'attachment', () => {
 		expect( isVisible?.( { media_details: { width: 640 } } ) ).toBe(
 			false
 		);
+	} );
+
+	it.each( [
+		[ 512, '512 B' ],
+		[ 1024 * 50, '50 KB' ],
+		[ 1024 * 1024 * 2.5, '2.5 MB' ],
+	] )( 'formats a file size of %i bytes', ( filesize, expected ) => {
+		expect(
+			attachment.filesize.getValue?.( {
+				item: { media_details: { filesize } },
+			} )
+		).toBe( expected );
+	} );
+
+	it( 'hides the file size of the media without one', () => {
+		const { getValue, isVisible } = attachment.filesize;
+		expect(
+			getValue?.( { item: { media_details: { filesize: 0 } } } )
+		).toBe( '' );
+		expect( isVisible?.( {} ) ).toBe( false );
 	} );
 } );
