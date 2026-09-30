@@ -11,7 +11,7 @@ The fields of this package live in folders of `src`:
 -   `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type (`author`, `comment_status`, `discussion`, `excerpt`, `notesCount`, `ping_status`, `post-content-info`). They are registered in code, see below.
 -   `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template).
 -   `wp_template_part`: the fields template parts have instead of the defaults. It has no fields yet: template parts exclude the default author field, since they declare their own client-side.
--   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
+-   `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
 
 Each field has a folder:
 

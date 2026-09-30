@@ -40,7 +40,6 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor/tsconfig.build.json" },
-		{ "path": "../media-fields/tsconfig.build.json" },
 		{ "path": "../media-utils/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../plugins" },
