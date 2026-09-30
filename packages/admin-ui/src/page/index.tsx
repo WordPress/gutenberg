@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
-import type { PageComponents } from './types';
+import type { PageBadge, PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 import styles from './style.module.css';
@@ -24,7 +24,10 @@ function Page( {
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
-	badges?: React.ReactNode;
+	/**
+	 * Badges displayed alongside the page title.
+	 */
+	badges?: PageBadge[];
 	/**
 	 * Optional visual mark (icon, image, etc.) shown before the page title or breadcrumbs.
 	 *
@@ -63,7 +66,7 @@ function Page( {
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
 			{ ( title ||
 				breadcrumbs ||
-				badges ||
+				!! badges?.length ||
 				actions ||
 				visual ||
 				!! navigation?.items?.length ) && (
