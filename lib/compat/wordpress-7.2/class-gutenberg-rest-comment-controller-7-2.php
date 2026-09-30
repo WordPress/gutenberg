@@ -475,6 +475,15 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
+			// A reaction under a hidden note would escape the trash/restore cascade.
+			if ( in_array( $parent_comment->comment_approved, array( 'trash', 'spam' ), true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction cannot be added to a trashed or spam note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
 			// The parent note must belong to the post the reaction targets.
 			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
 				return new WP_Error(

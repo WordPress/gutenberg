@@ -628,6 +628,51 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A reaction created under a hidden note would never be reached by the
+	 * trash/restore cascade, so the note must be live.
+	 *
+	 * @dataProvider data_hidden_note_statuses
+	 *
+	 * @param string $status Status to move the parent note to.
+	 */
+	public function test_cannot_create_reaction_on_hidden_note( $status ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_comment_status( $note_id, $status );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => 'heart',
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Data provider for test_cannot_create_reaction_on_hidden_note().
+	 *
+	 * @return array[]
+	 */
+	public function data_hidden_note_statuses() {
+		return array(
+			'trash' => array( 'trash' ),
+			'spam'  => array( 'spam' ),
+		);
+	}
+
+	/**
 	 * Creating a note requires edit access to the target post.
 	 */
 	public function test_cannot_create_note_without_edit_post_capability() {
