@@ -12,8 +12,8 @@ import styles from './style.module.css';
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
  * for when to use `Button`, `IconButton`, `Link`, or `ButtonLink`.
  */
-export const ButtonLink = forwardRef< HTMLAnchorElement, ButtonLinkProps >(
-	function UnforwardedButtonLink(
+const ForwardedButtonLink = forwardRef< HTMLAnchorElement, ButtonLinkProps >(
+	function ButtonLink(
 		{
 			tone = 'brand',
 			variant = 'solid',
@@ -43,3 +43,5 @@ export const ButtonLink = forwardRef< HTMLAnchorElement, ButtonLinkProps >(
 		);
 	}
 );
+
+export { ForwardedButtonLink as ButtonLink };
