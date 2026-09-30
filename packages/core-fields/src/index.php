@@ -24,6 +24,7 @@
  * - `author`, for the post types supporting `author`.
  * - `comment_status`, for the post types supporting `comments`.
  * - `discussion`, for the post types supporting `comments` or `trackbacks`.
+ * - `excerpt`, for the post types supporting `excerpt`.
  * - `notesCount`, for the post types whose `editor` support has the `notes`
  *   argument.
  * - `ping_status`, for the post types supporting `trackbacks`.
@@ -52,6 +53,7 @@ function register_core_post_type_supports_fields( $registry ) {
 			'author'         => post_type_supports( $post_type, 'author' ),
 			'comment_status' => post_type_supports( $post_type, 'comments' ),
 			'discussion'     => post_type_supports( $post_type, 'comments' ) || post_type_supports( $post_type, 'trackbacks' ),
+			'excerpt'        => post_type_supports( $post_type, 'excerpt' ),
 			'notesCount'     => is_array( $editor ) && (bool) array_filter( array_column( $editor, 'notes' ) ),
 			'ping_status'    => post_type_supports( $post_type, 'trackbacks' ),
 		);
@@ -113,6 +115,10 @@ function register_core_post_type_supports_fields( $registry ) {
  *   collection has its own author field.
  * - Template parts: `author`. They declare their own author field
  *   client-side.
+ * - Templates, template parts, and patterns: `excerpt`. Their excerpt is
+ *   their description: templates and patterns edit it with their own
+ *   description fields, declared client-side (the one of patterns has the
+ *   `excerpt` id), and template parts do not show it.
  * - Attachments: every default field. The media editor has its own fields,
  *   declared client-side and in the `attachment` collection.
  *
@@ -130,6 +136,10 @@ function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $a
 		case 'wp_template':
 		case 'wp_template_part':
 			$excluded_fields[] = 'author';
+			$excluded_fields[] = 'excerpt';
+			break;
+		case 'wp_block':
+			$excluded_fields[] = 'excerpt';
 			break;
 		case 'attachment':
 			$excluded_fields = array_merge( $excluded_fields, $all_fields );

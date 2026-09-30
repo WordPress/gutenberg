@@ -6,6 +6,7 @@ describe( 'post_type_supports', () => {
 		expect( Object.keys( postTypeSupports ) ).toEqual( [
 			'author',
 			'discussion',
+			'excerpt',
 			'ping_status',
 		] );
 		expect( postTypeSupports.author ).toEqual( {

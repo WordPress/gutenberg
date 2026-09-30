@@ -16,11 +16,13 @@
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { fieldExtensions as author } from './author/field';
 import { fieldExtensions as discussion } from './discussion/field';
+import { fieldExtensions as excerpt } from './excerpt/field';
 import { fieldExtensions as pingStatus } from './ping_status/field';
 
 const fields: FieldsScriptParts = {
 	author,
 	discussion,
+	excerpt,
 	ping_status: pingStatus,
 };
 

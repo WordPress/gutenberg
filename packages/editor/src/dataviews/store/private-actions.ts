@@ -19,7 +19,6 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
-	excerptField,
 	featuredImageField,
 	dateField,
 	parentField,
@@ -263,9 +262,7 @@ export const registerPostTypeSchema =
 				// `viewable` alone is not the full condition (the type must
 				// also be public), so the field also checks each post.
 				! isDesignPostType && postTypeConfig.viewable && slugField,
-				! isDesignPostType &&
-					postTypeConfig.supports?.excerpt &&
-					excerptField,
+				'excerpt',
 				isPattern &&
 					postTypeConfig.supports?.excerpt &&
 					patternDescriptionField,
