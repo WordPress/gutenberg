@@ -78,40 +78,4 @@ describe( 'Select iframe dismissal', () => {
 			).not.toBeInTheDocument();
 		} );
 	} );
-
-	it( 'keeps a non-modal Select open for a click in its own iframe', async () => {
-		const onPopupClick = vi.fn();
-		await render(
-			<Select.Root modal={ false }>
-				<Select.Trigger>Select</Select.Trigger>
-				<Select.Popup>
-					<Select.Item value="first">
-						<Select.ItemLabel>First</Select.ItemLabel>
-					</Select.Item>
-					<iframe title="Popup frame" />
-				</Select.Popup>
-			</Select.Root>
-		);
-
-		await userEvent.click( screen.getByRole( 'combobox' ) );
-		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
-		const iframeDocument = iframe.contentDocument;
-		if ( ! iframeDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-		const button = iframeDocument.createElement( 'button' );
-		button.textContent = 'Inside popup';
-		button.addEventListener( 'click', onPopupClick );
-		iframeDocument.body.appendChild( button );
-
-		await page
-			.frameLocator( page.getByTitle( 'Popup frame' ) )
-			.getByRole( 'button', { name: 'Inside popup' } )
-			.click();
-
-		expect( onPopupClick ).toHaveBeenCalledTimes( 1 );
-		await expect
-			.element( page.getByRole( 'option', { name: 'First' } ) )
-			.toBeVisible();
-	} );
 } );

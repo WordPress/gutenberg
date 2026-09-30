@@ -1,6 +1,5 @@
 import { useCallback, useState } from '@wordpress/element';
 import {
-	getNodeDocument,
 	isInsideCurrentPopup,
 	useObserveIframePresses,
 } from './iframe-dismissal-utils';
@@ -9,6 +8,12 @@ type OpenChangeHandler< EventDetails > = (
 	open: boolean,
 	eventDetails: EventDetails
 ) => void;
+
+function getNodeDocument( node: Node | null ) {
+	return node?.nodeType === Node.DOCUMENT_NODE
+		? ( node as Document )
+		: ( node?.ownerDocument ?? null );
+}
 
 function dispatchOutsidePress( event: Event, ownerDocument: Document ) {
 	let frameElement = getNodeDocument( event.target as Node | null )
