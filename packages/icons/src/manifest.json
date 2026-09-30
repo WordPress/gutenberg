@@ -846,6 +846,11 @@
 		"filePath": "library/justify-right.svg"
 	},
 	{
+		"slug": "justify-space-around",
+		"label": "Justify Space Around",
+		"filePath": "library/justify-space-around.svg"
+	},
+	{
 		"slug": "justify-space-between",
 		"label": "Justify Space Between",
 		"filePath": "library/justify-space-between.svg"
