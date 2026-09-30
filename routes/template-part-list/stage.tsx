@@ -8,18 +8,25 @@ import {
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
+import type {
+	View,
+	Action,
+	Field,
+	SupportedLayouts,
+} from '@wordpress/dataviews';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import {
 	Button,
+	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 import { unlock } from '@wordpress/routes-lock-unlock';
@@ -32,7 +39,7 @@ import {
 import { previewField } from './fields/preview';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
@@ -167,15 +174,23 @@ function TemplatePartListView( {
 		postTypeQuery
 	);
 
-	const allFields = usePostFields( {
-		postType: TEMPLATE_PART_POST_TYPE,
+	// `usePostActions` below registers the post type's schema, which is what
+	// brings in the actions; the fields come straight from the server.
+	const {
+		fields: allFields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields< WpTemplatePart >( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
 	} );
 
 	// Hide area column except in 'All' tab, hide status, and disable area filtering
-	const fields = useMemo( () => {
-		return [ previewField ].concat(
-			allFields
-				.filter( ( field: { id: string } ) => {
+	const fields = useMemo< Field< WpTemplatePart >[] >( () => {
+		return [
+			previewField,
+			...allFields
+				.filter( ( field ) => {
 					// Hide area column in specific area tabs
 					if ( field.id === 'area' && area ) {
 						return false;
@@ -186,14 +201,14 @@ function TemplatePartListView( {
 					}
 					return true;
 				} )
-				.map( ( field: { id: string; filterBy?: any } ) => {
+				.map( ( field ) => {
 					// Disable area field filtering since we use tabs
 					if ( field.id === 'area' ) {
-						return { ...field, filterBy: false };
+						return { ...field, filterBy: false as const };
 					}
 					return field;
-				} )
-		);
+				} ),
+		];
 	}, [ allFields, area ] );
 
 	const { data: posts, paginationInfo } = useMemo( () => {
@@ -322,13 +337,18 @@ function TemplatePartListView( {
 					</Tabs>
 				</div>
 			) }
+			{ fieldsError && (
+				<Notice status="error" isDismissible={ false }>
+					{ fieldsError.message }
+				</Notice>
+			) }
 			<DataViews
 				data={ posts }
 				fields={ fields }
 				view={ view }
 				onChangeView={ onChangeView }
 				actions={ actions }
-				isLoading={ isResolving }
+				isLoading={ isResolving || isLoadingFields }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
