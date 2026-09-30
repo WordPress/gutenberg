@@ -6,6 +6,7 @@ describe( 'wp_template', () => {
 		expect( Object.keys( wpTemplate ) ).toEqual( [
 			'author',
 			'description',
+			'description_readonly',
 			'title',
 		] );
 	} );
@@ -41,5 +42,21 @@ describe( 'wp_template', () => {
 		expect( isVisible?.( { source: 'theme', has_theme_file: true } ) ).toBe(
 			false
 		);
+	} );
+
+	it( 'shows the description of the other templates read-only', () => {
+		const { isVisible } = wpTemplate.description_readonly;
+		expect(
+			isVisible?.( { source: 'theme', description: 'Shows posts.' } )
+		).toBe( true );
+		expect( isVisible?.( { source: 'theme' } ) ).toBe( false );
+		expect(
+			isVisible?.( {
+				source: 'custom',
+				has_theme_file: false,
+				is_custom: true,
+				description: 'Mine.',
+			} )
+		).toBe( false );
 	} );
 } );
