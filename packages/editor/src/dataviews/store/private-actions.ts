@@ -118,7 +118,7 @@ export function setIsReady( kind: string, name: string ) {
  * media editor lays them out in its own order, and media_thumbnail is not
  * included as it's shown in the canvas preview.
  */
-const MEDIA_FIELDS = [ mediaAuthorField, attachedToField, titleField ];
+const MEDIA_FIELDS = [ mediaAuthorField, attachedToField ];
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
