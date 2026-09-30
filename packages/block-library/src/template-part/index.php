@@ -24,10 +24,6 @@ function render_block_core_template_part( $attributes ) {
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 	$theme            = $attributes['theme'] ?? get_stylesheet();
 
-	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
-	// is set in `wp_debug_mode()`.
-	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
-
 	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
 		$template_part_id    = $theme . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
@@ -48,10 +44,20 @@ function render_block_core_template_part( $attributes ) {
 			)
 		);
 		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+		$block_template      = $template_part_post ? _build_block_template_result_from_post( $template_part_post ) : null;
 		// Can be a WP_Error if the post's `wp_theme` terms can't be read, even though the query
-		// matched on them. In debug mode, leave `$content` empty so the unavailable message
-		// below is shown. Otherwise, fall back to the theme file.
-		$block_template = $template_part_post ? _build_block_template_result_from_post( $template_part_post ) : null;
+		// matched on them. Report it and fall back to the theme file.
+		if ( is_wp_error( $block_template ) ) {
+			wp_trigger_error(
+				__FUNCTION__,
+				sprintf(
+					/* translators: 1: Template part ID, 2: Error message. */
+					__( 'Error when loading the template part %1$s from the database: %2$s' ),
+					$template_part_id,
+					$block_template->get_error_message()
+				)
+			);
+		}
 		if ( $block_template && ! is_wp_error( $block_template ) ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
@@ -70,7 +76,7 @@ function render_block_core_template_part( $attributes ) {
 			 * @param string  $content            The template part content.
 			 */
 			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
-		} elseif ( ! is_wp_error( $block_template ) || ! $is_debug ) {
+		} else {
 			$template_part_file_path = '';
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
@@ -117,6 +123,10 @@ function render_block_core_template_part( $attributes ) {
 			}
 		}
 	}
+
+	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+	// is set in `wp_debug_mode()`.
+	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
 	if ( is_null( $content ) ) {
 		if ( $is_debug && isset( $attributes['slug'] ) ) {

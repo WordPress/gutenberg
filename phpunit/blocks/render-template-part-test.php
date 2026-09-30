@@ -31,6 +31,7 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 
 	public function tear_down() {
 		remove_filter( 'pre_get_block_file_template', array( $this, 'filter_pre_get_block_file_template' ), 10 );
+		remove_filter( 'wp_trigger_error_trigger_error', '__return_false' );
 
 		if ( $this->get_the_terms_filter ) {
 			remove_filter( 'get_the_terms', $this->get_the_terms_filter, 10 );
@@ -91,101 +92,109 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		add_filter( 'get_the_terms', $this->get_the_terms_filter, 10, 3 );
 	}
 
+	/**
+	 * Records errors reported with `wp_trigger_error()`, and stops them from being raised
+	 * so the test can check the rendered output.
+	 *
+	 * @return MockAction The action that records each error.
+	 */
+	private function capture_errors() {
+		$error_action = new MockAction();
+		add_action( 'wp_trigger_error_always_run', array( $error_action, 'action' ), 10, 3 );
+		add_filter( 'wp_trigger_error_trigger_error', '__return_false' );
+
+		return $error_action;
+	}
+
+	/**
+	 * Asserts that the theme file was rendered in place of the customized template part,
+	 * and that one error was reported.
+	 *
+	 * @param string     $output          The rendered block.
+	 * @param MockAction $error_action    The action that records errors.
+	 * @param string     $slug            The template part slug.
+	 * @param string     $expected_reason The error message expected in the report.
+	 */
+	private function assert_falls_back_with_error( $output, $error_action, $slug, $expected_reason ) {
+		$this->assertStringContainsString( 'Theme file template part', $output );
+		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assertSame( 1, $error_action->get_call_count(), 'One error should be reported.' );
+
+		$message = $error_action->get_args()[0][1];
+		$this->assertStringContainsString( get_stylesheet() . '//' . $slug, $message );
+		$this->assertStringContainsString( $expected_reason, $message );
+	}
+
 	public function test_renders_customized_template_part_from_post() {
 		$this->create_template_part( 'test-customized' );
 
-		$post_action = new MockAction();
+		$error_action = $this->capture_errors();
+		$post_action  = new MockAction();
 		add_action( 'render_block_core_template_part_post', array( $post_action, 'action' ) );
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-customized"} /-->' );
 
 		$this->assertStringContainsString( 'Customized template part', $output );
 		$this->assertSame( 1, $post_action->get_call_count(), 'The post action should fire once.' );
+		$this->assertSame( 0, $error_action->get_call_count(), 'No error should be reported.' );
 	}
 
-	public function test_handles_error_when_theme_term_cache_is_empty() {
+	public function test_falls_back_to_theme_file_when_theme_term_cache_is_empty() {
 		$template_part_id = $this->create_template_part( 'test-empty-cache' );
 
 		// The post has a `wp_theme` term in the database, but the cache says it has none.
 		wp_cache_set( $template_part_id, array(), 'wp_theme_relationships' );
 
-		$post_action = new MockAction();
-		$file_action = new MockAction();
+		$error_action = $this->capture_errors();
+		$post_action  = new MockAction();
+		$file_action  = new MockAction();
 		add_action( 'render_block_core_template_part_post', array( $post_action, 'action' ) );
 		add_action( 'render_block_core_template_part_file', array( $file_action, 'action' ) );
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-empty-cache"} /-->' );
 
-		$this->assert_error_output( 'test-empty-cache', $output );
+		$this->assert_falls_back_with_error( $output, $error_action, 'test-empty-cache', 'No theme is defined for this template.' );
 		$this->assertSame( 0, $post_action->get_call_count(), 'The post action should not fire.' );
-		$this->assertSame( $this->is_debug() ? 0 : 1, $file_action->get_call_count(), 'The file action should only fire outside debug mode.' );
+		$this->assertSame( 1, $file_action->get_call_count(), 'The file action should fire once.' );
 	}
 
-	public function test_handles_error_when_theme_terms_are_filtered_out() {
+	public function test_falls_back_to_theme_file_when_theme_terms_are_filtered_out() {
 		$this->create_template_part( 'test-filtered-terms' );
 		$this->filter_wp_theme_terms( false );
+		$error_action = $this->capture_errors();
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-filtered-terms"} /-->' );
 
-		$this->assert_error_output( 'test-filtered-terms', $output );
+		$this->assert_falls_back_with_error( $output, $error_action, 'test-filtered-terms', 'No theme is defined for this template.' );
 	}
 
-	public function test_handles_error_when_theme_terms_are_an_error() {
+	public function test_falls_back_to_theme_file_when_theme_terms_are_an_error() {
 		$this->create_template_part( 'test-terms-error' );
 		$this->filter_wp_theme_terms( new WP_Error( 'test_error', 'Test error' ) );
+		$error_action = $this->capture_errors();
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"test-terms-error"} /-->' );
 
-		$this->assert_error_output( 'test-terms-error', $output );
+		$this->assert_falls_back_with_error( $output, $error_action, 'test-terms-error', 'Test error' );
 	}
 
 	public function test_renders_nothing_when_post_fails_to_load_and_there_is_no_theme_file() {
 		$this->create_template_part( self::NO_FILE_SLUG );
 		$this->filter_wp_theme_terms( false );
+		$error_action = $this->capture_errors();
 
 		$none_action = new MockAction();
 		add_action( 'render_block_core_template_part_none', array( $none_action, 'action' ) );
 
 		$output = do_blocks( '<!-- wp:template-part {"slug":"' . self::NO_FILE_SLUG . '"} /-->' );
 
-		$expected = $this->is_debug() ? $this->get_unavailable_message( self::NO_FILE_SLUG ) : '';
+		// Matches the output of the block when the template part can't be found.
+		$expected = WP_DEBUG && WP_DEBUG_DISPLAY
+			? sprintf( 'Template part has been deleted or is unavailable: %s', self::NO_FILE_SLUG )
+			: '';
 
 		$this->assertSame( $expected, $output );
-		$this->assertSame( $this->is_debug() ? 0 : 1, $none_action->get_call_count(), 'The none action should only fire outside debug mode.' );
-	}
-
-	/**
-	 * Whether the block shows debug messages, matching the check in the block.
-	 *
-	 * @return bool
-	 */
-	private function is_debug() {
-		return WP_DEBUG && WP_DEBUG_DISPLAY;
-	}
-
-	/**
-	 * Gets the message the block shows in debug mode when a template part is unavailable.
-	 *
-	 * @param string $slug The template part slug.
-	 * @return string
-	 */
-	private function get_unavailable_message( $slug ) {
-		return sprintf( 'Template part has been deleted or is unavailable: %s', $slug );
-	}
-
-	/**
-	 * Asserts the output when the customized template part fails to load: the unavailable
-	 * message in debug mode, and the theme file otherwise.
-	 *
-	 * @param string $slug   The template part slug.
-	 * @param string $output The rendered block.
-	 */
-	private function assert_error_output( $slug, $output ) {
-		if ( $this->is_debug() ) {
-			$this->assertSame( $this->get_unavailable_message( $slug ), $output );
-		} else {
-			$this->assertStringContainsString( 'Theme file template part', $output );
-		}
-		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
+		$this->assertSame( 1, $error_action->get_call_count(), 'One error should be reported.' );
 	}
 }
