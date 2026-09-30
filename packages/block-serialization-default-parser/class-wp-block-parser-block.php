@@ -14,7 +14,7 @@
  */
 class WP_Block_Parser_Block {
 	/**
-	 * Name of block
+	 * Name of block, or `null` when the block is top-level freeform HTML content.
 	 *
 	 * @example "core/paragraph"
 	 *
@@ -74,7 +74,7 @@ class WP_Block_Parser_Block {
 	 *
 	 * @since 5.0.0
 	 *
-	 * @param string|null $name          Name of block.
+	 * @param string|null $name          Name of block, or `null` for freeform HTML content.
 	 * @param array       $attrs         Optional set of attributes from block comment delimiters.
 	 * @param array       $inner_blocks  List of inner blocks (of this same class).
 	 * @param string      $inner_html    Resultant HTML from inside block comment delimiters after removing inner blocks.

@@ -67,7 +67,8 @@ class WP_Block_Parser {
 	 *     @type array ...$0 {
 	 *         An associative array of a single parsed block object. See WP_Block_Parser_Block.
 	 *
-	 *         @type string|null $blockName    Name of block.
+	 *         @type string|null $blockName    Name of block, or `null` when the block is
+	 *                                         top-level freeform HTML content.
 	 *         @type array       $attrs        Attributes from block comment delimiters.
 	 *         @type array[]     $innerBlocks  List of inner blocks. An array of arrays that
 	 *                                         have the same structure as this one.
