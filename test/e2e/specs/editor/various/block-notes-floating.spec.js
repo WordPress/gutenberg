@@ -1070,6 +1070,58 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( content ).toBeVisible();
 		} );
 
+		test( 'reflects the room for notes in the menu', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+			pageUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block notes' },
+				comment: 'A roomy note',
+			} );
+			await editor.openDocumentSettingsSidebar();
+			// Open by keyboard: resizing moves the menu, and a pointer left
+			// outside the submenu would close it.
+			await page.mouse.move( 0, 0 );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.focus();
+			await page.keyboard.press( 'Enter' );
+			await page
+				.getByRole( 'menuitem', { name: 'Notes', exact: true } )
+				.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			const expand = page.getByRole( 'menuitemradio', {
+				name: 'Expand notes',
+			} );
+			const minimize = page.getByRole( 'menuitemradio', {
+				name: 'Minimize notes',
+			} );
+			await expect( expand ).toBeEnabled();
+			await expect( expand ).toBeChecked();
+
+			// The menu follows the window while it's open.
+			await page.setViewportSize( { width: 1100, height: 900 } );
+			await expect( expand ).toBeDisabled();
+			await expect( expand ).toHaveAccessibleDescription(
+				'Not enough space.'
+			);
+			await expect( minimize ).toBeChecked();
+
+			await page.setViewportSize( { width: 1440, height: 900 } );
+			await expect( expand ).toBeEnabled();
+			await expect( expand ).toBeChecked();
+
+			// And the canvas, when a shortcut closes a sidebar.
+			await page.setViewportSize( { width: 1100, height: 900 } );
+			await expect( expand ).toBeDisabled();
+			await pageUtils.pressKeys( 'primaryShift+,' );
+			await expect( expand ).toBeEnabled();
+		} );
+
 		test( 'shows hidden notes when adding a note', async ( {
 			editor,
 			page,
