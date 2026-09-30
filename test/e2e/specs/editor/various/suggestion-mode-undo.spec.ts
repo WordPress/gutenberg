@@ -212,7 +212,7 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( summaries ).toHaveCount( 0 );
 	} );
 
-	test( 'undo reverts a type-over replacement and removes both notes', async ( {
+	test( 'undo reverts a type-over replacement and removes its note', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -232,7 +232,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'there' );
 
-		// Typing over a selection proposes a delete + add pair.
+		// Typing over a selection proposes one replacement: an add run and
+		// a del run sharing one note.
 		await expect(
 			paragraph.locator(
 				`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
@@ -244,10 +245,10 @@ test.describe( 'Suggestion mode undo', () => {
 			)
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const summaries = await openSuggestionSummaries( page );
-		await expect( summaries ).toHaveCount( 2 );
+		await expect( summaries ).toHaveCount( 1 );
 
 		// The replacement was one gesture, so one undo withdraws it whole:
-		// the proposed text, the deletion marker, and both notes.
+		// the proposed text, the deletion marker, and the note.
 		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect( paragraph ).toHaveText( 'Hello world' );

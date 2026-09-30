@@ -457,13 +457,14 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toContainText( 'Hello world' );
 	} );
 
-	test( 'type-over: replacing a selection becomes a del + add pair', async ( {
+	test( 'type-over: replacing a selection is one Replace suggestion', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
-		// Typing over a selection proposes deleting the old text and adding
-		// the replacement, as two adjacent markers.
+		// Typing over a selection proposes one replacement, as Google Docs
+		// does: the new text ahead of the struck-through old text, both
+		// owned by a single note (#73411).
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -479,16 +480,211 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'planet' );
 
-		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
-		).toContainText( 'world' );
+		const added = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		const deleted = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		await expect( added ).toHaveText( 'planet' );
+		await expect( deleted ).toHaveText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello planetworld' );
+
+		// One note id carried by both halves.
+		const id = await added.getAttribute( 'data-suggestion-id' );
+		expect( id ).toMatch( /\d/ );
+		await expect( deleted ).toHaveAttribute( 'data-suggestion-id', id! );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Replace:' );
+		await expect( summaries ).toContainText( '“world” → “planet”' );
+	} );
+
+	test( 'type-over: accepting the Replace suggestion applies both halves', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'planet' );
 		await expect(
 			paragraph.locator(
 				'mark.wp-suggestion[data-suggestion-type="add"]'
 			)
-		).toContainText( 'planet' );
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Accept suggestion' } )
+			.click();
+
+		await expect( paragraph ).toHaveText( 'Hello planet' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+	} );
+
+	test( 'type-over: rejecting the Replace suggestion restores the text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'planet' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.click();
+
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+	} );
+
+	test( 'Backspace corrects a typo in your own pending addition', async ( {
+		editor,
+		page,
+	} ) => {
+		// A suggester has to be able to fix what they are typing. Backspace
+		// over their own proposed text removes it rather than being refused
+		// as an edit inside an existing suggestion (#73411).
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' wrold' );
+
+		const added = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( added ).toHaveText( ' wrold' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'orld' );
+
+		await expect( added ).toHaveCount( 1 );
+		await expect( added ).toHaveText( ' world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveCount( 0 );
+	} );
+
+	test( 'Backspace corrects the new text of a type-over', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'This is your first doc' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 4 } );
+		await page.keyboard.type( 'mu' );
+
+		const added = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( added ).toHaveText( 'mu' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'y' );
+
+		await expect( added ).toHaveText( 'my' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveText( 'your' );
+		await expect( paragraph ).toHaveText( 'This is myyour first doc' );
 	} );
 
 	test( 'collapsed delete: Backspace at a caret marks the previous character', async ( {
