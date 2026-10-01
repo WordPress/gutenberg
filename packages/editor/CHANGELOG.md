@@ -32,6 +32,7 @@
 ### Internal
 
 -   The private `usePostFields` hook is gone. Every screen reads the fields of an entity with `useFields` from `@wordpress/fields-loader` instead.
+-   The `core/editor` store no longer holds the fields of an entity. `registerPostTypeSchema` registers only the actions of a post type, and the store's private `registerEntityField`, `unregisterEntityField` and `getEntityFields` are gone.
 -   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
 
 ## 15.1.0 (2026-09-23)
