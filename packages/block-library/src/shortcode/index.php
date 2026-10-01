@@ -16,7 +16,14 @@
  * @return string Returns the block content.
  */
 function render_block_core_shortcode( $attributes, $content ) {
-	return wpautop( $content );
+	$pattern = get_shortcode_regex();
+	$safe_content = wp_strip_all_tags( $content );
+
+	if ( preg_match_all( '/' . $pattern . '/s', $safe_content, $matches ) ) {
+		return wpautop( implode( "\n", $matches[0] ) );
+	}
+
+	return '';
 }
 
 /**
