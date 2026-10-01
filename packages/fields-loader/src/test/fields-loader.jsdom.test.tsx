@@ -5,7 +5,7 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveFieldsConfig, useFields } from '../fields-loader';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const CONFIG = {
 	kind: 'postType',
