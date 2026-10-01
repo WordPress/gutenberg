@@ -7,6 +7,7 @@
 -   Restore an image's original attachment and editable details from the media editor's More options menu ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
 -   Allow consumers to restore their own state with snackbar Undo after saving an image edit ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
 -   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass the `form` prop to `MediaForm` to show them.
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses when it is given no `form` prop.
 
 ### Bug Fixes
 

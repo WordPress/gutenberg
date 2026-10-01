@@ -1,11 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { DataForm } from '@wordpress/dataviews';
-import type { Field } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import MediaForm from '../index';
 import type { Media } from '../../media-editor-provider';
 
 let mockFields: Field< Media >[] = [];
+let mockForm: Form | undefined;
 
 vi.mock(
 	import( '@wordpress/dataviews' ),
@@ -22,6 +23,7 @@ vi.mock(
 			useMediaEditorContext: () => ( {
 				media: { id: 1 },
 				fields: mockFields,
+				form: mockForm,
 				onChange: () => {},
 			} ),
 		} ) as unknown as typeof import( '../../media-editor-provider' )
@@ -49,7 +51,28 @@ const CORE_FIELD_IDS = [
 ];
 
 describe( 'MediaForm', () => {
-	it( 'orders the default form whatever the order of the fields', () => {
+	beforeEach( () => {
+		mockFields = [];
+		mockForm = undefined;
+	} );
+
+	it( 'uses the form of the provider settings', () => {
+		mockForm = { fields: [ 'acme_credit', 'title' ] };
+
+		render( <MediaForm /> );
+
+		expect( getFormFieldIds() ).toEqual( [ 'acme_credit', 'title' ] );
+	} );
+
+	it( 'prefers the form prop over the form of the provider settings', () => {
+		mockForm = { fields: [ 'acme_credit', 'title' ] };
+
+		render( <MediaForm form={ { fields: [ 'caption' ] } } /> );
+
+		expect( getFormFieldIds() ).toEqual( [ 'caption' ] );
+	} );
+
+	it( 'falls back to the default form whatever the order of the fields', () => {
 		mockFields = [
 			'caption',
 			'attached_to',
