@@ -95,6 +95,26 @@ export default function BlockBindingsAttributeControl( {
 	const { source: boundSourceName, args } = binding || {};
 	const source = getBlockBindingsSource( boundSourceName );
 
+	// Mirror how blocks decide whether the bound value can be edited, so the
+	// panel explains the locked state a user sees on the canvas.
+	const isValueReadOnly = useSelect(
+		( select ) => {
+			if ( ! binding || ! source ) {
+				return false;
+			}
+			const sourceContext = {};
+			for ( const key of source.usesContext ?? [] ) {
+				sourceContext[ key ] = blockContext[ key ];
+			}
+			return ! source.canUserEditValue?.( {
+				select,
+				context: sourceContext,
+				args: binding.args,
+			} );
+		},
+		[ binding, source, blockContext ]
+	);
+
 	let displayText;
 	let isValid = true;
 
@@ -148,6 +168,11 @@ export default function BlockBindingsAttributeControl( {
 						>
 							{ displayText }
 						</WCText>
+						{ isValueReadOnly && (
+							<WCText truncate variant="muted">
+								{ __( 'Read-only' ) }
+							</WCText>
+						) }
 					</VStack>
 				</Menu.Trigger>
 				{ ! isAttributeReadOnly && (
