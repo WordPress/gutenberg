@@ -79,11 +79,32 @@ describe( 'useRunActions', () => {
 		} );
 
 		await act( async () => {
-			await expect( result.current.run( action ) ).rejects.toThrow(
-				'Export failed'
-			);
+			await result.current.run( action );
 		} );
 
 		expect( result.current.pendingIds.has( 'export' ) ).toBe( false );
+		expect( console ).toHaveErroredWith(
+			'Widget w1 action "export" failed.',
+			expect.objectContaining( { message: 'Export failed' } )
+		);
+	} );
+
+	it( 'logs a callback that throws before returning a promise', async () => {
+		const action = exportAction( () => {
+			throw new Error( 'Export failed' );
+		} );
+		const { result } = renderHook( () => useRunActions( 'w1' ), {
+			wrapper,
+		} );
+
+		await act( async () => {
+			await result.current.run( action );
+		} );
+
+		expect( result.current.pendingIds.has( 'export' ) ).toBe( false );
+		expect( console ).toHaveErroredWith(
+			'Widget w1 action "export" failed.',
+			expect.objectContaining( { message: 'Export failed' } )
+		);
 	} );
 } );
