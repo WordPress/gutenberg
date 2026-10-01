@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### New Features
+### Internal
 
--   `MediaEdit`, the DataForm control that shows and picks the media of a field, and its `MediaEditProps` type. They come from `@wordpress/fields`, which still exports them, and live here so the fields registered on the server can render the control from a script module.
+-   Host `MediaEdit`, the DataForm control that shows and picks the media of a field, as a private API. It comes from `@wordpress/fields` and lives here so the fields registered on the server can render the control from a script module.
 
 ### Bug Fixes
 
