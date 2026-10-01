@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
+import { inertValue } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
@@ -236,7 +237,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? 'true' : undefined,
+		inert: inertValue( isSubtreeDisabled ),
 		className: clsx(
 			'block-editor-block-list__block',
 			{
