@@ -1,14 +1,14 @@
 import { Page } from '@wordpress/admin-ui';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { DataForm, type Field } from '@wordpress/dataviews';
+import { DataForm } from '@wordpress/dataviews';
 import { useViewConfig } from '@wordpress/views';
-import { MediaEdit } from '@wordpress/fields';
+import { useFields } from '@wordpress/fields-loader';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
-import { useEffect, useState } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { inertValue } from '@wordpress/react-inert-value';
+import { Notice } from '@wordpress/ui';
 import styles from './style.module.scss';
 
 type SiteSettings = {
@@ -29,75 +29,32 @@ type SiteSettings = {
  * `routes/post-list`: ultimately a field should be able to declare this kind
  * of asset dependency itself; once that exists, remove this wrapper.
  */
-function MediaEditWithEditorAssets( props: any ) {
-	const [ isReady, setIsReady ] = useState(
-		() => !! ( window as any ).wp?.media
-	);
-	useEffect( () => {
-		if ( ! isReady ) {
-			loadEditorAssets().then( () => setIsReady( true ) );
-		}
-	}, [ isReady ] );
+function withEditorAssets( FieldEdit: any ) {
+	return function EditWithEditorAssets( props: any ) {
+		const [ isReady, setIsReady ] = useState(
+			() => !! ( window as any ).wp?.media
+		);
+		useEffect( () => {
+			if ( ! isReady ) {
+				loadEditorAssets().then( () => setIsReady( true ) );
+			}
+		}, [ isReady ] );
 
-	// Render the field right away — only opening the modal needs the
-	// assets — and keep it inert until they have loaded.
-	return (
-		<div
-			aria-busy={ ! isReady || undefined }
-			style={ ! isReady ? { opacity: 0.6 } : undefined }
-			inert={ inertValue( ! isReady ) }
-		>
-			<MediaEdit { ...props } />
-		</div>
-	);
+		// Render the field right away — only opening the modal needs the
+		// assets — and keep it inert until they have loaded.
+		return (
+			<div
+				aria-busy={ ! isReady || undefined }
+				style={ ! isReady ? { opacity: 0.6 } : undefined }
+				inert={ inertValue( ! isReady ) }
+			>
+				<FieldEdit { ...props } />
+			</div>
+		);
+	};
 }
 
-const fields: Field< SiteSettings >[] = [
-	{
-		id: 'title',
-		type: 'text',
-		label: __( 'Site Title' ),
-		description: __(
-			"Displays in your site's layout via the Site Title block."
-		),
-		getValue: ( { item } ) => decodeEntities( item.title ?? '' ),
-	},
-	{
-		id: 'description',
-		type: 'text',
-		label: __( 'Site Tagline' ),
-		description: __(
-			"In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block."
-		),
-		getValue: ( { item } ) => decodeEntities( item.description ?? '' ),
-	},
-	{
-		id: 'site_logo',
-		type: 'media',
-		label: __( 'Site Logo' ),
-		description: __(
-			"Displays in your site's layout via the Site Logo block."
-		),
-		placeholder: __( 'Choose logo' ),
-		Edit: MediaEditWithEditorAssets,
-		setValue: ( { value } ) => ( {
-			site_logo: value ?? 0,
-		} ),
-	},
-	{
-		id: 'site_icon',
-		type: 'media',
-		label: __( 'Site Icon' ),
-		description: __(
-			'Shown in browser tabs, bookmarks, and mobile apps. It should be square and at least 512 by 512 pixels.'
-		),
-		placeholder: __( 'Choose icon' ),
-		Edit: MediaEditWithEditorAssets,
-		setValue: ( { value } ) => ( {
-			site_icon: value ?? 0,
-		} ),
-	},
-];
+const MEDIA_FIELDS = [ 'site_logo', 'site_icon' ];
 
 /**
  * The stage only renders a form, so it requests the `form` of the entity view
@@ -123,6 +80,22 @@ function Identity() {
 		name: 'site',
 		fields: VIEW_CONFIG_FIELDS,
 	} );
+	// The fields come from the server, see the `root_site` collection of
+	// `@wordpress/core-fields`. The route loader warms them up.
+	const {
+		fields: _fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields< SiteSettings >( { kind: 'root', name: 'site' } );
+	const fields = useMemo(
+		() =>
+			_fields.map( ( field ) =>
+				MEDIA_FIELDS.includes( field.id ) && field.Edit
+					? { ...field, Edit: withEditorAssets( field.Edit ) }
+					: field
+			),
+		[ _fields ]
+	);
 
 	const onChange = ( edits: Record< string, any > ) => {
 		// The site entity is a singleton and has no record key.
@@ -138,12 +111,21 @@ function Identity() {
 	return (
 		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>
 			<div className={ styles.form }>
-				<DataForm
-					data={ data }
-					fields={ fields }
-					form={ form }
-					onChange={ onChange }
-				/>
+				{ fieldsError && (
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ fieldsError.message }
+						</Notice.Description>
+					</Notice.Root>
+				) }
+				{ ! isLoadingFields && ! fieldsError && (
+					<DataForm
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ onChange }
+					/>
+				) }
 			</div>
 		</Page>
 	);
