@@ -2357,9 +2357,9 @@ Example:
 
 ### `description`
 
-A string describing the form field's purpose or usage. Used to provide additional context.
+A description of the form field's purpose or usage. Used to provide additional context. Pass a React element to include markup such as a link.
 
--   Type: `string`.
+-   Type: `string | ReactElement`.
 -   Optional.
 
 Example:

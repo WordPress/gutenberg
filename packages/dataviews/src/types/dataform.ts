@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import type { Field, FieldValidity } from './field-api';
 
 /**
@@ -441,7 +442,7 @@ export type FormField = {
 	/**
 	 * A description overriding the field's own description.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * The layout used to render this field,
@@ -480,7 +481,7 @@ export type NormalizedFormField = {
 	/**
 	 * A description overriding the field's own description.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * Child fields, for layouts that group fields together.

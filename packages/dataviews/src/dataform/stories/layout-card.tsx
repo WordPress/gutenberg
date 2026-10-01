@@ -3,6 +3,13 @@ import { Badge } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 
+const fileDetailsDescription = (
+	<>
+		Size, dimensions, and type of the uploaded file.{ ' ' }
+		<a href="https://wordpress.org/documentation/">Learn more</a>
+	</>
+);
+
 const LayoutCardComponent = ( {
 	withHeader,
 	withSummary,
@@ -263,6 +270,7 @@ const LayoutCardComponent = ( {
 						isCollapsible,
 						isOpened,
 					} ),
+					description: fileDetailsDescription,
 					children: [ 'fileSize', 'dimensions', 'fileType' ],
 				},
 				{

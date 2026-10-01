@@ -944,6 +944,38 @@ describe( 'DataForm component', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		it( 'renders a React element as the description of a card', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: { type: 'card' },
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								description: (
+									<>
+										Edit the post details.{ ' ' }
+										<a href="https://example.com/docs">
+											View the documentation
+										</a>
+									</>
+								),
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'link', { name: 'View the documentation' } )
+			).toHaveAttribute( 'href', 'https://example.com/docs' );
+		} );
+
 		const fieldsWithRequiredTitle = fields.map( ( field ) =>
 			field.id === 'title'
 				? { ...field, isValid: { required: true } }
