@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
--   Remove the `MediaEdit` component and its `MediaEditProps` type. The control moved to `@wordpress/media-utils`, where it is a private API while it is iterated on.
+-   Stop exporting the `MediaEdit` component and its `MediaEditProps` type. The featured image field keeps rendering the control.
 
 ### Enhancements
 
