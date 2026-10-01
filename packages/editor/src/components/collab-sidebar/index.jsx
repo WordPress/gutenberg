@@ -21,11 +21,7 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import {
-	getNoteIdsFromMetadata,
-	pickIndicatorNotes,
-	pickPrimaryNote,
-} from './utils';
+import { getThreadParticipants, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -39,15 +35,12 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+	const { clientId, isClassicBlock } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
@@ -150,17 +143,22 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStyles();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// The avatar indicator stands for every thread on the block, so it gets
-	// the whole set and aggregates their participants.
-	const indicatorThreads = useMemo( () => {
-		const noteIds = getNoteIdsFromMetadata( { noteId } );
-		if ( noteIds.length === 0 ) {
+	// The avatar indicator stands for every unresolved thread on the selected
+	// block, falling back to all of them when none are unresolved.
+	const indicatorParticipants = useMemo( () => {
+		if ( ! clientId ) {
 			return [];
 		}
-		return pickIndicatorNotes(
-			notes.filter( ( thread ) => noteIds.includes( thread.id ) )
+		const blockThreads = notes.filter(
+			( thread ) => thread.blockClientId === clientId
 		);
-	}, [ notes, noteId ] );
+		const unresolved = blockThreads.filter(
+			( thread ) => thread.status === 'hold'
+		);
+		return getThreadParticipants(
+			unresolved.length > 0 ? unresolved : blockThreads
+		);
+	}, [ notes, clientId ] );
 
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
@@ -172,9 +170,9 @@ function NotesSidebar( { postId } ) {
 				threads={ unresolvedNotes }
 				selectedId={ selectedNoteId }
 			/>
-			{ indicatorThreads.length > 0 && (
+			{ indicatorParticipants.length > 0 && (
 				<NoteAvatarIndicator
-					notes={ indicatorThreads }
+					participants={ indicatorParticipants }
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }

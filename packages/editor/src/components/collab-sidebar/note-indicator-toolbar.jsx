@@ -1,14 +1,13 @@
 import { ToolbarButton } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor, getThreadParticipants } from './utils';
+import { getAvatarBorderColor } from './utils';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -63,27 +62,16 @@ function ThreadParticipants( { participants } ) {
 	);
 }
 
-export function NoteAvatarIndicator( { onClick, notes } ) {
-	// A block can carry several threads; the indicator stands for all of them,
-	// so aggregate the participants rather than showing a single thread's.
-	const threadParticipants = useMemo(
-		() => getThreadParticipants( notes ?? [] ),
-		[ notes ]
-	);
-
-	if ( ! threadParticipants.length ) {
-		return null;
-	}
-
+export function NoteAvatarIndicator( { onClick, participants } ) {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			<ToolbarButton
 				className="editor-note-indicator"
 				label={ __( 'View notes' ) }
-				onClick={ () => onClick() }
+				onClick={ onClick }
 				showTooltip
 			>
-				<ThreadParticipants participants={ threadParticipants } />
+				<ThreadParticipants participants={ participants } />
 			</ToolbarButton>
 		</NoteIconToolbarSlotFill.Fill>
 	);

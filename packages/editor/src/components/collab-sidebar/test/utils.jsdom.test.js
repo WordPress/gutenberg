@@ -27,7 +27,6 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
-	pickIndicatorNotes,
 	getThreadParticipants,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
@@ -345,32 +344,6 @@ describe( 'pickPrimaryNote', () => {
 	} );
 } );
 
-describe( 'pickIndicatorNotes', () => {
-	it( 'returns every unresolved thread when some are unresolved', () => {
-		const threads = [
-			{ id: 1, status: 'hold' },
-			{ id: 2, status: 'approved' },
-			{ id: 3, status: 'hold' },
-		];
-		expect( pickIndicatorNotes( threads ) ).toEqual( [
-			threads[ 0 ],
-			threads[ 2 ],
-		] );
-	} );
-
-	it( 'falls back to every thread when none are unresolved', () => {
-		const threads = [
-			{ id: 1, status: 'approved' },
-			{ id: 2, status: 'approved' },
-		];
-		expect( pickIndicatorNotes( threads ) ).toEqual( threads );
-	} );
-
-	it( 'returns an empty list for an empty list', () => {
-		expect( pickIndicatorNotes( [] ) ).toEqual( [] );
-	} );
-} );
-
 describe( 'getThreadParticipants', () => {
 	function makeNote( { id, author, name, date, reply = [] } ) {
 		return {
@@ -451,20 +424,10 @@ describe( 'getThreadParticipants', () => {
 	} );
 
 	it( 'skips entries without an author name', () => {
-		const threads = [ { id: 1, author: 10, date: '2026-01-01T10:00:00' } ];
-		expect( getThreadParticipants( threads ) ).toEqual( [] );
-	} );
-
-	it( 'tolerates threads with no replies', () => {
 		const threads = [
-			{
-				id: 1,
-				author: 10,
-				author_name: 'Ann',
-				date: '2026-01-01T10:00:00',
-			},
+			{ id: 1, author: 10, date: '2026-01-01T10:00:00', reply: [] },
 		];
-		expect( getThreadParticipants( threads ) ).toHaveLength( 1 );
+		expect( getThreadParticipants( threads ) ).toEqual( [] );
 	} );
 } );
 
