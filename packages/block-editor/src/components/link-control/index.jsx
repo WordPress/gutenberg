@@ -243,14 +243,14 @@ function LinkControl( {
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
 
-	// Choosing a suggestion with Tab fills the input with its URL without
-	// selecting it. Remember the suggestion, so that submitting selects it
-	// rather than a plain URL, until the input is edited.
-	const filledSuggestionRef = useRef();
+	// Tab selects a suggestion by filling the input with its URL. Remember the
+	// suggestion, so that submitting adds it rather than a plain URL, until
+	// the input is edited.
+	const tabSelectedSuggestionRef = useRef();
 
 	// Wrapper for input changes that calls both internal and external handlers
 	const handleInputChange = ( newValue, suggestion ) => {
-		filledSuggestionRef.current = suggestion;
+		tabSelectedSuggestionRef.current = suggestion;
 		setInternalURLInputValue( newValue );
 		onInputChange?.( newValue );
 	};
@@ -520,9 +520,9 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		const filledSuggestion = filledSuggestionRef.current;
-		if ( filledSuggestion?.url === currentUrlInputValue ) {
-			handleSelectSuggestion( filledSuggestion );
+		const tabSelectedSuggestion = tabSelectedSuggestionRef.current;
+		if ( tabSelectedSuggestion?.url === currentUrlInputValue ) {
+			handleSelectSuggestion( tabSelectedSuggestion );
 			return;
 		}
 

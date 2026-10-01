@@ -1087,9 +1087,9 @@ describe( 'Link submission', () => {
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
 
-	describe( 'after choosing a suggestion with Tab', () => {
-		// Tab puts the suggestion's URL in the input and moves focus on to the
-		// submit button, so submitting must keep the suggestion it came from.
+	describe( 'after selecting a suggestion with Tab', () => {
+		// Tab selects a suggestion by putting its URL in the input, and moves
+		// focus on to the submit button, so submitting must keep the suggestion.
 		it( 'should submit the suggestion, not only its URL', async () => {
 			const user = userEvent.setup();
 			const mockOnChange = vi.fn();
