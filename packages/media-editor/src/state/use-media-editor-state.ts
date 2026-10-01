@@ -139,11 +139,6 @@ export interface MediaEditorSession {
 	endGesture: () => void;
 }
 
-interface InitialMediaEditorState {
-	cropper?: Partial< CropperState >;
-	cropOptions?: Partial< CropOptionsSlice >;
-}
-
 /**
  * The media editor session.
  *
@@ -166,20 +161,13 @@ interface InitialMediaEditorState {
  * state. Use `hasOutputEdits` when deciding whether the image output
  * needs saving.
  *
- * @param initialState Optional seed for the cropper and cropOptions slices.
+ * The session starts empty. Call `setSourceImage` to load an image.
+ *
  * @return The media editor session.
  */
-export function useMediaEditorState(
-	initialState?: InitialMediaEditorState
-): MediaEditorSession {
+export function useMediaEditorState(): MediaEditorSession {
 	const [ state, dispatch ] = useReducer( mediaEditorReducer, null, () =>
-		buildInitialMediaEditorState(
-			enforceContainment( {
-				...DEFAULT_STATE,
-				...initialState?.cropper,
-			} ),
-			initialState?.cropOptions
-		)
+		buildInitialMediaEditorState( { ...DEFAULT_STATE } )
 	);
 
 	// The "clean" snapshot the current state is compared against for
