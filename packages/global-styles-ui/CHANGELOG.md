@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal
