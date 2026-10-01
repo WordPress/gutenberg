@@ -1,7 +1,9 @@
-# Guidance
+# UI package guidance
 
-Before adding or changing code in this directory:
+Before changing or reviewing this package:
 
--   Read [README.md](./README.md) for this package's role, its relationship to other Design System packages, and setup guidance.
--   Read [CONTRIBUTING.md](./CONTRIBUTING.md) for the canonical design principles, implementation patterns, styling, and public API guidance.
--   Do not add new `--wp-ui-*` public CSS custom properties. Private custom properties should be `--_wp-ui-*`. See [Custom property names](./CONTRIBUTING.md#custom-property-names).
+-   Read [README.md](./README.md) when package roles, public usage, or setup are relevant.
+-   Read the relevant sections of [CONTRIBUTING.md](./CONTRIBUTING.md) before changing component APIs or styles. In particular, check its render/ref patterns, overlay slots, CSS layers, and custom-property policy for those changes.
+-   Use [design-system-contribution](../../.agents/skills/design-system-contribution/SKILL.md) for implementation and [design-system-code-review](../../.agents/skills/design-system-code-review/SKILL.md) for review.
+
+Keep reusable package behaviour separate from product-specific composition. Use the [cross-package guide](../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for that boundary and completion checks. When changing component status or exports, follow [Component status](./CONTRIBUTING.md#component-status) so recommendation metadata stays consistent.

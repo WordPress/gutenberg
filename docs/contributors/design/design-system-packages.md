@@ -21,9 +21,7 @@ Do not treat an API as private only because its name starts with
 public compatibility obligations. Verify their status against the
 [canonical API boundary guidance](/docs/contributors/code/coding-guidelines.md#legacy-experimental-apis-plugin-only-apis-and-private-apis).
 
-Use the package contribution workflows only when changing
-`packages/components`, `packages/ui`, or `packages/theme`. A package change
-must consider its published API and users beyond the Gutenberg call sites.
+Use the package contribution workflows when changing `packages/components`, `packages/ui`, or `packages/theme`. A package change must consider its published API and users beyond the Gutenberg call sites. When a change includes both package code and application code, check both contracts. Keep product-specific behaviour in the consuming package; add shared behaviour to the Design System only when it belongs in a reusable component or token.
 
 If the public surface cannot meet a product need, document the behaviour,
 affected consumers, attempted composition, and proposed public contract. Do
@@ -60,9 +58,7 @@ Use evidence for the state it actually describes:
 - The deployed checkout or runtime is authoritative for available exports,
   styles, and runtime behaviour. An installed package proves compile-time
   types, not an externalized runtime API.
-- In a review, the supplied diff describes the proposed post-change state;
-  use the checkout as its baseline and supporting context. Do not reject a
-  change merely because the diff has not been applied to that checkout.
+- In a review, establish whether the checkout is the base, proposed head, or another revision. Read the diff with the corresponding source. An unapplied diff is not evidence that its new API is missing, and a head checkout is not evidence of the old behaviour.
 - The Design System MCP server and current Storybook describe current
   recommendations. They do not prove that an older target exports an API.
 
@@ -102,6 +98,8 @@ those sources and verify the choice against its installed exports, types, and
 documentation. Preserve behavioural, styling, accessibility, and compatibility
 parity when migrating an existing component.
 
+For forms that edit a dataset, consider [`DataForm`](/packages/dataviews/README.md#dataform). For inline validation, read the [Validated Form Controls overview](/packages/ui/src/form/with-validation/stories/overview.mdx), including its status and limitations, and verify the target-version exports. Choose based on the form's state and validation needs rather than replacing individual controls without checking the whole form.
+
 Use semantic `--wpds-*` custom properties for Design System interface styling.
 Use `--wp--preset--*` custom properties for `theme.json` presets and
 block-facing styles. Token names and values change over time, so do not copy a
@@ -109,10 +107,7 @@ token inventory into a guide, application convention, or skill.
 
 ### Setup depends on the document
 
-Standard WordPress editor screens manage shared styles centrally. A separate
-application, iframe, popup window, or portal can require its own stylesheet
-and theming setup. Inventory which public packages render in each document,
-then follow the applicable package setup guidance:
+Standard WordPress editor screens manage shared styles centrally. A separate application, iframe, or popup window can require its own stylesheet and theming setup. Inventory which public packages render in each document, then follow the applicable package setup guidance:
 
 - [`@wordpress/components`](/packages/components/README.md)
 - [`@wordpress/ui`](/packages/ui/README.md#setup)
@@ -121,6 +116,10 @@ then follow the applicable package setup guidance:
 Apply setup only for packages that render there rather than copying a combined
 recipe into every document.
 
+A [React portal](https://react.dev/reference/react-dom/createPortal) changes DOM placement and can remain in the same document. Inspect its actual container and `ownerDocument` before adding document setup. CSS selectors and inherited custom properties follow the DOM tree, so a class on a toolbar or a nested theme provider may not reach a popup portaled outside that subtree. Apply product-specific popup styling through documented props or a class on the popup itself. Verify that its stylesheet is present in the destination document.
+
+Follow the [`ThemeProvider` nesting and root guidance](/packages/theme/README.md#nesting-providers) when overlays need theme overrides. Do not add an `isRoot` provider for every overlay; it changes document-level tokens, and only one root provider is supported per document.
+
 When an application directly bundles `@wordpress/components` and
 `@wordpress/ui`, follow the `@wordpress/ui` README’s documented overlay
 compatibility setup. Test overlays and focus in their actual rendering
@@ -128,9 +127,7 @@ documents.
 
 ## Change a package safely
 
-Start with a consumer and precedent audit: who needs the behaviour, which
-existing component or token is closest, and why public composition is not
-enough. Then follow the source guidance for the package being changed:
+Identify the affected consumers and a relevant component or token precedent. For a new capability, establish why existing public composition is insufficient. For a bug fix or internal refactor, identify the contract to restore or preserve. Follow the source guidance for the package being changed:
 
 - [`@wordpress/components` contribution guide](/packages/components/CONTRIBUTING.md)
 - [`@wordpress/ui` contribution guide](/packages/ui/CONTRIBUTING.md)
@@ -144,20 +141,33 @@ unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
 When a Design System package is bundled while one or more dependencies are supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check each supported entrypoint and version pairing before changing or removing the dependency contract.
 
-Before declaring package work complete, follow the applicable package source
-guidance and account for each relevant contract surface: public
-exports and types; semantics, states, interaction, and refs; compatibility and
-migration; focused tests and stories; public documentation and recommendation
-metadata; generated output; and the required changelog. Mark a surface not
-applicable rather than silently skipping it.
+Before declaring package work complete, check the requirements affected by the change:
+
+- Public exports and types, including declarations that resolve through the package's declared dependencies.
+- Semantics, states, interaction, refs, compatibility, and migration.
+- Focused tests and stories, public documentation, and component recommendation metadata when status or exports change.
+- Generated output and the changelog required by the [package policy](/packages/README.md#maintaining-changelogs).
+
+An internal refactor does not automatically need new stories or public documentation. Explain unresolved requirements without adding a checklist of unrelated surfaces to every contribution.
+
+### Compare contracts before replacing an API
+
+Compare the affected old and new behaviour before removing, renaming, or replacing a component, prop, token, or extension point. Include accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, and keyboard or focus behaviour where they apply. A compact comparison table can help with a multi-part migration.
+
+Search consumers beyond the changed package. Migrating all repository call sites does not prove compatibility for plugins or other npm consumers. Check documented extension points, such as SlotFill children and render callbacks, against the values and compositions they previously accepted. An adapter that handles built-in callers may not handle third-party input. If external usage cannot be established, state that limit and make any retirement of supported behaviour explicit.
+
+For tokens, compare semantic purpose and affected modes as well as default values. Follow the [token source guide](/packages/theme/tokens/README.md) and [build procedure](/packages/theme/README.md#building), then inspect the generated assets and consumers affected by the change. Two tokens with equal values in one theme are not necessarily interchangeable.
+
+## Verify the affected behaviour
+
+Select verification from the changed contract and the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure). Use existing coverage where it proves the behaviour. Keep state and structural checks in jsdom; use Browser Mode or a reproducible browser check for computed styles, layout, native focus, scrolling, and transitions. Load the styles used by the real consumer. Class assertions, mocked geometry, and snapshots alone do not prove visual parity.
+
+For interaction changes, exercise the relevant keyboard and pointer paths, accessible names, state transitions, dismissal, and focus return in the actual composition. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
+
+For style or token changes, select the conditions that can expose a regression: light and dark themes, nested providers, density, RTL, forced colors, reduced motion, long or translated content, zoom, or constrained containers. Inspect relevant composed consumers as well as the isolated story. Check whether a responsive decision depends on the viewport or the component's container before choosing a breakpoint or measurement API.
+
+Run the repository's applicable lint, type, generation, and build checks. Distinguish verified results from manual steps that have not been run. A blocked browser check limits a parity claim; it does not by itself prove a defect.
 
 ## Review checklist
 
-Consumer reviews verify the public contract and user-facing result: documented
-imports, styles and tokens in each document, overlay and iframe setup,
-semantics, keyboard/focus behaviour, states, responsive behaviour, and tests.
-
-Package-contribution reviews additionally assess public exports, external
-consumers, compatibility, source conventions, generated files, documentation,
-stories, and release impact. A source convention is evidence to compare with
-the current codebase, not a substitute for demonstrating user impact.
+Consumer reviews apply the [contract comparison](#compare-contracts-before-replacing-an-api) and [verification guidance](#verify-the-affected-behaviour) to the changed interface. Package reviews also apply the [package completion checks](#change-a-package-safely). Distinguish a demonstrated regression or violated repository requirement from a preferred implementation pattern, and report verification gaps separately from defects.

@@ -1,71 +1,29 @@
 ---
 name: design-system-ui-composition
-description: Use when building or changing a Gutenberg feature, plugin interface, or standalone application UI with public `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` APIs, including when the code does not yet use the Design System; do not use to change package source or depend on package-private implementation details.
+description: Use when building or changing a Gutenberg, plugin, or application interface, including custom UI that does not yet use WordPress Design System packages. Covers public component selection, composition, styling, and setup; route package-source changes to design-system-contribution.
 ---
 
 # Compose a WordPress Design System interface
 
-## Classify before searching
+## Start with the requested behaviour
 
-1. State the user-visible behaviour, minimum runtime and package versions,
-   rendering owner, runtime document, and whether each Design System dependency
-   is bundled or externalized.
-2. Inspect the changed surface and its nearest same-surface precedent once.
-3. Choose the narrowest path:
-   - **Lightweight:** keep an existing supported component when behaviour,
-     styling, and document setup do not change.
-   - **Standard:** select or compose a public component or token.
-   - **Deep:** handle custom UI, a package migration, or another rendering
-     document such as an iframe, popup, or portal.
+Inspect the target interface and a relevant nearby precedent. Identify what the user needs to do and which component owns the state. For a plan without a concrete host, state the assumptions that affect the API or interaction decision.
 
-Do not reopen component selection on the lightweight path. Verify the existing
-contract, make the narrow change, and stop.
+Keep an existing supported component for a narrow copy or prop edit when its behaviour and setup remain suitable. Do not turn that edit into a component migration or inventory unrelated runtime setup.
 
-## Select for the behaviour
+When component or token selection matters, read [Choose a recommended component](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). Verify the public API against the [target version](../../../docs/contributors/design/design-system-packages.md#check-the-target-version), including whether the application bundles the dependency or WordPress supplies it.
 
-When selection is material, write the required interaction contract before
-choosing a component. Follow the maintained recommendation sources and
-target-version checks in
-[Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component),
-then verify the selected public API in the deployed runtime or installed
-version, as applicable.
+Choose the smallest public composition that meets the interaction contract. A nearby menu or dialog is not a reason to add that behaviour to a simple trigger. Keep product-specific compositions in the consuming package.
 
-Choose the smallest public composition that owns exactly the required
-behaviour. Do not turn a trigger into a menu, dialog, or state owner merely
-because a nearby precedent does. Stop searching when one recommended option
-satisfies the behaviour and setup.
+## Check the changed integration
 
-## Apply conditional setup
+- For custom UI, check whether public composition meets the need before adding a control. Do not import package-private source or recreate an existing component just to adjust its presentation.
+- For a migration, use the [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api), including extension points used outside the repository.
+- For overlays or changed rendering destinations, read [Setup depends on the document](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document). Inspect the actual portal container and its owner document. Check style delivery, inherited tokens, and focus there; a same-document portal does not create a new document.
+- For a separate app or document, verify setup only for packages that render there. Record unresolved stylesheet, runtime-style, theming, or overlay requirements when they affect completion.
 
-- For custom UI, first establish why public composition is insufficient.
-- For a migration, preserve observable interaction, styling, accessibility,
-  and compatibility.
-- For a separate document, read the
-  [cross-package document setup guidance](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document)
-  before editing. Make a short per-document ledger for the packages actually
-  used: static styles, runtime-injected styles, root theming, and overlays.
-  Mark each applicable requirement verified or blocked; do not add setup for a
-  package that does not render there.
+If a public API cannot meet the need, describe the missing behaviour and options using [Contributing to the Design System](../../../storybook/stories/design-system/contributing.md). Respect an existing user decision about the gap; otherwise ask before introducing a workaround. Package fixes use [design-system-contribution](../design-system-contribution/SKILL.md) in a Gutenberg checkout. Outside one, draft an upstream report within the user's authorized scope.
 
-For a planning task with no concrete host file or state owner, keep the plan
-actionable under explicit assumptions. When the request names a target, inspect
-that exact target; do not silently plan against another package or active
-equivalent. Treat missing context as a verification gap; block only when it
-prevents a safe behaviour or API decision.
+## Verify and finish
 
-Use the linked public documentation for API and setup facts. Do not copy its
-component mappings, token inventory, or implementation recipes into this
-skill.
-
-## Finish
-
-Exercise the changed interaction and run focused checks. Before declaring
-completion, recheck the behaviour contract and every rendering document.
-Report unresolved setup or parity evidence as blocked rather than silently
-omitting it.
-
-If no public API meets the need, document the unmet behaviour and affected
-consumers, and stop to ask the user before working around it. Route
-package work to `design-system-contribution` in a local Gutenberg checkout;
-otherwise draft an upstream issue for the user to submit, following
-[Contributing to the Design System](../../../storybook/stories/design-system/contributing.md).
+Use [Verify the affected behaviour](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to exercise the changed interaction and rendering context. Report what was verified and what remains uncertain. A missing check is a verification gap; stop dependent work only when missing evidence prevents a safe decision.

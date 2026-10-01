@@ -1,69 +1,29 @@
 ---
 name: design-system-ui-review
-description: Use when reviewing a Gutenberg, plugin, or application UI/UX change for correct public WordPress Design System usage and user-facing behaviour, including a component, control, visual styling, token, interaction, layout, overlay, or other user-facing interface; do not use to implement a change or review Design System package source.
+description: Use when reviewing Gutenberg, plugin, or application UI/UX, including custom UI that does not yet use WordPress Design System packages. Covers public API usage, styling, interaction, accessibility, and setup; route package-source reviews to design-system-code-review.
 ---
 
 # Review a WordPress Design System interface
 
-## Start shallow
+## Establish the changed behaviour
 
-1. Define the changed user-facing behaviour, affected users, runtime document,
-   target versions, and dependency deployment boundary.
-2. Scan the complete diff once for semantics and accessibility, interaction
-   and focus, styling and tokens, integration, tests, and compatibility.
-   Account for every changed file before deep research; finding one defect
-   does not end this pass.
-3. Choose the narrowest review path:
-   - **Lightweight:** copy-only or supported-prop changes with no interaction,
-     styling, or setup change.
-   - **Standard:** component, custom UI, styling, or interaction changes.
-   - **Deep:** migrations, public-contract risk, or separate documents and
-     overlays.
+Read the complete diff and identify the affected user interactions and consumers. For a narrow copy or supported-prop change, check its semantics and API usage without reopening component selection or auditing unrelated setup.
 
-On the lightweight path, verify the target runtime API, every changed consumer,
-and required changelog coverage. State what the change improves and what
-behaviour and semantics remain unchanged, then stop. Do not reopen component selection
-without evidence that the existing component is unsuitable.
+For component, styling, interaction, migration, or rendering-context changes, read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md). Identify the relevant target versions and whether dependencies are bundled or supplied by WordPress. Establish whether the checkout represents the base or proposed head before using it as evidence.
 
-## Deepen only material questions
+Apply this review even when the interface currently uses custom markup. For a mixed package-and-consumer change, also use [design-system-code-review](../design-system-code-review/SKILL.md) on the package source.
 
-Use the recommendation sources in
-[Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component)
-only when component, package, prop, token, or setup selection is material.
-Apply that guide's evidence precedence: treat the supplied diff as the proposed
-post-change state, verify availability against the target version, and use MCP
-as current-direction context rather than target-version proof.
+## Investigate material questions
 
-For standard and deep reviews, investigate only the dimensions made material
-by the first pass. Judge custom UI by demonstrated user, accessibility,
-consistency, or maintenance impact—not by the mere existence of a public
-alternative. For separate documents, verify the applicable package setup in
-the document that renders the interface.
+- Use the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component) when API selection is material. Current Storybook or MCP advice does not establish availability in an older runtime.
+- For a replacement, follow the [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Check extension points as well as migrated repository callers.
+- For overlays and separate documents, verify [setup](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document) at the actual rendering destination. React ancestry alone does not prove CSS inheritance or selector reach.
+- Assess semantics, interaction, accessibility, responsive behaviour, and relevant themes using the guide's [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour).
 
-When custom UI has a material defect, explicitly decide whether the smallest
-coherent fix is to repair it or replace it with a verified public component.
-Do not leave the implementation direction implicit.
+Judge custom UI by demonstrated user, accessibility, consistency, or maintenance impact. The existence of a public alternative alone is not a defect. When a defect exists, decide whether the smallest coherent correction is to repair the custom UI or replace it with a verified public component.
 
-## Finding evidence gate
+## Report supported findings
 
-Before reporting a finding, establish:
+For each finding, identify the incorrect behaviour or violated repository requirement, a changed line that causes it, target-version or runtime evidence, and why it needs correction now. Resolve missing context or state the verification gap; do not infer a defect from an incomplete diff or missing test alone.
 
-1. the incorrect user-observable behaviour or public contract;
-2. the exact changed line that causes it;
-3. target-version source or runtime evidence for the expected behaviour; and
-4. why the change is required now rather than an optional enhancement.
-
-If any part is missing, resolve it, report a verification gap, or omit the
-finding. Treat missing context in a diff excerpt as a gap unless the complete
-diff proves an omission. Missing tests alone are not a defect without a
-demonstrated regression or repository requirement.
-
-## Output contract
-
-Recheck every finding against the complete diff and source. Classify each
-concern as a defect, verification gap, or optional follow-up. Report material
-findings with user impact, target evidence, and the smallest coherent
-direction, plus focused verification of the affected behaviour. Report no
-findings when the evidence exposes none. Do not prescribe package internals in
-a consumer review. Route package-source reviews to
-`design-system-code-review`, then stop.
+Recheck findings against the complete proposed change and distinguish defects from optional improvements. Include user impact and a focused way to verify the correction. Report no findings when the evidence supports none. Do not prescribe package-private APIs or make edits as part of this review.

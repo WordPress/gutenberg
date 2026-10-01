@@ -1,17 +1,9 @@
-## Status
+# Components package guidance
 
-This package contains UI components that are intended to be used anywhere in a general way (global), or specifically in the block editor.
+Before changing or reviewing this package, read the relevant sections of [CONTRIBUTING.md](./CONTRIBUTING.md). It covers compatibility, component APIs, styling, stories, and documentation. Existing components can have compatibility constraints that differ from the conventions for new components.
 
-We are currently in the process of rewriting the global components to be in the new `@wordpress/ui` package. Refer to the [`use-recommended-components` ESLint rule](../eslint-plugin/rules/use-recommended-components.js) for guidance on which components to use.
+-   For package implementation or review, use the repository's [design-system-contribution](../../.agents/skills/design-system-contribution/SKILL.md) or [design-system-code-review](../../.agents/skills/design-system-code-review/SKILL.md) skill, respectively.
+-   For Emotion migrations, use [emotion-to-scss-modules](../../.agents/skills/emotion-to-scss-modules/SKILL.md).
+-   For consumer component selection, follow [Choose a recommended component](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). This package remains supported; moving an existing consumer to `@wordpress/ui` requires a separate compatibility assessment.
 
-For components not explicitly listed in the `use-recommended-components` rule, locate the component's Storybook source within this package and use its status guidance. This guidance is more authoritative than the `experimental` tag or component prefix.
-
-## Forms
-
-Is the form going to edit items of a dataset, rather than simply submitting data somewhere? If so, consider using `DataForm` from the `@wordpress/dataviews` package.
-
-For adding validation, consider using the [Validated Form Components](./src/validated-form-controls).
-
-## Storybook
-
-Don't forget to check a component's Storybook documentation for additional usage guidance. The Storybook links ([public base URL](https://wordpress.github.io/gutenberg/)) are also useful to present to a human when they are asking for help with a component.
+Check the affected component's README, types, stories, and consumers before changing its contract. Use the [cross-package guide](../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to select verification for the changed behaviour.
