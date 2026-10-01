@@ -5,9 +5,8 @@ test.describe( 'Post Featured Image', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'opens the media library when isLink is true and no featured image is set', async ( {
+	test( 'does not wrap the placeholder in a link when isLink is true', async ( {
 		editor,
-		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/post-featured-image',
@@ -18,12 +17,6 @@ test.describe( 'Post Featured Image', () => {
 			name: 'Block: Featured Image',
 		} );
 		await expect( block ).toBeVisible();
-
-		await block
-			.getByRole( 'button', { name: 'Add a featured image' } )
-			.click();
-
-		await expect( page.locator( '.media-modal' ) ).toBeVisible();
-		await expect( block ).toBeVisible();
+		await expect( block.getByRole( 'link' ) ).toHaveCount( 0 );
 	} );
 } );
