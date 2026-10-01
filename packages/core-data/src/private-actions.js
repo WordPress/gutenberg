@@ -198,7 +198,7 @@ export function receiveViewConfig( kind, name, config ) {
 /**
  * Records that the entity sync manager opened a new undo level for a record
  * it syncs, so the level takes its place in core-data's undo history next to
- * the edits core-data records itself. See `utils/sync-undo-levels.js`.
+ * the edits core-data records itself.
  *
  * @param {string}        kind     Kind of the record.
  * @param {string}        name     Name of the record.
