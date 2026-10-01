@@ -576,8 +576,11 @@ function CompactMediaEditAttachments( {
  *
  * @example
  * ```tsx
- * import { MediaEdit } from '@wordpress/media-utils';
+ * import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
+ * import { unlock } from './lock-unlock';
  * import type { DataFormControlProps } from '@wordpress/dataviews';
+ *
+ * const { MediaEdit } = unlock( mediaUtilsPrivateApis );
  *
  * const featuredImageField = {
  *   id: 'featured_media',

@@ -19,3 +19,19 @@ export interface PostWithFeaturedMedia {
 		'wp:featuredmedia'?: FeaturedMedia[];
 	};
 }
+
+/**
+ * The part of the field the control reads. `@wordpress/fields` types the
+ * control with the `DataFormControlProps` of `@wordpress/dataviews`, which
+ * this package does not depend on, and the props type of the media control
+ * is private to `@wordpress/media-utils`, as the control is.
+ */
+export interface FeaturedMediaField {
+	label: string;
+	placeholder?: string;
+	getValue: ( args: { item: PostWithFeaturedMedia } ) => number | undefined;
+	setValue: ( args: {
+		item: PostWithFeaturedMedia;
+		value: number | undefined;
+	} ) => Record< string, any >;
+}

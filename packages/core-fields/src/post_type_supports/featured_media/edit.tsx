@@ -7,8 +7,11 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { MediaEditControl, type MediaEditProps } from '@wordpress/media-utils';
-import type { PostWithFeaturedMedia } from './types';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
+import { unlock } from '../../lock-unlock';
+import type { FeaturedMediaField, PostWithFeaturedMedia } from './types';
+
+const { MediaEditControl } = unlock( mediaUtilsPrivateApis );
 
 /*
  * A copy of the featured image control of `@wordpress/fields`, rendering the
@@ -17,7 +20,11 @@ import type { PostWithFeaturedMedia } from './types';
 
 type Item = PostWithFeaturedMedia;
 
-type FeaturedImageEditProps = MediaEditProps< Item >;
+type FeaturedImageEditProps = {
+	data: Item;
+	field: FeaturedMediaField;
+	onChange: ( edits: Record< string, any > ) => void;
+};
 
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 	function PostFeaturedImage(
