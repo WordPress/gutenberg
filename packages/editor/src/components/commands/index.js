@@ -394,7 +394,7 @@ const getPatternEditingContextualCommands = () =>
 					? [
 							selectedBlockClientId,
 							...getBlockParents( selectedBlockClientId, true ),
-					  ]
+						]
 					: [];
 
 			return {
@@ -545,7 +545,7 @@ const getPageContentFocusCommands = () =>
 		if ( !! goBack ) {
 			commands.push( {
 				name: 'core/switch-to-previous-entity',
-				label: __( 'Go back' ),
+				label: __( 'Back' ),
 				category: 'view',
 				callback: ( { close } ) => {
 					goBack();
@@ -593,12 +593,12 @@ const getManipulateDocumentCommands = () =>
 							/* translators: %s: template title */
 							__( 'Reset template: %s' ),
 							decodeEntities( template.title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: template part title */
 							__( 'Reset template part: %s' ),
 							decodeEntities( template.title )
-					  );
+						);
 			commands.push( {
 				name: 'core/reset-template',
 				label,

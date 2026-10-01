@@ -30,7 +30,7 @@ The fulfillment is named by the key that carries it, not by a separate discrimin
 
 Two more keys belong to the link, not to the envelope, so they only mean something alongside an `href`:
 
--   `download`: download instead of navigate; a string sets the filename.
+-   `download`: downloads instead of navigating unless `false`; a string sets the filename, `true` or `''` keeps the original.
 -   `openInNewTab`: open in a new tab.
 
 ```ts

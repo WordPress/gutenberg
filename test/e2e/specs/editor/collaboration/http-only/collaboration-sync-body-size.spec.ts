@@ -57,7 +57,7 @@ test.describe( 'Collaboration sync body size', () => {
 									? room.updates.length
 									: 0 ),
 							0
-					  )
+						)
 					: null;
 			} catch {}
 			syncRequests.push( {

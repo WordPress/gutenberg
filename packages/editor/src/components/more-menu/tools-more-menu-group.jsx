@@ -4,6 +4,6 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 	Symbol( 'ToolsMoreMenuGroup' )
 );
 
-ToolsMoreMenuGroup.Slot = ( { fillProps } ) => <Slot fillProps={ fillProps } />;
+ToolsMoreMenuGroup.Slot = Slot;
 
 export default ToolsMoreMenuGroup;

@@ -1,6 +1,8 @@
 /* eslint-disable no-bitwise, jsdoc/require-param */
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import {
 	parseHeic,
 	reverseBits32,
@@ -61,6 +63,13 @@ function concat( ...arrays: Uint8Array[] ): Uint8Array {
 		offset += a.length;
 	}
 	return result;
+}
+
+/** Copy bytes into an ArrayBuffer with an exact, non-shared backing store. */
+function toArrayBuffer( bytes: Uint8Array ): ArrayBuffer {
+	const buffer = new ArrayBuffer( bytes.byteLength );
+	new Uint8Array( buffer ).set( bytes );
+	return buffer;
 }
 
 /** Build a pitm box (Primary Item). */
@@ -279,7 +288,7 @@ function buildSingleImageHeic( {
 
 	// Assemble full file
 	const file = concat( ftyp, meta, mdat );
-	return file.buffer;
+	return toArrayBuffer( file );
 }
 
 // ---------------------------------------------------------------------------
@@ -512,7 +521,7 @@ describe( 'heic-parser', () => {
 			);
 			const mdat = buildBox( 'mdat', mdatPayload );
 
-			return concat( ftyp, meta, mdat ).buffer;
+			return toArrayBuffer( concat( ftyp, meta, mdat ) );
 		}
 
 		/** Build an iinf box with infe entries. */
@@ -658,7 +667,7 @@ describe( 'heic-parser', () => {
 				'ftyp',
 				new Uint8Array( [ 0x68, 0x65, 0x69, 0x63 ] )
 			);
-			expect( () => parseHeic( ftyp.buffer ) ).toThrow(
+			expect( () => parseHeic( toArrayBuffer( ftyp ) ) ).toThrow(
 				'No meta box found'
 			);
 		} );
@@ -667,7 +676,7 @@ describe( 'heic-parser', () => {
 			// meta box with only hdlr (no pitm, iloc, iprp)
 			const hdlr = buildHdlr();
 			const meta = buildFullBox( 'meta', 0, 0, hdlr );
-			expect( () => parseHeic( meta.buffer ) ).toThrow(
+			expect( () => parseHeic( toArrayBuffer( meta ) ) ).toThrow(
 				'Missing required boxes'
 			);
 		} );
@@ -684,7 +693,7 @@ describe( 'heic-parser', () => {
 				0,
 				concat( hdlr, pitm, iloc, emptyIprp )
 			);
-			expect( () => parseHeic( meta.buffer ) ).toThrow(
+			expect( () => parseHeic( toArrayBuffer( meta ) ) ).toThrow(
 				'Missing ipco or ipma'
 			);
 		} );
@@ -705,7 +714,7 @@ describe( 'heic-parser', () => {
 				0,
 				concat( hdlr, pitm, iloc, iprp )
 			);
-			expect( () => parseHeic( meta.buffer ) ).toThrow(
+			expect( () => parseHeic( toArrayBuffer( meta ) ) ).toThrow(
 				'No location data for primary item'
 			);
 		} );
@@ -726,7 +735,7 @@ describe( 'heic-parser', () => {
 				0,
 				concat( hdlr, pitm, iloc, iprp )
 			);
-			expect( () => parseHeic( meta.buffer ) ).toThrow(
+			expect( () => parseHeic( toArrayBuffer( meta ) ) ).toThrow(
 				'No property associations'
 			);
 		} );
@@ -819,7 +828,7 @@ describe( 'parseExifOrientation / getUnappliedExifOrientation', () => {
 		] );
 
 		// Optional native transform property associated with the primary item.
-		let iprp = new Uint8Array( 0 );
+		let iprp: Uint8Array< ArrayBufferLike > = new Uint8Array( 0 );
 		if ( withIrot ) {
 			const ipco = buildIpco( buildIspe( 10, 10 ), buildIrot( 1 ) );
 			const ipma = buildIpma( [ [ primaryItemId, [ 1, 2 ] ] ] );
@@ -845,7 +854,7 @@ describe( 'parseExifOrientation / getUnappliedExifOrientation', () => {
 		const meta = buildMeta( exifOffset );
 		const mdat = buildBox( 'mdat', exifPayload );
 
-		return concat( ftyp, meta, mdat ).buffer;
+		return toArrayBuffer( concat( ftyp, meta, mdat ) );
 	}
 
 	describe( 'parseExifOrientation', () => {

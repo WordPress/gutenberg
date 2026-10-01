@@ -122,7 +122,7 @@ export interface WidgetsProps {
  * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
-	function Widgets( { className }, ref ) {
+	function UnforwardedWidgets( { className }, ref ) {
 		const {
 			layout,
 			onLayoutChange,
@@ -131,8 +131,10 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			widgetTypes,
 			canPerform,
 		} = useDashboardInternalContext();
-		const { containerRef, columnCount } =
-			useDashboardContainerColumnCount( ref );
+		const { containerRef, columnCount } = useDashboardContainerColumnCount(
+			ref,
+			gridSettings.columns
+		);
 		const isMasonry = gridSettings.model === 'masonry';
 
 		const permissionsFor = useCallback< TilePermissionsFor >(

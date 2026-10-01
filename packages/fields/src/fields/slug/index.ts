@@ -11,6 +11,9 @@ const slugField: Field< BasePost > = {
 	Edit: SlugEdit,
 	render: SlugView,
 	filterBy: false,
+	// The REST API only exposes `permalink_template` for viewable public
+	// post types, so posts without a permalink hide the field.
+	isVisible: ( item ) => !! item.link && !! item.permalink_template,
 };
 
 /**
