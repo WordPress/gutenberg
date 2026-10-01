@@ -1,5 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import { Notice } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { privateApis as corePrivateApis } from '@wordpress/core-data';
@@ -122,9 +122,11 @@ export default function PageTemplates() {
 			actions={ <AddNewTemplate /> }
 		>
 			{ fieldsError && (
-				<Notice status="error" isDismissible={ false }>
-					{ fieldsError.message }
-				</Notice>
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{ fieldsError.message }
+					</Notice.Description>
+				</Notice.Root>
 			) }
 			<DataViews
 				key={ activeView }

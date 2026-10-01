@@ -1,10 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { useFields } from '@wordpress/fields-loader';
-import { Stack } from '@wordpress/ui';
+import { Notice, Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
 import PostCardPanel from '../post-card-panel';
@@ -401,9 +400,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onActionPerformed={ onActionPerformed }
 				/>
 				{ fieldsError && (
-					<Notice status="error" isDismissible={ false }>
-						{ fieldsError.message }
-					</Notice>
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ fieldsError.message }
+						</Notice.Description>
+					</Notice.Root>
 				) }
 				{ /* A form built from no fields renders nothing but its
 				     panel chrome, so it waits for the fields to arrive. */ }

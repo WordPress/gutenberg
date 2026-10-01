@@ -7,7 +7,8 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { Button, Notice } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useFields } from '@wordpress/fields-loader';
 import { unlock } from '@wordpress/routes-lock-unlock';
@@ -183,9 +184,11 @@ function NavigationListView( {
 				}
 			>
 				{ fieldsError && (
-					<Notice status="error" isDismissible={ false }>
-						{ fieldsError.message }
-					</Notice>
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ fieldsError.message }
+						</Notice.Description>
+					</Notice.Root>
 				) }
 				<DataViews
 					data={ navigationMenus }
