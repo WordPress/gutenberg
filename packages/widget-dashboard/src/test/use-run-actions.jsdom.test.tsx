@@ -1,7 +1,24 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import type { WidgetCallbackAction } from '@wordpress/widget-primitives';
 import { useRunActions } from '../components/widget-actions/use-run-actions';
+import { WidgetDashboard } from '../widget-dashboard';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockResizeObserver();
+
+/* The runner reads the dashboard's pending map from its context. */
+const wrapper = ( { children }: { children: ReactNode } ) => (
+	<WidgetDashboard
+		layout={ [] }
+		onLayoutChange={ () => {} }
+		widgetTypes={ [] }
+		resolveWidgetModule={ async () => ( { default: () => null } ) }
+	>
+		{ children }
+	</WidgetDashboard>
+);
 
 function exportAction(
 	callback: WidgetCallbackAction[ 'callback' ]
@@ -18,7 +35,9 @@ describe( 'useRunActions', () => {
 					settle = resolve;
 				} )
 		);
-		const { result } = renderHook( () => useRunActions() );
+		const { result } = renderHook( () => useRunActions( 'w1' ), {
+			wrapper,
+		} );
 
 		let running: Promise< void > | undefined;
 		act( () => {
@@ -36,11 +55,14 @@ describe( 'useRunActions', () => {
 	it( 'never marks pending an action whose callback returns no promise', async () => {
 		const callback = vi.fn();
 		const pendingCounts: number[] = [];
-		const { result } = renderHook( () => {
-			const runner = useRunActions();
-			pendingCounts.push( runner.pendingIds.size );
-			return runner;
-		} );
+		const { result } = renderHook(
+			() => {
+				const runner = useRunActions( 'w1' );
+				pendingCounts.push( runner.pendingIds.size );
+				return runner;
+			},
+			{ wrapper }
+		);
 
 		await act( () => result.current.run( exportAction( callback ) ) );
 
@@ -52,7 +74,9 @@ describe( 'useRunActions', () => {
 		const action = exportAction( () =>
 			Promise.reject( new Error( 'Export failed' ) )
 		);
-		const { result } = renderHook( () => useRunActions() );
+		const { result } = renderHook( () => useRunActions( 'w1' ), {
+			wrapper,
+		} );
 
 		await act( async () => {
 			await expect( result.current.run( action ) ).rejects.toThrow(

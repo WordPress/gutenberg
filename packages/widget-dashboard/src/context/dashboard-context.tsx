@@ -19,6 +19,8 @@ import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { resolveDashboardColumnCap } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
+import { createPendingActionsMap } from '../utils/pending-actions-map';
+import type { PendingActionsMap } from '../utils/pending-actions-map';
 import { createRuntimeActionsMap } from '../utils/runtime-actions-map';
 import type { RuntimeActionsMap } from '../utils/runtime-actions-map';
 import { useDashboardPolicy } from '../components/dashboard-policy';
@@ -106,6 +108,11 @@ interface InternalDashboardContextValue {
 	 * The actions each mounted instance declares at runtime.
 	 */
 	runtimeActions: RuntimeActionsMap;
+
+	/**
+	 * The callback actions of each instance still settling.
+	 */
+	pendingActions: PendingActionsMap;
 }
 
 const ALLOW_EVERY_OPERATION: CanPerformDashboardOperation = () => true;
@@ -187,6 +194,7 @@ export function WidgetDashboardProvider( {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
 	const [ runtimeActions ] = useState( createRuntimeActionsMap );
+	const [ pendingActions ] = useState( createPendingActionsMap );
 
 	const policy = useDashboardPolicy();
 
@@ -325,6 +333,7 @@ export function WidgetDashboardProvider( {
 			resolveWidgetModule,
 			canPerform,
 			runtimeActions,
+			pendingActions,
 		} ),
 		[
 			widgetTypes,
@@ -343,6 +352,7 @@ export function WidgetDashboardProvider( {
 			resolveWidgetModule,
 			canPerform,
 			runtimeActions,
+			pendingActions,
 		]
 	);
 

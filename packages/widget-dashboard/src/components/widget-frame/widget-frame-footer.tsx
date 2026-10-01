@@ -24,5 +24,11 @@ export function WidgetFrameFooter( {
 	const runtimeActions = useRuntimeActions( widget.uuid );
 	const { footer } = splitWidgetActions( widgetType, runtimeActions );
 
-	return <WidgetFooter actions={ footer } editMode={ editMode } />;
+	return (
+		<WidgetFooter
+			uuid={ widget.uuid }
+			actions={ footer }
+			editMode={ editMode }
+		/>
+	);
 }

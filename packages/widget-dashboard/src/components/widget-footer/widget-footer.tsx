@@ -76,6 +76,11 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 
 type WidgetFooterProps = {
 	/**
+	 * The instance whose actions these are.
+	 */
+	uuid: string;
+
+	/**
 	 * The promoted actions (`relevance: 'high'` and `'medium'`).
 	 */
 	actions: WidgetRuntimeAction[];
@@ -99,10 +104,11 @@ type WidgetFooterProps = {
  * @param {WidgetFooterProps} props Component props.
  */
 export function WidgetFooter( {
+	uuid,
 	actions,
 	editMode = false,
 }: WidgetFooterProps ): React.ReactNode {
-	const { run, pendingIds } = useRunActions();
+	const { run, pendingIds } = useRunActions( uuid );
 
 	if ( actions.length === 0 ) {
 		return null;

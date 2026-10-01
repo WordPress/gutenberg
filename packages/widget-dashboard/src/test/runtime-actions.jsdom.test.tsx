@@ -414,6 +414,50 @@ describe( 'runtime actions', () => {
 		);
 	} );
 
+	it( 'keeps a menu action pending across customize mode', async () => {
+		const user = userEvent.setup();
+		let settle = () => {};
+		onRefresh.mockImplementation(
+			() =>
+				new Promise< void >( ( resolve ) => {
+					settle = resolve;
+				} )
+		);
+		const layout = instance( 'test/plain', { refreshable: true } );
+		const { rerender } = render( <Harness layout={ layout } /> );
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'More' } )
+		);
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Refresh' } )
+		);
+
+		rerender( <Harness layout={ layout } editMode /> );
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'button', { name: 'More' } )
+			).not.toBeInTheDocument()
+		);
+		rerender( <Harness layout={ layout } /> );
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'More' } )
+		);
+		const item = await screen.findByRole( 'menuitem', { name: 'Refresh' } );
+		expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.click( item );
+		expect( onRefresh ).toHaveBeenCalledTimes( 1 );
+
+		settle();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Refresh' } )
+			).not.toHaveAttribute( 'aria-disabled', 'true' )
+		);
+	} );
+
 	it( 'shows the More trigger only while the menu holds an action', async () => {
 		const user = userEvent.setup();
 		render(

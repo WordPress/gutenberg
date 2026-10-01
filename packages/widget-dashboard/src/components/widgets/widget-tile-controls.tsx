@@ -54,7 +54,7 @@ export function WidgetTileControls( {
 			) }
 
 			{ menuActions.length > 0 && (
-				<WidgetActions actions={ menuActions } />
+				<WidgetActions uuid={ widget.uuid } actions={ menuActions } />
 			) }
 		</WidgetToolbar>
 	);

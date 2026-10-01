@@ -11,6 +11,11 @@ import styles from './widget-actions.module.css';
 
 type WidgetActionsProps = {
 	/**
+	 * The instance whose actions these are.
+	 */
+	uuid: string;
+
+	/**
 	 * The actions this menu materializes. The host routes by relevance:
 	 * the footer takes `'high'` and `'medium'`, this menu the rest, and
 	 * every action for full-bleed widgets, which have no footer.
@@ -28,7 +33,8 @@ type WidgetActionsProps = {
  * router's link through `HostLink`, so it navigates client-side.
  *
  * A callback action mounts a menu item, disabled while its promise settles.
- * That state is held here, so it survives the popup closing.
+ * That state lives with the instance, so it survives the popup closing and
+ * customize mode.
  *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.
@@ -36,10 +42,11 @@ type WidgetActionsProps = {
  * @param {WidgetActionsProps} props Component props.
  */
 export function WidgetActions( {
+	uuid,
 	actions,
 }: WidgetActionsProps ): React.ReactNode {
 	const reserveRef = useReserveHeaderSpace< HTMLSpanElement >( 'actions' );
-	const { run, pendingIds } = useRunActions();
+	const { run, pendingIds } = useRunActions( uuid );
 
 	if ( actions.length === 0 ) {
 		return null;
