@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { createRef } from '@wordpress/element';
 import { screen, render } from '@testing-library/react';
-import { LinkButton } from '../index';
+import { ButtonLink } from '../index';
 
-describe( 'LinkButton', () => {
+describe( 'ButtonLink', () => {
 	it( 'renders a link element by default', () => {
-		render( <LinkButton href="/example">Go to example</LinkButton> );
+		render( <ButtonLink href="/example">Go to example</ButtonLink> );
 
 		const link = screen.getByRole( 'link', { name: 'Go to example' } );
 
@@ -17,20 +17,20 @@ describe( 'LinkButton', () => {
 		const ref = createRef< HTMLAnchorElement >();
 
 		render(
-			<LinkButton ref={ ref } href="/example">
+			<ButtonLink ref={ ref } href="/example">
 				Go to example
-			</LinkButton>
+			</ButtonLink>
 		);
 
 		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
 	} );
 
 	it( 'merges custom className with built-in classes', () => {
-		const customClass = 'my-link-button';
+		const customClass = 'my-button-link';
 		render(
-			<LinkButton href="/example" className={ customClass }>
+			<ButtonLink href="/example" className={ customClass }>
 				Go to example
-			</LinkButton>
+			</ButtonLink>
 		);
 		expect(
 			screen.getByRole( 'link', { name: 'Go to example' } )
@@ -40,9 +40,9 @@ describe( 'LinkButton', () => {
 	describe( 'openInNewTab', () => {
 		it( 'sets target="_blank" when true', () => {
 			render(
-				<LinkButton href="https://example.com" openInNewTab>
+				<ButtonLink href="https://example.com" openInNewTab>
 					External
-				</LinkButton>
+				</ButtonLink>
 			);
 
 			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
