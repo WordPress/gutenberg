@@ -8,11 +8,12 @@ const IMAGE = {
 	naturalHeight: 600,
 };
 
+// Loading the image through the session, as the canvas does, so the
+// baseline and history start from the loaded image.
 function setupHook( visualSize = { width: 600, height: 400 } ) {
-	const view = renderHook( () =>
-		useMediaEditorState( { cropper: { image: IMAGE } } )
-	);
+	const view = renderHook( () => useMediaEditorState() );
 	act( () => {
+		view.result.current.setSourceImage( IMAGE );
 		view.result.current.cropper.setVisualSize( visualSize );
 	} );
 	return view;
@@ -24,20 +25,6 @@ describe( 'useMediaEditorState', () => {
 			const { result } = renderHook( () => useMediaEditorState() );
 
 			expect( result.current.cropOptions.aspectRatioValue ).toBe( '0' );
-		} );
-
-		it( 'merges initial cropper and cropOptions overrides', () => {
-			const { result } = renderHook( () =>
-				useMediaEditorState( {
-					cropper: { image: IMAGE },
-					cropOptions: { aspectRatioValue: '1' },
-				} )
-			);
-
-			expect( result.current.cropper.state.image ).toEqual( IMAGE );
-			expect( result.current.cropOptions ).toEqual( {
-				aspectRatioValue: '1',
-			} );
 		} );
 
 		it( 'starts with isDirty=false and no undo / redo', () => {
@@ -54,9 +41,8 @@ describe( 'useMediaEditorState', () => {
 		it( 'counts an aspect-ratio preset change as a session edit only', () => {
 			// No visual size is reported, so picking a ratio changes the
 			// preset without reshaping the crop.
-			const { result } = renderHook( () =>
-				useMediaEditorState( { cropper: { image: IMAGE } } )
-			);
+			const { result } = renderHook( () => useMediaEditorState() );
+			act( () => result.current.setSourceImage( IMAGE ) );
 
 			act( () => result.current.setAspectRatioValue( '1' ) );
 
