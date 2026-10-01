@@ -9,6 +9,16 @@ interface TrustedHTML {
 	toJSON: () => string;
 }
 
+/**
+ * Minimal ambient type for the part of the DOM Trusted Types
+ * `TrustedTypePolicyFactory` interface (`globalThis.trustedTypes`) used here.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/TrustedTypePolicyFactory/isHTML
+ */
+interface TrustedTypePolicyFactory {
+	isHTML: ( value: unknown ) => value is TrustedHTML;
+}
+
 declare const dangerousHTMLBrand: unique symbol;
 
 /**
@@ -68,8 +78,11 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
  * is an artifact of how `innerHTML` works, not a security boundary. Content
  * that isn't safe to render as HTML isn't made safe by this function.
  *
- * @param html Raw HTML string, or a native `TrustedHTML` value from a
- *             site-provided Trusted Types policy, to render.
+ * @param  html Raw HTML string, or a native `TrustedHTML` value from a
+ *              site-provided Trusted Types policy, to render.
+ *
+ * @throws {TypeError} If `html` is neither a string nor a native `TrustedHTML`
+ *                     value.
  *
  * @return An opaque token the `data-wp-html` directive recognizes as trusted HTML.
  *
@@ -89,6 +102,14 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
  * ```
  */
 export function asDangerousHTML( html: string | TrustedHTML ): DangerousHTML {
+	const { trustedTypes } = globalThis as {
+		trustedTypes?: TrustedTypePolicyFactory;
+	};
+	if ( typeof html !== 'string' && ! trustedTypes?.isHTML( html ) ) {
+		throw new TypeError(
+			'asDangerousHTML() expects a string or a native TrustedHTML value.'
+		);
+	}
 	const token = Object.freeze( Object.create( null ) ) as DangerousHTML;
 	trustedHtmlByToken.set( token, html );
 	return token;

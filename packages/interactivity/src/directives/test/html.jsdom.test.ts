@@ -4,7 +4,7 @@ import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
 import { hydratedIslands, toVdom } from '../../vdom';
 import { store } from '../../store';
-import { asDangerousHTML } from '../../html';
+import { asDangerousHTML, type DangerousHTML } from '../../html';
 
 let namespaceCount = 0;
 
@@ -98,6 +98,41 @@ describe( 'data-wp-html', () => {
 		await act( () => {
 			// @ts-expect-error Testing an invalid runtime value on purpose.
 			state.html = null;
+		} );
+		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
+	} );
+
+	it( 'keeps the existing content when a getter throws from asDangerousHTML()', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			state: {
+				isValid: false,
+				get html(): DangerousHTML {
+					return asDangerousHTML(
+						( state.isValid
+							? '<strong>Hi</strong>'
+							: null ) as string
+					);
+				},
+			},
+		} );
+
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>fallback</p></div>'
+		);
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+
+		const target = region.querySelector( 'div' )!;
+		expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+
+		await act( () => {
+			state.isValid = true;
+		} );
+		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
+
+		await act( () => {
+			state.isValid = false;
 		} );
 		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
 	} );
