@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Navigation Link: Add background image, size, and gradient support, withheld from the empty wrapper the same way as border, shadow and spacing.
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
