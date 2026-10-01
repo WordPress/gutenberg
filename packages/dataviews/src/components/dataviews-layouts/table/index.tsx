@@ -20,6 +20,7 @@ import {
 	useHasAPossibleBulkAction,
 	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
+	BulkActionToolbar,
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
@@ -311,13 +312,42 @@ function ViewTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const showBulkActions =
+		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		const tableHead = tableHeaderRef.current;
+		const ownerDocument = tableHead?.ownerDocument;
+		if (
+			showBulkActions &&
+			tableHead?.contains( ownerDocument?.activeElement ?? null )
+		) {
+			bulkSelectionRef.current?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! showBulkActions &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableSelectionRef.current?.focus();
+		}
+		hadSelectionRef.current = showBulkActions;
+	}, [ showBulkActions ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
 		enabledHorizontal: !! actions?.length,
 	} );
 
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const disableHeaderControls = showBulkActions;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -372,6 +402,11 @@ function ViewTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = getTableColumns( view, fields );
+	const columnCount =
+		columns.length +
+		( hasPrimaryColumn ? 1 : 0 ) +
+		( hasBulkActions ? 1 : 0 ) +
+		( actions?.length ? 1 : 0 );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -400,7 +435,7 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData ) {
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -467,13 +502,18 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
+					ref={ tableHeaderRef }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
 					} ) }
 					onContextMenu={ handleHeaderContextMenu }
 				>
-					<tr className="dataviews-view-table__row">
+					<tr
+						className="dataviews-view-table__row"
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ disableHeaderControls ? 'true' : undefined }
+					>
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
@@ -481,6 +521,7 @@ function ViewTable< Item >( {
 								onContextMenu={ handleHeaderContextMenu }
 							>
 								<BulkSelectionCheckbox
+									checkboxRef={ tableSelectionRef }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
 									data={ data }
@@ -582,6 +623,30 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
+					{ ( hasBulkActions || isActionInProgress ) && (
+						<tr
+							className="dataviews-view-table__bulk-actions-row"
+							hidden={ ! showBulkActions }
+						>
+							<td colSpan={ columnCount }>
+								<div
+									className="dataviews-view-table__bulk-actions-overlay"
+									ref={ bulkActionsRef }
+									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+									inert={ isLoading ? 'true' : undefined }
+								>
+									<BulkActionToolbar
+										onActionInProgressChange={
+											setIsActionInProgress
+										}
+										selectionCheckboxRef={
+											bulkSelectionRef
+										}
+									/>
+								</div>
+							</td>
+						</tr>
+					) }
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
@@ -590,12 +655,7 @@ function ViewTable< Item >( {
 							<tbody key={ `group-${ groupName }` }>
 								<tr className="dataviews-view-table__group-header-row">
 									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 ) +
-											( actions?.length ? 1 : 0 )
-										}
+										colSpan={ columnCount }
 										className="dataviews-view-table__group-header-cell"
 									>
 										{ view.groupBy?.showLabel === false

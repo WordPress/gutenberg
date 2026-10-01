@@ -561,7 +561,7 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.BulkActionToolbar`
+-   `DataViews.BulkActionToolbar` (deprecated; renders nothing because `DataViews.Layout` includes bulk actions)
 -   `DataViews.ViewConfig`
 
 #### example

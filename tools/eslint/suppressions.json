@@ -5110,14 +5110,6 @@
 			"count": 1
 		}
 	},
-	"packages/dataviews/src/components/dataviews-bulk-actions/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 4
-		}
-	},
 	"packages/dataviews/src/components/dataviews-filters/filter.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -5149,11 +5141,6 @@
 		}
 	},
 	"packages/dataviews/src/components/dataviews-picker-footer/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
