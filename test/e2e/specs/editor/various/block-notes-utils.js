@@ -137,11 +137,29 @@ class BlockNoteUtils {
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
-		await expect(
-			this.#getNotesSurface().getByRole( 'treeitem', {
-				name: `Note: ${ content }`,
-			} )
-		).toBeVisible();
+		await expect( this.getThread( content ) ).toBeVisible();
+	}
+
+	/**
+	 * Locates a note thread in the notes sidebar or floating notes.
+	 *
+	 * @param {string} content Text of the thread's root note.
+	 */
+	getThread( content ) {
+		return this.#getNotesSurface().getByRole( 'treeitem', {
+			name: `Note: ${ content }`,
+		} );
+	}
+
+	/**
+	 * Locates a snackbar notice.
+	 *
+	 * @param {string} text Text of the notice.
+	 */
+	getNotice( text ) {
+		return this.#page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: text } );
 	}
 
 	/**
@@ -171,6 +189,21 @@ class BlockNoteUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
+	}
+
+	/**
+	 * Deletes a note through its actions menu and waits for the delete to
+	 * finish.
+	 *
+	 * @param {number} [index] Index of the note's "Actions" button.
+	 */
+	async deleteNote( index = 0 ) {
+		await this.clickBlockNoteActionMenuItem( 'Delete', index );
+		await this.#page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+		await expect( this.getNotice( 'Note deleted.' ) ).toBeVisible();
 	}
 }
 
