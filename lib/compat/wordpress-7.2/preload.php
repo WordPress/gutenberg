@@ -67,6 +67,43 @@ function _gutenberg_get_site_editor_screen_post_types() {
 }
 
 /**
+ * Returns the path that serves the fields of the site when the screen being
+ * loaded is the identity one, from its `p` query arg.
+ *
+ * The site editor and the extensible site editor both show the site fields
+ * at `/identity`: packages/edit-site/src/components/sidebar-identity and
+ * routes/identity. The site is the `site` entity of the `root` kind rather
+ * than a post type, hence a function of its own.
+ *
+ * The path must match the request of the `getFieldsConfig` core data
+ * resolver, see packages/core-data/src/resolvers.js.
+ *
+ * @return string[] The path of the `wp/v2/fields` route for the site, empty
+ *                  for any other screen.
+ */
+function _gutenberg_get_site_fields_preload_paths() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only picks what to preload.
+	$path = isset( $_GET['p'] ) && is_string( $_GET['p'] ) ? sanitize_text_field( wp_unslash( $_GET['p'] ) ) : '';
+	// The router keeps the search of the route in `p`.
+	$path     = explode( '?', $path )[0];
+	$segments = explode( '/', trim( $path, '/' ) );
+
+	if ( 'identity' !== $segments[0] ) {
+		return array();
+	}
+
+	return array(
+		add_query_arg(
+			array(
+				'kind' => 'root',
+				'name' => 'site',
+			),
+			'/wp/v2/fields'
+		),
+	);
+}
+
+/**
  * Preloads the fields of the post types the post editor or the site editor
  * lists.
  *
@@ -74,7 +111,8 @@ function _gutenberg_get_site_editor_screen_post_types() {
  * the post fields, see `registerPostTypeSchema` in
  * packages/editor/src/dataviews/store/private-actions.ts. The post editor
  * reads the fields of the edited post type; the site editor those of the
- * edited post, if any, and of the post types of the screen it opens on.
+ * edited post, if any, and of the post types of the screen it opens on, or
+ * those of the site when it opens on the identity screen.
  *
  * @param array                   $paths   REST API paths to preload.
  * @param WP_Block_Editor_Context $context Block editor context.
@@ -91,7 +129,12 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 		$post_types = array_merge( $post_types, _gutenberg_get_site_editor_screen_post_types() );
 	}
 
-	return array_merge( $paths, _gutenberg_get_post_type_fields_preload_paths( $post_types ) );
+	$paths = array_merge( $paths, _gutenberg_get_post_type_fields_preload_paths( $post_types ) );
+	if ( 'core/edit-site' === $context->name ) {
+		$paths = array_merge( $paths, _gutenberg_get_site_fields_preload_paths() );
+	}
+
+	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
 
@@ -135,7 +178,8 @@ function _gutenberg_get_route_post_types() {
 }
 
 /**
- * Preloads the fields of the post types the route being loaded lists or edits.
+ * Preloads the fields of the post types the route being loaded lists or edits,
+ * or those of the site for the identity route.
  *
  * A page booted by `@wordpress/boot` prints a preloading middleware of its own
  * with the paths every one of its routes needs, see the `page.php` template of
@@ -149,13 +193,16 @@ function _gutenberg_get_route_post_types() {
  * attached to the handle and printed along with it.
  */
 function _gutenberg_preload_route_entity_fields() {
-	$paths = _gutenberg_get_post_type_fields_preload_paths( _gutenberg_get_route_post_types() );
+	$paths = array_merge(
+		_gutenberg_get_post_type_fields_preload_paths( _gutenberg_get_route_post_types() ),
+		_gutenberg_get_site_fields_preload_paths()
+	);
 	if ( empty( $paths ) ) {
 		return;
 	}
 
 	// `rest_preload_api_request()` only keeps the responses that succeeded, so
-	// a post type the current user cannot read leaves the request to the
+	// an entity whose fields the current user cannot read leaves the request to the
 	// client rather than preloading the error.
 	$preload_data = array_reduce( $paths, 'rest_preload_api_request', array() );
 	if ( empty( $preload_data ) ) {
