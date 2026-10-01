@@ -1,12 +1,17 @@
 import { useMemo, useState } from '@wordpress/element';
-import { Badge } from '@wordpress/ui';
+import { Badge, Link } from '@wordpress/ui';
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 
 const fileDetailsDescription = (
 	<>
-		Size, dimensions, and type of the uploaded file.{ ' ' }
-		<a href="https://wordpress.org/documentation/">Learn more</a>
+		WordPress records these details when the file is uploaded.{ ' ' }
+		<Link
+			href="https://wordpress.org/documentation/article/media-library-screen/"
+			openInNewTab
+		>
+			Learn more about the Media Library
+		</Link>
 	</>
 );
 
