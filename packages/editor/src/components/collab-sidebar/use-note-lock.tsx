@@ -46,15 +46,14 @@ export function useNoteLock(): {
 			 ).lockedNoteActions,
 			isPostLocked: !! (
 				getCurrentPostAttribute( 'meta' ) as
-					| { _wp_notes_locked?: boolean }
-					| undefined
+					{ _wp_notes_locked?: boolean } | undefined
 			 )?._wp_notes_locked,
 		};
 	}, [] );
 
 	return useMemo( () => {
 		const lockedActions: ReadonlySet< NoteAction > = new Set(
-			isPostLocked ? NOTE_LOCK_ACTIONS : settingsLockedActions ?? []
+			isPostLocked ? NOTE_LOCK_ACTIONS : ( settingsLockedActions ?? [] )
 		);
 
 		return {
